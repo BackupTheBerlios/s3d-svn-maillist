@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r780 - trunk/apps/s3dvt
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r780%20-%20trunk/apps/s3dvt&In-Reply-To=%3C200710190000.l9J00r8h031499%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000771.html">
+   <LINK REL="Next"  HREF="000773.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r780 - trunk/apps/s3dvt</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r780%20-%20trunk/apps/s3dvt&In-Reply-To=%3C200710190000.l9J00r8h031499%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r780 - trunk/apps/s3dvt">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 02:00:53 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000771.html">[S3d-svn] r779 - trunk/apps/s3dvt
+</A></li>
+        <LI>Next message: <A HREF="000773.html">[S3d-svn] r781 - trunk/apps/s3d_x11gate
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#772">[ date ]</a>
+              <a href="thread.html#772">[ thread ]</a>
+              <a href="subject.html#772">[ subject ]</a>
+              <a href="author.html#772">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 02:00:52 +0200 (Fri, 19 Oct 2007)
+New Revision: 780
+
+Modified:
+   trunk/apps/s3dvt/terminal.c
+Log:
+s3dvt: Remove unused init_line(..) and term_addstring(..)
+
+
+Modified: trunk/apps/s3dvt/terminal.c
+===================================================================
+--- trunk/apps/s3dvt/terminal.c	2007-10-19 00:00:38 UTC (rev 779)
++++ trunk/apps/s3dvt/terminal.c	2007-10-19 00:00:52 UTC (rev 780)
+@@ -501,17 +501,3 @@
+ 	}
+ 	gotnewdata = 1;
+ }
+-static void init_line(void)
+-{
+-	int i;
+-	for (i = 0;i &lt; MAX_LINES;i++) {
+-		clear_line(i);
+-	}
+-}
+-static void term_addstring(char *toprint)
+-{
+-	char *ns;
+-	for (ns = toprint;ns[0];ns++) {
+-		term_addchar(ns[0]);
+-	}  /*  better method */
+-}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000771.html">[S3d-svn] r779 - trunk/apps/s3dvt
+</A></li>
+	<LI>Next message: <A HREF="000773.html">[S3d-svn] r781 - trunk/apps/s3d_x11gate
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#772">[ date ]</a>
+              <a href="thread.html#772">[ thread ]</a>
+              <a href="subject.html#772">[ subject ]</a>
+              <a href="author.html#772">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

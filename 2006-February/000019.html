@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r23 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r23%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602031613.k13GDoun008510%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000018.html">
+   <LINK REL="Next"  HREF="000020.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r23 - trunk/apps/olsrs3d</H1>
+    <B>marec at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r23%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602031613.k13GDoun008510%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r23 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Fri Feb  3 17:13:50 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000018.html">[S3d-svn] r22 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000020.html">[S3d-svn] r24 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#19">[ date ]</a>
+              <a href="thread.html#19">[ thread ]</a>
+              <a href="subject.html#19">[ subject ]</a>
+              <a href="author.html#19">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-02-03 17:13:48 +0100 (Fri, 03 Feb 2006)
+New Revision: 23
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+Log:
+svn tests
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-02-03 13:26:47 UTC (rev 22)
++++ trunk/apps/olsrs3d/main.c	2006-02-03 16:13:48 UTC (rev 23)
+@@ -1,11 +1,15 @@
+ #include &lt;stdio.h&gt;
+ #include &lt;s3d.h&gt;
+-#include &lt;unistd.h&gt;	/* sleep() */
+-#include &lt;string.h&gt; /* strncpy() */
+-#include &lt;math.h&gt;	/* sqrt() */
++#include &lt;unistd.h&gt;		/* sleep() */
++#include &lt;string.h&gt; 		/* strncpy() */
++#include &lt;math.h&gt;		/* sqrt() */
++#include &lt;getopt.h&gt;		/*  getopt() */
+ #include &quot;olsrs3d.h&quot;
+ #define SPEED		10.0
+ 
++int DEBUG = 0;
++char OLSR_HOST[256];
++
+ int node_count=-1;
+ int alpha=0;
+ int obj,mesh;
+@@ -13,8 +17,28 @@
+ float bottom=-1.0;
+ float left=-1.0;
+ 
++
++
+ /***
+  *
++ * print usage info
++ *
++ ***/
++
++void print_usage( void ) {
++
++	printf( &quot;Usage is olsrs3d [options]\n&quot; );
++	printf( &quot;Options:\n&quot; );
++	printf( &quot;   -?\tprint this short help\n&quot; );
++	printf( &quot;   -d\tenable debug mode\n&quot; );
++	printf( &quot;   -h\tconnect to olsr node [default: localhost]\n&quot; );
++
++}
++
++
++
++/***
++ *
+  * calculate distance between 2 vectors =&gt; <A HREF="http://en.wikipedia.org/wiki/Euclidean_distance">http://en.wikipedia.org/wiki/Euclidean_distance</A>
+  *
+  *   p1   =&gt;   vector of node 1
+@@ -185,17 +209,50 @@
+ 		s3d_flags_on(mesh,S3D_OF_VISIBLE);
+ 	}
+ }
+-int main(int argc, char **argv)
+-{
+ 
+-	char host[256];
+-    if (argc &gt; 1) {
+-		strncpy(host,argv[1],256);
+-    } else {
+-		strncpy(host,&quot;127.0.0.1&quot;,256);
++
++
++int main( int argc, char *argv[] ) {
++
++	char s3d_options[256];
++
++	strncpy(OLSR_HOST,&quot;127.0.0.1&quot;,256);
++
++	while ( ( argc &gt; 1 ) &amp;&amp; ( argv[1][0] == '-' ) ) {
++
++		switch ( argv[1][1] ) {
++
++			case 'd':
++				DEBUG = 1;
++				printf( &quot;debug mode enabled ...\n&quot; );
++				break;
++
++			case '?':
++				print_usage();
++				return (0);
++
++			case 'h':
++				strncpy(OLSR_HOST,argv[1][1],256);
++				break;
++
++			default:
++				printf( &quot;Bad option %s\n&quot;, argv[1] );
++				print_usage();
++				return (0);
++
++		}
++
++		++argv;
++		--argc;
++
+ 	}
+-	process_init(host);
+-	if (!net_init(host))
++
++	printf( &quot;OLSR_HOST: %s\n&quot;, OLSR_HOST );
++
++	return (0);
++
++	process_init(OLSR_HOST);
++	if (!net_init(OLSR_HOST))
+ 	{
+ 
+ 		if (!s3d_init(&amp;argc,&amp;argv,&quot;olsrs3d&quot;))
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000018.html">[S3d-svn] r22 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000020.html">[S3d-svn] r24 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#19">[ date ]</a>
+              <a href="thread.html#19">[ thread ]</a>
+              <a href="subject.html#19">[ subject ]</a>
+              <a href="author.html#19">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

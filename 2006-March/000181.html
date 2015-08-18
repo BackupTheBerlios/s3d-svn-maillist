@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r185 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r185%20-%20trunk&In-Reply-To=%3C200603152012.k2FKCmwc009043%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000180.html">
+   <LINK REL="Next"  HREF="000182.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r185 - trunk</H1>
+    <B>ankon at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r185%20-%20trunk&In-Reply-To=%3C200603152012.k2FKCmwc009043%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r185 - trunk">ankon at berlios.de
+       </A><BR>
+    <I>Wed Mar 15 21:12:48 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000180.html">[S3d-svn] r184 - trunk/config
+</A></li>
+        <LI>Next message: <A HREF="000182.html">[S3d-svn] r186 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#181">[ date ]</a>
+              <a href="thread.html#181">[ thread ]</a>
+              <a href="subject.html#181">[ subject ]</a>
+              <a href="author.html#181">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: ankon
+Date: 2006-03-15 21:12:37 +0100 (Wed, 15 Mar 2006)
+New Revision: 185
+
+Modified:
+   trunk/configure.ac
+Log:
+Use the usual tools (big hammer, axe, spiked poles and silver bullets)
+to convince autotools that we don't need, want, have, or look like
+Fortran. Saves a few cycles for configure-ing :)
+
+
+
+Modified: trunk/configure.ac
+===================================================================
+--- trunk/configure.ac	2006-03-15 19:58:58 UTC (rev 184)
++++ trunk/configure.ac	2006-03-15 20:12:37 UTC (rev 185)
+@@ -8,6 +8,17 @@
+ 
+ AM_INIT_AUTOMAKE([dist-bzip2])
+ 
++# XXXHACK: lame attempt to avoid fortran in libtool and elsewhere
++tagnames=`echo $tagnames | sed s,F77,,g | sed s,FC,,g` # for AC_PROG_LIBTOOL
++# we could skip the test here, as we don't USE F77/FC anywhere, but, the user may
++# have a reason. 
++if test x${F77} = x; then
++	F77=nonexistent
++fi
++if test x${FC} = x; then
++	FC=nonexistent
++fi
++
+ dnl Checks for programs.
+ AC_PROG_CC
+ AC_PROG_INSTALL
+@@ -16,6 +27,7 @@
+ AC_PATH_X
+ AC_PATH_XTRA
+ AC_PROG_LIBTOOL
++
+ AC_HEADER_DIRENT
+ AC_HEADER_STDC
+ AC_CHECK_HEADERS(fcntl.h sys/ioctl.h sys/time.h unistd.h)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000180.html">[S3d-svn] r184 - trunk/config
+</A></li>
+	<LI>Next message: <A HREF="000182.html">[S3d-svn] r186 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#181">[ date ]</a>
+              <a href="thread.html#181">[ thread ]</a>
+              <a href="subject.html#181">[ subject ]</a>
+              <a href="author.html#181">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

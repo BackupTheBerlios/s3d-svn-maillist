@@ -1,0 +1,469 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r496 - in trunk: . apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r496%20-%20in%20trunk%3A%20.%20apps/s3dosm&In-Reply-To=%3C200611302107.kAUL7RwK021245%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000488.html">
+   <LINK REL="Next"  HREF="000490.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r496 - in trunk: . apps/s3dosm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r496%20-%20in%20trunk%3A%20.%20apps/s3dosm&In-Reply-To=%3C200611302107.kAUL7RwK021245%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r496 - in trunk: . apps/s3dosm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Thu Nov 30 22:07:27 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000488.html">[S3d-svn] r495 - trunk/apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000490.html">[S3d-svn] r497 - in trunk: . libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#489">[ date ]</a>
+              <a href="thread.html#489">[ thread ]</a>
+              <a href="subject.html#489">[ subject ]</a>
+              <a href="author.html#489">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-11-30 22:07:27 +0100 (Thu, 30 Nov 2006)
+New Revision: 496
+
+Modified:
+   trunk/
+   trunk/apps/s3dosm/db.c
+   trunk/apps/s3dosm/draw.c
+   trunk/apps/s3dosm/main.c
+   trunk/apps/s3dosm/nav.c
+   trunk/apps/s3dosm/s3dosm.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1184 at kero</A>:  dotslash | 2006-11-30 22:07:20 +0100
+ - draw with sqlite backend
+ - some colors to the ways
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1169
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1184
+
+Modified: trunk/apps/s3dosm/db.c
+===================================================================
+--- trunk/apps/s3dosm/db.c	2006-11-30 17:34:15 UTC (rev 495)
++++ trunk/apps/s3dosm/db.c	2006-11-30 21:07:27 UTC (rev 496)
+@@ -223,11 +223,11 @@
+ }
+ int db_create()
+ {
+-	db_exec(&quot;CREATE TABLE tag (tag_id INT, tagkey TEXT, tagvalue TEXT);&quot;, NULL, 0);
+-	db_exec(&quot;CREATE TABLE layer (layer_id INTEGER PRIMARY KEY, name TEXT, UNIQUE(layer_id));&quot;, NULL, 0);
+ 	db_exec(&quot;CREATE TABLE node (layer_id INT, node_id INTEGER PRIMARY KEY, latitude DOUBLE PRECISION, longitude DOUBLE PRECISION, altitude DOUBLE PRECISION, visible BOOLEAN, tag_id INT, UNIQUE(layer_id,node_id));&quot;,NULL,0);
+ 	db_exec(&quot;CREATE TABLE segment (layer_id INT, seg_id INTEGER PRIMARY KEY, node_from INT, node_to INT, tag_id INT, way_id INT,UNIQUE(layer_id,seg_id));&quot;, NULL, 0);
+ 	db_exec(&quot;CREATE TABLE way (layer_id INTEGER, way_id INTEGER PRIMARY KEY, tag_id INT, UNIQUE(layer_id,way_id));&quot;, NULL, 0);
++	db_exec(&quot;CREATE TABLE layer (layer_id INTEGER PRIMARY KEY, name TEXT, UNIQUE(layer_id));&quot;, NULL, 0);
++	db_exec(&quot;CREATE TABLE tag (tag_id INT, tagkey TEXT, tagvalue TEXT);&quot;, NULL, 0);
+ 	db_flush();
+ 	return(0);
+ }
+
+Modified: trunk/apps/s3dosm/draw.c
+===================================================================
+--- trunk/apps/s3dosm/draw.c	2006-11-30 17:34:15 UTC (rev 495)
++++ trunk/apps/s3dosm/draw.c	2006-11-30 21:07:27 UTC (rev 496)
+@@ -25,18 +25,18 @@
+ #include &lt;math.h&gt;	/* sin(), cos() */
+ #include &lt;stdio.h&gt;	/* printf() */
+ #include &lt;string.h&gt;	/* strcmp() */
+-#include &lt;stdlib.h&gt; /* atoi() */
++#include &lt;stdlib.h&gt; /* atoi(),malloc(), calloc(), free() */
+ struct vdata{
+ 	layer_t *layer;
+-	double lonsum,latsum;
++	float lonsum,latsum;
+ 	int n;
+ 	int oid;
+ 	int vnum;
+ };
+ 
+-void calc_earth_to_eukl(double lon, double lat, double *x)
++void calc_earth_to_eukl(float lon, float lat, float *x)
+ {
+-	double la,lo;
++	float la,lo;
+ 	la=lat*M_PI/180.0;
+ 	lo=lon*M_PI/180.0;
+ 	x[0]=ESIZE*sin(lo) *cos(la);
+@@ -50,7 +50,7 @@
+ 	
+ 	if (t-&gt;type==T_NODE)
+ 	{
+-		double x[3];
++		float x[3];
+ 		node_t *node=NODE_T(t);
+ 		node-&gt;vid=v-&gt;vnum;
+ 		calc_earth_to_eukl(node-&gt;lon,node-&gt;lat,x);
+@@ -90,80 +90,144 @@
+ 	}
+ }
+ 
+-void draw_add_segments(object_t *t, void *data)
+-{/*
+-	struct vdata *v=data;
+-	tag_t *tag;
+-	int color;
++
++static int lastid=-1;
++struct waylist {
++	int node_from,node_to;
++	int seg_id;
++	int node_from_l,node_from_r;	/* vertex id's for corners */
++	int node_to_l,node_to_r;
+ 	
+-	if (t-&gt;type==T_SEGMENT)
++};
++struct nodelist {
++	float la,lo,alt;		
++};
++struct nodelist nodelist_p[2];
++int				nodelist_n=0;
++
++struct waylist 	*waylist_p=NULL;
++int 			waylist_n=0;
++int 			waylist_bufn=0;
++
++/* just fetches node information and puts it in some simple 6x float buffer */
++int insert_node(void *data, int argc, char **argv, char **azColName)
++{
++	struct nodelist *np=data;	/* get the nodepointer */
++	int i;
++	for(i=0; i&lt;argc; i++){
++		if (argv[i]) {
++			if (0==strcmp(azColName[i],&quot;longitude&quot;))			np[nodelist_n].lo=strtod(argv[i],NULL);
++			else if (0==strcmp(azColName[i],&quot;latitude&quot;))		np[nodelist_n].la=strtod(argv[i],NULL);
++			else if (0==strcmp(azColName[i],&quot;altitude&quot;))		np[nodelist_n].alt=strtod(argv[i],NULL);
++		}
++	}
++	nodelist_n++;
++	return(0);
++}
++int select_waytype(void *data, int argc, char **argv, char **azColName)
++{
++	int i;
++	for(i=0; i&lt;argc; i++){
++		if (argv[i]) {
++			if (0==strcmp(argv[i],&quot;motorway&quot;))				*((int *) data)=1;	
++			else if (0==strcmp(argv[i],&quot;motorway_link&quot;))	*((int *) data)=2;	
++			else if (0==strcmp(argv[i],&quot;primary&quot;))			*((int *) data)=3;	
++			else if (0==strcmp(argv[i],&quot;secondary&quot;))		*((int *) data)=4;	
++			else if (0==strcmp(argv[i],&quot;residential&quot;))		*((int *) data)=5;	
++		}
++	}
++	return(0);
++}
++/* draw waylist, clear the queue */
++void waylist_draw()
++{
++	char query[MAXQ];
++	float x[6];
++	int i,vert=0;
++	int way_obj;
++	int waytype=0;
++/*	printf(&quot;way: %d - %d segments\n&quot;,lastid,waylist_n);*/
++	way_obj=s3d_new_object();
++	if (lastid!=-1) {
++		snprintf(query,MAXQ,&quot;SELECT tagvalue FROM tag WHERE tag_id=(SELECT tag_id FROM way WHERE way_id=%d) AND tagkey='highway';&quot;,lastid);
++		db_exec(query, select_waytype, &amp;waytype);
++	}
++	switch (waytype)
+ 	{
+-		node_t *from, *to;
+-		segment_t *seg=SEGMENT_T(t);
+-		from=NODE_T(avl_find(v-&gt;layer-&gt;tree,seg-&gt;from));
+-		to=NODE_T(avl_find(v-&gt;layer-&gt;tree,seg-&gt;to));
++		case 1:s3d_push_material(way_obj,0.3,0.3,1,	0.3,0.3,1.0,	0.3,0.3,1.0);	/* motorway */
++		case 2:s3d_push_material(way_obj,0.5,0.5,0.8,	0.5,0.5,0.8,	0.5,0.5,0.8);	/* motorway_link*/
++		case 3:s3d_push_material(way_obj,1.0,0.6,0.2,	1.0,0.6,0.2, 	1.0,0.6,0.2);	/* primary */
++		case 4:s3d_push_material(way_obj,1.0,1.0,0.0,	1.0,1.0,0.0, 	1.0,1.0,0.0);	/* secondary */
++		case 5:s3d_push_material(way_obj,1.0,0.4,0.4,	1.0,0.4,0.4, 	1.0,0.4,0.4);	/* residential */
++		default:s3d_push_material(way_obj,1,1,1,		1,1,1,			1,1,1); /* default */
++	}
+ 
+-		color=0;
+-		/ * TODO: look at the ways using it, not the segments  * /
+-		if (NULL!=(tag=tag_get(OBJECT_T(seg), &quot;highway&quot;)))
++	for (i=0;i&lt;waylist_n;i++)
++	{
++		float len;
++		nodelist_n=0;
++		snprintf(query,MAXQ,&quot;SELECT longitude, latitude, altitude FROM node WHERE node_id IN (%d,%d);&quot;,waylist_p[i].node_from,waylist_p[i].node_to);
++		db_exec(query, insert_node,(void *)nodelist_p);
++		calc_earth_to_eukl(nodelist_p[0].lo,nodelist_p[0].la,x);
++		calc_earth_to_eukl(nodelist_p[1].lo,nodelist_p[1].la,x+3);
++		s3d_push_vertices(way_obj,x,2);
++		s3d_push_line(way_obj, vert,vert+1, 0);
++		vert+=2;
++		len=sqrt( (x[0]-x[3])*(x[0]-x[3]) + (x[1]-x[4])*(x[1]-x[4]) + (x[2]-x[5])*(x[2]-x[5]));
++		if (len&gt;1000.0)
+ 		{
+-			if (0==(strcmp(tag-&gt;v,&quot;motorway&quot;))) color=1;
+-			else if (0==(strcmp(tag-&gt;v,&quot;motorway_link&quot;))) color=2;
+-			else if (0==(strcmp(tag-&gt;v,&quot;primary&quot;))) color=3;
+-			else if (0==(strcmp(tag-&gt;v,&quot;secondary&quot;))) color=4;
+-			else if (0==(strcmp(tag-&gt;v,&quot;residential&quot;))) color=5;
++			printf(&quot;length of segment is %3.3f\n&quot;,len);
++			printf(&quot;segment id %d: from id %d to id %d\n&quot;,waylist_p[i].seg_id,waylist_p[i].node_from,waylist_p[i].node_to);
++			printf(&quot;segment no %d of way %d: %f %f %f -&gt; &quot;,i, lastid,nodelist_p[0].la, nodelist_p[0].lo, nodelist_p[0].alt);
++			printf(&quot;%f %f %f\n&quot;,nodelist_p[1].la, nodelist_p[1].lo, nodelist_p[1].alt);
+ 		}
+-		if (from!=NULL &amp;&amp; to!=NULL)
+-		{
+-			s3d_push_line(v-&gt;oid,from-&gt;vid,to-&gt;vid,color);
+-			v-&gt;layer-&gt;visible=1;
+-		}
+-	}*/
++
++		s3d_link(way_obj,oidy);
++	}
++	s3d_flags_on(way_obj,S3D_OF_VISIBLE);
++	waylist_n=0;
++		
+ }
+-int draw_layer(layer_t *layer)
++void waylist_add(struct waylist *p)
+ {
+-	struct vdata v;
+-	int oid;
+-	oid=s3d_new_object();
+-	s3d_link(oid,oidy);
+-	v.layer=layer;
+-	v.oid=oid;
+-	v.vnum=0;
+-	v.n=0;
+-	v.lonsum=v.latsum=0;
+-	s3d_push_material(oid,1,1,1,		1,1,1,		1,1,1); /* default */
+-	s3d_push_material(oid,0.3,0.3,1,	0.3,0.3,1.0,	0.3,0.3,1.0);	/* motorway */
+-	s3d_push_material(oid,0.5,0.5,0.8,	0.5,0.5,0.8,	0.5,0.5,0.8);	/* motorway_link*/
+-	s3d_push_material(oid,1.0,1.0,0.0,	1.0,1.0,0.0, 	1.0,1.0,0.0);	/* primary */
+-	s3d_push_material(oid,0.8,0.8,0.2,	0.8,0.8,0.2, 	0.8,0.8,0.2);	/* secondary */
+-	s3d_push_material(oid,0.7,0.7,0.4,	0.7,0.7,0.4, 	0.7,0.7,0.4);	/* secondary */
+-	/*
+-	avl_tree_trav(layer-&gt;tree,draw_add_vertices,(void *)&amp;v);
+-	avl_tree_trav(layer-&gt;tree,draw_add_segments,(void *)&amp;v);*/
+-	layer-&gt;center_lo=(v.lonsum)/v.n;
+-	layer-&gt;center_la=(v.latsum)/v.n;	
+-	s3d_flags_on(oid,S3D_OF_VISIBLE);
+-	return(0);
++	if (waylist_n&gt;=waylist_bufn) {
++		waylist_bufn+=64;
++		waylist_p=realloc(waylist_p,sizeof(struct waylist)*waylist_bufn);
++	}
++	waylist_p[waylist_n].node_to= p-&gt;node_to;
++	waylist_p[waylist_n].node_from= p-&gt;node_from;
++	waylist_n++;
+ }
+-static int lastid=-1;
+-int way_group(void *NotUsed, int argc, char **argv, char **azColName){
++
++int way_group(void *NotUsed, int argc, char **argv, char **azColName)
++{
+ 	int i;
+-	int id;
++	int id=-1;
++	struct waylist p;
++	p.node_from=-1;
++	p.node_to=-1;
++	p.seg_id=-1;
+ 	for(i=0; i&lt;argc; i++){
+-		if (argv[i])
+-		if (0==strcmp(azColName[i],&quot;way_id&quot;)){
+-			id=(argv[i]==NULL)?-2:atoi(argv[i]);
++		if (argv[i]) {
++			if (0==strcmp(azColName[i],&quot;way_id&quot;))				id=atoi(argv[i]);
++			else if (0==strcmp(azColName[i],&quot;node_from&quot;))		p.node_from=atoi(argv[i]);
++			else if (0==strcmp(azColName[i],&quot;node_to&quot;))			p.node_to=atoi(argv[i]);
++			else if (0==strcmp(azColName[i],&quot;seg_id&quot;))			p.seg_id=atoi(argv[i]);
+ 		}
+-		printf(&quot;%s = %s\n&quot;, azColName[i], argv[i] ? argv[i] : &quot;NULL&quot;); 
++		/* 	printf(&quot;%s = %s\n&quot;, azColName[i], argv[i] ? argv[i] : &quot;NULL&quot;);  */
+ 	}
++	if (p.node_from==p.node_to)	/* skip */
++		return(0);
+ 	if ((lastid!=id) &amp;&amp; (id!=-1)) {
++		waylist_draw();
+ 		/* flush/draw the list, add new  */
+-		printf(&quot;new list: %d\n&quot;,id);
++/*		printf(&quot;new list: %d\n&quot;,id);*/
++		waylist_add(&amp;p);
+ 	} else {
+ 		/* add id to the list */
++		waylist_add(&amp;p);
+ 	}
+ 	lastid=id;
+-	sleep(1);
+ 		
+ 	return 0;
+ }
+@@ -171,15 +235,16 @@
+ void draw_ways(char *filter)
+ {
+ 	char query[MAXQ];
+-	snprintf(query,MAXQ,&quot;SELECT * FROM segment JOIN node WHERE %s AND (node.node_id=segment.node_to OR node.node_id=segment.node_from) ORDER BY way_id;&quot;,filter);
+-/*	snprintf(query,MAXQ,&quot;SELECT DISTINCT way_id,segment.layer_id,node_id,node_from,node_to,longitude,latitude FROM segment JOIN node WHERE %s AND (node.node_id=segment.node_to OR node.node_id=segment.node_from) ORDER BY way_id;&quot;,filter);*/
+-	printf(&quot;query: %s\n&quot;,query);
++	snprintf(query,MAXQ,&quot;SELECT * FROM segment WHERE %s ORDER BY way_id;&quot;,filter);
++/*	snprintf(query,MAXQ,&quot;SELECT DISTINCT way_id,segment.layer_id,node_id,node_from,node_to,longitude,latitude FROM segment JOIN node WHERE %s AND (node.node_id=segment.node_to OR node.node_id=segment.node_from) ORDER BY way_id;&quot;,filter);
++	printf(&quot;query: %s\n&quot;,query);*/
+ 	db_exec(query, way_group,0);
++	waylist_draw(); /* last way */
+ 	printf(&quot;[done]\n&quot;);
+ }
+ void draw_osm()
+ {
+-	draw_ways(&quot;segment.layer_id='osm'&quot;);
++	draw_ways(&quot;segment.layer_id=(SELECT layer_id FROM layer WHERE name='osm')&quot;);
+ }
+ void draw_all_layers()
+ {
+
+Modified: trunk/apps/s3dosm/main.c
+===================================================================
+--- trunk/apps/s3dosm/main.c	2006-11-30 17:34:15 UTC (rev 495)
++++ trunk/apps/s3dosm/main.c	2006-11-30 21:07:27 UTC (rev 496)
+@@ -38,8 +38,8 @@
+ 	if (db_create()) return(-1);
+ 	if (process_args(argc,argv)) return(-1);
+ 	nav_init();
++	nav_autocenter();
+ 	draw_all_layers();
+-	nav_autocenter();
+ 	return(0);
+ }
+ int quit()
+
+Modified: trunk/apps/s3dosm/nav.c
+===================================================================
+--- trunk/apps/s3dosm/nav.c	2006-11-30 17:34:15 UTC (rev 495)
++++ trunk/apps/s3dosm/nav.c	2006-11-30 21:07:27 UTC (rev 496)
+@@ -1,5 +1,9 @@
+ #include &quot;s3dosm.h&quot;
+ #include &lt;s3d.h&gt;
++#include &lt;string.h&gt;	/* strcmp() */
++#include &lt;stdlib.h&gt;	/* strtod() */
++#include &lt;stdio.h&gt;	/* printf() */
++
+ icon_t icons[ICON_NUM]={
+ 		{&quot;objs/accesspoint.3ds&quot;,0},
+ 		{&quot;objs/star.3ds&quot;,0},
+@@ -25,27 +29,34 @@
+ /* center to given latitude longitude */
+ void nav_center(float la, float lo)
+ {
+-	double x[3];
++	float x[3];
+ 	s3d_rotate(oidy,0,-lo,0);
+ 	s3d_rotate(oidx,-(90-la),0,0);
+ 	calc_earth_to_eukl(lo,la,x);
+ 	s3d_translate(oidx,0,-ESIZE*RESCALE,0);
+ 	s3d_scale(oidx,RESCALE);
+ }
+-/* find some good center on our own */
+-void nav_autocenter()
++
++int get_center(void *data, int argc, char **argv, char **azColName)
+ {
++	float *med=(float *)data;
+ 	int i;
+-	float la, lo, n;
+-	la=lo=n=0;
+-	for (i=0;i&lt;layerset.n;i++)
+-		if (layerset.p[i]-&gt;visible)
+-		{
+-			la+=layerset.p[i]-&gt;center_la;
+-			lo+=layerset.p[i]-&gt;center_lo;
+-			n+=1;
++	med[0]=0;
++	med[1]=0;
++	for(i=0; i&lt;argc; i++){
++		if (argv[i]) {
++			if (0==strcmp(azColName[i],&quot;la&quot;))			med[0]=strtod(argv[i],NULL);
++			else if (0==strcmp(azColName[i],&quot;lo&quot;))		med[1]=strtod(argv[i],NULL);
+ 		}
+-	if (n&gt;0)
+-		nav_center(la/n, lo/n);
+-			
++	}
++	return(0);
+ }
++/* find some good center on our own */
++void nav_autocenter()
++{
++	float med[2];
++	char query[]=&quot;SELECT avg(longitude) as lo, avg(latitude) as la FROM node; &quot;;
++	db_exec(query,get_center,med);
++	nav_center(med[0],med[1]);
++	printf(&quot;center to %f,%f\n&quot;,med[0],med[1]);
++}
+
+Modified: trunk/apps/s3dosm/s3dosm.h
+===================================================================
+--- trunk/apps/s3dosm/s3dosm.h	2006-11-30 17:34:15 UTC (rev 495)
++++ trunk/apps/s3dosm/s3dosm.h	2006-11-30 21:07:27 UTC (rev 496)
+@@ -84,9 +84,9 @@
+ 
+ struct _node_t {
+ 	object_t	 base;
+-	double 		 lon;		/* longitude */
+-	double 		 lat;		/* latitude */
+-	double 		 alt;		/* altitude */
++	float 		 lon;		/* longitude */
++	float 		 lat;		/* latitude */
++	float 		 alt;		/* altitude */
+ 	char 		 visible;	/* node visible? 0 = no, 1 = yes, 2 = some sepcial object */
+ 	int 		 vid;		/* vertex id */
+ /*	time_t time;*/
+@@ -130,7 +130,7 @@
+ layer_t *load_kismet_file(char *filename);
+ /* draw.c */
+ void draw_all_layers();
+-void calc_earth_to_eukl(double lon, double lat, double *x);
++void calc_earth_to_eukl(float lon, float lat, float *x);
+ int draw_layer(layer_t *layer);
+ /* nav.c */
+ void nav_init();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000488.html">[S3d-svn] r495 - trunk/apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000490.html">[S3d-svn] r497 - in trunk: . libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#489">[ date ]</a>
+              <a href="thread.html#489">[ thread ]</a>
+              <a href="subject.html#489">[ subject ]</a>
+              <a href="author.html#489">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

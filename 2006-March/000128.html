@@ -1,0 +1,538 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r132 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r132%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603030001.k2301HQX018279%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000127.html">
+   <LINK REL="Next"  HREF="000129.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r132 - trunk/apps/olsrs3d</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r132%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603030001.k2301HQX018279%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r132 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Fri Mar  3 01:01:17 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000127.html">[S3d-svn] r131 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000129.html">[S3d-svn] r133 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#128">[ date ]</a>
+              <a href="thread.html#128">[ thread ]</a>
+              <a href="subject.html#128">[ subject ]</a>
+              <a href="author.html#128">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-03-03 01:01:13 +0100 (Fri, 03 Mar 2006)
+New Revision: 132
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/net.c
+   trunk/apps/olsrs3d/olsrs3d.h
+   trunk/apps/olsrs3d/process.c
+Log:
+remove old code I
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-03-02 23:59:11 UTC (rev 131)
++++ trunk/apps/olsrs3d/main.c	2006-03-03 00:01:13 UTC (rev 132)
+@@ -1,10 +1,9 @@
+ /*
+  * main.c
+  *
+- * Copyright (C) 2005-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *                         Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
+  *                         Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of olsrs3d, an olsr topology visualizer for s3d.
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+@@ -48,12 +47,12 @@
+ int Olsr_node_count_obj = -1;
+ int Byte_count;
+ 
+-int node_count=-1;
+-int alpha=0;
+-int Olsr_node_obj, Olsr_node_inet_obj, Olsr_node_hna_net, mesh;
+-float asp=1.0;
+-float bottom=-1.0;
+-float left=-1.0;
++// int node_count=-1;
++// int alpha=0;
++int Olsr_node_obj, Olsr_node_inet_obj, Olsr_node_hna_net;
++float Asp = 1.0;
++float Bottom = -1.0;
++float Left = -1.0;
+ 
+ float CamPosition[2][3];   /* CamPosition[trans|rot][x-z] */
+ float ZeroPosition[3] = {0,0,0};   /* current position zero position */
+@@ -549,7 +548,7 @@
+ 		s3d_link( Olsr_node_count_obj, 0 );
+ 		s3d_flags_on( Olsr_node_count_obj, S3D_OF_VISIBLE );
+ 		s3d_scale( Olsr_node_count_obj, 0.2 );
+-		s3d_translate( Olsr_node_count_obj, left*3.0, -bottom*3.0-0.2, -3.0 );
++		s3d_translate( Olsr_node_count_obj, Left*3.0, -Bottom*3.0-0.2, -3.0 );
+ 
+ 		Last_olsr_node_count = Olsr_node_count;
+ 
+@@ -564,7 +563,7 @@
+ 		}
+ 	}
+ 
+-	alpha=(alpha+5)%360;
++// 	alpha=(alpha+5)%360;
+ // 	s3d_rotate(mesh,0,alpha,0);
+ 	if(RotateSwitch) {
+ 		Zp_rotate = (Zp_rotate+RotateSpeed)%360;
+@@ -580,7 +579,7 @@
+ {
+ 	s3d_quit();
+ 	net_quit();
+-	process_quit();
++// 	process_quit();
+ }
+ 
+ /***
+@@ -665,18 +664,18 @@
+ 		CamPosition[1][0] = inf-&gt;rot_x;
+ 		CamPosition[1][1] = inf-&gt;rot_y;
+ 		CamPosition[1][2] = inf-&gt;rot_z;
+-		asp=inf-&gt;scale;
+-		if (asp&gt;1.0) /* wide screen */
++		Asp=inf-&gt;scale;
++		if (Asp&gt;1.0) /* wide screen */
+ 		{
+-			bottom=-1.0;
+-			left=-asp;
++			Bottom=-1.0;
++			Left=-Asp;
+ 		} else {  /* high screen */
+-			bottom=(-1.0/asp);
+-			left=-1.0;
++			Bottom=(-1.0/Asp);
++			Left=-1.0;
+ 
+ 		}
+-		s3d_translate(mesh,(-left)*3.0-1.8,bottom*3.0+0.8,-3.0);
+-		s3d_flags_on(mesh,S3D_OF_VISIBLE);
++// 		s3d_translate(mesh,(-Left)*3.0-1.8,Bottom*3.0+0.8,-3.0);
++// 		s3d_flags_on(mesh,S3D_OF_VISIBLE);
+ 	}
+ 	// printf(&quot;%f %f %f\n&quot;,inf-&gt;trans_x,inf-&gt;trans_y,inf-&gt;trans_z);
+ }
+@@ -822,6 +821,7 @@
+ 
+ 	int optchar;
+ 	strncpy( Olsr_host, &quot;127.0.0.1&quot;, 256 );
++	lbuf[0] = '\0';   /* init lbuf */
+ 
+ 	while ( ( optchar = getopt ( argc, argv, &quot;dhH:&quot; ) ) != -1 ) {
+ 
+@@ -856,7 +856,7 @@
+ 
+ 	/* set extern int optind = 0 for parse_args in io.c */
+ 	optind = 0;
+-	process_init(Olsr_host);
++// 	process_init(Olsr_host);
+ 	if (!net_init(Olsr_host))
+ 	{
+ 		if (!s3d_init(&amp;argc,&amp;argv,&quot;olsrs3d&quot;))
+@@ -877,7 +877,7 @@
+ 			s3d_mainloop(mainloop);
+ 			s3d_quit();
+ 			net_quit();
+-			process_quit();
++// 			process_quit();
+ 		}
+ 	}
+ 	return(0);
+
+Modified: trunk/apps/olsrs3d/net.c
+===================================================================
+--- trunk/apps/olsrs3d/net.c	2006-03-02 23:59:11 UTC (rev 131)
++++ trunk/apps/olsrs3d/net.c	2006-03-03 00:01:13 UTC (rev 132)
+@@ -1,10 +1,9 @@
+ /*
+  * net.c
+  *
+- * Copyright (C) 2005-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *                         Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
+  *                         Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of olsrs3d, an olsr topology visualizer for s3d.
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-03-02 23:59:11 UTC (rev 131)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-03-03 00:01:13 UTC (rev 132)
+@@ -1,10 +1,9 @@
+ /*
+  * olsrs3d.h
+  *
+- * Copyright (C) 2005-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *                         Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
+  *                         Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of olsrs3d, an olsr topology visualizer for s3d.
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+@@ -27,13 +26,15 @@
+ 
+ 
+ #define NAMEMAX		128
+-struct t_node {
+-	float pos[3], mov[3];
+-	char name[NAMEMAX];
+-	int obj,s_obj;
+-};
+ 
+ 
++// struct t_node {
++// 	float pos[3], mov[3];
++// 	char name[NAMEMAX];
++// 	int obj,s_obj;
++// };
++
++
+ /* linked list for the all connections */
+ struct olsr_con {
+ 
+@@ -98,26 +99,30 @@
+ extern int Olsr_node_count_obj;
+ extern int Olsr_node_count;
+ extern int Last_olsr_node_count;
++
+ extern int Byte_count;
++
+ extern int ZeroPoint;
+ 
+-extern float bottom,left;
++extern float Bottom, Left;
+ 
+-extern int 	max, new_max;
+-extern float 	*adj;
+-extern int	*adj_obj;
+-extern int	node_count;
+-extern float 	bottom,left;
++// extern float bottom,left;
++//
++// extern int 	max, new_max;
++// extern float 	*adj;
++// extern int	*adj_obj;
++// extern int	node_count;
++// extern float Bottom, Left;
+ 
+ 
+-struct t_node 	*node;
++// struct t_node 	*node;
+ #define MAXLINESIZE 1000 /* lines in a digraph just shouldn't get that longer ... */
+ #define MAXDATASIZE 100 /* max number of bytes we can get at once  */
+ extern char lbuf[MAXLINESIZE];
+ /* process */
+-int process_init();
++// int process_init();
+ int process_main();
+-int process_quit();
++// int process_quit();
+ /* net */
+ int net_init(char *host);
+ int net_main();
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-03-02 23:59:11 UTC (rev 131)
++++ trunk/apps/olsrs3d/process.c	2006-03-03 00:01:13 UTC (rev 132)
+@@ -1,10 +1,9 @@
+ /*
+  * process.c
+  *
+- * Copyright (C) 2005-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *                         Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
+  *                         Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of olsrs3d, an olsr topology visualizer for s3d.
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+@@ -31,12 +30,15 @@
+ #include &lt;stdlib.h&gt; 	/* rand(), malloc(), realloc(), free(), strtof() */
+ #include &lt;s3d.h&gt;
+ #include &quot;olsrs3d.h&quot;
++
+ char lbuf[MAXLINESIZE];
+-int max,new_max;
+-float 	*adj,*new_adj;
+-int		*adj_obj,*new_adj_obj;
+ 
+ 
++// int max,new_max;
++// float 	*adj,*new_adj;
++// int		*adj_obj,*new_adj_obj;
++
++
+ /***
+  *
+  * create new or alter connection between 2 nodes
+@@ -142,18 +144,18 @@
+  *   l    =&gt;   length ? ETX ?
+  *
+  ***/
+-
++/*
+ int add_adj(int n1, int n2, float l)
+ {
+ 	int o,i,j;
+ 	i=n1&lt;n2?n1:n2;
+ 	j=n1&gt;n2?n1:n2;
+ 	if ((n1&lt;max) &amp;&amp; (n2&lt;max))
+-		/* connection already exists */
++		/ * connection already exists * /
+ 		o=adj_obj[i*max+j];
+ 	else o=-1;
+ 	if (o==-1)
+-	{ /* need to generate new object .. */
++	{ / * need to generate new object .. * /
+ 		o=s3d_new_object();
+ 		s3d_push_material(o,1.0,1.0,1.0,
+ 							1.0,1.0,1.0,
+@@ -162,14 +164,14 @@
+ 		s3d_push_polygon(o,0,4,5,0);
+ 		s3d_push_polygon(o,3,1,2,0);
+ 
+-/*		printf(&quot;new adjacent object %d between %d and %d\n&quot;,o,i,j);*/
++/ *		printf(&quot;new adjacent object %d between %d and %d\n&quot;,o,i,j);* /
+ 	}
+ 	new_adj_obj[i*new_max+j]=o;
+ 	new_adj[i*new_max+j]=l;
+ 	new_adj[j*new_max+i]=l;
+ 
+ 	return(0);
+-}
++}*/
+ 
+ 
+ 
+@@ -178,7 +180,7 @@
+  * redo all connections between nodes ?
+  *
+  ***/
+-
++/*
+ int resize_adj()
+ {
+ 	int i,ind;
+@@ -187,26 +189,26 @@
+ 
+ 	if (new_max&gt;1)
+ 	{
+-		/* leave out one ? */
++		/ * leave out one ? * /
+ 		for (i=(new_max-2);i&gt;=0;i--)
+ 		{
+ 			memmove(new_adj+new_max*i,new_adj+(new_max-1)*i,sizeof(float)*(new_max-1));
+ 			memmove(new_adj_obj+new_max*i,new_adj_obj+(new_max-1)*i,sizeof(float)*(new_max-1));
+-			ind=i*new_max+(new_max-1);				/* the right edge */
++			ind=i*new_max+(new_max-1);				/ * the right edge * /
+ 			new_adj[ind]=0.0f;
+ 			new_adj_obj[ind]=-1;
+-			ind=(new_max-1)*new_max+i;				/* the bottom edge */
++			ind=(new_max-1)*new_max+i;				/ * the bottom edge * /
+ 			new_adj[ind]=0.0f;
+ 			new_adj_obj[ind]=-1;
+ 		}
+ 	}
+-	new_adj[new_max*new_max-1]=0.0f;			/* the right bottom corner */
+-	new_adj_obj[new_max*new_max-1]=-1;			/* the right bottom corner */
++	new_adj[new_max*new_max-1]=0.0f;			/ * the right bottom corner * /
++	new_adj_obj[new_max*new_max-1]=-1;			/ * the right bottom corner * /
+ 	return(0);
+ }
++*/
+ 
+ 
+-
+ /***
+  *
+  * get pointer to olsr node or create new node if node string could not be found
+@@ -307,35 +309,35 @@
+  *   return node id
+  *
+  ***/
+-
++/*
+ int get_node_num(char *str)
+ {
+-	int i,j;   /* inc vars */
+-	float f;   /* where does it get its value from ? */
++	int i,j;   / * inc vars * /
++	float f;   / * where does it get its value from ? * /
+ 
+ 	for (i=0;i&lt;new_max;i++)
+ 	{
+ 		if (strncmp(node[i].name,str,NAMEMAX)==0)
+ 		{
+-			return(i); /* return the index */
++			return(i); / * return the index * /
+ 		}
+ 	}
+ 
+-	/* i==new_max now */
++	/ * i==new_max now * /
+ 	new_max++;
+ 
+ 	node=realloc(node,sizeof(struct t_node)*new_max);
+ 
+-	/* create new node */
++	/ * create new node * /
+ 	strncpy(node[i].name,str,NAMEMAX);
+ 	node[i].obj=s3d_clone(Olsr_node_obj);
+ 	s3d_flags_on(node[i].obj,S3D_OF_VISIBLE);
+ 
+-	/* create node text and attach (link) it to the node */
++	/ * create node text and attach (link) it to the node * /
+ 	node[i].s_obj=s3d_draw_string(str,&amp;f);
+ 	s3d_link(node[i].s_obj, node[i].obj);
+ 	s3d_translate(node[i].s_obj,-f/2,-2,0);
+-	/*s3d_rotate(node[i].s_obj,0,180,0);*/
++	/ *s3d_rotate(node[i].s_obj,0,180,0);* /
+ 	s3d_flags_on(node[i].s_obj,S3D_OF_VISIBLE);
+ 
+ 	printf(&quot;new %s [%d], Olsr_node_obj nr. %d - %d\n&quot;,str,i,node[i].obj,node[i].s_obj);
+@@ -349,24 +351,24 @@
+ 	resize_adj();
+ 
+ 	return(i);
+-}
++}*/
+ 
+-int commit_input()
++/*int commit_input()
+ {
+ 	int 	i,j;
+ 	float 	*swap_adj;
+ 	int  	*swap_adj_obj;
+ 	char	nc_str[20];
+-/* 	printf(&quot;committing input ... \n&quot;);
++	printf(&quot;committing input ... \n&quot;);
+ 
+-	/ * remove old adjacent objects ... * /
++     / * remove old adjacent objects ... * /
+  	for (i=0;i&lt;max;i++)
+  		for (j=i+1;j&lt;max;j++)
+  			if (adj_obj[i*max+j]!=-1)
+  				if (new_adj_obj[i*new_max+j]==-1)
+  				{
+-   / *				printf(&quot;old link does not exist anymore ...\n&quot;);* /
+- 					/ * this link does not exist anymore ... * /
++ 				printf(&quot;old link does not exist anymore ...\n&quot;);
++ 					/ * this link does not exist anymore ...
+  					s3d_del_object(adj_obj[i*max+j]);
+  				}
+ 	/ * swap the matrices * /
+@@ -375,11 +377,11 @@
+ 
+  	adj=new_adj;
+  	adj_obj=new_adj_obj;
+-	*/
+ 
+ 
+-	/* if we have more nodes redraw node count */
+-	/* what if we have less nodes ?? */
++
++	/ * if we have more nodes redraw node count * /
++	/ * what if we have less nodes ?? * /
+ 	if (new_max&gt;max)
+ 	{
+ 		swap_adj=realloc(swap_adj,sizeof(float)*new_max*new_max);
+@@ -394,23 +396,25 @@
+ 
+ 	}
+ 
+-/*
++
+  	new_adj=swap_adj;
+  	new_adj_obj=swap_adj_obj;
+- 	*/
+-	/* setting new maxsize */
++
++	/ * setting new maxsize * /
+ 	max=new_max;
+-	/* resetting the input-matrices*/
+-	/*
++	/ * resetting the input-matrices * /
++
+  	for (i=0;i&lt;max;i++)
+  	for (j=0;j&lt;max;j++)
+  	{
+  		new_adj[i*max+j]=0.0;
+  		new_adj_obj[i*max+j]=-1;
+  	}
+- 	*/
++
+ 	return(0);
+ }
++
++*/
+ /*
+  int parse_line( int lbuf_index ) {
+ 
+@@ -665,7 +669,7 @@
+ }
+ 
+ 
+-int process_init()
++/* int process_init()
+ {
+ 	lbuf[0]='\0';
+ 	max=new_max=0;
+@@ -684,3 +688,4 @@
+ 	if (new_adj_obj!=NULL) 	free(new_adj_obj);
+ 	return(0);
+ }
++*/
+\ No newline at end of file
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000127.html">[S3d-svn] r131 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000129.html">[S3d-svn] r133 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#128">[ date ]</a>
+              <a href="thread.html#128">[ thread ]</a>
+              <a href="subject.html#128">[ subject ]</a>
+              <a href="author.html#128">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r406 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r406%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200609172143.k8HLhEA3015100%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000398.html">
+   <LINK REL="Next"  HREF="000400.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r406 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r406%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200609172143.k8HLhEA3015100%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r406 - in trunk: . server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Sep 17 23:43:14 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000398.html">[S3d-svn] r405 - in trunk: . apps/olsrs3d libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000400.html">[S3d-svn] r407 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#399">[ date ]</a>
+              <a href="thread.html#399">[ thread ]</a>
+              <a href="subject.html#399">[ subject ]</a>
+              <a href="author.html#399">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-17 23:43:13 +0200 (Sun, 17 Sep 2006)
+New Revision: 406
+
+Modified:
+   trunk/
+   trunk/server/main.c
+   trunk/server/shm.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r988 at balthasar</A>:  dotslash | 2006-09-17 23:43:09 +0200
+ - shm quickfix
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:986
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:988
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2006-09-17 20:04:23 UTC (rev 405)
++++ trunk/server/main.c	2006-09-17 21:43:13 UTC (rev 406)
+@@ -68,10 +68,9 @@
+ {
+ #ifdef SIGS
+ 	int ret,i;
+-	struct timespec t={0,200*1000*1000}; /* 200 mili seconds */
++	struct timespec t={0,500*1000*1000}; /* 500 mili seconds */
+ 	if (signal(SIGCHLD, sigchld_handler) == SIG_ERR);
+ 	kidpid=fork();
+-	running=1;
+ 	if (kidpid==-1)
+ 	{
+ 		errsf(&quot;rc_init()&quot;,&quot;*sobsob*, can't fork&quot;);
+
+Modified: trunk/server/shm.c
+===================================================================
+--- trunk/server/shm.c	2006-09-17 20:04:23 UTC (rev 405)
++++ trunk/server/shm.c	2006-09-17 21:43:13 UTC (rev 406)
+@@ -44,7 +44,7 @@
+ extern int procs_n;
+ struct t_shmcb waiting_comblock;
+ 
+-key_t *data;
++key_t *data=NULL;
+ char ftoken[]=&quot;/tmp/.s3d&quot;;
+ int shmid;
+ int mkey;	/* increasing key */
+@@ -141,12 +141,15 @@
+ 	/* detach from the segment: */
+ 	s3dprintf(LOW,&quot;shm_quit()...&quot;);
+ 	unlink(ftoken);
+-	data[0]=data[1]=0;
+-	s3dprintf(MED,&quot;shm_quit():removing init block&quot;);
+-	if (shmdt(data) == -1) 
+-		errn(&quot;shm_quit():shmdt()&quot;,errno);
+-	if (shmctl(shmid, IPC_RMID, NULL) == -1) 
+-		errn(&quot;shm_quit():shmctl()&quot;,errno);
++	if (data!=NULL)
++	{
++		data[0]=data[1]=0;
++		s3dprintf(MED,&quot;shm_quit():removing init block&quot;);
++		if (shmdt(data) == -1) 
++			errn(&quot;shm_quit():shmdt()&quot;,errno);
++		if (shmctl(shmid, IPC_RMID, NULL) == -1) 
++			errn(&quot;shm_quit():shmctl()&quot;,errno);
++	}
+ 	return(0);
+ }
+ int shm_remove(struct t_process *p)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000398.html">[S3d-svn] r405 - in trunk: . apps/olsrs3d libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000400.html">[S3d-svn] r407 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#399">[ date ]</a>
+              <a href="thread.html#399">[ thread ]</a>
+              <a href="subject.html#399">[ subject ]</a>
+              <a href="author.html#399">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

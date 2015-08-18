@@ -1,0 +1,353 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r219 - in trunk: . Documentation/s3dapi client objs server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r219%20-%20in%20trunk%3A%20.%20Documentation/s3dapi%20client%20objs%20server&In-Reply-To=%3C200603191955.k2JJt6mI004166%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000214.html">
+   <LINK REL="Next"  HREF="000216.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r219 - in trunk: . Documentation/s3dapi client objs server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r219%20-%20in%20trunk%3A%20.%20Documentation/s3dapi%20client%20objs%20server&In-Reply-To=%3C200603191955.k2JJt6mI004166%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r219 - in trunk: . Documentation/s3dapi client objs server">dotslash at berlios.de
+       </A><BR>
+    <I>Sun Mar 19 20:55:06 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000214.html">[S3d-svn] r218 - in trunk: . apps/dot_mcp
+</A></li>
+        <LI>Next message: <A HREF="000216.html">[S3d-svn] r220 - in trunk: . apps/s3d_x11gate apps/s3dgps example extras
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#215">[ date ]</a>
+              <a href="thread.html#215">[ thread ]</a>
+              <a href="subject.html#215">[ subject ]</a>
+              <a href="author.html#215">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-03-19 20:54:11 +0100 (Sun, 19 Mar 2006)
+New Revision: 219
+
+Added:
+   trunk/Documentation/s3dapi/README
+   trunk/objs/AUTHORS
+   trunk/objs/s3d_logo.3ds
+Modified:
+   trunk/
+   trunk/client/proto_out.c
+   trunk/client/s3d.h
+   trunk/objs/Makefile.am
+   trunk/server/TODO
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r335 at balthasar</A>:  dotslash | 2006-03-19 20:53:54 +0100
+ - adding authors and objects. 
+ - adding s3dapi README
+ - s3d.h fix (just signed/unsigned stuff)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:333
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:335
+
+Added: trunk/Documentation/s3dapi/README
+===================================================================
+--- trunk/Documentation/s3dapi/README	2006-03-19 19:33:49 UTC (rev 218)
++++ trunk/Documentation/s3dapi/README	2006-03-19 19:54:11 UTC (rev 219)
+@@ -0,0 +1,8 @@
++You can read this online on
++
++<A HREF="http://s3d.berlios.de/doc">http://s3d.berlios.de/doc</A>
++
++or compile it yourself, for example with
++
++docbook2html s3dapi.docbook
++
+
+Modified: trunk/client/proto_out.c
+===================================================================
+--- trunk/client/proto_out.c	2006-03-19 19:33:49 UTC (rev 218)
++++ trunk/client/proto_out.c	2006-03-19 19:54:11 UTC (rev 219)
+@@ -43,7 +43,7 @@
+ 	return(_queue_want_object());  /*  TODO: well ... */
+ }
+ /*  clones an object */
+-int s3d_clone(unsigned long oid)
++int s3d_clone(int oid)
+ {
+ 	uint32_t res;
+ 	res=s3d_new_object();
+@@ -52,7 +52,7 @@
+ }
+ 
+ /*  changes the target of a clone-object */
+-int s3d_clone_target(unsigned long oid, unsigned long toid)
++int s3d_clone_target(int oid, int toid)
+ {
+ 	uint32_t buf[2];
+ 	buf[0]=htonl(oid);
+@@ -62,7 +62,7 @@
+ 	return oid;
+ }
+ /*  deletes an object */
+-int s3d_del_object(unsigned long oid)
++int s3d_del_object(int oid)
+ {
+ 	uint32_t res=htonl(oid);
+ 	net_send(S3D_P_C_DEL_OBJ,(char *)&amp;res,4);
+@@ -70,7 +70,7 @@
+ }
+ /*  creates a link from object oid_from to object oid_to in order to copy */
+ /*  translations/rotations */
+-int s3d_link(unsigned long oid_from, unsigned long oid_to)
++int s3d_link(int oid_from, int oid_to)
+ {
+ 	uint32_t buf[2];
+ 	buf[0]=htonl(oid_from);
+@@ -79,7 +79,7 @@
+ 	return(0);
+ }
+ /*  remove the link to another object */
+-int s3d_unlink(unsigned long oid)
++int s3d_unlink(int oid)
+ {
+ 	uint32_t buf;
+ 	buf=htonl(oid);
+@@ -213,7 +213,7 @@
+ /* 	free(buf); */
+ 	return(0);
+ }
+-int s3d_push_polygon(int object, int v1, int v2, int v3, int material)
++int s3d_push_polygon(int object, unsigned long v1, unsigned long v2, unsigned long v3, unsigned long material)
+ {
+ 	char				buf[4+4*4],*ptr;
+ 	int					len=4+4*4;
+@@ -227,7 +227,7 @@
+ 	net_send(S3D_P_C_PUSH_POLY,buf,len);
+ 	return(0);
+ }
+-int s3d_push_line(int object, int v1, int v2, int material)
++int s3d_push_line(int object, unsigned long v1, unsigned long v2, unsigned long material)
+ {
+ 	char				buf[4+3*4],*ptr;
+ 	int					len=4+3*4;
+@@ -632,7 +632,7 @@
+ 	}
+ 	return(0);
+ }
+-int s3d_pep_material_texture(int object, unsigned long mat, unsigned long tex)
++int s3d_pep_material_texture(int object, unsigned long tex)
+ {
+ 	char				buf[4*2],*ptr;
+ 	ptr=buf;
+@@ -642,7 +642,7 @@
+ 	return(0);
+ }
+ /*  load data (which has width w and height h) into object, texture tex at position (xpos,ypos) */
+-int s3d_load_texture(int object, unsigned long tex, unsigned short xpos, unsigned short ypos, unsigned short w, unsigned short h, char *data)
++int s3d_load_texture(int object, unsigned long tex, unsigned short xpos, unsigned short ypos, unsigned short w, unsigned short h, unsigned char *data)
+ {
+ 	char				buf[MF_LEN+4],*ptr;
+ 	int 				linestep,lines,i;
+
+Modified: trunk/client/s3d.h
+===================================================================
+--- trunk/client/s3d.h	2006-03-19 19:33:49 UTC (rev 218)
++++ trunk/client/s3d.h	2006-03-19 19:54:11 UTC (rev 219)
+@@ -99,9 +99,9 @@
+ 
+ int s3d_pep_materials_a(int object, float *mbuf, unsigned short n);
+ int s3d_load_materials_a(int object, float *mbuf, unsigned long start, unsigned short n);
+-int s3d_push_polygon(int object, int v1, int v2, int v3, int material);
++int s3d_push_polygon(int object, unsigned long v1, unsigned long v2, unsigned long v3, unsigned long material);
+ int s3d_push_polygons(int object, unsigned long *pbuf, unsigned short n);
+-int s3d_push_line(int object, int v1, int v2, int material);
++int s3d_push_line(int object, unsigned long v1, unsigned long v2, unsigned long material);
+ int s3d_push_lines(int object, unsigned long *lbuf, unsigned short n);
+ int s3d_push_texture(int object, unsigned short w, unsigned short h);
+ int s3d_pop_vertex(int object, unsigned long n);
+@@ -113,23 +113,23 @@
+ int s3d_pep_polygon_normals(int object, float *nbuf,unsigned short n);
+ int s3d_pep_polygon_tex_coord(int object, float x1, float y1, float x2, float y2, float x3, float y3);
+ int s3d_pep_polygon_tex_coords(int object, float *tbuf,unsigned short n);
+-int s3d_pep_material_texture(int object, unsigned long mat, unsigned long tex);
++int s3d_pep_material_texture(int object, unsigned long tex);
+ int s3d_pep_vertex(int object, float x, float y, float z);
+ int s3d_pep_vertices(int object, float *vbuf,unsigned short n);
+ int s3d_pep_line(int object, int v1, int v2, int material);
+ int s3d_pep_lines(int object, unsigned long *lbuf,unsigned short n);
+ int s3d_load_polygon_normals(int object, float *nbuf,unsigned long start, unsigned short n);
+ int s3d_load_polygon_tex_coords(int object, float *tbuf, unsigned long start, unsigned short n);
+-int s3d_load_texture(int object, unsigned long tex, unsigned short xpos, unsigned short ypos, unsigned short w, unsigned short h, char *data);
++int s3d_load_texture(int object, unsigned long tex, unsigned short xpos, unsigned short ypos, unsigned short w, unsigned short h, unsigned char *data);
+ 
+ int s3d_new_object();
+-int s3d_del_object(unsigned long oid);
++int s3d_del_object(int oid);
+ 
+-int s3d_clone(unsigned long oid);
+-int s3d_clone_target(unsigned long oid, unsigned long toid);
++int s3d_clone(int oid);
++int s3d_clone_target(int oid, int toid);
+ 
+-int s3d_link(unsigned long oid_from, unsigned long oid_to);
+-int s3d_unlink(unsigned long oid);
++int s3d_link(int oid_from, int oid_to);
++int s3d_unlink(int oid);
+ 
+ int s3d_flags_on(int object, unsigned long flags);
+ int s3d_flags_off(int object, unsigned long flags);
+
+Added: trunk/objs/AUTHORS
+===================================================================
+--- trunk/objs/AUTHORS	2006-03-19 19:33:49 UTC (rev 218)
++++ trunk/objs/AUTHORS	2006-03-19 19:54:11 UTC (rev 219)
+@@ -0,0 +1,72 @@
++All those objects in here (except for martin sterns, from whom I don't know yet) are 
++may be used under the term GPL, that means you may distribute and modify or alter them
++as you want, if you give full credits and redistribute them under GPL again. 
++Too bad we don't have source code for them. maybe GPL is no good idea, but o well. :)
++
++I know, some of them (especially mine) are mostly junk, but maybe you find them useful ;)
++
++### Mike Greanz (mog):
++
++btn_close.3ds
++btn_maximize.3ds
++btn_minimize.3ds
++btn_rotate.3ds
++
++### Andreas Langer:
++
++accesspoint.3ds
++accesspoint_inet.3ds
++internet.3ds
++
++### Martin Stern:
++
++martin_stern/*
++
++### Christiane Weidauer (yd):
++
++abs2.3ds
++abs.3ds
++cube.3ds
++cubey.3ds
++cubeyholes.3ds
++miu.3ds
++spikeybla.3ds
++star.3ds
++
++
++### Simon Wunderlich:
++
++arrow.3ds
++big_p.3ds
++bigsphere.3ds
++comp.3ds
++clock_bg.3ds
++dot.3ds
++dotdot.3ds
++duno.3ds
++dirstep.3ds
++folder.3ds
++geometry.3ds
++go_button.3ds
++katze_body.3ds
++katze_leg.3ds
++katze_tail.3ds
++lil_p.3ds
++materials.3ds
++meshnode.3ds
++new_sphere.3ds
++notes.3ds
++reset.3ds
++ringsystem.3ds
++rotate.3ds
++s3d_logo.3ds
++sec_p.3ds
++snow_body.3ds
++snow_foot.3ds
++snow_head.3ds
++sphere.3ds
++weirdball.3ds
++wtf.3ds
++xyz.3ds
++
++
+
+Modified: trunk/objs/Makefile.am
+===================================================================
+--- trunk/objs/Makefile.am	2006-03-19 19:33:49 UTC (rev 218)
++++ trunk/objs/Makefile.am	2006-03-19 19:54:11 UTC (rev 219)
+@@ -41,5 +41,8 @@
+ 	big_p.3ds \
+ 	spikeybla.3ds \
+ 	btn_close.3ds \
+-	btn_minimize.3ds
++	btn_minimize.3ds \
++	btn_rotate.3ds \
++	btn_maximize.3ds \
++	AUTHORS
+ 
+
+Added: trunk/objs/s3d_logo.3ds
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/objs/s3d_logo.3ds
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Modified: trunk/server/TODO
+===================================================================
+--- trunk/server/TODO	2006-03-19 19:33:49 UTC (rev 218)
++++ trunk/server/TODO	2006-03-19 19:54:11 UTC (rev 219)
+@@ -14,7 +14,6 @@
+ 
+  
+ IDEAS:
+- - how to define special keys? e.g. the GLUT way, the SDL way, the ANSI way ...
+  - ipv6, unix socket support. 
+  - put whole processes in display lists?!
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000214.html">[S3d-svn] r218 - in trunk: . apps/dot_mcp
+</A></li>
+	<LI>Next message: <A HREF="000216.html">[S3d-svn] r220 - in trunk: . apps/s3d_x11gate apps/s3dgps example extras
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#215">[ date ]</a>
+              <a href="thread.html#215">[ thread ]</a>
+              <a href="subject.html#215">[ subject ]</a>
+              <a href="author.html#215">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,38 @@
+From lazhur at mail.berlios.de  Wed Mar 30 21:45:40 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Wed, 30 Mar 2011 21:45:40 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-7-1-g454e570
+Message-ID: <20110330194540.74F61480044@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  454e5706c3ed760f6cd609b357def5851ac2250d (commit)
+      from  31adcbc082190a7f46442a9a91ec4ec47c860b2b (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 454e5706c3ed760f6cd609b357def5851ac2250d
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Wed Mar 30 21:45:01 2011 +0200
+
+    Add actual dependency for virtual package libsdl-dev
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/control |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

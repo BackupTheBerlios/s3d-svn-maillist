@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r769 - trunk/libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r769%20-%20trunk/libs3dw&In-Reply-To=%3C200710182359.l9INxAhJ030734%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000760.html">
+   <LINK REL="Next"  HREF="000762.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r769 - trunk/libs3dw</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r769%20-%20trunk/libs3dw&In-Reply-To=%3C200710182359.l9INxAhJ030734%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r769 - trunk/libs3dw">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 01:59:10 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000760.html">[S3d-svn] r768 - trunk/example
+</A></li>
+        <LI>Next message: <A HREF="000762.html">[S3d-svn] r770 - trunk/apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#761">[ date ]</a>
+              <a href="thread.html#761">[ thread ]</a>
+              <a href="subject.html#761">[ subject ]</a>
+              <a href="author.html#761">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 01:59:09 +0200 (Fri, 19 Oct 2007)
+New Revision: 769
+
+Modified:
+   trunk/libs3dw/arrange.c
+   trunk/libs3dw/scrollbar.c
+   trunk/libs3dw/textbox.c
+   trunk/libs3dw/widget.c
+Log:
+libs3dw: Mark local functions and variables as static
+
+
+Modified: trunk/libs3dw/arrange.c
+===================================================================
+--- trunk/libs3dw/arrange.c	2007-10-18 23:59:02 UTC (rev 768)
++++ trunk/libs3dw/arrange.c	2007-10-18 23:59:09 UTC (rev 769)
+@@ -118,7 +118,7 @@
+ }
+ 
+ #define DIST 40.0
+-void s3dw_follow(void)
++static void s3dw_follow(void)
+ {
+ 	s3dw_widget *w, *root = s3dw_getroot();
+ 	int i;
+
+Modified: trunk/libs3dw/scrollbar.c
+===================================================================
+--- trunk/libs3dw/scrollbar.c	2007-10-18 23:59:02 UTC (rev 768)
++++ trunk/libs3dw/scrollbar.c	2007-10-18 23:59:09 UTC (rev 769)
+@@ -28,7 +28,7 @@
+ #include &lt;stdlib.h&gt; /* malloc() */
+ #include &lt;string.h&gt; /* strdup() */
+ 
+-void s3dw_scrollbar_draw(s3dw_widget *widget)
++static void s3dw_scrollbar_draw(s3dw_widget *widget)
+ {
+ 	s3dw_scrollbar *scrollbar = (s3dw_scrollbar *)widget;
+ 	float back_vertices[3*32];
+
+Modified: trunk/libs3dw/textbox.c
+===================================================================
+--- trunk/libs3dw/textbox.c	2007-10-18 23:59:02 UTC (rev 768)
++++ trunk/libs3dw/textbox.c	2007-10-18 23:59:09 UTC (rev 769)
+@@ -28,7 +28,7 @@
+ #include &lt;stdlib.h&gt; /* malloc() */
+ #include &lt;string.h&gt; /* strdup() */
+ 
+-void s3dw_textbox_draw(s3dw_widget *widget)
++static void s3dw_textbox_draw(s3dw_widget *widget)
+ {
+ 	float h, w;
+ 	float vertices[12*3];
+
+Modified: trunk/libs3dw/widget.c
+===================================================================
+--- trunk/libs3dw/widget.c	2007-10-18 23:59:02 UTC (rev 768)
++++ trunk/libs3dw/widget.c	2007-10-18 23:59:09 UTC (rev 769)
+@@ -79,7 +79,7 @@
+ 		widget-&gt;flags |= S3DW_VISIBLE;
+ }
+ /* removes an widget from it's parent, should have been appended before */
+-void s3dw_widget_remove(s3dw_widget *widget)
++static void s3dw_widget_remove(s3dw_widget *widget)
+ {
+ 	s3dw_widget *parent = widget-&gt;parent;
+ 	int i, stackpos;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000760.html">[S3d-svn] r768 - trunk/example
+</A></li>
+	<LI>Next message: <A HREF="000762.html">[S3d-svn] r770 - trunk/apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#761">[ date ]</a>
+              <a href="thread.html#761">[ thread ]</a>
+              <a href="subject.html#761">[ subject ]</a>
+              <a href="author.html#761">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

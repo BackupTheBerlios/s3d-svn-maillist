@@ -1,0 +1,231 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r393 - in trunk: apps/dot_mcp apps/s3dfm apps/s3dgps	example libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r393%20-%20in%20trunk%3A%20apps/dot_mcp%20apps/s3dfm%20apps/s3dgps%0A%09example%20libs3d&In-Reply-To=%3C200609160121.k8G1LwHu005560%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000385.html">
+   <LINK REL="Next"  HREF="000387.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r393 - in trunk: apps/dot_mcp apps/s3dfm apps/s3dgps	example libs3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r393%20-%20in%20trunk%3A%20apps/dot_mcp%20apps/s3dfm%20apps/s3dgps%0A%09example%20libs3d&In-Reply-To=%3C200609160121.k8G1LwHu005560%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r393 - in trunk: apps/dot_mcp apps/s3dfm apps/s3dgps	example libs3d">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep 16 03:21:58 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000385.html">[S3d-svn] r392 - in trunk: apps/dot_mcp apps/olsrs3d	apps/s3d_x11gate apps/s3dfm apps/s3dgps apps/s3dvt example libs3d
+</A></li>
+        <LI>Next message: <A HREF="000387.html">[S3d-svn] r394 - in trunk: example libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#386">[ date ]</a>
+              <a href="thread.html#386">[ thread ]</a>
+              <a href="subject.html#386">[ subject ]</a>
+              <a href="author.html#386">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-16 03:21:58 +0200 (Sat, 16 Sep 2006)
+New Revision: 393
+
+Modified:
+   trunk/apps/dot_mcp/menu.c
+   trunk/apps/s3dfm/parse.c
+   trunk/apps/s3dgps/s3dgps.c
+   trunk/example/filebrowser.c
+   trunk/example/modelloader.c
+   trunk/libs3d/Makefile.am
+   trunk/libs3d/modelread.c
+Log:
+- gefrickel
+- TODO: libg3d/libs3d autohell
+
+Modified: trunk/apps/dot_mcp/menu.c
+===================================================================
+--- trunk/apps/dot_mcp/menu.c	2006-09-16 00:59:49 UTC (rev 392)
++++ trunk/apps/dot_mcp/menu.c	2006-09-16 01:21:58 UTC (rev 393)
+@@ -36,11 +36,11 @@
+ static int go=-1;
+ static int act;
+ static struct menu_entry menu[]={
+-		{&quot;objs/comp.model&quot;,&quot;terminal&quot;,&quot;s3dvt&quot;,				0,0},
+-		{&quot;objs/comp.model&quot;,&quot;olsrs3d&quot;,&quot;olsrs3d&quot;,				0,0},
+-		{&quot;objs/comp.model&quot;,&quot;s3d_x11gate&quot;,&quot;s3d_x11gate&quot;,		0,0},
+-		{&quot;objs/comp.model&quot;,&quot;filebrowser&quot;,&quot;filebrowser&quot;,		0,0}, 
+-		{&quot;objs/comp.model&quot;,&quot;logout&quot;,&quot;LOGOUT&quot;,					0,0}, 
++		{&quot;objs/comp.3ds&quot;,&quot;terminal&quot;,&quot;s3dvt&quot;,				0,0},
++		{&quot;objs/comp.3ds&quot;,&quot;olsrs3d&quot;,&quot;olsrs3d&quot;,				0,0},
++		{&quot;objs/comp.3ds&quot;,&quot;s3d_x11gate&quot;,&quot;s3d_x11gate&quot;,		0,0},
++		{&quot;objs/comp.3ds&quot;,&quot;filebrowser&quot;,&quot;filebrowser&quot;,		0,0}, 
++		{&quot;objs/comp.3ds&quot;,&quot;logout&quot;,&quot;LOGOUT&quot;,					0,0}, 
+ };
+ void menu_click(int oid)
+ {
+
+Modified: trunk/apps/s3dfm/parse.c
+===================================================================
+--- trunk/apps/s3dfm/parse.c	2006-09-16 00:59:49 UTC (rev 392)
++++ trunk/apps/s3dfm/parse.c	2006-09-16 01:21:58 UTC (rev 393)
+@@ -102,7 +102,7 @@
+ 				{
+ 				   if (ext!=NULL)
+ 				   {
+-					   if (0==strncmp(ext,&quot;.model&quot;,strlen(ext)&lt;4?strlen(ext):4))
++					   if (0==strncmp(ext,&quot;.3ds&quot;,strlen(ext)&lt;4?strlen(ext):4))
+ 							   list[n].type=T_GEOMETRY;
+ 					   else if (0==strncmp(ext,&quot;.mp3&quot;,strlen(ext)&lt;4?strlen(ext):4))
+ 							   list[n].type=T_MUSIC;
+
+Modified: trunk/apps/s3dgps/s3dgps.c
+===================================================================
+--- trunk/apps/s3dgps/s3dgps.c	2006-09-16 00:59:49 UTC (rev 392)
++++ trunk/apps/s3dgps/s3dgps.c	2006-09-16 01:21:58 UTC (rev 393)
+@@ -62,7 +62,7 @@
+ int 				 frame=0;
+ struct point_t		 posicon;
+ int					 iconlist[ICON_MAX];
+-char				*iconnames[]={&quot;objs/arrow.model&quot;};
++char				*iconnames[]={&quot;objs/arrow.3ds&quot;};
+ 
+ unsigned char 		*recode_image(unsigned char *data, int nc, int w, int h);
+ int 				 load_mapimage(char *path,float lng, float lat, int scale);
+
+Modified: trunk/example/filebrowser.c
+===================================================================
+--- trunk/example/filebrowser.c	2006-09-16 00:59:49 UTC (rev 392)
++++ trunk/example/filebrowser.c	2006-09-16 01:21:58 UTC (rev 393)
+@@ -105,7 +105,7 @@
+ 				{
+ 				   if (ext!=NULL)
+ 				   {
+-					   if (0==strncmp(ext,&quot;.model&quot;,strlen(ext)&lt;4?strlen(ext):4))
++					   if (0==strncmp(ext,&quot;.3ds&quot;,strlen(ext)&lt;4?strlen(ext):4))
+ 							   item[n].type=T_GEOMETRY;
+ 					   else if (0==strncmp(ext,&quot;.mp3&quot;,strlen(ext)&lt;4?strlen(ext):4))
+ 							   item[n].type=T_MUSIC;
+
+Modified: trunk/example/modelloader.c
+===================================================================
+--- trunk/example/modelloader.c	2006-09-16 00:59:49 UTC (rev 392)
++++ trunk/example/modelloader.c	2006-09-16 01:21:58 UTC (rev 393)
+@@ -31,7 +31,7 @@
+ int i,oid;
+ void mainloop()
+ {
+-	s3d_rotate(oid,0,i,0);
++/*	s3d_rotate(oid,0,i,0);*/
+ 	i++;
+ 	nanosleep(&amp;t,NULL); 
+ }
+@@ -44,7 +44,7 @@
+ {
+ 	if (argc&lt;2)
+ 	{
+-		printf(&quot;usage: %s [somefile.model]\n&quot;,argv[0]);
++		printf(&quot;usage: %s [somefile.3ds]\n&quot;,argv[0]);
+ 		return(-1);
+ 	}
+ 	if (!s3d_init(&amp;argc,&amp;argv,&quot;modelloader&quot;))	
+
+Modified: trunk/libs3d/Makefile.am
+===================================================================
+--- trunk/libs3d/Makefile.am	2006-09-16 00:59:49 UTC (rev 392)
++++ trunk/libs3d/Makefile.am	2006-09-16 01:21:58 UTC (rev 393)
+@@ -11,6 +11,7 @@
+ 
+ libs3d_la_CPPFLAGS=	-I${top_srcdir}/server
+ libs3d_la_CFLAGS=	@FONTCONFIG_CFLAGS@ @FREETYPE_CFLAGS@ -I$(top_srcdir)/libs3d/libg3d/include @GLIB_CFLAGS@
+-libs3d_la_LIBADD=	@FONTCONFIG_LIBS@ @FREETYPE_LIBS@ @LIBM@ $(top_builddir)/libs3d/libg3d/src/libg3d.la
++libs3d_la_LIBADD=	@FONTCONFIG_LIBS@ @FREETYPE_LIBS@ @LIBM@ 
++libs3d_la_LDFLAGS=	$(top_builddir)/libs3d/libg3d/src/libg3d.la
+ 
+ EXTRA_DIST=		lgpl.txt
+
+Modified: trunk/libs3d/modelread.c
+===================================================================
+--- trunk/libs3d/modelread.c	2006-09-16 00:59:49 UTC (rev 392)
++++ trunk/libs3d/modelread.c	2006-09-16 01:21:58 UTC (rev 393)
+@@ -150,8 +150,9 @@
+ 			/* push vertices */
+ 			for ( j = 0; j &lt; object-&gt;vertex_count; j++ ) {
+ 				/* 2. and 3. coord have to change places otherwise the object will be turned */
+-				swaph=							 object-&gt;vertex_data[j * 3 + 2];
+-				object-&gt;vertex_data[j * 3 + 2] = object-&gt;vertex_data[j * 3 + 1];
++				object-&gt;vertex_data[j * 3 + 0] =  object-&gt;vertex_data[j * 3 + 0];
++				swaph=							  object-&gt;vertex_data[j * 3 + 2];
++				object-&gt;vertex_data[j * 3 + 2] = -object-&gt;vertex_data[j * 3 + 1];
+ 				object-&gt;vertex_data[j * 3 + 1] = swaph;
+ 			}
+ 			s3d_push_vertices( obj_id, object-&gt;vertex_data, object-&gt;vertex_count);
+@@ -216,12 +217,31 @@
+ 				oldflags=face-&gt;flags;
+ 
+ 				/* add polygon to the polygon buffer */
+-				for (i=0;i&lt;3;i++)
+-					polybuf[npoly*4+i]=face-&gt;vertex_indices[i] + voff;
++				polybuf[npoly*4+0]=face-&gt;vertex_indices[0] + voff;
++				polybuf[npoly*4+1]=face-&gt;vertex_indices[2] + voff;
++				polybuf[npoly*4+2]=face-&gt;vertex_indices[1] + voff;
+ 				polybuf[npoly*4+3]=mat2tex-&gt;material_id;
+ 
+-				if ( face-&gt;flags &amp; G3D_FLAG_FAC_NORMALS ) memcpy( normalbuf + npoly*9,  face-&gt;normals, sizeof(float) * 9);
+-				if ( face-&gt;flags &amp; G3D_FLAG_FAC_TEXMAP )  memcpy( texcoordbuf + npoly*6,  face-&gt;tex_vertex_data, sizeof(float) * 6);
++				if ( face-&gt;flags &amp; G3D_FLAG_FAC_NORMALS ) {
++					normalbuf[ npoly*9 + 0] =  face-&gt;normals[ 0 ];
++					normalbuf[ npoly*9 + 1] =  face-&gt;normals[ 1 ];
++					normalbuf[ npoly*9 + 2] =  face-&gt;normals[ 2 ];
++					normalbuf[ npoly*9 + 3] =  face-&gt;normals[ 6 ];
++					normalbuf[ npoly*9 + 4] =  face-&gt;normals[ 7 ];
++					normalbuf[ npoly*9 + 5] =  face-&gt;normals[ 8 ];
++					normalbuf[ npoly*9 + 6] =  face-&gt;normals[ 3 ];
++					normalbuf[ npoly*9 + 7] =  face-&gt;normals[ 4 ];
++					normalbuf[ npoly*9 + 8] =  face-&gt;normals[ 5 ];
++				}
++				if ( face-&gt;flags &amp; G3D_FLAG_FAC_TEXMAP )  
++				{
++					texcoordbuf[ npoly*6 + 0] = face-&gt;tex_vertex_data[ 0 ];
++					texcoordbuf[ npoly*6 + 1] = face-&gt;tex_vertex_data[ 1 ];
++					texcoordbuf[ npoly*6 + 2] = face-&gt;tex_vertex_data[ 4 ];
++					texcoordbuf[ npoly*6 + 3] = face-&gt;tex_vertex_data[ 5 ];
++					texcoordbuf[ npoly*6 + 4] = face-&gt;tex_vertex_data[ 2 ];
++					texcoordbuf[ npoly*6 + 5] = face-&gt;tex_vertex_data[ 3 ];
++				}
+ 				npoly++;
+ 				oface = oface-&gt;next;
+ 			}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000385.html">[S3d-svn] r392 - in trunk: apps/dot_mcp apps/olsrs3d	apps/s3d_x11gate apps/s3dfm apps/s3dgps apps/s3dvt example libs3d
+</A></li>
+	<LI>Next message: <A HREF="000387.html">[S3d-svn] r394 - in trunk: example libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#386">[ date ]</a>
+              <a href="thread.html#386">[ thread ]</a>
+              <a href="subject.html#386">[ subject ]</a>
+              <a href="author.html#386">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

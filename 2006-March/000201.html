@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r205 - trunk/example
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r205%20-%20trunk/example&In-Reply-To=%3C200603181443.k2IEhYDg026266%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000200.html">
+   <LINK REL="Next"  HREF="000202.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r205 - trunk/example</H1>
+    <B>ankon at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r205%20-%20trunk/example&In-Reply-To=%3C200603181443.k2IEhYDg026266%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r205 - trunk/example">ankon at berlios.de
+       </A><BR>
+    <I>Sat Mar 18 15:43:34 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000200.html">[S3d-svn] r204 - in trunk: . client server
+</A></li>
+        <LI>Next message: <A HREF="000202.html">[S3d-svn] r206 - trunk/client
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#201">[ date ]</a>
+              <a href="thread.html#201">[ thread ]</a>
+              <a href="subject.html#201">[ subject ]</a>
+              <a href="author.html#201">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: ankon
+Date: 2006-03-18 15:43:25 +0100 (Sat, 18 Mar 2006)
+New Revision: 205
+
+Modified:
+   trunk/example/Makefile.am
+Log:
+ptrtest is gone.
+sort alphabetically.
+
+
+
+Modified: trunk/example/Makefile.am
+===================================================================
+--- trunk/example/Makefile.am	2006-03-18 14:39:55 UTC (rev 204)
++++ trunk/example/Makefile.am	2006-03-18 14:43:25 UTC (rev 205)
+@@ -1,18 +1,17 @@
+ noinst_PROGRAMS=	3dsloader filebrowser hudtest katze \
+ 			radius_test s3dclock snowman \
+-			strtest texturetest linetest ptrtest
++			strtest texturetest linetest
+ 			
+ 3dsloader_SOURCES=	3dsloader.c
+ filebrowser_SOURCES=	filebrowser.c
+ hudtest_SOURCES=	hudtest.c
+ katze_SOURCES=		katze.c
++linetest_SOURCES=	linetest.c
+ radius_test_SOURCES=	radius_test.c
+ s3dclock_SOURCES=	s3dclock.c
+ snowman_SOURCES=	snowman.c
+ strtest_SOURCES=	strtest.c
+ texturetest_SOURCES=	texturetest.c
+-linetest_SOURCES=	linetest.c
+-ptrtest_SOURCES=	ptrtest.c
+ 
+ CPPFLAGS=		-I$(top_srcdir)/server -I$(top_srcdir)/client
+ LIBS=			$(top_builddir)/client/libs3d.la
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000200.html">[S3d-svn] r204 - in trunk: . client server
+</A></li>
+	<LI>Next message: <A HREF="000202.html">[S3d-svn] r206 - trunk/client
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#201">[ date ]</a>
+              <a href="thread.html#201">[ thread ]</a>
+              <a href="subject.html#201">[ subject ]</a>
+              <a href="author.html#201">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,251 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r220 - in trunk: . apps/s3d_x11gate apps/s3dgps example extras
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r220%20-%20in%20trunk%3A%20.%20apps/s3d_x11gate%20apps/s3dgps%20example%20extras&In-Reply-To=%3C200603192009.k2JK95RU008831%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000215.html">
+   <LINK REL="Next"  HREF="000217.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r220 - in trunk: . apps/s3d_x11gate apps/s3dgps example extras</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r220%20-%20in%20trunk%3A%20.%20apps/s3d_x11gate%20apps/s3dgps%20example%20extras&In-Reply-To=%3C200603192009.k2JK95RU008831%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r220 - in trunk: . apps/s3d_x11gate apps/s3dgps example extras">dotslash at berlios.de
+       </A><BR>
+    <I>Sun Mar 19 21:09:05 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000215.html">[S3d-svn] r219 - in trunk: . Documentation/s3dapi client objs server
+</A></li>
+        <LI>Next message: <A HREF="000217.html">[S3d-svn] r221 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#216">[ date ]</a>
+              <a href="thread.html#216">[ thread ]</a>
+              <a href="subject.html#216">[ subject ]</a>
+              <a href="author.html#216">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-03-19 21:08:38 +0100 (Sun, 19 Mar 2006)
+New Revision: 220
+
+Modified:
+   trunk/
+   trunk/apps/s3d_x11gate/s3d_x11gate.c
+   trunk/apps/s3dgps/s3dgps.c
+   trunk/example/texturetest.c
+   trunk/extras/mplayer.1.0pre7.s3d.patch
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r337 at balthasar</A>:  dotslash | 2006-03-19 21:08:27 +0100
+ - some more fixes due API changes (textures)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:335
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:337
+
+Modified: trunk/apps/s3d_x11gate/s3d_x11gate.c
+===================================================================
+--- trunk/apps/s3d_x11gate/s3d_x11gate.c	2006-03-19 19:54:11 UTC (rev 219)
++++ trunk/apps/s3d_x11gate/s3d_x11gate.c	2006-03-19 20:08:38 UTC (rev 220)
+@@ -103,7 +103,7 @@
+ 				if (last_change!=y)
+ 				{	 /*  last change is already over, post it! */
+ /*					printf(&quot;[%d to %d]&quot;,start_change,last_change);*/
+-					s3d_load_texture(oid,0,0,start_change,width,last_change-start_change+1,tex_image+start_change*width*4);
++					s3d_load_texture(oid,0,0,start_change,width,last_change-start_change+1,(unsigned char *)tex_image+start_change*width*4);
+ 					start_change=-1;
+ 					last_change=-1;
+ 				}
+@@ -113,7 +113,7 @@
+ 		if (last_change!=-1)
+ 		{
+ /*			printf(&quot;last one: [%d-%d]&quot;,start_change,last_change);*/
+-			s3d_load_texture(oid,0,0,start_change,width,last_change-start_change,tex_image+start_change*width*4);
++			s3d_load_texture(oid,0,0,start_change,width,last_change-start_change,(unsigned char *)tex_image+start_change*width*4);
+ 		}
+ /* 		s3d_load_texture(oid,0,0,0,width,height,tex_image); */
+ 		 /*  swap images */
+@@ -206,7 +206,7 @@
+ 									   0.0,0.0);
+ 		s3d_push_texture(oid,width,height);
+ 					 /*  push data on texture 0 position (0,0) */
+-		s3d_pep_material_texture(oid,0,0);	 /*  assign texture 0 to material 0 */
++		s3d_pep_material_texture(oid,0);	 /*  assign texture 0 to material 0 */
+ 		s3d_flags_on(oid,S3D_OF_VISIBLE);
+ 		s3d_mainloop(mainloop);
+ 		free(img1);
+
+Modified: trunk/apps/s3dgps/s3dgps.c
+===================================================================
+--- trunk/apps/s3dgps/s3dgps.c	2006-03-19 19:54:11 UTC (rev 219)
++++ trunk/apps/s3dgps/s3dgps.c	2006-03-19 20:08:38 UTC (rev 220)
+@@ -193,9 +193,9 @@
+ 									   1.0,1.0,
+ 									   0.0,1.0);
+ 		s3d_push_texture(oid,w,h);		
+-		s3d_load_texture(oid,0,0,0,w,h,(char *)data);
++		s3d_load_texture(oid,0,0,0,w,h,(unsigned char *)data);
+ 		free(data);
+-		s3d_pep_material_texture(oid,0,0);	 /*  assign texture 0 to material 0 */
++		s3d_pep_material_texture(oid,0);	 /*  assign texture 0 to material 0 */
+ 	} else {
+ 		printf(&quot;can't load %s\n&quot;,path);
+ 	}
+
+Modified: trunk/example/texturetest.c
+===================================================================
+--- trunk/example/texturetest.c	2006-03-19 19:54:11 UTC (rev 219)
++++ trunk/example/texturetest.c	2006-03-19 20:08:38 UTC (rev 220)
+@@ -72,10 +72,10 @@
+ 				data[(y*MAXX+x)*4+3]=255;
+ 			}
+ 		s3d_push_texture(oid,MAXX,MAXY);		
+-		s3d_load_texture(oid,0,0,0,MAXX,MAXY,(char *)data);
++		s3d_load_texture(oid,0,0,0,MAXX,MAXY,data);
+ 					 /*  push data on texture 0 position (0,0) */
+ 		free(data);
+-		s3d_pep_material_texture(oid,0,0);	 /*  assign texture 0 to material 0 */
++		s3d_pep_material_texture(oid,0);	 /*  assign texture 0 to material 0 */
+ 		s3d_flags_on(oid,S3D_OF_VISIBLE);
+ 		i=0;
+ 		s3d_mainloop(mainloop);
+
+Modified: trunk/extras/mplayer.1.0pre7.s3d.patch
+===================================================================
+--- trunk/extras/mplayer.1.0pre7.s3d.patch	2006-03-19 19:54:11 UTC (rev 219)
++++ trunk/extras/mplayer.1.0pre7.s3d.patch	2006-03-19 20:08:38 UTC (rev 220)
+@@ -1,6 +1,6 @@
+-diff -Naur MPlayer-1.0pre7.old/configure MPlayer-1.0pre7/configure
+---- MPlayer-1.0pre7.old/configure	2005-04-13 13:46:35.000000000 +0200
+-+++ MPlayer-1.0pre7/configure	2005-05-22 18:12:56.586338408 +0200
++diff -Naur MPlayer-1.0pre7/configure MPlayer-1.0pre7.s3d/configure
++--- MPlayer-1.0pre7/configure	2005-04-13 13:46:35.000000000 +0200
+++++ MPlayer-1.0pre7.s3d/configure	2005-05-22 18:19:08.000000000 +0200
+ @@ -234,6 +234,7 @@
+    --disable-vidix        disable VIDIX [enable on x86 *nix]
+    --enable-gl            build with OpenGL render support [autodetect]
+@@ -70,9 +70,9 @@
+  $_def_caca
+  $_def_tga
+  $_def_toolame
+-diff -Naur MPlayer-1.0pre7.old/libvo/video_out.c MPlayer-1.0pre7/libvo/video_out.c
+---- MPlayer-1.0pre7.old/libvo/video_out.c	2004-12-21 21:33:51.000000000 +0100
+-+++ MPlayer-1.0pre7/libvo/video_out.c	2005-05-22 18:09:59.288291808 +0200
++diff -Naur MPlayer-1.0pre7/libvo/video_out.c MPlayer-1.0pre7.s3d/libvo/video_out.c
++--- MPlayer-1.0pre7/libvo/video_out.c	2004-12-21 21:33:51.000000000 +0100
+++++ MPlayer-1.0pre7.s3d/libvo/video_out.c	2005-05-22 18:19:08.000000000 +0200
+ @@ -84,6 +84,7 @@
+  extern vo_functions_t video_out_png;
+  extern vo_functions_t video_out_ggi;
+@@ -91,10 +91,10 @@
+  #ifdef HAVE_CACA
+  	&amp;video_out_caca,
+  #endif
+-diff -Naur MPlayer-1.0pre7.old/libvo/vo_s3d.c MPlayer-1.0pre7/libvo/vo_s3d.c
+---- MPlayer-1.0pre7.old/libvo/vo_s3d.c	1970-01-01 01:00:00.000000000 +0100
+-+++ MPlayer-1.0pre7/libvo/vo_s3d.c	2005-05-22 18:09:59.289291656 +0200
+-@@ -0,0 +1,160 @@
++diff -Naur MPlayer-1.0pre7/libvo/vo_s3d.c MPlayer-1.0pre7.s3d/libvo/vo_s3d.c
++--- MPlayer-1.0pre7/libvo/vo_s3d.c	1970-01-01 01:00:00.000000000 +0100
+++++ MPlayer-1.0pre7.s3d/libvo/vo_s3d.c	2006-03-19 20:56:19.000000000 +0100
++@@ -0,0 +1,169 @@
+ +#include &lt;stdio.h&gt;
+ +#include &lt;stdlib.h&gt;
+ +#include &lt;string.h&gt;
+@@ -170,6 +170,7 @@
+ +static uint32_t
+ +config(uint32_t width, uint32_t height, uint32_t d_width, uint32_t d_height, uint32_t fullscreen, char *title, uint32_t format)
+ +{
+++	float aspect;
+ +	image_width = width;
+ +	image_height = height;
+ +	printf(&quot;config!!\n\n&quot;);
+@@ -178,14 +179,21 @@
+ +	} else {
+ +		free(data2);
+ +		s3d_pop_texture(oid,1);
+++		s3d_pop_vertex(oid,4);
+ +	}
+-+	s3d_scale(oid,(((float) d_width)/((float) d_height)),1.0,1.0);
+++	aspect=((float) d_width)/((float) d_height);
+++	s3d_push_vertex(oid,-3*aspect,-3,0);
+++	s3d_push_vertex(oid, 3*aspect,-3,0);
+++	s3d_push_vertex(oid, 3*aspect, 3,0);
+++	s3d_push_vertex(oid,-3*aspect, 3,0);
+++
+++/*	s3d_scale(oid,(((float) d_width)/((float) d_height)),1.0,1.0);*/
+ +	data2=malloc(width*height*4);
+ +	memset(data2,128,width*height*4);
+ +	s3d_push_texture(oid,image_width,image_height);		
+ +   	mp_msg (MSGT_VO, MSGL_INFO,&quot;[s3d] requesting a %d %d texture... \n&quot;,image_width,image_height);
+ +   	mp_msg (MSGT_VO, MSGL_INFO,&quot;[s3d] wanted size is %d %d... \n&quot;,d_width,d_height);
+-+	s3d_pep_material_texture(oid,0,0);	// assign texture 0 to material 0
+++	s3d_pep_material_texture(oid,0);	// assign texture 0 to material 0
+ +	return 0;
+ +}
+ +
+@@ -213,6 +221,7 @@
+ +    	mp_msg (MSGT_VO, MSGL_WARN, &quot;[s3d] sorry, can't reach server.\n&quot;);
+ +		return(ENOSYS);
+ +	}
+++	oid=s3d_new_object();
+ +	s3d_push_vertex(oid,-3,-3,0);
+ +	s3d_push_vertex(oid, 3,-3,0);
+ +	s3d_push_vertex(oid, 3, 3,0);
+@@ -255,9 +264,9 @@
+ +  }
+ +  return VO_NOTIMPL;
+ +}
+-diff -Naur MPlayer-1.0pre7.old/Makefile MPlayer-1.0pre7/Makefile
+---- MPlayer-1.0pre7.old/Makefile	2005-04-16 22:18:12.000000000 +0200
+-+++ MPlayer-1.0pre7/Makefile	2005-05-22 18:13:18.386024352 +0200
++diff -Naur MPlayer-1.0pre7/Makefile MPlayer-1.0pre7.s3d/Makefile
++--- MPlayer-1.0pre7/Makefile	2005-04-16 22:18:12.000000000 +0200
+++++ MPlayer-1.0pre7.s3d/Makefile	2005-05-22 18:19:08.000000000 +0200
+ @@ -30,7 +30,7 @@
+  OBJS_MENCODER = $(SRCS_MENCODER:.c=.o)
+  OBJS_MPLAYER = $(SRCS_MPLAYER:.c=.o)
+@@ -267,3 +276,4 @@
+  AO_LIBS = $(ARTS_LIB) $(ESD_LIB) $(JACK_LIB) $(NAS_LIB) $(SGIAUDIO_LIB) $(POLYP_LIB)
+  CODEC_LIBS = $(AV_LIB) $(FAME_LIB) $(MAD_LIB) $(VORBIS_LIB) $(THEORA_LIB) $(FAAD_LIB) $(LIBLZO_LIB) $(DECORE_LIB) $(XVID_LIB) $(DTS_LIB) $(PNG_LIB) $(Z_LIB) $(JPEG_LIB) $(ALSA_LIB) $(XMMS_LIB) $(X264_LIB)
+  COMMON_LIBS = libmpcodecs/libmpcodecs.a $(W32_LIB) $(DS_LIB) libaf/libaf.a libmpdemux/libmpdemux.a input/libinput.a postproc/libswscale.a osdep/libosdep.a $(DVDREAD_LIB) $(CODEC_LIBS) $(FREETYPE_LIB) $(TERMCAP_LIB) $(CDPARANOIA_LIB) $(MPLAYER_NETWORK_LIB) $(WIN32_LIB) $(GIF_LIB) $(MACOSX_FRAMEWORKS) $(SMBSUPPORT_LIB) $(FRIBIDI_LIB) $(FONTCONFIG_LIB) $(ENCA_LIB)
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000215.html">[S3d-svn] r219 - in trunk: . Documentation/s3dapi client objs server
+</A></li>
+	<LI>Next message: <A HREF="000217.html">[S3d-svn] r221 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#216">[ date ]</a>
+              <a href="thread.html#216">[ thread ]</a>
+              <a href="subject.html#216">[ subject ]</a>
+              <a href="author.html#216">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

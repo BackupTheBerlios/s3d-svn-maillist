@@ -1,0 +1,437 @@
+From lazhur at mail.berlios.de  Tue Dec  2 10:59:38 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 2 Dec 2008 10:59:38 +0100
+Subject: [S3d-svn] r1047 - in trunk: apps/s3dfm apps/s3dosm libs3d server
+Message-ID: <200812020959.mB29xc5Z020531@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-12-02 10:59:37 +0100 (Tue, 02 Dec 2008)
+New Revision: 1047
+
+Modified:
+   trunk/apps/s3dfm/fs.c
+   trunk/apps/s3dosm/io.c
+   trunk/libs3d/io.c
+   trunk/server/shm.c
+Log:
+Open files explicit as binary file
+
+Unix operating systems ignore the t or b modi in fopen and will open
+them without any modifications. Windows will try to convert line endings
+\n to \r\n.
+
+Modified: trunk/apps/s3dfm/fs.c
+===================================================================
+--- trunk/apps/s3dfm/fs.c	2008-11-28 20:32:38 UTC (rev 1046)
++++ trunk/apps/s3dfm/fs.c	2008-12-02 09:59:37 UTC (rev 1047)
+@@ -191,13 +191,13 @@
+ 	default:
+ 		printf("fs_copy -> atomic copy\n");
+ 		printf("open source...");
+-		if (NULL == (fps = fopen(source, "r"))) {
++		if (NULL == (fps = fopen(source, "rb"))) {
+ 			fs_error("fs_copy():fopen(source)", source);
+ 			return(-1);
+ 		}
+ 		printf("ok\n");
+ 		printf("open dest...");
+-		if (NULL == (fpd = fopen(dest, "w"))) {
++		if (NULL == (fpd = fopen(dest, "wb"))) {
+ 			fs_error("fs_copy():fopen(source)", source);
+ 			return(-1);
+ 		}
+
+Modified: trunk/apps/s3dosm/io.c
+===================================================================
+--- trunk/apps/s3dosm/io.c	2008-11-28 20:32:38 UTC (rev 1046)
++++ trunk/apps/s3dosm/io.c	2008-12-02 09:59:37 UTC (rev 1047)
+@@ -38,7 +38,7 @@
+ 	int filesize;
+ 	struct stat bf;
+ 
+-	if ((fp = fopen(fname, "rt")) == NULL) {
++	if ((fp = fopen(fname, "rb")) == NULL) {
+ 		fprintf(stderr, "read_file( %s ):fopen(): %s", fname, strerror(errno));
+ 		return(NULL);
+ 	}
+
+Modified: trunk/libs3d/io.c
+===================================================================
+--- trunk/libs3d/io.c	2008-11-28 20:32:38 UTC (rev 1046)
++++ trunk/libs3d/io.c	2008-12-02 09:59:37 UTC (rev 1047)
+@@ -267,7 +267,7 @@
+ 	int filesize;
+ 	struct stat bf;
+ 	*pointer = NULL;
+-	/* if ((fp = fopen(fname, "rt")) == NULL)
++	/* if ((fp = fopen(fname, "rb")) == NULL)
+ 	 { errn("s3d_open_file():fopen()",errno); return(0);}
+ 	 if (fseek(fp, 0, SEEK_END) != 0)
+ 	 { errn("s3d_open_file():fseek()",errno); return(0);}
+@@ -276,7 +276,7 @@
+ 	 if (fseek(fp, 0, SEEK_SET) != 0)
+ 	 { errn("s3d_open_file():fseek()",errno); return(0);}*/
+ 
+-	if ((fp = fopen(fname, "rt")) == NULL) {
++	if ((fp = fopen(fname, "rb")) == NULL) {
+ 		errdn(VLOW, "s3d_open_file():fopen()", errno);
+ 		return(-1);
+ 	}
+
+Modified: trunk/server/shm.c
+===================================================================
+--- trunk/server/shm.c	2008-11-28 20:32:38 UTC (rev 1046)
++++ trunk/server/shm.c	2008-12-02 09:59:37 UTC (rev 1047)
+@@ -64,7 +64,7 @@
+ 	key_t key;
+ 
+ 	/* create an empty token file */
+-	fp = fopen(ftoken, "w");
++	fp = fopen(ftoken, "wb");
+ 	fclose(fp);
+ 	/* make the key: */
+ 	if ((key = ftok(ftoken, 'R')) == -1) {
+
+
+
+From lazhur at mail.berlios.de  Sat Dec 13 13:04:55 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 13 Dec 2008 13:04:55 +0100
+Subject: [S3d-svn] r1048 - trunk/Documentation
+Message-ID: <200812131204.mBDC4twA023582@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-12-13 13:04:55 +0100 (Sat, 13 Dec 2008)
+New Revision: 1048
+
+Modified:
+   trunk/Documentation/extractdefinitions.py
+Log:
+Make documentation extractor compatible with Python 3.0
+
+Modified: trunk/Documentation/extractdefinitions.py
+===================================================================
+--- trunk/Documentation/extractdefinitions.py	2008-12-02 09:59:37 UTC (rev 1047)
++++ trunk/Documentation/extractdefinitions.py	2008-12-13 12:04:55 UTC (rev 1048)
+@@ -6,12 +6,8 @@
+ import os
+ import re
+ 
+-class Callable:
+-    def __init__(self, func):
+-        self.__call__ = func
+-
+ def main():
+-	print 'reading with "doxygen xml.doxygen" generated files'
++	print('reading with "doxygen xml.doxygen" generated files')
+ 	refidlist = []
+ 
+ 	libs3d = xml.dom.minidom.parse("xml/s3d_8h.xml")
+@@ -499,8 +495,8 @@
+ 		return sect2
+ 
+ 	# make functions "static"
+-	generate = Callable(generate)
+-	generate_sgml = Callable(generate_sgml)
++	generate = staticmethod(generate)
++	generate_sgml = staticmethod(generate_sgml)
+ 
+ class docbook_structs:
+ 	"""
+@@ -548,8 +544,8 @@
+ 		return sect2
+ 
+ 	# make functions "static"
+-	generate = Callable(generate)
+-	generate_sgml = Callable(generate_sgml)
++	generate = staticmethod(generate)
++	generate_sgml = staticmethod(generate_sgml)
+ 
+ class docbook_typedefs:
+ 	"""
+@@ -585,8 +581,8 @@
+ 		return sect2
+ 
+ 	# make functions "static"
+-	generate = Callable(generate)
+-	generate_sgml = Callable(generate_sgml)
++	generate = staticmethod(generate)
++	generate_sgml = staticmethod(generate_sgml)
+ 
+ 
+ def manpage_header(root, name, refid, mannum, ref_name, ref_namediv, synopsisinfo):
+@@ -668,8 +664,8 @@
+ 		return refentry
+ 
+ 	# make functions "static"
+-	generate = Callable(generate)
+-	generate_sgml = Callable(generate_sgml)
++	generate = staticmethod(generate)
++	generate_sgml = staticmethod(generate_sgml)
+ 
+ class manpage_structs:
+ 	"""
+@@ -721,8 +717,8 @@
+ 		return refentry
+ 
+ 	# make functions "static"
+-	generate = Callable(generate)
+-	generate_sgml = Callable(generate_sgml)
++	generate = staticmethod(generate)
++	generate_sgml = staticmethod(generate_sgml)
+ 
+ if __name__ == '__main__':
+ 	main()
+
+
+
+From lazhur at mail.berlios.de  Tue Dec 23 11:55:15 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 23 Dec 2008 11:55:15 +0100
+Subject: [S3d-svn] r1049 - in trunk: apps/meshs3d experimental/olsrs3d
+Message-ID: <200812231055.mBNAtFKh027564@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-12-23 11:55:14 +0100 (Tue, 23 Dec 2008)
+New Revision: 1049
+
+Modified:
+   trunk/apps/meshs3d/main.c
+   trunk/experimental/olsrs3d/main.c
+Log:
+Don't convert to int when we compare two float after rintf
+
+Modified: trunk/apps/meshs3d/main.c
+===================================================================
+--- trunk/apps/meshs3d/main.c	2008-12-13 12:04:55 UTC (rev 1048)
++++ trunk/apps/meshs3d/main.c	2008-12-23 10:55:14 UTC (rev 1049)
+@@ -253,7 +253,7 @@
+ 			rgb = 2.0 - etx;
+ 
+ 			c = 3;
+-			c1 = con->color == 3 && (int) rintf(con->rgb * 10) != (int) rintf(rgb * 10) ? 1 : 0;
++			c1 = con->color == 3 && rintf(con->rgb * 10) != rintf(rgb * 10) ? 1 : 0;
+ 			r = 1.0;
+ 			g = 1.0;
+ 			b = rgb;
+@@ -264,7 +264,7 @@
+ 			rgb = 1.5 - (etx / 2.0);
+ 
+ 			c = 4;
+-			c1 = con->color == 4 && (int) rintf(con->rgb * 10) != (int) rintf(rgb * 10) ? 1 : 0;
++			c1 = con->color == 4 && rintf(con->rgb * 10) != rintf(rgb * 10) ? 1 : 0;
+ 			r = 1.0;
+ 			g = rgb;
+ 
+@@ -274,7 +274,7 @@
+ 			rgb = 1.75 - (etx / 4.0);
+ 
+ 			c = 5;
+-			c1 = con->color == 5 && (int) rintf(con->rgb * 10) != (int) rintf(rgb * 10) ? 1 : 0;
++			c1 = con->color == 5 && rintf(con->rgb * 10) != rintf(rgb * 10) ? 1 : 0;
+ 
+ 			r = rgb;
+ 			g = rgb - 0.5;
+@@ -286,7 +286,7 @@
+ 			rgb = 1000.0 / (1500.0 + etx);
+ 
+ 			c = 6;
+-			c1 = con->color == 6 && (int) rintf(con->rgb * 10) != (int) rintf(rgb * 10) ? 1 : 0;
++			c1 = con->color == 6 && rintf(con->rgb * 10) != rintf(rgb * 10) ? 1 : 0;
+ 
+ 			r = g = b = rgb;
+ 
+
+Modified: trunk/experimental/olsrs3d/main.c
+===================================================================
+--- trunk/experimental/olsrs3d/main.c	2008-12-13 12:04:55 UTC (rev 1048)
++++ trunk/experimental/olsrs3d/main.c	2008-12-23 10:55:14 UTC (rev 1049)
+@@ -628,7 +628,7 @@
+ 				} else if ((etx >= 1.5) && (etx < 2.0)) {
+ 
+ 					rgb = 2.0 - etx;
+-					if (olsr_con->color != 3 || (olsr_con->color == 3 && (int) rintf(olsr_con->rgb * 10) != (int) rintf(rgb * 10))) {
++					if (olsr_con->color != 3 || (olsr_con->color == 3 && rintf(olsr_con->rgb * 10) != rintf(rgb * 10))) {
+ 						s3d_pep_material(olsr_con->obj_id,
+ 						                 1.0, 1.0, rgb,
+ 						                 1.0, 1.0, rgb,
+@@ -642,7 +642,7 @@
+ 				} else if ((etx >= 2.0) && (etx < 3.0)) {
+ 
+ 					rgb = 1.5 - (etx / 2.0);
+-					if (olsr_con->color != 4 || (olsr_con->color == 4 && (int) rintf(olsr_con->rgb * 10) != (int) rintf(rgb * 10))) {
++					if (olsr_con->color != 4 || (olsr_con->color == 4 && rintf(olsr_con->rgb * 10) != rintf(rgb * 10))) {
+ 						s3d_pep_material(olsr_con->obj_id,
+ 						                 1.0, rgb, 0.0,
+ 						                 1.0, rgb, 0.0,
+@@ -657,7 +657,7 @@
+ 
+ 					rgb = 1.75 - (etx / 4.0);
+ 
+-					if (olsr_con->color != 5 || (olsr_con->color == 5 && (int) rintf(olsr_con->rgb * 10) != (int) rintf(rgb * 10))) {
++					if (olsr_con->color != 5 || (olsr_con->color == 5 && rintf(olsr_con->rgb * 10) != rintf(rgb * 10))) {
+ 
+ 						s3d_pep_material(olsr_con->obj_id,
+ 						                 rgb, rgb - 0.5, 0.0,
+@@ -673,7 +673,7 @@
+ 
+ 					rgb = 1000.0 / (1500.0 + etx);
+ 
+-					if (olsr_con->color != 6 || (olsr_con->color == 6 && (int) rintf(olsr_con->rgb * 10) != (int) rintf(rgb * 10))) {
++					if (olsr_con->color != 6 || (olsr_con->color == 6 && rintf(olsr_con->rgb * 10) != rintf(rgb * 10))) {
+ 
+ 						s3d_pep_material(olsr_con->obj_id,
+ 						                 rgb, rgb, rgb,
+
+
+
+From lazhur at mail.berlios.de  Tue Dec 23 11:55:24 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 23 Dec 2008 11:55:24 +0100
+Subject: [S3d-svn] r1050 - trunk/experimental/comptest
+Message-ID: <200812231055.mBNAtOme027579@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-12-23 11:55:23 +0100 (Tue, 23 Dec 2008)
+New Revision: 1050
+
+Modified:
+   trunk/experimental/comptest/comptest.h
+Log:
+comptest: Correct declaration of x11_addwindows
+
+Modified: trunk/experimental/comptest/comptest.h
+===================================================================
+--- trunk/experimental/comptest/comptest.h	2008-12-23 10:55:14 UTC (rev 1049)
++++ trunk/experimental/comptest/comptest.h	2008-12-23 10:55:23 UTC (rev 1050)
+@@ -94,7 +94,7 @@
+ int xinit(void);
+ int error(Display *COMPUNUSED(dpy), XErrorEvent *event);
+ int print_event(Display *COMPUNUSED(dpy), XEvent *event);
+-void x11_addwindows();
++void x11_addwindows(void);
+ char *x11_get_prop(Window win, char *prop);
+ char *x11_get_name(Window win);
+ void print_properties(Window win);
+
+
+
+From lazhur at mail.berlios.de  Tue Dec 23 11:55:29 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 23 Dec 2008 11:55:29 +0100
+Subject: [S3d-svn] r1051 - in trunk: libs3d server
+Message-ID: <200812231055.mBNAtTJM027593@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-12-23 11:55:29 +0100 (Tue, 23 Dec 2008)
+New Revision: 1051
+
+Modified:
+   trunk/libs3d/endian.c
+   trunk/server/endian.c
+Log:
+Make declarations available for hton*b function definitions
+
+Modified: trunk/libs3d/endian.c
+===================================================================
+--- trunk/libs3d/endian.c	2008-12-23 10:55:23 UTC (rev 1050)
++++ trunk/libs3d/endian.c	2008-12-23 10:55:29 UTC (rev 1051)
+@@ -1,5 +1,5 @@
+ /*
+- * event.c
++ * endian.c
+  *
+  * Copyright (C) 2004-2008  S3D contributors
+  *
+@@ -23,6 +23,8 @@
+ 
+ #include <arpa/inet.h> /*  htonl(),htons() */
+ #include <stdint.h>
++#include "s3d.h"
++#include "s3dlib.h"
+ 
+ /* convert buffer with floats from host to network endianess */
+ void htonfb(float* netfloat, int num)
+
+Modified: trunk/server/endian.c
+===================================================================
+--- trunk/server/endian.c	2008-12-23 10:55:23 UTC (rev 1050)
++++ trunk/server/endian.c	2008-12-23 10:55:29 UTC (rev 1051)
+@@ -1,5 +1,5 @@
+ /*
+- * event.c
++ * endian.c
+  *
+  * Copyright (C) 2004-2008  S3D contributors
+  *
+@@ -23,6 +23,7 @@
+ 
+ #include <arpa/inet.h> /*  htonl(),htons() */
+ #include <stdint.h>
++#include "global.h"
+ 
+ /* convert buffer with floats from host to network endianess */
+ void htonfb(float* netfloat, int num)
+
+
+
+From lazhur at mail.berlios.de  Wed Dec 24 21:33:15 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Wed, 24 Dec 2008 21:33:15 +0100
+Subject: [S3d-svn] r1052 - trunk/objs
+Message-ID: <200812242033.mBOKXF80022051@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-12-24 21:33:15 +0100 (Wed, 24 Dec 2008)
+New Revision: 1052
+
+Removed:
+   trunk/objs/martin_stern/
+Modified:
+   trunk/objs/AUTHORS
+Log:
+Remove binary files without free copyright status
+
+All files from Martin Stern aren't under a (known) free license. This
+could end in s3d being marked as non-free software in distributions with
+an hard copyright check. Non of the files are used by s3d or related
+programs and should not create any missing dependencies when they get
+removed.
+This commit can be reverted when the copyright status changes to a
+compatible license.
+
+
+Modified: trunk/objs/AUTHORS
+===================================================================
+--- trunk/objs/AUTHORS	2008-12-23 10:55:29 UTC (rev 1051)
++++ trunk/objs/AUTHORS	2008-12-24 20:33:15 UTC (rev 1052)
+@@ -1,9 +1,10 @@
+-All those objects in here (except for martin sterns, from whom I don't know yet) are 
+-may be used under the term GPL-2+, that means you may distribute and modify or alter them
+-as you want, if you give full credits and redistribute them under GPL-2+ again.
+-Too bad we don't have source code for them. maybe GPL-2+ is no good idea, but o well. :)
++All those objects in here may be used under the term GPL-2+, that means you may
++distribute and modify or alter them as you want, if you give full credits and
++redistribute them under GPL-2+ again. Too bad we don't have source code for
++them. maybe GPL-2+ is no good idea, but o well. :)
+ 
+-I know, some of them (especially mine) are mostly junk, but maybe you find them useful ;)
++I know, some of them (especially mine) are mostly junk, but maybe you find them
++useful ;)
+ 
+ ### Mike Greanz (mog):
+ 
+@@ -18,10 +19,6 @@
+ accesspoint_inet.3ds
+ internet.3ds
+ 
+-### Martin Stern:
+-
+-martin_stern/*
+-
+ ### Christiane Weidauer (yd):
+ 
+ abs2.3ds
+
+
+

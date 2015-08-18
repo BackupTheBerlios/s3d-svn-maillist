@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r993 - trunk/Documentation
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r993%20-%20trunk/Documentation&In-Reply-To=%3C200809062109.m86L9SeS032532%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000972.html">
+   <LINK REL="Next"  HREF="000974.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r993 - trunk/Documentation</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r993%20-%20trunk/Documentation&In-Reply-To=%3C200809062109.m86L9SeS032532%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r993 - trunk/Documentation">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep  6 23:09:28 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000972.html">[S3d-svn] r992 - in trunk/Documentation: . manpages/man3
+</A></li>
+        <LI>Next message: <A HREF="000974.html">[S3d-svn] r994 - in trunk/Documentation: . libs3d libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#973">[ date ]</a>
+              <a href="thread.html#973">[ thread ]</a>
+              <a href="subject.html#973">[ subject ]</a>
+              <a href="author.html#973">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-06 23:09:27 +0200 (Sat, 06 Sep 2008)
+New Revision: 993
+
+Modified:
+   trunk/Documentation/extractdefinitions.py
+Log:
+Set id for documentation references while extracting informations
+
+Modified: trunk/Documentation/extractdefinitions.py
+===================================================================
+--- trunk/Documentation/extractdefinitions.py	2008-09-04 23:36:09 UTC (rev 992)
++++ trunk/Documentation/extractdefinitions.py	2008-09-06 21:09:27 UTC (rev 993)
+@@ -271,10 +271,11 @@
+ 		if node.attributes['kind'].nodeValue != 'function':
+ 			continue
+ 
+-		function = {'return': '', 'name': '', 'param': [], 'brief': '', 'help': []}
++		function = {'return': '', 'name': '', 'id': '', 'param': [], 'brief': '', 'help': []}
+ 		for node2 in node.childNodes:
+ 			if node2.nodeName == &quot;name&quot;:
+ 				function['name'] = get_text(node2)
++				function['id'] = function['name']
+ 
+ 			if node2.nodeName == &quot;type&quot;:
+ 				function['return'] = remove_exportdefinitions(get_text(node2))
+@@ -299,8 +300,9 @@
+ 	structlist = []
+ 	# find refs (names of xml files) of structs
+ 	for node in dom.getElementsByTagName(&quot;innerclass&quot;):
+-		struct = {'name': '', 'ref': '', 'elements': [], 'brief': '', 'help': []}
++		struct = {'name': '', 'id': '', 'ref': '', 'elements': [], 'brief': '', 'help': []}
+ 		struct['name'] = get_text(node)
++		struct['id'] = 'struct'+struct['name']
+ 		struct['ref'] = node.attributes['refid'].nodeValue
+ 		structlist.append(struct)
+ 
+@@ -330,10 +332,11 @@
+ 		if node.attributes['kind'].nodeValue != 'typedef':
+ 			continue
+ 
+-		typedef = {'name': '', 'definition': '', 'help': []}
++		typedef = {'name': '', 'id': '', 'definition': '', 'help': []}
+ 		for node2 in node.childNodes:
+ 			if node2.nodeName == 'name':
+ 				typedef['name'] = get_text(node2)
++				typedef['id'] = typedef['name']
+ 
+ 			if node2.nodeName == 'definition':
+ 				typedef['definition'] = get_text(node2)
+@@ -363,7 +366,7 @@
+ 	def generate_sgml(function, synopsis):
+ 		sgml = xml.dom.minidom.Document()
+ 		sect2 = create_append(sgml, 'sect2')
+-		sect2.setAttribute('id', function['name'])
++		sect2.setAttribute('id', function['id'])
+ 
+ 		title = create_append(sect2, 'title')
+ 		create_append_text(title, function['name'])
+@@ -414,7 +417,7 @@
+ 	def generate_sgml(struct):
+ 		sgml = xml.dom.minidom.Document()
+ 		sect2 = create_append(sgml, 'sect2')
+-		sect2.setAttribute('id', 'struct'+struct['name'])
++		sect2.setAttribute('id', struct['id'])
+ 
+ 		title = create_append(sect2, 'title')
+ 		create_append_text(title, 'struct '+struct['name'])
+@@ -462,7 +465,7 @@
+ 	def generate_sgml(typedef):
+ 		sgml = xml.dom.minidom.Document()
+ 		sect2 = create_append(sgml, 'sect2')
+-		sect2.setAttribute('id', typedef['name'])
++		sect2.setAttribute('id', typedef['id'])
+ 
+ 		title = create_append(sect2, 'title')
+ 		create_append_text(title, 'typedef '+typedef['name'])
+@@ -481,9 +484,9 @@
+ 	generate_sgml = Callable(generate_sgml)
+ 
+ 
+-def manpage_header(root, name, mannum, ref_name, ref_namediv, synopsisinfo):
++def manpage_header(root, name, refid, mannum, ref_name, ref_namediv, synopsisinfo):
+ 	refentry = create_append(root, 'refentry')
+-	refentry.setAttribute('id', cleanup_stringbegin(name))
++	refentry.setAttribute('id', cleanup_stringbegin(refid))
+ 
+ 	refmeta = create_append(refentry, 'refmeta')
+ 
+@@ -527,7 +530,7 @@
+ 	def generate_sgml(function, synopsis):
+ 		sgml = xml.dom.minidom.Document()
+ 
+-		(refentry, funcsynopsis) = manpage_header(sgml, function['name'], '3', function['name'], function['brief'].strip(), &quot;#include &lt;&quot;+synopsis+&quot;&gt;&quot;)
++		(refentry, funcsynopsis) = manpage_header(sgml, function['name'], function['id'], '3', function['name'], function['brief'].strip(), &quot;#include &lt;&quot;+synopsis+&quot;&gt;&quot;)
+ 
+ 		# prototype
+ 		funcprototype = create_append(funcsynopsis, 'funcprototype')
+@@ -577,7 +580,7 @@
+ 	def generate_sgml(struct, synopsis):
+ 		sgml = xml.dom.minidom.Document()
+ 
+-		(refentry, funcsynopsis) = manpage_header(sgml, struct['name'], '9', 'struct ' + struct['name'], &quot;&quot;, &quot;#include &lt;&quot;+synopsis+&quot;&gt;&quot;)
++		(refentry, funcsynopsis) = manpage_header(sgml, struct['name'], struct['id'], '9', 'struct ' + struct['name'], &quot;&quot;, &quot;#include &lt;&quot;+synopsis+&quot;&gt;&quot;)
+ 
+ 		# add definition of struct
+ 		refsect1 = create_append(refentry, 'refsect1')
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000972.html">[S3d-svn] r992 - in trunk/Documentation: . manpages/man3
+</A></li>
+	<LI>Next message: <A HREF="000974.html">[S3d-svn] r994 - in trunk/Documentation: . libs3d libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#973">[ date ]</a>
+              <a href="thread.html#973">[ thread ]</a>
+              <a href="subject.html#973">[ subject ]</a>
+              <a href="author.html#973">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r294 - in trunk: . apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r294%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200605251711.k4PHBO4K010992%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000286.html">
+   <LINK REL="Next"  HREF="000288.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r294 - in trunk: . apps/s3dfm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r294%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200605251711.k4PHBO4K010992%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r294 - in trunk: . apps/s3dfm">dotslash at berlios.de
+       </A><BR>
+    <I>Thu May 25 19:11:24 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000286.html">[S3d-svn] r293 - in trunk: . libg3d libg3d/config libg3d/doc libg3d/doc/api libg3d/doc/api/html libg3d/doc/api/tmpl libg3d/doc/api/xml libg3d/include libg3d/include/g3d libg3d/m4 libg3d/plugins libg3d/plugins/image libg3d/plugins/image/.deps libg3d/plugins/import libg3d/plugins/import/.deps libg3d/s3d libg3d/src libg3d/src/.deps libg3d/tests libg3d/tests/.deps
+</A></li>
+        <LI>Next message: <A HREF="000288.html">[S3d-svn] r295 - in trunk: . example libg3d libg3d/doc libg3d/doc/api libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#287">[ date ]</a>
+              <a href="thread.html#287">[ thread ]</a>
+              <a href="subject.html#287">[ subject ]</a>
+              <a href="author.html#287">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-25 19:11:20 +0200 (Thu, 25 May 2006)
+New Revision: 294
+
+Modified:
+   trunk/
+   trunk/apps/s3dfm/box.c
+   trunk/apps/s3dfm/main.c
+   trunk/apps/s3dfm/s3dfm.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r583 at balthasar</A>:  dotslash | 2006-05-17 18:40:30 +0200
+ - keep detached objects up, don't remove them recursively ...
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:581
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:583
+
+Modified: trunk/apps/s3dfm/box.c
+===================================================================
+--- trunk/apps/s3dfm/box.c	2006-05-25 12:31:14 UTC (rev 293)
++++ trunk/apps/s3dfm/box.c	2006-05-25 17:11:20 UTC (rev 294)
+@@ -342,24 +342,31 @@
+ }
+ 
+ /* undisplay a directory, thus recursively removing the kids.*/
+-int box_collapse(struct t_item *dir)
++int box_collapse(struct t_item *dir,int force)
+ {
+ 	int i;
++	int ret;
+ 	struct t_item *par;
+ 	if (&amp;root==dir)
+ 	{
+ 		printf(&quot;won't undisplay root window ... \n&quot;);
+ 		return(-1);
+ 	}
++	if (dir-&gt;detached &amp;&amp; !force)
++		return(1);
+ 	if (dir-&gt;disp==0)
+ 	{
+ /*		printf(&quot;[A]lready undisplayed, nothing to do ...\n&quot;);*/
+ 		return(-1);
+ 	}
++	ret=0;
+ 	for (i=0;i&lt;dir-&gt;n_item;i++)
++		if (dir-&gt;list[i].disp)
++			ret|=box_collapse(&amp;dir-&gt;list[i],force);
++
++	if (ret &amp;&amp; !force) return(ret);
++	for (i=0;i&lt;dir-&gt;n_item;i++)
+ 	{
+-		if (dir-&gt;list[i].disp)
+-			box_collapse(&amp;dir-&gt;list[i]);
+ 		if (dir-&gt;list[i].block!=-1)
+ 		{
+ 			s3d_del_object(dir-&gt;list[i].block);
+@@ -391,7 +398,7 @@
+ 	{
+ 		box_position_kids(dir-&gt;parent);
+ 	}
+-	return(0);
++	return(ret);
+ }
+ /* only display dir and its kids, but nothing below. */
+ int box_collapse_grandkids(struct t_item *dir)
+@@ -403,7 +410,7 @@
+ 		{
+ 			kid=&amp;dir-&gt;list[i];
+ 			for (j=0;j&lt;kid-&gt;n_item;j++)
+-				box_collapse(&amp;kid-&gt;list[j]);
++				box_collapse(&amp;kid-&gt;list[j],0);
+ 		}
+ 	return(0);
+ }
+
+Modified: trunk/apps/s3dfm/main.c
+===================================================================
+--- trunk/apps/s3dfm/main.c	2006-05-25 12:31:14 UTC (rev 293)
++++ trunk/apps/s3dfm/main.c	2006-05-25 17:11:20 UTC (rev 294)
+@@ -138,7 +138,7 @@
+ 	{
+ 		if (f-&gt;close==oid)
+ 		{
+-			box_collapse(f);
++			box_collapse(f,1);
+ /*			if (f-&gt;parent!=NULL)
+ 				ani_focus(f-&gt;parent);*/
+ 			return;
+
+Modified: trunk/apps/s3dfm/s3dfm.h
+===================================================================
+--- trunk/apps/s3dfm/s3dfm.h	2006-05-25 12:31:14 UTC (rev 293)
++++ trunk/apps/s3dfm/s3dfm.h	2006-05-25 17:11:20 UTC (rev 294)
+@@ -80,7 +80,7 @@
+ int ani_check(struct t_item *f);
+ int ani_onstack(struct t_item *f);
+ /* display.c */
+-int box_collapse(struct t_item *dir);
++int box_collapse(struct t_item *dir,int force);
+ int box_collapse_grandkids(struct t_item *dir);
+ int box_expand(struct t_item *dir);
+ int box_buildblock(struct t_item *dir);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000286.html">[S3d-svn] r293 - in trunk: . libg3d libg3d/config libg3d/doc libg3d/doc/api libg3d/doc/api/html libg3d/doc/api/tmpl libg3d/doc/api/xml libg3d/include libg3d/include/g3d libg3d/m4 libg3d/plugins libg3d/plugins/image libg3d/plugins/image/.deps libg3d/plugins/import libg3d/plugins/import/.deps libg3d/s3d libg3d/src libg3d/src/.deps libg3d/tests libg3d/tests/.deps
+</A></li>
+	<LI>Next message: <A HREF="000288.html">[S3d-svn] r295 - in trunk: . example libg3d libg3d/doc libg3d/doc/api libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#287">[ date ]</a>
+              <a href="thread.html#287">[ thread ]</a>
+              <a href="subject.html#287">[ subject ]</a>
+              <a href="author.html#287">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r834 - trunk/extras/distro/gentoo/media-gfx/s3d-svn
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r834%20-%20trunk/extras/distro/gentoo/media-gfx/s3d-svn&In-Reply-To=%3C200711021656.lA2GuS3Q029398%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000826.html">
+   <LINK REL="Next"  HREF="000828.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r834 - trunk/extras/distro/gentoo/media-gfx/s3d-svn</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r834%20-%20trunk/extras/distro/gentoo/media-gfx/s3d-svn&In-Reply-To=%3C200711021656.lA2GuS3Q029398%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r834 - trunk/extras/distro/gentoo/media-gfx/s3d-svn">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Nov  2 17:56:28 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000826.html">[S3d-svn] r833 - in trunk: . cmake/modules
+</A></li>
+        <LI>Next message: <A HREF="000828.html">[S3d-svn] r835 - in trunk: . cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#827">[ date ]</a>
+              <a href="thread.html#827">[ thread ]</a>
+              <a href="subject.html#827">[ subject ]</a>
+              <a href="author.html#827">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-11-02 17:56:27 +0100 (Fri, 02 Nov 2007)
+New Revision: 834
+
+Modified:
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild
+Log:
+Remove direct dependency to glib from svn ebuild
+
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest	2007-11-02 16:56:11 UTC (rev 833)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest	2007-11-02 16:56:27 UTC (rev 834)
+@@ -1,7 +1,7 @@
+-EBUILD s3d-svn-9999.ebuild 1080 RMD160 dc3c9fe70997bf2496a0c2edccd2cc51681dbeeb SHA1 03cfd6342ee586319d88ddfe8ee92cb2cdf4dcab SHA256 a38520cb14c71bce43bd711c02b58bff8dbd20851e22bd29ca08cd3a544ec07a
+-MD5 460aeebf714955e28675ff46157bfc83 s3d-svn-9999.ebuild 1080
+-RMD160 dc3c9fe70997bf2496a0c2edccd2cc51681dbeeb s3d-svn-9999.ebuild 1080
+-SHA256 a38520cb14c71bce43bd711c02b58bff8dbd20851e22bd29ca08cd3a544ec07a s3d-svn-9999.ebuild 1080
++EBUILD s3d-svn-9999.ebuild 1061 RMD160 81acf0f98dc368f04501e8afc7c66891de33cd39 SHA1 4c572320e14913fe400819ec815f9e234a7658c1 SHA256 8e1755c6bb0b1f4ed4a6af2670f8e39726afb1143e4c8d224501ff95d740d48b
++MD5 f957f6fc776836e338ad33af8076ee78 s3d-svn-9999.ebuild 1061
++RMD160 81acf0f98dc368f04501e8afc7c66891de33cd39 s3d-svn-9999.ebuild 1061
++SHA256 8e1755c6bb0b1f4ed4a6af2670f8e39726afb1143e4c8d224501ff95d740d48b s3d-svn-9999.ebuild 1061
+ MISC ChangeLog 717 RMD160 732719801434d2f34762040a3d76224a376eafe9 SHA1 e3f6ae8c96e94d078c05f06a26c4671126bf2ae0 SHA256 50813962433038ee35016fdbd5a738f99f8ef5da1dbb6db01c35b258ca180587
+ MD5 29def1ab7084d3f1a14f46b8e18774a9 ChangeLog 717
+ RMD160 732719801434d2f34762040a3d76224a376eafe9 ChangeLog 717
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild	2007-11-02 16:56:11 UTC (rev 833)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild	2007-11-02 16:56:27 UTC (rev 834)
+@@ -19,7 +19,6 @@
+ RDEPEND=&quot;!media-gfx/s3d
+ 	&gt;=media-libs/libsdl-1.2.7
+ 	&gt;=media-libs/freetype-2
+-	&gt;=dev-libs/glib-2
+ 	dev-libs/libxml2
+ 	media-fonts/ttf-bitstream-vera
+ 	media-libs/fontconfig
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000826.html">[S3d-svn] r833 - in trunk: . cmake/modules
+</A></li>
+	<LI>Next message: <A HREF="000828.html">[S3d-svn] r835 - in trunk: . cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#827">[ date ]</a>
+              <a href="thread.html#827">[ thread ]</a>
+              <a href="subject.html#827">[ subject ]</a>
+              <a href="author.html#827">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

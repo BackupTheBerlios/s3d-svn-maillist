@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r926 - in trunk: Documentation Documentation/manpages	libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r926%20-%20in%20trunk%3A%20Documentation%20Documentation/manpages%0A%09libs3d&In-Reply-To=%3C200807200915.m6K9F4bs017806%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000919.html">
+   <LINK REL="Next"  HREF="000921.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r926 - in trunk: Documentation Documentation/manpages	libs3d</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r926%20-%20in%20trunk%3A%20Documentation%20Documentation/manpages%0A%09libs3d&In-Reply-To=%3C200807200915.m6K9F4bs017806%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r926 - in trunk: Documentation Documentation/manpages	libs3d">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Jul 20 11:15:04 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000919.html">[S3d-svn] r925 - trunk/apps/dot_mcp
+</A></li>
+        <LI>Next message: <A HREF="000921.html">[S3d-svn] r927 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#920">[ date ]</a>
+              <a href="thread.html#920">[ thread ]</a>
+              <a href="subject.html#920">[ subject ]</a>
+              <a href="author.html#920">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-07-20 11:15:04 +0200 (Sun, 20 Jul 2008)
+New Revision: 926
+
+Modified:
+   trunk/Documentation/bookinfo.docbook
+   trunk/Documentation/manpages/s3d.1
+   trunk/Documentation/manpages/s3dmanpage.sgml
+   trunk/libs3d/io.c
+Log:
+Fix typo enviroment -&gt; environment
+
+Modified: trunk/Documentation/bookinfo.docbook
+===================================================================
+--- trunk/Documentation/bookinfo.docbook	2008-07-20 09:14:58 UTC (rev 925)
++++ trunk/Documentation/bookinfo.docbook	2008-07-20 09:15:04 UTC (rev 926)
+@@ -1,6 +1,6 @@
+ &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+ &lt;bookinfo&gt;
+-&lt;title&gt;S3D - a 3D Desktop Enviroment&lt;/title&gt;
++&lt;title&gt;S3D - a 3D Desktop Environment&lt;/title&gt;
+ &lt;authorgroup&gt;
+ &lt;author&gt;
+ &lt;firstname&gt;Simon&lt;/firstname&gt;
+
+Modified: trunk/Documentation/manpages/s3d.1
+===================================================================
+--- trunk/Documentation/manpages/s3d.1	2008-07-20 09:14:58 UTC (rev 925)
++++ trunk/Documentation/manpages/s3d.1	2008-07-20 09:15:04 UTC (rev 926)
+@@ -13,7 +13,7 @@
+ 
+ .SH &quot;DESCRIPTION&quot;
+ .PP
+-\fBs3d(1)\fR is a network display server which can be used as 3d desktop enviroment.
++\fBs3d(1)\fR is a network display server which can be used as 3d desktop environment.
+ .PP
+ .SH &quot;OPTIONS&quot;
+ .PP
+
+Modified: trunk/Documentation/manpages/s3dmanpage.sgml
+===================================================================
+--- trunk/Documentation/manpages/s3dmanpage.sgml	2008-07-20 09:14:58 UTC (rev 925)
++++ trunk/Documentation/manpages/s3dmanpage.sgml	2008-07-20 09:15:04 UTC (rev 926)
+@@ -24,7 +24,7 @@
+ 	&lt;refsect1&gt; 
+ 		&lt;title&gt;DESCRIPTION&lt;/title&gt; 
+ 		&lt;para&gt;
+-			&lt;command&gt;s3d(1)&lt;/command&gt; is a network display server which can be used as 3d desktop enviroment.
++			&lt;command&gt;s3d(1)&lt;/command&gt; is a network display server which can be used as 3d desktop environment.
+ 		&lt;/para&gt;
+ 		&lt;para&gt; &lt;/para&gt;
+ 	&lt;/refsect1&gt; 
+
+Modified: trunk/libs3d/io.c
+===================================================================
+--- trunk/libs3d/io.c	2008-07-20 09:14:58 UTC (rev 925)
++++ trunk/libs3d/io.c	2008-07-20 09:15:04 UTC (rev 926)
+@@ -67,7 +67,7 @@
+ void s3d_usage(void)
+ {
+ 	printf(&quot;s3d-parameters:\n&quot;);
+-	printf(&quot; --s3d-url &lt;url&gt;: skip S3D enviroment and connect to this url\n&quot;);
++	printf(&quot; --s3d-url &lt;url&gt;: skip S3D environment and connect to this url\n&quot;);
+ 	printf(&quot; --help, -?, -h, --s3d-help: this helpful text\n&quot;);
+ }
+ 
+@@ -123,7 +123,7 @@
+ 
+ 	cb_lock = 1; /* don't bother while initiating ... is set to 0 after INIT packet received. */
+ 	if (NULL != (s = getenv(&quot;S3D&quot;))) {
+-		s3dprintf(VLOW, &quot;at least we have the enviroment variable ... %s&quot;, s);
++		s3dprintf(VLOW, &quot;at least we have the environment variable ... %s&quot;, s);
+ 		url = s;
+ 	}
+ 	parse_args(argc, argv);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000919.html">[S3d-svn] r925 - trunk/apps/dot_mcp
+</A></li>
+	<LI>Next message: <A HREF="000921.html">[S3d-svn] r927 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#920">[ date ]</a>
+              <a href="thread.html#920">[ thread ]</a>
+              <a href="subject.html#920">[ subject ]</a>
+              <a href="author.html#920">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

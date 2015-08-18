@@ -1,0 +1,322 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r945 - in trunk: apps/s3dfm apps/s3dosm example	experimental/comptest experimental/olsrs3d libs3d libs3dw server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r945%20-%20in%20trunk%3A%20apps/s3dfm%20apps/s3dosm%20example%0A%09experimental/comptest%20experimental/olsrs3d%20libs3d%20libs3dw%20server&In-Reply-To=%3C200808162203.m7GM3OFS001087%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000929.html">
+   <LINK REL="Next"  HREF="000930.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r945 - in trunk: apps/s3dfm apps/s3dosm example	experimental/comptest experimental/olsrs3d libs3d libs3dw server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r945%20-%20in%20trunk%3A%20apps/s3dfm%20apps/s3dosm%20example%0A%09experimental/comptest%20experimental/olsrs3d%20libs3d%20libs3dw%20server&In-Reply-To=%3C200808162203.m7GM3OFS001087%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r945 - in trunk: apps/s3dfm apps/s3dosm example	experimental/comptest experimental/olsrs3d libs3d libs3dw server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Aug 17 00:03:24 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000929.html">[S3d-svn] r944 - in trunk: apps/s3dvt libs3d libs3dw server
+</A></li>
+        <LI>Next message: <A HREF="000930.html">[S3d-svn] r946 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#925">[ date ]</a>
+              <a href="thread.html#925">[ thread ]</a>
+              <a href="subject.html#925">[ subject ]</a>
+              <a href="author.html#925">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-08-17 00:03:23 +0200 (Sun, 17 Aug 2008)
+New Revision: 945
+
+Modified:
+   trunk/apps/s3dfm/focus.c
+   trunk/apps/s3dfm/parse.c
+   trunk/apps/s3dosm/kismet.c
+   trunk/apps/s3dosm/osm.c
+   trunk/example/filebrowser.c
+   trunk/experimental/comptest/comptest.c
+   trunk/experimental/comptest/x11.c
+   trunk/experimental/olsrs3d/search.c
+   trunk/libs3d/sei_construct.c
+   trunk/libs3dw/input.c
+   trunk/server/graphics.c
+Log:
+Remove dead stores
+
+Modified: trunk/apps/s3dfm/focus.c
+===================================================================
+--- trunk/apps/s3dfm/focus.c	2008-08-16 22:03:16 UTC (rev 944)
++++ trunk/apps/s3dfm/focus.c	2008-08-16 22:03:23 UTC (rev 945)
+@@ -32,9 +32,8 @@
+ 	float scale, s;
+ 	if (f-&gt;disp == D_DIR) {
+ 		s = 0.2;
+-		scale = 1 / s;
+ 		if (f-&gt;parent != NULL)
+-			scale = 1 / s * focus_get_scale(f-&gt;parent);
++			scale = 1.f / s * focus_get_scale(f-&gt;parent);
+ 		else
+ 			return(1.0);
+ 		root.px -= f-&gt;px;
+
+Modified: trunk/apps/s3dfm/parse.c
+===================================================================
+--- trunk/apps/s3dfm/parse.c	2008-08-16 22:03:16 UTC (rev 944)
++++ trunk/apps/s3dfm/parse.c	2008-08-16 22:03:23 UTC (rev 945)
+@@ -44,7 +44,7 @@
+ 	for (i = 0;i &lt; dir-&gt;n_sub;i++) {
+ 		dir-&gt;sub[i]-&gt;check = 1;
+ 	}
+-	n = i = scandir(path, &amp;namelist, NULL, alphasort);
++	n = scandir(path, &amp;namelist, NULL, alphasort);
+ 	if (n &lt; 0) {
+ 		window_fs_errno(path);
+ 		return(-1);
+
+Modified: trunk/apps/s3dosm/kismet.c
+===================================================================
+--- trunk/apps/s3dosm/kismet.c	2008-08-16 22:03:16 UTC (rev 944)
++++ trunk/apps/s3dosm/kismet.c	2008-08-16 22:03:23 UTC (rev 945)
+@@ -35,7 +35,6 @@
+ 	xmlNodePtr kids, gpskids;
+ 
+ 	node_init(&amp;node);
+-	attr = cur-&gt;properties;
+ 
+ 	node.base.layerid = layerid;
+ 	node.base.id = 0;  /* let database decide */
+
+Modified: trunk/apps/s3dosm/osm.c
+===================================================================
+--- trunk/apps/s3dosm/osm.c	2008-08-16 22:03:16 UTC (rev 944)
++++ trunk/apps/s3dosm/osm.c	2008-08-16 22:03:23 UTC (rev 945)
+@@ -92,7 +92,6 @@
+ 	xmlAttrPtr attr;
+ 
+ 	node_init(&amp;node);
+-	attr = cur-&gt;properties;
+ 
+ 	node.base.layerid = layerid;
+ 	for (attr = cur-&gt;properties;attr;attr = attr-&gt;next) {
+
+Modified: trunk/example/filebrowser.c
+===================================================================
+--- trunk/example/filebrowser.c	2008-08-16 22:03:16 UTC (rev 944)
++++ trunk/example/filebrowser.c	2008-08-16 22:03:23 UTC (rev 945)
+@@ -140,17 +140,13 @@
+ 				break;
+ 			}
+ 
+-			px = posx;
+-			py = posy;
+-			pz = posz;
+ 			alpha = ((360.0f * n) / ((float)i));
+-			radius = ((n_item * 10) / ((float)M_PI * 4));
+ 			if (n_item &lt; 5)
+ 				radius = ((50) / ((float)M_PI * 4));
+ 			else
+ 				radius = ((n_item * 10) / ((float)M_PI * 4));
+ 			px = posx - sinf(DEG2RAD(alpha)) * radius;
+-			pz = posy;
++			py = posy;
+ 			pz = posz - cosf(DEG2RAD(alpha)) * radius;
+ 
+ 			item[n].pie_oid = s3d_new_object();
+
+Modified: trunk/experimental/comptest/comptest.c
+===================================================================
+--- trunk/experimental/comptest/comptest.c	2008-08-16 22:03:16 UTC (rev 944)
++++ trunk/experimental/comptest/comptest.c	2008-08-16 22:03:23 UTC (rev 945)
+@@ -40,12 +40,9 @@
+ static void mainloop(void)
+ {
+ 	struct timeval start, stop;
+-	float secs;
+ 	gettimeofday(&amp;start, NULL);
+ 	event();
+ 	gettimeofday(&amp;stop, NULL);
+-	secs = (stop.tv_sec - start.tv_sec) + (stop.tv_usec - start.tv_usec)/1e6;
+-/*	printf(&quot;msecs to process events: %3.3f\n&quot;, secs*1e3);*/
+ 	nanosleep(&amp;t, NULL);
+ }
+ 
+
+Modified: trunk/experimental/comptest/x11.c
+===================================================================
+--- trunk/experimental/comptest/x11.c	2008-08-16 22:03:16 UTC (rev 944)
++++ trunk/experimental/comptest/x11.c	2008-08-16 22:03:23 UTC (rev 945)
+@@ -47,10 +47,9 @@
+ 	case UnmapNotify:		name = &quot;Unmap&quot;;				break;
+ 	case ReparentNotify:	name = &quot;Reparent&quot;;			break;
+ 	case CirculateNotify:	name = &quot;Circulate&quot;;			break;
+-	case PropertyNotify:	name = &quot;PropertyNotify&quot;;	return(0);	break;
++	case PropertyNotify:	return(0);
+ 	}
+ 	if (event-&gt;type == xdamage.event + XDamageNotify) {
+-		name = &quot;Damage&quot;;
+ 		return(0); /* don't report this. */
+ 	} else if (event-&gt;type == ConfigureNotify) {
+ 		name = &quot;Configure&quot;;
+
+Modified: trunk/experimental/olsrs3d/search.c
+===================================================================
+--- trunk/experimental/olsrs3d/search.c	2008-08-16 22:03:16 UTC (rev 944)
++++ trunk/experimental/olsrs3d/search.c	2008-08-16 22:03:23 UTC (rev 945)
+@@ -156,7 +156,7 @@
+ /* public */
+ void move_to_search_widget(float cam_position_t[], float cam_position_r[])
+ {
+-	float target, current;
++	float target;
+ 
+ 	set_search_status(WIDGET);
+ 	cam_position_t[0] = (cam_position_t[0] * 4 + _search_widget-&gt;x) / 5;
+@@ -164,30 +164,21 @@
+ 	cam_position_t[2] = (cam_position_t[2] * 4 + (_search_widget-&gt;z - 10)) / 5;
+ 
+ 	target = _search_widget-&gt;arx;
+-	current = cam_position_r[0];
+ 
+ 	if (_search_widget-&gt;arx - cam_position_r[0] &gt; 180)
+ 		target -= 360;
+-	if (_search_widget-&gt;arx - cam_position_r[0] &lt; -180)
+-		current -= 360;
+ 	cam_position_r[0] = (cam_position_r[0] * 4 + target) / 5;
+ 
+ 	target = _search_widget-&gt;ary;
+-	current = cam_position_r[1];
+ 
+ 	if (_search_widget-&gt;ary - cam_position_r[1] &gt; 180)
+ 		target -= 360;
+-	if (_search_widget-&gt;ary - cam_position_r[1] &lt; -180)
+-		current -= 360;
+ 	cam_position_r[1] = (cam_position_r[1] * 4 + target) / 5;
+ 
+ 	target = _search_widget-&gt;arz;
+-	current = cam_position_r[2];
+ 
+ 	if (_search_widget-&gt;arz - cam_position_r[2] &gt; 180)
+ 		target -= 360;
+-	if (_search_widget-&gt;arz - cam_position_r[2] &lt; -180)
+-		current -= 360;
+ 	cam_position_r[2] = (cam_position_r[2] * 4 + target) / 5;
+ 
+ 	s3d_translate(0, cam_position_t[0], cam_position_t[1], cam_position_t[2]);
+@@ -204,37 +195,28 @@
+ /* public */
+ void move_to_return_point(float cam_position_t[], float cam_position_r[])
+ {
+-	float target, current;
++	float target;
+ 
+ 	cam_position_t[0] = (cam_position_t[0] * 4 + _return_point[0][0]) / 5;
+ 	cam_position_t[1] = (cam_position_t[1] * 4 + _return_point[0][1]) / 5;
+ 	cam_position_t[2] = (cam_position_t[2] * 4 + _return_point[0][2]) / 5;
+ 
+ 	target = _return_point[1][0];
+-	current = cam_position_r[0];
+ 
+ 	if (_return_point[1][0] - cam_position_r[0] &gt; 180)
+ 		target -= 360;
+-	if (_return_point[1][0] - cam_position_r[0] &lt; -180)
+-		current -= 360;
+ 	cam_position_r[0] = (cam_position_r[0] * 4 + target) / 5;
+ 
+ 	target = _return_point[1][1];
+-	current = cam_position_r[1];
+ 
+ 	if (_return_point[1][1] - cam_position_r[1] &gt; 180)
+ 		target -= 360;
+-	if (_return_point[1][1] - cam_position_r[1] &lt; -180)
+-		current -= 360;
+ 	cam_position_r[1] = (cam_position_r[1] * 4 + target) / 5;
+ 
+ 	target = _return_point[1][2];
+-	current = cam_position_r[2];
+ 
+ 	if (_return_point[1][2] - cam_position_r[2] &gt; 180)
+ 		target -= 360;
+-	if (_return_point[1][2] - cam_position_r[2] &lt; -180)
+-		current -= 360;
+ 	cam_position_r[2] = (cam_position_r[2] * 4 + target) / 5;
+ 
+ 	s3d_translate(0, cam_position_t[0], cam_position_t[1], cam_position_t[2]);
+
+Modified: trunk/libs3d/sei_construct.c
+===================================================================
+--- trunk/libs3d/sei_construct.c	2008-08-16 22:03:16 UTC (rev 944)
++++ trunk/libs3d/sei_construct.c	2008-08-16 22:03:23 UTC (rev 945)
+@@ -733,11 +733,6 @@
+ 			if (FP_EQUAL(tr[t].lo.y, tr[tlast].lo.y) &amp;&amp;
+ 			                FP_EQUAL(tr[t].lo.x, tr[tlast].lo.x) &amp;&amp; tribot) {  /* bottom forms a triangle */
+ 
+-				if (is_swapped)
+-					tmptriseg = seg[segnum].prev;
+-				else
+-					tmptriseg = seg[segnum].next;
+-
+ 				if ((tmpseg &gt; 0) &amp;&amp; is_left_of(tmpseg, &amp;s.v0)) {
+ 					/* L-R downward cusp */
+ 					tr[tr[t].d1].u0 = t;
+
+Modified: trunk/libs3dw/input.c
+===================================================================
+--- trunk/libs3dw/input.c	2008-08-16 22:03:16 UTC (rev 944)
++++ trunk/libs3dw/input.c	2008-08-16 22:03:23 UTC (rev 945)
+@@ -196,7 +196,6 @@
+ 	s3dprintf(MED, &quot;edit field got key %d!!&quot;, key);
+ 	switch (keys-&gt;keysym) {
+ 	case S3DK_BACKSPACE:
+-		len = strlen(input-&gt;text);
+ 		if ((len = strlen(input-&gt;text)) &gt; 0) {
+ 			newtext = (char *)malloc(len + 0); /* +1 for the terminating byte, -1 for the deleted character */
+ 			strncpy(newtext, input-&gt;text, len);
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2008-08-16 22:03:16 UTC (rev 944)
++++ trunk/server/graphics.c	2008-08-16 22:03:23 UTC (rev 945)
+@@ -300,7 +300,6 @@
+ 			s3dprintf(VLOW, &quot;[HIT %d] names %d [z1:%f|z2:%f] mcp_o=%d, o=%d &quot;, i, names, z1, z2, mcp_o, o);
+ 		}
+ 		s3dprintf(VLOW, &quot;mcp_o= %d, o= %d&quot;, mcp_o, o);
+-		ptr = select_buf;
+ 		if (mcp_o == -1) { /* it's an mcp object */
+ 			s3dprintf(LOW, &quot;clicked on mcp-object no. %d&quot;, o);
+ 			event_obj_click(p, o);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000929.html">[S3d-svn] r944 - in trunk: apps/s3dvt libs3d libs3dw server
+</A></li>
+	<LI>Next message: <A HREF="000930.html">[S3d-svn] r946 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#925">[ date ]</a>
+              <a href="thread.html#925">[ thread ]</a>
+              <a href="subject.html#925">[ subject ]</a>
+              <a href="author.html#925">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

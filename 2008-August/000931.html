@@ -1,0 +1,2726 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r942 - in trunk: apps/dot_mcp apps/kism3d apps/meshs3d	apps/s3d_x11gate apps/s3dfm apps/s3dosm apps/s3dvt example	experimental/comptest experimental/olsrs3d	experimental/testvis experimental/wiitest libs3d libs3dw server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r942%20-%20in%20trunk%3A%20apps/dot_mcp%20apps/kism3d%20apps/meshs3d%0A%09apps/s3d_x11gate%20apps/s3dfm%20apps/s3dosm%20apps/s3dvt%20example%0A%09experimental/comptest%20experimental/olsrs3d%0A%09experimental/testvis%20experimental/wiitest%20libs3d%20libs3dw%20server&In-Reply-To=%3C200808152308.m7FN8V0G005162%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000926.html">
+   <LINK REL="Next"  HREF="000927.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r942 - in trunk: apps/dot_mcp apps/kism3d apps/meshs3d	apps/s3d_x11gate apps/s3dfm apps/s3dosm apps/s3dvt example	experimental/comptest experimental/olsrs3d	experimental/testvis experimental/wiitest libs3d libs3dw server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r942%20-%20in%20trunk%3A%20apps/dot_mcp%20apps/kism3d%20apps/meshs3d%0A%09apps/s3d_x11gate%20apps/s3dfm%20apps/s3dosm%20apps/s3dvt%20example%0A%09experimental/comptest%20experimental/olsrs3d%0A%09experimental/testvis%20experimental/wiitest%20libs3d%20libs3dw%20server&In-Reply-To=%3C200808152308.m7FN8V0G005162%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r942 - in trunk: apps/dot_mcp apps/kism3d apps/meshs3d	apps/s3d_x11gate apps/s3dfm apps/s3dosm apps/s3dvt example	experimental/comptest experimental/olsrs3d	experimental/testvis experimental/wiitest libs3d libs3dw server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sat Aug 16 01:08:31 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000926.html">[S3d-svn] r941 - in trunk: . cmake/modules
+</A></li>
+        <LI>Next message: <A HREF="000927.html">[S3d-svn] r943 - in trunk: libs3d libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#931">[ date ]</a>
+              <a href="thread.html#931">[ thread ]</a>
+              <a href="subject.html#931">[ subject ]</a>
+              <a href="author.html#931">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-08-16 01:08:15 +0200 (Sat, 16 Aug 2008)
+New Revision: 942
+
+Modified:
+   trunk/apps/dot_mcp/main.c
+   trunk/apps/dot_mcp/menu.c
+   trunk/apps/kism3d/client.c
+   trunk/apps/kism3d/gui.c
+   trunk/apps/kism3d/kism3d.c
+   trunk/apps/kism3d/list.h
+   trunk/apps/kism3d/network.c
+   trunk/apps/meshs3d/allocate.c
+   trunk/apps/meshs3d/hash.c
+   trunk/apps/meshs3d/main.c
+   trunk/apps/meshs3d/process.c
+   trunk/apps/s3d_x11gate/s3d_x11gate.c
+   trunk/apps/s3dfm/dialog.c
+   trunk/apps/s3dfm/fly.c
+   trunk/apps/s3dfm/fs.c
+   trunk/apps/s3dfm/node.c
+   trunk/apps/s3dfm/parse.c
+   trunk/apps/s3dfm/s3dfm.h
+   trunk/apps/s3dosm/db.c
+   trunk/apps/s3dosm/draw.c
+   trunk/apps/s3dosm/gps.c
+   trunk/apps/s3dosm/http_fetcher.c
+   trunk/apps/s3dosm/io.c
+   trunk/apps/s3dosm/kismet.c
+   trunk/apps/s3dosm/object.c
+   trunk/apps/s3dosm/osm.c
+   trunk/apps/s3dosm/s3dosm.h
+   trunk/apps/s3dosm/tag.c
+   trunk/apps/s3dosm/ui.c
+   trunk/apps/s3dvt/main.c
+   trunk/example/filebrowser.c
+   trunk/example/texturetest.c
+   trunk/example/widgets.c
+   trunk/example/wiresphere.c
+   trunk/experimental/comptest/window.c
+   trunk/experimental/comptest/x11.c
+   trunk/experimental/olsrs3d/main.c
+   trunk/experimental/olsrs3d/olsrs3d.h
+   trunk/experimental/olsrs3d/process.c
+   trunk/experimental/testvis/testvis.c
+   trunk/experimental/wiitest/wiitest.c
+   trunk/libs3d/error.c
+   trunk/libs3d/event.c
+   trunk/libs3d/fontselect.c
+   trunk/libs3d/freetype.c
+   trunk/libs3d/hash.c
+   trunk/libs3d/io.c
+   trunk/libs3d/modelread.c
+   trunk/libs3d/network.c
+   trunk/libs3d/object_queue.c
+   trunk/libs3d/proto_in.c
+   trunk/libs3d/s3d.h
+   trunk/libs3d/s3dlib.h
+   trunk/libs3d/shm.c
+   trunk/libs3d/tcp.c
+   trunk/libs3d/texture.c
+   trunk/libs3dw/button.c
+   trunk/libs3dw/input.c
+   trunk/libs3dw/label.c
+   trunk/libs3dw/root.c
+   trunk/libs3dw/s3dw.h
+   trunk/libs3dw/s3dw_int.h
+   trunk/libs3dw/surface.c
+   trunk/libs3dw/textbox.c
+   trunk/libs3dw/widget.c
+   trunk/server/allocate.c
+   trunk/server/error.c
+   trunk/server/event.c
+   trunk/server/global.h
+   trunk/server/main.c
+   trunk/server/network.c
+   trunk/server/object.c
+   trunk/server/process.c
+   trunk/server/shm.c
+Log:
+Make it compile with stricter (c++ like) compilers
+
+Modified: trunk/apps/dot_mcp/main.c
+===================================================================
+--- trunk/apps/dot_mcp/main.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/dot_mcp/main.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -195,7 +195,7 @@
+ 	return(0);
+ }
+ 
+-static void* find_app(int oid)
++static struct app* find_app(int oid)
+ {
+ 	struct app *a = apps;
+ 	while (a != NULL) {
+@@ -271,7 +271,7 @@
+ 	mo = (struct mcp_object *)hrmz-&gt;buf;
+ 	if (NULL == (a = find_app(mo-&gt;object))) {
+ 		printf(&quot;adding new object ......&quot;);
+-		a = malloc(sizeof(struct app));
++		a = (struct app*)malloc(sizeof(struct app));
+ 		a-&gt;oid = mo-&gt;object;
+ 		a-&gt;r = mo-&gt;r;
+ 		strncpy(a-&gt;name, mo-&gt;name, 256);
+
+Modified: trunk/apps/dot_mcp/menu.c
+===================================================================
+--- trunk/apps/dot_mcp/menu.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/dot_mcp/menu.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -30,7 +30,7 @@
+ #include &lt;stdlib.h&gt; /* exit() */
+ #include &lt;string.h&gt; /* strlen(),strncpy(), strncat() */
+ struct menu_entry {
+-	char *icon, *name, *path;
++	const char *icon, *name, *path;
+ 	int icon_oid, str_oid;
+ };
+ 
+
+Modified: trunk/apps/kism3d/client.c
+===================================================================
+--- trunk/apps/kism3d/client.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/kism3d/client.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -46,7 +46,7 @@
+ 
+ 
+ 	/* we reached the end of the list and must create a new wlan_network */
+-	wlan_client = alloc_memory(sizeof(struct wlan_client));
++	wlan_client = (struct wlan_client*)alloc_memory(sizeof(struct wlan_client));
+ 
+ 	INIT_LIST_HEAD(&amp;wlan_client-&gt;list);
+ 
+
+Modified: trunk/apps/kism3d/gui.c
+===================================================================
+--- trunk/apps/kism3d/gui.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/kism3d/gui.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -58,9 +58,9 @@
+ 	unsigned int *l; /* lines */
+ 	num_v = (stacks + 1) * slices;
+ 	num_l = stacks * slices + (stacks - 1) * slices; /* vertical + horizontal */
+-	v = malloc(sizeof(float) * 3 * num_v);
+-	n = malloc(sizeof(float) * 6 * num_l);
+-	l = malloc(sizeof(unsigned int) * 3 * num_l);
++	v = (float*)malloc(sizeof(float) * 3 * num_v);
++	n = (float*)malloc(sizeof(float) * 6 * num_l);
++	l = (unsigned int*)malloc(sizeof(unsigned int) * 3 * num_l);
+ 	i = 0;
+ 	for (x = 0;x &lt; slices;x++) {
+ 		alpha = (x * 360.0 / slices) * M_PI / 180.0;
+
+Modified: trunk/apps/kism3d/kism3d.c
+===================================================================
+--- trunk/apps/kism3d/kism3d.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/kism3d/kism3d.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -233,7 +233,7 @@
+ 				if (wlan_network-&gt;ssid != NULL)
+ 					free(wlan_network-&gt;ssid);
+ 
+-				wlan_network-&gt;ssid = alloc_memory(strlen(ssid));
++				wlan_network-&gt;ssid = (char*)alloc_memory(strlen(ssid));
+ 				strcpy(wlan_network-&gt;ssid, ssid);
+ 
+ 				pthread_mutex_unlock(&amp;Network_list_mutex);
+@@ -356,7 +356,7 @@
+ 
+ 	while (argc &gt; found_args) {
+ 
+-		kismet_src = alloc_memory(sizeof(struct kismet_src));
++		kismet_src = (struct kismet_src*)alloc_memory(sizeof(struct kismet_src));
+ 
+ 		INIT_LIST_HEAD(&amp;kismet_src-&gt;list);
+ 		kismet_src-&gt;enable_level = 0;
+@@ -404,7 +404,7 @@
+ 		kismet_src-&gt;kismet_addr.sin_port = htons(kismet_src-&gt;port);
+ 		kismet_src-&gt;kismet_addr.sin_addr.s_addr = kismet_src-&gt;ip;
+ 
+-		kismet_src-&gt;kismet_ip = alloc_memory(16);
++		kismet_src-&gt;kismet_ip = (char*)alloc_memory(16);
+ 		inet_ntop(AF_INET, &amp;kismet_src-&gt;ip, kismet_src-&gt;kismet_ip, 16);
+ 
+ 
+@@ -431,7 +431,7 @@
+ 		}
+ 
+ 
+-		kismet_src-&gt;recv_buff = alloc_memory(1500);
++		kismet_src-&gt;recv_buff = (char*)alloc_memory(1500);
+ 
+ 		FD_SET(kismet_src-&gt;sock, &amp;wait_sockets);
+ 		if (kismet_src-&gt;sock &gt; max_sock)
+
+Modified: trunk/apps/kism3d/list.h
+===================================================================
+--- trunk/apps/kism3d/list.h	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/kism3d/list.h	2008-08-15 23:08:15 UTC (rev 942)
+@@ -21,8 +21,8 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#include &lt;stdlib.h&gt;
+ 
+-
+ struct list_head {
+ 	struct list_head *next, *prev;
+ };
+@@ -75,29 +75,29 @@
+  * This is only for internal list manipulation where we know
+  * the prev/next entries already!
+  */
+-static inline void __list_add(struct list_head *new,
++static inline void __list_add(struct list_head *n,
+                               struct list_head *prev,
+                               struct list_head *next)
+ {
+-	next-&gt;prev = new;
+-	new-&gt;next = next;
+-	new-&gt;prev = prev;
+-	prev-&gt;next = new;
++	next-&gt;prev = n;
++	n-&gt;next = next;
++	n-&gt;prev = prev;
++	prev-&gt;next = n;
+ }
+ 
+ 
+ 
+ /**
+  * list_add_tail - add a new entry
+- * @new: new entry to be added
++ * @n: new entry to be added
+  * @head: list head to add it before
+  *
+  * Insert a new entry before the specified head.
+  * This is useful for implementing queues.
+  */
+-static inline void list_add_tail(struct list_head *new, struct list_head *head)
++static inline void list_add_tail(struct list_head *n, struct list_head *head)
+ {
+-	__list_add(new, head-&gt;prev, head);
++	__list_add(n, head-&gt;prev, head);
+ }
+ 
+ 
+@@ -125,7 +125,7 @@
+ static inline void list_del(struct list_head *entry)
+ {
+ 	__list_del(entry-&gt;prev, entry-&gt;next);
+-	entry-&gt;next = (void *) 0;
+-	entry-&gt;prev = (void *) 0;
++	entry-&gt;next = NULL;
++	entry-&gt;prev = NULL;
+ }
+ 
+
+Modified: trunk/apps/kism3d/network.c
+===================================================================
+--- trunk/apps/kism3d/network.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/kism3d/network.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -41,7 +41,7 @@
+ 
+ 
+ 	/* we reached the end of the list and must create a new wlan_network */
+-	wlan_network = alloc_memory(sizeof(struct wlan_network));
++	wlan_network = (struct wlan_network*)alloc_memory(sizeof(struct wlan_network));
+ 
+ 	INIT_LIST_HEAD(&amp;wlan_network-&gt;list);
+ 
+
+Modified: trunk/apps/meshs3d/allocate.c
+===================================================================
+--- trunk/apps/meshs3d/allocate.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/meshs3d/allocate.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -84,7 +84,7 @@
+ 
+ 	if (walker == NULL) {
+ 
+-		walker = malloc(sizeof(struct memoryUsage));
++		walker = (struct memoryUsage*)malloc(sizeof(struct memoryUsage));
+ 
+ 		walker-&gt;length = length;
+ 		walker-&gt;tag = tag;
+@@ -192,7 +192,7 @@
+ 
+ 	/* printf(&quot;sizeof(struct chunkHeader) = %u, sizeof (struct chunkTrailer) = %u\n&quot;, sizeof (struct chunkHeader), sizeof (struct chunkTrailer)); */
+ 
+-	memory = malloc(length + sizeof(struct chunkHeader) + sizeof(struct chunkTrailer));
++	memory = (unsigned char*)malloc(length + sizeof(struct chunkHeader) + sizeof(struct chunkTrailer));
+ 
+ 	if (memory == NULL) {
+ 		fprintf(stderr, &quot;Cannot allocate %u bytes, malloc tag = %d\n&quot;, (unsigned int)(length + sizeof(struct chunkHeader) + sizeof(struct chunkTrailer)), tag);
+@@ -230,7 +230,7 @@
+ 	uint32_t copyLength;
+ 
+ 	if (memoryParameter) { /* if memoryParameter==NULL, realloc() should work like malloc() !! */
+-		memory = memoryParameter;
++		memory = (unsigned char*)memoryParameter;
+ 		chunkHeader = (struct chunkHeader *)(memory - sizeof(struct chunkHeader));
+ 
+ 		if (chunkHeader-&gt;magicNumber != MAGIC_NUMBER) {
+@@ -247,7 +247,7 @@
+ 	}
+ 
+ 
+-	result = debugMalloc(length, tag);
++	result = (unsigned char*)debugMalloc(length, tag);
+ 	if (memoryParameter) {
+ 		copyLength = length;
+ 
+@@ -270,7 +270,7 @@
+ 	struct chunkHeader *walker;
+ 	struct chunkHeader *previous;
+ 
+-	memory = memoryParameter;
++	memory = (unsigned char*)memoryParameter;
+ 	chunkHeader = (struct chunkHeader *)(memory - sizeof(struct chunkHeader));
+ 
+ 	if (chunkHeader-&gt;magicNumber != MAGIC_NUMBER) {
+
+Modified: trunk/apps/meshs3d/hash.c
+===================================================================
+--- trunk/apps/meshs3d/hash.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/meshs3d/hash.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -85,7 +85,7 @@
+ 	struct hash_it_t *iter;
+ 
+ 	if (iter_in == NULL) {
+-		iter = debugMalloc(sizeof(struct hash_it_t), 301);
++		iter = (struct hash_it_t*)debugMalloc(sizeof(struct hash_it_t), 301);
+ 		iter-&gt;index =  -1;
+ 		iter-&gt;bucket = NULL;
+ 		iter-&gt;prev_bucket = NULL;
+@@ -154,12 +154,12 @@
+ struct hashtable_t *hash_new(int size, hashdata_compare_cb compare, hashdata_choose_cb choose) {
+ 	struct hashtable_t *hash;
+ 
+-	hash = debugMalloc(sizeof(struct hashtable_t) , 302);
++	hash = (struct hashtable_t*)debugMalloc(sizeof(struct hashtable_t) , 302);
+ 	if (hash == NULL)      /* could not allocate the hash control structure */
+ 		return (NULL);
+ 
+ 	hash-&gt;size = size;
+-	hash-&gt;table = debugMalloc(sizeof(struct element_t *) * size, 303);
++	hash-&gt;table = (struct element_t**)debugMalloc(sizeof(struct element_t *) * size, 303);
+ 	if (hash-&gt;table == NULL) {   /* could not allocate the table */
+ 		debugFree(hash, 1305);
+ 		return(NULL);
+@@ -189,7 +189,7 @@
+ 	}
+ 
+ 	/* found the tail of the list, add new element */
+-	if (NULL == (bucket = debugMalloc(sizeof(struct element_t), 304)))
++	if (NULL == (bucket = (struct element_t*)debugMalloc(sizeof(struct element_t), 304)))
+ 		return(-1); /* debugMalloc failed */
+ 
+ 	bucket-&gt;data = data;   /* init the new bucket */
+
+Modified: trunk/apps/meshs3d/main.c
+===================================================================
+--- trunk/apps/meshs3d/main.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/meshs3d/main.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -159,7 +159,7 @@
+ 					ip[0] = max(node-&gt;ip, tmp_node-&gt;ip);
+ 					ip[1] = min(node-&gt;ip, tmp_node-&gt;ip);
+ 
+-					if (NULL != (con = hash_find(con_hash, ip))) {
++					if (NULL != (con = (struct node_con*)hash_find(con_hash, ip))) {
+ 						s3d_del_object(con-&gt;obj_id);
+ 						con-&gt;obj_id = -1;
+ 					}
+@@ -349,7 +349,7 @@
+ 				ip[1] = sec_node-&gt;ip;
+ 				distance = dirt(first_node-&gt;pos_vec, sec_node-&gt;pos_vec, tmp_mov_vec);
+ 
+-				if ((NULL != (con = hash_find(con_hash, ip)))) {
++				if ((NULL != (con = (struct node_con*)hash_find(con_hash, ip)))) {
+ 
+ 					/* we have a connection */
+ 					wish_distance = ((con-&gt;etx1_sqrt + con-&gt;etx2_sqrt)) + 4;
+
+Modified: trunk/apps/meshs3d/process.c
+===================================================================
+--- trunk/apps/meshs3d/process.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/meshs3d/process.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -53,7 +53,7 @@
+ 
+ static int long_choose(void *data, int32_t size)
+ {
+-	unsigned char *key = data;
++	unsigned char *key = (unsigned char*)data;
+ 	uint32_t hash = 0;
+ 	size_t i;
+ 
+@@ -77,7 +77,7 @@
+ /* hash algorithm from <A HREF="http://en.wikipedia.org/wiki/Hash_table">http://en.wikipedia.org/wiki/Hash_table</A> */
+ static int orig_choose(void *data, int32_t size)
+ {
+-	unsigned char *key = data;
++	unsigned char *key = (unsigned char*)data;
+ 	uint32_t hash = 0;
+ 	size_t i;
+ 
+@@ -92,7 +92,7 @@
+ 	return (hash % size);
+ }
+ 
+-static void exit_error(char *format, ...)
++static void exit_error(const char *format, ...)
+ {
+ 	va_list args;
+ 
+
+Modified: trunk/apps/s3d_x11gate/s3d_x11gate.c
+===================================================================
+--- trunk/apps/s3d_x11gate/s3d_x11gate.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3d_x11gate/s3d_x11gate.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -51,7 +51,7 @@
+ static XImage *image;
+ static Display *dpy = NULL;
+ static int window, scr;
+-static unsigned int width, height, height, depth;
++static unsigned int width, height, depth;
+ static Visual *visual;
+ static XShmSegmentInfo shminfo;
+ static char *tex_image = NULL, *otex_image = NULL, *img1, *img2;
+@@ -188,7 +188,7 @@
+ }
+ int main(int argc, char **argv)
+ {
+-	char *disp = NULL;
++	const char *disp = NULL;
+ 	int a, b, c, d;
+ 	int xt;
+ 	if (disp == NULL) disp = getenv(&quot;DISPLAY&quot;);
+@@ -217,7 +217,7 @@
+ 
+ 		image = XShmCreateImage(dpy, visual, depth, ZPixmap, NULL, &amp;shminfo, width, height);
+ 		shminfo.shmid = shmget(IPC_PRIVATE, image-&gt;bytes_per_line * image-&gt;height, IPC_CREAT | 0777);
+-		shminfo.shmaddr = image-&gt;data = shmat(shminfo.shmid, NULL, 0);
++		shminfo.shmaddr = image-&gt;data = (char*)shmat(shminfo.shmid, NULL, 0);
+ 		shmctl(shminfo.shmid, IPC_RMID, NULL);
+ 		shminfo.readOnly = False;
+ 		if (!XShmAttach(dpy, &amp;shminfo))
+@@ -229,8 +229,8 @@
+ 		s3d_set_callback(S3D_EVENT_OBJ_CLICK, mouseclick);
+ 		s3d_set_callback(S3D_EVENT_KEY, keypress);
+ 		printf(&quot;screen: %dx%d\n&quot;, width, height);
+-		img1 = malloc(width * height * sizeof(uint32_t));
+-		img2 = malloc(width * height * sizeof(uint32_t));
++		img1 = (char*)malloc(width * height * sizeof(uint32_t));
++		img2 = (char*)malloc(width * height * sizeof(uint32_t));
+ 		tex_image = img1;
+ 		otex_image = img2;
+ 		oid = s3d_new_object();
+
+Modified: trunk/apps/s3dfm/dialog.c
+===================================================================
+--- trunk/apps/s3dfm/dialog.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3dfm/dialog.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -55,8 +55,8 @@
+ 		if (dir-&gt;sub[i]-&gt;sub != NULL) get_selected(fp, dir-&gt;sub[i]); /* scan subdir */
+ 		if (dir-&gt;sub[i]-&gt;detached) {
+ 			fp-&gt;n++;
+-			fp-&gt;p = realloc(fp-&gt;p, sizeof(t_file) * fp-&gt;n);
+-			s = malloc(M_DIR);
++			fp-&gt;p = (struct _t_file*)realloc(fp-&gt;p, sizeof(t_file) * fp-&gt;n);
++			s = (char*)malloc(M_DIR);
+ 			node_path(dir-&gt;sub[i], s);
+ 			fp-&gt;p[fp-&gt;n - 1].name = s;
+ 			if ((fs_lock == TYPE_COPY) || (fs_lock == TYPE_MOVE))
+@@ -114,7 +114,7 @@
+ 	s3dw_delete(button-&gt;parent); /* parent =surface. this means close containing window */
+ 
+ }
+-void window_fs_errno(char *errmsg)
++void window_fs_errno(const char *errmsg)
+ {
+ 	s3dw_surface *infwin;
+ 	s3dw_button  *button;
+@@ -165,7 +165,7 @@
+ 	pthread_create(&amp;filethread, NULL, thread_start, NULL);
+ 	s3dw_delete(button-&gt;parent); /* parent =surface. this means close containing window */
+ }
+-void window_copy(char *S3DFMUNUSED(path))
++void window_copy(const char *S3DFMUNUSED(path))
+ {
+ 	s3dw_surface *infwin;
+ 	s3dw_button  *okbutton, *abortbutton;
+@@ -179,7 +179,7 @@
+ 		return;
+ 	}
+ 	fs_lock = TYPE_COPY;
+-	fp = malloc(sizeof(filelist));
++	fp = (filelist*)malloc(sizeof(filelist));
+ 	fp-&gt;n = 0;
+ 	fp-&gt;p = NULL;
+ 	get_selected(fp, &amp;root);
+@@ -230,7 +230,7 @@
+ 		return;
+ 	}
+ 	fs_lock = TYPE_UNLINK;
+-	fp = malloc(sizeof(filelist));
++	fp = (filelist*)malloc(sizeof(filelist));
+ 	fp-&gt;n = 0;
+ 	fp-&gt;p = NULL;
+ 	get_selected(fp, &amp;root);
+@@ -282,7 +282,7 @@
+ 	window_fs_abort(button); /* finish */
+ 
+ }
+-void window_mkdir(char *path)
++void window_mkdir(const char *path)
+ {
+ 	s3dw_surface *infwin;
+ 	s3dw_button  *okbutton, *abortbutton;
+@@ -309,7 +309,7 @@
+ 	s3dw_show(S3DWIDGET(infwin));
+ }
+ 
+-void window_move(char *S3DFMUNUSED(path))
++void window_move(const char *S3DFMUNUSED(path))
+ {
+ 	s3dw_surface *infwin;
+ 	s3dw_button  *button;
+
+Modified: trunk/apps/s3dfm/fly.c
+===================================================================
+--- trunk/apps/s3dfm/fly.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3dfm/fly.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -58,7 +58,7 @@
+ t_node *fly_create_anode(t_node *node)
+ {
+ 	t_node *work;
+-	work = malloc(sizeof(t_node));
++	work = (t_node*)malloc(sizeof(t_node));
+ 	node_init(work);
+ 	work-&gt;parent = node-&gt;parent;
+ 	work-&gt;scale = node-&gt;scale;
+
+Modified: trunk/apps/s3dfm/fs.c
+===================================================================
+--- trunk/apps/s3dfm/fs.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3dfm/fs.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -50,7 +50,7 @@
+ 	int n, i, j;
+ 	char *name;
+ 
+-	fl = malloc(sizeof(filelist));
++	fl = (filelist*)malloc(sizeof(filelist));
+ 	fl-&gt;p = NULL;
+ 	fl-&gt;n = 0;
+ 	n = scandir(path, &amp;namelist, NULL, alphasort);
+@@ -60,11 +60,11 @@
+ 	} else {
+ 		j = 0;
+ 		fl-&gt;n = n - 2 ; /* ignore . and .. */
+-		fl-&gt;p = malloc(sizeof(t_file) * fl-&gt;n);
++		fl-&gt;p = (struct _t_file*)malloc(sizeof(t_file) * fl-&gt;n);
+ 		for (i = 0;i &lt; n;i++) {
+ 			name = namelist[i]-&gt;d_name;
+ 			if (!((strcmp(name, &quot;.&quot;) == 0) || (strcmp(name, &quot;..&quot;) == 0))) { /* ignore */
+-				fl-&gt;p[j].name = malloc(strlen(name) + strlen(path) + 2);
++				fl-&gt;p[j].name = (char*)malloc(strlen(name) + strlen(path) + 2);
+ 				strcpy(fl-&gt;p[j].name, path);
+ 				strcat(fl-&gt;p[j].name, &quot;/&quot;);
+ 				strcat(fl-&gt;p[j].name, name);
+@@ -207,7 +207,7 @@
+ 	return(0);
+ }
+ /* copy the source to the destination, destination should be a directory. */
+-int fs_fl_copy(filelist *fl, char *dest)
++int fs_fl_copy(filelist *fl, const char *dest)
+ {
+ 	int i;
+ 	int r;
+@@ -217,7 +217,7 @@
+ 	for (i = 0;i &lt; fl-&gt;n;i++) {
+ 		fl-&gt;p[i].state = STATE_INUSE;
+ 		bname = basename(fl-&gt;p[i].name);
+-		sdest = malloc(strlen(dest) + strlen(bname) + 2);
++		sdest = (char*)malloc(strlen(dest) + strlen(bname) + 2);
+ 
+ 		strcpy(sdest, dest);
+ 		strcat(sdest, &quot;/&quot;);
+@@ -291,7 +291,7 @@
+ }
+ 
+ /* moves the source to the destination */
+-int fs_fl_move(filelist *fl, char *dest)
++int fs_fl_move(filelist *fl, const char *dest)
+ {
+ 	int i;
+ 	int r;
+@@ -301,7 +301,7 @@
+ 	for (i = 0;i &lt; fl-&gt;n;i++) {
+ 		fl-&gt;p[i].state = STATE_INUSE;
+ 		bname = basename(fl-&gt;p[i].name);
+-		sdest = malloc(strlen(dest) + strlen(bname) + 2);
++		sdest = (char*)malloc(strlen(dest) + strlen(bname) + 2);
+ 
+ 		strcpy(sdest, dest);
+ 		strcat(sdest, &quot;/&quot;);
+@@ -316,13 +316,13 @@
+ }
+ 
+ /* write an error and wait for a reaction */
+-int fs_error(char *message, char *file)
++int fs_error(const char *message, char *file)
+ {
+ 	static struct timespec t = {
+ 		0, 100*1000*1000
+ 	};
+ 	fs_err.err = errno;
+-	fs_err.message = message;
++	fs_err.message = (char*)message;
+ 	fs_err.file = file;
+ 	fs_err.state = ESTATE_RISE;
+ 	printf(&quot;[FS ERROR]: %s %s %s&quot;, message, file, strerror(errno));
+
+Modified: trunk/apps/s3dfm/node.c
+===================================================================
+--- trunk/apps/s3dfm/node.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3dfm/node.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -26,7 +26,7 @@
+ #include &lt;stdio.h&gt; /* printf() */
+ #include &lt;stdlib.h&gt; /* free() */
+ /* find the node to a path, return NULL if not parsed yet */
+-t_node *node_getbypath(char *path)
++t_node *node_getbypath(const char *path)
+ {
+ 	char p[M_DIR];
+ 	char *s, *match;
+
+Modified: trunk/apps/s3dfm/parse.c
+===================================================================
+--- trunk/apps/s3dfm/parse.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3dfm/parse.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -63,8 +63,8 @@
+ 					/* i now holds the right index in sub, so we use dir-&gt;sub[i]
+ 					 * to reference the new item now... */
+ 					dir-&gt;n_sub++;
+-					dir-&gt;sub = realloc(dir-&gt;sub , dir-&gt;n_sub * sizeof(t_node *));
+-					dir-&gt;sub[i] = malloc(sizeof(t_node));
++					dir-&gt;sub = (struct _t_node**)realloc(dir-&gt;sub , dir-&gt;n_sub * sizeof(t_node *));
++					dir-&gt;sub[i] = (struct _t_node*)malloc(sizeof(t_node));
+ 					node_init(dir-&gt;sub[i]);
+ 					strncpy(dir-&gt;sub[i]-&gt;name, nstr, M_NAME);
+ 					dir-&gt;sub[i]-&gt;parent = dir;
+@@ -96,7 +96,7 @@
+ 				dir-&gt;check = 1;
+ 			}
+ 		/* if we removed something, then shrink the buffer accordingly .. */
+-		if (dir-&gt;check)  dir-&gt;sub = realloc(dir-&gt;sub , dir-&gt;n_sub * sizeof(t_node *));
++		if (dir-&gt;check)  dir-&gt;sub = (struct _t_node**)realloc(dir-&gt;sub , dir-&gt;n_sub * sizeof(t_node *));
+ 		dir-&gt;parsed = 1;
+ 	}
+ 	return(0);
+
+Modified: trunk/apps/s3dfm/s3dfm.h
+===================================================================
+--- trunk/apps/s3dfm/s3dfm.h	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3dfm/s3dfm.h	2008-08-15 23:08:15 UTC (rev 942)
+@@ -155,12 +155,12 @@
+ void    window_fs(s3dw_widget *button);
+ void   window_fs_another(void);
+ void   window_fs_nothing(void);
+-void   window_fs_errno(char *errmsg);
++void   window_fs_errno(const char *errmsg);
+ void   window_fs_abort(s3dw_widget *button);
+-void   window_copy(char *path);
++void   window_copy(const char *path);
+ void   window_fs_mkdir(s3dw_widget *button);
+-void   window_mkdir(char *path);
+-void   window_move(char *path);
++void   window_mkdir(const char *path);
++void   window_move(const char *path);
+ void   window_info(char *path);
+ void   window_fsani(void);
+ void    window_unlink(void);
+@@ -176,20 +176,20 @@
+ filelist  *fl_new(char *path);
+ void   fl_del(filelist *fl);
+ void    fs_fl_approx(filelist *fl, int *files, int *dirs, int *bytes);
+-int    fs_fl_copy(filelist *fl, char *dest);
+-int    fs_fl_move(filelist *fl, char *dest);
++int    fs_fl_copy(filelist *fl, const char *dest);
++int    fs_fl_move(filelist *fl, const char *dest);
+ int    fs_fl_unlink(filelist *fl);
+ void    fs_approx(char *source, int *files, int *dirs, int *bytes);
+ int    fs_copy(char *source, char *dest);
+ int    fs_move(char *source, char *dest);
+ int    fs_unlink(char *dest);
+-int    fs_error(char *message, char *file);
++int    fs_error(const char *message, char *file);
+ /* icon.c */
+ int    icon_draw(t_node *dir);
+ int    icon_undisplay(t_node *dir);
+ void    icon_focus_color(t_node *dir, int on);
+ /* node.c */
+-t_node   *node_getbypath(char *path);
++t_node   *node_getbypath(const char *path);
+ void    node_path(t_node *dir, char *path);
+ t_node   *node_getbyoid(t_node *t, int oid);
+ int    node_init(t_node *dir);
+
+Modified: trunk/apps/s3dosm/db.c
+===================================================================
+--- trunk/apps/s3dosm/db.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3dosm/db.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -33,16 +33,15 @@
+ 
+ static sqlite3 *db;
+ static char *dbFile = NULL;
+-int db_exec(const char *query, sqlite3_callback callback, void *arg);
+ 
+ /* TODO: remove '' for security reasons */
+-static void clean_string(char *clean, char *dirty, int n)
++static void clean_string(char *clean, const char *dirty, int n)
+ {
+ 	strncpy(clean, dirty, n);
+ 	clean[n-1] = 0;
+ }
+ 
+-int db_add_tag(object_t *obj, char *key, char *val)
++int db_add_tag(object_t *obj, const char *key, const char *val)
+ {
+ 	char tagquery[MAXQ];
+ 	char mkey[MAXQ], mval[MAXQ];
+@@ -104,7 +103,7 @@
+ 	return(0);
+ }
+ 
+-int db_insert_layer(char *layer_name)
++int db_insert_layer(const char *layer_name)
+ {
+ 	char findquery[MAXQ];
+ 	char addquery[MAXQ];
+@@ -126,7 +125,7 @@
+ #define MAGIC 1337 /* just to elevate the nodes a little bit */
+ static int found = 0;
+ /* tries to find node coordinates of ip, returns 1 if has found something */
+-int db_olsr_check(char *ip, float *pos)
++int db_olsr_check(const char *ip, float *pos)
+ {
+ 	char findquery[MAXQ];
+ 	char clean_ip[16];
+@@ -164,7 +163,7 @@
+ int db_getpoint(void *data, int argc, char **argv, char **azColName)
+ {
+ 	float lo = 0.0, la = 0.0, alt = 0.0;
+-	float *p = data;
++	float *p = (float*)data;
+ 	int i;
+ 	for (i = 0; i &lt; argc; i++) {
+ 		if (argv[i]) {
+@@ -208,7 +207,7 @@
+ 
+ /* get the value for a a certain tagid and keyvalue (field). Write into target, which has to be allocated with MAXQ bytes of space.
+  * Nothing is written when nothing is found. */
+-int db_gettag(int tagid, char *field, char *target)
++int db_gettag(int tagid, const char *field, char *target)
+ {
+ 	char query[MAXQ];
+ 	target[0] = 0;
+@@ -227,11 +226,11 @@
+ 	return 0;
+ }
+ 
+-static int db_really_exec(const char *query, sqlite3_callback callback, void *arg)
++static int db_really_exec(const char *query, sqlite3_callback callback, const void *arg)
+ {
+ 	char *zErrMsg = NULL;
+ 	int rc;
+-	if (SQLITE_OK != (rc = sqlite3_exec(db, query, callback, arg, &amp;zErrMsg))) {
++	if (SQLITE_OK != (rc = sqlite3_exec(db, query, callback, (void*)arg, &amp;zErrMsg))) {
+ 		fprintf(stderr, &quot;query: %s\n&quot;, query);
+ 		fprintf(stderr, &quot;SQL error: %s\n&quot;, zErrMsg);
+ 		exit(-1);
+@@ -248,7 +247,7 @@
+ 	qlen = 0;
+ }
+ 
+-int db_exec(const char *query, sqlite3_callback callback, void *arg)
++int db_exec(const char *query, sqlite3_callback callback, const void *arg)
+ {
+ 	int ret;
+ #ifdef DB_STACK
+@@ -269,7 +268,7 @@
+ 	return(ret);
+ }
+ 
+-int db_init(char *dbFile)
++int db_init(const char *dbFile)
+ {
+ 	int rc;
+ 	tagid = 1;
+
+Modified: trunk/apps/s3dosm/draw.c
+===================================================================
+--- trunk/apps/s3dosm/draw.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3dosm/draw.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -125,7 +125,7 @@
+ /* just fetches node information and puts in the nodelist */
+ static int insert_node(void *data, int argc, char **argv, char **azColName)
+ {
+-	struct nodelist *np = data; /* get the nodepointer */
++	struct nodelist *np = (struct nodelist *)data; /* get the nodepointer */
+ 	int i;
+ 	for (i = 0; i &lt; argc; i++) {
+ 		if (argv[i]) {
+@@ -151,7 +151,7 @@
+ 	return(0);
+ }
+ /* draw waylist, clear the queue */
+-static void waylist_draw(char *filter)
++static void waylist_draw(const char *filter)
+ {
+ 	float len;
+ 	char query[MAXQ];
+@@ -364,9 +364,9 @@
+ {
+ 	if (waylist_n &gt;= waylist_bufn) {
+ 		waylist_bufn += 64;
+-		waylist_p = realloc(waylist_p, sizeof(struct waylist) * waylist_bufn);
+-		nodelist_p = realloc(nodelist_p, sizeof(struct nodelist) * waylist_bufn * 2); /* we can have twice as many nodes as there are segments in a graph. */
+-		adjlist_p = realloc(adjlist_p, sizeof(struct nodelist) * waylist_bufn * 2);
++		waylist_p = (struct waylist *)realloc(waylist_p, sizeof(struct waylist) * waylist_bufn);
++		nodelist_p = (struct nodelist *)realloc(nodelist_p, sizeof(struct nodelist) * waylist_bufn * 2); /* we can have twice as many nodes as there are segments in a graph. */
++		adjlist_p = (struct adjlist *)realloc(adjlist_p, sizeof(struct nodelist) * waylist_bufn * 2);
+ 	}
+ 	waylist_p[waylist_n].node_to = p-&gt;node_to;
+ 	waylist_p[waylist_n].node_from = p-&gt;node_from;
+@@ -412,7 +412,7 @@
+ 	s3d_rotate(user_icon, (90 - la), lo, 0);
+ }
+ 
+-static void draw_ways(char *filter)
++static void draw_ways(const char *filter)
+ {
+ 	char query[MAXQ];
+ 	num_done = 0;
+
+Modified: trunk/apps/s3dosm/gps.c
+===================================================================
+--- trunk/apps/s3dosm/gps.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3dosm/gps.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -174,10 +174,10 @@
+ 	lon_old = lo;
+ 	lastfix = fix;
+ }
+-int gps_init(char *gpshost)
++int gps_init(const char *gpshost)
+ {
+ 	int sock_opts;
+-	char *err_str;
++	const char *err_str;
+ 	dgps = gps_open(gpshost, &quot;2947&quot;);
+ 	if (dgps == NULL) {
+ 		switch (errno) {
+@@ -263,7 +263,7 @@
+ }
+ #else
+ 
+-int gps_init(char *S3DOSMUNUSED(gpshost))
++int gps_init(const char *S3DOSMUNUSED(gpshost))
+ {
+ 	printf(&quot;GPS support not compiled in!\n&quot;);
+ 	return(0);
+
+Modified: trunk/apps/s3dosm/http_fetcher.c
+===================================================================
+--- trunk/apps/s3dosm/http_fetcher.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3dosm/http_fetcher.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -75,7 +75,7 @@
+ 	}
+ 
+ 	/* Copy the url passed in into a buffer we can work with, change, etc. */
+-	url = malloc(strlen(url_tmp) + 1);
++	url = (char*)malloc(strlen(url_tmp) + 1);
+ 	if (url == NULL) {
+ 		errorSource = ERRNO;
+ 		return -1;
+@@ -379,7 +379,7 @@
+ 
+ 	snprintf((char *)plain, 1024, &quot;%s:%s&quot;, user, pass);
+ 	len = strlen((char *)plain);
+-	b64 = malloc(len * 4 + 1);
++	b64 = (char*)malloc(len * 4 + 1);
+ 	i = j = c = 0;
+ 	while (i &lt; len || c != 0) {
+ 		switch (c) {
+
+Modified: trunk/apps/s3dosm/io.c
+===================================================================
+--- trunk/apps/s3dosm/io.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3dosm/io.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -31,7 +31,7 @@
+ #include &lt;errno.h&gt;   /* errno */
+ #include &lt;s3d.h&gt;   /* s3d_usage() */
+ 
+-char *read_file(char *fname, int *fsize)
++char *read_file(const char *fname, int *fsize)
+ {
+ 	FILE *fp;
+ 	char *buf = NULL;
+@@ -47,7 +47,7 @@
+ 		return(NULL);
+ 	}
+ 	filesize = bf.st_size;
+-	if ((buf = malloc(filesize)) == NULL)  {
++	if ((buf = (char*)malloc(filesize)) == NULL)  {
+ 		fprintf(stderr, &quot;read_file( %s ):malloc(): %s&quot;, fname, strerror(errno));
+ 		return(NULL);
+ 	}
+
+Modified: trunk/apps/s3dosm/kismet.c
+===================================================================
+--- trunk/apps/s3dosm/kismet.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3dosm/kismet.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -74,7 +74,7 @@
+ }
+ 
+ /* parse the osm input file */
+-layer_t *parse_kismet(char *buf, int length)
++layer_t *parse_kismet(const char *buf, int length)
+ {
+ 	xmlDocPtr doc;
+ 	xmlNodePtr cur, c;
+@@ -109,7 +109,7 @@
+ 	xmlFreeDoc(doc);
+ 	return(layer);
+ }
+-layer_t *load_kismet_file(char *filename)
++layer_t *load_kismet_file(const char *filename)
+ {
+ 	int length;
+ 	char *file;
+
+Modified: trunk/apps/s3dosm/object.c
+===================================================================
+--- trunk/apps/s3dosm/object.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3dosm/object.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -48,7 +48,7 @@
+ 
+ object_t* object_new(int key)
+ {
+-	object_t *nobj = malloc(sizeof(object_t));
++	object_t *nobj = (object_t*)malloc(sizeof(object_t));
+ 	object_init(nobj);
+ 	nobj-&gt;id = key;
+ 	return (nobj);
+@@ -68,7 +68,7 @@
+ }
+ node_t* node_new(void)
+ {
+-	node_t *nnode = malloc(sizeof(node_t));
++	node_t *nnode = (node_t*)malloc(sizeof(node_t));
+ 	node_init(nnode);
+ 	return(nnode);
+ }
+@@ -87,7 +87,7 @@
+ }
+ segment_t* segment_new(void)
+ {
+-	segment_t *nsegment = malloc(sizeof(segment_t));
++	segment_t *nsegment = (segment_t*)malloc(sizeof(segment_t));
+ 	segment_init(nsegment);
+ 	return(nsegment);
+ }
+@@ -106,7 +106,7 @@
+ }
+ way_t* way_new(void)
+ {
+-	way_t *nway = malloc(sizeof(way_t));
++	way_t *nway = (way_t*)malloc(sizeof(way_t));
+ 	way_init(nway);
+ 	return(nway);
+ }
+@@ -119,7 +119,7 @@
+ /* ########### layer  ############### */
+ layer_t* layer_new(void)
+ {
+-	layer_t *nlayer = malloc(sizeof(layer_t));
++	layer_t *nlayer = (layer_t*)malloc(sizeof(layer_t));
+ 	nlayer-&gt;tree = NULL;
+ 	nlayer-&gt;visible = 0;
+ 	return(nlayer);
+@@ -131,6 +131,6 @@
+ {
+ 	if (layer == NULL) return;
+ 	layerset.n++;
+-	layerset.p = realloc(layerset.p, sizeof(layer_t *) * layerset.n);
++	layerset.p = (layer_t**)realloc(layerset.p, sizeof(layer_t *) * layerset.n);
+ 	layerset.p[layerset.n-1] = layer;
+ }
+
+Modified: trunk/apps/s3dosm/osm.c
+===================================================================
+--- trunk/apps/s3dosm/osm.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3dosm/osm.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -108,7 +108,7 @@
+ 	}
+ }
+ /* parse the osm input file */
+-layer_t *parse_osm(char *buf, int length)
++layer_t *parse_osm(const char *buf, int length)
+ {
+ 	xmlDocPtr doc;
+ 	xmlNodePtr cur, c;
+@@ -161,7 +161,7 @@
+ 	free(fileBuf);
+ 	return layer;
+ }
+-layer_t *load_osm_file(char *filename)
++layer_t *load_osm_file(const char *filename)
+ {
+ 	int length;
+ 	char *file;
+
+Modified: trunk/apps/s3dosm/s3dosm.h
+===================================================================
+--- trunk/apps/s3dosm/s3dosm.h	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3dosm/s3dosm.h	2008-08-15 23:08:15 UTC (rev 942)
+@@ -47,7 +47,7 @@
+ };
+ 
+ struct _icon_t {
+-	char *path;
++	const char *path;
+ 	int oid;
+ };
+ enum {
+@@ -141,12 +141,12 @@
+ void mainloop(void);
+ /* osm.c */
+ void debug_obj(object_t *obj, void *dummy);
+-layer_t *parse_osm(char *buf, int length);
+-layer_t *load_osm_file(char *filename);
++layer_t *parse_osm(const char *buf, int length);
++layer_t *load_osm_file(const char *filename);
+ layer_t *load_osm_web(float minlon, float minlat, float maxlon, float maxlat);
+ /* kismet.c */
+-layer_t *parse_kismet(char *buf, int length);
+-layer_t *load_kismet_file(char *filename);
++layer_t *parse_kismet(const char *buf, int length);
++layer_t *load_kismet_file(const char *filename);
+ /* draw.c */
+ void draw_all_layers(void);
+ int draw_layer(layer_t *layer);
+@@ -161,18 +161,18 @@
+ float get_heading(float la1, float lo1, float la2, float lo2);
+ extern int oidy;
+ /* tag.c */
+-void tag_add(object_t *obj, char *k, char *v);
+-tag_t *tag_get(object_t *obj, char *k);
++void tag_add(object_t *obj, const char *k, char *v);
++tag_t *tag_get(object_t *obj, const char *k);
+ void tag_free(tag_t *tag);
+ /* io.c */
+-char *read_file(char *fname, int *fsize);
++char *read_file(const char *fname, int *fsize);
+ int process_args(int argc, char **argv);
+ /* db.c */
+ int db_olsr_node_init(float *pos);
+-int db_olsr_check(char *ip, float *pos);
+-int db_exec(const char *query, sqlite3_callback callback, void *arg);
+-int db_add_tag(object_t *obj, char *key, char *val);
+-int db_gettag(int tagid, char *field, char *target);
++int db_olsr_check(const char *ip, float *pos);
++int db_exec(const char *query, sqlite3_callback callback, const void *arg);
++int db_add_tag(object_t *obj, const char *key, const char *val);
++int db_gettag(int tagid, const char *field, char *target);
+ int db_getint(void *tagid, int argc, char **argv, char **azColName);
+ int db_getpoint(void *data, int argc, char **argv, char **azColName);
+ int db_insert_node(node_t *node);
+@@ -180,19 +180,19 @@
+ int db_insert_way_only(way_t *way);
+ int db_insert_way_seg(way_t *way, int seg_n);
+ int db_insert_object(object_t *obj);
+-int db_init(char *dbFile);
++int db_init(const char *dbFile);
+ int db_quit(void);
+ int db_create(void);
+-int db_insert_layer(char *layer_name);
++int db_insert_layer(const char *layer_name);
+ void db_flush(void);
+ int callback(void *NotUsed, int argc, char **argv, char **azColName);
+ /* gps.c */
+-int gps_init(char *gpshost);
++int gps_init(const char *gpshost);
+ int gps_main(void);
+ int gps_quit(void);
+ /* ui.c */
+ int ui_init(void);
+-int load_window(char *text);
++int load_window(const char *text);
+ int load_window_remove(void);
+ int load_update_status(float percent);
+ /* olsrs3d.c */
+
+Modified: trunk/apps/s3dosm/tag.c
+===================================================================
+--- trunk/apps/s3dosm/tag.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3dosm/tag.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -24,11 +24,11 @@
+ #include &lt;stdio.h&gt; /* printf() */
+ #include &lt;string.h&gt; /* strcmp() */
+ #include &lt;stdlib.h&gt; /* realloc() */
+-void tag_add(object_t *obj, char *k, char *v)
++void tag_add(object_t *obj, const char *k, char *v)
+ {
+ 	tag_t *t;
+ 	obj-&gt;tag_n++;
+-	obj-&gt;tag_p = realloc(obj-&gt;tag_p, obj-&gt;tag_n * sizeof(tag_t));
++	obj-&gt;tag_p = (tag_t*)realloc(obj-&gt;tag_p, obj-&gt;tag_n * sizeof(tag_t));
+ 	if (k != NULL &amp;&amp; v != NULL) {
+ 		t = &amp;(obj-&gt;tag_p[obj-&gt;tag_n-1]);
+ 		t-&gt;ttype = TAG_UNKNOWN;
+@@ -38,7 +38,7 @@
+ 		if (0 == strcmp(k, &quot;name&quot;)) t-&gt;ttype = TAG_NAME;
+ 	}
+ }
+-tag_t *tag_get(object_t *obj, char *k)
++tag_t *tag_get(object_t *obj, const char *k)
+ {
+ 	int i;
+ 	for (i = 0;i &lt; obj-&gt;tag_n;i++) {
+
+Modified: trunk/apps/s3dosm/ui.c
+===================================================================
+--- trunk/apps/s3dosm/ui.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3dosm/ui.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -138,7 +138,7 @@
+ }
+ 
+ /* initialize the loadwindow or change its caption text */
+-int load_window(char *text)
++int load_window(const char *text)
+ {
+ 	if (loadwindow == NULL) { /* create it */
+ 		loadwindow = s3dw_surface_new(&quot;Now loading ...&quot;, 20, 5);
+
+Modified: trunk/apps/s3dvt/main.c
+===================================================================
+--- trunk/apps/s3dvt/main.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/apps/s3dvt/main.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -184,8 +184,8 @@
+ static int pipe_init_terminal(void)
+ {
+ 	int uid = 0, gid = 0;
+-	char *exe = &quot;/bin/bash&quot;;
+-	char *args = &quot;-i&quot;;
++	const char *exe = &quot;/bin/bash&quot;;
++	const char *args = &quot;-i&quot;;
+ 
+ 	term_mode = M_PIPE;
+ 	if ((pipe(mpipe_in) == -1) || (pipe(mpipe_out) == -1)) {
+
+Modified: trunk/example/filebrowser.c
+===================================================================
+--- trunk/example/filebrowser.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/example/filebrowser.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -58,7 +58,7 @@
+ };
+ static struct t_item *item;
+ static int n_item = 0;
+-static int display_dir(char *dir, int S3DUNUSED(depth), int  posx, int posy, int posz)
++static int display_dir(const char *dir, int S3DUNUSED(depth), int  posx, int posy, int posz)
+ {
+ 	struct dirent **namelist;
+ 	int n, i;
+@@ -83,7 +83,7 @@
+ 		perror(&quot;scandir&quot;);
+ 		return(-1);
+ 	} else {
+-		item = malloc(sizeof(struct t_item) * i);
++		item = (struct t_item*)malloc(sizeof(struct t_item) * i);
+ 		n_item = i;
+ 		while (n--) {
+ 			item[n].type = T_DUNO;
+
+Modified: trunk/example/texturetest.c
+===================================================================
+--- trunk/example/texturetest.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/example/texturetest.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -45,7 +45,7 @@
+ 	unsigned char *data;
+ 
+ 	if (!s3d_init(&amp;argc, &amp;argv, &quot;texturetest&quot;)) {
+-		data = malloc(MAXX * MAXY * 4);
++		data = (unsigned char *)malloc(MAXX * MAXY * 4);
+ 		oid = s3d_new_object();
+ 		s3d_push_vertex(oid, -1, -1, 0);
+ 		s3d_push_vertex(oid, 1, -1, 0);
+
+Modified: trunk/example/widgets.c
+===================================================================
+--- trunk/example/widgets.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/example/widgets.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -130,7 +130,7 @@
+ 
+ 	s3dw_show(S3DWIDGET(surface));
+ }
+-static char *text = &quot;okay\nn2\n3\nfooobarfooobar ...\noh no\n its too loooong\n&quot;;
++static const char *text = &quot;okay\nn2\n3\nfooobarfooobar ...\noh no\n its too loooong\n&quot;;
+ int main(int argc, char **argv)
+ {
+ 	s3dw_button *button;
+
+Modified: trunk/example/wiresphere.c
+===================================================================
+--- trunk/example/wiresphere.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/example/wiresphere.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -42,9 +42,9 @@
+ 	unsigned int *l; /* lines */
+ 	num_v = (stacks + 1) * slices;
+ 	num_l = stacks * slices + (stacks - 1) * slices; /* vertical + horizontal */
+-	v = malloc(sizeof(float) * 3 * num_v);
+-	n = malloc(sizeof(float) * 6 * num_l);
+-	l = malloc(sizeof(unsigned int) * 3 * num_l);
++	v = (float*)malloc(sizeof(float) * 3 * num_v);
++	n = (float*)malloc(sizeof(float) * 6 * num_l);
++	l = (unsigned int*)malloc(sizeof(unsigned int) * 3 * num_l);
+ 	i = 0;
+ 	for (x = 0;x &lt; slices;x++) {
+ 		alpha = (x * 360.0f / slices) * (float)M_PI / 180.0f;
+
+Modified: trunk/experimental/comptest/window.c
+===================================================================
+--- trunk/experimental/comptest/window.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/experimental/comptest/window.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -78,7 +78,7 @@
+ struct window *window_add(Display *dpy, Window id)
+ {
+ 	struct window *win;
+-	win = malloc(sizeof(struct window));
++	win = (struct window *)malloc(sizeof(struct window));
+ 	if (!win)
+ 		return(NULL);
+ 
+@@ -121,7 +121,12 @@
+ /*	XSelectInput(dpy, win-&gt;id, SubstructureNotifyMask | ExposureMask | StructureNotifyMask | PropertyChangeMask);*/
+ 	XSelectInput(dpy, win-&gt;id, 0);
+ 
++#if defined(__cplusplus) || defined(c_plusplus)
++	if (win-&gt;attr.c_class != InputOnly)		/* don't create damage on these windows */
++#else
+ 	if (win-&gt;attr.class != InputOnly)		/* don't create damage on these windows */
++#endif 
++	
+ 		win-&gt;damage = XDamageCreate(dpy, win-&gt;id, XDamageReportNonEmpty);
+ 	if (win-&gt;next == NULL) 
+ 		window_restack(win, None);
+@@ -292,15 +297,20 @@
+ 	if (win-&gt;attr.map_state == IsUnmapped)	/* not mapped images can't be grabbed */
+ 		return;
+ 
++#if defined(__cplusplus) || defined(c_plusplus)
++	if (win-&gt;attr.c_class == InputOnly)		/* can't grab image from this source */
++		return;
++#else
+ 	if (win-&gt;attr.class == InputOnly)		/* can't grab image from this source */
+ 		return;
++#endif
+ 
+ 	if (x &lt; 0) x = 0;
+ 	if (y &lt; 0) y = 0;
+ 	if (width &gt; win-&gt;attr.width - x)   width = win-&gt;attr.width - x;
+ 	if (height &gt; win-&gt;attr.height - y)   height = win-&gt;attr.height - y;
+ 
+-	bitmap = malloc(TEXW * height * sizeof(uint32_t));
++	bitmap = (char*)malloc(TEXW * height * sizeof(uint32_t));
+ 	for (xleft = x; xleft &lt; x + width ; xleft = xright) {
+ 		xright = (xleft + TEXW) &amp; ~(TEXW - 1);
+ 		if (xright &gt; (x + width))
+
+Modified: trunk/experimental/comptest/x11.c
+===================================================================
+--- trunk/experimental/comptest/x11.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/experimental/comptest/x11.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -38,7 +38,7 @@
+ 
+ int print_event(Display *COMPUNUSED(dpy), XEvent *event)
+ {
+-	char *name = &quot;unknown&quot;;
++	const char *name = &quot;unknown&quot;;
+ 	switch (event-&gt;type &amp; 0x7f) {
+ 	case CreateNotify:		name = &quot;Create&quot;;			break;
+ 	case DestroyNotify:		name = &quot;Destroy&quot;;			break;
+@@ -62,10 +62,10 @@
+ 
+ int error(Display *COMPUNUSED(dpy), XErrorEvent *event)
+ {
+-	char *name;
++	const char *name;
+ 	char buf[256];
+ 	char buf_req[256];
+-	char *req;
++	const char *req;
+ 
+ 	XGetErrorText(dpy, event-&gt;error_code, buf, 256);
+ 	name = buf;
+
+Modified: trunk/experimental/olsrs3d/main.c
+===================================================================
+--- trunk/experimental/olsrs3d/main.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/experimental/olsrs3d/main.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -154,7 +154,7 @@
+ }
+ 
+ 
+-void window_error(char *msg)
++void window_error(const char *msg)
+ {
+ 
+ 	s3dw_surface *infwin;
+@@ -1007,7 +1007,7 @@
+ 		tmpNeighbour = tmpNeighbour-&gt;next_olsr_neigh_list;
+ 	}
+ 
+-	Olsr_neighbour_label_obj = malloc(Size * sizeof(int));
++	Olsr_neighbour_label_obj = (int*)malloc(Size * sizeof(int));
+ 	tmpNeighbour = Olsr_node_pEtx-&gt;olsr_neigh_list;
+ 
+ 	for (i = 0; i &lt; Size ;i++) {
+
+Modified: trunk/experimental/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/experimental/olsrs3d/olsrs3d.h	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/experimental/olsrs3d/olsrs3d.h	2008-08-15 23:08:15 UTC (rev 942)
+@@ -80,4 +80,4 @@
+ void out_of_mem(void);
+ void print_etx(void);
+ float dist(float p1[], float p2[]);
+-void window_error(char *msg);
++void window_error(const char *msg);
+
+Modified: trunk/experimental/olsrs3d/process.c
+===================================================================
+--- trunk/experimental/olsrs3d/process.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/experimental/olsrs3d/process.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -83,7 +83,7 @@
+ 	/* new connection */
+ 	if ((*olsr_con) == NULL) {
+ 
+-		(*olsr_con) = malloc(sizeof(struct olsr_con));
++		(*olsr_con) = (struct olsr_con*)malloc(sizeof(struct olsr_con));
+ 		if ((*olsr_con) == NULL) out_of_mem();
+ 
+ 		/* create connection object */
+@@ -133,14 +133,14 @@
+ 		/* add new olsr connection to olsr nodes in order to access the connection from the olsr node */
+ 		olsr_neigh_list = &amp;(*olsr_con)-&gt;left_olsr_node-&gt;olsr_neigh_list;
+ 		while ((*olsr_neigh_list) != NULL) olsr_neigh_list = &amp;(*olsr_neigh_list)-&gt;next_olsr_neigh_list;
+-		(*olsr_neigh_list) = malloc(sizeof(struct olsr_neigh_list));
++		(*olsr_neigh_list) = (struct olsr_neigh_list*)malloc(sizeof(struct olsr_neigh_list));
+ 		if ((*olsr_neigh_list) == NULL) out_of_mem();
+ 		(*olsr_neigh_list)-&gt;olsr_con = (*olsr_con);
+ 		(*olsr_neigh_list)-&gt;next_olsr_neigh_list = NULL;
+ 
+ 		olsr_neigh_list = &amp;(*olsr_con)-&gt;right_olsr_node-&gt;olsr_neigh_list;
+ 		while ((*olsr_neigh_list) != NULL) olsr_neigh_list = &amp;(*olsr_neigh_list)-&gt;next_olsr_neigh_list;
+-		(*olsr_neigh_list) = malloc(sizeof(struct olsr_neigh_list));
++		(*olsr_neigh_list) = (struct olsr_neigh_list*)malloc(sizeof(struct olsr_neigh_list));
+ 		if ((*olsr_neigh_list) == NULL) out_of_mem();
+ 		(*olsr_neigh_list)-&gt;olsr_con = (*olsr_con);
+ 		(*olsr_neigh_list)-&gt;next_olsr_neigh_list = NULL;
+@@ -164,7 +164,7 @@
+  *
+  ***/
+ 
+-static void* get_olsr_node(struct olsr_node **olsr_node, char *ip)
++static struct olsr_node* get_olsr_node(struct olsr_node **olsr_node, char *ip)
+ {
+ 
+ 	int result;   /* result of strcmp */
+@@ -210,7 +210,7 @@
+ 	/* if node is NULL we reached the end of the tree and must create a new olsr_node */
+ 	if ((*olsr_node) == NULL) {
+ 
+-		(*olsr_node) = malloc(sizeof(struct olsr_node));
++		(*olsr_node) = (struct olsr_node*)malloc(sizeof(struct olsr_node));
+ 		if ((*olsr_node) == NULL) out_of_mem();
+ 
+ 		(*olsr_node)-&gt;left = NULL;
+@@ -272,18 +272,18 @@
+ 
+ void lst_add(int id, struct olsr_node **olsr_node)
+ {
+-	struct Obj_to_ip *new;
+-	new = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
+-	if (new == NULL)
++	struct Obj_to_ip *n;
++	n = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
++	if (n == NULL)
+ 		out_of_mem();
+-	new-&gt;id = id;
+-	new-&gt;olsr_node = *olsr_node;
++	n-&gt;id = id;
++	n-&gt;olsr_node = *olsr_node;
+ 	move_lst_ptr(&amp;id);
+-	new-&gt;prev = List_ptr;
+-	new-&gt;next = List_ptr-&gt;next;
+-	List_ptr-&gt;next-&gt;prev = new;
+-	List_ptr-&gt;next = new;
+-	/* printf(&quot;obj2ip: add object %d between %d .. %d ip %s to list\n&quot;,new-&gt;id,new-&gt;prev-&gt;id,new-&gt;next-&gt;id,new-&gt;olsr_node-&gt;ip); */
++	n-&gt;prev = List_ptr;
++	n-&gt;next = List_ptr-&gt;next;
++	List_ptr-&gt;next-&gt;prev = n;
++	List_ptr-&gt;next = n;
++	/* printf(&quot;obj2ip: add object %d between %d .. %d ip %s to list\n&quot;,n-&gt;id,n-&gt;prev-&gt;id,n-&gt;next-&gt;id,n-&gt;olsr_node-&gt;ip); */
+ }
+ 
+ /*
+
+Modified: trunk/experimental/testvis/testvis.c
+===================================================================
+--- trunk/experimental/testvis/testvis.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/experimental/testvis/testvis.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -161,8 +161,8 @@
+ 	struct t_data t_dat;
+ 	pthread_t thread;
+ 
+-	head = malloc(sizeof(*head));
+-	z = malloc(sizeof(*z));
++	head = (struct data *)malloc(sizeof(*head));
++	z = (struct data *)malloc(sizeof(*z));
+ 
+ 	head-&gt;next = z;
+ 
+@@ -177,7 +177,7 @@
+ 		if ((tmp_buffer = strstr(buffer, &quot;add&quot;)) != NULL) {
+ 			tmp_buffer[strlen(tmp_buffer) - 1] = 0;
+ 			tmp_buffer += 4;
+-			t = malloc(sizeof(*t));
++			t = (struct data *)malloc(sizeof(*t));
+ 			snprintf(t-&gt;line, LINE_SIZE, tmp_buffer);
+ 			t-&gt;index = ++index;
+ 			t-&gt;active = 1;
+
+Modified: trunk/experimental/wiitest/wiitest.c
+===================================================================
+--- trunk/experimental/wiitest/wiitest.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/experimental/wiitest/wiitest.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -69,7 +69,8 @@
+ 	if (addr != NULL) {
+ 		str2ba(addr, &amp;bdaddr);
+ 	} else {
+-		bdaddr = *BDADDR_ANY;
++		/* BDADDR_ANY */
++		memset(&amp;bdaddr, 0, sizeof(bdaddr_t));
+ 	}
+ 
+ 	/* Connect to the wiimote */
+
+Modified: trunk/libs3d/error.c
+===================================================================
+--- trunk/libs3d/error.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3d/error.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -41,13 +41,13 @@
+ 		fprintf(stderr, &quot;s3dlib: %s\n&quot;, (char *)&amp;dbm);
+ 	}
+ }
+-void errdn(int relevance, char *func, int en)
++void errdn(int relevance, const char *func, int en)
+ {
+ 	if (relevance &gt;= DEBUG)
+ 		fprintf(stderr, &quot;s3dlib error: %s: (%d) %s\n&quot;, func, en, strerror(en));
+ }
+ 
+-void errds(int relevance, char *func, const char *fmt, ...)
++void errds(int relevance, const char *func, const char *fmt, ...)
+ {
+ 	char dbm[DBM_MAX];
+ 	va_list args;
+@@ -60,11 +60,11 @@
+ 	}
+ }
+ #endif
+-void errn(char *func, int en)
++void errn(const char *func, int en)
+ {
+ 	fprintf(stderr, &quot;s3dlib error: %s: (%d) %s\n&quot;, func, en, strerror(en));
+ }
+-void errs(char *func, char *msg)
++void errs(const char *func, const char *msg)
+ {
+ 	fprintf(stderr, &quot;s3dlib error: %s: %s\n&quot;, func, msg);
+ }
+
+Modified: trunk/libs3d/event.c
+===================================================================
+--- trunk/libs3d/event.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3d/event.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -51,7 +51,7 @@
+ 	}
+ 	newevt-&gt;next = NULL;
+ 	if (s3d_stack != NULL) {
+-		for (p = s3d_stack;p-&gt;next != NULL;p = p-&gt;next);  /*  go to the end */
++		for (p = s3d_stack;p-&gt;next != NULL;p = p-&gt;next) { }  /*  go to the end */
+ 		p-&gt;next = newevt;
+ 	} else
+ 		s3d_stack = newevt;
+
+Modified: trunk/libs3d/fontselect.c
+===================================================================
+--- trunk/libs3d/fontselect.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3d/fontselect.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -39,7 +39,7 @@
+ 
+ 
+ #ifdef WITH_FONTCONFIG
+-char *s3d_findfont(char *mask)
++char *s3d_findfont(const char *mask)
+ {
+ 	FcPattern *pattern = NULL, *match = NULL;
+ 	FcChar8 *file = NULL;
+@@ -60,7 +60,7 @@
+ /*  this uses the xserver to get a font-path and scan it for ttf-fonts. */
+ /*  if it matches, give it out ... it's not nice, right, and might not */
+ /*  work on your place. */
+-char *s3d_findfont(char *mask)
++char *(const char *mask)
+ {
+ 	char **flist = NULL;
+ 	int fnum = 0;
+
+Modified: trunk/libs3d/freetype.c
+===================================================================
+--- trunk/libs3d/freetype.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3d/freetype.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -139,7 +139,7 @@
+ 	norm = 1.0 / face-&gt;glyph-&gt;metrics.vertAdvance;
+ 	if ((face-&gt;glyph-&gt;outline.n_points &gt; 0) &amp;&amp; (face-&gt;glyph-&gt;outline.n_points &lt; SEI_SS)) {
+ 		tess_buf[a].vn = face-&gt;glyph-&gt;outline.n_points;
+-		tess_buf[a].vbuf = malloc(sizeof(float) * face-&gt;glyph-&gt;outline.n_points * 3);
++		tess_buf[a].vbuf = (float*)malloc(sizeof(float) * face-&gt;glyph-&gt;outline.n_points * 3);
+ 
+ 		j = 0;
+ 		ncontours = face-&gt;glyph-&gt;outline.n_contours;
+@@ -234,7 +234,7 @@
+ 			ncntr[c] = cntr[perm[c]];
+ 		}
+ 		n = 0;
+-		tess_buf[a].pbuf = malloc(sizeof(uint32_t) * 4 * (face-&gt;glyph-&gt;outline.n_points + 2 * face-&gt;glyph-&gt;outline.n_contours));
++		tess_buf[a].pbuf = (uint32_t*)malloc(sizeof(uint32_t) * 4 * (face-&gt;glyph-&gt;outline.n_points + 2 * face-&gt;glyph-&gt;outline.n_contours));
+ 		k = 0;
+ 		for (c = ncontours - 1;c &gt;= 0;c--) {
+ 			n++;     /* count out and inlines ... */
+@@ -268,8 +268,8 @@
+ 	/* only draw if it has some information in it */
+ 	if ((tess_buf[a].pn != 0) &amp;&amp; (tess_buf[a].vn != 0)) {
+ 
+-		vbuf = malloc(sizeof(float) * 3 * tess_buf[a].vn);
+-		pbuf = malloc(sizeof(uint32_t) * 4 * tess_buf[a].pn);
++		vbuf = (float*)malloc(sizeof(float) * 3 * tess_buf[a].vn);
++		pbuf = (uint32_t*)malloc(sizeof(uint32_t) * 4 * tess_buf[a].pn);
+ 		memcpy(vbuf, tess_buf[a].vbuf, sizeof(float)*3*tess_buf[a].vn);
+ 		memcpy(pbuf, tess_buf[a].pbuf, sizeof(uint32_t)*4*tess_buf[a].pn);
+ 		/*  prepare the buffs ... */
+@@ -301,7 +301,7 @@
+ 	*xoff += tess_buf[a].xoff;  /*  xoffset */
+ 	return(0);
+ }
+-int s3d_select_font(char *path)
++int s3d_select_font(const char *path)
+ {
+ 	char    *oldfont = memory_font;
+ 	int     oldsize = memory_font_size;
+@@ -338,7 +338,7 @@
+ }
+ 
+ /*  draws a simple string. */
+-int s3d_draw_string(char *str, float *xlen)
++int s3d_draw_string(const char *str, float *xlen)
+ {
+ 	int i;
+ 	float xoff;
+@@ -367,7 +367,7 @@
+ 	return(f_oid);
+ }
+ /* get the string length before actually drawing it. */
+-float s3d_strlen(char *str)
++float s3d_strlen(const char *str)
+ {
+ 	int i;
+ 	float xoff;
+
+Modified: trunk/libs3d/hash.c
+===================================================================
+--- trunk/libs3d/hash.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3d/hash.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -82,7 +82,7 @@
+ 	struct hash_it_t *iter;
+ 
+ 	if (iter_in == NULL) {
+-		iter= malloc(sizeof(struct hash_it_t));
++		iter= (struct hash_it_t*)malloc(sizeof(struct hash_it_t));
+ 		iter-&gt;index =  -1;
+ 		iter-&gt;bucket = NULL;
+ 		iter-&gt;prev_bucket = NULL;
+@@ -151,12 +151,12 @@
+ struct hashtable_t *_s3d_hash_new(int size, hashdata_compare_cb compare, hashdata_choose_cb choose) {
+ 	struct hashtable_t *hash;
+ 
+-	hash= malloc( sizeof(struct hashtable_t));
++	hash= (struct hashtable_t*)malloc( sizeof(struct hashtable_t));
+ 	if ( hash == NULL ) 			/* could not allocate the hash control structure */
+ 		return (NULL);
+ 
+ 	hash-&gt;size= size;
+-	hash-&gt;table= malloc( sizeof(struct element_t *) * size);
++	hash-&gt;table= (struct element_t **)malloc( sizeof(struct element_t *) * size);
+ 	if ( hash-&gt;table == NULL ) {	/* could not allocate the table */
+ 		free(hash);
+ 		return(NULL);
+@@ -185,7 +185,7 @@
+ 	}
+ 
+ 	/* found the tail of the list, add new element */
+-	if (NULL == (bucket= malloc(sizeof(struct element_t))))
++	if (NULL == (bucket = (struct element_t*)malloc(sizeof(struct element_t))))
+ 		return(-1); /* malloc failed */
+ 
+ 	bucket-&gt;data= data;				/* init the new bucket */
+
+Modified: trunk/libs3d/io.c
+===================================================================
+--- trunk/libs3d/io.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3d/io.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -110,7 +110,7 @@
+ 	return(0);
+ }
+ /*  external functions go here ... */
+-int s3d_init(int *argc, char ***argv, char *name)
++int s3d_init(int *argc, char ***argv, const char *name)
+ {
+ 	char     *s;
+ 	char      urlc[256];   /*  this should be enough for an url */
+@@ -189,7 +189,7 @@
+ 		_queue_quit();
+ 		while (NULL != (ret = s3d_pop_event())) s3d_delete_event(ret);  /*  clear the stack ... */
+ 		cb_lock = 0; /* we don't care about old callbacks, now we just quit! */
+-		ret = malloc(sizeof(struct s3d_evt));
++		ret = (struct s3d_evt *)malloc(sizeof(struct s3d_evt));
+ 		ret-&gt;event = S3D_EVENT_QUIT;
+ 		ret-&gt;length = 0;
+ 		s3d_push_event(ret);
+@@ -210,7 +210,7 @@
+ }
+ /*  opens a file returning it's filesize  */
+ /*  and setting *pointer to the buffer. to be freed */
+-int s3d_open_file(char *fname, char **pointer)
++int s3d_open_file(const char *fname, char **pointer)
+ {
+ 	FILE *fp;
+ 	char *buf = NULL;
+@@ -236,7 +236,7 @@
+ 	}
+ 	filesize = bf.st_size;
+ 	/* s3dprintf(LOW, &quot;opening %s, filesize is %d&quot;,fname, filesize);*/
+-	if ((buf = malloc(filesize)) == NULL) {
++	if ((buf = (char *)malloc(filesize)) == NULL) {
+ 		errn(&quot;s3d_open_3ds_file():malloc()&quot;, errno);
+ 		exit(-1);
+ 	}
+
+Modified: trunk/libs3d/modelread.c
+===================================================================
+--- trunk/libs3d/modelread.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3d/modelread.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -43,7 +43,7 @@
+ #define MAXSTRN  20
+ static int model_load(char *file);
+ /*  just a helper function for reading from file instead of memory. */
+-int s3d_import_model_file(char *fname)
++int s3d_import_model_file(const char *fname)
+ {
+ 	char *buf, *ptr, *next;
+ 	char searchpath[1024];
+@@ -80,7 +80,7 @@
+ 	return(-1); /* nothing in search path ... */
+ }
+ 
+-static void* get_mat2tex(struct material2texture **mat2tex, void *mat_ptr)
++static struct material2texture* get_mat2tex(struct material2texture **mat2tex, void *mat_ptr)
+ {
+ 
+ 	while ((*mat2tex) != NULL) {
+@@ -93,7 +93,7 @@
+ 
+ 	if ((*mat2tex) == NULL) {
+ 
+-		(*mat2tex) = malloc(sizeof(struct material2texture));
++		(*mat2tex) = (struct material2texture *)malloc(sizeof(struct material2texture));
+ 
+ 		if ((*mat2tex) == NULL) {
+ 			errs(&quot;model_import()&quot;, &quot;Sorry - you ran out of memory !\n&quot;);
+@@ -184,7 +184,7 @@
+ 						/* reorder pixeldata - s3d wants rgba */
+ 						if (s3d_pixeldata != NULL) free(s3d_pixeldata);
+ 
+-						s3d_pixeldata = malloc(sizeof(uint8_t) * face-&gt;tex_image-&gt;width * face-&gt;tex_image-&gt;height * 32);
++						s3d_pixeldata = (uint8_t*)malloc(sizeof(uint8_t) * face-&gt;tex_image-&gt;width * face-&gt;tex_image-&gt;height * 32);
+ 
+ 						if (s3d_pixeldata == NULL) {
+ 							errs(&quot;model_load()&quot;, &quot;Sorry - you ran out of memory !\n&quot;);
+
+Modified: trunk/libs3d/network.c
+===================================================================
+--- trunk/libs3d/network.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3d/network.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -73,7 +73,7 @@
+ #ifdef SIGS
+ 		if (_s3d_sigio) {
+ #endif
+-			while (_s3d_net_receive());
++			while (_s3d_net_receive()) {}
+ #ifdef SIGS
+ 			_s3d_sigio = 0;
+ 		}
+@@ -82,7 +82,7 @@
+ #endif
+ #ifdef SHM
+ 	case CON_SHM:
+-		while (_shm_net_receive());
++		while (_shm_net_receive()) {}
+ 		break;
+ #endif
+ 	}
+
+Modified: trunk/libs3d/object_queue.c
+===================================================================
+--- trunk/libs3d/object_queue.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3d/object_queue.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -54,7 +54,7 @@
+ 	int i;
+ 	queue_size = 1;
+ 	requested = 0;
+-	queue = malloc(sizeof(unsigned int) * queue_size);
++	queue = (unsigned int*)malloc(sizeof(unsigned int) * queue_size);
+ 	for (i = 0;i &lt; queue_size;i++) {
+ 		queue[i] = Q_UNUSED;
+ 	}
+@@ -85,7 +85,7 @@
+ 	if (queue_size == 0) return(-1);  /*  already quit. */
+ 	/*  if we reach here, all slots all taken.  */
+ 	/*  s3dprintf(LOW,&quot;no place for object, resizing stack.&quot;,i); */
+-	queue = realloc(queue, sizeof(unsigned int) * (queue_size + 1));
++	queue = (unsigned int*)realloc(queue, sizeof(unsigned int) * (queue_size + 1));
+ 	queue_size += 1;
+ 	requested--;
+ 	queue[queue_size-1] = oid;
+
+Modified: trunk/libs3d/proto_in.c
+===================================================================
+--- trunk/libs3d/proto_in.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3d/proto_in.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -48,7 +48,7 @@
+ 	case S3D_P_S_CLICK:
+ 		if (length == 4) {
+ 			oid = ntohl(*((uint32_t *)buf));
+-			if (NULL != (s3devt = malloc(sizeof(struct s3d_evt)))) {
++			if (NULL != (s3devt = (struct s3d_evt*)malloc(sizeof(struct s3d_evt)))) {
+ 				*((uint32_t *)buf) = oid;  /*  reuse buffer ... */
+ 				s3devt-&gt;event = S3D_EVENT_OBJ_CLICK;
+ 				s3devt-&gt;length = 4;
+@@ -75,7 +75,7 @@
+ 		break;
+ 	case S3D_P_S_KEY:
+ 		if (length == 8) {
+-			if (NULL != (s3devt = malloc(sizeof(struct s3d_evt)))) {
++			if (NULL != (s3devt = (struct s3d_evt*)malloc(sizeof(struct s3d_evt)))) {
+ 				struct s3d_key_event *keyevent;
+ 				s3devt-&gt;length = 2;
+ 				keyevent = (struct s3d_key_event *)buf;
+@@ -91,7 +91,7 @@
+ 		break;
+ 	case S3D_P_S_MBUTTON:
+ 		if (length == 2) {
+-			if (NULL != (s3devt = malloc(sizeof(struct s3d_evt)))) {
++			if (NULL != (s3devt = (struct s3d_evt*)malloc(sizeof(struct s3d_evt)))) {
+ 				s3devt-&gt;event = S3D_EVENT_MBUTTON;
+ 				s3devt-&gt;length = 2;
+ 				s3devt-&gt;buf = buf;
+@@ -102,7 +102,7 @@
+ 	case S3D_P_MCP_OBJECT:
+ 		if (length == sizeof(struct mcp_object)) {
+ 			/*     oid=htonl(*((uint32_t *)buf)); */
+-			if (NULL != (s3devt = malloc(sizeof(struct s3d_evt)))) {
++			if (NULL != (s3devt = (struct s3d_evt*)malloc(sizeof(struct s3d_evt)))) {
+ 				/*      *((uint32_t *)buf)=oid;  / *  reuse buffer ... * / */
+ 				s3devt-&gt;event = S3D_MCP_OBJECT;
+ 				s3devt-&gt;length = length;
+@@ -120,7 +120,7 @@
+ 	case S3D_P_S_OINFO:
+ 		if (length == sizeof(struct s3d_obj_info)) {
+ 			/*     oid=htonl(*((uint32_t *)buf)); */
+-			if (NULL != (s3devt = malloc(sizeof(struct s3d_evt)))) {
++			if (NULL != (s3devt = (struct s3d_evt*)malloc(sizeof(struct s3d_evt)))) {
+ 				/*      *((uint32_t *)buf)=oid;  / *  reuse buffer ... * / */
+ 				s3devt-&gt;event = S3D_EVENT_OBJ_INFO;
+ 				s3devt-&gt;length = length;
+@@ -164,7 +164,7 @@
+ 
+ 	case S3D_P_MCP_DEL_OBJECT:
+ 		if (length == 4) {
+-			if (NULL != (s3devt = malloc(sizeof(struct s3d_evt)))) {
++			if (NULL != (s3devt = (struct s3d_evt*)malloc(sizeof(struct s3d_evt)))) {
+ 				s3devt-&gt;event = S3D_MCP_DEL_OBJECT;
+ 				s3devt-&gt;length = length;
+ 				*((uint32_t *)buf) = ntohl(*((uint32_t *)buf));  /*  revert oid */
+
+Modified: trunk/libs3d/s3d.h
+===================================================================
+--- trunk/libs3d/s3d.h	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3d/s3d.h	2008-08-15 23:08:15 UTC (rev 942)
+@@ -88,7 +88,7 @@
+ 
+ /* framework functions */
+ S3DEXPORT void s3d_usage(void);
+-S3DEXPORT int s3d_init(int *argc, char ***argv, char *name);
++S3DEXPORT int s3d_init(int *argc, char ***argv, const char *name);
+ S3DEXPORT int s3d_quit(void);
+ S3DEXPORT int s3d_mainloop(void (*f)(void));
+ 
+@@ -157,11 +157,11 @@
+ S3DEXPORT int s3d_scale(int object, float s);
+ 
+ /* high-level object creating */
+-S3DEXPORT int s3d_import_model_file(char *fname);
+-S3DEXPORT int s3d_open_file(char *fname, char **pointer);
+-S3DEXPORT int s3d_select_font(char *mask);
+-S3DEXPORT int s3d_draw_string(char *str, float *xlen);
+-S3DEXPORT float s3d_strlen(char *str);
++S3DEXPORT int s3d_import_model_file(const char *fname);
++S3DEXPORT int s3d_open_file(const char *fname, char **pointer);
++S3DEXPORT int s3d_select_font(const char *mask);
++S3DEXPORT int s3d_draw_string(const char *str, float *xlen);
++S3DEXPORT float s3d_strlen(const char *str);
+ 
+ /* some vector calculation helpers */
+ 
+
+Modified: trunk/libs3d/s3dlib.h
+===================================================================
+--- trunk/libs3d/s3dlib.h	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3d/s3dlib.h	2008-08-15 23:08:15 UTC (rev 942)
+@@ -97,24 +97,24 @@
+ 
+ #ifdef DEBUG
+ S3DEXPORT void s3dprintf(int relevance, const char *fmt, ...);
+-S3DEXPORT void errdn(int relevance, char *func, int en);
+-S3DEXPORT void errds(int relevance, char *func, const char *fmt, ...);
++S3DEXPORT void errdn(int relevance, const char *func, int en);
++S3DEXPORT void errds(int relevance, const char *func, const char *fmt, ...);
+ #else
+ static __inline__ void s3dprintf(int S3DUNUSED(relevance),
+                                  const char *S3DUNUSED(fmt), ...) {}
+ static __inline__ void errdn(int S3DUNUSED(relevance),
+-                             char *S3DUNUSED(func),
++                             const char *S3DUNUSED(func),
+                              int S3DUNUSED(en)) {}
+ static __inline__ void errds(int S3DUNUSED(relevance),
+-                             char *S3DUNUSED(func),
++                             const char *S3DUNUSED(func),
+                              const char *S3DUNUSED(fmt), ...) {}
+ #endif
+ 
+-void errn(char *func, int en);
+-void errs(char *func, char *msg);
++void errn(const char *func, int en);
++void errs(const char *func, const char *msg);
+ 
+ /*  fontselect.c */
+-char *s3d_findfont(char *mask);
++char *s3d_findfont(const char *mask);
+ /*  object_queue.c */
+ int _queue_init(void);
+ int _queue_fill(void);
+
+Modified: trunk/libs3d/shm.c
+===================================================================
+--- trunk/libs3d/shm.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3d/shm.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -74,13 +74,13 @@
+ 	}
+ 
+ 	/* attach to the segment to get a pointer to it: */
+-	next_key = shmat(shmid, (void *)0, 0);
++	next_key = (uint32_t*)shmat(shmid, (void *)0, 0);
+ 	if (next_key == (uint32_t *)(-1)) {
+ 		errn(&quot;shm_init():shmat()&quot;, errno);
+ 		return(1);
+ 	}
+ 	s3dprintf(MED, &quot;right now, next_keys are: %08x, %08x&quot;, next_key[0], next_key[1]);
+-	while ((0 == (key_in = next_key[1])) || (0 == (key_out = next_key[0])));
++	while ((0 == (key_in = next_key[1])) || (0 == (key_out = next_key[0]))) {}
+ 	next_key[0] = next_key[1] = 0;
+ 	s3dprintf(MED, &quot;right now, next_keys are: %08x, %08x&quot;, key_in, key_out);
+ 	/* as we have the new key, we  can detach here now. */
+@@ -179,7 +179,7 @@
+ 		if (1 == shm_readn(&amp;opcode, 1)) {
+ 			shm_readn((char *)&amp;length, 2);
+ 			length = ntohs(length);
+-			buf = malloc(length);
++			buf = (char*)malloc(length);
+ 			shm_readn(buf, length);
+ 			net_prot_in(opcode, length, buf);
+ 			found = 1;
+
+Modified: trunk/libs3d/tcp.c
+===================================================================
+--- trunk/libs3d/tcp.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3d/tcp.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -163,7 +163,7 @@
+ 				if (1 == tcp_readn(&amp;opcode, 1)) {
+ 					tcp_readn((char *)&amp;length, 2);
+ 					length = ntohs(length);
+-					buf = malloc(length);
++					buf = (char*)malloc(length);
+ 					tcp_readn(buf, length);
+ 					net_prot_in(opcode, length, buf);
+ 					found = 1;
+
+Modified: trunk/libs3d/texture.c
+===================================================================
+--- trunk/libs3d/texture.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3d/texture.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -37,25 +37,25 @@
+ static void _s3d_free_s3dtex(void *d1);
+ static struct hashtable_t *tex_hash = NULL;
+ 
+-static int _s3d_choose_cb(void *d1, int size) 
++static int _s3d_choose_cb(void *d1, int size)
+ {
+-	struct s3d_texshm *t1 = d1;
++	struct s3d_texshm *t1 = (struct s3d_texshm *)d1;
+ 	return((t1-&gt;oid*32 + t1-&gt;tex)%size);
+ }
+ 
+-static int _s3d_compare_cb(void *d1, void *d2) 
++static int _s3d_compare_cb(void *d1, void *d2)
+ {
+ 	struct s3d_texshm *t1, *t2;
+-	t1 = d1;
+-	t2 = d2;
++	t1 = (struct s3d_texshm *)d1;
++	t2 = (struct s3d_texshm *)d2;
+ 	if ((t1-&gt;oid == t2-&gt;oid) &amp;&amp; (t1-&gt;tex == t2-&gt;tex))
+ 		return(0);
+ 	return(1);
+ }
+ 
+-static void _s3d_free_s3dtex(void *d1) 
++static void _s3d_free_s3dtex(void *d1)
+ {
+-	struct s3d_tex *tex = d1;
++	struct s3d_tex *tex = (struct s3d_tex *)d1;
+ #ifdef SHM	
+ 	if (tex-&gt;buf != NULL) {
+ 		shmdt(tex-&gt;buf);
+@@ -74,19 +74,19 @@
+ 	if (tex_hash == NULL)
+ 		return;
+ #ifdef SHM
+-	tex = _s3d_hash_remove(tex_hash, tshm);
++	tex = (struct s3d_tex *)_s3d_hash_remove(tex_hash, tshm);
+ 	if (tex != NULL)
+ 		_s3d_free_s3dtex(tex);
+ 	if (tshm-&gt;shmid == -1)
+ 		return;
+ 
+-	tex = malloc(sizeof(*tex));
++	tex = (struct s3d_tex *)malloc(sizeof(*tex));
+ 	tex-&gt;tshm = *tshm;
+-	tex-&gt;buf = shmat(tex-&gt;tshm.shmid, (void *)0, 0);
+-    if ((key_t *)tex-&gt;buf == (key_t *)(-1)) {
+-          errn(&quot;shm_init():shmat()&quot;, errno);
+-		  free(tex);
+-          return;
++	tex-&gt;buf = (char*)shmat(tex-&gt;tshm.shmid, (void *)0, 0);
++	if ((key_t *)tex-&gt;buf == (key_t *)(-1)) {
++		errn(&quot;shm_init():shmat()&quot;, errno);
++		free(tex);
++		return;
+ 	}
+ 	s3dprintf(HIGH, &quot;adding new texture ...&quot;);
+ 	_s3d_hash_add(tex_hash, tex);
+@@ -97,14 +97,14 @@
+ {
+ 	struct s3d_texshm check;
+ 	struct s3d_tex *tex;
+-   	int32_t i, p1, p2, m;
+-    int16_t mw, mh; 
++	int32_t i, p1, p2, m;
++	int16_t mw, mh;
+ 
+ 	if (tex_hash == NULL)
+ 		return(-1);
+ 	check.oid = object;
+ 	check.tex = tid;
+-	tex = _s3d_hash_find(tex_hash, (void *)&amp;check);
++	tex = (struct s3d_tex *)_s3d_hash_find(tex_hash, (void *)&amp;check);
+ 	if (tex == NULL)
+ 		return(-1); /* coudn't find */
+ 	s3dprintf(VLOW, &quot;texture: oid %d, tex %d, shmid %d, tw %d, th %d, w %d, h %d ...&quot;,
+
+Modified: trunk/libs3dw/button.c
+===================================================================
+--- trunk/libs3dw/button.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3dw/button.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -87,7 +87,7 @@
+ }
+ 
+ /* create a new button in the surface */
+-s3dw_button *s3dw_button_new(s3dw_surface *surface, char *text, float posx, float posy)
++s3dw_button *s3dw_button_new(s3dw_surface *surface, const char *text, float posx, float posy)
+ {
+ 	s3dw_button *button;
+ 	s3dw_widget *widget;
+
+Modified: trunk/libs3dw/input.c
+===================================================================
+--- trunk/libs3dw/input.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3dw/input.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -173,7 +173,7 @@
+ 	free(input);
+ }
+ /* changes the text of the input */
+-void s3dw_input_change_text(s3dw_input *input, char *text)
++void s3dw_input_change_text(s3dw_input *input, const char *text)
+ {
+ 	s3dw_widget *widget = (s3dw_widget *)input;
+ 	uint32_t oid_text;
+@@ -198,7 +198,7 @@
+ 	case S3DK_BACKSPACE:
+ 		len = strlen(input-&gt;text);
+ 		if ((len = strlen(input-&gt;text)) &gt; 0) {
+-			newtext = malloc(len + 0); /* +1 for the terminating byte, -1 for the deleted character */
++			newtext = (char *)malloc(len + 0); /* +1 for the terminating byte, -1 for the deleted character */
+ 			strncpy(newtext, input-&gt;text, len);
+ 			newtext[len-1] = 0;
+ 			s3dw_input_change_text(input, newtext);
+@@ -209,7 +209,7 @@
+ 	default:
+ 		if (isprint(key)) {
+ 			len = strlen(input-&gt;text);
+-			newtext = malloc(len + 2); /* +1 for the terminating byte, +1 for the new character */
++			newtext = (char *)malloc(len + 2); /* +1 for the terminating byte, +1 for the new character */
+ 			strcpy(newtext, input-&gt;text);
+ 			newtext[len] = key;
+ 			newtext[len+1] = 0;
+
+Modified: trunk/libs3dw/label.c
+===================================================================
+--- trunk/libs3dw/label.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3dw/label.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -50,7 +50,7 @@
+ 	s3d_flags_off(widget-&gt;oid, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+ }
+ /* change label text */
+-void s3dw_label_change_text(s3dw_label *label, char *text)
++void s3dw_label_change_text(s3dw_label *label, const char *text)
+ {
+ 	s3dw_widget *widget = (s3dw_widget *)label;
+ 
+@@ -65,7 +65,7 @@
+ 
+ 
+ /* create a new label in the surface */
+-s3dw_label *s3dw_label_new(s3dw_surface *surface, char *text, float posx, float posy)
++s3dw_label *s3dw_label_new(s3dw_surface *surface, const char *text, float posx, float posy)
+ {
+ 	s3dw_label *label;
+ 	s3dw_widget *widget;
+
+Modified: trunk/libs3dw/root.c
+===================================================================
+--- trunk/libs3dw/root.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3dw/root.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -53,7 +53,7 @@
+ 	return(0);
+ }
+ 
+-char *s3dw_get_type_string(int type)
++const char *s3dw_get_type_string(int type)
+ {
+ 	switch (type) {
+ 	case S3DW_TROOT:
+
+Modified: trunk/libs3dw/s3dw.h
+===================================================================
+--- trunk/libs3dw/s3dw.h	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3dw/s3dw.h	2008-08-15 23:08:15 UTC (rev 942)
+@@ -166,14 +166,14 @@
+ 	float title_text_mat[12]; /* material for the text on the title bar */
+ };
+ /* button.c */
+-S3DWEXPORT s3dw_button   *s3dw_button_new(s3dw_surface *surface, char *text, float posx, float posy);
+-S3DWEXPORT s3dw_label    *s3dw_label_new(s3dw_surface *surface, char *text, float posx, float posy);
++S3DWEXPORT s3dw_button   *s3dw_button_new(s3dw_surface *surface, const char *text, float posx, float posy);
++S3DWEXPORT s3dw_label    *s3dw_label_new(s3dw_surface *surface, const char *text, float posx, float posy);
+ S3DWEXPORT s3dw_input    *s3dw_input_new(s3dw_surface *surface, float width, float posx, float posy);
+-S3DWEXPORT s3dw_textbox   *s3dw_textbox_new(s3dw_surface *surface, char *text, float posx, float posy, float width, float height);
++S3DWEXPORT s3dw_textbox   *s3dw_textbox_new(s3dw_surface *surface, const char *text, float posx, float posy, float width, float height);
+ S3DWEXPORT char     *s3dw_input_gettext(s3dw_input *input);
+-S3DWEXPORT void      s3dw_input_change_text(s3dw_input *input, char *text);
+-S3DWEXPORT void      s3dw_label_change_text(s3dw_label *label, char *text);
+-S3DWEXPORT s3dw_surface   *s3dw_surface_new(char *title, float width, float height);
++S3DWEXPORT void      s3dw_input_change_text(s3dw_input *input, const char *text);
++S3DWEXPORT void      s3dw_label_change_text(s3dw_label *label, const char *text);
++S3DWEXPORT s3dw_surface   *s3dw_surface_new(const char *title, float width, float height);
+ 
+ S3DWEXPORT s3dw_widget   *s3dw_getroot(void);
+ S3DWEXPORT void     s3dw_moveit(s3dw_widget *widget);
+@@ -186,7 +186,7 @@
+ S3DWEXPORT void      s3dw_textbox_scrollleft(s3dw_textbox *textbox);
+ S3DWEXPORT void      s3dw_textbox_scrollright(s3dw_textbox *textbox);
+ S3DWEXPORT void      s3dw_textbox_scrollto(s3dw_textbox *textbox, int x, int y);
+-S3DWEXPORT void      s3dw_textbox_change_text(s3dw_textbox *textbox, char *text);
++S3DWEXPORT void      s3dw_textbox_change_text(s3dw_textbox *textbox, const char *text);
+ 
+ S3DWEXPORT int      s3dw_handle_click(struct s3d_evt *evt);
+ S3DWEXPORT int      s3dw_handle_key(struct s3d_evt *evt);
+
+Modified: trunk/libs3dw/s3dw_int.h
+===================================================================
+--- trunk/libs3dw/s3dw_int.h	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3dw/s3dw_int.h	2008-08-15 23:08:15 UTC (rev 942)
+@@ -39,7 +39,7 @@
+ int s3dw_click_nothing(s3dw_widget *widget, uint32_t dummy);
+ int s3dw_key_nothing(s3dw_widget *widget, struct s3d_key_event *dummy);
+ void s3dw_root_destroy(s3dw_widget *widget);
+-char *s3dw_get_type_string(int type);
++const char *s3dw_get_type_string(int type);
+ /* widget.c */
+ s3dw_widget* s3dw_widget_new(s3dw_widget *widget);
+ void s3dw_widget_append(s3dw_widget *parent, s3dw_widget *widget);
+
+Modified: trunk/libs3dw/surface.c
+===================================================================
+--- trunk/libs3dw/surface.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3dw/surface.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -126,7 +126,7 @@
+ 	s3d_flags_off(surface-&gt;oid_tbar, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+ }
+ /* create a new surface */
+-s3dw_surface *s3dw_surface_new(char *title, float width, float height)
++s3dw_surface *s3dw_surface_new(const char *title, float width, float height)
+ {
+ 	s3dw_surface *surface;
+ 	s3dw_widget  *widget;
+
+Modified: trunk/libs3dw/textbox.c
+===================================================================
+--- trunk/libs3dw/textbox.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3dw/textbox.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -115,7 +115,7 @@
+ 	int x, y;
+ 	float width;
+ 	textbox-&gt;n_lineoids = widget-&gt;height - 2;
+-	textbox-&gt;p_lineoids = malloc(textbox-&gt;n_lineoids * sizeof(int));
++	textbox-&gt;p_lineoids = (int*)malloc(textbox-&gt;n_lineoids * sizeof(int));
+ 	width = widget-&gt;width - 1.5;
+ 	y = -textbox-&gt;window_y;
+ 	x = textbox-&gt;window_x;
+@@ -196,7 +196,7 @@
+ }
+ 
+ /* create a new textbox in the surface */
+-s3dw_textbox *s3dw_textbox_new(s3dw_surface *surface, char *text, float posx, float posy, float width, float height)
++s3dw_textbox *s3dw_textbox_new(s3dw_surface *surface, const char *text, float posx, float posy, float width, float height)
+ {
+ 	s3dw_textbox *textbox;
+ 	s3dw_widget *widget;
+@@ -265,7 +265,7 @@
+ 	s3dw_textbox_redraw(widget);
+ }
+ 
+-void s3dw_textbox_change_text(s3dw_textbox *textbox, char *text)
++void s3dw_textbox_change_text(s3dw_textbox *textbox, const char *text)
+ {
+ 	s3dw_widget *widget = (s3dw_widget *)textbox;
+ 	/* redraw the text ... */
+
+Modified: trunk/libs3dw/widget.c
+===================================================================
+--- trunk/libs3dw/widget.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/libs3dw/widget.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -71,7 +71,7 @@
+ void s3dw_widget_append(s3dw_widget *parent, s3dw_widget *widget)
+ {
+ 	parent-&gt;nobj++;
+-	parent-&gt;pobj = realloc(parent-&gt;pobj, sizeof(s3dw_widget **) * (parent-&gt;nobj));
++	parent-&gt;pobj = (s3dw_widget**)realloc(parent-&gt;pobj, sizeof(s3dw_widget **) * (parent-&gt;nobj));
+ 	parent-&gt;pobj[parent-&gt;nobj-1] = widget;
+ 	widget-&gt;parent = parent;
+ 	widget-&gt;style = parent-&gt;style;
+
+Modified: trunk/server/allocate.c
+===================================================================
+--- trunk/server/allocate.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/server/allocate.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -97,7 +97,7 @@
+ 
+ 	/*  printf(&quot;sizeof(struct chunkHeader) = %u, sizeof (struct chunkTrailer) = %u\n&quot;, sizeof (struct chunkHeader), sizeof (struct chunkTrailer)); */
+ 
+-	memory = malloc(length + sizeof(struct chunkHeader) + sizeof(struct chunkTrailer));
++	memory = (unsigned char*)malloc(length + sizeof(struct chunkHeader) + sizeof(struct chunkTrailer));
+ 
+ 	if (memory == NULL) {
+ 		fprintf(stderr, &quot;Cannot allocate %u bytes, tag = %d\n&quot;, (unsigned int)(length + sizeof(struct chunkHeader) + sizeof(struct chunkTrailer)), tag);
+@@ -131,7 +131,7 @@
+ 	checkIntegrity();
+ 
+ 	if (memoryParameter) { /* if memoryParameter==NULL, realloc() should work like malloc() !! */
+-		memory = memoryParameter;
++		memory = (unsigned char*)memoryParameter;
+ 		chunkHeader = (struct chunkHeader *)(memory - sizeof(struct chunkHeader));
+ 
+ 		if (chunkHeader-&gt;magicNumber != MAGIC_NUMBER) {
+@@ -148,7 +148,7 @@
+ 	}
+ 
+ 
+-	result = debugMalloc(length, tag);
++	result = (unsigned char*)debugMalloc(length, tag);
+ 	if (memoryParameter) {
+ 		copyLength = length;
+ 
+@@ -173,7 +173,7 @@
+ 
+ 	checkIntegrity();
+ 
+-	memory = memoryParameter;
++	memory = (unsigned char*)memoryParameter;
+ 	chunkHeader = (struct chunkHeader *)(memory - sizeof(struct chunkHeader));
+ 
+ 	if (chunkHeader-&gt;magicNumber != MAGIC_NUMBER) {
+
+Modified: trunk/server/error.c
+===================================================================
+--- trunk/server/error.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/server/error.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -32,31 +32,31 @@
+ /*  basicly, this is for upcoming logfiles, or maybe draw error-messages into */
+ /*  the 3d-space */
+ /*  this is the generic failure routine ... */
+-void errn(char *func, int en)
++void errn(const char *func, int en)
+ {
+ 	fprintf(stderr, &quot;error: %s: (%d) %s\n&quot;, func, en, strerror(en));
+ }
+ /*  ... and it's fatal pendant */
+-void errnf(char *func, int en)
++void errnf(const char *func, int en)
+ {
+ 	fprintf(stderr, &quot;FATAL: %s: (%d) %s\n&quot;, func, en, strerror(en));
+ 	exit(-1);
+ }
+ 
+ /*  prints an error with the function and it's error-message */
+-void errs(char *func, char *msg)
++void errs(const char *func, const char *msg)
+ {
+ 	fprintf(stderr, &quot;error: %s: %s\n&quot;, func, msg);
+ }
+ 
+-void errsf(char *func, char *msg)
++void errsf(const char *func, const char *msg)
+ {
+ 	fprintf(stderr, &quot;FATAL: %s: %s\n&quot;, func, msg);
+ 	exit(-1);
+ }
+ #ifdef DEBUG
+ /*  printing error message */
+-void errds(int relevance, char *func, const char *fmt, ...)
++void errds(int relevance, const char *func, const char *fmt, ...)
+ {
+ 	char dbm[DBM_MAX];
+ 	va_list args;
+
+Modified: trunk/server/event.c
+===================================================================
+--- trunk/server/event.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/server/event.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -130,7 +130,7 @@
+ 		shmtex_packet.th = htons(o-&gt;p_tex[tex].th);
+ 		shmtex_packet.w = htons(o-&gt;p_tex[tex].w);
+ 		shmtex_packet.h = htons(o-&gt;p_tex[tex].h);
+-		prot_com_out(p, S3D_P_S_SHMTEX, (void *)&amp;shmtex_packet, sizeof(shmtex_packet));
++		prot_com_out(p, S3D_P_S_SHMTEX, (uint8_t *)&amp;shmtex_packet, sizeof(shmtex_packet));
+ 	}
+ 	return(0);
+ }
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/server/global.h	2008-08-15 23:08:15 UTC (rev 942)
+@@ -159,7 +159,7 @@
+ 	float    scale;
+ 	t_mtrx   m;
+ 	int    m_uptodate;
+-	float r, or;     /*  radius, object radius */
++	float r, o_r;     /*  radius, object radius */
+ };
+ #ifdef SHM
+ struct t_shmcb {
+@@ -266,16 +266,16 @@
+ void user_key(unsigned short key, unsigned short unicode, unsigned short mod, int state);
+ 
+ /*  error.c */
+-void errn(char *func, int en);
+-void errnf(char *func, int en);
+-void errs(char *func, char *msg);
+-void errsf(char *func, char *msg);
++void errn(const char *func, int en);
++void errnf(const char *func, int en);
++void errs(const char *func, const char *msg);
++void errsf(const char *func, const char *msg);
+ #ifdef DEBUG
+-void errds(int relevance, char *func, const char *fmt, ...);
++void errds(int relevance, const char *func, const char *fmt, ...);
+ void s3dprintf(int relevance, const char *msg, ...);
+ #else
+ static __inline__ void errds(int relevance __attribute__((unused)),
+-                             char *func __attribute__((unused)),
++                             const char *func __attribute__((unused)),
+                              const char *fmt __attribute__((unused)), ...) {}
+ static __inline__ void s3dprintf(int relevance __attribute__((unused)),
+                                  const char *msg __attribute__((unused)), ...) {}
+@@ -314,7 +314,7 @@
+ int process_del(int id);
+ int process_init(void);
+ int process_quit(void);
+-struct t_process *process_protinit(struct t_process *p, char *name);
++struct t_process *process_protinit(struct t_process *p, const char *name);
+ struct t_process *get_proc_by_pid(int pid);
+ /*  object.c */
+ int obj_debug(struct t_process *p, int32_t oid);
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/server/main.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -38,11 +38,11 @@
+ static int kidpid = 0;
+ static int norc = 0;
+ int running;
+-static char *rc = NULL;
+-static char *homerc = &quot;~/.s3drc&quot;;
+-static char *etcrc = &quot;/etc/s3drc&quot;;
++static const char *rc = NULL;
++static const char *homerc = &quot;~/.s3drc&quot;;
++static const char *etcrc = &quot;/etc/s3drc&quot;;
+ /*static int father_done=0;*/
+-static char **s3drc[] = {&amp;rc, &amp;homerc, &amp;etcrc};
++static const char **s3drc[] = {&amp;rc, &amp;homerc, &amp;etcrc};
+ 
+ static void mainloop(void);
+ #ifdef SIGS
+
+Modified: trunk/server/network.c
+===================================================================
+--- trunk/server/network.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/server/network.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -100,7 +100,7 @@
+ #ifdef G_SDL
+ 		SDL_SetTimer(50, (SDL_TimerCallback) net_turn_off);
+ #endif
+-		while (turn &amp;&amp; tcp_pollproc());  /*  if there is new data, loop please. this is for testing now, and should be combined with timing later .. */
++		while (turn &amp;&amp; tcp_pollproc()) {}  /*  if there is new data, loop please. this is for testing now, and should be combined with timing later .. */
+ #ifdef G_SDL
+ 		SDL_SetTimer(0, NULL);
+ #endif
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/server/object.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -86,7 +86,7 @@
+ 
+ 		m = obj-&gt;n_vertex;  /*  saving the first number of vertices */
+ 		px = x;    /*  movable pointer for x, later */
+-		if (NULL != (p_vertex = realloc(obj-&gt;p_vertex, sizeof(struct t_vertex) * (n + (obj-&gt;n_vertex))))) {
++		if (NULL != (p_vertex = (struct t_vertex*)realloc(obj-&gt;p_vertex, sizeof(struct t_vertex) * (n + (obj-&gt;n_vertex))))) {
+ 			if (obj-&gt;dplist) {
+ 				s3dprintf(VLOW, &quot;freeing display list %d to get new data&quot;, obj-&gt;dplist);
+ 				glDeleteLists(obj-&gt;dplist, 1);
+@@ -152,7 +152,7 @@
+ 		}
+ 		m = obj-&gt;n_mat;  /*  saving the first number of materials */
+ 		px = x;    /*  movable pointer for x, later */
+-		if (NULL != (p_mat = realloc(obj-&gt;p_mat, sizeof(struct t_mat) * (n + (obj-&gt;n_mat))))) {
++		if (NULL != (p_mat = (struct t_mat*)realloc(obj-&gt;p_mat, sizeof(struct t_mat) * (n + (obj-&gt;n_mat))))) {
+ 			if (obj-&gt;dplist) {
+ 				s3dprintf(VLOW, &quot;freeing display list %d to get new data&quot;, obj-&gt;dplist);
+ 				glDeleteLists(obj-&gt;dplist, 1);
+@@ -197,7 +197,7 @@
+ 
+ 		m = obj-&gt;n_poly;  /*  saving the first number of polys */
+ 		px = x;    /*  movable pointer for x, later */
+-		if (NULL != (p_poly = realloc(obj-&gt;p_poly, sizeof(struct t_poly) * (n + (obj-&gt;n_poly))))) {
++		if (NULL != (p_poly = (struct t_poly*)realloc(obj-&gt;p_poly, sizeof(struct t_poly) * (n + (obj-&gt;n_poly))))) {
+ 			if (obj-&gt;dplist) {
+ 				s3dprintf(VLOW, &quot;freeing display list %d to get new data&quot;, obj-&gt;dplist);
+ 				glDeleteLists(obj-&gt;dplist, 1);
+@@ -238,7 +238,7 @@
+ 
+ 		m = obj-&gt;n_line;  /*  saving the first number of lines */
+ 		px = x;    /*  movable pointer for x, later */
+-		if (NULL != (p_line = realloc(obj-&gt;p_line, sizeof(struct t_line) * (n + (obj-&gt;n_line))))) {
++		if (NULL != (p_line = (struct t_line*)realloc(obj-&gt;p_line, sizeof(struct t_line) * (n + (obj-&gt;n_line))))) {
+ 			if (obj-&gt;dplist) {
+ 				s3dprintf(VLOW, &quot;freeing display list %d to get new data&quot;, obj-&gt;dplist);
+ 				glDeleteLists(obj-&gt;dplist, 1);
+@@ -270,7 +270,7 @@
+ 		errn(&quot;texture_shm_register():shmget()&quot;, errno);
+ 		return(-1);
+ 	}
+-	tex-&gt;buf = shmat(tex-&gt;shmid, (void *)0, 0);
++	tex-&gt;buf = (uint8_t*)shmat(tex-&gt;shmid, (void *)0, 0);
+ 	if ((key_t *)tex-&gt;buf == (key_t *)(-1)) {
+ 		errn(&quot;shm_init():shmat()&quot;, errno);
+ 		shmctl(tex-&gt;shmid, IPC_RMID, NULL);
+@@ -323,7 +323,7 @@
+ 		}
+ 		m = obj-&gt;n_tex;    /*  saving the first number of textures */
+ 		px = x;    /*  movable pointer for x, later */
+-		if (NULL != (p_tex = realloc(obj-&gt;p_tex, sizeof(struct t_tex) * (n + (obj-&gt;n_tex))))) {
++		if (NULL != (p_tex = (struct t_tex*)realloc(obj-&gt;p_tex, sizeof(struct t_tex) * (n + (obj-&gt;n_tex))))) {
+ 			/*   if (obj-&gt;dplist)
+ 			   {
+ 			    s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+@@ -339,7 +339,7 @@
+ 				if ((obj-&gt;p_tex[m+i].tw &lt;= TEXTURE_MAX_W) &amp;&amp; (obj-&gt;p_tex[m+i].th &lt;= TEXTURE_MAX_H) &amp;&amp;
+ 				                (obj-&gt;p_tex[m+i].tw &gt; 0) &amp;&amp; (obj-&gt;p_tex[m+i].th &gt; 0)) {
+ 					/* find the next power of 2 that can hold the width of the texture */
+-					for (hm = 1; hm &lt; obj-&gt;p_tex[m+i].tw; hm *= 2);
++					for (hm = 1; hm &lt; obj-&gt;p_tex[m+i].tw; hm *= 2) {}
+ 					s3dprintf(MED, &quot;hm %d, tw %d&quot;, hm, obj-&gt;p_tex[m+i].tw);
+ 					obj-&gt;p_tex[m+i].w = hm;
+ 					if (hm == obj-&gt;p_tex[m+i].tw)  
+@@ -348,7 +348,7 @@
+ 						obj-&gt;p_tex[m+i].xs = (float)((double)obj-&gt;p_tex[m+i].tw) / ((double)obj-&gt;p_tex[m+i].w);
+ 
+ 					/* find the next power of 2 that can hold the height of the texture */
+-					for (hm = 1; hm &lt; obj-&gt;p_tex[m+i].th; hm *= 2);
++					for (hm = 1; hm &lt; obj-&gt;p_tex[m+i].th; hm *= 2) {}
+ 					s3dprintf(MED, &quot;hm %d, th %d&quot;, hm, obj-&gt;p_tex[m+i].th);
+ 
+ 					obj-&gt;p_tex[m+i].h = hm;
+@@ -368,7 +368,7 @@
+ 					if (texture_shm_register(&amp;(obj-&gt;p_tex[m+i]), bufsize) == 0) 
+ 						event_texshm(p, oid, m+i);
+ 					else
+-						obj-&gt;p_tex[m+i].buf = malloc(bufsize);
++						obj-&gt;p_tex[m+i].buf = (uint8_t*)malloc(bufsize);
+ 					
+ 					memset(obj-&gt;p_tex[m+i].buf, 0, bufsize);
+ 
+@@ -969,7 +969,7 @@
+ 			obj-&gt;n_vertex = 0;
+ 			obj-&gt;p_vertex = NULL;
+ 		} else if (n &gt; 0) {
+-			if (NULL != (p_vertex = realloc(obj-&gt;p_vertex, sizeof(struct t_vertex) * (m - n)))) {
++			if (NULL != (p_vertex = (struct t_vertex*)realloc(obj-&gt;p_vertex, sizeof(struct t_vertex) * (m - n)))) {
+ 				if (obj-&gt;dplist) {
+ 					s3dprintf(VLOW, &quot;freeing display list %d to get new data&quot;, obj-&gt;dplist);
+ 					glDeleteLists(obj-&gt;dplist, 1);
+@@ -1005,7 +1005,7 @@
+ 			obj-&gt;n_mat = 0;
+ 			obj-&gt;p_mat = NULL;
+ 		} else if (n &gt; 0)
+-			if (NULL != (p_mat = realloc(obj-&gt;p_mat, sizeof(struct t_mat) * (m - n)))) {
++			if (NULL != (p_mat = (struct t_mat*)realloc(obj-&gt;p_mat, sizeof(struct t_mat) * (m - n)))) {
+ 				if (obj-&gt;dplist) {
+ 					s3dprintf(VLOW, &quot;freeing display list %d to get new data&quot;, obj-&gt;dplist);
+ 					glDeleteLists(obj-&gt;dplist, 1);
+@@ -1038,7 +1038,7 @@
+ 			obj-&gt;n_poly = 0;
+ 			obj-&gt;p_poly = NULL;
+ 		} else if (n &gt; 0)
+-			if (NULL != (p_poly = realloc(obj-&gt;p_poly, sizeof(struct t_poly) * (m - n)))) {
++			if (NULL != (p_poly = (struct t_poly*)realloc(obj-&gt;p_poly, sizeof(struct t_poly) * (m - n)))) {
+ 				if (obj-&gt;dplist) {
+ 					s3dprintf(VLOW, &quot;freeing display list %d to get new data&quot;, obj-&gt;dplist);
+ 					glDeleteLists(obj-&gt;dplist, 1);
+@@ -1071,7 +1071,7 @@
+ 			obj-&gt;n_line = 0;
+ 			obj-&gt;p_line = NULL;
+ 		} else if (n &gt; 0)
+-			if (NULL != (p_line = realloc(obj-&gt;p_line, sizeof(struct t_line) * (m - n)))) {
++			if (NULL != (p_line = (struct t_line*)realloc(obj-&gt;p_line, sizeof(struct t_line) * (m - n)))) {
+ 				if (obj-&gt;dplist) {
+ 					s3dprintf(VLOW, &quot;freeing display list %d to get new data&quot;, obj-&gt;dplist);
+ 					glDeleteLists(obj-&gt;dplist, 1);
+@@ -1109,7 +1109,7 @@
+ 		} else if (n &gt; 0) {
+ 			for (i = (m - n);i &lt; m;i++) 
+ 				texture_delete(&amp;(obj-&gt;p_tex[i]));
+-			if (NULL != (p_tex = realloc(obj-&gt;p_tex, sizeof(struct t_tex) * (m - n)))) {
++			if (NULL != (p_tex = (struct t_tex*)realloc(obj-&gt;p_tex, sizeof(struct t_tex) * (m - n)))) {
+ 				if (obj-&gt;dplist) {
+ 					s3dprintf(VLOW, &quot;freeing display list %d to get new data&quot;, obj-&gt;dplist);
+ 					glDeleteLists(obj-&gt;dplist, 1);
+@@ -1246,7 +1246,7 @@
+ 	if (p-&gt;id == MCP) return; /*  mcp does not need that. */
+ 	if (OBJ_VALID(p, oid, o)) {
+ 		if (o-&gt;oflags&amp;OF_SYSTEM) {
+-			o-&gt;r = o-&gt;or = 0; /* we don't care about system objects */
++			o-&gt;r = o-&gt;o_r = 0; /* we don't care about system objects */
+ 			return;
+ 		}
+ 		vp = o-&gt;p_vertex;
+@@ -1298,7 +1298,7 @@
+ 	o = p-&gt;object[oid];
+ 	if (o-&gt;oflags&amp;OF_SYSTEM)
+ 		return; /* we don't care, system objects don't count. */
+-	r = o-&gt;r + o-&gt;or;
++	r = o-&gt;r + o-&gt;o_r;
+ 	if (r &gt; mcp_o-&gt;r) {  /*  this is now the biggest object. */
+ 		mcp_o-&gt;r = r;
+ 		p-&gt;biggest_obj = oid;
+@@ -1309,7 +1309,7 @@
+ 			found = 0;
+ 			for (i = 0;i &lt; p-&gt;n_obj;i++)
+ 				if (p-&gt;object[i] != NULL) {
+-					if ((r2 = p-&gt;object[i]-&gt;r + p-&gt;object[i]-&gt;or) &gt; r) { /*  this object is bigger than the old biggest one. */
++					if ((r2 = p-&gt;object[i]-&gt;r + p-&gt;object[i]-&gt;o_r) &gt; r) { /*  this object is bigger than the old biggest one. */
+ 						if (!(p-&gt;object[i]-&gt;oflags&amp;OF_SYSTEM)) {
+ 							p-&gt;biggest_obj = oid;
+ 							r = r2;
+@@ -1411,7 +1411,7 @@
+ 		mySetMatrix(o-&gt;m);
+ 		myTransform3f(v);
+ 		/*  and get it's destination point. phew */
+-		o-&gt;or = sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
++		o-&gt;o_r = sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+ 	} else
+ 		if (o-&gt;oflags&amp;OF_SYSTEM) /* TODO: what will we do if $sys_object is linked to another? */
+ 		{ /* a system object changed position? let's update the focus'ed sys-objects */
+@@ -1530,7 +1530,7 @@
+ 	             GL_RGBA, GL_UNSIGNED_BYTE, tex-&gt;buf);
+ 	/* this is fairly hacky, but we only use one buffer and decrease the image left-top to right-bottom,
+ 	 * so we only read from elements AFTER the updated (written) elements. */
+-	buf = malloc((w / 2) * (h / 2) * 4);
++	buf = (unsigned char*)malloc((w / 2) * (h / 2) * 4);
+ 	src = tex-&gt;buf;
+ 	i = 1;
+ 	while (w != 1 || h != 1) {
+@@ -1874,7 +1874,7 @@
+ {
+ 	struct t_obj *obj;
+ 	int32_t pos, reuse = 0;
+-	obj = malloc(sizeof(struct t_obj));  /*  get an object and define it with our data */
++	obj = (struct t_obj*)malloc(sizeof(struct t_obj));  /*  get an object and define it with our data */
+ 	memset(obj, 0, sizeof(struct t_obj));
+ 	obj-&gt;linkid = -1;
+ 	obj-&gt;lsub = -1;
+@@ -1886,7 +1886,7 @@
+ 	obj-&gt;n_vertex = obj-&gt;n_poly = obj-&gt;n_mat = obj-&gt;n_tex = 0;
+ 	obj-&gt;clone_ooid = 0;
+ 	obj-&gt;virtual_pid = 0;
+-	obj-&gt;r = obj-&gt;or = 0.0F;
++	obj-&gt;r = obj-&gt;o_r = 0.0F;
+ 	obj-&gt;m_uptodate = 0;
+ 	memcpy(obj-&gt;m, Identity, sizeof(t_mtrx));
+ 	/*  fresh and clean ... */
+@@ -1901,8 +1901,8 @@
+ 		}
+ 		if (!reuse) {
+ 			if (p-&gt;n_obj &gt; 0)
+-				p-&gt;object = realloc(p-&gt;object, sizeof(struct t_obj *) * (p-&gt;n_obj + 1));
+-			else p-&gt;object = malloc(sizeof(struct t_obj *) * (p-&gt;n_obj + 1));
++				p-&gt;object = (struct t_obj**)realloc(p-&gt;object, sizeof(struct t_obj *) * (p-&gt;n_obj + 1));
++			else p-&gt;object = (struct t_obj**)malloc(sizeof(struct t_obj *) * (p-&gt;n_obj + 1));
+ 			pos = p-&gt;n_obj;    /*  add object at the end */
+ 			p-&gt;n_obj++;      /*  increment counter */
+ 		}
+@@ -2002,7 +2002,7 @@
+ 				p-&gt;biggest_obj = -1;
+ 				for (i = 0;i &lt; p-&gt;n_obj;i++)
+ 					if (p-&gt;object[i] != NULL) {
+-						r = p-&gt;object[i]-&gt;r + p-&gt;object[i]-&gt;or;
++						r = p-&gt;object[i]-&gt;r + p-&gt;object[i]-&gt;o_r;
+ 						if (r &gt; mr) {
+ 							if (!(p-&gt;object[i]-&gt;oflags&amp;OF_SYSTEM)) {
+ 								p-&gt;biggest_obj = i;
+@@ -2069,7 +2069,7 @@
+ 		i = oid;
+ 		while ((i != -1) &amp;&amp; (p-&gt;object[i] == NULL)) i--;
+ 		p-&gt;n_obj = i + 1;
+-		p-&gt;object = realloc(p-&gt;object, sizeof(struct t_obj *) * (p-&gt;n_obj));
++		p-&gt;object = (struct t_obj**)realloc(p-&gt;object, sizeof(struct t_obj *) * (p-&gt;n_obj));
+ 	}
+ 	return(0);
+ }
+
+Modified: trunk/server/process.c
+===================================================================
+--- trunk/server/process.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/server/process.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -35,7 +35,7 @@
+ int process_sys_init(struct t_process *p);
+ 
+ /* protocol request for process initialization */
+-struct t_process *process_protinit(struct t_process *p, char *name) {
++struct t_process *process_protinit(struct t_process *p, const char *name) {
+ 	int con_type;
+ 	int32_t mcp_oid;
+ 	if ((strncmp(name, &quot;sys_&quot;, 4) == 0)) { /* we don't like &quot;sys_&quot;-apps, kicking this */
+@@ -129,7 +129,7 @@
+ struct t_process *process_add(void) {
+ 	struct t_process *new_p;
+ 	procs_n++;
+-	procs_p = realloc(procs_p, sizeof(struct t_process)*procs_n); /* increase the block */
++	procs_p = (struct t_process *)realloc(procs_p, sizeof(struct t_process)*procs_n); /* increase the block */
+ 	new_p = &amp;procs_p[procs_n-1];
+ 
+ 	new_p-&gt;id   = procs_n - 1;
+@@ -172,7 +172,7 @@
+ 		/* this is kind of pointer madness */
+ 	}
+ 	procs_n--;
+-	procs_p = realloc(procs_p, sizeof(struct t_process) * procs_n); /* decrease the block,
++	procs_p = (struct t_process*)realloc(procs_p, sizeof(struct t_process) * procs_n); /* decrease the block,
+   wipe the last one */
+ 	return(0);
+ }
+
+Modified: trunk/server/shm.c
+===================================================================
+--- trunk/server/shm.c	2008-08-15 13:08:47 UTC (rev 941)
++++ trunk/server/shm.c	2008-08-15 23:08:15 UTC (rev 942)
+@@ -80,7 +80,7 @@
+ 	}
+ 
+ 	/* attach to the segment to get a pointer to it: */
+-	data = shmat(shmid, (void *)0, 0);
++	data = (key_t *)shmat(shmid, (void *)0, 0);
+ 	if (data == (key_t *)(-1)) {
+ 		errnf(&quot;shm_init():shmat()&quot;, errno);
+ 		return(1);
+@@ -111,7 +111,7 @@
+ 		errn(&quot;shm_open_comblock:shmget()&quot;, errno);
+ 		return(1);
+ 	}
+-	mycb-&gt;data_ctos = shmat(mycb-&gt;shmid_ctos, (void *)0, 0);
++	mycb-&gt;data_ctos = (char*)shmat(mycb-&gt;shmid_ctos, (void *)0, 0);
+ 	if (mycb-&gt;data_ctos == (char *)(-1)) {
+ 		errn(&quot;shm_open_comblock:shmat()&quot;, errno);
+ 		return(1);
+@@ -121,7 +121,7 @@
+ 		errn(&quot;shm_open_comblock:shmget()&quot;, errno);
+ 		return(1);
+ 	}
+-	mycb-&gt;data_stoc = shmat(mycb-&gt;shmid_stoc, (void *)0, 0);
++	mycb-&gt;data_stoc = (char*)shmat(mycb-&gt;shmid_stoc, (void *)0, 0);
+ 	if (mycb-&gt;data_stoc == (char *)(-1)) {
+ 		errn(&quot;shm_open_comblock:shmat()&quot;, errno);
+ 		return(1);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000926.html">[S3d-svn] r941 - in trunk: . cmake/modules
+</A></li>
+	<LI>Next message: <A HREF="000927.html">[S3d-svn] r943 - in trunk: libs3d libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#931">[ date ]</a>
+              <a href="thread.html#931">[ thread ]</a>
+              <a href="subject.html#931">[ subject ]</a>
+              <a href="author.html#931">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

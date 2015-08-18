@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r925 - trunk/apps/dot_mcp
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r925%20-%20trunk/apps/dot_mcp&In-Reply-To=%3C200807200914.m6K9EwaW017731%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000918.html">
+   <LINK REL="Next"  HREF="000920.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r925 - trunk/apps/dot_mcp</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r925%20-%20trunk/apps/dot_mcp&In-Reply-To=%3C200807200914.m6K9EwaW017731%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r925 - trunk/apps/dot_mcp">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Jul 20 11:14:58 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000918.html">[S3d-svn] r924 - trunk/experimental
+</A></li>
+        <LI>Next message: <A HREF="000920.html">[S3d-svn] r926 - in trunk: Documentation Documentation/manpages	libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#919">[ date ]</a>
+              <a href="thread.html#919">[ thread ]</a>
+              <a href="subject.html#919">[ subject ]</a>
+              <a href="author.html#919">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-07-20 11:14:58 +0200 (Sun, 20 Jul 2008)
+New Revision: 925
+
+Modified:
+   trunk/apps/dot_mcp/menu.c
+Log:
+Replace dot_mcp menu entries with new programs
+
+Modified: trunk/apps/dot_mcp/menu.c
+===================================================================
+--- trunk/apps/dot_mcp/menu.c	2008-07-20 09:14:53 UTC (rev 924)
++++ trunk/apps/dot_mcp/menu.c	2008-07-20 09:14:58 UTC (rev 925)
+@@ -37,8 +37,11 @@
+ static int go = -1;
+ static int act;
+ static struct menu_entry menu[] = {
+-	{&quot;objs/comp.3ds&quot;, &quot;terminal&quot;, &quot;s3dvt&quot;,    0, 0
+-	}, {&quot;objs/comp.3ds&quot;, &quot;olsrs3d&quot;, &quot;olsrs3d&quot;,    0, 0}, {&quot;objs/comp.3ds&quot;, &quot;s3d_x11gate&quot;, &quot;s3d_x11gate&quot;,  0, 0}, {&quot;objs/comp.3ds&quot;, &quot;filebrowser&quot;, &quot;filebrowser&quot;,  0, 0}, {&quot;objs/comp.3ds&quot;, &quot;logout&quot;, &quot;LOGOUT&quot;,     0, 0},
++	{&quot;objs/comp.3ds&quot;, &quot;terminal&quot;, &quot;s3dvt&quot;,    0, 0},
++	{&quot;objs/comp.3ds&quot;, &quot;meshs3d&quot;, &quot;meshs3d&quot;,    0, 0},
++	{&quot;objs/comp.3ds&quot;, &quot;s3d_x11gate&quot;, &quot;s3d_x11gate&quot;,  0, 0},
++	{&quot;objs/comp.3ds&quot;, &quot;s3dfm&quot;, &quot;s3dfm&quot;,  0, 0},
++	{&quot;objs/comp.3ds&quot;, &quot;logout&quot;, &quot;LOGOUT&quot;,     0, 0},
+ };
+ 
+ void menu_click(int oid)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000918.html">[S3d-svn] r924 - trunk/experimental
+</A></li>
+	<LI>Next message: <A HREF="000920.html">[S3d-svn] r926 - in trunk: Documentation Documentation/manpages	libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#919">[ date ]</a>
+              <a href="thread.html#919">[ thread ]</a>
+              <a href="subject.html#919">[ subject ]</a>
+              <a href="author.html#919">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,212 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r81 - in trunk: . client
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r81%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200602172046.k1HKkkgF020432%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000076.html">
+   <LINK REL="Next"  HREF="000078.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r81 - in trunk: . client</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r81%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200602172046.k1HKkkgF020432%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r81 - in trunk: . client">dotslash at berlios.de
+       </A><BR>
+    <I>Fri Feb 17 21:46:46 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000076.html">[S3d-svn] r80 - in trunk: . apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000078.html">[S3d-svn] r82 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#77">[ date ]</a>
+              <a href="thread.html#77">[ thread ]</a>
+              <a href="subject.html#77">[ subject ]</a>
+              <a href="author.html#77">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-02-17 21:46:45 +0100 (Fri, 17 Feb 2006)
+New Revision: 81
+
+Modified:
+   trunk/
+   trunk/ChangeLog
+   trunk/client/3dsread.c
+   trunk/client/TODO
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r102 at balthasar</A>:  dotslash | 2006-02-17 21:46:40 +0100
+ gints and gintl
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:100
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:102
+
+Modified: trunk/ChangeLog
+===================================================================
+--- trunk/ChangeLog	2006-02-17 18:44:27 UTC (rev 80)
++++ trunk/ChangeLog	2006-02-17 20:46:45 UTC (rev 81)
+@@ -1,4 +1,6 @@
+ 2006-02-17	Simon Wunderlich - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;	
++	- gintl() and gints() added in 3dsread.c, hopefully
++	  improving endianess compatibility
+ 	- moved dot_mcp to apps
+ 	- abadoning my own tries and the glu-tesselator 
+ 	  for triangulating the fonts and using public
+
+Modified: trunk/client/3dsread.c
+===================================================================
+--- trunk/client/3dsread.c	2006-02-17 18:44:27 UTC (rev 80)
++++ trunk/client/3dsread.c	2006-02-17 20:46:45 UTC (rev 81)
+@@ -199,7 +199,23 @@
+ 	free(v_t_buf);
+ 	return(nbuf);
+ }
+-
++/* get the intergers in the right order */
++unsigned short gints(char *ptr)
++{
++	register unsigned short i;
++	i= ((unsigned char )ptr[0]);
++	i+=((unsigned char )ptr[1])*0x100;
++	return i;
++}
++unsigned long gintl(char *ptr)
++{
++	register unsigned long i;
++	i= ((unsigned char )ptr[0]);
++	i+=((unsigned char )ptr[1])*0x100;
++	i+=((unsigned char )ptr[2])*0x10000;
++	i+=((unsigned char )ptr[3])*0x1000000;
++	return i;
++}
+ /*  imports a 3ds file as ONE object, even it virtually contains more. */
+ /*  it returns the object id ... */
+ int s3d_import_3ds(char *buf)
+@@ -226,10 +242,10 @@
+ 	ptr=buf;
+ 	while (((ptr)&gt;=buf) &amp;&amp; ((ptr)&lt;(buf+filesize)))
+ 	{
+-		cid=*((unsigned short *) (ptr));
+-		clen=*((unsigned long *) (ptr+2));
++		cid=gints(ptr);
++		clen=gintl(ptr+2);
+ 		
+-		dprintf (VLOW,&quot;[pos %x]: \t%04x [len:%d]&quot;,(ptr-buf),cid,(clen-6));
++		dprintf (LOW,&quot;[pos %x]: \t%04x [len:%d]&quot;,(ptr-buf),cid,(clen-6));
+ 		if ((ptr==buf) &amp;&amp; (cid!=0x4d4d))
+ 		{
+ 			errs(&quot;3d_import_3ds()&quot;,&quot;file doesn't start with 0x4d4d, maybe file corrupt?&quot;);
+@@ -266,7 +282,7 @@
+ 			  mesh_end=ptr+(clen-6);
+ 			  break;
+ 		  case 0x4110: 
+-			  vertexnum=*((unsigned short *) ptr);
++			  vertexnum=gints(ptr);
+ 			  ptr+=sizeof(unsigned short);
+ 			  dprintf(VLOW,&quot;-- vertices list!! number of vertices: %d&quot;,vertexnum);
+ 			  vertex_buf=malloc(sizeof(float)*3*vertexnum);
+@@ -282,19 +298,20 @@
+ 			  v+=vertexnum;  /*  for the correct vertex offset */
+ 			break;
+ 		  case 0x4120:
+-			polynum=*((unsigned short *) ptr);
++			polynum=gints(ptr);
+ 			ptr+=sizeof(unsigned short);
+-			dprintf(VLOW,&quot;-- polygon list!! number of polygons: %d&quot;,polynum);
++			dprintf(LOW,&quot;-- polygon list!! number of polygons: %d&quot;,polynum);
+ 			poly_buf=malloc(sizeof(unsigned long)*4*polynum);
+ 			if (poly_buf==NULL) break;
+ 		    for (j=0; j&lt;polynum; j++)
+ 			{
+-				poly_buf[j*4+0]=htonl(vertex_offset+*((unsigned short *)ptr+0)); 
+-				poly_buf[j*4+1]=htonl(vertex_offset+*((unsigned short *)ptr+1));
+-				poly_buf[j*4+2]=htonl(vertex_offset+*((unsigned short *)ptr+2));
++				poly_buf[j*4+0]=htonl(vertex_offset+gints(ptr+0)); 
++				poly_buf[j*4+1]=htonl(vertex_offset+gints(ptr+2));
++				poly_buf[j*4+2]=htonl(vertex_offset+gints(ptr+4));
+ 				poly_buf[j*4+3]=htonl(col_obj);  /*  we should have a default material .... */
+ 				ptr+=sizeof(unsigned short)*4;
+ 		    }
++			dprintf(LOW,&quot;done&quot;);
+ 			break;
+ 		  case 0x4130:
+ 			ptr2=(char *)ptr+(clen-6);  /*  backup our endpointer ... */
+@@ -309,14 +326,13 @@
+ 				errds(MED,&quot;s3d_import_3ds()&quot;,&quot;couldn't find material %s&quot;,ostr);
+ 				col_obj=0;
+ 			}
+-			nfaces=*((unsigned short *)ptr);
++			nfaces=gints(ptr);
+ 			ptr+=2;
+ 			for (i=0;i&lt;nfaces;i++)
+ 			{
+-				j=*((unsigned short *)ptr+i);
+-			 /* 	dprintf(LOW, &quot;trying to change material of poly %d&quot;,j); */
++				j=gints(ptr+2*i);
+ 				if (j&gt;=0 &amp;&amp; j&lt;polynum)
+-					poly_buf[*((unsigned short *)ptr+i)*4+3]=htonl(col_obj); 
++					poly_buf[gints(ptr+2*i)*4+3]=htonl(col_obj); 
+ 				else {
+ 					errds(MED,&quot;s3d_import_3ds()&quot;,&quot;polygon %d out of range!&quot;,j);
+ 				}
+@@ -326,6 +342,11 @@
+ 		  case 0x4150:
+ 			dprintf(VLOW,&quot;-- smoothing group information (length %d [%d])&quot;, clen,clen/4);
+ 			smooth_list=(unsigned long *)ptr;
++			for (j=0;j&lt;(clen/4);j++)
++			{
++				smooth_list[j]=gintl(ptr+j*4);
++			}
++
+ 			ptr=(char *)ptr+(clen-6);
+ 			break;
+ 		  case 0x4160:
+
+Modified: trunk/client/TODO
+===================================================================
+--- trunk/client/TODO	2006-02-17 18:44:27 UTC (rev 80)
++++ trunk/client/TODO	2006-02-17 20:46:45 UTC (rev 81)
+@@ -1,2 +1,3 @@
+ TODO:
+  - .max, .x, .obj files
++ - turn debug messages OUT
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000076.html">[S3d-svn] r80 - in trunk: . apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000078.html">[S3d-svn] r82 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#77">[ date ]</a>
+              <a href="thread.html#77">[ thread ]</a>
+              <a href="subject.html#77">[ subject ]</a>
+              <a href="author.html#77">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

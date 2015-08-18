@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r476 - in trunk: . apps/kism3d apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r476%20-%20in%20trunk%3A%20.%20apps/kism3d%20apps/s3dosm&In-Reply-To=%3C200611131605.kADG5rAf011986%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000468.html">
+   <LINK REL="Next"  HREF="000470.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r476 - in trunk: . apps/kism3d apps/s3dosm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r476%20-%20in%20trunk%3A%20.%20apps/kism3d%20apps/s3dosm&In-Reply-To=%3C200611131605.kADG5rAf011986%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r476 - in trunk: . apps/kism3d apps/s3dosm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Nov 13 17:05:53 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000468.html">[S3d-svn] r475 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000470.html">[S3d-svn] r477 - trunk/apps/kism3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#469">[ date ]</a>
+              <a href="thread.html#469">[ thread ]</a>
+              <a href="subject.html#469">[ subject ]</a>
+              <a href="author.html#469">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-11-13 17:05:52 +0100 (Mon, 13 Nov 2006)
+New Revision: 476
+
+Added:
+   trunk/apps/kism3d/Makefile.am
+   trunk/apps/s3dosm/Makefile.am
+Modified:
+   trunk/
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1141 at kero</A>:  dotslash | 2006-11-13 17:05:49 +0100
+ - autohell again, forgot to upload Makefile.am (thanks Lazhur)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1139
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1141
+
+Added: trunk/apps/kism3d/Makefile.am
+===================================================================
+--- trunk/apps/kism3d/Makefile.am	2006-11-13 15:56:09 UTC (rev 475)
++++ trunk/apps/kism3d/Makefile.am	2006-11-13 16:05:52 UTC (rev 476)
+@@ -0,0 +1,13 @@
++bin_PROGRAMS=	kism3d
++
++kism3dincludedir = ${pkgincludedir}/kism3d
++
++kism3dinclude_HEADERS =  \
++	kism3d.h list.h
++kism3d_SOURCES =  \
++	kism3d.c
++
++kism3d_CPPFLAGS=		-I${top_srcdir}/libs3d -I${top_srcdir}/libs3dw
++kism3d_LDADD=		${top_builddir}/libs3d/libs3d.la ${top_builddir}/libs3dw/libs3dw.la
++
++
+
+Added: trunk/apps/s3dosm/Makefile.am
+===================================================================
+--- trunk/apps/s3dosm/Makefile.am	2006-11-13 15:56:09 UTC (rev 475)
++++ trunk/apps/s3dosm/Makefile.am	2006-11-13 16:05:52 UTC (rev 476)
+@@ -0,0 +1,12 @@
++bin_PROGRAMS=	s3dosm
++s3dosmincludedir = ${pkgincludedir}/s3dosm
++s3dosminclude_HEADERS =  \
++	s3dosm.h
++				  
++s3dosm_SOURCES =  \
++	main.c http_fetcher.c http_error_codes.c osm.c \
++	avl.c object.c draw.c kismet.c nav.c tag.c io.c
++
++s3dosm_CPPFLAGS=	-I$(top_srcdir)/libs3d @LIBXML2_CFLAGS@
++s3dosm_LDADD=		$(top_builddir)/libs3d/libs3d.la @LIBXML2_LIBS@
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000468.html">[S3d-svn] r475 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000470.html">[S3d-svn] r477 - trunk/apps/kism3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#469">[ date ]</a>
+              <a href="thread.html#469">[ thread ]</a>
+              <a href="subject.html#469">[ subject ]</a>
+              <a href="author.html#469">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

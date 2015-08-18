@@ -1,0 +1,307 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r766 - trunk/libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r766%20-%20trunk/libs3d&In-Reply-To=%3C200710182358.l9INwiHF030554%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000757.html">
+   <LINK REL="Next"  HREF="000759.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r766 - trunk/libs3d</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r766%20-%20trunk/libs3d&In-Reply-To=%3C200710182358.l9INwiHF030554%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r766 - trunk/libs3d">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 01:58:44 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000757.html">[S3d-svn] r765 - trunk/server
+</A></li>
+        <LI>Next message: <A HREF="000759.html">[S3d-svn] r767 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#758">[ date ]</a>
+              <a href="thread.html#758">[ thread ]</a>
+              <a href="subject.html#758">[ subject ]</a>
+              <a href="author.html#758">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 01:58:43 +0200 (Fri, 19 Oct 2007)
+New Revision: 766
+
+Modified:
+   trunk/libs3d/event.c
+   trunk/libs3d/freetype.c
+   trunk/libs3d/io.c
+   trunk/libs3d/modelread.c
+   trunk/libs3d/network.c
+   trunk/libs3d/sei_misc.c
+   trunk/libs3d/sei_tri.c
+   trunk/libs3d/shm.c
+   trunk/libs3d/tcp.c
+Log:
+libs3d: Mark local functions and variables as static
+
+
+Modified: trunk/libs3d/event.c
+===================================================================
+--- trunk/libs3d/event.c	2007-10-18 23:58:34 UTC (rev 765)
++++ trunk/libs3d/event.c	2007-10-18 23:58:43 UTC (rev 766)
+@@ -27,7 +27,7 @@
+ #include &quot;proto.h&quot;
+ #include &lt;stdlib.h&gt;   /*  malloc(), free() */
+ 
+-struct s3d_evt *s3d_stack;
++static struct s3d_evt *s3d_stack;
+ int cb_lock = 2;  /*  callback lock */
+ void s3d_push_event(struct s3d_evt *newevt)
+ {
+
+Modified: trunk/libs3d/freetype.c
+===================================================================
+--- trunk/libs3d/freetype.c	2007-10-18 23:58:34 UTC (rev 765)
++++ trunk/libs3d/freetype.c	2007-10-18 23:58:43 UTC (rev 766)
+@@ -36,7 +36,7 @@
+ #define FT_ERROR_START_LIST     {
+ #define FT_ERROR_END_LIST       { 0, 0 } };
+ 
+-const struct {
++static const struct {
+ 	int          err_code;
+ 	const char*  err_msg;
+ } ft_errors[] =
+@@ -57,12 +57,12 @@
+ 
+ static int v_off;   /*  the vertex number offset, to have the right vertex numbers for each character */
+ static int ch;
+-struct t_buf tess_buf[256];
++static struct t_buf tess_buf[256];
+ 
+ 
+ 
+ /*  initialize truetype and tess_buf ... */
+-int s3d_ft_init(void)
++static int s3d_ft_init(void)
+ {
+ 	int error = FT_Init_FreeType(&amp;library);
+ 	int i;
+@@ -78,7 +78,7 @@
+ 	return(0);
+ }
+ 
+-int s3d_ft_load_font(void)
++static int s3d_ft_load_font(void)
+ {
+ 	FT_Error error;
+ 	if ((memory_font == NULL) || (memory_font_size == 0)) {
+@@ -96,7 +96,7 @@
+ 	return(0);
+ }
+ 
+-int _s3d_clear_tessbuf(void)
++static int _s3d_clear_tessbuf(void)
+ {
+ 	int i;
+ 
+@@ -115,7 +115,7 @@
+ 
+ /* renders a character with seidels algorithm and stores it in the tess_buf for later
+  * usage */
+-int _s3d_add_tessbuf(uint16_t a)
++static int _s3d_add_tessbuf(uint16_t a)
+ {
+ 	float norm, ar, xa, ya;
+ 	int i, j, k, c, n, start, outl, s, e;
+@@ -263,7 +263,7 @@
+ }
+ 
+ /* draws one charachter a */
+-int _s3d_draw_tessbuf(int oid, uint16_t a, int *voff, float *xoff)
++static int _s3d_draw_tessbuf(int oid, uint16_t a, int *voff, float *xoff)
+ {
+ 	float *vbuf;
+ 	uint32_t *pbuf;
+@@ -401,12 +401,13 @@
+ 	return(xoff);
+ 
+ }
+-int s3d_ft_quit(void)
++
++#if 0
++static int s3d_ft_quit(void)
+ {
+ 	_s3d_clear_tessbuf();
+ 	FT_Done_FreeType(library);
+ 	ft_init = 0;
+ 	return(0);
+ }
+-
+-
++#endif /* 0 */
+
+Modified: trunk/libs3d/io.c
+===================================================================
+--- trunk/libs3d/io.c	2007-10-18 23:58:34 UTC (rev 765)
++++ trunk/libs3d/io.c	2007-10-18 23:58:43 UTC (rev 766)
+@@ -59,7 +59,7 @@
+ #ifdef SIGS
+ int _s3d_sigio = 0;
+ int _s3d_ready = 0;
+-void sigint_handler(int S3DUNUSED(sig), int S3DUNUSED(code))  /*  ... ? */
++static void sigint_handler(int S3DUNUSED(sig), int S3DUNUSED(code))  /*  ... ? */
+ {
+ 	/*s3d_quit();*/ /* TODO: sometimes no clean quit ?!*/
+ 	exit(-1);
+
+Modified: trunk/libs3d/modelread.c
+===================================================================
+--- trunk/libs3d/modelread.c	2007-10-18 23:58:34 UTC (rev 765)
++++ trunk/libs3d/modelread.c	2007-10-18 23:58:43 UTC (rev 766)
+@@ -38,7 +38,7 @@
+ 	int material_id;
+ 	int texture_id;
+ };
+-struct material2texture *mat2tex_root = NULL;
++static struct material2texture *mat2tex_root = NULL;
+ 
+ #define MAXSTRN  20
+ static int model_load(char *file);
+@@ -80,7 +80,7 @@
+ 	return(-1); /* nothing in search path ... */
+ }
+ 
+-void *get_mat2tex(struct material2texture **mat2tex, void *mat_ptr)
++static void* get_mat2tex(struct material2texture **mat2tex, void *mat_ptr)
+ {
+ 
+ 	while ((*mat2tex) != NULL) {
+@@ -116,7 +116,7 @@
+ 
+ 
+ 
+-int model_load(char *file)
++static int model_load(char *file)
+ {
+ 	G3DContext     *context;
+ 	G3DModel    *model;
+
+Modified: trunk/libs3d/network.c
+===================================================================
+--- trunk/libs3d/network.c	2007-10-18 23:58:34 UTC (rev 765)
++++ trunk/libs3d/network.c	2007-10-18 23:58:43 UTC (rev 766)
+@@ -63,7 +63,7 @@
+ }
+ /* handler for socket based connection types */
+ #ifdef TCP
+-int _s3d_net_receive(void)
++static int _s3d_net_receive(void)
+ {
+ 	return(_s3d_tcp_net_receive());
+ 	return(0);
+
+Modified: trunk/libs3d/sei_misc.c
+===================================================================
+--- trunk/libs3d/sei_misc.c	2007-10-18 23:58:34 UTC (rev 765)
++++ trunk/libs3d/sei_misc.c	2007-10-18 23:58:43 UTC (rev 766)
+@@ -44,7 +44,7 @@
+ 
+ static int choose_idx;
+ static int permute[SEGSIZE];
+-double mlog2(double x)
++static double mlog2(double x)
+ {
+ 	return log(x) / log(2);
+ }
+
+Modified: trunk/libs3d/sei_tri.c
+===================================================================
+--- trunk/libs3d/sei_tri.c	2007-10-18 23:58:34 UTC (rev 765)
++++ trunk/libs3d/sei_tri.c	2007-10-18 23:58:43 UTC (rev 766)
+@@ -135,8 +135,8 @@
+  * set (polygon-area - polygon-boundary). The return value for points
+  * on the boundary is not consistent!!!
+  */
+-
+-int is_point_inside_polygon(double vertex[2])
++#if 0
++static int is_point_inside_polygon(double vertex[2])
+ {
+ 	point_t v;
+ 	int trnum, rseg;
+@@ -156,3 +156,4 @@
+ 	rseg = t-&gt;rseg;
+ 	return _greater_than_equal_to(&amp;seg[rseg].v1, &amp;seg[rseg].v0);
+ }
++#endif /* 0 */
+
+Modified: trunk/libs3d/shm.c
+===================================================================
+--- trunk/libs3d/shm.c	2007-10-18 23:58:34 UTC (rev 765)
++++ trunk/libs3d/shm.c	2007-10-18 23:58:43 UTC (rev 766)
+@@ -47,7 +47,7 @@
+ static struct buf_t *data_in, *data_out;
+ static int shmid_in, shmid_out;
+ static int shm_idle = 0;
+-struct timespec t = {
++static struct timespec t = {
+ 	0, 10*1000*1000
+ }; /* 10 mili second */
+ /* char ftoken[]=&quot;/tmp/.s3d_shm&quot;;*/
+
+Modified: trunk/libs3d/tcp.c
+===================================================================
+--- trunk/libs3d/tcp.c	2007-10-18 23:58:34 UTC (rev 765)
++++ trunk/libs3d/tcp.c	2007-10-18 23:58:43 UTC (rev 766)
+@@ -41,14 +41,14 @@
+ extern int _s3d_sigio;
+ #endif
+ 
+-int s3d_socket;   /*  this is the socket which holds the tcp-socket .... */
++static int s3d_socket;   /*  this is the socket which holds the tcp-socket .... */
+ 
+ #ifdef SIGS
+-void sigpipe_handler(int S3DUNUSED(sig), int S3DUNUSED(code))  /*  ... ? */
++static void sigpipe_handler(int S3DUNUSED(sig), int S3DUNUSED(code))  /*  ... ? */
+ {
+ 	errs(&quot;sigpipe_handler()&quot;, &quot;there is a broken pipe somewhere&quot;);
+ }
+-void sigio_handler(int S3DUNUSED(sig), int S3DUNUSED(code))  /*  ... ? */
++static void sigio_handler(int S3DUNUSED(sig), int S3DUNUSED(code))  /*  ... ? */
+ {
+ 	_s3d_sigio = 1;
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000757.html">[S3d-svn] r765 - trunk/server
+</A></li>
+	<LI>Next message: <A HREF="000759.html">[S3d-svn] r767 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#758">[ date ]</a>
+              <a href="thread.html#758">[ thread ]</a>
+              <a href="subject.html#758">[ subject ]</a>
+              <a href="author.html#758">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,78 @@
+From ecsv at mail.berlios.de  Mon Jul 18 09:57:23 2011
+From: ecsv at mail.berlios.de (ecsv at BerliOS)
+Date: Mon, 18 Jul 2011 09:57:23 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.2-5-1-ga92cda8
+Message-ID: <20110718075724.0B71B481547@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  a92cda896e23b89ed37ed320d97ead31021a7db1 (commit)
+      from  ecde9be1abc649661e73026433ec8f14bafea878 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit a92cda896e23b89ed37ed320d97ead31021a7db1
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Mon Jul 18 09:56:40 2011 +0200
+
+    Add optional and required dependencies to -dev packages
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    6 ++++++
+ debian/control   |    7 +++++++
+ 2 files changed, 13 insertions(+), 0 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From ecsv at mail.berlios.de  Sat Jul 23 16:57:44 2011
+From: ecsv at mail.berlios.de (ecsv at BerliOS)
+Date: Sat, 23 Jul 2011 16:57:44 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.2-5-2-g6f44314
+Message-ID: <20110723145745.80038480DAB@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  6f443142f5e4590db9a02995beba7d6534d5dce2 (commit)
+      from  a92cda896e23b89ed37ed320d97ead31021a7db1 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 6f443142f5e4590db9a02995beba7d6534d5dce2
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Jul 23 16:43:21 2011 +0200
+
+    Mark all targets in debian/rules as phony
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    1 +
+ debian/rules     |    5 +++--
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

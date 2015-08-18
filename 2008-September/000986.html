@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1006 - in trunk: apps/kism3d libs3d server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1006%20-%20in%20trunk%3A%20apps/kism3d%20libs3d%20server&In-Reply-To=%3C200809252222.m8PMMXC0006948%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000985.html">
+   <LINK REL="Next"  HREF="000987.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1006 - in trunk: apps/kism3d libs3d server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1006%20-%20in%20trunk%3A%20apps/kism3d%20libs3d%20server&In-Reply-To=%3C200809252222.m8PMMXC0006948%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1006 - in trunk: apps/kism3d libs3d server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 26 00:22:33 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000985.html">[S3d-svn] r1005 - in trunk: experimental/testvis libs3d server
+</A></li>
+        <LI>Next message: <A HREF="000987.html">[S3d-svn] r1007 - in trunk: Documentation cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#986">[ date ]</a>
+              <a href="thread.html#986">[ thread ]</a>
+              <a href="subject.html#986">[ subject ]</a>
+              <a href="author.html#986">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-26 00:22:32 +0200 (Fri, 26 Sep 2008)
+New Revision: 1006
+
+Modified:
+   trunk/apps/kism3d/kism3d.c
+   trunk/libs3d/proto_in.c
+   trunk/server/graphics_sdl.c
+Log:
+Fix possible null pointer dereferences
+
+Modified: trunk/apps/kism3d/kism3d.c
+===================================================================
+--- trunk/apps/kism3d/kism3d.c	2008-09-25 22:22:14 UTC (rev 1005)
++++ trunk/apps/kism3d/kism3d.c	2008-09-25 22:22:32 UTC (rev 1006)
+@@ -227,9 +227,16 @@
+ 
+ 				}
+ 
+-				wlan_network-&gt;type = atoi(type);
+-				wlan_network-&gt;chan = atoi(channel);
++				if (channel != NULL)
++					wlan_network-&gt;chan = atoi(channel);
++				else
++					wlan_network-&gt;chan = 0;
+ 
++				if (type != NULL)
++					wlan_network-&gt;type = atoi(type);
++				else
++					wlan_network-&gt;type = 0;
++
+ 				if (wlan_network-&gt;ssid != NULL)
+ 					free(wlan_network-&gt;ssid);
+ 
+
+Modified: trunk/libs3d/proto_in.c
+===================================================================
+--- trunk/libs3d/proto_in.c	2008-09-25 22:22:14 UTC (rev 1005)
++++ trunk/libs3d/proto_in.c	2008-09-25 22:22:32 UTC (rev 1006)
+@@ -86,8 +86,9 @@
+ 				keyevent-&gt;state = ntohs(keyevent-&gt;state);
+ 				s3devt-&gt;buf = buf;
+ 				s3devt-&gt;event = (keyevent-&gt;state == 0) ? S3D_EVENT_KEYDOWN : S3D_EVENT_KEYUP;
++
++				s3dprintf(VLOW, &quot;S3D_P_S_KEY: key %d hit!!&quot;, *((uint16_t *)s3devt-&gt;buf));
+ 			}
+-			s3dprintf(VLOW, &quot;S3D_P_S_KEY: key %d hit!!&quot;, *((uint16_t *)s3devt-&gt;buf));
+ 		}
+ 		break;
+ 	case S3D_P_S_MBUTTON:
+@@ -96,8 +97,8 @@
+ 				s3devt-&gt;event = S3D_EVENT_MBUTTON;
+ 				s3devt-&gt;length = 2;
+ 				s3devt-&gt;buf = buf;
++				s3dprintf(VLOW, &quot;S3D_P_S_MBUTTON: mbutton %d, state %d !!&quot;, *((uint8_t *)s3devt-&gt;buf), *(1 + (uint8_t *)s3devt-&gt;buf));
+ 			}
+-			s3dprintf(VLOW, &quot;S3D_P_S_MBUTTON: mbutton %d, state %d !!&quot;, *((uint8_t *)s3devt-&gt;buf), *(1 + (uint8_t *)s3devt-&gt;buf));
+ 		}
+ 		break;
+ 	case S3D_P_MCP_OBJECT:
+
+Modified: trunk/server/graphics_sdl.c
+===================================================================
+--- trunk/server/graphics_sdl.c	2008-09-25 22:22:14 UTC (rev 1005)
++++ trunk/server/graphics_sdl.c	2008-09-25 22:22:32 UTC (rev 1006)
+@@ -40,16 +40,18 @@
+ 		errsf(&quot;SDL_Init()&quot;, SDL_GetError());
+ 	if ((VideoInfo = (SDL_VideoInfo *)SDL_GetVideoInfo()) == NULL)
+ 		errs(&quot;SDL_GetVIdeoInfo()&quot;, SDL_GetError());
+-	if (VideoInfo -&gt; hw_available) {
+-		s3dprintf(LOW, &quot;detected HW_SURFACE&quot;);
+-		SDLFlags |= SDL_HWSURFACE;
+-	} else {
+-		s3dprintf(LOW, &quot;detected SW_SURFACE&quot;);
+-		SDLFlags |= SDL_SWSURFACE;
++	else {
++		if (VideoInfo-&gt;hw_available) {
++			s3dprintf(LOW, &quot;detected HW_SURFACE&quot;);
++			SDLFlags |= SDL_HWSURFACE;
++		} else {
++			s3dprintf(LOW, &quot;detected SW_SURFACE&quot;);
++			SDLFlags |= SDL_SWSURFACE;
++		}
++		if (VideoInfo-&gt;blit_hw)
++			SDLFlags |= SDL_HWACCEL;
++		/*     if(SDL_WM_ToggleFullScreen(GLwin) == 0)         SDLerror(&quot;SDL_WM_ToggleFullScreen&quot;); */
+ 	}
+-	if (VideoInfo -&gt; blit_hw)
+-		SDLFlags |= SDL_HWACCEL;
+-	/*     if(SDL_WM_ToggleFullScreen(GLwin) == 0)         SDLerror(&quot;SDL_WM_ToggleFullScreen&quot;); */
+ 
+ 
+ 	/*  set some opengl-attributes */
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000985.html">[S3d-svn] r1005 - in trunk: experimental/testvis libs3d server
+</A></li>
+	<LI>Next message: <A HREF="000987.html">[S3d-svn] r1007 - in trunk: Documentation cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#986">[ date ]</a>
+              <a href="thread.html#986">[ thread ]</a>
+              <a href="subject.html#986">[ subject ]</a>
+              <a href="author.html#986">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

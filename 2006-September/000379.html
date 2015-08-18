@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r386 - trunk/libs3d/libg3d/plugins/import
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r386%20-%20trunk/libs3d/libg3d/plugins/import&In-Reply-To=%3C200609151747.k8FHlH4P030706%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000378.html">
+   <LINK REL="Next"  HREF="000380.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r386 - trunk/libs3d/libg3d/plugins/import</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r386%20-%20trunk/libs3d/libg3d/plugins/import&In-Reply-To=%3C200609151747.k8FHlH4P030706%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r386 - trunk/libs3d/libg3d/plugins/import">marec at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 15 19:47:17 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000378.html">[S3d-svn] r385 - in trunk/libs3d/libg3d: . plugins/import src
+</A></li>
+        <LI>Next message: <A HREF="000380.html">[S3d-svn] r387 - in trunk: example libs3d/libg3d/plugins/import
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#379">[ date ]</a>
+              <a href="thread.html#379">[ thread ]</a>
+              <a href="subject.html#379">[ subject ]</a>
+              <a href="author.html#379">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-09-15 19:47:17 +0200 (Fri, 15 Sep 2006)
+New Revision: 386
+
+Modified:
+   trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c
+Log:
+libg3d update III
+
+Modified: trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c
+===================================================================
+--- trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c	2006-09-15 16:47:39 UTC (rev 385)
++++ trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c	2006-09-15 17:47:17 UTC (rev 386)
+@@ -400,13 +400,27 @@
+ {
+ 
+ 	G3DObject *object;
++	G3DFace *face;
++	GSList *oface;
++	gint32 chunk_length, i;
+ 
+ 	object = (G3DObject *)parent-&gt;object;
+ 	g_return_val_if_fail(object, FALSE);
+ 
+-	/* g3d_read_int16_le(global-&gt;f) */
+-	/* smooth list goes here face-&gt;normals */
++	oface = object-&gt;faces;
++	while ( oface-&gt;next ) {
++		oface = oface-&gt;next;
++	}
+ 
++	face = (G3DFace *)oface-&gt;data;
++	face-&gt;normals = g_malloc(chunk_length);
++	chunk_length = g3d_read_int16_le(global-&gt;f);
++
++	for ( i = 0; i &lt; ( chunk_length / 4 ); i++ )
++	{
++		face-&gt;normals[i] = gintl(ptr+j*4);
++	}
++
+ 	return TRUE;
+ }
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000378.html">[S3d-svn] r385 - in trunk/libs3d/libg3d: . plugins/import src
+</A></li>
+	<LI>Next message: <A HREF="000380.html">[S3d-svn] r387 - in trunk: example libs3d/libg3d/plugins/import
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#379">[ date ]</a>
+              <a href="thread.html#379">[ thread ]</a>
+              <a href="subject.html#379">[ subject ]</a>
+              <a href="author.html#379">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r282 - in trunk: . client
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r282%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200605142247.k4EMlEP9014578%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000274.html">
+   <LINK REL="Next"  HREF="000276.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r282 - in trunk: . client</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r282%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200605142247.k4EMlEP9014578%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r282 - in trunk: . client">dotslash at berlios.de
+       </A><BR>
+    <I>Mon May 15 00:47:14 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000274.html">[S3d-svn] r281 - in trunk: . Documentation/s3dapi
+</A></li>
+        <LI>Next message: <A HREF="000276.html">[S3d-svn] r283 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#275">[ date ]</a>
+              <a href="thread.html#275">[ thread ]</a>
+              <a href="subject.html#275">[ subject ]</a>
+              <a href="author.html#275">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-15 00:47:13 +0200 (Mon, 15 May 2006)
+New Revision: 282
+
+Modified:
+   trunk/
+   trunk/TODO
+   trunk/client/Makefile.am
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r561 at balthasar</A>:  dotslash | 2006-05-15 00:45:26 +0200
+ - not really what i wanted, but better than before: 
+   we're now installing to $(PREFIX)/include/s3d.h, not
+   $(PREFIX)/include/s3d/s3d.h ...
+   if anyone knows how to tell autohell to just create a symlink
+   from $(PREFIX)/include/s3d.h to $(PREFIX)/include/s3d/s3d.h,
+   please tell me! thanks.
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:559
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:561
+
+Modified: trunk/TODO
+===================================================================
+--- trunk/TODO	2006-05-14 15:59:04 UTC (rev 281)
++++ trunk/TODO	2006-05-14 22:47:13 UTC (rev 282)
+@@ -3,7 +3,6 @@
+ dot_mcp:
+ 	* sane paths for applications
+ autotools:
+-	* install ${PREFIX}/include/s3d.h as symlink to ${PREFIX}/include/s3d/s3d.h
+ 	* OBJECTPATH for finding the object?
+ 	* ./configure: line 23422: HAVE_PTHREAD: command not found &lt; huh?
+ 	* ./configure: line 22373: MDL_HAVE_OPENGL: command not found
+
+Modified: trunk/client/Makefile.am
+===================================================================
+--- trunk/client/Makefile.am	2006-05-14 15:59:04 UTC (rev 281)
++++ trunk/client/Makefile.am	2006-05-14 22:47:13 UTC (rev 282)
+@@ -5,7 +5,7 @@
+ 			proto_out.c shm.c shm_ringbuf.c tcp.c \
+ 			sei_construct.c sei_misc.c sei_monotone.c sei_tri.c vector.c
+ 			
+-pkginclude_HEADERS=	s3d.h s3d_keysym.h
++include_HEADERS= s3d.h s3d_keysym.h
+ noinst_HEADERS=		config.h s3dlib.h sei_triangulate.h sei_interface.h
+ 
+ libs3d_la_CPPFLAGS=	-I${top_srcdir}/server
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000274.html">[S3d-svn] r281 - in trunk: . Documentation/s3dapi
+</A></li>
+	<LI>Next message: <A HREF="000276.html">[S3d-svn] r283 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#275">[ date ]</a>
+              <a href="thread.html#275">[ thread ]</a>
+              <a href="subject.html#275">[ subject ]</a>
+              <a href="author.html#275">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r808 - trunk/extras/distro/gentoo/media-gfx/s3d-svn
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r808%20-%20trunk/extras/distro/gentoo/media-gfx/s3d-svn&In-Reply-To=%3C200710222220.l9MMK2Wh009335%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000799.html">
+   <LINK REL="Next"  HREF="000801.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r808 - trunk/extras/distro/gentoo/media-gfx/s3d-svn</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r808%20-%20trunk/extras/distro/gentoo/media-gfx/s3d-svn&In-Reply-To=%3C200710222220.l9MMK2Wh009335%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r808 - trunk/extras/distro/gentoo/media-gfx/s3d-svn">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Oct 23 00:20:02 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000799.html">[S3d-svn] r807 - trunk/extras/distro/gentoo/media-gfx/s3d-svn
+</A></li>
+        <LI>Next message: <A HREF="000801.html">[S3d-svn] r809 - in trunk/Documentation: libs3d libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#800">[ date ]</a>
+              <a href="thread.html#800">[ thread ]</a>
+              <a href="subject.html#800">[ subject ]</a>
+              <a href="author.html#800">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-23 00:20:01 +0200 (Tue, 23 Oct 2007)
+New Revision: 808
+
+Modified:
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/ChangeLog
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild
+Log:
+Added useflag xcomposite for comptest to s3d-svn ebuild
+
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/ChangeLog
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/ChangeLog	2007-10-22 22:19:49 UTC (rev 807)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/ChangeLog	2007-10-22 22:20:01 UTC (rev 808)
+@@ -3,6 +3,9 @@
+ *s3d-svn-9999 (22 Oct 2007)
+ 
+   22 Oct 2007; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; s3d-svn-9999.ebuild:
++  Added useflag xcomposite to build comptest.
++
++  22 Oct 2007; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; s3d-svn-9999.ebuild:
+   Added useflag to build documentation.
+ 
+ *s3d-svn-9999 (5 Jul 2007)
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest	2007-10-22 22:19:49 UTC (rev 807)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest	2007-10-22 22:20:01 UTC (rev 808)
+@@ -1,11 +1,11 @@
+-EBUILD s3d-svn-9999.ebuild 977 RMD160 832560df4bd0673709ce4bf6c5d14cd39b8ef3ea SHA1 25abea26d8016ac83db84fa66a01468467958a03 SHA256 442a7a7213564bbd85d200c68233f9434fc9adad7f82475bce657e50ad872b98
+-MD5 2d63c7d2e99744ac6d9c0bff6c5fd79b s3d-svn-9999.ebuild 977
+-RMD160 832560df4bd0673709ce4bf6c5d14cd39b8ef3ea s3d-svn-9999.ebuild 977
+-SHA256 442a7a7213564bbd85d200c68233f9434fc9adad7f82475bce657e50ad872b98 s3d-svn-9999.ebuild 977
+-MISC ChangeLog 595 RMD160 2c8efb9d72b245a282d9e672cb43cb895d74f5ea SHA1 3d3296f8ba38d567d156b88ad90c62084163728b SHA256 102da7b6d056e063cb8a6ed39149e33a85c5cdfb1bc644c25ec06b0b13ba77e7
+-MD5 2d0abf76b3c5bd36bf57b6e9fda10a98 ChangeLog 595
+-RMD160 2c8efb9d72b245a282d9e672cb43cb895d74f5ea ChangeLog 595
+-SHA256 102da7b6d056e063cb8a6ed39149e33a85c5cdfb1bc644c25ec06b0b13ba77e7 ChangeLog 595
++EBUILD s3d-svn-9999.ebuild 1095 RMD160 ae52f86830e1931f2ca591c80da2164aa9a7bd40 SHA1 537b0b887184a943794e6adeac73f1b39b0bc0ef SHA256 5973d09cec59e0c6f8122f985843b3a2d7e21a3e76fb9ea5ba4a32e0b6c03c32
++MD5 94a47bed0b2f6abfd50edc7ec13d5e4e s3d-svn-9999.ebuild 1095
++RMD160 ae52f86830e1931f2ca591c80da2164aa9a7bd40 s3d-svn-9999.ebuild 1095
++SHA256 5973d09cec59e0c6f8122f985843b3a2d7e21a3e76fb9ea5ba4a32e0b6c03c32 s3d-svn-9999.ebuild 1095
++MISC ChangeLog 717 RMD160 732719801434d2f34762040a3d76224a376eafe9 SHA1 e3f6ae8c96e94d078c05f06a26c4671126bf2ae0 SHA256 50813962433038ee35016fdbd5a738f99f8ef5da1dbb6db01c35b258ca180587
++MD5 29def1ab7084d3f1a14f46b8e18774a9 ChangeLog 717
++RMD160 732719801434d2f34762040a3d76224a376eafe9 ChangeLog 717
++SHA256 50813962433038ee35016fdbd5a738f99f8ef5da1dbb6db01c35b258ca180587 ChangeLog 717
+ MISC metadata.xml 239 RMD160 236f28d8249f562b764e2d854580d8301b150418 SHA1 76f167e3abff81e9535c16a637fd1e7f91d4fda3 SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f
+ MD5 261031c8b7aca6f50babf7e44b35deb1 metadata.xml 239
+ RMD160 236f28d8249f562b764e2d854580d8301b150418 metadata.xml 239
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild	2007-10-22 22:19:49 UTC (rev 807)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild	2007-10-22 22:20:01 UTC (rev 808)
+@@ -1,6 +1,6 @@
+ inherit subversion
+ 
+-IUSE=&quot;gps doc&quot;
++IUSE=&quot;gps doc xcomposite&quot;
+ 
+ ESVN_REPO_URI=&quot;<A HREF="http://svn.berlios.de/svnroot/repos/s3d/trunk">http://svn.berlios.de/svnroot/repos/s3d/trunk</A>&quot;
+ 
+@@ -38,7 +38,12 @@
+ 
+ 	doc? ( app-text/docbook-sgml-utils )
+ 	gps? ( sci-geosciences/gpsd )	
+-
++	xcomposite? (
++		x11-libs/libXcomposite
++		x11-libs/libXdamage
++		x11-libs/libXfixes
++		x11-libs/libXrender
++	)
+ 	virtual/glut
+ 	&quot;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000799.html">[S3d-svn] r807 - trunk/extras/distro/gentoo/media-gfx/s3d-svn
+</A></li>
+	<LI>Next message: <A HREF="000801.html">[S3d-svn] r809 - in trunk/Documentation: libs3d libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#800">[ date ]</a>
+              <a href="thread.html#800">[ thread ]</a>
+              <a href="subject.html#800">[ subject ]</a>
+              <a href="author.html#800">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

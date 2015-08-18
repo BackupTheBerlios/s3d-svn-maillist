@@ -1,0 +1,710 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r445 - in trunk: . apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r445%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200610012009.k91K9RbL009699%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000439.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r445 - in trunk: . apps/s3dfm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r445%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200610012009.k91K9RbL009699%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r445 - in trunk: . apps/s3dfm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Oct  1 22:09:27 CEST 2006</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000439.html">[S3d-svn] r446 - in trunk: . apps/dot_mcp apps/olsrs3d apps/s3dfm	libs3d libs3dw server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#438">[ date ]</a>
+              <a href="thread.html#438">[ thread ]</a>
+              <a href="subject.html#438">[ subject ]</a>
+              <a href="author.html#438">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-10-01 22:09:26 +0200 (Sun, 01 Oct 2006)
+New Revision: 445
+
+Modified:
+   trunk/
+   trunk/apps/s3dfm/Makefile.am
+   trunk/apps/s3dfm/dialog.c
+   trunk/apps/s3dfm/event.c
+   trunk/apps/s3dfm/fly.c
+   trunk/apps/s3dfm/fs.c
+   trunk/apps/s3dfm/main.c
+   trunk/apps/s3dfm/node.c
+   trunk/apps/s3dfm/s3dfm.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1080 at balthasar</A>:  dotslash | 2006-10-01 22:09:19 +0200
+ - nodes are descending now, but unstable
+ - copy works + enabled
+ - unlink works + enabled
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1077
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1080
+
+Modified: trunk/apps/s3dfm/Makefile.am
+===================================================================
+--- trunk/apps/s3dfm/Makefile.am	2006-09-28 17:07:43 UTC (rev 444)
++++ trunk/apps/s3dfm/Makefile.am	2006-10-01 20:09:26 UTC (rev 445)
+@@ -10,6 +10,6 @@
+ 	string.c fly.c focus.c
+ 
+ s3dfm_CPPFLAGS=		-I${top_srcdir}/libs3d -I${top_srcdir}/libs3dw
+-s3dfm_LDADD=		${top_builddir}/libs3d/libs3d.la ${top_builddir}/libs3dw/libs3dw.la
++s3dfm_LDADD=		${top_builddir}/libs3d/libs3d.la ${top_builddir}/libs3dw/libs3dw.la -lpthread
+ 
+ 
+
+Modified: trunk/apps/s3dfm/dialog.c
+===================================================================
+--- trunk/apps/s3dfm/dialog.c	2006-09-28 17:07:43 UTC (rev 444)
++++ trunk/apps/s3dfm/dialog.c	2006-10-01 20:09:26 UTC (rev 445)
+@@ -28,13 +28,18 @@
+ #include &lt;string.h&gt; /* strlen() */
+ #include &lt;stdlib.h&gt; /* realloc(),malloc() */
+ #include &lt;errno.h&gt;  /* errno */
++#include &lt;pthread.h&gt; /* pthread_create() */
+ #include &lt;sys/stat.h&gt; /* mkdir() */
+ #include &lt;sys/types.h&gt; /* mkdir() */
+ 
+ static s3dw_input	 *input;
+ static filelist *fp;
++static char destdir[M_DIR];
++static t_node *destnode=NULL;
+ 
+ extern int typeinput;
++int fs_lock=0;
++pthread_t filethread;
+ 
+ 
+ void close_win(s3dw_widget *button)
+@@ -56,8 +61,13 @@
+ 			s=malloc(M_DIR);
+ 			node_path(dir-&gt;sub[i],s);
+ 			fp-&gt;p[fp-&gt;n - 1].name=s;
+-			fp-&gt;p[fp-&gt;n - 1].anode=fly_create_anode(dir-&gt;sub[i]);
++			if ((fs_lock==TYPE_COPY)||(fs_lock==TYPE_MOVE))
++				fp-&gt;p[fp-&gt;n - 1].anode=fly_create_anode(dir-&gt;sub[i]);
++			else
++				fp-&gt;p[fp-&gt;n - 1].anode=NULL;
+ 			fp-&gt;p[fp-&gt;n - 1].size=0; /*TODO: later */
++			fp-&gt;p[fp-&gt;n - 1].state=STATE_NONE;
++	
+ 		}
+ 	}
+ 	return(0);
+@@ -71,6 +81,7 @@
+ 	s3dw_label_new(infwin,&quot;F5 - Copy&quot;,1,3);
+ 	s3dw_label_new(infwin,&quot;F6 - Move&quot;,1,4);
+ 	s3dw_label_new(infwin,&quot;F7 - Create Directory&quot;,1,5);
++	s3dw_label_new(infwin,&quot;F8 - Unlink&quot;,1,5);
+ 	s3dw_label_new(infwin,&quot;R - Refresh&quot;,1,6);
+ 	s3dw_label_new(infwin,&quot;I - Info&quot;,1,7);
+ 
+@@ -98,7 +109,6 @@
+ 	button=s3dw_button_new(infwin,&quot;OK&quot;,5,5);
+ 	button-&gt;onclick=close_win;
+ 	s3dw_show(S3DWIDGET(infwin));
+-
+ }
+ void window_fs_errno(char *errmsg)
+ {
+@@ -124,24 +134,52 @@
+ 		fp=NULL;
+ 	}
+ 	typeinput=0;
++	fs_lock=TYPE_NONE;
+ 	s3dw_delete(button-&gt;parent); /* parent =surface. this means close containing window */
+ }
++void *thread_start(void *ptr)
++{
++	switch (fs_lock)
++	{
++		case TYPE_COPY: 
++			printf(&quot;starting a copy process in the thread ... \n&quot;);
++			destnode=node_getbypath(destdir);
++			fs_fl_copy(fp,destdir);
++			printf(&quot;done\n&quot;);
++			break;
++		case TYPE_UNLINK:
++			printf(&quot;unlinking some files ... \n&quot;);
++			fs_fl_unlink(fp);
++			printf(&quot;done\n&quot;);
++			break;
++	}
++	fs_lock=TYPE_FINISHED;
++	return(NULL);
++	
++}
++/* now really copy ... */
++void window_fs(s3dw_widget *button)
++{
++	pthread_create( &amp;filethread, NULL, thread_start, NULL);
++	s3dw_delete(button-&gt;parent); /* parent =surface. this means close containing window */
++}
+ void window_copy(char *path)
+ {
+ 	s3dw_surface *infwin;
+ 	s3dw_button  *okbutton,*abortbutton;
+ 	float l;
+-	char destdir[M_DIR];
+ 
+ 	int i,m;
+ 
+-	if (fp!=NULL) 	{	window_fs_another(); 	return; }
++	if (fs_lock) 	{	window_fs_another(); 	return; }
++	fs_lock=TYPE_COPY;
+ 	fp=malloc(sizeof(filelist));
+ 	fp-&gt;n=0;
+ 	fp-&gt;p=NULL;
+ 	get_selected(fp,&amp;root);
+ 	printf(&quot;selected %d nodes\n&quot;,fp-&gt;n);
+ 	if (fp-&gt;n == 0)	{	window_fs_nothing();	free(fp); fp=NULL;return;	}
++	/* get the longest item on the list */
+ 	m=10;
+ 	for (i=0;i&lt;fp-&gt;n;i++)
+ 	{
+@@ -155,17 +193,54 @@
+ 	for (i=0;i&lt;fp-&gt;n;i++)
+ 		s3dw_label_new(infwin,fp-&gt;p[i].name,3,2+i);
+ 	s3dw_label_new(infwin,&quot;to:&quot;,1,fp-&gt;n+3);
+-	node_path(focus,destdir);
++	node_path(node_getdir(focus),destdir);
+ 	s3dw_label_new(infwin,destdir,3,fp-&gt;n+4);
+ 
+ 	okbutton=s3dw_button_new(infwin,&quot;OK&quot;,l/2-3,fp-&gt;n+5);
+-	okbutton-&gt;onclick=window_fs_abort;
++	okbutton-&gt;onclick=window_fs;
+ 	abortbutton=s3dw_button_new(infwin,&quot;abort&quot;,l/2,fp-&gt;n+5);
+ 	abortbutton-&gt;onclick=window_fs_abort;
+ 
+ 	s3dw_show(S3DWIDGET(infwin));
+ 
+ }
++
++
++void window_unlink()
++{
++	s3dw_surface *infwin;
++	s3dw_button  *okbutton,*abortbutton;
++	float l;
++
++	int i,m;
++
++	if (fs_lock) 	{	window_fs_another(); 	return; }
++	fs_lock=TYPE_UNLINK;
++	fp=malloc(sizeof(filelist));
++	fp-&gt;n=0;
++	fp-&gt;p=NULL;
++	get_selected(fp,&amp;root);
++	printf(&quot;selected %d nodes\n&quot;,fp-&gt;n);
++	if (fp-&gt;n == 0)	{	window_fs_nothing();	free(fp); fp=NULL;return;	}
++	/* get the longest item on the list */
++	m=10;
++	for (i=0;i&lt;fp-&gt;n;i++)
++		if (strlen(fp-&gt;p[i].name)&gt;m) m=strlen(fp-&gt;p[i].name);
++
++	l=(m+3)*0.7;
++	infwin=s3dw_surface_new(&quot;Unlink Window&quot;,l,fp-&gt;n+8);
++	s3dw_label_new(infwin,&quot;Unlink: &quot;,1,1);
++	for (i=0;i&lt;fp-&gt;n;i++)
++		s3dw_label_new(infwin,fp-&gt;p[i].name,3,2+i);
++
++	okbutton=s3dw_button_new(infwin,&quot;OK&quot;,l/2-3,fp-&gt;n+3);
++	okbutton-&gt;onclick=window_fs;
++	abortbutton=s3dw_button_new(infwin,&quot;Abort&quot;,l/2,fp-&gt;n+3);
++	abortbutton-&gt;onclick=window_fs_abort;
++
++	s3dw_show(S3DWIDGET(infwin));
++
++}
+ void window_fs_mkdir(s3dw_widget *button)
+ {
+ 	char *dir;
+@@ -185,6 +260,7 @@
+ /*			parse_again(item);*/
+ 		}
+ 	}
++	fs_lock=0;
+ 	window_fs_abort(button); /* finish */
+ 
+ }
+@@ -194,7 +270,7 @@
+ 	s3dw_button  *okbutton,*abortbutton;
+ 	char string1[M_DIR];
+ 	float l;
+-	if (fp!=NULL) {window_fs_another(); return; }
++	if (fs_lock) {window_fs_another(); return; }
+ 	snprintf(string1,M_DIR,&quot;Create Directory in %s&quot;,path);
+ 	l=strlen(string1)*0.7;
+ 	infwin=s3dw_surface_new(&quot;Create Directory&quot;,l,8);
+@@ -204,19 +280,19 @@
+ 	s3dw_focus(S3DWIDGET(input));
+ 	s3dw_focus(S3DWIDGET(infwin));
+ 	typeinput=1;
++	fs_lock=1;
+ 	okbutton=s3dw_button_new(infwin,&quot;OK&quot;,l/2-3,5);
+ 	okbutton-&gt;onclick=window_fs_mkdir;
+ 	abortbutton=s3dw_button_new(infwin,&quot;abort&quot;,l/2,5);
+ 	abortbutton-&gt;onclick=window_fs_abort;
+ 	s3dw_show(S3DWIDGET(infwin));
+-
+ }
+ 
+ void window_move(char *path)
+ {
+ 	s3dw_surface *infwin;
+ 	s3dw_button  *button;
+-	if (fp!=NULL) {window_fs_another(); return; }
++	if (fs_lock) {window_fs_another(); return; }
+ 	infwin=s3dw_surface_new(&quot;Info Window&quot;,20,8);
+ 	s3dw_label_new(infwin,&quot;Sorry, moving is not implemented yet.. :(&quot;,1,2);
+ 	button=s3dw_button_new(infwin,&quot;Too bad&quot;,7,5);
+@@ -252,3 +328,88 @@
+ 	/* of couse, show it */
+ 	s3dw_show(S3DWIDGET(infwin));
+ }
++/* check if a file operation is finished and clean up */
++void window_fsani()
++{
++	int i;
++	t_node *node, dummy;
++	if (fs_lock!=TYPE_NONE)	{
++		/* get current position of our destination node */
++		if (destnode!=NULL)
++		{
++			node=destnode;
++			node_init(&amp;dummy);
++			dummy.parent = node-&gt;parent;
++			dummy.scale = node-&gt;scale;
++			dummy.px = node-&gt;px;
++			dummy.py = node-&gt;py;
++			dummy.pz = node-&gt;pz;
++			dummy.type = node-&gt;type;
++			fly_set_absolute_position(&amp;dummy);
++		} else {
++			dummy.px=0;
++			dummy.py=0;
++			dummy.pz=0;
++			dummy.scale=0.01;
++		}
++
++		for (i=0;i&lt;fp-&gt;n;i++) {
++			if (fp-&gt;p[i].state==STATE_FINISHED)
++			{ /* we can go and clean up now. */
++				if (NULL!=(node=node_getbypath(fp-&gt;p[i].name)))
++				{
++					printf(&quot;[CLEANUP] for node %s (%s)\n&quot;,node-&gt;name,fp-&gt;p[i].name);
++					node-&gt;detached=0;
++					if (node-&gt;parent!=NULL)
++					{
++						parse_dir(node-&gt;parent);
++						switch (node-&gt;disp)
++						{
++							case D_ICON:	box_order_icons(node-&gt;parent);					break;
++							case D_DIR:		box_order_subdirs(node-&gt;parent);				break;
++						}
++					}
++				}
++				fp-&gt;p[i].state=STATE_CLEANED;
++			}
++			if (fp-&gt;p[i].state&gt;STATE_NONE)
++			{
++				if (destnode!=NULL)
++				{
++					fp-&gt;p[i].anode-&gt;px=dummy.px;
++					fp-&gt;p[i].anode-&gt;py=dummy.py;
++					fp-&gt;p[i].anode-&gt;pz=dummy.pz;
++					ani_add(fp-&gt;p[i].anode);
++				}
++
++
++			}
++		}
++		if (fs_lock==TYPE_FINISHED)	{
++			if (fp!=NULL)
++			{
++				fl_del(fp);
++				fp=NULL;
++			}
++			typeinput=0;
++			fs_lock=TYPE_NONE;
++			if (destnode!=NULL)
++				if (destnode-&gt;disp==D_DIR) /* it usually is opened */
++				{
++					printf(&quot;reordering icons on destnode ...\n&quot;);
++					box_order_icons(destnode);	
++				}
++			destnode=NULL;
++
++		}
++		if (fs_err.active)
++		{
++			char errmsg[M_DIR];
++			/* TODO: draw a window, wait for input */
++			snprintf(errmsg,M_DIR,&quot;Error \&quot;%s\&quot; on %s&quot;,fs_err.message,fs_err.file);
++			errno=fs_err.err;
++			window_fs_errno(errmsg);
++			fs_err.active=0;
++		}
++	}
++}
+
+Modified: trunk/apps/s3dfm/event.c
+===================================================================
+--- trunk/apps/s3dfm/event.c	2006-09-28 17:07:43 UTC (rev 444)
++++ trunk/apps/s3dfm/event.c	2006-10-01 20:09:26 UTC (rev 445)
+@@ -88,6 +88,14 @@
+ 		case S3DK_F7:
+ 				window_mkdir(path);
+ 				break;
++		case S3DK_F8:
++				window_unlink();
++				break;
++		case S3DK_F10:
++				/* some debugging stuff */
++				node_getbypath(path);
++				break;
++
+ 		case S3DK_UP:
+ 		case S3DK_LEFT:
+ 		case S3DK_RIGHT:
+
+Modified: trunk/apps/s3dfm/fly.c
+===================================================================
+--- trunk/apps/s3dfm/fly.c	2006-09-28 17:07:43 UTC (rev 444)
++++ trunk/apps/s3dfm/fly.c	2006-10-01 20:09:26 UTC (rev 445)
+@@ -51,7 +51,7 @@
+ 	node-&gt;py=work.py;
+ 	node-&gt;pz=work.pz;
+ 	node-&gt;scale=work.scale;
+-	printf(&quot;node coordinates: %3.3f %3.3f %3.3f %3.3f\n&quot;,node-&gt;px,node-&gt;py,node-&gt;pz,node-&gt;scale);
++/*	printf(&quot;node coordinates: %3.3f %3.3f %3.3f %3.3f\n&quot;,node-&gt;px,node-&gt;py,node-&gt;pz,node-&gt;scale);*/
+ 	return(0);
+ }
+ /* create a copy of *node as an icon (block) which can be moved for animation ... */
+
+Modified: trunk/apps/s3dfm/fs.c
+===================================================================
+--- trunk/apps/s3dfm/fs.c	2006-09-28 17:07:43 UTC (rev 444)
++++ trunk/apps/s3dfm/fs.c	2006-10-01 20:09:26 UTC (rev 445)
+@@ -34,11 +34,11 @@
+ #include &lt;sys/stat.h&gt;
+ #include &lt;unistd.h&gt;
+ 
+-#include &lt;errno.h&gt;
++#include &lt;errno.h&gt; /* errno */
+ 
++struct fs_error fs_err={0,0,NULL,NULL};
+ 
+ 
+-
+ /* generates the file list */
+ filelist *fl_new(char *path)
+ {
+@@ -54,7 +54,7 @@
+     if (n &lt;= 2) /* . and .. is always included. */
+ 	{
+ 		if (n&lt;0)
+-	        perror(&quot;scandir&quot;);
++	        fs_error(&quot;fl_new():scandir()&quot;,path);
+ 	} else {
+ 		j=0;
+ 		fl-&gt;n=n-2 ; /* ignore . and .. */
+@@ -73,7 +73,7 @@
+ 			free(namelist[i]);
+ 		}
+ 		if (j!=fl-&gt;n)
+-		{
++		{ /* TODO: GUH! don't exit(-1) */
+ 			printf(&quot;assertion failed\n&quot;);
+ 			exit(-1);
+ 		}
+@@ -177,16 +177,34 @@
+ 			link(source,dest);
+ 			break;
+ 		default:
+-			printf(&quot;atomic copy ... from %s to %s\n&quot;, source, dest);
+-			if (NULL==(fps=fopen(source,&quot;r&quot;))) return(-1);
+-			if (NULL==(fpd=fopen(dest,&quot;w&quot;))) return(-1);
++			printf(&quot;fs_copy -&gt; atomic copy\n&quot;);
++			printf(&quot;open source...&quot;);
++			if (NULL==(fps=fopen(source,&quot;r&quot;))) 
++			{
++				fs_error(&quot;fs_copy():fopen(source)&quot;,source);
++				return(-1);
++			}
++			printf(&quot;ok\n&quot;);
++			printf(&quot;open dest...&quot;);
++			if (NULL==(fpd=fopen(dest,&quot;w&quot;))) 
++			{
++				fs_error(&quot;fs_copy():fopen(source)&quot;,source);
++				return(-1);
++			}
++			printf(&quot;ok\n&quot;);
+ 			/* TODO: overwrite protection etc */
++			printf(&quot;copy ...&quot;);
+ 		
+ 			while (!feof(fps))
+ 			{
++				printf(&quot;.&quot;);
++				errno=0;
+ 				n=fread(buf,1,1024,fps);
++				if (errno)	fs_error(&quot;fs_copy():fread(source)&quot;,source);
+ 				fwrite(buf,1,n,fpd);
++				if (errno)	fs_error(&quot;fs_copy():fwrite(source)&quot;,source);
+ 			}
++			printf(&quot;ok\n&quot;);
+ 			fclose(fps);
+ 			fclose(fpd);
+ 
+@@ -203,6 +221,7 @@
+ 	r=0;
+ 	for (i=0;i&lt;fl-&gt;n;i++)
+ 	{
++		fl-&gt;p[i].state=STATE_INUSE;
+ 		bname=basename(fl-&gt;p[i].name);
+ 		sdest=malloc(strlen(dest)+strlen(bname)+2);
+ 
+@@ -212,6 +231,7 @@
+ 		r|=fs_copy(fl-&gt;p[i].name,sdest);
+ 
+ 		free(sdest);
++		fl-&gt;p[i].state=STATE_FINISHED;
+ 	}
+ 
+ 	return(r);
+@@ -235,14 +255,14 @@
+ 			printf(&quot;removing %s\n&quot;,dest);
+ 			if (rmdir(dest)==-1)
+ 			{
+-				perror(&quot;fs_fl_unlink(): rmdir()&quot;);
++				fs_error(&quot;fs_fl_unlink(): rmdir()&quot;,dest);
+ 				return(-1);
+ 			}
+ 		}
+ 	} else {
+ 		if (unlink(dest)==-1)
+ 		{
+-			perror(&quot;fs_fl_unlink(): unlink()&quot;);
++			fs_error(&quot;fs_fl_unlink(): unlink()&quot;,dest);
+ 			return(-1);
+ 		}
+ 	}
+@@ -255,8 +275,10 @@
+ 	r=0;
+ 	for (i=0;i&lt;fl-&gt;n;i++)
+ 	{
++		fl-&gt;p[i].state=STATE_INUSE;
+ 		printf(&quot;-&gt; atomic unlink %s\n&quot;,fl-&gt;p[i].name);
+ 		r|=fs_unlink(fl-&gt;p[i].name);
++		fl-&gt;p[i].state=STATE_FINISHED;
+ 	}
+ 	return(r);
+ 
+@@ -272,7 +294,7 @@
+ 				fs_unlink(source);
+ 				break;
+ 			default: 
+-				perror(&quot;fs_move()&quot;);
++				fs_error(&quot;fs_move()&quot;,dest);
+ 				return(-1); /* can't help it */
+ 			
+ 		}
+@@ -290,6 +312,7 @@
+ 	r=0;
+ 	for (i=0;i&lt;fl-&gt;n;i++)
+ 	{
++		fl-&gt;p[i].state=STATE_INUSE;
+ 		bname=basename(fl-&gt;p[i].name);
+ 		sdest=malloc(strlen(dest)+strlen(bname)+2);
+ 
+@@ -299,6 +322,7 @@
+ 		r|=fs_move(fl-&gt;p[i].name,sdest);
+ 
+ 		free(sdest);
++		fl-&gt;p[i].state=STATE_FINISHED;
+ 	}
+ 
+ 	return(r);
+@@ -306,4 +330,14 @@
+ 	return(0);
+ }
+ 
+-
++/* write an error and wait for a reaction */
++int fs_error(char *message, char *file)
++{
++	fs_err.err=errno;
++	fs_err.message=message;
++	fs_err.file=file;
++	fs_err.active=1;
++	printf(&quot;[FS ERROR]: %s %s %s&quot;,message,file,strerror(errno));
++	while (fs_err.active); /* until situation clear, wait */
++	return(0);
++}
+
+Modified: trunk/apps/s3dfm/main.c
+===================================================================
+--- trunk/apps/s3dfm/main.c	2006-09-28 17:07:43 UTC (rev 444)
++++ trunk/apps/s3dfm/main.c	2006-10-01 20:09:26 UTC (rev 445)
+@@ -32,6 +32,7 @@
+ {
+ 	ani_mate();
+ 	s3dw_ani_mate();
++	window_fsani();
+ 	nanosleep(&amp;t,NULL); 
+ }
+ int main (int argc, char **argv)
+
+Modified: trunk/apps/s3dfm/node.c
+===================================================================
+--- trunk/apps/s3dfm/node.c	2006-09-28 17:07:43 UTC (rev 444)
++++ trunk/apps/s3dfm/node.c	2006-10-01 20:09:26 UTC (rev 445)
+@@ -36,17 +36,23 @@
+ 	if (path==NULL) return NULL;
+ 	if (path[0]=='/')
+ 	{
+-		strncpy(p,path,M_DIR);
++		strncpy(p,path,M_DIR-1);
+ 		s=p+1;
+ 		cur=&root;
+ 	} else return NULL; /* TODO: also process local paths. right now, we are to lazy */
++	p[strlen(p)+1]=0; /* extra terminating 0, to be sure */
+ 	printf(&quot;processing rest of string %s\n&quot;,s);
+ 	match=s;
+-	while ((s=index(s,'/'))!=NULL) { /* while we have slashes inside */
+-		s[0]=0; /* mark the slash with space */
+-		s++;	/* move to the next */
++	while (*s!=0) { /* while search string is not empty */
++		if ((s=index(s,'/'))!=NULL)
++		{
++			s[0]=0; /* mark the slash with space */
++			s++;	/* move to the next */
++		} else {
++			s=match+strlen(match); /* select terminating 0 */
++		}
+ 		/* parse ... */
+-		printf(&quot;looking for a match for %s\n&quot;,match);
++		printf(&quot;looking for a match for %s, rest is %s\n&quot;,match,s);
+ 		for (i=0;i&lt;cur-&gt;n_sub;i++)
+ 			if (0==strcmp(cur-&gt;sub[i]-&gt;name,match))
+ 			{ /* found !! */
+
+Modified: trunk/apps/s3dfm/s3dfm.h
+===================================================================
+--- trunk/apps/s3dfm/s3dfm.h	2006-09-28 17:07:43 UTC (rev 444)
++++ trunk/apps/s3dfm/s3dfm.h	2006-10-01 20:09:26 UTC (rev 445)
+@@ -71,13 +71,23 @@
+ };
+ struct _t_file {
+ 	char *name;
+-	int size;
++	int size,state;
+ 	struct _t_node *anode;
+ };
++enum {
++	STATE_NONE, 		/* nothing happned */
++	STATE_INUSE, 		/* currently processing */
++	STATE_FINISHED, 	/* file operation finished */
++	STATE_CLEANED		/* cleaned (e.g. reordered the item */
++};
+ struct _filelist {
+ 	struct _t_file *p;
+ 	int n;
+ };
++struct fs_error {
++	int err,active;
++	char *message, *file;
++};
+ typedef struct _filelist filelist;
+ typedef struct _t_node   t_node;
+ typedef struct _t_file	 t_file;
+@@ -85,7 +95,18 @@
+ 
+ extern t_node root,cam; /* some global objects */
+ extern t_node *focus;	/* the focused object */
++extern struct fs_error fs_err;
+ 
++enum {
++	TYPE_NONE,
++	TYPE_COPY,
++	TYPE_MOVE,
++	TYPE_UNLINK,
++	TYPE_FINISHED
++};
++
++extern int fs_lock;
++
+ /* animation.c */
+ int 		 ani_onstack(t_node *f);
+ void 		 ani_add(t_node *f);
+@@ -110,6 +131,7 @@
+ /* dialog.c */
+ void		 close_win(s3dw_widget *button);
+ void		 window_help();
++void 		 window_fs(s3dw_widget *button);
+ void		 window_fs_another();
+ void		 window_fs_nothing();
+ void		 window_fs_errno(char *errmsg);
+@@ -119,6 +141,8 @@
+ void		 window_mkdir(char *path);
+ void		 window_move(char *path);
+ void		 window_info(char *path);
++void		 window_fsani();
++void 		 window_unlink();
+ /* event.c */
+ int 		 event_click(struct s3d_evt *evt);
+ int			 event_key(struct s3d_evt *evt);
+@@ -138,6 +162,7 @@
+ int			 fs_copy(char *source, char *dest);
+ int			 fs_move(char *source, char *dest);
+ int			 fs_unlink(char *dest);
++int 		 fs_error(char *message, char *file);
+ /* icon.c */
+ int 		 icon_draw(t_node *dir);
+ int 		 icon_undisplay(t_node *dir);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000439.html">[S3d-svn] r446 - in trunk: . apps/dot_mcp apps/olsrs3d apps/s3dfm	libs3d libs3dw server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#438">[ date ]</a>
+              <a href="thread.html#438">[ thread ]</a>
+              <a href="subject.html#438">[ subject ]</a>
+              <a href="author.html#438">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,192 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r850 - trunk/svnonly/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r850%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711082310.lA8NAKbl021079%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000842.html">
+   <LINK REL="Next"  HREF="000844.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r850 - trunk/svnonly/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r850%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711082310.lA8NAKbl021079%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r850 - trunk/svnonly/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Fri Nov  9 00:10:20 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000842.html">[S3d-svn] r849 - trunk/svnonly/comptest
+</A></li>
+        <LI>Next message: <A HREF="000844.html">[S3d-svn] r851 - trunk/svnonly/wiitest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#843">[ date ]</a>
+              <a href="thread.html#843">[ thread ]</a>
+              <a href="subject.html#843">[ subject ]</a>
+              <a href="author.html#843">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-09 00:10:19 +0100 (Fri, 09 Nov 2007)
+New Revision: 850
+
+Modified:
+   trunk/svnonly/comptest/comptest.c
+Log:
+- use correct z-order as we get it from configureevent 
+
+
+Modified: trunk/svnonly/comptest/comptest.c
+===================================================================
+--- trunk/svnonly/comptest/comptest.c	2007-11-08 22:18:15 UTC (rev 849)
++++ trunk/svnonly/comptest/comptest.c	2007-11-08 23:10:19 UTC (rev 850)
+@@ -82,6 +82,7 @@
+ 
+ int xinit(void);
+ void window_update_content(struct window *win, int x, int y, int width, int height);
++static void window_set_position(struct window *win);
+ static int print_event(Display *dpy, XEvent *event);
+ void event();
+ 
+@@ -126,10 +127,10 @@
+ 		break;
+ 	}
+ 	if (event-&gt;type == xdamage.event + XDamageNotify) {
+-		name = &quot;Damage!!&quot;;
++		name = &quot;Damage&quot;;
+ 		return(0); /* don't report this. */
+ 	} else if (event-&gt;type == ConfigureNotify) {
+-		name = &quot;Configure!!&quot;;
++		name = &quot;Configure&quot;;
+ 	}
+ 
+ 	printf(&quot;Event: %s\n&quot;, name);
+@@ -221,6 +222,11 @@
+ 	return(0);
+ }
+ 
++static void window_set_position(struct window *win) {
++	s3d_translate(win-&gt;oid, win-&gt;attr.x / 20, -win-&gt;attr.y / 20, -0.01 * win-&gt;no);
++}
++
++
+ static void deco_box(struct window *win)
+ {
+ 	/* float vertices[8*3] = {
+@@ -313,12 +319,46 @@
+ 		}
+ 		vindex++;
+ 	}
+-	printf(&quot;win-&gt;no == %d\n&quot;, win-&gt;no);
+-	s3d_translate(win-&gt;oid, win-&gt;attr.x / 20, -win-&gt;attr.y / 20, 1 * win-&gt;no);
++	window_set_position(win);
+ 	/*  push data on texture 0 position (0,0) */
+ 	s3d_flags_on(win-&gt;oid, S3D_OF_VISIBLE);
+ }
+-static struct window *window_find(Window id) {
++
++void window_restack(struct window *win, Window above) 
++{
++	struct window **wp;
++	Window old_above;
++	int i;
++	if (win-&gt;next == NULL)		old_above = None;
++	else						old_above = win-&gt;next-&gt;id;
++
++	if (old_above == above)		return;
++
++	/* unlink from list */
++	for (wp = &amp;window_head; *wp != NULL; wp = &amp;(*wp)-&gt;next) 
++		if (*wp == win)
++			break;
++
++	if (*wp == NULL) return;
++	*wp = win-&gt;next;
++
++	/* relink in front of the new &quot;above&quot; window */
++	for (wp = &amp;window_head; *wp != NULL; wp = &amp;(*wp)-&gt;next) 
++		if ((*wp)-&gt;id == above)
++			break;
++
++	win-&gt;next = *wp;
++	*wp = win;
++
++	for (i=0, wp = &amp;window_head; *wp != NULL; wp = &amp;(*wp)-&gt;next, i++)
++		if (i != (*wp)-&gt;no) {
++			(*wp)-&gt;no = i;
++			if ((*wp)-&gt;oid != -1)
++				window_set_position(*wp);
++		}
++}
++static struct window *window_find(Window id) 
++{
+ 	struct window *window;
+ 	for (window = window_head; window != NULL; window = window-&gt;next) {
+ 		if (window-&gt;id == id)
+@@ -378,6 +418,7 @@
+ 				h = window;
+ 				h-&gt;next = h-&gt;next-&gt;next;
+ 				window = window-&gt;next;
++				break;
+ 			}
+ 		}
+ 		printf(&quot;not found (window %d) for removal.\n&quot;, (int)id);
+@@ -387,7 +428,6 @@
+ 	/* TODO */
+ 	free(window);
+ }
+-
+ static void window_update_geometry(struct window *win, int x, int y, int width, int height)
+ {
+ 
+@@ -408,7 +448,7 @@
+ 		} else {
+ 			win-&gt;attr.x = x;
+ 			win-&gt;attr.y = y;
+-			s3d_translate(win-&gt;oid, win-&gt;attr.x / 20, -win-&gt;attr.y / 20, 1 * win-&gt;no);
++			window_set_position(win);
+ 		}
+ 	} else {
+ 		win-&gt;attr.x = x;
+@@ -580,6 +620,7 @@
+ 			if (window != NULL) {
+ 				/*    printf(&quot;Configure: window = %d, geometry = %d:%d (at %d:%d)\n&quot;,
+ 				           (int)e-&gt;window, e-&gt;width, e-&gt;height, e-&gt;x, e-&gt;y);*/
++				window_restack(window, e-&gt;above);
+ 				window_update_geometry(window, e-&gt;x, e-&gt;y, e-&gt;width, e-&gt;height);
+ 			} else {
+ 				printf(&quot;Configure: Could not find window to configure.\n&quot;);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000842.html">[S3d-svn] r849 - trunk/svnonly/comptest
+</A></li>
+	<LI>Next message: <A HREF="000844.html">[S3d-svn] r851 - trunk/svnonly/wiitest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#843">[ date ]</a>
+              <a href="thread.html#843">[ thread ]</a>
+              <a href="subject.html#843">[ subject ]</a>
+              <a href="author.html#843">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

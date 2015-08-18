@@ -1,0 +1,353 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r986 - trunk/Documentation
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r986%20-%20trunk/Documentation&In-Reply-To=%3C200809031545.m83FjosQ031359%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000965.html">
+   <LINK REL="Next"  HREF="000967.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r986 - trunk/Documentation</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r986%20-%20trunk/Documentation&In-Reply-To=%3C200809031545.m83FjosQ031359%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r986 - trunk/Documentation">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Wed Sep  3 17:45:50 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000965.html">[S3d-svn] r985 - trunk/Documentation
+</A></li>
+        <LI>Next message: <A HREF="000967.html">[S3d-svn] r987 - trunk/Documentation
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#966">[ date ]</a>
+              <a href="thread.html#966">[ thread ]</a>
+              <a href="subject.html#966">[ subject ]</a>
+              <a href="author.html#966">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-03 17:45:50 +0200 (Wed, 03 Sep 2008)
+New Revision: 986
+
+Modified:
+   trunk/Documentation/extractdefinitions.py
+Log:
+Save detaileddescriptions in a specialized class
+
+Modified: trunk/Documentation/extractdefinitions.py
+===================================================================
+--- trunk/Documentation/extractdefinitions.py	2008-09-03 15:45:44 UTC (rev 985)
++++ trunk/Documentation/extractdefinitions.py	2008-09-03 15:45:50 UTC (rev 986)
+@@ -77,61 +77,87 @@
+ 	return t
+ 
+ 
+-&quot;&quot;&quot;
+-Generate linear list of text and section types
+-&quot;&quot;&quot;
+-def get_text_complex(node):
++class detaileddescription:
+ 	t = []
+-	for node in node.childNodes:
+-		if node.nodeType == Node.TEXT_NODE:
+-			t.append(node.data)
+-		else:
+-			if node.nodeName == 'sp':
+-				t.append(&quot; &quot;)
+-			elif node.nodeName == 'para':
+-				t.append({'type': 'para', 'text': ''})
+-				t += get_text_complex(node)
+-			elif node.nodeName == 'programlisting':
+-				t.append({'type': 'programlisting', 'text': ''})
+-				t += get_text_complex(node)
+-				t.append({'type': 'para', 'text': ''})
+-			elif node.nodeName == 'simplesect':
+-				if node.attributes['kind'].nodeValue == 'remark':
+-					t.append({'type': 'warning', 'text': ''})
+-					t += get_text_complex(node)
+-					t.append({'type': 'para', 'text': ''})
++
++	def __init__(self, node):
++		self.t = []
++		self.__get_text_complex(node)
++		self.__complex2simplearray()
++
++	&quot;&quot;&quot;
++	Generate linear list of text and section types
++	&quot;&quot;&quot;
++	def __get_text_complex(self, node):
++		for node in node.childNodes:
++			if node.nodeType == Node.TEXT_NODE:
++				self.t.append(node.data)
++			else:
++				if node.nodeName == 'sp':
++					self.t.append(&quot; &quot;)
++				elif node.nodeName == 'para':
++					self.t.append({'type': 'para', 'text': ''})
++					self.__get_text_complex(node)
++				elif node.nodeName == 'programlisting':
++					self.t.append({'type': 'programlisting', 'text': ''})
++					self.__get_text_complex(node)
++					self.t.append({'type': 'para', 'text': ''})
++				elif node.nodeName == 'simplesect':
++					if node.attributes['kind'].nodeValue == 'remark':
++						self.t.append({'type': 'warning', 'text': ''})
++						self.__get_text_complex(node)
++						self.t.append({'type': 'para', 'text': ''})
++					else:
++						self.t.append({'type': 'para', 'text': ''})
++						self.__get_text_complex(node)
+ 				else:
+-					t.append({'type': 'para', 'text': ''})
+-					t += get_text_complex(node)
+-			else:
+-				t += get_text_complex(node)
+-	return t
++					self.__get_text_complex(node)
+ 
+-&quot;&quot;&quot;
+-Convert linear list of text and section types to list of section types with corresponding text
+-&quot;&quot;&quot;
+-def complex2simplearray(objects):
+-	cur_object = 0
+-	array = []
+-	for element in objects:
+-		if type(element) != dict:
+-			# add text to last section type
+-			if cur_object == 0:
+-				array.append({'type': 'para', 'text': element})
+-				cur_object = array[0]
++	&quot;&quot;&quot;
++	Convert linear list of text and section types to list of section types with corresponding text
++	&quot;&quot;&quot;
++	def __complex2simplearray(self):
++		cur_object = 0
++		array = []
++		for element in self.t:
++			if type(element) != dict:
++				# add text to last section type
++				if cur_object == 0:
++					array.append({'type': 'para', 'text': element})
++					cur_object = array[0]
++				else:
++					cur_object['text'] += element
+ 			else:
+-				cur_object['text'] += element
+-		else:
+-			# add new section type
+-			if element['type'] == 'para' and len(array) != 0 and array[-1]['type'] in ['warning']:
+-				# ignore para inside warning and add text to last section type
+-				cur_object['text'] += element['text']
+-			else:
+-				cur_object = element
+-				array.append(element)
++				# add new section type
++				if element['type'] == 'para' and len(array) != 0 and array[-1]['type'] in ['warning']:
++					# ignore para inside warning and add text to last section type
++					cur_object['text'] += element['text']
++				else:
++					cur_object = element
++					array.append(element)
+ 
+-	return array
++		self.t = array
+ 
++	&quot;&quot;&quot;
++	Append complex help section to dom
++	&quot;&quot;&quot;
++	def dom_append(self, sect):
++		for p in self.t:
++			if p['text'] != '':
++				if p['type'] in ['warning']:
++					# add para in warning before adding help text
++					extra_para = create_append(sect, p['type'])
++					para = create_append(extra_para, 'para')
++					create_append_text(para, p['text'])
++				else:
++					if p['text'].strip() == '':
++						continue
++					para = create_append(sect, p['type'])
++					create_append_text(para, p['text'])
++
++	def isempty(self):
++		return (len(self.t) == 0) or (len(self.t) == 1 and self.t[0]['text'].strip() == '')
++
+ def remove_exportdefinitions(function_return):
+ 	exports = [&quot;S3DEXPORT&quot;, &quot;S3DWEXPORT&quot;]
+ 	for export in exports:
+@@ -165,23 +191,6 @@
+ 	return t
+ 
+ &quot;&quot;&quot;
+-Append complex help section to sect
+-&quot;&quot;&quot;
+-def help_append(sgml, sect, help):
+-	for p in help:
+-		if p['text'] != '':
+-			if p['type'] in ['warning']:
+-				# add para in warning before adding help text
+-				extra_para = create_append(sect, p['type'])
+-				para = create_append(extra_para, 'para')
+-				create_append_text(para, p['text'])
+-			else:
+-				if p['text'].strip() == '':
+-					continue
+-				para = create_append(sect, p['type'])
+-				create_append_text(para, p['text'])
+-
+-&quot;&quot;&quot;
+ Extract function informations from doxygen dom
+ &quot;&quot;&quot;
+ def extract_functions(dom):
+@@ -214,8 +223,7 @@
+ 				function['param'].append(param)
+ 
+ 			if node2.nodeName == 'detaileddescription':
+-				help = get_text_complex(node2)
+-				function['help'] = complex2simplearray(help)
++				function['help'] = detaileddescription(node2)
+ 
+ 		functionlist.append(function)
+ 
+@@ -239,8 +247,7 @@
+ 
+ 		for node in dom.getElementsByTagName('compounddef')[0].childNodes:
+ 			if node.nodeName == 'detaileddescription':
+-				help = get_text_complex(node)
+-				struct['help'] = complex2simplearray(help)
++				struct['help'] = detaileddescription(node)
+ 
+ 		for node in dom.getElementsByTagName(&quot;memberdef&quot;):
+ 			element = {'type': '', 'name' : '', 'help': []}
+@@ -252,8 +259,7 @@
+ 					element['type'] = get_text(node2)
+ 
+ 				if node2.nodeName == 'detaileddescription':
+-					help = get_text_complex(node2)
+-					element['help'] = complex2simplearray(help)
++					element['help'] = detaileddescription(node2)
+ 
+ 			struct['elements'].append(element)
+ 
+@@ -278,8 +284,7 @@
+ 				typedef['definition'] = get_text(node2)
+ 
+ 			if node2.nodeName == 'detaileddescription':
+-				help = get_text_complex(node2)
+-				typedef['help'] = complex2simplearray(help)
++				typedef['help'] = detaileddescription(node2)
+ 
+ 		typedeflist.append(typedef)
+ 
+@@ -339,7 +344,7 @@
+ 				create_append_text(paramdef, function['param'][i]['array'])
+ 
+ 		# add help to function
+-		help_append(sgml, sect2, function['help'])
++		function['help'].dom_append(sect2)
+ 
+ 		return sect2
+ 
+@@ -381,13 +386,13 @@
+ 		create_append_text(programlisting, '}')
+ 
+ 		# add help to struct
+-		help_append(sgml, sect2, struct['help'])
++		struct['help'].dom_append(sect2)
+ 
+ 		# add list of struct members with their help
+ 		variablelist = create_append(sect2, 'variablelist')
+ 		for element in struct['elements']:
+ 			# ignore members with empty help texts
+-			if len(element['help']) == 1 and element['help'][0]['text'].strip() == '':
++			if element['help'].isempty():
+ 				continue
+ 
+ 			varlistentry = create_append(variablelist, 'varlistentry')
+@@ -396,7 +401,7 @@
+ 			listitem = create_append(varlistentry, 'listitem')
+ 
+ 			# add help to struct member
+-			help_append(sgml, listitem, element['help'])
++			element['help'].dom_append(listitem)
+ 
+ 		# remove empty variablelist
+ 		if len(variablelist.childNodes) == 0:
+@@ -435,7 +440,7 @@
+ 		create_append_text(programlisting, typedef['definition'])
+ 
+ 		# add help to typedef
+-		help_append(sgml, sect2, typedef['help'])
++		typedef['help'].dom_append(sect2)
+ 
+ 		return sect2
+ 
+@@ -515,7 +520,7 @@
+ 		refsect1 = create_append(refentry, 'refsect1')
+ 		title = create_append(refsect1, 'title')
+ 		create_append_text(title, &quot;Description&quot;)
+-		help_append(sgml, refsect1, function['help'])
++		function['help'].dom_append(refsect1)
+ 
+ 		return refentry
+ 
+@@ -584,13 +589,13 @@
+ 		refsect1 = create_append(refentry, 'refsect1')
+ 		title = create_append(refsect1, 'title')
+ 		create_append_text(title, &quot;Description&quot;)
+-		help_append(sgml, refsect1, struct['help'])
++		struct['help'].dom_append(refsect1)
+ 
+ 		# add list of struct members with their help
+ 		variablelist = create_append(refsect1, 'variablelist')
+ 		for element in struct['elements']:
+ 			# ignore members with empty help texts
+-			if len(element['help']) == 1 and element['help'][0]['text'].strip() == '':
++			if element['help'].isempty():
+ 				continue
+ 
+ 			varlistentry = create_append(variablelist, 'varlistentry')
+@@ -599,7 +604,7 @@
+ 			listitem = create_append(varlistentry, 'listitem')
+ 
+ 			# add help to struct member
+-			help_append(sgml, listitem, element['help'])
++			element['help'].dom_append(listitem)
+ 
+ 		# remove empty variablelist
+ 		if len(variablelist.childNodes) == 0:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000965.html">[S3d-svn] r985 - trunk/Documentation
+</A></li>
+	<LI>Next message: <A HREF="000967.html">[S3d-svn] r987 - trunk/Documentation
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#966">[ date ]</a>
+              <a href="thread.html#966">[ thread ]</a>
+              <a href="subject.html#966">[ subject ]</a>
+              <a href="author.html#966">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

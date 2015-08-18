@@ -1,0 +1,243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r716 - in trunk: . apps/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r716%20-%20in%20trunk%3A%20.%20apps/comptest&In-Reply-To=%3C200710081306.l98D6IIB013709%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000707.html">
+   <LINK REL="Next"  HREF="000709.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r716 - in trunk: . apps/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r716%20-%20in%20trunk%3A%20.%20apps/comptest&In-Reply-To=%3C200710081306.l98D6IIB013709%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r716 - in trunk: . apps/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Oct  8 15:06:18 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000707.html">[S3d-svn] r715 - trunk/apps/meshs3d
+</A></li>
+        <LI>Next message: <A HREF="000709.html">[S3d-svn] r717 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#708">[ date ]</a>
+              <a href="thread.html#708">[ thread ]</a>
+              <a href="subject.html#708">[ subject ]</a>
+              <a href="author.html#708">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-10-08 15:06:17 +0200 (Mon, 08 Oct 2007)
+New Revision: 716
+
+Modified:
+   trunk/
+   trunk/apps/comptest/comptest.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r2591 at kero</A>:  dotslash | 2007-10-08 15:05:55 +0200
+ - add more experimental stuff for the composite test (event handling etc)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2475
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2591
+
+Modified: trunk/apps/comptest/comptest.c
+===================================================================
+--- trunk/apps/comptest/comptest.c	2007-10-07 21:33:22 UTC (rev 715)
++++ trunk/apps/comptest/comptest.c	2007-10-08 13:06:17 UTC (rev 716)
+@@ -78,9 +78,12 @@
+ 
+ int xinit();
+ void window_update(struct window *win, int x, int y, int width, int height);
++static int print_event(Display *dpy, XEvent *event);
++void event();
+ 
+ void mainloop()
+ {
++	event();
+ 	nanosleep(&amp;t, NULL);
+ }
+ 
+@@ -92,14 +95,98 @@
+ 	return(i);
+ }
+ 
+-static int error(Display *COMPUNUSED(dpy), XErrorEvent *COMPUNUSED(event))
++static int print_event(Display *COMPUNUSED(dpy), XEvent *event)
+ {
+-	/*    printf (&quot;error %d request %d minor %d serial %d\n&quot;,
+-	        event-&gt;error_code, event-&gt;request_code, event-&gt;minor_code, event-&gt;serial);*/
+-	return 0;
++	char *name = &quot;unknown&quot;;
++	switch (event-&gt;type &amp; 0x7f) {
++	case Expose:
++		name = &quot;Expose&quot;;
++		break;
++	case MapNotify:
++		name = &quot;Map&quot;;
++		break;
++	case UnmapNotify:
++		name = &quot;Unmap&quot;;
++		break;
++	case ReparentNotify:
++		name = &quot;Reparent&quot;;
++		break;
++	case CirculateNotify:
++		name = &quot;Circulate&quot;;
++		break;
++	}
++	if ( event-&gt;type == xdamage.event + XDamageNotify ) {
++		XDamageNotifyEvent *e = (XDamageNotifyEvent*) event ;
++		// e-&gt;drawable is the window ID of the damaged window
++		// e-&gt;geometry is the geometry of the damaged window	
++		// e-&gt;area     is the bounding rect for the damaged area	
++		// e-&gt;damage   is the damage handle returned by XDamageCreate()
++
++		// Subtract all the damage, repairing the window.
++		name = &quot;Damage!!&quot;;
++	}
++	else if ( event-&gt;type == ConfigureNotify ) {
++		XConfigureEvent *e = &amp;event-&gt;xconfigure;	
++		// The windows size, position or Z index in the stacking
++		// order has changed
++		name = &quot;Configure!!&quot;;
++	}
++
++
++	printf(&quot;Event: %s\n&quot;, name);
++	return(0);
++
++
+ }
++/*static int error(Display *COMPUNUSED(dpy), XErrorEvent *COMPUNUSED(event))*/
++static int error(Display *COMPUNUSED(dpy), XErrorEvent *event)
++{
++	char *name = &quot;&quot;;
++    int     o;
+ 
++    o = event-&gt;error_code - xfixes.error;
++    switch (o) {
++    case BadRegion:
++        name = &quot;BadRegion&quot;;
++        break;
++    default:
++        break;
++    }
++    o = event-&gt;error_code - xdamage.error;
++    switch (o) {
++    case BadDamage:
++        name = &quot;BadDamage&quot;;
++        break;
++    default:
++        break;
++    }
++    o = event-&gt;error_code - xrender.error;
++    switch (o) {
++    case BadPictFormat:
++        name = &quot;BadPictFormat&quot;;
++        break;
++    case BadPicture:
++        name = &quot;BadPicture&quot;;
++        break;
++    case BadPictOp:
++        name = &quot;BadPictOp&quot;;
++        break;
++    case BadGlyphSet:
++        name = &quot;BadGlyphSet&quot;;
++        break;
++    case BadGlyph:
++        name = &quot;BadGlyph&quot;;
++        break;
++    default:
++        break;
++    }
+ 
++	 printf (&quot;error %d (name: %s) request %d minor %d serial %d\n&quot;,
++	        event-&gt;error_code, name, event-&gt;request_code, event-&gt;minor_code, (int)event-&gt;serial);
++	return(0);
++}
++
++
+ int xinit()
+ {
+ 	dpy = XOpenDisplay(display);
+@@ -234,6 +321,10 @@
+ 		return;
+ 	win-&gt;id = id;
+ 	XGetWindowAttributes(dpy, win-&gt;id, &amp;win-&gt;attr);
++/*	XSelectInput(dpy, win-&gt;id, ExposureMask|ButtonPressMask|KeyPressMask*/
++	XSelectInput(dpy, win-&gt;id, ExposureMask
++					|SubstructureNotifyMask | ExposureMask | StructureNotifyMask | PropertyChangeMask);
++/*	XSelectInput(dpy, win-&gt;id, ExposureMask);*/
+ 	win-&gt;format = XRenderFindVisualFormat(dpy, win-&gt;attr.visual);
+ 
+ 	if (win-&gt;format != 0) {
+@@ -348,7 +439,18 @@
+ 
+ void event()
+ {
+-	/* XNextEvent (dpy, &amp;ev);*/
++	XEvent event;
++	while (QLength(dpy)) {
++		XNextEvent(dpy, &amp;event);
++		print_event(dpy, &amp;event);
++		if ( event.type == xdamage.event + XDamageNotify ) {
++			XDamageNotifyEvent *e = (XDamageNotifyEvent*) &amp;event ;
++			printf(&quot;window = %d, geometry = %d:%d (at %d:%d), area = %d:%d (at %d:%d)\n&quot;, 
++					e-&gt;drawable, e-&gt;geometry.width, e-&gt;geometry.height, e-&gt;geometry.x, e-&gt;geometry.y,
++					e-&gt;area.width, e-&gt;area.height, e-&gt;area.x, e-&gt;area.y);
++			XDamageSubtract(dpy, e-&gt;damage, None, None);
++		}
++	}
+ }
+ 
+ 
+@@ -365,6 +467,10 @@
+ 	if (!s3d_init(&amp;argc, &amp;argv, &quot;compotest&quot;)) {
+ 		for (scr_no = 0; scr_no &lt; ScreenCount(dpy); scr_no++) {
+ 			XCompositeRedirectSubwindows(dpy, RootWindow(dpy, scr_no), CompositeRedirectAutomatic);
++/*			XCompositeRedirectSubwindows(dpy, RootWindow(dpy, scr_no), CompositeRedirectManual);*/
++			XSelectInput(dpy, RootWindow(dpy, scr_no),
++						SubstructureNotifyMask | ExposureMask | StructureNotifyMask | PropertyChangeMask);
++
+ 			XQueryTree(dpy, RootWindow(dpy, scr_no), &amp;root_return, &amp;parent_return, &amp;children, &amp;nchildren);
+ 			for (i = 0; i &lt; (int)nchildren; i++)
+ 				window_add(dpy, children[i]);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000707.html">[S3d-svn] r715 - trunk/apps/meshs3d
+</A></li>
+	<LI>Next message: <A HREF="000709.html">[S3d-svn] r717 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#708">[ date ]</a>
+              <a href="thread.html#708">[ thread ]</a>
+              <a href="subject.html#708">[ subject ]</a>
+              <a href="author.html#708">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

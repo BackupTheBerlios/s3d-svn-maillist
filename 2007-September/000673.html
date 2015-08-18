@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r681 - trunk/apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r681%20-%20trunk/apps/s3dfm&In-Reply-To=%3C200709232156.l8NLuKnd013181%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000672.html">
+   <LINK REL="Next"  HREF="000674.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r681 - trunk/apps/s3dfm</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r681%20-%20trunk/apps/s3dfm&In-Reply-To=%3C200709232156.l8NLuKnd013181%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r681 - trunk/apps/s3dfm">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Sep 23 23:56:20 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000672.html">[S3d-svn] r680 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000674.html">[S3d-svn] r682 - trunk/apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#673">[ date ]</a>
+              <a href="thread.html#673">[ thread ]</a>
+              <a href="subject.html#673">[ subject ]</a>
+              <a href="author.html#673">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-09-23 23:56:19 +0200 (Sun, 23 Sep 2007)
+New Revision: 681
+
+Modified:
+   trunk/apps/s3dfm/dialog.c
+   trunk/apps/s3dfm/string.c
+Log:
+Fix -Wextra sign warnings in s3dfm
+
+
+Modified: trunk/apps/s3dfm/dialog.c
+===================================================================
+--- trunk/apps/s3dfm/dialog.c	2007-09-23 21:56:12 UTC (rev 680)
++++ trunk/apps/s3dfm/dialog.c	2007-09-23 21:56:19 UTC (rev 681)
+@@ -171,7 +171,8 @@
+ 	s3dw_button  *okbutton, *abortbutton;
+ 	float l;
+ 
+-	int i, m;
++	int i;
++	unsigned int m;
+ 
+ 	if (fs_lock)  {
+ 		window_fs_another();
+@@ -221,7 +222,8 @@
+ 	s3dw_button  *okbutton, *abortbutton;
+ 	float l;
+ 
+-	int i, m;
++	int i;
++	unsigned int m;
+ 
+ 	if (fs_lock)  {
+ 		window_fs_another();
+
+Modified: trunk/apps/s3dfm/string.c
+===================================================================
+--- trunk/apps/s3dfm/string.c	2007-09-23 21:56:12 UTC (rev 680)
++++ trunk/apps/s3dfm/string.c	2007-09-23 21:56:19 UTC (rev 681)
+@@ -58,7 +58,7 @@
+ void dotted_int(char *s, unsigned int i)
+ {
+ 	char st[M_DIR];
+-	int p;
++	unsigned int p;
+ 	p = 0;
+ 	st[0] = 0;
+ 	while (i &gt; 0) {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000672.html">[S3d-svn] r680 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000674.html">[S3d-svn] r682 - trunk/apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#673">[ date ]</a>
+              <a href="thread.html#673">[ thread ]</a>
+              <a href="subject.html#673">[ subject ]</a>
+              <a href="author.html#673">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

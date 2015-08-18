@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r921 - in trunk: libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r921%20-%20in%20trunk%3A%20libs3d%20libs3dw&In-Reply-To=%3C200807191904.m6JJ4mWI000761%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000914.html">
+   <LINK REL="Next"  HREF="000916.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r921 - in trunk: libs3d libs3dw</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r921%20-%20in%20trunk%3A%20libs3d%20libs3dw&In-Reply-To=%3C200807191904.m6JJ4mWI000761%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r921 - in trunk: libs3d libs3dw">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sat Jul 19 21:04:48 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000914.html">[S3d-svn] r920 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000916.html">[S3d-svn] r922 - trunk/libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#915">[ date ]</a>
+              <a href="thread.html#915">[ thread ]</a>
+              <a href="subject.html#915">[ subject ]</a>
+              <a href="author.html#915">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-07-19 21:04:47 +0200 (Sat, 19 Jul 2008)
+New Revision: 921
+
+Modified:
+   trunk/libs3d/CMakeLists.txt
+   trunk/libs3dw/CMakeLists.txt
+Log:
+Add soversion to library names
+
+Modified: trunk/libs3d/CMakeLists.txt
+===================================================================
+--- trunk/libs3d/CMakeLists.txt	2008-07-10 16:55:24 UTC (rev 920)
++++ trunk/libs3d/CMakeLists.txt	2008-07-19 19:04:47 UTC (rev 921)
+@@ -7,6 +7,7 @@
+ 	sei_construct.c sei_misc.c sei_monotone.c sei_tri.c shm.c
+ 	shm_ringbuf.c tcp.c vector.c hash.c texture.c)
+ target_link_libraries(s3d ${S3D_LIBRARY_DEPENDENCIES})
++set_target_properties(s3d PROPERTIES VERSION ${VERSION} SOVERSION 2)
+ set(S3D_LIBRARIES ${S3D_LIBRARY_DEPENDENCIES} s3d CACHE PATHS &quot;Path to libraries&quot;)
+ 
+ # install
+
+Modified: trunk/libs3dw/CMakeLists.txt
+===================================================================
+--- trunk/libs3dw/CMakeLists.txt	2008-07-10 16:55:24 UTC (rev 920)
++++ trunk/libs3dw/CMakeLists.txt	2008-07-19 19:04:47 UTC (rev 921)
+@@ -2,6 +2,7 @@
+ 
+ add_library(s3dw SHARED animate.c arrange.c button.c event.c input.c
+ 	label.c root.c scrollbar.c style.c surface.c textbox.c widget.c)
++set_target_properties(s3dw PROPERTIES VERSION ${VERSION} SOVERSION 2)
+ set(S3DW_LIBRARIES s3dw CACHE PATHS &quot;Path to libraries&quot;)
+ 
+ # install
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000914.html">[S3d-svn] r920 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000916.html">[S3d-svn] r922 - trunk/libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#915">[ date ]</a>
+              <a href="thread.html#915">[ thread ]</a>
+              <a href="subject.html#915">[ subject ]</a>
+              <a href="author.html#915">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

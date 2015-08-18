@@ -1,0 +1,402 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r439 - in trunk: . apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r439%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200609262237.k8QMb3n6017515%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000431.html">
+   <LINK REL="Next"  HREF="000433.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r439 - in trunk: . apps/s3dfm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r439%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200609262237.k8QMb3n6017515%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r439 - in trunk: . apps/s3dfm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Wed Sep 27 00:37:03 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000431.html">[S3d-svn] r438 - in trunk: . apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000433.html">[S3d-svn] r440 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#432">[ date ]</a>
+              <a href="thread.html#432">[ thread ]</a>
+              <a href="subject.html#432">[ subject ]</a>
+              <a href="author.html#432">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-27 00:37:02 +0200 (Wed, 27 Sep 2006)
+New Revision: 439
+
+Modified:
+   trunk/
+   trunk/apps/s3dfm/TODO
+   trunk/apps/s3dfm/animation.c
+   trunk/apps/s3dfm/box.c
+   trunk/apps/s3dfm/event.c
+   trunk/apps/s3dfm/icon.c
+   trunk/apps/s3dfm/node.c
+   trunk/apps/s3dfm/parse.c
+   trunk/apps/s3dfm/s3dfm.h
+   trunk/apps/s3dfm/string.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1065 at balthasar</A>:  dotslash | 2006-09-27 00:36:51 +0200
+ - display fixes (titlestring, sidestring)
+ - some more cleanup
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1063
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1065
+
+Modified: trunk/apps/s3dfm/TODO
+===================================================================
+--- trunk/apps/s3dfm/TODO	2006-09-26 16:16:22 UTC (rev 438)
++++ trunk/apps/s3dfm/TODO	2006-09-26 22:37:02 UTC (rev 439)
+@@ -1,3 +1,5 @@
++- focus
++- let blocks fly in animation
+ - copy
+ - delete
+ - create directories
+
+Modified: trunk/apps/s3dfm/animation.c
+===================================================================
+--- trunk/apps/s3dfm/animation.c	2006-09-26 16:16:22 UTC (rev 438)
++++ trunk/apps/s3dfm/animation.c	2006-09-26 22:37:02 UTC (rev 439)
+@@ -160,13 +160,19 @@
+ 	for (i=0;i&lt;ani_n;i++)
+ 	{
+ 		f=ani_s[i];
+-		ani_iterate(f);
+-		if (ani_check(f))
+-		{
+-			ani_finish(f,i);
+-			i--; /* a new object is here now, take care in the next iteration */
++		if (f-&gt;oid==-1)
++		{ /* kick out bad animations */
++			ani_del(i);
++			i--;
+ 		} else {
+-			ani_doit(f);
++			ani_iterate(f);
++			if (ani_check(f))
++			{
++				ani_finish(f,i);
++				i--; /* a new object is here now, take care in the next iteration */
++			} else {
++				ani_doit(f);
++			}
+ 		}
+ 	}
+ }
+
+Modified: trunk/apps/s3dfm/box.c
+===================================================================
+--- trunk/apps/s3dfm/box.c	2006-09-26 16:16:22 UTC (rev 438)
++++ trunk/apps/s3dfm/box.c	2006-09-26 22:37:02 UTC (rev 439)
+@@ -56,11 +56,17 @@
+ /* places the string at the left side of the cube */
+ void box_sidelabel(t_node *dir)
+ {
+-
++	float len;
++	if (dir-&gt;objs.str==-1)
++	{
++		dir-&gt;objs.str=s3d_draw_string(dir-&gt;name,&amp;len);
++		if (len&lt;2) len=2;
++		dir-&gt;objs.strlen=len;
++	}
+ 	s3d_rotate(dir-&gt;objs.str,0,90,0);
+ 	s3d_translate(dir-&gt;objs.str,1.1,0.3,1);
+-	s3d_scale(dir-&gt;objs.str,(float)1.8/(dir-&gt;len));
+-	s3d_scale(dir-&gt;objs.str,(float)1.8/(dir-&gt;len));
++	s3d_scale(dir-&gt;objs.str,(float)1.8/(dir-&gt;objs.strlen));
++	s3d_scale(dir-&gt;objs.str,(float)1.8/(dir-&gt;objs.strlen));
+ 	s3d_link(dir-&gt;objs.str,dir-&gt;oid);
+ 	s3d_flags_on(dir-&gt;objs.str,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ }
+@@ -210,8 +216,7 @@
+ 	s3d_push_vertices(dir-&gt;objs.title,tvertices,sizeof(tvertices)/(3*sizeof(float)));
+ 	s3d_push_polygons(dir-&gt;objs.title,bar_poly,sizeof(bar_poly)/(sizeof(unsigned long)*4));
+ 	s3d_link(dir-&gt;objs.title,dir-&gt;oid);
+-	dots_at_start(fullname,30,dir);
+-	dir-&gt;objs.titlestr=s3d_draw_string(fullname,&amp;len);
++	dir-&gt;objs.titlestr=s3d_draw_string(dots_at_start(fullname,30,dir),&amp;len);
+ 	if (len&gt;(1.6*5.0))		s3d_scale(dir-&gt;objs.titlestr,1.6/len);
+ 	else					s3d_scale(dir-&gt;objs.titlestr,0.2);
+ 	s3d_translate(dir-&gt;objs.titlestr,-1.0,1.05,1.01);
+@@ -251,24 +256,27 @@
+ int box_undisplay(t_node *dir)
+ {
+ 	printf(&quot;box_undisplay( %s )\n&quot;,dir-&gt;name);
+-	if (dir-&gt;objs.close!=-1)		{	s3d_del_object(dir-&gt;objs.close);		dir-&gt;objs.close=-1; }
+-	if (dir-&gt;objs.select!=-1)	{	s3d_del_object(dir-&gt;objs.select);	dir-&gt;objs.select=-1; }
+-	if (dir-&gt;objs.title!=-1)		{	s3d_del_object(dir-&gt;objs.title);		dir-&gt;objs.title=-1; }
+-	if (dir-&gt;objs.titlestr!=-1)	{	s3d_del_object(dir-&gt;objs.titlestr);	dir-&gt;objs.titlestr=-1; }
+-	if (dir-&gt;oid!=-1)			s3d_del_object(dir-&gt;oid);
++	if (dir-&gt;objs.close!=-1)		{	s3d_del_object(dir-&gt;objs.close);	dir-&gt;objs.close=-1; }
++	if (dir-&gt;objs.select!=-1)		{	s3d_del_object(dir-&gt;objs.select);	dir-&gt;objs.select=-1; }
++	if (dir-&gt;objs.title!=-1)		{	s3d_del_object(dir-&gt;objs.title);	dir-&gt;objs.title=-1; }
++	if (dir-&gt;objs.titlestr!=-1)		{	s3d_del_object(dir-&gt;objs.titlestr);	dir-&gt;objs.titlestr=-1; }
++	if (dir-&gt;oid!=-1)				{	s3d_del_object(dir-&gt;oid);	}
++	/* keep this. icons also needs the *same* string */
++	/*	if (dir-&gt;objs.str!=-1)			{ 	s3d_del_object(dir-&gt;objs.str); dir-&gt;objs.str=-1;	}*/
+ 	dir-&gt;disp=D_NONE;
+ 	return(0);
+ }
+ /* the opposite effect of box_expand, e.g. transforming the box back to an icon */
+ int box_unexpand(t_node *dir)
+ {
++	printf(&quot;box_unexpand( %s )\n&quot;,dir-&gt;name);
+ 	if (dir-&gt;parent==NULL) /* we can't do this on root.... */
+ 		return(-1);
+ 	box_undisplay(dir);
+ 	icon_draw(dir);
++	dir-&gt;parent-&gt;dirs_opened--;
+ 	box_order_icons(dir-&gt;parent);
+-	dir-&gt;parent-&gt;dirs_opened--;
+-	printf(&quot;[U]ndisplayed %s\n&quot;,dir-&gt;name);
++	box_order_subdirs(dir-&gt;parent);
+ 	return(0);
+ }
+ 
+@@ -296,15 +304,15 @@
+ 		if (dir-&gt;sub[i]-&gt;disp==D_DIR)
+ 			ret|=box_close(dir-&gt;sub[i],force);
+ 	if (ret &amp;&amp; !force) 
+-	{
++	{	/* if anything got wrong, return here ... */
+ 		box_order_subdirs(dir);
+-		return(ret); /* if anything got wrong, return here ... */
++		return(ret); 
+ 	} else {
+ 		/* also remove the icons */
+ 		for (i=0;i&lt;dir-&gt;n_sub;i++)
+ 			if (dir-&gt;sub[i]-&gt;disp==D_ICON)
+ 				icon_undisplay(dir-&gt;sub[i]);
+-		box_undisplay(dir);
++		box_unexpand(dir);
+ 	}
+ 	return(ret);
+ }
+@@ -359,7 +367,6 @@
+ 					ani_add(dir-&gt;sub[i]);
+ 					j++;
+ 				}
+-
+ 			}
+ 	}
+ }
+@@ -370,18 +377,16 @@
+ 	dps=ceil(sqrt(dir-&gt;n_sub)); /* directories per line */
+ 	for (i=0;i&lt;dir-&gt;n_sub;i++)
+ 	{
+-		dir-&gt;sub[i]-&gt;px = -1 +2*  ((float)((int)i%dps)+0.5)/((float)dps);
+-		dir-&gt;sub[i]-&gt;py = 0.5+((float)((int)i/dps)+0.5)/((float)dps)-0.5;
+-		dir-&gt;sub[i]-&gt;pz = 1.0;
+-		dir-&gt;sub[i]-&gt;scale = (float)1.0/((float)dps);
+-		dir-&gt;sub[i]-&gt;dscale = dir-&gt;sub[i]-&gt;scale;
+-		dir-&gt;sub[i]-&gt;dpx = dir-&gt;sub[i]-&gt;px;
+-		dir-&gt;sub[i]-&gt;dpy = dir-&gt;sub[i]-&gt;py;
+-		dir-&gt;sub[i]-&gt;dpz = dir-&gt;sub[i]-&gt;dpz;
+-		/* make a first setup so there is no flickering */
+-		s3d_link(dir-&gt;sub[i]-&gt;oid,dir-&gt;oid); /* if it's already displayed, make sure it linked properly ... */
+-		ani_finish(dir-&gt;sub[i], -1);
+-		s3d_flags_on(dir-&gt;sub[i]-&gt;oid,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-		s3d_flags_on(dir-&gt;sub[i]-&gt;objs.str,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++		if (dir-&gt;sub[i]-&gt;disp == D_ICON)
++		{
++			dir-&gt;sub[i]-&gt;px = -1 +2*  ((float)((int)i%dps)+0.5)/((float)dps);
++			dir-&gt;sub[i]-&gt;py = 0.5+((float)((int)i/dps)+0.5)/((float)dps)-0.5;
++			dir-&gt;sub[i]-&gt;pz = 1.0;
++			dir-&gt;sub[i]-&gt;scale = (float)1.0/((float)dps);
++			s3d_link(dir-&gt;sub[i]-&gt;oid,dir-&gt;oid);	 /* if it's already displayed, make sure it linked properly ... */
++			ani_finish(dir-&gt;sub[i], -1);			 /* copy to the current animation state */
++			s3d_flags_on(dir-&gt;sub[i]-&gt;oid,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++			s3d_flags_on(dir-&gt;sub[i]-&gt;objs.str,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++		}
+ 	}
+ }
+
+Modified: trunk/apps/s3dfm/event.c
+===================================================================
+--- trunk/apps/s3dfm/event.c	2006-09-26 16:16:22 UTC (rev 438)
++++ trunk/apps/s3dfm/event.c	2006-09-26 22:37:02 UTC (rev 439)
+@@ -100,8 +100,6 @@
+ 		if (f-&gt;objs.close==oid)
+ 		{
+ 			box_close(f,1);
+-			if (f-&gt;parent!=NULL)
+-				ani_focus(f-&gt;parent);
+ 			return;
+ 		}
+ 		if (f-&gt;objs.select==oid)
+
+Modified: trunk/apps/s3dfm/icon.c
+===================================================================
+--- trunk/apps/s3dfm/icon.c	2006-09-26 16:16:22 UTC (rev 438)
++++ trunk/apps/s3dfm/icon.c	2006-09-26 22:37:02 UTC (rev 439)
+@@ -69,10 +69,8 @@
+ 	{
+ 		dir-&gt;objs.str=s3d_draw_string(dir-&gt;name,&amp;len);
+ 		if (len&lt;2) len=2;
+-		dir-&gt;len=len;
+-	}
+-	else 
+-		len=dir-&gt;len;
++		dir-&gt;objs.strlen=len;
++	} else len=dir-&gt;objs.strlen;
+ 	s3d_scale(dir-&gt;objs.str,(float)1.8/len);
+ 	s3d_translate(dir-&gt;objs.str,-0.9,-0.3,0.1);
+ 	s3d_rotate(dir-&gt;objs.str,0,0,0);
+
+Modified: trunk/apps/s3dfm/node.c
+===================================================================
+--- trunk/apps/s3dfm/node.c	2006-09-26 16:16:22 UTC (rev 438)
++++ trunk/apps/s3dfm/node.c	2006-09-26 22:37:02 UTC (rev 439)
+@@ -101,11 +101,12 @@
+ 	dir-&gt;objs.select=-1;
+ 	dir-&gt;objs.title=-1;
+ 	dir-&gt;objs.titlestr=-1;
+-
+-	dir-&gt;len=0;
+-	dir-&gt;disp=0;
++	dir-&gt;objs.strlen=0;
++	
++	dir-&gt;disp=D_NONE;
+ 	dir-&gt;parsed=0;
+ 
++	dir-&gt;check=0;
+ 	dir-&gt;px=root.pz=0.0;
+ 	dir-&gt;dirs_opened=0;
+ 	dir-&gt;type=T_DUNO;
+@@ -152,9 +153,7 @@
+ /* node select handles click on the detach button. selected items can be moved, copied etc.*/
+ void node_select(t_node *dir)
+ {
+-	printf(&quot;node_select(%s)\n&quot;,dir-&gt;name);
+ 	dir-&gt;detached=dir-&gt;detached?0:1; /* swapping, not sure if !dir-&gt;detached would do the same .. */
+-	printf(&quot;dir-&gt;type = %d\n&quot;,dir-&gt;disp);
+ 	switch (dir-&gt;disp)
+ 	{
+ 		case D_DIR:
+
+Modified: trunk/apps/s3dfm/parse.c
+===================================================================
+--- trunk/apps/s3dfm/parse.c	2006-09-26 16:16:22 UTC (rev 438)
++++ trunk/apps/s3dfm/parse.c	2006-09-26 22:37:02 UTC (rev 439)
+@@ -57,7 +57,7 @@
+ 			/* setup kids in the sub */
+ 			for (i=0;i&lt;oldn;i++) /* see if it's already there */
+ 				if (dir-&gt;sub[i])
+-				if (0==strcmp(namelist[n]-&gt;d_name,dir-&gt;sub[n]-&gt;name))
++				if (0==strcmp(namelist[n]-&gt;d_name,dir-&gt;sub[i]-&gt;name))
+ 					break;
+  		    if ((0!=strcmp(nstr,&quot;.&quot;)) &amp;&amp; (0!=strcmp(nstr,&quot;..&quot;))) /* we don't care about those */
+ 			{
+
+Modified: trunk/apps/s3dfm/s3dfm.h
+===================================================================
+--- trunk/apps/s3dfm/s3dfm.h	2006-09-26 16:16:22 UTC (rev 438)
++++ trunk/apps/s3dfm/s3dfm.h	2006-09-26 22:37:02 UTC (rev 439)
+@@ -61,12 +61,13 @@
+ #define D_DIR		2
+ 	int				 parsed,detached;					/* Flags for parsed/detached (selected) nodes ... */
+ 	int 			 oid;								/* main oid, e.g the block or icons oid */
+-	float 			 len;								/* lenght ... TODO: of what? */
+ 	struct 			 {	
+ 		/* some objects which might be used ... if not, should be -1 */
+ 		int 		 close,select,title,titlestr; /* box decorations. */
+-		int 		 str;						  
++		int 		 str;						  /* the name of the nodeas s3d object */
++		float		 strlen;					  /* the length of this string */
+ 		
++		
+ 	} 				 objs;
+ 	int 			 check;							    /* check marker, for internal things */
+ };
+@@ -143,7 +144,7 @@
+ /* parse.c */
+ int 		 parse_dir(t_node *dir);
+ /* string.c */
+-void 		 dots_at_start(char *s, unsigned int n, t_node *d);
+ void		 dotted_int(char *s,unsigned int i);
+-char		 *mstrncat(char *dest, const char *src, int n);
+-char		 *mstrncpy(char *dest, const char *src, int n);
++char 		*dots_at_start(char *str, unsigned int n, t_node *d);
++char		*mstrncat(char *dest, const char *src, int n);
++char		*mstrncpy(char *dest, const char *src, int n);
+
+Modified: trunk/apps/s3dfm/string.c
+===================================================================
+--- trunk/apps/s3dfm/string.c	2006-09-26 16:16:22 UTC (rev 438)
++++ trunk/apps/s3dfm/string.c	2006-09-26 22:37:02 UTC (rev 439)
+@@ -20,12 +20,18 @@
+  * along with s3dfm; if not, write to the Free Software
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
++
++/* just a few helper functions which only operate on strings, so we put them 
++ * here ... */
++
+ #include &quot;s3dfm.h&quot;
+ #include &lt;string.h&gt; /* strlen(), strncpy() */
+-/* writes the path of the item d in string s with bufferlength n, 
++
++/* writes the path of the item d in string str with bufferlength n, 
+  * adds some dots to the beginning if its too long */ 
+-void dots_at_start(char *s, unsigned int n, t_node *d)
++char *dots_at_start(char *str, unsigned int n, t_node *d)
+ {
++	char *s=str;
+ 	int i,j;
+ 	i=n-2;
+ 	s[n-1]=0;
+@@ -47,6 +53,7 @@
+ 	} while ((d=d-&gt;parent)!=NULL);
+ 	if (i&lt;0)			s[0]=s[1]='.';
+ 	else 				s=(char *)s+i+1; /* jump to start of the string */
++	return(s);
+ 
+ }
+ /* add some dots to an integer value for better readability */
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000431.html">[S3d-svn] r438 - in trunk: . apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000433.html">[S3d-svn] r440 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#432">[ date ]</a>
+              <a href="thread.html#432">[ thread ]</a>
+              <a href="subject.html#432">[ subject ]</a>
+              <a href="author.html#432">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r867 - trunk/svnonly/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r867%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711202228.lAKMSed6023771%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000859.html">
+   <LINK REL="Next"  HREF="000861.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r867 - trunk/svnonly/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r867%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711202228.lAKMSed6023771%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r867 - trunk/svnonly/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Tue Nov 20 23:28:40 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000859.html">[S3d-svn] r866 - trunk/svnonly/comptest
+</A></li>
+        <LI>Next message: <A HREF="000861.html">[S3d-svn] r868 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#860">[ date ]</a>
+              <a href="thread.html#860">[ thread ]</a>
+              <a href="subject.html#860">[ subject ]</a>
+              <a href="author.html#860">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-20 23:28:40 +0100 (Tue, 20 Nov 2007)
+New Revision: 867
+
+Modified:
+   trunk/svnonly/comptest/window.c
+   trunk/svnonly/comptest/x11.c
+Log:
+- don't add a window if it's already removed (hackish)
+
+
+Modified: trunk/svnonly/comptest/window.c
+===================================================================
+--- trunk/svnonly/comptest/window.c	2007-11-20 22:04:26 UTC (rev 866)
++++ trunk/svnonly/comptest/window.c	2007-11-20 22:28:40 UTC (rev 867)
+@@ -86,19 +86,29 @@
+ 		return;
+ 	}
+ 	win-&gt;id = id;
+-	XGetWindowAttributes(dpy, win-&gt;id, &amp;win-&gt;attr);
++	win-&gt;next = window_head;
++	window_head = win;
++	win-&gt;damage = None;
++	win-&gt;pix = None;
++	win-&gt;no = 0;
++	win-&gt;oid = -1;
++	win-&gt;already_updated = 0;
+ 
++	/* TODO: at my place, windows are created and destroyed in the same moment. so this 
++	 * function fails sometimes. 
++	 * maybe there is a function asking something like &quot;is there really a window with id ;win-&gt;id'...&quot;. 
++	 * that would help here. */
++	if (!XGetWindowAttributes(dpy, win-&gt;id, &amp;win-&gt;attr)) {
++		/* window does not exit, next event is probably it's removal ... */
++		return;
++	}
++	
++
+ 	/* XSelectInput(dpy, win-&gt;id, ExposureMask|ButtonPressMask|KeyPressMask*/
+ /*	XSelectInput(dpy, win-&gt;id, SubstructureNotifyMask | ExposureMask | StructureNotifyMask | PropertyChangeMask);*/
+ 	XSelectInput(dpy, win-&gt;id, 0);
+ 
+ 	win-&gt;damage = XDamageCreate(dpy, win-&gt;id, XDamageReportNonEmpty);
+-	win-&gt;pix = None;
+-	win-&gt;no = 0;
+-	win-&gt;oid = -1;
+-	win-&gt;next = window_head;
+-	window_head = win;
+-	win-&gt;already_updated = 0;
+ 	if (win-&gt;next == NULL) 
+ 		window_restack(win, None);
+ 	else
+@@ -243,11 +253,6 @@
+ 	if (win-&gt;attr.class == InputOnly)		/* can't grab image from this source */
+ 		return;
+ 
+-	/* update the whole window for now. */
+-	/* x = 50;
+-	 y = 50;
+-	 width = win-&gt;attr.width;
+-	 height = win-&gt;attr.height;*/
+ 	if (x &lt; 0) x = 0;
+ 	if (y &lt; 0) y = 0;
+ 	if (width &gt; win-&gt;attr.width - x)   width = win-&gt;attr.width - x;
+@@ -269,17 +274,14 @@
+ 		if (xright &gt; (x + width))
+ 			xright = x + width;
+ 		chunk_width = xright - xleft;
+-/*		printf(&quot;map-state = %d, backing_store = %d\n&quot;, win-&gt;attr.map_state);
+-		printf(&quot;request image: xleft = %d, xright = %d, width = %d, x:y = %d:%d, width:height = %d:%d, ~TEXW = %08x\n&quot;,
+-		       xleft, xright, width, x, y, width, height, ~TEXW);*/
+-		/* image = XGetImage(dpy, win-&gt;id, xleft, y, chunk_width, height, AllPlanes, ZPixmap); */
++
+ 		if (win-&gt;pix == None)
+ 			win-&gt;pix = XCompositeNameWindowPixmap(dpy, win-&gt;id);
+-
+ 		image = XGetImage(dpy, win-&gt;pix, xleft, y, chunk_width, height, AllPlanes, ZPixmap);
+ 		if (!image) {
+-/*			printf(&quot;XGetImage Error: xleft = %d, xright = %d, width = %d, x:y = %d:%d, width:height = %d:%d\n&quot;,
+-							xleft, xright, width, x, y, width, height);*/
++			printf(&quot;XGetImage Error: xleft = %d, xright = %d, width = %d, x:y = %d:%d, width:height = %d:%d\n&quot;,
++							xleft, xright, width, x, y, width, height);
++			exit(-1);
+ 			if (win-&gt;oid != -1) {
+ 				s3d_del_object(win-&gt;oid);
+ 				win-&gt;oid = -1;
+
+Modified: trunk/svnonly/comptest/x11.c
+===================================================================
+--- trunk/svnonly/comptest/x11.c	2007-11-20 22:04:26 UTC (rev 866)
++++ trunk/svnonly/comptest/x11.c	2007-11-20 22:28:40 UTC (rev 867)
+@@ -218,6 +218,7 @@
+ 			 }
+ 		case CreateNotify:{
+ 			XCreateWindowEvent *e = &amp;event.xcreatewindow;
++			printf(&quot;override_redirect = %d\n&quot;, (int)e-&gt;override_redirect);
+ 			window_add(e-&gt;display, e-&gt;window);
+ 			break;
+ 			}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000859.html">[S3d-svn] r866 - trunk/svnonly/comptest
+</A></li>
+	<LI>Next message: <A HREF="000861.html">[S3d-svn] r868 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#860">[ date ]</a>
+              <a href="thread.html#860">[ thread ]</a>
+              <a href="subject.html#860">[ subject ]</a>
+              <a href="author.html#860">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

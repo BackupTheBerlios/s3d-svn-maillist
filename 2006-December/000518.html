@@ -1,0 +1,948 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r525 - in trunk: . apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r525%20-%20in%20trunk%3A%20.%20apps/s3dosm&In-Reply-To=%3C200612101519.kBAFJHgM010278%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000517.html">
+   <LINK REL="Next"  HREF="000519.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r525 - in trunk: . apps/s3dosm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r525%20-%20in%20trunk%3A%20.%20apps/s3dosm&In-Reply-To=%3C200612101519.kBAFJHgM010278%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r525 - in trunk: . apps/s3dosm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Dec 10 16:19:17 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000517.html">[S3d-svn] r524 - in trunk: . libs3d
+</A></li>
+        <LI>Next message: <A HREF="000519.html">[S3d-svn] r526 - in trunk: . apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#518">[ date ]</a>
+              <a href="thread.html#518">[ thread ]</a>
+              <a href="subject.html#518">[ subject ]</a>
+              <a href="author.html#518">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-12-10 16:19:16 +0100 (Sun, 10 Dec 2006)
+New Revision: 525
+
+Modified:
+   trunk/
+   trunk/apps/s3dosm/db.c
+   trunk/apps/s3dosm/draw.c
+   trunk/apps/s3dosm/gps.c
+   trunk/apps/s3dosm/kismet.c
+   trunk/apps/s3dosm/nav.c
+   trunk/apps/s3dosm/object.c
+   trunk/apps/s3dosm/osm.c
+   trunk/apps/s3dosm/s3dosm.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1265 at kero</A>:  dotslash | 2006-12-10 16:19:07 +0100
+ - add kismet loader (again)
+ - optimize osm/kismet parser for database read
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1264
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1265
+
+Modified: trunk/apps/s3dosm/db.c
+===================================================================
+--- trunk/apps/s3dosm/db.c	2006-12-10 15:19:13 UTC (rev 524)
++++ trunk/apps/s3dosm/db.c	2006-12-10 15:19:16 UTC (rev 525)
+@@ -29,53 +29,39 @@
+ #include &lt;stdlib.h&gt;	/* atoi() */
+ static char qbuf[QBUF];
+ static int qlen=0;
++static int tagid=1;		/* tagid, incremented with each new object */
+ 
+-static int tagid;
+ static sqlite3 *db;
+ static char *dbFile=NULL;
+ int db_exec(const char *query, sqlite3_callback callback, void *arg);
+ static int db_getint(void *tagid, int argc, char **argv, char **azColName);
+ 
+ /* TODO: remove '' for security reasons */
+-char *clean_string(char *dirty)
++void clean_string(char *clean, char *dirty, int n)
+ {
+-	return(strdup(dirty));
++	strncpy(clean, dirty, n);
+ }
+-int db_insert_tags(int tag_n, tag_t *tag_p)
++int db_add_tag(object_t *obj, char *key, char *val)
+ {
+-	int i;
+ 	char tagquery[MAXQ];
+-	char *mkey, *mval;
+-	if (tag_n&gt;0 &amp;&amp; tag_p!=NULL)
+-	{
+-		 /* add tags */
+-		tagid++;
+-		tagquery[0]=0;
+-		for (i=0;i&lt;tag_n;i++)
+-		{
+-			mkey=clean_string(tag_p[i].k);
+-			mval=clean_string(tag_p[i].v);
+-			snprintf(tagquery,MAXQ,&quot;INSERT INTO tag VALUES (%d, '%s','%s' );&quot;,tagid, mkey, mval);
+-			db_exec(tagquery, NULL, 0);
+-			free(mkey);
+-			free(mval);
+-		}
+-		return(tagid);
+-	} else 
+-		return(0);
++	char mkey[MAXQ], mval[MAXQ];
++	clean_string(mkey,key,MAXQ);
++	clean_string(mval,val,MAXQ);
++	snprintf(tagquery,MAXQ,&quot;INSERT INTO tag VALUES (%d, '%s','%s' );&quot;,(int)obj-&gt;tagid, mkey, mval);
++	db_exec(tagquery, NULL, 0);
++	return(0);
+ }
+ int db_insert_node(node_t *node)
+ {
+-	int tagid;
+ 	char addquery[MAXQ];
+-	tagid= db_insert_tags(node-&gt;base.tag_n,node-&gt;base.tag_p);
++	node-&gt;base.tagid= tagid++;
+ 	
+ 	if (node-&gt;base.id==0) /* give own id */
+ 		snprintf(addquery,MAXQ,&quot;INSERT INTO node (layer_id, latitude, longitude, altitude, visible, tag_id) VALUES (%d, %f, %f, %f, %d, %d);&quot;,
+-						(int)node-&gt;base.layerid,				node-&gt;lat,		node-&gt;lon,		node-&gt;alt,		node-&gt;visible, 		tagid);
++						(int)node-&gt;base.layerid,				node-&gt;lat,		node-&gt;lon,		node-&gt;alt,		node-&gt;visible, 		(int)node-&gt;base.tagid);
+ 	else
+ 		snprintf(addquery,MAXQ,&quot;INSERT INTO node VALUES (%d, %d, %f, %f, %f, %d, %d);&quot;,
+-					(int)node-&gt;base.layerid,(int)node-&gt;base.id,	node-&gt;lat,		node-&gt;lon,		node-&gt;alt,		node-&gt;visible, 		tagid);
++					(int)node-&gt;base.layerid,(int)node-&gt;base.id,	node-&gt;lat,		node-&gt;lon,		node-&gt;alt,		node-&gt;visible, 		(int)node-&gt;base.tagid);
+ 
+ 	db_exec(addquery, NULL, 0);
+ 	return(0);
+@@ -83,40 +69,48 @@
+ 
+ int db_insert_segment(segment_t *seg)
+ {
+-	int tagid;
+ 	char addquery[MAXQ];
+-	tagid= db_insert_tags(seg-&gt;base.tag_n,seg-&gt;base.tag_p);
++	seg-&gt;base.tagid=tagid++;
++	
+ 
++	if (seg-&gt;base.id==0) /* give own id */
++	{
++		printf(&quot;ugh, segment id is 0!\n&quot;);
++		exit(0);
++	}
+ /*	if (seg-&gt;base.id==0) / * give own id * /
+ 		snprintf(addquery,MAXQ,&quot;INSERT INTO segment (layer_id, node_from, node_to, tag_id) VALUES (%d, %d, %d), %d;&quot;,
+ 						(int)seg-&gt;base.layerid,				(int)seg-&gt;from, (int)seg-&gt;to,	tagid );
+ 	else*/
+ 		snprintf(addquery,MAXQ,&quot;INSERT INTO segment (layer_id, seg_id, node_from, node_to, tag_id) VALUES (%d, %d, %d, %d, %d);&quot;,
+-						(int)seg-&gt;base.layerid,(int)seg-&gt;base.id,(int)seg-&gt;from, (int)seg-&gt;to,	tagid );
++						(int)seg-&gt;base.layerid,(int)seg-&gt;base.id,(int)seg-&gt;from, (int)seg-&gt;to,	(int)seg-&gt;base.tagid );
+ 	db_exec(addquery, NULL, 0);
+ 
+ 	return(0);
+ }
+-int db_insert_way(way_t *way)
++int db_insert_way_only(way_t *way)
+ {
+-	int tagid,i;
+ 	char addquery[MAXQ];
+-	tagid= db_insert_tags(way-&gt;base.tag_n,way-&gt;base.tag_p);
+-	snprintf(addquery,MAXQ,&quot;INSERT INTO way (layer_id, way_id, tag_id) VALUES (%d, %d, %d);&quot;,(int)way-&gt;base.layerid, (int)way-&gt;base.id, tagid );
++	way-&gt;base.tagid= tagid++;
++	snprintf(addquery,MAXQ,&quot;INSERT INTO way (layer_id, way_id, tag_id) VALUES (%d, %d, %d);&quot;,(int)way-&gt;base.layerid, (int)way-&gt;base.id, (int)way-&gt;base.tagid );
+ 	db_exec(addquery, NULL, 0);
+-	for (i=0;i&lt;way-&gt;seg_n;i++) {
+-		snprintf(addquery,MAXQ,&quot;UPDATE segment SET way_id=%d WHERE seg_id=%d AND layer_id=%d;&quot;,(int)way-&gt;base.id,(int)way-&gt;seg_p[i],(int)way-&gt;base.layerid );
+-		db_exec(addquery, NULL, 0);
+-	}
+ 	return(0);
+ }
++
++int db_insert_way_seg(way_t *way, int seg_n)
++{
++	char addquery[MAXQ];
++	snprintf(addquery,MAXQ,&quot;UPDATE segment SET way_id=%d WHERE seg_id=%d AND layer_id=%d;&quot;,(int)way-&gt;base.id,seg_n,(int)way-&gt;base.layerid );
++	db_exec(addquery, NULL, 0);
++	return(0);
++}
+ int db_insert_layer(char *layer_name)
+ {
+ 	char findquery[MAXQ];
+ 	char addquery[MAXQ];
+-	char *clayer;
++	char clayer[MAXQ];
+ 	int layerid=-1;
+-	clayer=clean_string(layer_name);
++	clean_string(clayer,layer_name,MAXQ);
+ 	
+ 	snprintf(findquery, MAXQ, &quot;SELECT layer_id FROM layer WHERE name='%s';&quot;, clayer);
+     db_exec(findquery, db_getint, &amp;layerid);
+@@ -126,9 +120,9 @@
+     	db_exec(addquery, NULL, 0);db_flush();
+     	db_exec(findquery, db_getint, &amp;layerid);
+ 	}
+-	free(clayer);
+ 	return(layerid);
+ }
++/*
+ int db_insert_object(object_t *obj)
+ {
+ 	if (obj==NULL)
+@@ -139,17 +133,31 @@
+ 	switch (obj-&gt;type) {
+ 		case T_NODE:			return(db_insert_node((node_t *)obj));
+ 		case T_SEGMENT:			return(db_insert_segment((segment_t *)obj));
+-		case T_WAY:				return(	db_insert_way((way_t *)obj));
++		case T_WAY:				return(db_insert_way((way_t *)obj));
+ 		default:break;
+ 	}
+ 	return(-1);
+ }
+-
++*/
+ static int db_getint(void *tagid, int argc, char **argv, char **azColName){
+   if (argv[0]!=NULL) 
+ 	  *((int *)tagid)=atoi(argv[0]);
+   return 0;
+ }
++static int db_getstr(void *string, int argc, char **argv, char **azColName) {
++	if (argv[0])
++		strncpy((char *)string,argv[0],MAXQ);
++	return(0);
++}
++int db_gettag(int tagid, char *field, char *target)
++{
++	char query[MAXQ];
++	target[0]=0;
++	snprintf(query,MAXQ,&quot;SELECT tagvalue FROM tag WHERE tagkey='%s' AND tag_id=%d;&quot;,field,tagid);
++	db_exec(query, db_getstr,target);
++	return(target[0]==0);
++}
++
+ int callback(void *NotUsed, int argc, char **argv, char **azColName){
+   int i;
+   for(i=0; i&lt;argc; i++){
+
+Modified: trunk/apps/s3dosm/draw.c
+===================================================================
+--- trunk/apps/s3dosm/draw.c	2006-12-10 15:19:13 UTC (rev 524)
++++ trunk/apps/s3dosm/draw.c	2006-12-10 15:19:16 UTC (rev 525)
+@@ -43,54 +43,47 @@
+ 	x[1]=(ESIZE+alt)*			sin(la);
+ 	x[2]=(ESIZE+alt)*cos(lo) *cos(la);
+ }
+-void draw_add_vertices(object_t *t, void *data)
++int draw_icon(void *data, int argc, char **argv, char **azColName) 
+ {
+-	struct vdata *v=data;
+-	tag_t *tag;
++	int i,tagid=-1,oid;
++	char s[MAXQ];
++	float la, lo, alt;
++	float x[3];
++	la=lo=alt=0.0;
+ 	
+-	if (t-&gt;type==T_NODE)
+-	{
+-		float x[3];
+-		node_t *node=NODE_T(t);
+-		node-&gt;vid=v-&gt;vnum;
+-		calc_earth_to_eukl(node-&gt;lat,node-&gt;lon,0,x);
+-		s3d_push_vertex(v-&gt;oid,x[0],x[1],x[2]);
+-		if (node-&gt;visible==2) /* something special */
+-		{
+-			if (NULL!=(tag=tag_get(OBJECT_T(node), &quot;amenity&quot;)))
+-			{
+-				if (0==(strcmp(tag-&gt;v,&quot;wifi&quot;)))
+-				{
+-					tag_t *wtag,*ttag;
+-					if (NULL!=(ttag=tag_get(OBJECT_T(node),&quot;wifi_type&quot;))) {
+-						if (0==strcmp(ttag-&gt;v,&quot;infrastructure&quot;))
+-						{	
+-							if (NULL!=(wtag=tag_get(OBJECT_T(node), &quot;wifi_wep&quot;)))
+-								if (0==strcmp(wtag-&gt;v,&quot;true&quot;))
+-									node-&gt;base.oid=s3d_clone(icons[ICON_AP_OPEN].oid);
+-								else
+-									node-&gt;base.oid=s3d_clone(icons[ICON_AP].oid);
+-							else
+-							node-&gt;base.oid=s3d_clone(icons[ICON_AP].oid);
+-							s3d_translate(node-&gt;base.oid,x[0],x[1],x[2]);
+-							s3d_link(node-&gt;base.oid,v-&gt;oid);
+-							s3d_flags_on(node-&gt;base.oid,S3D_OF_VISIBLE);
+-							s3d_rotate(node-&gt;base.oid,(90-node-&gt;lat),node-&gt;lon,0);
+-							v-&gt;layer-&gt;visible=1;
+-						} else { /* not an ap */
+-						}
+-					}
++	for(i=0; i&lt;argc; i++) {
++		if (argv[i]) {
++			if (0==strcmp(azColName[i],&quot;longitude&quot;))			lo=strtod(argv[i],NULL);
++			else if (0==strcmp(azColName[i],&quot;latitude&quot;))		la=strtod(argv[i],NULL);
++			else if (0==strcmp(azColName[i],&quot;altitude&quot;))		alt=strtod(argv[i],NULL);
++			else if (0==strcmp(azColName[i],&quot;tag_id&quot;)) 			tagid=atoi(argv[i]);
++		}
++	}
++	if (0==db_gettag(tagid, &quot;amenity&quot;,s)) {
++		oid=-1;
++		if (0==strcmp(s,&quot;wifi&quot;)) {					/* some wifi icon */
++			if (0==db_gettag(tagid, &quot;wifi_type&quot;,s)) {
++				if (0==strcmp(s,&quot;infrastructure&quot;)) {	/* access point */
++					if (0==db_gettag(tagid, &quot;wifi_wep&quot;,s)) {
++						if (0==strcmp(s,&quot;true&quot;))	oid=s3d_clone(icons[ICON_AP_WPA].oid);
++						else						oid=s3d_clone(icons[ICON_AP_OPEN].oid);
++					} else oid=s3d_clone(icons[ICON_AP_OPEN].oid);	/* assuming open ap */
+ 				}
+ 			}
+ 		}
+-		v-&gt;vnum++;
+-		v-&gt;lonsum+=node-&gt;lon;
+-		v-&gt;latsum+=node-&gt;lat;
+-		v-&gt;n++;
+-	}
++		if (oid!=-1) {
++			calc_earth_to_eukl(la,lo,0,x);
++			s3d_translate(oid,x[0],x[1],x[2]);
++			s3d_rotate(oid,(90-la),lo,0);
++			s3d_link(oid,oidy);
++			s3d_flags_on(oid,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++			/* TODO: update database */
++		}
++				
++	} 
++	return(0);
+ }
+ 
+-
+ static int lastid=-1;
+ struct waylist {
+ 	int node_from,node_to;
+@@ -157,7 +150,7 @@
+ #define 	V_SUB(a,b,c)	c[0]=a[0]-b[0];	c[1]=a[1]-b[1];	c[2]=a[2]-b[2];
+ #define		V_DOT(a,b)		a[0]*b[0] + a[1]*b[1] + a[2] * b[2]
+ #define		V_CROSS(a,b,c)	c[0]=a[1]*b[2] - a[2]*b[1];		c[1]=a[2]*b[0] - a[0]*b[2]; 	c[2]=a[0]*b[1] - a[1]*b[0];
+-#define		V_LEN(a)		sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2]);
++#define		V_LEN(a)		sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2])
+ #define		V_SCAL(a,s)		a[0]=s*a[0];	a[1]=s*a[1];	a[2]=s*a[2];
+ #define		V_NORM(a)		temp=V_LEN(a); V_SCAL(a,1/temp);
+ 
+@@ -193,7 +186,7 @@
+ 		case 1:s3d_push_material(way_obj,0.6,0.6,0.6,		1.0,1.0,1.0, 	1.0,1.0,1.0);	/* residential */
+ 		default:s3d_push_material(way_obj,0.6,0.2,0.6,		1.0,1.0,1.0,	1.0,0.5,1.0); /* default */
+ 	}
+-	street_width=0.5+waytype/10;
++	street_width=(0.5+waytype/10)/RESCALE;
+ 	/* put nodes of the graph into a list */
+ 	nodelist_n=0;
+ 	for (i=0;i&lt;waylist_n*2;i++) {
+@@ -206,7 +199,7 @@
+ 			nodelist_p[j].node_id=node_id;
+ 			snprintf(query,MAXQ,&quot;SELECT longitude, latitude, altitude FROM node WHERE %s AND node_id=%d;&quot;,filter, node_id);
+ 			db_exec(query, insert_node,(void *)(nodelist_p));
+-			calc_earth_to_eukl(nodelist_p[j].la,nodelist_p[j].lo,0+waytype/2,nodelist_p[j].x); /* elevate higher priority streets a little bit ... */
++			calc_earth_to_eukl(nodelist_p[j].la,nodelist_p[j].lo,0,nodelist_p[j].x); /* elevate higher priority streets a little bit ... */
+ 			len=sqrt(nodelist_p[j].x[0]*nodelist_p[j].x[0] + nodelist_p[j].x[1]*nodelist_p[j].x[1] + nodelist_p[j].x[2]*nodelist_p[j].x[2]);
+ 			nodelist_p[j].normal[0]=nodelist_p[j].x[0]/len;
+ 			nodelist_p[j].normal[1]=nodelist_p[j].x[1]/len;
+@@ -233,7 +226,7 @@
+ 				adjlist_n++;
+ 			}
+ 		}
+-			
++
+ 		if (adjlist_n&gt;1)	/* more than one adjacent, need to order and calculate intersections */
+ 		{
+ 			if (adjlist_n&gt;2) /* no ordering needed for 2 incoming segments */
+@@ -276,17 +269,22 @@
+ 				V_NORM(right);
+ 				V_CROSS(nodelist_p[i].normal, left ,an);	/* an is also normalized, as first and second argument are already length 1 */
+ 				V_ADD(left, right, n);						/* direction which our intersection is */
++
++				V_CROSS(nodelist_p[i].normal, n, s);
++				V_CROSS(s, nodelist_p[i].normal, n); /* get n on the plane which is spanned by the points normal */
++
+ 				n_len=V_LEN(n);
+ 
+-				if (n_len&lt;0.1)
++				V_COPY(s, nodelist_p[i].x);	/* s = P + (street_width/ ( n * an)) * n */
++				V_SCAL(n,1/n_len);	/* normalize n first! */
++				scale=V_DOT(n,an);	/* get cos (alpha/2), alpha is opposite angel of left and right segment */
++
++				if ((n_len&lt;0.1) || (fabs(scale)&lt;0.1))
+ 				{	/* too low, don't use, just have intersection 90 degree of it. */
+ 					V_SCAL(an, -street_width);		/* S = P + street_width * an */
+ 					V_ADD(nodelist_p[i].x, an, s);
+ 
+ 				} else {
+-					V_COPY(s, nodelist_p[i].x);	/* s = P + (street_width/ ( n * an)) * n */
+-					V_SCAL(n,1/n_len);	/* normalize n first! */
+-					scale=V_DOT(n,an);	/* get cos (alpha/2), alpha is opposite angel of left and right segment */
+ 					V_SCAL(n,-street_width/scale);
+ 					V_ADD(s, n, s);
+ 				}
+@@ -337,13 +335,21 @@
+ 		}
+ 	}
+ 	for (i=0;i&lt;waylist_n;i++) {
+-/*		printf(&quot;drawing way from points %d %d %d %d\n&quot;,waylist_p[i].node_from_l, waylist_p[i].node_to_l, waylist_p[i].node_to_r,waylist_p[i].node_from_r);*/
+-		s3d_push_polygon(way_obj, waylist_p[i].node_from_l, waylist_p[i].node_to_l, waylist_p[i].node_to_r, 0);
+-		s3d_push_polygon(way_obj, waylist_p[i].node_from_l, waylist_p[i].node_to_r, waylist_p[i].node_from_r, 0);
+-		
++		uint32_t	polys[8];
++		/* printf(&quot;drawing way from points %d %d %d %d\n&quot;,waylist_p[i].node_from_l, waylist_p[i].node_to_l, waylist_p[i].node_to_r,waylist_p[i].node_from_r);*/
++		polys[0]=waylist_p[i].node_from_l;
++		polys[1]=waylist_p[i].node_to_l;
++		polys[2]=waylist_p[i].node_to_r;
++		polys[3]=0;
++		polys[4]=waylist_p[i].node_from_l;
++		polys[5]=waylist_p[i].node_to_r;
++		polys[6]=waylist_p[i].node_from_r;
++		polys[7]=0;
++
++		s3d_push_polygons(way_obj, polys, 2);
+ 	}
+ 	s3d_link(way_obj,oidy);
+-	s3d_flags_on(way_obj,S3D_OF_VISIBLE);
++	s3d_flags_on(way_obj,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 	waylist_n=0;
+ }
+ void waylist_add(struct waylist *p)
+@@ -390,6 +396,13 @@
+ 		
+ 	return 0;
+ }
++void draw_translate_icon(int user_icon, float la, float lo)
++{
++	float x[3];
++	calc_earth_to_eukl(la,lo,1/RESCALE,x);
++	s3d_translate(user_icon,x[0],x[1],x[2]);
++	s3d_rotate(user_icon,(90-la),lo,0);
++}
+ 
+ void draw_ways(char *filter)
+ {
+@@ -399,18 +412,23 @@
+ 	waylist_draw(filter); /* last way */
+ 	printf(&quot;[done]\n&quot;);
+ }
+-void draw_translate_icon(int user_icon, float la, float lo)
+-{
+-	float x[3];
+-	calc_earth_to_eukl(la,lo,0,x);
+-	s3d_translate(user_icon,x[0],x[1],x[2]);
+-	s3d_rotate(user_icon,(90-la),lo,0);
+-}
+ void draw_osm()
+ {
++	printf(&quot;draw_osm()\n&quot;);
+ 	draw_ways(&quot;layer_id=(SELECT layer_id FROM layer WHERE name='osm')&quot;);
+ }
++void draw_kismet()
++{
++	char query[MAXQ];
++	char filter[]=&quot;layer_id=(SELECT layer_id FROM layer WHERE name='kismet')&quot;;
++	printf(&quot;[draw kismet]\n&quot;);
++	snprintf(query,MAXQ,&quot;SELECT * FROM node WHERE %s;&quot;,filter);
++	db_exec(query, draw_icon,filter);
++	waylist_draw(filter); /* last way */
++	printf(&quot;[done]\n&quot;);
++}
+ void draw_all_layers()
+ {
+ 	draw_osm();
++	draw_kismet();
+ }
+
+Modified: trunk/apps/s3dosm/gps.c
+===================================================================
+--- trunk/apps/s3dosm/gps.c	2006-12-10 15:19:13 UTC (rev 524)
++++ trunk/apps/s3dosm/gps.c	2006-12-10 15:19:16 UTC (rev 525)
+@@ -120,11 +120,12 @@
+ #endif
+ 	tlat=la;tlon=lo;
+ 	if (fix) {
++		printf(&quot;have a fix\n&quot;);
+ 		nav_center(la,lo);
+ 		if (!finitef(heading)) {
+ 			heading=get_heading(lat_old,lon_old,la,lo);
+-			if (!lastfix &amp;&amp; fix) 		{s3d_scale(user_icon,1.0);}
+-			if (lastfix &amp;&amp; !fix)		{s3d_scale(user_icon,0.3);lat=tlat;lon=tlon;}
++			if (!lastfix &amp;&amp; fix) 		{s3d_scale(user_icon,1.0/RESCALE);}
++			if (lastfix &amp;&amp; !fix)		{s3d_scale(user_icon,0.3/RESCALE);lat=tlat;lon=tlon;}
+ 			if (finitef(heading))		s3d_rotate(user_icon,0,heading,0);
+ 		}
+ 		if (finitef(speed)) {
+@@ -169,6 +170,7 @@
+ 	s3d_link(user_icon,user_icon_rotator);
+ 	s3d_link(user_icon_rotator,oidy); 
+ 	s3d_flags_on(user_icon,S3D_OF_VISIBLE);
++	s3d_scale(user_icon,1.0/RESCALE);
+ 	tlat=lat=lat_old=0.0;
+ 	tlon=lon=lon_old=0.0;
+ 	gps_active=1;
+
+Modified: trunk/apps/s3dosm/kismet.c
+===================================================================
+--- trunk/apps/s3dosm/kismet.c	2006-12-10 15:19:13 UTC (rev 524)
++++ trunk/apps/s3dosm/kismet.c	2006-12-10 15:19:16 UTC (rev 525)
+@@ -22,55 +22,58 @@
+  */
+ 
+ #include &quot;s3dosm.h&quot;
++#include &lt;math.h&gt;			/* fabs() */
+ #include &lt;string.h&gt;			/* strcmp() */
+ #include &lt;stdlib.h&gt;			/* strtof(),strtod(),strtol() */
+ #include &lt;libxml/parser.h&gt;
+ #include &lt;libxml/tree.h&gt;
+ static int layerid;
+-object_t *parse_kismet_node(xmlNodePtr cur)
++void parse_kismet_node(xmlNodePtr cur)
+ {
+-	node_t *node;
++	node_t node;
+ 	xmlAttrPtr attr;
+ 	xmlNodePtr kids,gpskids;
+ 
+-	node=node_new();
++	node_init(&amp;node);
+ 	attr=cur-&gt;properties;
+ 
+-	node-&gt;base.layerid=layerid;
+-	node-&gt;base.id=0;				/* let database decide */
+-	for (attr=cur-&gt;properties;attr;attr=attr-&gt;next)
+-	{
+-/*		if (0==strcmp((char *)attr-&gt;name,&quot;number&quot;)) 		node-&gt;base.id=		strtol((char *)attr-&gt;children-&gt;content,NULL,10);
+-		else */if (0==strcmp((char *)attr-&gt;name,&quot;wep&quot;)) 		tag_add(OBJECT_T(node),&quot;wifi_wep&quot;,(char *)attr-&gt;children-&gt;content);
+-		else if (0==strcmp((char *)attr-&gt;name,&quot;type&quot;)) 		tag_add(OBJECT_T(node),&quot;wifi_type&quot;,(char *)attr-&gt;children-&gt;content);
+-	}
++	node.base.layerid=layerid;
++	node.base.id=0;				/* let database decide */
++	node.visible=2;	/* something special */
+ 	for (kids=cur-&gt;children;kids;kids=kids-&gt;next)
+ 	{
+-		if (0==strcmp((char *)kids-&gt;name,&quot;SSID&quot;)) 			tag_add(OBJECT_T(node),&quot;wifi_SSID&quot;,(char *)xmlNodeGetContent(kids-&gt;children));
+-		if (0==strcmp((char *)kids-&gt;name,&quot;BSSID&quot;)) 			tag_add(OBJECT_T(node),&quot;wifi_BSSID&quot;,(char *)xmlNodeGetContent(kids-&gt;children));
+ 		if (0==strcmp((char *)kids-&gt;name,&quot;gps-info&quot;))
+ 		{
+ 			for (gpskids=kids-&gt;children;gpskids;gpskids=gpskids-&gt;next)
+ 			{
+ 				/* get median value */
+-				if (0==strcmp((char *)gpskids-&gt;name,&quot;min-lat&quot;)) 		node-&gt;lat=node-&gt;lat + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
+-				if (0==strcmp((char *)gpskids-&gt;name,&quot;max-lat&quot;)) 		node-&gt;lat=node-&gt;lat + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
+-				if (0==strcmp((char *)gpskids-&gt;name,&quot;min-lon&quot;)) 		node-&gt;lon=node-&gt;lon + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
+-				if (0==strcmp((char *)gpskids-&gt;name,&quot;max-lon&quot;)) 		node-&gt;lon=node-&gt;lon + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
+-				if (0==strcmp((char *)gpskids-&gt;name,&quot;min-alt&quot;)) 		node-&gt;alt=node-&gt;alt + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
+-				if (0==strcmp((char *)gpskids-&gt;name,&quot;max-alt&quot;)) 		node-&gt;alt=node-&gt;alt + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
++				if (0==strcmp((char *)gpskids-&gt;name,&quot;min-lat&quot;)) 		node.lat=node.lat + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
++				if (0==strcmp((char *)gpskids-&gt;name,&quot;max-lat&quot;)) 		node.lat=node.lat + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
++				if (0==strcmp((char *)gpskids-&gt;name,&quot;min-lon&quot;)) 		node.lon=node.lon + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
++				if (0==strcmp((char *)gpskids-&gt;name,&quot;max-lon&quot;)) 		node.lon=node.lon + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
++				if (0==strcmp((char *)gpskids-&gt;name,&quot;min-alt&quot;)) 		node.alt=node.alt + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
++				if (0==strcmp((char *)gpskids-&gt;name,&quot;max-alt&quot;)) 		node.alt=node.alt + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
+ 			}
+ 		}
+ 	}
+-	node-&gt;visible=2;	/* something special */
+-	tag_add(OBJECT_T(node), &quot;amenity&quot;, &quot;wifi&quot;);
++	if ((fabs(node.lon)&gt;0.01) || (fabs(node.lat)&gt;0.01)) /* really, i don't want to discriminate anyone at 0 lat 0 lon running a wifi hotspot, even
++																	if it's in the middle of the ocean. i'm very sorry. */
++	{
+ 
+-	if (node-&gt;base.id&gt;0 &amp;&amp; (node-&gt;lon!=0.0) &amp;&amp; (node-&gt;lat!=0.0)) /* really, i don't want to discriminate anyone at 0 lat 0 lon running a wifi hotspot, even
+-																	if it's in the middle of the ocean. i'm very sorry. */
+-		return(OBJECT_T(node));
+-	else {
+-		node_free(node);
+-		return(NULL);
++		db_insert_node(&amp;node);
++		for (kids=cur-&gt;children;kids;kids=kids-&gt;next)
++		{
++			if (0==strcmp((char *)kids-&gt;name,&quot;SSID&quot;)) 			db_add_tag(OBJECT_T(&amp;node),&quot;wifi_SSID&quot;,(char *)xmlNodeGetContent(kids-&gt;children));
++			if (0==strcmp((char *)kids-&gt;name,&quot;BSSID&quot;)) 			db_add_tag(OBJECT_T(&amp;node),&quot;wifi_BSSID&quot;,(char *)xmlNodeGetContent(kids-&gt;children));
++		}
++		for (attr=cur-&gt;properties;attr;attr=attr-&gt;next)
++		{
++	/*		if (0==strcmp((char *)attr-&gt;name,&quot;number&quot;)) 		node-&gt;base.id=		strtol((char *)attr-&gt;children-&gt;content,NULL,10);
++			else */if (0==strcmp((char *)attr-&gt;name,&quot;wep&quot;)) 	db_add_tag(OBJECT_T(&amp;node),&quot;wifi_wep&quot;,(char *)attr-&gt;children-&gt;content);
++			else if (0==strcmp((char *)attr-&gt;name,&quot;type&quot;)) 		db_add_tag(OBJECT_T(&amp;node),&quot;wifi_type&quot;,(char *)attr-&gt;children-&gt;content);
++		}
++
++		db_add_tag(OBJECT_T(&amp;node), &quot;amenity&quot;, &quot;wifi&quot;);
+ 	}
+ }
+ 
+@@ -80,7 +83,6 @@
+ 	xmlDocPtr doc;
+ 	xmlNodePtr cur;
+ 	layer_t *layer=layer_new();
+-	object_t *obj;
+ 	
+ 
+ 	doc = xmlReadMemory(buf, length, &quot;noname.xml&quot;, NULL, 0);
+@@ -102,9 +104,7 @@
+ 		{
+ 			if (0==strcmp((char *)cur-&gt;name,&quot;wireless-network&quot;))
+ 			{
+-				if (NULL!=(obj=parse_kismet_node(cur)))
+-					db_insert_object(obj);
+-				else fprintf(stderr,&quot;bad node\n&quot;); 
++				parse_kismet_node(cur);
+ 			} 
+ 		}
+ 	}
+
+Modified: trunk/apps/s3dosm/nav.c
+===================================================================
+--- trunk/apps/s3dosm/nav.c	2006-12-10 15:19:13 UTC (rev 524)
++++ trunk/apps/s3dosm/nav.c	2006-12-10 15:19:16 UTC (rev 525)
+@@ -7,7 +7,8 @@
+ 
+ icon_t icons[ICON_NUM]={
+ 		{&quot;objs/accesspoint.3ds&quot;,0},
+-		{&quot;objs/star.3ds&quot;,0},
++		{&quot;objs/noinetwep.3ds&quot;,0},
++		{&quot;objs/noinetwpa.3ds&quot;,0},
+ 		{&quot;objs/arrow2.3ds&quot;,0}
+ 	};
+ int oidx, oidy;
+@@ -18,6 +19,7 @@
+ 	int i;
+ 	for (i=0;i&lt;ICON_NUM;i++)
+ 	{
++		printf(&quot;loading %s\n&quot;,icons[i].path);
+ 		icons[i].oid=s3d_import_model_file(icons[i].path);
+ 	}
+ }
+
+Modified: trunk/apps/s3dosm/object.c
+===================================================================
+--- trunk/apps/s3dosm/object.c	2006-12-10 15:19:13 UTC (rev 524)
++++ trunk/apps/s3dosm/object.c	2006-12-10 15:19:16 UTC (rev 525)
+@@ -40,6 +40,7 @@
+ 	nobj-&gt;id=0;
+ 	nobj-&gt;oid=-1;
+ 	nobj-&gt;layerid=-1;
++	nobj-&gt;tagid=-1;
+ 	nobj-&gt;tag_n=0;
+ 	nobj-&gt;tag_p=NULL;
+ 	nobj-&gt;type=T_OBJECT;
+
+Modified: trunk/apps/s3dosm/osm.c
+===================================================================
+--- trunk/apps/s3dosm/osm.c	2006-12-10 15:19:13 UTC (rev 524)
++++ trunk/apps/s3dosm/osm.c	2006-12-10 15:19:16 UTC (rev 525)
+@@ -30,14 +30,10 @@
+ static int layerid;
+ int parse_osm_tags(object_t *obj, xmlNodePtr cur)
+ {
+-	
+ 	xmlNodePtr c;
+ 	xmlAttrPtr attr;
+ 	char *v,*k;
+-	tag_t *t;
+-	int n;
+ 	v=k=NULL;
+-	n=0;
+ 	for (c=cur-&gt;children;c!=NULL; c=c-&gt;next)
+ 	{
+ 		if (0==strcmp((char *)c-&gt;name,&quot;tag&quot;))	{
+@@ -46,158 +42,79 @@
+ 				if (0==strcmp((char *)attr-&gt;name,&quot;k&quot;)) 				k=(char *)attr-&gt;children-&gt;content;
+ 				else if (0==strcmp((char *)attr-&gt;name,&quot;v&quot;)) 		v=(char *)attr-&gt;children-&gt;content;
+ 			}
+-			if (k==NULL || v==NULL)			printf(&quot;bad tag!!\n&quot;);
+-			else 							n++;
+-		}
+-	}
+-	obj-&gt;tag_n=n;
+-	obj-&gt;tag_p=malloc(obj-&gt;tag_n*sizeof(tag_t));
+-	n=0;
+-	for (c=cur-&gt;children;c!=NULL; c=c-&gt;next)
+-	{
+-		if (0==strcmp((char *)c-&gt;name,&quot;tag&quot;))	{
+-			for (attr=c-&gt;properties;attr;attr=attr-&gt;next)
+-			{
+-				if (0==strcmp((char *)attr-&gt;name,&quot;k&quot;)) 				k=(char *)attr-&gt;children-&gt;content;
+-				else if (0==strcmp((char *)attr-&gt;name,&quot;v&quot;)) 		v=(char *)attr-&gt;children-&gt;content;
+-			}
+ 			if (k!=NULL &amp;&amp; v!=NULL)
+-			{
+-				t=&amp;(obj-&gt;tag_p[n]);
+-				t-&gt;ttype=TAG_UNKNOWN;
+-				t-&gt;k=strdup(k);
+-				t-&gt;v=strdup(v);
+-				t-&gt;d.s=v;
+-				if 		(0==strcmp(k,&quot;name&quot;))	t-&gt;ttype=TAG_NAME;
+-
+-				n++;
+-			}
++				db_add_tag(obj, k, v);
+ 		}
+ 	}
+-
+-
+-	
+ 	return(0);
+ 
+ }
+-object_t *parse_osm_way(xmlNodePtr cur)
++void parse_osm_way(xmlNodePtr cur)
+ {
+-	way_t *way;
++	way_t way;
+ 	xmlNodePtr kids;
+ 	xmlAttrPtr attr,kattr;
+-	int n=0;
++	int seg;
+ 
+-	way=way_new();
++	way_init(&amp;way);
+ 	
+-	way-&gt;base.layerid=layerid;
++	way.base.layerid=layerid;
+ 	for (attr=cur-&gt;properties;attr;attr=attr-&gt;next)
+-		if (0==strcmp((char *)attr-&gt;name,&quot;id&quot;)) 			way-&gt;base.id=	strtol((char *)attr-&gt;children-&gt;content,NULL,10);
+-	/* count segments */
++		if (0==strcmp((char *)attr-&gt;name,&quot;id&quot;)) 			way.base.id=	strtol((char *)attr-&gt;children-&gt;content,NULL,10);
++	db_insert_way_only(&amp;way);
++	parse_osm_tags(OBJECT_T(&amp;way),cur);
+ 	for (kids=cur-&gt;children;kids!=NULL;kids=kids-&gt;next)
+ 	{
+-		if (0==strcmp((char *)kids-&gt;name,&quot;seg&quot;))			n++;
+-	}
+-	/* add segments in segment buffer */
+-	if (n&gt;0)
+-	{
+-		way-&gt;seg_n=n;
+-		way-&gt;seg_p=malloc(sizeof(ID_T)*n);
+-		n=0;
+-		for (kids=cur-&gt;children;kids!=NULL;kids=kids-&gt;next)
+-		{
+-			if (0==strcmp((char *)kids-&gt;name,&quot;seg&quot;))	{
+-				for (kattr=kids-&gt;properties;kattr;kattr=kattr-&gt;next)
+-					if (0==strcmp((char *)kattr-&gt;name,&quot;id&quot;)) 			way-&gt;seg_p[n]=	strtol((char *)kattr-&gt;children-&gt;content,NULL,10);
+-				n++;
+-			}
++		if (0==strcmp((char *)kids-&gt;name,&quot;seg&quot;))	{
++			seg=-1;
++			for (kattr=kids-&gt;properties;kattr;kattr=kattr-&gt;next)
++				if (0==strcmp((char *)kattr-&gt;name,&quot;id&quot;)) 			seg=	strtol((char *)kattr-&gt;children-&gt;content,NULL,10);
++			db_insert_way_seg(&amp;way,seg);
+ 		}
+ 	}
+-
+-	parse_osm_tags(OBJECT_T(way),cur);
+-	if (way-&gt;base.id&gt;0)
+-		return(OBJECT_T(way));
+-	else {
+-		way_free(way);
+-		return(NULL);
+-	}
+ }
+-object_t *parse_osm_segment(xmlNodePtr cur)
++void parse_osm_segment(xmlNodePtr cur)
+ {
+-	segment_t *segment;
++	segment_t segment;
+ 	xmlAttrPtr attr;
+ 
+-	segment=segment_new();
++	segment_init(&amp;segment);
+ 	
+-	segment-&gt;base.layerid=layerid;
++	segment.base.layerid=layerid;
+ 	for (attr=cur-&gt;properties;attr;attr=attr-&gt;next)
+ 	{
+ 		
+-		if (0==strcmp((char *)attr-&gt;name,&quot;id&quot;)) 			segment-&gt;base.id=	strtol((char *)attr-&gt;children-&gt;content,NULL,10);
+-		else if (0==strcmp((char *)attr-&gt;name,&quot;from&quot;)) 		segment-&gt;from=		strtod((char *)attr-&gt;children-&gt;content,NULL);
+-		else if (0==strcmp((char *)attr-&gt;name,&quot;to&quot;)) 		segment-&gt;to=		strtod((char *)attr-&gt;children-&gt;content,NULL);
++		if (0==strcmp((char *)attr-&gt;name,&quot;id&quot;)) 			segment.base.id=	strtol((char *)attr-&gt;children-&gt;content,NULL,10);
++		else if (0==strcmp((char *)attr-&gt;name,&quot;from&quot;)) 		segment.from=		strtod((char *)attr-&gt;children-&gt;content,NULL);
++		else if (0==strcmp((char *)attr-&gt;name,&quot;to&quot;)) 		segment.to=			strtod((char *)attr-&gt;children-&gt;content,NULL);
+ 	}
+-	parse_osm_tags(OBJECT_T(segment),cur);
+-	if ((segment-&gt;base.id&gt;0) &amp;&amp; (segment-&gt;from&gt;0) &amp;&amp; (segment-&gt;to&gt;0))
+-		return(OBJECT_T(segment));
+-	else {
+-		segment_free(segment);
+-		return(NULL);
++	if ((segment.base.id&gt;0) &amp;&amp; (segment.from&gt;0) &amp;&amp; (segment.to&gt;0)) {
++		db_insert_segment(&amp;segment);
++		parse_osm_tags(OBJECT_T(&amp;segment),cur);
+ 	}
+ }
+-object_t *parse_osm_node(xmlNodePtr cur)
++void parse_osm_node(xmlNodePtr cur)
+ {
+-	node_t *node;
++	node_t node;
+ 	xmlAttrPtr attr;
+ 
+-	node=node_new();
++	node_init(&amp;node);
+ 	attr=cur-&gt;properties;
+ 	
+-	node-&gt;base.layerid=layerid;
++	node.base.layerid=layerid;
+ 	for (attr=cur-&gt;properties;attr;attr=attr-&gt;next)
+ 	{
+-		if (0==strcmp((char *)attr-&gt;name,&quot;id&quot;)) 			node-&gt;base.id=		strtol((char *)attr-&gt;children-&gt;content,NULL,10);
+-		else if (0==strcmp((char *)attr-&gt;name,&quot;lat&quot;)) 		node-&gt;lat=			strtod((char *)attr-&gt;children-&gt;content,NULL);
+-		else if (0==strcmp((char *)attr-&gt;name,&quot;lon&quot;)) 		node-&gt;lon=			strtod((char *)attr-&gt;children-&gt;content,NULL);
+-		else if (0==strcmp((char *)attr-&gt;name,&quot;visible&quot;)) 	node-&gt;visible=		(0==strcmp((char *)attr-&gt;children-&gt;content,&quot;true&quot;))?1:0;
++		if (0==strcmp((char *)attr-&gt;name,&quot;id&quot;)) 			node.base.id=		strtol((char *)attr-&gt;children-&gt;content,NULL,10);
++		else if (0==strcmp((char *)attr-&gt;name,&quot;lat&quot;)) 		node.lat=			strtod((char *)attr-&gt;children-&gt;content,NULL);
++		else if (0==strcmp((char *)attr-&gt;name,&quot;lon&quot;)) 		node.lon=			strtod((char *)attr-&gt;children-&gt;content,NULL);
++		else if (0==strcmp((char *)attr-&gt;name,&quot;visible&quot;)) 	node.visible=		(0==strcmp((char *)attr-&gt;children-&gt;content,&quot;true&quot;))?1:0;
+ 		else if (0==strcmp((char *)attr-&gt;name,&quot;time&quot;)) {}	/* TODO */
+ 	}
+-	parse_osm_tags(OBJECT_T(node),cur);
+-	if (node-&gt;base.id&gt;0)
+-		return(OBJECT_T(node));
+-	else {
+-		node_free(node);
+-		return(NULL);
++	if (node.base.id&gt;0) {
++		db_insert_node(&amp;node);
++		parse_osm_tags(OBJECT_T(&amp;node),cur);
+ 	}
+ }
+-
+-void debug_obj(object_t *obj, void *dummy)
+-{
+-	int i;
+-	way_t *way=WAY_T(obj);
+-	node_t *node=NODE_T(obj);
+-	segment_t *seg=SEGMENT_T(obj);
+-	switch (obj-&gt;type)
+-	{
+-		case T_OBJECT:
+-				printf(&quot;object %d\n&quot;,(int)obj-&gt;id);
+-				break;
+-		case T_NODE:
+-				 printf(&quot;node %d [%f,%f,%f]\n&quot;,(int)obj-&gt;id,node-&gt;lon,node-&gt;lat,node-&gt;alt);
+-				 break;
+-		case T_SEGMENT:
+-				 printf(&quot;segment %d [%d-&gt;%d]\n&quot;,(int)obj-&gt;id,(int)seg-&gt;from,(int)seg-&gt;to);
+-				 break;
+-		case T_WAY:
+-				 printf(&quot;way %d [ &quot;,(int)obj-&gt;id);
+-				 for (i=0;i&lt;way-&gt;seg_n;i++)
+-					printf(&quot;%d &quot;,(int)way-&gt;seg_p[i]);
+-				 printf(&quot;]\n&quot;);
+-				 break;
+-				 
+-	}
+-	for (i=0;i&lt;obj-&gt;tag_n;i++)
+-		printf(&quot;tag %d: %s -&gt; %s\n&quot;,i,obj-&gt;tag_p[i].k,obj-&gt;tag_p[i].v);
+-}
+ /* parse the osm input file */
+ layer_t *parse_osm(char *buf, int length)
+ {
+@@ -226,13 +143,9 @@
+ 		if (cur-&gt;type==XML_ELEMENT_NODE)
+ 		{
+ 			obj=NULL;
+-			if (0==strcmp((char *)cur-&gt;name,&quot;node&quot;))				obj=parse_osm_node(cur);
+-			else if (0==strcmp((char *)cur-&gt;name,&quot;segment&quot;))		obj=parse_osm_segment(cur);
+-			else if (0==strcmp((char *)cur-&gt;name,&quot;way&quot;))			obj=parse_osm_way(cur);
+-			if (obj!=NULL)
+-				db_insert_object(obj);
+-			else
+-				fprintf(stderr,&quot;bad object\n&quot;);
++			if (0==strcmp((char *)cur-&gt;name,&quot;node&quot;))				parse_osm_node(cur);
++			else if (0==strcmp((char *)cur-&gt;name,&quot;segment&quot;))		parse_osm_segment(cur);
++			else if (0==strcmp((char *)cur-&gt;name,&quot;way&quot;))			parse_osm_way(cur);
+ 			if ((i++)%100==0) {printf(&quot;.&quot;);fflush(stdout);}
+ 		}
+ 	}
+
+Modified: trunk/apps/s3dosm/s3dosm.h
+===================================================================
+--- trunk/apps/s3dosm/s3dosm.h	2006-12-10 15:19:13 UTC (rev 524)
++++ trunk/apps/s3dosm/s3dosm.h	2006-12-10 15:19:16 UTC (rev 525)
+@@ -1,7 +1,7 @@
+ #include &lt;sqlite3.h&gt;
+ #include &quot;../../config.h&quot;
+ #define	ESIZE	637800		/* earth size */
+-#define	RESCALE	0.5
++#define	RESCALE	1
+ #define VIEWHEIGHT 3
+ #define MAXQ	4096	
+ #define QBUF	1024*128
+@@ -46,8 +46,9 @@
+ 	T_WAY
+ };
+ enum {
+-	ICON_AP,
+ 	ICON_AP_OPEN,
++	ICON_AP_WEP,
++	ICON_AP_WPA,
+ 	ICON_ARROW,
+ 	ICON_NUM
+ };
+@@ -72,6 +73,7 @@
+ struct _object_t {
+ 	ID_T 		 id;		/* id of this object */
+ 	ID_T		 layerid;
++	ID_T		 tagid;
+ 	int 		 oid;		/* s3d oid */
+ 	int 		 type;		/* type of this object */
+ 	/* avl stuff */
+@@ -152,9 +154,12 @@
+ int process_args(int argc, char **argv);
+ /* db.c */
+ int db_exec(const char *query, sqlite3_callback callback, void *arg);
++int db_add_tag(object_t *obj, char *key, char *val);
++int db_gettag(int tagid, char *field, char *target);
+ int db_insert_node(node_t *node);
+ int db_insert_segment(segment_t *seg);
+-int db_insert_way(way_t *way);
++int db_insert_way_only(way_t *way);
++int db_insert_way_seg(way_t *way, int seg_n);
+ int db_insert_object(object_t *obj);
+ int db_init(char *dbFile);
+ int db_quit();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000517.html">[S3d-svn] r524 - in trunk: . libs3d
+</A></li>
+	<LI>Next message: <A HREF="000519.html">[S3d-svn] r526 - in trunk: . apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#518">[ date ]</a>
+              <a href="thread.html#518">[ thread ]</a>
+              <a href="subject.html#518">[ subject ]</a>
+              <a href="author.html#518">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

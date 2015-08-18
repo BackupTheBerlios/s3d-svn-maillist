@@ -1,0 +1,417 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r554 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r554%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200612241054.kBOAsFtW005934%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000546.html">
+   <LINK REL="Next"  HREF="000548.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r554 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r554%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200612241054.kBOAsFtW005934%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r554 - in trunk: . server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Dec 24 11:54:15 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000546.html">[S3d-svn] r553 - in trunk: . apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000548.html">[S3d-svn] r555 - trunk/extras/distro/gentoo/media-libs/libg3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#547">[ date ]</a>
+              <a href="thread.html#547">[ thread ]</a>
+              <a href="subject.html#547">[ subject ]</a>
+              <a href="author.html#547">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-12-24 11:54:15 +0100 (Sun, 24 Dec 2006)
+New Revision: 554
+
+Added:
+   trunk/server/allocate.c
+Modified:
+   trunk/
+   trunk/server/Makefile.am
+   trunk/server/global.h
+   trunk/server/object.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1337 at kero</A>:  dotslash | 2006-12-24 11:54:09 +0100
+ - add allocate.c to find heap corruptions (thanks marek)
+ - don't use GL_COMPILE_AND_EXECUTE, first GL_COMPILE, then glCallList()
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1333
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1337
+
+Modified: trunk/server/Makefile.am
+===================================================================
+--- trunk/server/Makefile.am	2006-12-23 23:52:30 UTC (rev 553)
++++ trunk/server/Makefile.am	2006-12-24 10:54:15 UTC (rev 554)
+@@ -16,7 +16,8 @@
+ 	$(MAYBE_GLUT) $(MAYBE_SDL) \
+ 	main.c matrix.c mcp.c navigation.c \
+ 	network.c object.c process.c proto.c \
+-	shm.c shm_ringbuf.c tcp.c user.c
++	shm.c shm_ringbuf.c tcp.c user.c \
++	allocate.c
+ 
+ s3d_LDADD=	@LIBM@ @GL_LIBS@ ${MAYBE_SDL_LIBS} ${MAYBE_GLUT_LIBS}
+ s3d_CFLAGS=	@GL_CFLAGS@ ${MAYBE_SDL_CFLAGS} ${MAYBE_GLUT_CFLAGS} ${DEVEL_CFLAGS} 
+
+Added: trunk/server/allocate.c
+===================================================================
+--- trunk/server/allocate.c	2006-12-23 23:52:30 UTC (rev 553)
++++ trunk/server/allocate.c	2006-12-24 10:54:15 UTC (rev 554)
+@@ -0,0 +1,262 @@
++/*
++ * allocate.c
++ *
++ * Copyright (C) 2006 	Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
++ * 						Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * 						(probably more people from the batman project)
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++/* this file is taken from the batman project (www.open-mesh.net/batman)
++ * to find heap corruptions... */
++
++
++#include &lt;stdio.h&gt;
++#include &lt;stdlib.h&gt;
++#include &lt;string.h&gt;
++
++#include &quot;allocate.h&quot;
++
++#define DEBUG_MALLOC
++
++#define MAGIC_NUMBER 0x12345678
++
++#if defined DEBUG_MALLOC
++
++struct chunkHeader *chunkList = NULL;
++
++struct chunkHeader
++{
++	struct chunkHeader *next;
++	unsigned int length;
++	int tag;
++	unsigned int magicNumber;
++};
++
++struct chunkTrailer
++{
++	unsigned int magicNumber;
++};
++
++void checkIntegrity(void)
++{
++	struct chunkHeader *walker;
++	struct chunkTrailer *chunkTrailer;
++	unsigned char *memory;
++
++	for (walker = chunkList; walker != NULL; walker = walker-&gt;next)
++	{
++		if (walker-&gt;magicNumber != MAGIC_NUMBER)
++		{
++			fprintf(stderr, &quot;Invalid magic number in header: %08x, tag = %d\n&quot;, walker-&gt;magicNumber, walker-&gt;tag);
++			exit(1);
++		}
++
++		memory = (unsigned char *)walker;
++
++		chunkTrailer = (struct chunkTrailer *)(memory + sizeof(struct chunkHeader) + walker-&gt;length);
++
++		if (chunkTrailer-&gt;magicNumber != MAGIC_NUMBER)
++		{
++			fprintf(stderr, &quot;Invalid magic number in header: %08x, tag = %d\n&quot;, chunkTrailer-&gt;magicNumber, walker-&gt;tag);
++			exit(1);
++		}
++	}
++}
++
++void checkLeak(void)
++{
++	struct chunkHeader *walker;
++
++	for (walker = chunkList; walker != NULL; walker = walker-&gt;next)
++		fprintf(stderr, &quot;Memory leak detected, tag = %d\n&quot;, walker-&gt;tag);
++}
++
++void *debugMalloc(unsigned int length, int tag)
++{
++	unsigned char *memory;
++	struct chunkHeader *chunkHeader;
++	struct chunkTrailer *chunkTrailer;
++	unsigned char *chunk;
++
++// 	printf(&quot;sizeof(struct chunkHeader) = %u, sizeof (struct chunkTrailer) = %u\n&quot;, sizeof (struct chunkHeader), sizeof (struct chunkTrailer));
++
++	memory = malloc(length + sizeof(struct chunkHeader) + sizeof(struct chunkTrailer));
++
++	if (memory == NULL)
++	{
++		fprintf(stderr, &quot;Cannot allocate %u bytes, tag = %d\n&quot;, (unsigned int)(length + sizeof(struct chunkHeader) + sizeof(struct chunkTrailer)), tag);
++		exit(1);
++	}
++
++	chunkHeader = (struct chunkHeader *)memory;
++	chunk = memory + sizeof(struct chunkHeader);
++	chunkTrailer = (struct chunkTrailer *)(memory + sizeof(struct chunkHeader) + length);
++
++	chunkHeader-&gt;length = length;
++	chunkHeader-&gt;tag = tag;
++	chunkHeader-&gt;magicNumber = MAGIC_NUMBER;
++
++	chunkTrailer-&gt;magicNumber = MAGIC_NUMBER;
++
++	chunkHeader-&gt;next = chunkList;
++	chunkList = chunkHeader;
++
++	return chunk;
++}
++
++void *debugRealloc(void *memoryParameter, unsigned int length, int tag)
++{
++	unsigned char *memory;
++	struct chunkHeader *chunkHeader;
++	struct chunkTrailer *chunkTrailer;
++	unsigned char *result;
++	unsigned int copyLength;
++
++	if (memoryParameter) { /* if memoryParameter==NULL, realloc() should work like malloc() !! */
++		memory = memoryParameter;
++		chunkHeader = (struct chunkHeader *)(memory - sizeof(struct chunkHeader));
++	
++		if (chunkHeader-&gt;magicNumber != MAGIC_NUMBER)
++		{
++			fprintf(stderr, &quot;Invalid magic number in header: %08x, tag = %d\n&quot;, chunkHeader-&gt;magicNumber, chunkHeader-&gt;tag);
++			exit(1);
++		}
++	
++		chunkTrailer = (struct chunkTrailer *)(memory + chunkHeader-&gt;length);
++	
++		if (chunkTrailer-&gt;magicNumber != MAGIC_NUMBER)
++		{
++			fprintf(stderr, &quot;Invalid magic number in header: %08x, tag = %d\n&quot;, chunkTrailer-&gt;magicNumber, chunkHeader-&gt;tag);
++			exit(1);
++		}
++	}
++	
++
++	result = debugMalloc(length, tag);
++	if (memoryParameter) {
++		copyLength = length;
++
++		if (copyLength &gt; chunkHeader-&gt;length)
++			copyLength = chunkHeader-&gt;length;
++	
++		memcpy(result, memoryParameter, copyLength);
++		debugFree(memoryParameter);
++	}
++
++
++	return result;
++}
++
++void debugFree(void *memoryParameter)
++{
++	unsigned char *memory;
++	struct chunkHeader *chunkHeader;
++	struct chunkTrailer *chunkTrailer;
++	struct chunkHeader *walker;
++	struct chunkHeader *previous;
++
++	memory = memoryParameter;
++	chunkHeader = (struct chunkHeader *)(memory - sizeof(struct chunkHeader));
++
++	if (chunkHeader-&gt;magicNumber != MAGIC_NUMBER)
++	{
++		fprintf(stderr, &quot;Invalid magic number in header: %08x, tag = %d\n&quot;, chunkHeader-&gt;magicNumber, chunkHeader-&gt;tag);
++		exit(1);
++	}
++
++	previous = NULL;
++
++	for (walker = chunkList; walker != NULL; walker = walker-&gt;next)
++	{
++		if (walker == chunkHeader)
++			break;
++
++		previous = walker;
++	}
++
++	if (walker == NULL)
++	{
++		fprintf(stderr, &quot;Double free detected, tag = %d\n&quot;, chunkHeader-&gt;tag);
++		exit(1);
++	}
++
++	if (previous == NULL)
++		chunkList = walker-&gt;next;
++
++	else
++		previous-&gt;next = walker-&gt;next;
++
++	chunkTrailer = (struct chunkTrailer *)(memory + chunkHeader-&gt;length);
++
++	if (chunkTrailer-&gt;magicNumber != MAGIC_NUMBER)
++	{
++		fprintf(stderr, &quot;Invalid magic number in header: %08x, tag = %d\n&quot;, chunkTrailer-&gt;magicNumber, chunkHeader-&gt;tag);
++		exit(1);
++	}
++
++	free(chunkHeader);
++}
++
++#else
++
++void checkIntegrity(void)
++{
++}
++
++void checkLeak(void)
++{
++}
++
++void *debugMalloc(unsigned int length, int tag)
++{
++	void *result;
++
++	result = malloc(length);
++
++	if (result == NULL)
++	{
++		fprintf(stderr, &quot;Cannot allocate %u bytes, tag = %d\n&quot;, length, tag);
++		exit(1);
++	}
++
++	return result;
++}
++
++void *debugRealloc(void *memory, unsigned int length, int tag)
++{
++	void *result;
++
++	result = realloc(memory, length);
++
++	if (result == NULL)
++	{
++		fprintf(stderr, &quot;Cannot re-allocate %u bytes, tag = %d\n&quot;, length, tag);
++		exit(1);
++	}
++
++	return result;
++}
++
++void debugFree(void *memory)
++{
++	free(memory);
++}
++
++#endif
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2006-12-23 23:52:30 UTC (rev 553)
++++ trunk/server/global.h	2006-12-24 10:54:15 UTC (rev 554)
+@@ -373,3 +373,16 @@
+ /* cull.c */
+ void cull_get_planes(void);
+ int  cull_sphere_in_frustum(struct t_vertex *center, float radius);
++
++/* allocate.c */
++#if DEBUG &lt;= VLOW
++#include &lt;stdlib.h&gt;
++void checkIntegrity(void);
++void checkLeak(void);
++void *debugMalloc(unsigned int length, int tag);
++void *debugRealloc(void *memory, unsigned int length, int tag);
++void debugFree(void *memoryParameter);
++#define malloc(x)		debugMalloc(x,42)
++#define free(x)			debugFree(x);
++#define realloc(x,y)	debugRealloc(x,y,42)
++#endif
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2006-12-23 23:52:30 UTC (rev 553)
++++ trunk/server/object.c	2006-12-24 10:54:15 UTC (rev 554)
+@@ -1689,10 +1689,9 @@
+ /*	into_position(p,obj,0);*/
+ 	if (obj-&gt;oflags&amp;OF_SYSTEM)		return(-1); 					/* can't render system objects */
+ 	if (obj-&gt;oflags&amp;OF_CLONE)		obj=p-&gt;object[obj-&gt;n_vertex]; 	/* it's a clone - draw the clone! */
+-	if (obj-&gt;dplist)				glCallList(obj-&gt;dplist);		/* we have done that before, call the GLList */
+-	else {
++	if (!obj-&gt;dplist) {
+ 		obj-&gt;dplist=glGenLists(1);
+-		if (obj-&gt;dplist)	glNewList(obj-&gt;dplist,GL_COMPILE_AND_EXECUTE);
++		if (obj-&gt;dplist)	glNewList(obj-&gt;dplist,GL_COMPILE); /* only compile and calling later should save time. maybe. */
+ 		 else 				s3dprintf(LOW,&quot;couldn't get a new list :/&quot;);
+ 		omat=-1;
+ 		for (pn=0; pn&lt;obj-&gt;n_poly; pn++)  /*  cycle throu our polygons ... */
+@@ -1817,6 +1816,8 @@
+ 		}
+ 		if (obj-&gt;dplist) glEndList();
+ 	}
++	if (obj-&gt;dplist)
++		glCallList(obj-&gt;dplist);		/* call the just compiled ore old display list */
+ 	glPopMatrix();
+ 	return(0);
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000546.html">[S3d-svn] r553 - in trunk: . apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000548.html">[S3d-svn] r555 - trunk/extras/distro/gentoo/media-libs/libg3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#547">[ date ]</a>
+              <a href="thread.html#547">[ thread ]</a>
+              <a href="subject.html#547">[ subject ]</a>
+              <a href="author.html#547">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

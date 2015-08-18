@@ -1,0 +1,371 @@
+From lazhur at mail.berlios.de  Wed Sep  8 18:35:48 2010
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Wed,  8 Sep 2010 18:35:48 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-5-6-gc06dfeb
+Message-ID: <20100908163548.EE35348101F@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  c06dfebf6dac81d1c109ed6715d773126448adb5 (commit)
+       via  5121e4fa249b1b8e2eec68c4b874fb4680014b03 (commit)
+       via  ceb1f145f08f6444985d0b9a9d2b614541d04994 (commit)
+       via  6330a33594951a496bd6b6308828a10846b889c3 (commit)
+      from  c431e6c8ae457a3c4912acfc00ec8667dc9e077e (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit c06dfebf6dac81d1c109ed6715d773126448adb5
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Sep 8 17:38:02 2010 +0200
+
+    Disable PIE due to failed builds
+
+commit 5121e4fa249b1b8e2eec68c4b874fb4680014b03
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Sep 8 14:35:10 2010 +0200
+
+    Use hardening-includes for CFLAGS and LDFLAGS hardened builds
+
+commit ceb1f145f08f6444985d0b9a9d2b614541d04994
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Sep 8 13:57:53 2010 +0200
+
+    Set *FLAGS using dpkg-buildflags in debian/rules
+
+commit 6330a33594951a496bd6b6308828a10846b889c3
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Sep 8 13:25:49 2010 +0200
+
+    Upgrade debhelper compat to v8
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    4 ++++
+ debian/compat    |    2 +-
+ debian/control   |    8 ++++----
+ debian/rules     |   11 +++++++++++
+ 4 files changed, 20 insertions(+), 5 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Thu Sep  9 02:16:51 2010
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu,  9 Sep 2010 02:16:51 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-5-7-g3748d69
+Message-ID: <20100909001651.68BD6480F17@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  3748d699b2035096a7c990f9ca0d4e8c0f4c6a17 (commit)
+      from  c06dfebf6dac81d1c109ed6715d773126448adb5 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 3748d699b2035096a7c990f9ca0d4e8c0f4c6a17
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Sep 9 01:36:24 2010 +0200
+
+    Add full BSD-3 license to debian/copyright
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    1 +
+ debian/copyright |   26 ++++++++++++++++++++++++--
+ 2 files changed, 25 insertions(+), 2 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Sep 11 00:05:03 2010
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 11 Sep 2010 00:05:03 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-5-8-g5851538
+Message-ID: <20100910220504.7A0564809F7@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  585153862f409352c77cdfe2c63560b5537d50d2 (commit)
+      from  3748d699b2035096a7c990f9ca0d4e8c0f4c6a17 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 585153862f409352c77cdfe2c63560b5537d50d2
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Fri Sep 10 23:46:43 2010 +0200
+
+    Filter -fPIE and -pie for libs3d(w)
+    
+    It is not possible to compile libraries as position independent
+    executables. Thus the CFLAGS and LDFLAGS must be free of any -pie, -fPIE
+    and -fpie.
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog                |    2 +
+ debian/patches/filter_pie.patch |   72 +++++++++++++++++++++++++++++++++++++++
+ debian/patches/series           |    1 +
+ debian/rules                    |    1 -
+ 4 files changed, 75 insertions(+), 1 deletions(-)
+ create mode 100644 debian/patches/filter_pie.patch
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Sep 11 00:05:04 2010
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 11 Sep 2010 00:05:04 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	updated. v0.2.1.1-23-g8c5eeba
+Message-ID: <20100910220504.B530C480012@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been updated
+       via  8c5eebaa397d1036873adae0436a7a43faacd029 (commit)
+      from  d81ea3d26d9233bdc10dc9e3059e62c4e0167f21 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+-----------------------------------------------------------------------
+
+Summary of changes:
+ cmake/modules/FilterPIE.cmake |   35 +++++++++++++++++++++++++++++++++++
+ libs3d/CMakeLists.txt         |    1 +
+ libs3dw/CMakeLists.txt        |    1 +
+ 3 files changed, 37 insertions(+), 0 deletions(-)
+ create mode 100644 cmake/modules/FilterPIE.cmake
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Sep 11 00:05:04 2010
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 11 Sep 2010 00:05:04 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-94-gad765fa
+Message-ID: <20100910220504.E70A7480012@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  ad765fac327b601781c512485f2eac441aa2cf2c (commit)
+       via  8c5eebaa397d1036873adae0436a7a43faacd029 (commit)
+       via  d81ea3d26d9233bdc10dc9e3059e62c4e0167f21 (commit)
+       via  182b965429fcaa1f24845bd79101e723e153f408 (commit)
+       via  ab07ae73449a6e8e6a776ffc0665ea4201fd1788 (commit)
+      from  ff1c7875a2a149fa069c77475e37022522f8b86f (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit ad765fac327b601781c512485f2eac441aa2cf2c
+Merge: ff1c787 8c5eeba
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Sep 11 00:04:57 2010 +0200
+
+    Merge branch 'maint'
+    
+    Conflicts:
+    	libs3d/CMakeLists.txt
+    	libs3dw/CMakeLists.txt
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/Maintain.txt                         |   74 ++++++++++---------
+ Documentation/RelNotes-0.2.1.2.txt                 |    6 ++-
+ Documentation/SubmittingPatches                    |   57 ++++++++--------
+ apps/s3dvt/main.c                                  |    2 +-
+ .../modules/{TestForSIGS.cmake => FilterPIE.cmake} |   19 ++---
+ libs3d/CMakeLists.txt                              |    1 +
+ libs3dw/CMakeLists.txt                             |    1 +
+ 7 files changed, 82 insertions(+), 78 deletions(-)
+ copy cmake/modules/{TestForSIGS.cmake => FilterPIE.cmake} (79%)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Tue Sep 21 21:27:40 2010
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 21 Sep 2010 21:27:40 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-5-9-g40d9c37
+Message-ID: <20100921192741.13479480053@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  40d9c375acef37f9c68e7da5cbfd48a8e14cbbf8 (commit)
+      from  585153862f409352c77cdfe2c63560b5537d50d2 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 40d9c375acef37f9c68e7da5cbfd48a8e14cbbf8
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue Sep 21 21:28:48 2010 +0200
+
+    Explicit depend build depend on pkg-config
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    1 +
+ debian/control   |    2 +-
+ 2 files changed, 2 insertions(+), 1 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Thu Sep 23 13:42:07 2010
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 23 Sep 2010 13:42:07 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-5-10-g743e960
+Message-ID: <20100923114207.C80AD480F9E@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  743e9607d14bea0e200e796f336431d36209f0fd (commit)
+      from  40d9c375acef37f9c68e7da5cbfd48a8e14cbbf8 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 743e9607d14bea0e200e796f336431d36209f0fd
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Sep 23 13:40:27 2010 +0200
+
+    Release s3d 0.2.1.1-6
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Thu Sep 23 13:42:08 2010
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 23 Sep 2010 13:42:08 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS annotated tag, debian/0.2.1.1-6,
+	created. debian/0.2.1.1-6
+Message-ID: <20100923114209.11198480F9E@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The annotated tag, debian/0.2.1.1-6 has been created
+        at  5aad9c1e259fe8ff75afdb04564c60db3d013d19 (tag)
+   tagging  743e9607d14bea0e200e796f336431d36209f0fd (commit)
+  replaces  debian/0.2.1.1-5
+ tagged by  Sven Eckelmann
+        on  Thu Sep 23 13:42:24 2010 +0200
+
+- Log -----------------------------------------------------------------
+Debian release 0.2.1.1-6
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQIcBAABCgAGBQJMmz0gAAoJEF2HCgfBJntGPIcP/2Q5Ds5X+N+qVACYyWrBd22T
+7mnxmqrp87Lp1tXnaa6wWkKiJcFaf4CKCwa4a06MteApXs61g2y6wZlWFkT6hHEv
+Js2Qra8FFxpyJJbORSDKimndc2WeoOHkogNy7hnOuRl9hBVv5WaCRERlhgGjh/z7
+rR5NxtQuvR+xaVLRwyL03CXWhdnqCUTavnujKfOfdgzmPyUibJC+VPqPWgqWzyE1
+tvQlzuRda5nVwBtV2ORmeIAk5YsGfOHrpu7DVm+th45saLRRnSc/BJmSiqsNnuBP
+FrE9KZgQer12XzG3eTXYhzqI2Mpu+vIsd2lpJhg3odLGnlwhqsWeg77MVXkA1en+
+vOUOSHm09HuMizc7Ijpbca1bnmZF2IM9FrXFbbNQD+S7LNCl29+pZ75kAYnSaqAc
+EmW/NTvd8MN8zxK2BbNWg+5bV/w6sj/q2V2DizgXRHcodegq2rN1Pp9q9faecNvn
+4V9HJhoKP+KGwj3cDjn2R4jaWdue9XQyBFd2Z3lFlChFCRTahrKbTJ+1QQ9lEQNv
+yJsAQZEpEiLoJAvYwb1zZOSS/ExLXu9bLPPAXF2AVa4oyZASQdA/T9KELQLMrcyv
+lcQ28HgyX+ejDUdEfqYjN1X0XXlGa63JKwmx9/Yi02e0yuhVT+iqLwXvuv4K1u6g
+AqZO9Ij3lG0kShtQ/Wy3
+=qwoX
+-----END PGP SIGNATURE-----
+
+Sven Eckelmann (10):
+      Upgraded to policy 3.9.0, no changes required
+      Upgraded to policy 3.9.1
+      Upgrade debhelper compat to v8
+      Set *FLAGS using dpkg-buildflags in debian/rules
+      Use hardening-includes for CFLAGS and LDFLAGS hardened builds
+      Disable PIE due to failed builds
+      Add full BSD-3 license to debian/copyright
+      Filter -fPIE and -pie for libs3d(w)
+      Explicit depend build depend on pkg-config
+      Release s3d 0.2.1.1-6
+
+-----------------------------------------------------------------------
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

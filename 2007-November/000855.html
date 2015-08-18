@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r862 - trunk/svnonly/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r862%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711202043.lAKKhrFI018219%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000854.html">
+   <LINK REL="Next"  HREF="000856.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r862 - trunk/svnonly/comptest</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r862%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711202043.lAKKhrFI018219%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r862 - trunk/svnonly/comptest">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Nov 20 21:43:53 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000854.html">[S3d-svn] r861 - trunk/svnonly/comptest
+</A></li>
+        <LI>Next message: <A HREF="000856.html">[S3d-svn] r863 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#855">[ date ]</a>
+              <a href="thread.html#855">[ thread ]</a>
+              <a href="subject.html#855">[ subject ]</a>
+              <a href="author.html#855">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-11-20 21:43:52 +0100 (Tue, 20 Nov 2007)
+New Revision: 862
+
+Modified:
+   trunk/svnonly/comptest/window.c
+Log:
+comptest: Workaround to show dotslash the source of missing window image
+
+
+Modified: trunk/svnonly/comptest/window.c
+===================================================================
+--- trunk/svnonly/comptest/window.c	2007-11-20 20:43:38 UTC (rev 861)
++++ trunk/svnonly/comptest/window.c	2007-11-20 20:43:52 UTC (rev 862)
+@@ -229,7 +229,9 @@
+ 				     (gs &gt; 0 ? ((*s &amp; image-&gt;green_mask) &gt;&gt; gs) : ((*s  &amp; image-&gt;green_mask) &lt;&lt; -gs)) |
+ 				     (bs &gt; 0 ? ((*s &amp; image-&gt;blue_mask) &gt;&gt; bs)  : ((*s  &amp; image-&gt;blue_mask) &lt;&lt; -bs)) |
+ 				     255 &lt;&lt; 24;
++				*t = *s;
+ 
++
+ 				bmp_ptr += sizeof(uint32_t);
+ 				img_ptr += bpp;
+ 			}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000854.html">[S3d-svn] r861 - trunk/svnonly/comptest
+</A></li>
+	<LI>Next message: <A HREF="000856.html">[S3d-svn] r863 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#855">[ date ]</a>
+              <a href="thread.html#855">[ thread ]</a>
+              <a href="subject.html#855">[ subject ]</a>
+              <a href="author.html#855">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

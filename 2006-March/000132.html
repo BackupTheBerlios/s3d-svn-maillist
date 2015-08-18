@@ -1,0 +1,459 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r136 - in trunk: . apps/olsrs3d apps/s3dfm apps/s3dgps client server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r136%20-%20in%20trunk%3A%20.%20apps/olsrs3d%20apps/s3dfm%20apps/s3dgps%20client%20server&In-Reply-To=%3C200603032030.k23KUKmm017092%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000131.html">
+   <LINK REL="Next"  HREF="000133.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r136 - in trunk: . apps/olsrs3d apps/s3dfm apps/s3dgps client server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r136%20-%20in%20trunk%3A%20.%20apps/olsrs3d%20apps/s3dfm%20apps/s3dgps%20client%20server&In-Reply-To=%3C200603032030.k23KUKmm017092%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r136 - in trunk: . apps/olsrs3d apps/s3dfm apps/s3dgps client server">dotslash at berlios.de
+       </A><BR>
+    <I>Fri Mar  3 21:30:20 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000131.html">[S3d-svn] r135 - in trunk: . apps apps/s3dfm client example
+</A></li>
+        <LI>Next message: <A HREF="000133.html">[S3d-svn] r137 - in trunk: . client server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#132">[ date ]</a>
+              <a href="thread.html#132">[ thread ]</a>
+              <a href="subject.html#132">[ subject ]</a>
+              <a href="author.html#132">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-03-03 21:30:10 +0100 (Fri, 03 Mar 2006)
+New Revision: 136
+
+Modified:
+   trunk/
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/olsrs3d.h
+   trunk/apps/olsrs3d/process.c
+   trunk/apps/s3dfm/main.c
+   trunk/apps/s3dgps/s3dgps.c
+   trunk/client/3dsread.c
+   trunk/client/io.c
+   trunk/client/s3d.h
+   trunk/client/sei_construct.c
+   trunk/client/sei_misc.c
+   trunk/client/sei_tri.c
+   trunk/server/graphics.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r191 at balthasar</A>:  dotslash | 2006-03-03 21:29:56 +0100
+ - compiler output beatifying (-Wall found a lot ;)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:188
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:191
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-03-03 19:04:36 UTC (rev 135)
++++ trunk/apps/olsrs3d/main.c	2006-03-03 20:30:10 UTC (rev 136)
+@@ -182,11 +182,11 @@
+ 
+ void handle_olsr_node( struct olsr_node *olsr_node ) {
+ 
+-	int result;   /* result of strcmp */
++/*	int result;    * result of strcmp */
+ 	float f, distance;
+ 	float tmp_mov_vec[3];
+ 	struct olsr_node *other_node;
+-	struct olsr_con **olsr_con;
++/*	struct olsr_con **olsr_con;*/
+ 	struct Obj_to_ip *Obj_to_ip_curr;
+ 	struct olsr_neigh_list *olsr_neigh_list, *prev_olsr_neigh_list, *other_node_neigh_list, *tmp_olsr_neigh_list;
+ 
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-03-03 19:04:36 UTC (rev 135)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-03-03 20:30:10 UTC (rev 136)
+@@ -110,6 +110,7 @@
+ int net_main();
+ int net_quit();
+ /* main obj2ip list*/
++void out_of_mem( void );
+ void lst_add(int id,struct olsr_node **olsr_node);
+ void lst_del(int id);
+ void lst_out();
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-03-03 19:04:36 UTC (rev 135)
++++ trunk/apps/olsrs3d/process.c	2006-03-03 20:30:10 UTC (rev 136)
+@@ -126,7 +126,7 @@
+ 		(*olsr_neigh_list)-&gt;next_olsr_neigh_list = NULL;
+ 
+ 	}
+-
++	return(0);
+ }
+ 
+ 
+@@ -217,7 +217,7 @@
+ 		return (*olsr_node);
+ 
+ 	}
+-
++	return(0);
+ }
+ 
+ 
+@@ -336,7 +336,13 @@
+ 
+ 	}
+ 
+-	if ( last_cr_ptr != NULL ) memmove( lbuf, ++last_cr_ptr, strlen( last_cr_ptr) );
++	if ( last_cr_ptr != NULL ) 
++	{
++		/* memmove( lbuf, ++last_cr_ptr, strlen( last_cr_ptr) ); */
++		/* TODO: please check this process.c:339: warning: operation on `last_cr_ptr' may be undefined, i've changed it like this: */
++		last_cr_ptr++;
++		memmove( lbuf, last_cr_ptr, strlen( last_cr_ptr) );
++	}
+ 
+ 	return(0);
+ 
+
+Modified: trunk/apps/s3dfm/main.c
+===================================================================
+--- trunk/apps/s3dfm/main.c	2006-03-03 19:04:36 UTC (rev 135)
++++ trunk/apps/s3dfm/main.c	2006-03-03 20:30:10 UTC (rev 136)
+@@ -57,13 +57,12 @@
+ 
+ int display_dir(struct t_item *dir)
+ {
+-	int n,i;
+-	float  px,py,pz;
+-	char *ext;
+-	char *nstr;
++	int i;
++	float  px,pz;
+ 	float dss; /* dirstep size */
+ 	int dirn, dirc,dps;
+ 	int icon;
++	px=pz=0.0;
+ 	if (dir-&gt;disp)
+ 		return(-1); /* already displayed ... */ 
+ 
+@@ -122,6 +121,7 @@
+         }
+ 	}
+ 	dir-&gt;disp=1;
++	return(0);
+ }
+ void get_path(struct t_item *dir, char *path)
+ {
+@@ -139,7 +139,6 @@
+ 	struct dirent **namelist;
+ 	int n,i;
+ 	char *ext,*nstr;
+-	float alpha,al,radius,f;
+ 	char path[M_DIR];
+ 	char ndir[M_DIR];  
+ 	if (dir-&gt;n_item&gt;0) /* refusing */
+@@ -202,7 +201,7 @@
+ 	struct t_item *f;
+ 	if (t-&gt;icon==oid)
+ 		return(t);
+-	if (t-&gt;type=T_FOLDER)
++	if (t-&gt;type==T_FOLDER)
+ 		for (i=0;i&lt;t-&gt;n_item;i++)
+ 			if ((f=finditem(&amp;(t-&gt;list[i]),oid))!=NULL)
+ 				return(f);
+@@ -246,7 +245,7 @@
+ 
+ void object_click(struct s3d_evt *evt)
+ {
+-	int i,oid;
++	int oid;
+ 	struct t_item *f;
+ 	oid=(int)*((unsigned long *)evt-&gt;buf);
+ 	printf(&quot;! clicked object %d\n&quot;,oid);
+@@ -268,7 +267,6 @@
+ int main (int argc, char **argv)
+ {
+ 	int i;
+-	struct t_item dummy;
+ 	if (!s3d_init(&amp;argc,&amp;argv,&quot;filebrowser&quot;))	
+ 	{
+ 		i=0;
+
+Modified: trunk/apps/s3dgps/s3dgps.c
+===================================================================
+--- trunk/apps/s3dgps/s3dgps.c	2006-03-03 19:04:36 UTC (rev 135)
++++ trunk/apps/s3dgps/s3dgps.c	2006-03-03 20:30:10 UTC (rev 136)
+@@ -30,7 +30,7 @@
+ #include &lt;stdlib.h&gt;	/* malloc(), free() */
+ #include &lt;string.h&gt; /* strlen() */
+ #include &lt;math.h&gt;	/* sin(),cos(), M_PI */
+-#include &lt;simage.h&gt;
++#include &lt;simage.h&gt; /* simage things */
+ 
+ #define PIXELFACT	2817.947378
+ #define PIXELFACTN	281794.7378
+@@ -101,7 +101,7 @@
+ /* recodes the image if it's not in rgba format */
+ unsigned char *recode_image(unsigned char *data, int nc, int w, int h)
+ {
+-	unsigned char *new_block;
++	unsigned char *new_block=NULL;
+ 	int x,y;
+ 	switch (nc)
+ 	{
+@@ -153,7 +153,7 @@
+ 	float x,y,z;
+ 	double wr,hr,er;
+ 	unsigned char *data;
+-	int oid;
++	int oid=-1;
+ 	if (simage_check_supported(path))
+ 	{
+ 		printf(&quot;file %s can be loaded!!\n&quot;,path);
+@@ -260,7 +260,7 @@
+ void parse_mapkoords()
+ {
+ 	FILE *fp;
+-	char buf[BFS],*ptr,*sptr,*filename,c;
++	char buf[BFS],*ptr,*sptr,*filename=NULL,c;
+ 	char path[BFS];
+ 	char *prefix=&quot;/home/dotslash/.s3dgps/&quot;;
+ 	int len;
+@@ -268,6 +268,8 @@
+ 	double lng,lat;
+ 	int i;
+ 	long scale;
++	lng=lat=0;
++	scale=0;
+ 	
+ 	strncpy(path,prefix,BFS);
+ 	strncpy(path+strlen(path),&quot;map_koord.txt&quot;,BFS);
+
+Modified: trunk/client/3dsread.c
+===================================================================
+--- trunk/client/3dsread.c	2006-03-03 19:04:36 UTC (rev 135)
++++ trunk/client/3dsread.c	2006-03-03 20:30:10 UTC (rev 136)
+@@ -46,7 +46,8 @@
+ 	while (next!=NULL)
+ 	{
+ 		next=NULL;
+-		if (next=strchr(ptr,':'))
++		
++		if (NULL!=(next=strchr(ptr,':')))
+ 		{
+ 			*next=0; 							/* clear the delimiter */
+ 			next+=1;							/* move to the beginner of the next dir */
+
+Modified: trunk/client/io.c
+===================================================================
+--- trunk/client/io.c	2006-03-03 19:04:36 UTC (rev 135)
++++ trunk/client/io.c	2006-03-03 20:30:10 UTC (rev 136)
+@@ -61,7 +61,7 @@
+ }
+ 
+ #endif
+-int s3d_usage()
++void s3d_usage()
+ {
+ 	printf(&quot;s3d-parameters:\n&quot;);
+ 	printf(&quot; --s3d-url &lt;url&gt;: skip S3D enviroment and connect to this url\n&quot;);
+
+Modified: trunk/client/s3d.h
+===================================================================
+--- trunk/client/s3d.h	2006-03-03 19:04:36 UTC (rev 135)
++++ trunk/client/s3d.h	2006-03-03 20:30:10 UTC (rev 136)
+@@ -30,7 +30,7 @@
+ };
+ 
+ typedef void (*s3d_cb)(struct s3d_evt *);
+-int s3d_usage();
++void s3d_usage();
+ int s3d_init(int *argc, char ***argv, char *name);
+ int s3d_quit();
+ int s3d_mainloop(void (*f)());
+
+Modified: trunk/client/sei_construct.c
+===================================================================
+--- trunk/client/sei_construct.c	2006-03-03 19:04:36 UTC (rev 135)
++++ trunk/client/sei_construct.c	2006-03-03 20:30:10 UTC (rev 136)
+@@ -39,6 +39,7 @@
+ 
+ #include &lt;sei_triangulate.h&gt;
+ #include &lt;math.h&gt;
++#include &lt;string.h&gt; /* memset() */
+ 
+ 
+ node_t qs[QSIZE];		/* Query structure */
+@@ -385,6 +386,7 @@
+       errs(&quot;sei:locate_endpoint()&quot;,&quot;Haggu!!!! (whatever)&quot;);
+       break;
+     }
++  return(-1);
+ }
+ 
+ 
+@@ -433,16 +435,20 @@
+ 	      /* Change the upper neighbours of the lower trapezoids */
+ 	      
+ 	      if ((tr[t].d0 = tr[tnext].d0) &gt; 0)
+-		if (tr[tr[t].d0].u0 == tnext)
+-		  tr[tr[t].d0].u0 = t;
+-		else if (tr[tr[t].d0].u1 == tnext)
+-		  tr[tr[t].d0].u1 = t;
++		  {
++			if (tr[tr[t].d0].u0 == tnext)
++			  tr[tr[t].d0].u0 = t;
++			else if (tr[tr[t].d0].u1 == tnext)
++			  tr[tr[t].d0].u1 = t;
++		  }
+ 	      
+ 	      if ((tr[t].d1 = tr[tnext].d1) &gt; 0)
+-		if (tr[tr[t].d1].u0 == tnext)
+-		  tr[tr[t].d1].u0 = t;
+-		else if (tr[tr[t].d1].u1 == tnext)
+-		  tr[tr[t].d1].u1 = t;
++		  {
++			if (tr[tr[t].d1].u0 == tnext)
++			  tr[tr[t].d1].u0 = t;
++			else if (tr[tr[t].d1].u1 == tnext)
++			  tr[tr[t].d1].u1 = t;
++		  }
+ 	      
+ 	      tr[t].lo = tr[tnext].lo;
+ 	      tr[tnext].state = ST_INVALID; /* invalidate the lower */
+@@ -470,13 +476,13 @@
+      int segnum;
+ {
+   segment_t s;
+-  segment_t *so = &amp;seg[segnum];
+-  int tu, tl, sk, tfirst, tlast, tnext;
+-  int tfirstr, tlastr, tfirstl, tlastl;
+-  int i1, i2, t, t1, t2, tn;
++  int tu, tl, sk, tfirst, tlast;
++  int tfirstr = 0, tlastr = 0, tfirstl, tlastl;
++  int i1, i2, t, tn;
+   point_t tpt;
+   int tritop = 0, tribot = 0, is_swapped = 0;
+   int tmptriseg;
++  int tmpseg = 1;
+ 
+   s = seg[segnum];
+   if (_greater_than(&amp;s.v1, &amp;s.v0)) /* Get higher vertex in v0 */
+@@ -833,12 +839,11 @@
+ 	  if (FP_EQUAL(tr[t].lo.y, tr[tlast].lo.y) &amp;&amp; 
+ 	      FP_EQUAL(tr[t].lo.x, tr[tlast].lo.x) &amp;&amp; tribot)
+ 	    {		/* bottom forms a triangle */
+-	      int tmpseg;
+ 
+ 	      if (is_swapped)	
+-		tmptriseg = seg[segnum].prev;
++			tmptriseg = seg[segnum].prev;
+ 	      else
+-		tmptriseg = seg[segnum].next;
++			tmptriseg = seg[segnum].next;
+ 
+ 	      if ((tmpseg &gt; 0) &amp;&amp; is_left_of(tmpseg, &amp;s.v0))
+ 		{
+@@ -880,7 +885,7 @@
+       
+       else
+ 	{
+-	  int tmpseg = tr[tr[t].d0].rseg;
++	  tmpseg = tr[tr[t].d0].rseg;
+ 	  double y0, yt;
+ 	  point_t tmppt;
+ 	  int tnext, i_d0, i_d1;
+
+Modified: trunk/client/sei_misc.c
+===================================================================
+--- trunk/client/sei_misc.c	2006-03-03 19:04:36 UTC (rev 135)
++++ trunk/client/sei_misc.c	2006-03-03 20:30:10 UTC (rev 136)
+@@ -79,8 +79,6 @@
+ /* segments in S */
+ int choose_segment()
+ {
+-  int i;
+-
+   errds(VLOW,&quot;sei:choose_segment()&quot;,&quot;%d&quot;, permute[choose_idx]);
+   return permute[choose_idx++];
+ }
+
+Modified: trunk/client/sei_tri.c
+===================================================================
+--- trunk/client/sei_tri.c	2006-03-03 19:04:36 UTC (rev 135)
++++ trunk/client/sei_tri.c	2006-03-03 20:30:10 UTC (rev 136)
+@@ -39,6 +39,7 @@
+ 
+ #include &lt;sei_triangulate.h&gt;
+ #include &lt;sys/time.h&gt;
++#include &lt;string.h&gt; /* memset() */
+ 
+ 
+ static int initialise(n)
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2006-03-03 19:04:36 UTC (rev 135)
++++ trunk/server/graphics.c	2006-03-03 20:30:10 UTC (rev 136)
+@@ -222,7 +222,6 @@
+ 	GLint viewport[4];
+ 	GLfloat xpos,ypos;
+ 	float big,z1;
+-	int found;
+ 	uint32_t mcp_o,o;
+ 	struct t_process *p=get_proc_by_pid(MCP);
+ 	GLuint select_buf[SBSIZE],*ptr,names,hits;
+@@ -268,7 +267,7 @@
+ 		big=INFINITY;
+ 		dprintf(LOW,&quot;had %d hits&quot;,hits);
+ 		ptr=select_buf;
+-		mcp_o=o=-1;
++		mcp_o=o=names=-1;
+ 		/* check all the hits, only select the nearest ... */
+ 		for (i=0;i&lt;hits;i++)
+ 		{
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000131.html">[S3d-svn] r135 - in trunk: . apps apps/s3dfm client example
+</A></li>
+	<LI>Next message: <A HREF="000133.html">[S3d-svn] r137 - in trunk: . client server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#132">[ date ]</a>
+              <a href="thread.html#132">[ thread ]</a>
+              <a href="subject.html#132">[ subject ]</a>
+              <a href="author.html#132">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

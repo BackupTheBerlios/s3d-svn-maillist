@@ -1,0 +1,241 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r513 - in trunk: apps/kism3d libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r513%20-%20in%20trunk%3A%20apps/kism3d%20libs3d&In-Reply-To=%3C200612042257.kB4MvUhV025059%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000505.html">
+   <LINK REL="Next"  HREF="000507.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r513 - in trunk: apps/kism3d libs3d</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r513%20-%20in%20trunk%3A%20apps/kism3d%20libs3d&In-Reply-To=%3C200612042257.kB4MvUhV025059%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r513 - in trunk: apps/kism3d libs3d">marec at mail.berlios.de
+       </A><BR>
+    <I>Mon Dec  4 23:57:30 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000505.html">[S3d-svn] r512 - in trunk: apps/kism3d libs3d
+</A></li>
+        <LI>Next message: <A HREF="000507.html">[S3d-svn] r514 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#506">[ date ]</a>
+              <a href="thread.html#506">[ thread ]</a>
+              <a href="subject.html#506">[ subject ]</a>
+              <a href="author.html#506">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-12-04 23:57:30 +0100 (Mon, 04 Dec 2006)
+New Revision: 513
+
+Modified:
+   trunk/apps/kism3d/gui.c
+   trunk/apps/kism3d/kism3d.c
+   trunk/apps/kism3d/kism3d.h
+   trunk/libs3d/vector.c
+Log:
+move to network
+
+Modified: trunk/apps/kism3d/gui.c
+===================================================================
+--- trunk/apps/kism3d/gui.c	2006-12-04 22:30:59 UTC (rev 512)
++++ trunk/apps/kism3d/gui.c	2006-12-04 22:57:30 UTC (rev 513)
+@@ -43,8 +43,10 @@
+ 
+ int Client_obj;
+ 
++struct timespec sleeptime = { 0, 100 * 1000 * 1000 };   /* 100 mili seconds */
+ 
+ 
++
+ int wire_sphere(int slices, int stacks)
+ {
+ 	int x,y,i,o;
+@@ -168,10 +170,14 @@
+ 				snprintf( label_str, 100, &quot;Type: %s, CH: %i, Clients: %i&quot;, ( wlan_network-&gt;type == 0 ? &quot;Managed&quot; : ( wlan_network-&gt;type == 1 ? &quot;Ad-Hoc&quot; : ( wlan_network-&gt;type == 2 ? &quot;Prober&quot; : &quot;unknown&quot; ) ) ), wlan_network-&gt;chan, wlan_network-&gt;num_wlan_clients );
+ 
+ 				/* determine our longest string which we draw */
+-				maxlen=s3d_strlen(label_str);
+-				if ((templen=s3d_strlen(wlan_network-&gt;ssid))  &gt; maxlen ) maxlen=templen;
+-				if ((templen=s3d_strlen(wlan_network-&gt;bssid)) &gt; maxlen ) maxlen=templen;
++				maxlen = s3d_strlen( label_str );
+ 
++				if ( ( templen = s3d_strlen( wlan_network-&gt;ssid ) ) &gt; maxlen )
++					maxlen = templen;
++
++				if ( ( templen = s3d_strlen( wlan_network-&gt;bssid ) ) &gt; maxlen )
++					maxlen = templen;
++
+ 				wlan_network-&gt;props_changed = 0;
+ 
+ 				if ( wlan_network-&gt;ssid_id != -1 )
+@@ -184,9 +190,7 @@
+ 				if ( wlan_network-&gt;bssid_id == -1 ) {
+ 
+ 					wlan_network-&gt;bssid_id = s3d_draw_string( wlan_network-&gt;bssid, NULL );
+-					/* NEW!! XXX NEW!! */
+-					wlan_network-&gt;bssid_len= maxlen; /* we store maxlen here. the other strings might be longer, so we use the longest string for
+-														calculating our rotation. TODO: maybe rename this field to something like textblock_width? :) */
++					wlan_network-&gt;text_width = maxlen; /* the other strings might be longer, so we use the longest string for calculating our rotation. */
+ 					s3d_link( wlan_network-&gt;bssid_id, wlan_network-&gt;obj_id );
+ 					s3d_translate( wlan_network-&gt;bssid_id, - maxlen / 2, 2 + wlan_network-&gt;scale_fac, 0 );
+ 					s3d_scale( wlan_network-&gt;bssid_id, NETWORK_TEXT_SCALE );
+@@ -222,7 +226,7 @@
+ 			angle = s3d_angle_to_cam( wlan_network-&gt;pos_vec, CamPosition[0], &amp;angle_rad );
+ 			s3d_rotate( wlan_network-&gt;bssid_id, 0, angle , 0 );
+ 
+-			s3d_translate( wlan_network-&gt;bssid_id, -cos(angle_rad) * NETWORK_TEXT_SCALE * wlan_network-&gt;bssid_len / 2 ,2 , sin(angle_rad) * NETWORK_TEXT_SCALE * wlan_network-&gt;bssid_len / 2 );
++			s3d_translate( wlan_network-&gt;bssid_id, -cos(angle_rad) * NETWORK_TEXT_SCALE * wlan_network-&gt;text_width / 2 ,2 , sin(angle_rad) * NETWORK_TEXT_SCALE * wlan_network-&gt;text_width / 2 );
+ 
+ 			wlan_network-&gt;rotation = ( wlan_network-&gt;rotation + 1 ) % 360;
+ 			s3d_rotate( wlan_network-&gt;wrsphr_id, 0, wlan_network-&gt;rotation, 0 );
+@@ -312,7 +316,6 @@
+ 
+ 	s3dw_handle_click( evt );
+ 
+-	printf(&quot;id which was clicked: %d\n&quot;,clicked_id);
+ 	/* emulate double click */
+ 	if ( ( Last_Click_Oid == clicked_id ) &amp;&amp; ( Last_Click_Time + 250 &gt; get_time() ) ) {
+ 
+@@ -374,7 +377,7 @@
+ 
+ void mainloop() {
+ 
+-	struct timespec sleeptime = { 0, 100 * 1000 * 1000 };   /* 100 mili seconds */
++	float angle, diff_vec[3], tmp_vec[3] = { 0.0, 0.0, -1.0 };
+ 
+ 
+ 	handle_networks();
+@@ -384,8 +387,26 @@
+ 
+ 		/* move to network */
+ 		printf( &quot;Moving to Network: %s, %s\n&quot;, ((struct wlan_network *)Cam_target)-&gt;bssid, ((struct wlan_network *)Cam_target)-&gt;ssid );
+-		Cam_target = NULL;
+ 
++		CamPosition[0][0] = ( CamPosition[0][0] * 4 + ((struct wlan_network *)Cam_target)-&gt;pos_vec[0] + 7 ) / 5;
++		CamPosition[0][1] = ( CamPosition[0][1] * 4 + ((struct wlan_network *)Cam_target)-&gt;pos_vec[1] ) / 5;
++		CamPosition[0][2] = ( CamPosition[0][2] * 4 + ((struct wlan_network *)Cam_target)-&gt;pos_vec[2] + 7 ) / 5;
++
++		diff_vec[0] = CamPosition[0][0] - ((struct wlan_network *)Cam_target)-&gt;pos_vec[0] + 7;
++		diff_vec[1] = 0.0;
++		diff_vec[2] = CamPosition[0][2] - ((struct wlan_network *)Cam_target)-&gt;pos_vec[2] + 7;
++
++		angle = s3d_vector_angle( diff_vec, tmp_vec );
++		/* angle = ( real_node_pos[0] &gt; 0) ? ( 180 - ( 180 / M_PI * angle ) ) : ( 180 + ( 180 / M_PI * angle ) ); */
++		angle = 180 - ( 180 / M_PI * angle );
++		CamPosition[1][1] = ( CamPosition[1][1] * 4 + angle ) / 5;
++
++		s3d_translate( 0, CamPosition[1][0], CamPosition[1][1], CamPosition[1][2] );
++		s3d_rotate( 0, CamPosition[1][0], CamPosition[1][1], CamPosition[1][2] );
++
++		/* TODO: need an abort if target is reached
++			Cam_target = NULL; */
++
+ 	}
+ 
+ 	if ( Kism3d_aborted )
+
+Modified: trunk/apps/kism3d/kism3d.c
+===================================================================
+--- trunk/apps/kism3d/kism3d.c	2006-12-04 22:30:59 UTC (rev 512)
++++ trunk/apps/kism3d/kism3d.c	2006-12-04 22:57:30 UTC (rev 513)
+@@ -42,10 +42,11 @@
+ DEFINE_LIST_HEAD(Network_list);
+ DEFINE_LIST_HEAD(Client_list);
+ 
+-pthread_t s3d_thread_id = NULL;
++pthread_t s3d_thread_id;
+ pthread_mutex_t Network_list_mutex = PTHREAD_MUTEX_INITIALIZER;
+ pthread_mutex_t Client_list_mutex = PTHREAD_MUTEX_INITIALIZER;
+ 
++int thread_running = 0;
+ int Kism3d_aborted = 0;
+ int Num_networks = 0;
+ 
+@@ -158,8 +159,13 @@
+ 
+ 						case 3:
+ 
+-							if ( s3d_thread_id == NULL )
++							if ( !thread_running ) {
++
++								thread_running++;
+ 								pthread_create( &amp;s3d_thread_id, NULL, &amp;gui_main, NULL );
++
++							}
++
+ 							break;
+ 
+ 					}
+@@ -355,7 +361,6 @@
+ 	/* struct wlan_network *wlan_network;
+ 	struct wlan_client *wlan_client; */
+ 	struct timeval tv;
+-// 	pthread_t s3d_thread_id;
+ 	int num_kismet_sources = 0, found_args = 1, max_sock = -1, res, status;
+ 	char *colon_ptr, buff[1000];
+ 	fd_set wait_sockets, tmp_wait_sockets;
+
+Modified: trunk/apps/kism3d/kism3d.h
+===================================================================
+--- trunk/apps/kism3d/kism3d.h	2006-12-04 22:30:59 UTC (rev 512)
++++ trunk/apps/kism3d/kism3d.h	2006-12-04 22:57:30 UTC (rev 513)
+@@ -66,7 +66,7 @@
+ 	int misc_id;
+ 	int rotation;
+ 	int scale_fac;
+-	float bssid_len;
++	float text_width;
+ 
+ };
+ 
+
+Modified: trunk/libs3d/vector.c
+===================================================================
+--- trunk/libs3d/vector.c	2006-12-04 22:30:59 UTC (rev 512)
++++ trunk/libs3d/vector.c	2006-12-04 22:57:30 UTC (rev 513)
+@@ -108,7 +108,7 @@
+ 
+ float s3d_angle_to_cam( float obj_pos[], float cam_pos[], float *angle_rad ) {
+ 
+-	float angle, tmp_mov_vec[3], desc_norm_vec[3] = { 0, 0, -1 };
++	float angle, tmp_mov_vec[3], desc_norm_vec[3] = { 0.0, 0.0, -1.0 };
+ 
+ 
+ 	tmp_mov_vec[0] = cam_pos[0] - obj_pos[0];
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000505.html">[S3d-svn] r512 - in trunk: apps/kism3d libs3d
+</A></li>
+	<LI>Next message: <A HREF="000507.html">[S3d-svn] r514 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#506">[ date ]</a>
+              <a href="thread.html#506">[ thread ]</a>
+              <a href="subject.html#506">[ subject ]</a>
+              <a href="author.html#506">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

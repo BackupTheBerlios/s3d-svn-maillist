@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r390 - in trunk/libs3d/libg3d: plugins/import src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r390%20-%20in%20trunk/libs3d/libg3d%3A%20plugins/import%20src&In-Reply-To=%3C200609152251.k8FMpSpD029141%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000382.html">
+   <LINK REL="Next"  HREF="000384.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r390 - in trunk/libs3d/libg3d: plugins/import src</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r390%20-%20in%20trunk/libs3d/libg3d%3A%20plugins/import%20src&In-Reply-To=%3C200609152251.k8FMpSpD029141%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r390 - in trunk/libs3d/libg3d: plugins/import src">marec at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep 16 00:51:28 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000382.html">[S3d-svn] r389 - trunk/libs3d/libg3d/plugins/import
+</A></li>
+        <LI>Next message: <A HREF="000384.html">[S3d-svn] r391 - in trunk: apps/dot_mcp apps/olsrs3d	apps/s3d_x11gate apps/s3dfm apps/s3dgps apps/s3dvt example	libs3d libs3d/libg3d/plugins/import
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#383">[ date ]</a>
+              <a href="thread.html#383">[ thread ]</a>
+              <a href="subject.html#383">[ subject ]</a>
+              <a href="author.html#383">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-09-16 00:51:28 +0200 (Sat, 16 Sep 2006)
+New Revision: 390
+
+Modified:
+   trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c
+   trunk/libs3d/libg3d/src/model.c
+Log:
+g3d scaling deactivated
+
+Modified: trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c
+===================================================================
+--- trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c	2006-09-15 22:47:55 UTC (rev 389)
++++ trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c	2006-09-15 22:51:28 UTC (rev 390)
+@@ -406,7 +406,7 @@
+ 	GSList *oface;
+ 	gint32 i, j, k, n=0, polynum, group;
+ 	guint32 *smooth_list;
+-	gfloat *pnormal_list, *v_t_buf;			 	
++	gfloat *pnormal_list, *v_t_buf;
+ 	gfloat a[3],b[3], *p0,*p1,*p2,*r;
+ 	gfloat len;
+ 
+@@ -424,6 +424,7 @@
+ 	printf(&quot;reading %d int32 values\n&quot;,polynum);
+ 	for ( i=0 ; i&lt;polynum ; i++ ) 
+ 		smooth_list[i] = g3d_read_int32_le(global-&gt;f);
++
+ 	parent-&gt;nb -= polynum * 4;
+ 	/* first, we calculate the normal by the polygon vertices (just vector product) */
+ 	i=0;
+@@ -434,7 +435,7 @@
+ 		p0=&amp;(object-&gt;vertex_data[3* face-&gt;vertex_indices[0]]);
+ 		p1=&amp;(object-&gt;vertex_data[3* face-&gt;vertex_indices[1]]);
+ 		p2=&amp;(object-&gt;vertex_data[3* face-&gt;vertex_indices[2]]);
+-		
++
+ 		a[0]=p1[0] - p0[0];
+ 		a[1]=p1[1] - p0[1];
+ 		a[2]=p1[2] - p0[2];
+@@ -444,7 +445,7 @@
+ 		r[0]=a[1]*b[2] - a[2]*b[1];
+ 		r[1]=a[2]*b[0] - a[0]*b[2];
+ 		r[2]=a[0]*b[1] - a[1]*b[0];
+-	
++
+ 		len=sqrt(r[0]*r[0]+r[1]*r[1]+r[2]*r[2]);
+ 		if (len!=0.0F)
+ 		{
+@@ -457,6 +458,7 @@
+ 		face-&gt;flags|=G3D_FLAG_FAC_NORMALS;
+ 		i++;
+ 	}
++
+ 	do {
+ 		/* find a suitable group. -1 means we've already taken care */
+ 		group=-1;
+@@ -509,7 +511,7 @@
+ 						if (len==0.0F)   /*  this should not happen. well ... */
+ 								for (n=0;n&lt;3;n++)	v_t_buf[k*3 + n]=0;
+ 						else	for (n=0;n&lt;3;n++)	v_t_buf[k*3 + n]/=len; /* normalize it */
+-						
++
+ 						if (len!=0.0) 	memcpy(face-&gt;normals +j*3, v_t_buf+ 	k*3,sizeof(gfloat)*3);	/*  finally, we save the normal in our normal buffer */
+ 						else  			{memcpy(face-&gt;normals +j*3, pnormal_list+i*3,sizeof(gfloat)*3);	/*  use the pbuf normal */
+ 							printf(&quot;using pnormal_list as fallback\n&quot;);
+
+Modified: trunk/libs3d/libg3d/src/model.c
+===================================================================
+--- trunk/libs3d/libg3d/src/model.c	2006-09-15 22:47:55 UTC (rev 389)
++++ trunk/libs3d/libg3d/src/model.c	2006-09-15 22:51:28 UTC (rev 390)
+@@ -72,8 +72,8 @@
+ 	{
+ 		object = (G3DObject *)oitem-&gt;data;
+ 
+-		g3d_object_scale(object, (10.0 / max_rad));
+-		g3d_object_optimize(object);
++ 		g3d_object_scale(object, (10.0 / max_rad));
++ 		g3d_object_optimize(object);
+ 
+ 		objects_post_load(object-&gt;objects, max_rad);
+ 
+@@ -165,14 +165,14 @@
+ 			return NULL;
+ 		}
+ 
+-		/* center model */
+-		g3d_model_center(model);
++		/* center model
++		g3d_model_center(model); */
+ 
+-		/* get maximum radius of all objects */
+-		max_rad = objects_max_radius(model-&gt;objects);
++		/* get maximum radius of all objects
++		max_rad = objects_max_radius(model-&gt;objects); */
+ 
+-		/* scale and optimize objects */
+-		objects_post_load(model-&gt;objects, max_rad);
++		/* scale and optimize objects
++		objects_post_load(model-&gt;objects, max_rad); */
+ 
+ 		/* save filename */
+ 		if(model-&gt;filename == NULL)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000382.html">[S3d-svn] r389 - trunk/libs3d/libg3d/plugins/import
+</A></li>
+	<LI>Next message: <A HREF="000384.html">[S3d-svn] r391 - in trunk: apps/dot_mcp apps/olsrs3d	apps/s3d_x11gate apps/s3dfm apps/s3dgps apps/s3dvt example	libs3d libs3d/libg3d/plugins/import
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#383">[ date ]</a>
+              <a href="thread.html#383">[ thread ]</a>
+              <a href="subject.html#383">[ subject ]</a>
+              <a href="author.html#383">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

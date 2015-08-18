@@ -1,0 +1,488 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r385 - in trunk/libs3d/libg3d: . plugins/import src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r385%20-%20in%20trunk/libs3d/libg3d%3A%20.%20plugins/import%20src&In-Reply-To=%3C200609151647.k8FGleai027539%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000377.html">
+   <LINK REL="Next"  HREF="000379.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r385 - in trunk/libs3d/libg3d: . plugins/import src</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r385%20-%20in%20trunk/libs3d/libg3d%3A%20.%20plugins/import%20src&In-Reply-To=%3C200609151647.k8FGleai027539%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r385 - in trunk/libs3d/libg3d: . plugins/import src">marec at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 15 18:47:40 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000377.html">[S3d-svn] r384 - trunk/libs3d/libg3d/include/g3d
+</A></li>
+        <LI>Next message: <A HREF="000379.html">[S3d-svn] r386 - trunk/libs3d/libg3d/plugins/import
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#378">[ date ]</a>
+              <a href="thread.html#378">[ thread ]</a>
+              <a href="subject.html#378">[ subject ]</a>
+              <a href="author.html#378">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-09-15 18:47:39 +0200 (Fri, 15 Sep 2006)
+New Revision: 385
+
+Removed:
+   trunk/libs3d/libg3d/s3d/
+   trunk/libs3d/libg3d/src/object-orig.c
+Modified:
+   trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c
+Log:
+libg3d update II
+
+Modified: trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c
+===================================================================
+--- trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c	2006-09-15 16:42:11 UTC (rev 384)
++++ trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c	2006-09-15 16:47:39 UTC (rev 385)
+@@ -395,29 +395,18 @@
+ 	return TRUE;
+ }
+ 
+-/* texture vertices */
++/* smoothing groups */
+ gboolean x3ds_cb_0x4150(x3ds_global_data *global, x3ds_parent_data *parent)
+ {
+-/* 	G3DObject *object;
+- 	gint32 i;
+ 
++	G3DObject *object;
++
+ 	object = (G3DObject *)parent-&gt;object;
+- 	g_return_val_if_fail(object, FALSE);
++	g_return_val_if_fail(object, FALSE);
+ 
+- 	object-&gt;tex_vertex_count = g3d_read_int16_le(global-&gt;f);
+- 	parent-&gt;nb -= 2;
++	/* g3d_read_int16_le(global-&gt;f) */
++	/* smooth list goes here face-&gt;normals */
+ 
+- 	object-&gt;tex_vertex_data = g_new0(gfloat, object-&gt;tex_vertex_count * 2);
+-
+- 	for(i = 0; i &lt; object-&gt;tex_vertex_count; i ++)
+- 	{
+- 		object-&gt;tex_vertex_data[i * 2 + 0] = g3d_read_float_le(global-&gt;f);
+- 		object-&gt;tex_vertex_data[i * 2 + 1] = g3d_read_float_le(global-&gt;f);
+- 		parent-&gt;nb -= 8;
+-
+- 		if((i % 1000) == 0) x3ds_update_progress(global);
+- 	}*/
+-
+ 	return TRUE;
+ }
+ 
+
+Deleted: trunk/libs3d/libg3d/src/object-orig.c
+===================================================================
+--- trunk/libs3d/libg3d/src/object-orig.c	2006-09-15 16:42:11 UTC (rev 384)
++++ trunk/libs3d/libg3d/src/object-orig.c	2006-09-15 16:47:39 UTC (rev 385)
+@@ -1,368 +0,0 @@
+-/* $Id: object.c,v 1.1.2.7 2006/01/23 16:38:47 dahms Exp $ */
+-
+-/*
+-    libg3d - 3D object loading library
+-
+-    Copyright (C) 2005, 2006  Markus Dahms &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">mad at automagically.de</A>&gt;
+-
+-    This library is free software; you can redistribute it and/or
+-    modify it under the terms of the GNU Lesser General Public
+-    License as published by the Free Software Foundation; either
+-    version 2.1 of the License, or (at your option) any later version.
+-
+-    This library is distributed in the hope that it will be useful,
+-    but WITHOUT ANY WARRANTY; without even the implied warranty of
+-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-    Lesser General Public License for more details.
+-
+-    You should have received a copy of the GNU Lesser General Public
+-    License along with this library; if not, write to the Free Software
+-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+-*/
+-
+-#include &lt;string.h&gt;
+-#include &lt;math.h&gt;
+-
+-#include &lt;g3d/types.h&gt;
+-#include &lt;g3d/vector.h&gt;
+-#include &lt;g3d/matrix.h&gt;
+-#include &lt;g3d/face.h&gt;
+-
+-void g3d_object_free(G3DObject *object)
+-{
+-	GSList *slist, *snext;
+-	G3DMaterial *mat;
+-	G3DFace *face;
+-
+-	if(object-&gt;name != NULL)
+-		g_free(object-&gt;name);
+-
+-	/* materials */
+-	slist = object-&gt;materials;
+-	while(slist != NULL)
+-	{
+-		mat = (G3DMaterial*)slist-&gt;data;
+-		snext = slist-&gt;next;
+-		g_slist_free_1(slist);
+-		slist = snext;
+-	}
+-
+-	/* faces */
+-	slist = object-&gt;faces;
+-	while(slist != NULL)
+-	{
+-		face = (G3DFace*)slist-&gt;data;
+-		g3d_face_free(face);
+-		snext = slist-&gt;next;
+-		g_slist_free_1(slist);
+-		slist = snext;
+-	}
+-
+-	/* vertices */
+-	if(object-&gt;vertex_data != NULL) g_free(object-&gt;vertex_data);
+-	if(object-&gt;tex_vertex_data != NULL) g_free(object-&gt;tex_vertex_data);
+-	if(object-&gt;_normals != NULL) g_free(object-&gt;_normals);
+-	if(object-&gt;_indices != NULL) g_free(object-&gt;_indices);
+-	if(object-&gt;_materials != NULL) g_free(object-&gt;_materials);
+-	if(object-&gt;_flags != NULL) g_free(object-&gt;_flags);
+-
+-	g_free(object);
+-}
+-
+-gdouble g3d_object_radius(G3DObject *object)
+-{
+-	guint32 i;
+-	gdouble max_radius = 0.0, r;
+-	gfloat *v;
+-
+-	for(i = 0; i &lt; object-&gt;vertex_count; i ++)
+-	{
+-		v = &amp;object-&gt;vertex_data[i * 3];
+-		r = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
+-		if(r &gt; max_radius)
+-			max_radius = r;
+-	}
+-
+-	return sqrt(max_radius);
+-}
+-
+-gboolean g3d_object_scale(G3DObject *object, gfloat scale)
+-{
+-	guint32 i;
+-	gfloat *matrix;
+-
+-	for(i = 0; i &lt; object-&gt;vertex_count; i ++)
+-	{
+-		object-&gt;vertex_data[i * 3 + 0] *= scale;
+-		object-&gt;vertex_data[i * 3 + 1] *= scale;
+-		object-&gt;vertex_data[i * 3 + 2] *= scale;
+-	}
+-
+-	if(object-&gt;transformation)
+-	{
+-		matrix = object-&gt;transformation-&gt;matrix;
+-		g3d_matrix_translate(
+-			- (matrix[12] - (matrix[12] * scale)),
+-			- (matrix[13] - (matrix[13] * scale)),
+-			- (matrix[14] - (matrix[14] * scale)),
+-			matrix);
+-	}
+-
+-	return TRUE;
+-}
+-
+-#define G3D_OBJECT_TRANSFORM_NORMALS 0
+-
+-gboolean g3d_object_transform(G3DObject *object, gfloat *matrix)
+-{
+-	guint32 i;
+-#if G3D_OBJECT_TRANSFORM_NORMALS
+-	G3DFace *face;
+-	GSList *fitem;
+-#endif
+-
+-	/* transform vertices */
+-	for(i = 0; i &lt; object-&gt;vertex_count; i ++)
+-	{
+-		g3d_vector_transform(
+-			&amp;(object-&gt;vertex_data[i * 3 + 0]),
+-			&amp;(object-&gt;vertex_data[i * 3 + 1]),
+-			&amp;(object-&gt;vertex_data[i * 3 + 2]),
+-			matrix);
+-	}
+-
+-#if G3D_OBJECT_TRANSFORM_NORMALS
+-	fitem = object-&gt;faces;
+-	while(fitem)
+-	{
+-		face = (G3DFace *)fitem-&gt;data;
+-
+-		if(face-&gt;flags &amp; G3D_FLAG_FAC_NORMALS)
+-		{
+-			for(i = 0; i &lt; face-&gt;vertex_count; i ++)
+-			{
+-				g3d_vector_transform(
+-					&amp;(face-&gt;normals[i * 3 + 0]),
+-					&amp;(face-&gt;normals[i * 3 + 1]),
+-					&amp;(face-&gt;normals[i * 3 + 2]),
+-					matrix);
+-				g3d_vector_unify(
+-					&amp;(face-&gt;normals[i * 3 + 0]),
+-					&amp;(face-&gt;normals[i * 3 + 1]),
+-					&amp;(face-&gt;normals[i * 3 + 2]));
+-			}
+-		}
+-
+-		fitem = fitem-&gt;next;
+-	}
+-#endif
+-
+-	return TRUE;
+-}
+-
+-G3DObject *g3d_object_duplicate(G3DObject *object)
+-{
+-	G3DObject *new;
+-	G3DFace *face, *oface;
+-	GSList *litem;
+-
+-	new = g_new0(G3DObject, 1);
+-
+-	/* name */
+-	if(object-&gt;name)
+-		new-&gt;name = g_strdup(object-&gt;name);
+-
+-	/* vertices */
+-	new-&gt;vertex_count = object-&gt;vertex_count;
+-	new-&gt;vertex_data = g_new0(gfloat, new-&gt;vertex_count * 3);
+-	memcpy(new-&gt;vertex_data, object-&gt;vertex_data,
+-		new-&gt;vertex_count * 3 * sizeof(gfloat));
+-
+-	/* texture stuff */
+-	/* TODO: implement? */
+-
+-	/* faces */
+-	litem = object-&gt;faces;
+-	while(litem)
+-	{
+-		oface = (G3DFace *)litem-&gt;data;
+-
+-		face = g_new0(G3DFace, 1);
+-		face-&gt;material = oface-&gt;material;
+-		face-&gt;vertex_count = oface-&gt;vertex_count;
+-		face-&gt;vertex_indices = g_new0(guint32, face-&gt;vertex_count);
+-		memcpy(face-&gt;vertex_indices, oface-&gt;vertex_indices,
+-			face-&gt;vertex_count * sizeof(guint32));
+-		face-&gt;flags = oface-&gt;flags;
+-		if(face-&gt;flags &amp; G3D_FLAG_FAC_NORMALS)
+-		{
+-			face-&gt;normals = g_new0(gfloat, face-&gt;vertex_count * 3);
+-			memcpy(face-&gt;normals, oface-&gt;normals,
+-				face-&gt;vertex_count * 3 * sizeof(gfloat));
+-		}
+-		if(face-&gt;flags &amp; G3D_FLAG_FAC_TEXMAP)
+-		{
+-			face-&gt;tex_image = oface-&gt;tex_image;
+-			face-&gt;tex_vertex_count = oface-&gt;tex_vertex_count;
+-			face-&gt;tex_vertex_data = g_new0(gfloat, face-&gt;tex_vertex_count * 2);
+-			memcpy(face-&gt;tex_vertex_data, oface-&gt;tex_vertex_data,
+-				face-&gt;tex_vertex_count * 2 * sizeof(gfloat));
+-		}
+-
+-		new-&gt;faces = g_slist_prepend(new-&gt;faces, face);
+-
+-		litem = litem-&gt;next;
+-	}
+-
+-	return new;
+-}
+-
+-gboolean g3d_object_merge(G3DObject *o1, G3DObject *o2)
+-{
+-	G3DFace *face;
+-	GSList *fitem;
+-	guint32 i, voff, foff = 0;
+-
+-	/* copy vertices */
+-	voff = o1-&gt;vertex_count;
+-	o1-&gt;vertex_count += o2-&gt;vertex_count;
+-
+-	o1-&gt;vertex_data = g_realloc(o1-&gt;vertex_data,
+-		o1-&gt;vertex_count * 3 * sizeof(gfloat));
+-
+-	memcpy(o1-&gt;vertex_data + voff * 3, o2-&gt;vertex_data,
+-		o2-&gt;vertex_count * 3 * sizeof(gfloat));
+-
+-	/* attach faces to first object */
+-	fitem = o2-&gt;faces;
+-	while(fitem)
+-	{
+-		face = (G3DFace *)fitem-&gt;data;
+-		foff ++;
+-
+-		if(face-&gt;vertex_count &gt; 100)
+-		{
+-			g_printerr(&quot;face-&gt;vertex_count &gt; 100: %d (%dth)&quot;,
+-				face-&gt;vertex_count, foff);
+-		}
+-
+-		for(i = 0; i &lt; face-&gt;vertex_count; i ++)
+-			face-&gt;vertex_indices[i] += voff;
+-
+-		o1-&gt;faces = g_slist_prepend(o1-&gt;faces, face);
+-
+-		fitem = fitem-&gt;next;
+-	}
+-
+-	/* FIXME: clean up o2 or copy faces */
+-
+-	return TRUE;
+-}
+-
+-gboolean g3d_object_smooth(G3DObject *object)
+-{
+-	/* FIXME: implement */
+-	return FALSE;
+-}
+-
+-gboolean g3d_object_optimize(G3DObject *object)
+-{
+-	G3DFace *face;
+-	guint32 index = 0, i, j;
+-	GSList *fitem;
+-	gfloat nx, ny, nz;
+-
+-	/* count number of faces (optimized) */
+-	object-&gt;_num_faces = 0;
+-	fitem = object-&gt;faces;
+-	while(fitem)
+-	{
+-		face = (G3DFace *)fitem-&gt;data;
+-		object-&gt;_num_faces += face-&gt;vertex_count - 2;
+-
+-		fitem = fitem-&gt;next;
+-	}
+-
+-	object-&gt;_normals = g_new0(gfloat, object-&gt;_num_faces * 9);
+-	object-&gt;_materials = g_new0(G3DMaterial *, object-&gt;_num_faces);
+-	object-&gt;_flags = g_new0(guint32, object-&gt;_num_faces);
+-	object-&gt;_indices = g_new0(guint32, object-&gt;_num_faces * 3);
+-	object-&gt;_tex_images = g_new0(guint32, object-&gt;_num_faces);
+-	object-&gt;_tex_coords = g_new0(gfloat, object-&gt;_num_faces * 6);
+-
+-	/* copy faces */
+-	fitem = object-&gt;faces;
+-	while(fitem)
+-	{
+-		face = (G3DFace *)fitem-&gt;data;
+-
+-		/* generate default normal for face */
+-		if(!(face-&gt;flags &amp; G3D_FLAG_FAC_NORMALS))
+-		{
+-			if(!g3d_face_get_normal(face, object, &amp;nx, &amp;ny, &amp;nz))
+-			{
+-				fitem = fitem-&gt;next;
+-				object-&gt;_num_faces -= face-&gt;vertex_count - 2;
+-			}
+-
+-			g3d_vector_unify(&amp;nx, &amp;ny, &amp;nz);
+-		}
+-
+-		for(i = 0; i &lt; (face-&gt;vertex_count - 2); i ++)
+-		{
+-			object-&gt;_materials[index] = face-&gt;material;
+-			object-&gt;_flags[index] = face-&gt;flags;
+-
+-			if(face-&gt;flags &amp; G3D_FLAG_FAC_TEXMAP)
+-				object-&gt;_tex_images[index] = face-&gt;tex_image-&gt;tex_id;
+-
+-			for(j = 0; j &lt; 3; j ++)
+-			{
+-				/* vertex stuff */
+-				if(j == 0)
+-					object-&gt;_indices[index * 3] = face-&gt;vertex_indices[0];
+-				else
+-					object-&gt;_indices[index * 3+j] = face-&gt;vertex_indices[i+j];
+-
+-				/* normal stuff */
+-				if(face-&gt;flags &amp; G3D_FLAG_FAC_NORMALS)
+-				{
+-					object-&gt;_normals[(index * 3 + j) * 3 + 0] =
+-						face-&gt;normals[(i + j) * 3 + 0];
+-					object-&gt;_normals[(index * 3 + j) * 3 + 1] =
+-						face-&gt;normals[(i + j) * 3 + 1];
+-					object-&gt;_normals[(index * 3 + j) * 3 + 2] =
+-						face-&gt;normals[(i + j) * 3 + 2];
+-				}
+-				else
+-				{
+-					object-&gt;_normals[(index * 3 + j) * 3 + 0] = nx;
+-					object-&gt;_normals[(index * 3 + j) * 3 + 1] = ny;
+-					object-&gt;_normals[(index * 3 + j) * 3 + 2] = nz;
+-				}
+-
+-				/* texture stuff */
+-				if(face-&gt;flags &amp; G3D_FLAG_FAC_TEXMAP)
+-				{
+-					/* u */
+-					object-&gt;_tex_coords[(index * 3 + j) * 2 + 0] =
+-						(j == 0) ?
+-							face-&gt;tex_vertex_data[0] :
+-							face-&gt;tex_vertex_data[(i + j) * 2 + 0];
+-					/* v */
+-					object-&gt;_tex_coords[(index * 3 + j) * 2 + 1] =
+-						(j == 0) ?
+-							face-&gt;tex_vertex_data[1] :
+-							face-&gt;tex_vertex_data[(i + j) * 2 + 1];
+-				}
+-			} /* j: 0 &lt; 3 */
+-
+-			index ++;
+-		} /* i: 0 &lt; vertex_count - 2 */
+-
+-		fitem = fitem-&gt;next;
+-	} /* while(fitem) */
+-
+-	return TRUE;
+-}
+-
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000377.html">[S3d-svn] r384 - trunk/libs3d/libg3d/include/g3d
+</A></li>
+	<LI>Next message: <A HREF="000379.html">[S3d-svn] r386 - trunk/libs3d/libg3d/plugins/import
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#378">[ date ]</a>
+              <a href="thread.html#378">[ thread ]</a>
+              <a href="subject.html#378">[ subject ]</a>
+              <a href="author.html#378">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

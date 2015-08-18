@@ -1,0 +1,193 @@
+From lazhur at mail.berlios.de  Fri Jan  7 14:05:26 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Fri,  7 Jan 2011 14:05:26 +0100 (CET)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-6-4-gd81984c
+Message-ID: <20110107130526.6C4A748074C@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  d81984c680e01d80fe0a38e130e1f9410d4ed7c0 (commit)
+      from  a6f56f54fa53fc4a05003db301db50e67f7b6d10 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit d81984c680e01d80fe0a38e130e1f9410d4ed7c0
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Fri Jan 7 14:05:54 2011 +0100
+
+    Update debian/copyright to rev=135
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/copyright |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Jan  8 21:24:10 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat,  8 Jan 2011 21:24:10 +0100 (CET)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-6-5-g0e61060
+Message-ID: <20110108202411.0DC53480BE5@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  0e61060186b66fd1085b0d27d1c893543338531e (commit)
+      from  d81984c680e01d80fe0a38e130e1f9410d4ed7c0 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 0e61060186b66fd1085b0d27d1c893543338531e
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Jan 8 21:23:54 2011 +0100
+
+    Update debian/copyright to DEP5 revision 153
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    1 +
+ debian/copyright |   38 ++++++++++----------------------------
+ 2 files changed, 11 insertions(+), 28 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Jan  8 22:10:10 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat,  8 Jan 2011 22:10:10 +0100 (CET)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-6-6-g8e0dbd4
+Message-ID: <20110108211010.EF70A480BE5@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  8e0dbd4f7068c1fa23312f1ea01a4a8d4614a5dd (commit)
+      from  0e61060186b66fd1085b0d27d1c893543338531e (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 8e0dbd4f7068c1fa23312f1ea01a4a8d4614a5dd
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Jan 8 22:09:33 2011 +0100
+
+    Update copyright years in debian/copyright
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    4 +++-
+ debian/copyright |    4 ++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sun Jan  9 14:56:43 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun,  9 Jan 2011 14:56:43 +0100 (CET)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-6-7-gac5d166
+Message-ID: <20110109135644.4552B480413@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  ac5d166a17fa26a965f1ff58b4f76c93b6a3888c (commit)
+      from  8e0dbd4f7068c1fa23312f1ea01a4a8d4614a5dd (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit ac5d166a17fa26a965f1ff58b4f76c93b6a3888c
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sun Jan 9 14:55:41 2011 +0100
+
+    Use more verbose license terms
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/copyright |   36 ++++++++++++++++++++++++++++++++++--
+ 1 files changed, 34 insertions(+), 2 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Thu Jan 20 20:18:56 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 20 Jan 2011 20:18:56 +0100 (CET)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-6-8-gf73eccc
+Message-ID: <20110120191857.0A782480E74@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  f73ecccd3fa16d93570c6a832cedb7caa121ad3f (commit)
+      from  ac5d166a17fa26a965f1ff58b4f76c93b6a3888c (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit f73ecccd3fa16d93570c6a832cedb7caa121ad3f
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Thu Jan 20 20:06:36 2011 +0100
+
+    Update DEP-5 Format url to revision 164
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    2 +-
+ debian/copyright |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

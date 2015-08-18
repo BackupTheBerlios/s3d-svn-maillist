@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r366 - in trunk: . libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r366%20-%20in%20trunk%3A%20.%20libs3dw&In-Reply-To=%3C200606292012.k5TKCdUg029734%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000358.html">
+   <LINK REL="Next"  HREF="000360.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r366 - in trunk: . libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r366%20-%20in%20trunk%3A%20.%20libs3dw&In-Reply-To=%3C200606292012.k5TKCdUg029734%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r366 - in trunk: . libs3dw">dotslash at berlios.de
+       </A><BR>
+    <I>Thu Jun 29 22:12:39 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000358.html">[S3d-svn] r365 - in trunk: example libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000360.html">[S3d-svn] r367 - in trunk: . libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#359">[ date ]</a>
+              <a href="thread.html#359">[ thread ]</a>
+              <a href="subject.html#359">[ subject ]</a>
+              <a href="author.html#359">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-29 22:12:38 +0200 (Thu, 29 Jun 2006)
+New Revision: 366
+
+Modified:
+   trunk/
+   trunk/libs3dw/arrange.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r863 at balthasar</A>:  dotslash | 2006-06-29 22:12:03 +0200
+ - windows turning to teh user~
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:844
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:863
+
+Modified: trunk/libs3dw/arrange.c
+===================================================================
+--- trunk/libs3dw/arrange.c	2006-06-27 17:32:46 UTC (rev 365)
++++ trunk/libs3dw/arrange.c	2006-06-29 20:12:38 UTC (rev 366)
+@@ -26,14 +26,29 @@
+ #include &lt;s3dw_int.h&gt;
+ #include &lt;stdlib.h&gt; /* rand(), RAND_MAX */
+ #include &lt;math.h&gt;	/* M_PI */
++#define R2D		(180/M_PI)
+ s3dw_widget *cam=NULL;
+ 
+ void s3dw_arr_widgetcenter(s3dw_widget *widget, float *center)
+ {
+-	center[0]=widget-&gt;s*widget-&gt;width/2;
+-	center[1]=widget-&gt;s*-widget-&gt;height/2+0.5;
+-	center[2]=widget-&gt;s*0.5;
++	float x,y,z,xt,yt,zt;
++	x=widget-&gt;s*widget-&gt;width/2;
++	y=widget-&gt;s*-widget-&gt;height/2+0.5;
++	z=widget-&gt;s*0.5;
++	/* calc back rotation */
++	/* around the y axis (horizontal direction) */
++	xt= cos(widget-&gt;ry/R2D)*x + sin(widget-&gt;ry/R2D) *z;
++	yt=y;
++	zt=-sin(widget-&gt;ry/R2D)*x + cos(widget-&gt;ry/R2D) *z;
+ 	
++	/* around the x axis (vertical direction) */
++	x=xt;
++	y= cos(widget-&gt;rx/R2D)*yt + sin(widget-&gt;rx/R2D) *zt;
++	z=-sin(widget-&gt;rx/R2D)*yt + cos(widget-&gt;rx/R2D) *zt;
++	
++	center[0]=x;
++	center[1]=y;
++	center[2]=z;
+ }
+ void s3dw_arr_normdir(float *dir)
+ {
+@@ -49,31 +64,49 @@
+ 	dir[1]/=dirlen;
+ 	dir[2]/=dirlen;
+ }
++int al=0;
+ void s3dw_turn()
+ {
+ 	s3dw_widget *w,*root=s3dw_getroot();
+ 	int i;
+-	float a[3],b[3],ry,rz;
++	float a[3],b[3],rx,ry;
++	float op[3],np[3];
+ 	a[0]=0;
+ 	a[1]=0;
+ 	a[2]=1;
++	al++;
+ 	for (i=0;i&lt;root-&gt;nobj;i++)
+ 	{
+ 		w=root-&gt;pobj[i];
+ 		if (w-&gt;oid!=0)
+ 		{
++			s3dw_arr_widgetcenter(w,op);
+ 			/* horizontal movement */
+-			b[0]=w-&gt;x   - cam-&gt;x;
++			b[0]=w-&gt;x + op[0]  - cam-&gt;x;
+ 			b[1]=0;
+-			b[2]=w-&gt;z   - cam-&gt;z;
++			b[2]=w-&gt;z + op[2]  - cam-&gt;z;
+ 			ry=180*s3d_vector_angle(a,b)/M_PI;
+-			b[0]=w-&gt;x   - cam-&gt;x;
+-			b[1]=0;
+-			b[2]=w-&gt;z   - cam-&gt;z;
+-			rz=180*s3d_vector_angle(a,b)/M_PI;
++			/* correct acos incompletness */
++			if (b[0]&lt;0) ry=180-ry;
++			else 		ry=180+ry;
++			b[0]=0;
++			b[1]=w-&gt;y + op[1]   - cam-&gt;y;
++			b[2]=w-&gt;z + op[2]   - cam-&gt;z;
++			rx=180*s3d_vector_angle(a,b)/M_PI;
++			if (b[1]&gt;0) rx=180-rx;
++			else 		rx=180+rx;
++			if ((rx&gt;90) &amp;&amp; (rx&lt;=180)) 
++				rx=180 - rx;
++			else if ((rx&gt;=180) &amp;&amp; (rx&lt;270))  rx=540 - rx ;
++
++			w-&gt;rx=rx;
+ 			w-&gt;ry=ry;
+-			w-&gt;rz=rz;
+-			s3dprintf(MED,&quot;turn %03.3f, %03.3f&quot;,ry,rz);
++			s3dw_arr_widgetcenter(w,np);
++			w-&gt;x-=np[0] - op[0];
++			w-&gt;y-=np[1] - op[1];
++			w-&gt;z-=np[2] - op[2];
++
++			s3dw_ani_add(w);
+ 		}
+ 	}
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000358.html">[S3d-svn] r365 - in trunk: example libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000360.html">[S3d-svn] r367 - in trunk: . libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#359">[ date ]</a>
+              <a href="thread.html#359">[ thread ]</a>
+              <a href="subject.html#359">[ subject ]</a>
+              <a href="author.html#359">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

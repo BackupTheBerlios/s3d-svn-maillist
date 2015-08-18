@@ -1,0 +1,405 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r37 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r37%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602091728.k19HSf2Z030242%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000032.html">
+   <LINK REL="Next"  HREF="000034.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r37 - trunk/apps/olsrs3d</H1>
+    <B>marec at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r37%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602091728.k19HSf2Z030242%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r37 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Thu Feb  9 18:28:41 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000032.html">[S3d-svn] r36 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000034.html">[S3d-svn] r38 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#33">[ date ]</a>
+              <a href="thread.html#33">[ thread ]</a>
+              <a href="subject.html#33">[ subject ]</a>
+              <a href="author.html#33">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-02-09 18:28:33 +0100 (Thu, 09 Feb 2006)
+New Revision: 37
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/olsrs3d.h
+   trunk/apps/olsrs3d/process.c
+Log:
+adj-list
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-02-09 15:40:31 UTC (rev 36)
++++ trunk/apps/olsrs3d/main.c	2006-02-09 17:28:33 UTC (rev 37)
+@@ -11,7 +11,6 @@
+ 
+ char Olsr_host[256];   // ip or hostname of olsr node with running dot_draw plugin
+ 
+-static struct olsr_node *Root = NULL;   // top of olsr node tree
+ 
+ int node_count=-1;
+ int alpha=0;
+@@ -141,14 +140,13 @@
+ 
+ void handle_olsr_node( struct olsr_node *olsr_node ) {
+ 
+-	float f;
++	float f, distance;
++	float tmp_mov_vec[3];
++	struct olsr_con **olsr_con;
+ 
+ 	// no more node left
+ 	if ( olsr_node == NULL ) return;
+-
+-	// reset movement vector
+-	olsr_node-&gt;mov_vec[0] = olsr_node-&gt;mov_vec[1] = olsr_node-&gt;mov_vec[2] = 0.0;
+-
++printf( &quot;durchlauf: %s\n&quot;, olsr_node );
+ 	// olsr node shape has been modified
+ 	if ( olsr_node-&gt;inet_gw_modified ) {
+ 
+@@ -168,7 +166,7 @@
+ 		s3d_flags_on( olsr_node-&gt;obj_id, S3D_OF_VISIBLE );
+ 
+ 		/* create olsr node text and attach (link) it to the node */
+-		node-&gt;desc_id = s3d_draw_string( olsr_node-&gt;ip, &amp;f );
++		olsr_node-&gt;desc_id = s3d_draw_string( olsr_node-&gt;ip, &amp;f );
+ 		s3d_link( olsr_node-&gt;desc_id, olsr_node-&gt;obj_id );
+ 		s3d_translate( olsr_node-&gt;desc_id, -f/2,-2,0 );
+ 		s3d_flags_on( olsr_node-&gt;desc_id, S3D_OF_VISIBLE );
+@@ -177,6 +175,23 @@
+ 
+ 	}
+ 
++	/* reset movement vector */
++	olsr_node-&gt;mov_vec[0] = olsr_node-&gt;mov_vec[1] = olsr_node-&gt;mov_vec[2] = 0.0;
++
++	/* calculate new movement vector */
++// 	olsr_con = &amp;olsr_node-&gt;olsr_con;
++//
++// 	while ( (*olsr_con) != NULL ) {
++//
++// 		distance = dirt( olsr_node-&gt;pos_vec, (*olsr_con)-&gt;olsr_node-&gt;pos_vec, tmp_mov_vec );
++// 		f = ( (*olsr_con)-&gt;etx ) / distance;
++// 		if ( f &lt; 0.3 ) f = 0.3;
++// 		mov_add( olsr_node-&gt;mov_vec, tmp_mov_vec, 1/f-1);
++//
++// 		olsr_con = &amp;(*olsr_con)-&gt;next_olsr_con;
++//
++// 	}
++
+ 	handle_olsr_node( olsr_node-&gt;left );
+ 	handle_olsr_node( olsr_node-&gt;right );
+ 
+@@ -197,62 +212,62 @@
+ // 	}
+ 
+ 	// prepare nodes
+-	handle_olsr_node( &amp;Root );
++	handle_olsr_node( Root );
+ 
+-	for (i=0;i&lt;max;i++)
+-	{
+-		for (j=i+1;j&lt;max;j++)
+-		{
+-			if (i!=j)
+-			{
+-				gd=adj[i*max+j];
+-				d=dirt(node[i].pos,node[j].pos,m);
+-				if (gd==0.0)	/* points are not connected */
+-				{
++	/*	for (i=0;i&lt;max;i++)*/
++	/*	{*/
++	/*		for (j=i+1;j&lt;max;j++)*/
++	/*		{*/
++	/*			if (i!=j)*/
++	/*			{*/
++	/*				gd=adj[i*max+j];*/
++	/*				d=dirt(node[i].pos,node[j].pos,m);*/
++	/*				if (gd==0.0)*/	/* points are not connected */
++	/*				{*/
+ /*					printf(&quot;distance between i and j: %f\n&quot;,d);*/
+-					if (d&lt;0.1) d=0.1;
+-					mov_add(node[j].mov,m,100/(d*d));
+-					mov_add(node[i].mov,m,-100/(d*d));
+-				} else { /* connected!! */
++	/*					if (d&lt;0.1) d=0.1;*/
++	/*					mov_add(node[j].mov,m,100/(d*d));*/
++	/*					mov_add(node[i].mov,m,-100/(d*d));*/
++	/*				} else {*/ /* connected!! */
+ 
+-					f=(gd)/d;
+-					if (f&lt;0.3) f=0.3;
+-					mov_add(node[i].mov,m,1/f-1);
+-					mov_add(node[j].mov,m,-(1/f-1));
++	/*					f=(gd)/d;*/
++	/*					if (f&lt;0.3) f=0.3;*/
++	/*					mov_add(node[i].mov,m,1/f-1);*/
++	/*					mov_add(node[j].mov,m,-(1/f-1));*/
+ /*					printf(&quot;distance between %d and %d: %f / %f = %f\n&quot;,i,j,gd,d,f);*/
+-				}
+-			}
+-		}
+-		d=dirt(node[i].pos,z,m);
++	/*				}*/
++	/*			}*/
++	/*		}*/
++	/*		d=dirt(node[i].pos,z,m);*/
+ /*		mov_add(node[i].mov,m,d/100); * move a little bit to point zero */
+-		mov_add(node[i].mov,m,1); /* move a little bit to point zero */
+-	}
++/*		mov_add(node[i].mov,m,1); * move a little bit to point zero */
++/*	}
+ 	/* move it!! */
+-	for (i=0;i&lt;max;i++)
+-	{
++// 	for (i=0;i&lt;max;i++)
++// 	{
+ /*		printf(&quot;applying move vector for point %d: %f:%f:%f\n&quot;,i,node[i].mov[0],node[i].mov[1],node[i].mov[2]);*/
+-		if ((d=dist(node[i].mov,z))&gt;10.0)
+-			mov_add(node[i].pos,node[i].mov,1.0/((float )d)); /* normalize */
+-		else
+-			mov_add(node[i].pos,node[i].mov,0.1);
+-		s3d_translate(node[i].obj,node[i].pos[0],node[i].pos[1],node[i].pos[2]);
+-		for (j=i+1;j&lt;max;j++)
+-			if ((o=adj_obj[max*i+j])!=-1)
+-			{
+-				s3d_pop_vertex(o,6);
++// 		if ((d=dist(node[i].mov,z))&gt;10.0)
++// 			mov_add(node[i].pos,node[i].mov,1.0/((float )d)); /* normalize */
++// 		else
++// 			mov_add(node[i].pos,node[i].mov,0.1);
++// 		s3d_translate(node[i].obj,node[i].pos[0],node[i].pos[1],node[i].pos[2]);
++// 		for (j=i+1;j&lt;max;j++)
++// 			if ((o=adj_obj[max*i+j])!=-1)
++// 			{
++// 				s3d_pop_vertex(o,6);
+ /*				s3d_pop_polygon(o,2);*/
+-				s3d_push_vertex(o,node[i].pos[0],	 node[i].pos[1],node[i].pos[2]);
+-				s3d_push_vertex(o,node[i].pos[0]+0.2,node[i].pos[1],node[i].pos[2]);
+-				s3d_push_vertex(o,node[i].pos[0]-0.2,node[i].pos[1],node[i].pos[2]);
++// 				s3d_push_vertex(o,node[i].pos[0],	 node[i].pos[1],node[i].pos[2]);
++// 				s3d_push_vertex(o,node[i].pos[0]+0.2,node[i].pos[1],node[i].pos[2]);
++// 				s3d_push_vertex(o,node[i].pos[0]-0.2,node[i].pos[1],node[i].pos[2]);
+ 
+-				s3d_push_vertex(o,node[j].pos[0],	 node[j].pos[1],node[j].pos[2]);
+-				s3d_push_vertex(o,node[j].pos[0],node[j].pos[1]+0.2,node[j].pos[2]);
+-				s3d_push_vertex(o,node[j].pos[0],node[j].pos[1]-0.2,node[j].pos[2]);
++// 				s3d_push_vertex(o,node[j].pos[0],	 node[j].pos[1],node[j].pos[2]);
++// 				s3d_push_vertex(o,node[j].pos[0],node[j].pos[1]+0.2,node[j].pos[2]);
++// 				s3d_push_vertex(o,node[j].pos[0],node[j].pos[1]-0.2,node[j].pos[2]);
+ 
+ /*				s3d_push_polygon(o,0,4,5,0);
+ 				s3d_push_polygon(o,3,1,2,0);*/
+-			}
+-	}
++// 			}
++// 	}
+ 	while (0!=(r=net_main()))
+ 		if (r==-1)
+ 		{
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-02-09 15:40:31 UTC (rev 36)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-02-09 17:28:33 UTC (rev 37)
+@@ -6,7 +6,7 @@
+ };
+ 
+ 
+-// binary tree for the connections
++// linked list for the connections
+ struct olsr_con {
+ 
+ 	struct olsr_con *next_olsr_con;   // pointer to next connection
+@@ -14,7 +14,7 @@
+ 	int obj_id;   // id of connection object in s3d
+ 	float etx;
+ 
+-}
++};
+ 
+ 
+ // we contruct a binary tree to handle the nodes
+@@ -34,6 +34,10 @@
+ };
+ 
+ 
++
++static struct olsr_node *Root = NULL;   // top of olsr node tree
++
++
+ extern int 	max, new_max;
+ extern float 	*adj;
+ extern int	*adj_obj;
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-02-09 15:40:31 UTC (rev 36)
++++ trunk/apps/olsrs3d/process.c	2006-02-09 17:28:33 UTC (rev 37)
+@@ -142,46 +142,47 @@
+  *
+  ***/
+ 
+-void *get_olsr_node( struct olsr_node **node, char *ip ) {
++void *get_olsr_node( struct olsr_node **olsr_node, char *ip ) {
+ 
+ 	int i;   // inc var
+ 	int result;   // result of strcmp
+ 
+ 	// if node is NULL we reached the end of the tree and must create a new olsr_node
+-	if ( (*node) == NULL ) {
++	if ( (*olsr_node) == NULL ) {
+ 
+-		(*node) = malloc( sizeof( struct olsr_node ) );
+-		if ( (*node) == NULL ) out_of_mem();
++		(*olsr_node) = malloc( sizeof( struct olsr_node ) );
++		if ( (*olsr_node) == NULL ) out_of_mem();
+ 
+-		(*node)-&gt;left = NULL;
+-		(*node)-&gt;right = NULL;
+-		strncpy((*node)-&gt;ip,ip,NAMEMAX);
+-		(*node)-&gt;inet_gw = 0;
+-		(*node)-&gt;inet_gw_modified = 1;
++		(*olsr_node)-&gt;left = NULL;
++		(*olsr_node)-&gt;right = NULL;
++		strncpy((*olsr_node)-&gt;ip,ip,NAMEMAX);
++		(*olsr_node)-&gt;inet_gw = 0;
++		(*olsr_node)-&gt;inet_gw_modified = 1;
++		printf( &quot;add: %s\n&quot;, (*olsr_node)-&gt;ip );
+ 
+ 		for ( i=0; i&lt;3; i++ ) {
+-			(*node)-&gt;pos_vec[i] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
+-			(*node)-&gt;mov_vec[i] = 0.0;
++			(*olsr_node)-&gt;pos_vec[i] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
++			(*olsr_node)-&gt;mov_vec[i] = 0.0;
+ 		}
+ 
+-		(*node)-&gt;obj_id = NULL;
+-		(*node)-&gt;desc_id = NULL;
+-		(*node)-&gt;olsr_con = NULL;
++		(*olsr_node)-&gt;obj_id = NULL;
++		(*olsr_node)-&gt;desc_id = NULL;
++		(*olsr_node)-&gt;olsr_con = NULL;
+ 
+-		return (*node);
++		return (*olsr_node);
+ 
+ 	}
+ 
+-	result = strncmp( (*node)-&gt;ip, ip, NAMEMAX );
++	result = strncmp( (*olsr_node)-&gt;ip, ip, NAMEMAX );
+ 
+ 	// we found the node
+-	if ( result == 0 ) return (*node);
++	if ( result == 0 ) return (*olsr_node);
+ 
+ 	// the searched node must be in the subtree
+ 	if ( result &lt; 0 ) {
+-		get_olsr_node( &amp;(*node)-&gt;right, ip );
++		get_olsr_node( &amp;(*olsr_node)-&gt;right, ip );
+ 	} else {
+-		get_olsr_node( &amp;(*node)-&gt;left, ip );
++		get_olsr_node( &amp;(*olsr_node)-&gt;left, ip );
+ 	}
+ 
+ }
+@@ -332,22 +333,27 @@
+ 	{
+ /*		printf(&quot;######link from [%s] to [%s], label [%s]\n&quot;,data[0],data[1],data[2]);*/
+ 		// announced network via HNA
+-// 		if ( strcmp( data[2], &quot;HNA&quot; ) == 0 ) {
+-//
+-// 			// connection to internet
+-// 			if ( strcmp( data[1], &quot;0.0.0.0/0.0.0.0&quot; ) == 0 ) {
+-// 				n1=get_node_num(data[0]);
+-// 				s3d_del_object(node[n1].obj);
+-// 				node[n1].obj=s3d_clone(Olsr_node_inet_obj);
+-// 				s3d_flags_on(node[n1].obj,S3D_OF_VISIBLE);
+-// 				s3d_link(node[n1].s_obj, node[n1].obj);
+-//
+-// 			}
+-//
+-// 			// TODO: other HNA hast to be done
+-//
+-// 		// normal node
+-// 		} else {
++		if ( strcmp( data[2], &quot;HNA&quot; ) == 0 ) {
++
++			// connection to internet
++			if ( strcmp( data[1], &quot;0.0.0.0/0.0.0.0&quot; ) == 0 ) {
++
++				olsr_node1 = get_olsr_node( &amp;Root, data[0] );
++
++				if ( olsr_node1-&gt;inet_gw == 0 ) {
++
++					olsr_node1-&gt;inet_gw = 1;
++					olsr_node1-&gt;inet_gw_modified = 1;
++					printf( &quot;new internet: %s\n&quot;, olsr_node1-&gt;ip );
++
++				}
++
++			}
++
++			/* TODO: other HNA hast to be done */
++
++		// normal node
++		} else {
+ // 			n1=get_node_num(data[0]);
+ // 			n2=get_node_num(data[1]);
+ 			olsr_node1 = get_olsr_node( &amp;Root, data[0] );
+@@ -356,8 +362,8 @@
+ /*		printf(&quot;######link from %d to %d, %f, %d\n&quot;,n1,n2,f, f&gt;=10);*/
+ 			if (f&gt;=5) /* just to prevent ascii to float converting inconsistency ... */
+ // 				add_adj(n1,n2,f);
+-				add_olsr_con( olsr_node1-&gt;olsr_con, olsr_node2, f );
+-// 		}
++				add_olsr_con( &amp;(olsr_node1)-&gt;olsr_con, olsr_node2, f );
++		}
+ 	}
+ 	return(0);
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000032.html">[S3d-svn] r36 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000034.html">[S3d-svn] r38 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#33">[ date ]</a>
+              <a href="thread.html#33">[ thread ]</a>
+              <a href="subject.html#33">[ subject ]</a>
+              <a href="author.html#33">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

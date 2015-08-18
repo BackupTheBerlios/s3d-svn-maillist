@@ -1,0 +1,305 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r691 - trunk/example
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r691%20-%20trunk/example&In-Reply-To=%3C200709232158.l8NLwHCR013703%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000683.html">
+   <LINK REL="Next"  HREF="000684.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r691 - trunk/example</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r691%20-%20trunk/example&In-Reply-To=%3C200709232158.l8NLwHCR013703%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r691 - trunk/example">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Sep 23 23:58:17 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000683.html">[S3d-svn] r690 - trunk/apps/s3dvt
+</A></li>
+        <LI>Next message: <A HREF="000684.html">[S3d-svn] r692 - trunk/apps/s3d_x11gate
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#682">[ date ]</a>
+              <a href="thread.html#682">[ thread ]</a>
+              <a href="subject.html#682">[ subject ]</a>
+              <a href="author.html#682">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-09-23 23:58:16 +0200 (Sun, 23 Sep 2007)
+New Revision: 691
+
+Added:
+   trunk/example/example.h
+Modified:
+   trunk/example/filebrowser.c
+   trunk/example/linetest.c
+   trunk/example/modelloader.c
+   trunk/example/ptrtest.c
+   trunk/example/s3dclock.c
+   trunk/example/strtest.c
+   trunk/example/widgets.c
+   trunk/example/wiresphere.c
+Log:
+Mark unused parameter in example as S3DUNUSED to fix warnings
+
+
+Added: trunk/example/example.h
+===================================================================
+--- trunk/example/example.h	2007-09-23 21:58:09 UTC (rev 690)
++++ trunk/example/example.h	2007-09-23 21:58:16 UTC (rev 691)
+@@ -0,0 +1,39 @@
++/*
++ * examples.h
++ *
++ * Copyright (C) 2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#ifndef _EXAMPLES_H_
++#define _EXAMPLES_H_
++
++#include &lt;config-s3d.h&gt;
++
++#ifndef S3DUNUSED
++#if defined(UNUSEDPARAM_ATTRIBUTE)
++#define S3DUNUSED(x) (x)__attribute__((unused))
++#elif defined(UNUSEDPARAM_OMIT)
++#define S3DUNUSED(x) /* x */
++#else
++#define S3DUNUSED(x) x
++#endif
++#endif
++
++#endif /* _EXAMPLES_H_ */
+
+Modified: trunk/example/filebrowser.c
+===================================================================
+--- trunk/example/filebrowser.c	2007-09-23 21:58:09 UTC (rev 690)
++++ trunk/example/filebrowser.c	2007-09-23 21:58:16 UTC (rev 691)
+@@ -32,6 +32,7 @@
+ #include &lt;unistd.h&gt;  /*  chdir() */
+ #include &lt;math.h&gt;  /*  sin(),cos() */
+ #include &lt;time.h&gt; /* nanosleep() */
++#include &quot;example.h&quot; /* S3DUNUSED */
+ static struct timespec t = {
+ 	0, 100*1000*1000
+ }; /* 100 mili seconds */
+@@ -54,7 +55,7 @@
+ };
+ struct t_item *item;
+ int n_item = 0;
+-int display_dir(char *dir, int depth, int  posx, int posy, int posz)
++int display_dir(char *dir, int S3DUNUSED(depth), int  posx, int posy, int posz)
+ {
+ 	struct dirent **namelist;
+ 	int n, i;
+
+Modified: trunk/example/linetest.c
+===================================================================
+--- trunk/example/linetest.c	2007-09-23 21:58:09 UTC (rev 690)
++++ trunk/example/linetest.c	2007-09-23 21:58:16 UTC (rev 691)
+@@ -26,9 +26,10 @@
+ #include &lt;s3d.h&gt;
+ #include &lt;stdio.h&gt;  /*  NULL*/
+ #include &lt;unistd.h&gt; /* sleep() */
++#include &quot;example.h&quot; /* S3DUNUSED */
+ int i;
+ int o;
+-void stop(struct s3d_evt *evt)
++void stop(struct s3d_evt *S3DUNUSED(evt))
+ {
+ 	s3d_quit();
+ }
+
+Modified: trunk/example/modelloader.c
+===================================================================
+--- trunk/example/modelloader.c	2007-09-23 21:58:09 UTC (rev 690)
++++ trunk/example/modelloader.c	2007-09-23 21:58:16 UTC (rev 691)
+@@ -27,6 +27,7 @@
+ #include &lt;s3d.h&gt;
+ #include &lt;stdio.h&gt;  /* NULL */
+ #include &lt;time.h&gt; /* nanosleep() */
++#include &quot;example.h&quot; /* S3DUNUSED */
+ static struct timespec t = {
+ 	0, 100*1000*1000
+ }; /* 100 mili seconds */
+@@ -37,7 +38,7 @@
+ 	i = (i + 1) % 360;
+ 	nanosleep(&amp;t, NULL);
+ }
+-int object_click(struct s3d_evt *evt)
++int object_click(struct s3d_evt *S3DUNUSED(evt))
+ {
+ 	s3d_quit();
+ 	return(0);
+
+Modified: trunk/example/ptrtest.c
+===================================================================
+--- trunk/example/ptrtest.c	2007-09-23 21:58:09 UTC (rev 690)
++++ trunk/example/ptrtest.c	2007-09-23 21:58:16 UTC (rev 691)
+@@ -26,6 +26,7 @@
+ #include &lt;stdio.h&gt;  /*  NULL*/
+ #include &lt;time.h&gt; /* nanosleep() */
+ #include &lt;math.h&gt; /* sin(), cos() */
++#include &quot;example.h&quot; /* S3DUNUSED */
+ int i;
+ int o;
+ float bottom = -1.0;
+@@ -36,7 +37,7 @@
+ static struct timespec t = {
+ 	0, 10*1000*1000
+ }; /* 100 mili seconds */
+-int stop(struct s3d_evt *evt)
++int stop(struct s3d_evt *S3DUNUSED(evt))
+ {
+ 	s3d_quit();
+ 	return(0);
+
+Modified: trunk/example/s3dclock.c
+===================================================================
+--- trunk/example/s3dclock.c	2007-09-23 21:58:09 UTC (rev 690)
++++ trunk/example/s3dclock.c	2007-09-23 21:58:16 UTC (rev 691)
+@@ -26,6 +26,7 @@
+ #include &lt;stdio.h&gt;  /*  NULL, sprintf() */
+ #include &lt;time.h&gt;  /*  nanosleep(), struct tm, time_t...  */
+ #include &lt;string.h&gt;  /*  strlen() */
++#include &quot;example.h&quot; /* S3DUNUSED */
+ static struct timespec t = {
+ 	0, 100*1000*1000
+ }; /* 100 mili seconds */
+@@ -35,7 +36,7 @@
+ time_t now, onow;
+ char time_str[256];
+ 
+-void stop(struct s3d_evt *evt)
++void stop(struct s3d_evt *S3DUNUSED(evt))
+ {
+ 	s3d_quit();
+ }
+
+Modified: trunk/example/strtest.c
+===================================================================
+--- trunk/example/strtest.c	2007-09-23 21:58:09 UTC (rev 690)
++++ trunk/example/strtest.c	2007-09-23 21:58:16 UTC (rev 691)
+@@ -26,8 +26,9 @@
+ #include &lt;s3d.h&gt;
+ #include &lt;stdio.h&gt;  /*  NULL*/
+ #include &lt;unistd.h&gt; /* sleep() */
++#include &quot;example.h&quot; /* S3DUNUSED */
+ int o;
+-void stop(struct s3d_evt *evt)
++void stop(struct s3d_evt *S3DUNUSED(evt))
+ {
+ 	s3d_quit();
+ }
+
+Modified: trunk/example/widgets.c
+===================================================================
+--- trunk/example/widgets.c	2007-09-23 21:58:09 UTC (rev 690)
++++ trunk/example/widgets.c	2007-09-23 21:58:16 UTC (rev 691)
+@@ -30,6 +30,7 @@
+ #include &lt;time.h&gt; /* nanosleep() */
+ #include &lt;stdlib.h&gt; /* free() */
+ #include &lt;string.h&gt; /* strlen() */
++#include &quot;example.h&quot;
+ 
+ s3dw_surface *surface;
+ s3dw_input *input;
+@@ -78,12 +79,12 @@
+ 
+ }
+ 
+-void done_button(s3dw_widget *dummy)
++void done_button(s3dw_widget *S3DUNUSED(dummy))
+ {
+ 	s3d_quit();
+ }
+ 
+-void okay_button(s3dw_widget *dummy)
++void okay_button(s3dw_widget *S3DUNUSED(dummy))
+ {
+ 	s3dw_button *button;
+ 	char string[32];
+@@ -115,7 +116,7 @@
+ 	/* we don't need it anymore. always free strings, don't leak around */
+ 	free(age);
+ }
+-void no_button(s3dw_widget *dummy)
++void no_button(s3dw_widget *S3DUNUSED(dummy))
+ {
+ 	s3dw_button *button;
+ 	s3dw_delete(S3DWIDGET(surface));
+
+Modified: trunk/example/wiresphere.c
+===================================================================
+--- trunk/example/wiresphere.c	2007-09-23 21:58:09 UTC (rev 690)
++++ trunk/example/wiresphere.c	2007-09-23 21:58:16 UTC (rev 691)
+@@ -27,6 +27,7 @@
+ #include &lt;time.h&gt; /* nanosleep()  */
+ #include &lt;math.h&gt; /* M_PI, cos(), sin() */
+ #include &lt;stdlib.h&gt; /* malloc(), free() */
++#include &quot;example.h&quot; /* S3DUNUSED */
+ static struct timespec t = {
+ 	0, 100*1000*1000
+ }; /* 100 mili seconds */
+@@ -98,7 +99,7 @@
+ 	free(l);
+ 	return(o);
+ }
+-void stop(struct s3d_evt *evt)
++void stop(struct s3d_evt *S3DUNUSED(evt))
+ {
+ 	s3d_quit();
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000683.html">[S3d-svn] r690 - trunk/apps/s3dvt
+</A></li>
+	<LI>Next message: <A HREF="000684.html">[S3d-svn] r692 - trunk/apps/s3d_x11gate
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#682">[ date ]</a>
+              <a href="thread.html#682">[ thread ]</a>
+              <a href="subject.html#682">[ subject ]</a>
+              <a href="author.html#682">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

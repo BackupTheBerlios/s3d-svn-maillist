@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r73 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r73%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602151741.k1FHfp8u023085%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000068.html">
+   <LINK REL="Next"  HREF="000070.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r73 - trunk/apps/olsrs3d</H1>
+    <B>nichtsnutz at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r73%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602151741.k1FHfp8u023085%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r73 - trunk/apps/olsrs3d">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Wed Feb 15 18:41:51 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000068.html">[S3d-svn] r72 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000070.html">[S3d-svn] r74 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#69">[ date ]</a>
+              <a href="thread.html#69">[ thread ]</a>
+              <a href="subject.html#69">[ subject ]</a>
+              <a href="author.html#69">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-02-15 18:41:48 +0100 (Wed, 15 Feb 2006)
+New Revision: 73
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+Log:
+change key event structur, add &quot;r&quot; for rotate object and &quot;+&quot;,&quot;-&quot; for rotate speed
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-02-15 17:40:25 UTC (rev 72)
++++ trunk/apps/olsrs3d/main.c	2006-02-15 17:41:48 UTC (rev 73)
+@@ -25,10 +25,12 @@
+ float CamPosition[2][3];   /* CamPosition[trans|rot][x-z] */
+ float ZeroPosition[3] = {0,0,0};   /* current position zero position */
+ int ZeroPoint;   /* object zeropoint */
++int Zp_rotate = 0;
+ int ColorSwitch = 0;   /* enable/disable colored olsr connections */
++int RotateSwitch = 0;
++int RotateSpeed = 2;
+ 
+ 
+-
+ /***
+  *
+  * print usage info
+@@ -483,6 +485,10 @@
+ 		}
+ 	alpha=(alpha+5)%360;
+ 	s3d_rotate(mesh,0,alpha,0);
++	if(RotateSwitch) {
++		Zp_rotate = (Zp_rotate+RotateSpeed)%360;
++		s3d_rotate(ZeroPoint,0,Zp_rotate,0);
++	}
+ 	usleep(100000);
+ /*	sleep(1);*/
+ 	return;
+@@ -502,16 +508,33 @@
+  ***/
+ 
+ void keypress(struct s3d_evt *event) {
++	
+ 	int key;
+ 	key=*((unsigned short *)event-&gt;buf);
+-	/* ESC */
+-	if(key == 27)
+-		stop();
+-	if(key == 49)
+-		lst_out();
+-	if(key == 99)
+-		if(ColorSwitch) ColorSwitch = 0;
+-		else ColorSwitch = 1;
++	switch(key) {
++		case 27: /* esc */
++			stop();
++			break;
++			case 15: /* strg + o */
++			lst_out(); /* output ob2ip list */
++			break;
++		case 99: /* c*/
++			if(ColorSwitch) ColorSwitch = 0;
++			else ColorSwitch = 1;
++			break;
++		case 114: /* r */
++			if(RotateSwitch) RotateSwitch = 0;
++			else RotateSwitch = 1;
++			break;
++		case 43: /* + */
++			if(RotateSwitch &amp;&amp; RotateSpeed &lt; 10)
++				RotateSpeed++;
++			break;
++		case 45: /* - */
++			if(RotateSwitch &amp;&amp; RotateSpeed &gt; 1)
++				RotateSpeed--;
++			break;
++	}
+ }
+ 
+ /***
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000068.html">[S3d-svn] r72 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000070.html">[S3d-svn] r74 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#69">[ date ]</a>
+              <a href="thread.html#69">[ thread ]</a>
+              <a href="subject.html#69">[ subject ]</a>
+              <a href="author.html#69">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

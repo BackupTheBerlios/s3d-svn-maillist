@@ -1,0 +1,284 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r302 - trunk/example
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r302%20-%20trunk/example&In-Reply-To=%3C200605251946.k4PJkIi0010844%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000294.html">
+   <LINK REL="Next"  HREF="000296.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r302 - trunk/example</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r302%20-%20trunk/example&In-Reply-To=%3C200605251946.k4PJkIi0010844%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r302 - trunk/example">marec at berlios.de
+       </A><BR>
+    <I>Thu May 25 21:46:18 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000294.html">[S3d-svn] r301 - in trunk: . libs3d/libg3d libs3d/libg3d/doc libs3d/libg3d/doc/api libs3d/libg3d/include libs3d/libg3d/include/g3d libs3d/libg3d/m4 libs3d/libg3d/plugins libs3d/libg3d/plugins/image libs3d/libg3d/plugins/import libs3d/libg3d/src libs3d/libg3d/tests
+</A></li>
+        <LI>Next message: <A HREF="000296.html">[S3d-svn] r303 - in trunk: . libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#295">[ date ]</a>
+              <a href="thread.html#295">[ thread ]</a>
+              <a href="subject.html#295">[ subject ]</a>
+              <a href="author.html#295">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-05-25 21:46:11 +0200 (Thu, 25 May 2006)
+New Revision: 302
+
+Added:
+   trunk/example/3dsloader_g3d.c
+Log:
+new 3d-file loader
+
+
+Added: trunk/example/3dsloader_g3d.c
+===================================================================
+--- trunk/example/3dsloader_g3d.c	2006-05-25 18:58:58 UTC (rev 301)
++++ trunk/example/3dsloader_g3d.c	2006-05-25 19:46:11 UTC (rev 302)
+@@ -0,0 +1,207 @@
++/*
++ * 3dsloader.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
++
++
++#include &lt;s3d.h&gt;
++#include &lt;stdio.h&gt;  /* NULL */
++#include &lt;time.h&gt;	/* nanosleep() */
++#include &lt;g3d/g3d.h&gt;
++#include &lt;stdlib.h&gt;
++
++
++struct material2texture {
++	struct material2texture *next_ptr;   /* pointer to next */
++	void *material_ptr;
++	void *texture_ptr;
++	int material_id;
++	int texture_id;
++};
++
++
++static struct timespec t={0,100*1000*1000}; /* 100 mili seconds */
++struct material2texture *mat2tex_root = NULL;
++int i,obj_id;
++
++
++
++void mainloop() {
++	s3d_rotate(obj_id,0,i,0);
++	i++;
++	nanosleep(&amp;t,NULL);
++}
++
++
++
++void object_click(struct s3d_evt *evt) {
++	s3d_quit();
++}
++
++
++
++void *get_mat2tex( struct material2texture **mat2tex, void *mat_ptr ) {
++
++	while ( (*mat2tex) != NULL ) {
++
++		if ( (*mat2tex)-&gt;material_ptr == mat_ptr ) return (*mat2tex);
++
++		mat2tex = &amp;(*mat2tex)-&gt;next_ptr;
++
++	}
++
++	if ( (*mat2tex) == NULL ) {
++
++		(*mat2tex) = malloc( sizeof( struct material2texture ) );
++
++		if ( (*mat2tex) == NULL ) {
++			printf( &quot;Sorry - you ran out of memory !\n&quot; );
++			exit(8);
++		}
++
++		(*mat2tex)-&gt;next_ptr = NULL;
++		(*mat2tex)-&gt;material_ptr = mat_ptr;
++		(*mat2tex)-&gt;texture_ptr = NULL;
++		(*mat2tex)-&gt;material_id = -1;
++		(*mat2tex)-&gt;texture_id = -1;
++
++		return (*mat2tex);
++
++	}
++
++	return(0);
++
++}
++
++
++
++int main (int argc, char **argv) {
++
++	G3DContext *context;
++	G3DModel *model;
++	G3DObject *object;
++	G3DFace *face;
++	GSList *oitem, *oface;
++	struct material2texture *mat2tex;
++	int j, material_count, texture_count;
++
++	if (argc&lt;2) {
++		printf(&quot;usage: %s [somefile.3ds]\n&quot;,argv[0]);
++		return(-1);
++	}
++
++	context = g3d_context_new();
++
++	if ( !s3d_init( &amp;argc,&amp;argv,&quot;3dsloader_g3d&quot; ) ) {
++
++		s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
++
++		model = g3d_model_load(context, argv[1]);
++
++		if ( model ) {
++
++			oitem = model-&gt;objects;
++			obj_id = s3d_new_object();
++			material_count = texture_count = 0;
++
++			while ( oitem ) {
++
++				object = (G3DObject *)oitem-&gt;data;
++
++				/* push vertices */
++				for ( j = 0; j &lt; object-&gt;vertex_count; j++ ) {
++					s3d_push_vertex( obj_id, object-&gt;vertex_data[j * 3], object-&gt;vertex_data[j * 3 + 1], object-&gt;vertex_data[j * 3 + 2] );
++				}
++
++
++				oface = object-&gt;faces;
++
++				while ( oface ) {
++
++					face = (G3DFace *)oface-&gt;data;
++
++					mat2tex = get_mat2tex( &amp;mat2tex_root, face-&gt;material );
++
++					if ( mat2tex-&gt;material_id == -1 ) {
++
++						printf( &quot;push material: %i\n&quot;, material_count );
++
++						s3d_push_material_a( obj_id, face-&gt;material-&gt;r, face-&gt;material-&gt;g, face-&gt;material-&gt;b, face-&gt;material-&gt;a, face-&gt;material-&gt;specular[0], face-&gt;material-&gt;specular[1], face-&gt;material-&gt;specular[2], face-&gt;material-&gt;specular[3], face-&gt;material-&gt;r, face-&gt;material-&gt;g, face-&gt;material-&gt;b, face-&gt;material-&gt;a );
++
++						mat2tex-&gt;material_id = material_count;
++						material_count++;
++
++						if ( face-&gt;tex_image != NULL ) {
++
++							s3d_push_texture( obj_id, face-&gt;tex_image-&gt;width, face-&gt;tex_image-&gt;height );
++							s3d_pep_material_texture( obj_id, texture_count );
++							s3d_load_texture( obj_id, texture_count, 0, 0, face-&gt;tex_image-&gt;width, face-&gt;tex_image-&gt;height, face-&gt;tex_image-&gt;pixeldata );
++
++							mat2tex-&gt;texture_id = texture_count;
++							texture_count++;
++
++						}
++
++					}
++
++					printf( &quot;push polygone with material: %i\n&quot;, mat2tex-&gt;material_id );
++
++					/* push polygones */
++					s3d_push_polygon( obj_id, face-&gt;vertex_indices[0], face-&gt;vertex_indices[1], face-&gt;vertex_indices[2], mat2tex-&gt;material_id );
++
++					/* has polygone normals */
++					if ( face-&gt;flags &amp; G3D_FLAG_FAC_NORMALS ) s3d_pep_polygon_normals( obj_id, face-&gt;normals, 1 );
++
++					/* face with texture */
++					if ( ( mat2tex-&gt;texture_id != -1 ) &amp;&amp; ( face-&gt;flags &amp; G3D_FLAG_FAC_TEXMAP ) ) {
++
++						printf( &quot;neues face: %i\n&quot;, face-&gt;tex_vertex_count );
++/* 						for ( j = 0; j &lt; face-&gt;tex_vertex_count; j++ ) {
++ 							printf( &quot;%i -&gt; %f\n&quot;, j, face-&gt;tex_vertex_data[j] ); */
++							s3d_pep_polygon_tex_coord( obj_id, face-&gt;tex_vertex_data[0], face-&gt;tex_vertex_data[1], face-&gt;tex_vertex_data[2], face-&gt;tex_vertex_data[3], face-&gt;tex_vertex_data[4], face-&gt;tex_vertex_data[5] );
++/* 						} */
++
++					}
++
++
++					oface = oface-&gt;next;
++
++				}
++
++				s3d_flags_on( obj_id, S3D_OF_VISIBLE|S3D_OF_SELECTABLE );
++
++				oitem = oitem-&gt;next;
++
++			}
++
++			s3d_mainloop(mainloop);
++
++		}
++
++		s3d_quit();
++
++	}
++
++	return(0);
++
++}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000294.html">[S3d-svn] r301 - in trunk: . libs3d/libg3d libs3d/libg3d/doc libs3d/libg3d/doc/api libs3d/libg3d/include libs3d/libg3d/include/g3d libs3d/libg3d/m4 libs3d/libg3d/plugins libs3d/libg3d/plugins/image libs3d/libg3d/plugins/import libs3d/libg3d/src libs3d/libg3d/tests
+</A></li>
+	<LI>Next message: <A HREF="000296.html">[S3d-svn] r303 - in trunk: . libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#295">[ date ]</a>
+              <a href="thread.html#295">[ thread ]</a>
+              <a href="subject.html#295">[ subject ]</a>
+              <a href="author.html#295">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

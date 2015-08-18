@@ -1,0 +1,1145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r584 - in trunk: . apps apps/meshs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r584%20-%20in%20trunk%3A%20.%20apps%20apps/meshs3d&In-Reply-To=%3C200703101745.l2AHjrxt019741%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000575.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r584 - in trunk: . apps apps/meshs3d</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r584%20-%20in%20trunk%3A%20.%20apps%20apps/meshs3d&In-Reply-To=%3C200703101745.l2AHjrxt019741%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r584 - in trunk: . apps apps/meshs3d">nichtsnutz at mail.berlios.de
+       </A><BR>
+    <I>Sat Mar 10 18:45:53 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000575.html">[S3d-svn] r583 - in trunk: libs3d server
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#576">[ date ]</a>
+              <a href="thread.html#576">[ thread ]</a>
+              <a href="subject.html#576">[ subject ]</a>
+              <a href="author.html#576">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2007-03-10 18:45:52 +0100 (Sat, 10 Mar 2007)
+New Revision: 584
+
+Added:
+   trunk/apps/meshs3d/
+   trunk/apps/meshs3d/Makefile.am
+   trunk/apps/meshs3d/main.c
+   trunk/apps/meshs3d/meshs3d.h
+   trunk/apps/meshs3d/net.c
+   trunk/apps/meshs3d/process.c
+Modified:
+   trunk/apps/Makefile.am
+   trunk/configure.ac
+Log:
+rewrite olsrs3d
+
+Modified: trunk/apps/Makefile.am
+===================================================================
+--- trunk/apps/Makefile.am	2007-03-04 20:25:19 UTC (rev 583)
++++ trunk/apps/Makefile.am	2007-03-10 17:45:52 UTC (rev 584)
+@@ -6,4 +6,4 @@
+ MAYBE_S3DOSM=	s3dosm
+ endif
+ 
+-SUBDIRS =  ${MAYBE_X11GATE} ${MAYBE_S3DOSM} s3dvt olsrs3d dot_mcp s3dfm kism3d
++SUBDIRS =  ${MAYBE_X11GATE} ${MAYBE_S3DOSM} s3dvt olsrs3d dot_mcp s3dfm kism3d meshs3d
+
+Added: trunk/apps/meshs3d/Makefile.am
+===================================================================
+--- trunk/apps/meshs3d/Makefile.am	2007-03-04 20:25:19 UTC (rev 583)
++++ trunk/apps/meshs3d/Makefile.am	2007-03-10 17:45:52 UTC (rev 584)
+@@ -0,0 +1,15 @@
++bin_PROGRAMS=	meshs3d
++
++meshs3dincludedir = $(pkgincludedir)/meshs3d
++
++meshs3dinclude_HEADERS =  \
++	meshs3d.h
++	
++meshs3d_SOURCES =  \
++	main.c \
++	net.c \
++	process.c
++
++meshs3d_CPPFLAGS=	-pg -I$(top_srcdir)/libs3d -I$(top_srcdir)/libs3dw
++meshs3d_LDADD=		$(top_builddir)/libs3d/libs3d.la $(top_builddir)/libs3dw/libs3dw.la
++meshs3d_LDFLAGS=	-pg
+
+Added: trunk/apps/meshs3d/main.c
+===================================================================
+--- trunk/apps/meshs3d/main.c	2007-03-04 20:25:19 UTC (rev 583)
++++ trunk/apps/meshs3d/main.c	2007-03-10 17:45:52 UTC (rev 584)
+@@ -0,0 +1,227 @@
++/*
++ * main.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *                         Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
++ *                         Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
++ *
++ * This file is part of meshs3d, an olsr/batman topology visualizer for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * olsrs3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * olsrs3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with olsrs3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#include &lt;stdio.h&gt;
++#include &lt;s3d.h&gt;
++#include &lt;s3d_keysym.h&gt;
++#include &lt;s3dw.h&gt;
++#include &lt;sys/time.h&gt;
++#include &lt;time.h&gt;
++#include &lt;string.h&gt;
++#include &lt;math.h&gt;
++#include &lt;getopt.h&gt;
++#include &lt;stdlib.h&gt;
++#include &lt;stdint.h&gt;
++#include &quot;meshs3d.h&quot;
++
++/* global vars */
++struct glob Global;
++
++void init_globals( void )
++{
++	Global.debug = 0;
++	Global.obj_node_hna = 0;
++	Global.obj_node_inet = 0;
++	Global.obj_node_normal = 0;
++	Global.obj_btn_close = 0;
++	Global.obj_s3d_url = 0;
++	Global.obj_zero_point = 0;
++		
++}
++
++
++void print_usage( void )
++{
++
++	printf( &quot;Usage is olsrs3d [options] [-- [s3d options]]\n&quot; );
++	printf( &quot;olsrs3d options:\n&quot; );
++	printf( &quot;   -h\tprint this short help\n&quot; );
++	printf( &quot;   -d\tenable debug mode\n&quot; );
++	printf( &quot;   -H\tconnect to olsr node [default: localhost]\n&quot; );
++	s3d_usage();
++}
++
++void mainloop()
++{
++
++	int net_result;   /* result of function net_main */
++//	char nc_str[20];
++//	float strLen;
++//
++//	/* calculate new movement vector */
++//	calc_olsr_node_mov();
++//
++//	/* prepare nodes */
++//	handle_olsr_node( Olsr_root );
++//
++//	/* move it */
++//	move_olsr_nodes();
++//
++//	/* if we have more or less nodes now - redraw node count */
++//	if ( Olsr_node_count != Last_olsr_node_count ) {
++//
++//		if ( Olsr_node_count_obj != -1 ) s3d_del_object( Olsr_node_count_obj );
++//		snprintf( nc_str, 20, &quot;node count: %d&quot;, Olsr_node_count );
++//		Olsr_node_count_obj = s3d_draw_string( nc_str, &amp;strLen );
++//		s3d_link( Olsr_node_count_obj, 0 );
++//		s3d_flags_on( Olsr_node_count_obj, S3D_OF_VISIBLE );
++//		s3d_scale( Olsr_node_count_obj, 0.2 );
++//		s3d_translate( Olsr_node_count_obj, -Left*3.0-(strLen * 0.2), -Bottom*3.0-0.5, -3.0 );
++//		Last_olsr_node_count = Olsr_node_count;
++//
++//	}
++//
++//	if ( Output_block_completed ) {
++//
++//		Output_block_counter++;
++//		Output_block_completed = 0;
++//
++//	}
++
++//	/* read data from socket */
++//	Net_read_count = 0;
++	while ( ( net_result = net_main() ) != 0 ) {
++		if ( net_result == -1 ) {
++			s3d_quit();
++			break;
++		}
++	}
++//
++//	/* rotate modus */
++//	if(RotateSwitch) {
++//		Zp_rotate = ( Zp_rotate + RotateSpeed ) &gt; 360 ? 0.0 : ( Zp_rotate + RotateSpeed );
++//		s3d_rotate(ZeroPoint,0,Zp_rotate,0);
++//	}
++//
++//	/* calc for node description */
++//	CamPosition2[0][0]=  CamPosition[0][0]*cos(Zp_rotate*M_PI/180.0) - CamPosition[0][2] * sin (Zp_rotate*M_PI/180.0);
++//	CamPosition2[0][1]=  CamPosition[0][1];
++//	CamPosition2[0][2]=  CamPosition[0][0]*sin(Zp_rotate*M_PI/180.0) + CamPosition[0][2] * cos (Zp_rotate*M_PI/180.0);
++//
++//	/* check search status */
++///*	if( get_search_status() == WIDGET )
++//		move_to_search_widget( CamPosition[0], CamPosition[1] );*/
++//	if( get_search_status() == FOLLOW )
++//		follow_node( CamPosition[0], CamPosition[1], Zp_rotate );
++///*	if( get_search_status() == ABORT )
++//		move_to_return_point( CamPosition[0], CamPosition[1] );*/
++//
++//
++//	if( Olsr_ip_label_obj != -1 )
++//	{
++//		print_etx();
++//	}
++//	s3dw_ani_mate();
++//
++//	nanosleep( &amp;sleep_time, NULL );
++//
++	return;
++
++}
++
++
++int main( int argc, char *argv[] ) {
++	int optchar;
++	char olsr_host[256];
++	
++	init_globals();
++	strncpy( olsr_host, &quot;127.0.0.1&quot;, 256 );
++	lbuf[0] = '\0';
++
++	while ( ( optchar = getopt ( argc, argv, &quot;dhH:&quot; ) ) != -1 ) {
++
++		switch ( optchar ) {
++
++			case 'd':
++				Global.debug = 1;
++				break;
++
++			case 'H':
++				strncpy( olsr_host, optarg, 256 );
++				break;
++
++			case 'h':
++			default:
++				print_usage();
++				return (0);
++
++		}
++
++	}
++
++	if ( Global.debug )
++		printf( &quot;debug mode enabled ...\n&quot; );
++
++//	/* initialize obj2ip linked list */
++//	lst_initialize();
++
++	/* delete olsrs3d options */
++	while ( ( optind &lt; argc ) &amp;&amp; ( argv[optind][0] != '-' ) ) optind++;		/* optind may point to ip addr of '-H' */
++	optind--;
++	argv[optind] = argv[0];		/* save program path */
++	argc -= optind;				/* jump over olsrs3d options */
++	argv += optind;
++
++	/* set extern int optind = 0 for parse_args in io.c */
++	optind = 0;
++
++
++	if (!net_init(olsr_host))
++	{
++//		s3d_set_callback(S3D_EVENT_OBJ_INFO,object_info);
++//		s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
++//		s3d_set_callback(S3D_EVENT_KEY,keypress);
++//		s3d_set_callback(S3D_EVENT_QUIT,stop);
++
++		if (!s3d_init(&amp;argc,&amp;argv,&quot;meshs3d&quot;))
++		{
++
++			if (s3d_select_font(&quot;vera&quot;))
++				printf(&quot;font not found\n&quot;);
++
++			Global.obj_node_normal = s3d_import_model_file( &quot;objs/accesspoint.3ds&quot; );
++			Global.obj_node_inet = s3d_import_model_file( &quot;objs/accesspoint_inet.3ds&quot; );
++			Global.obj_node_hna = s3d_import_model_file( &quot;objs/internet.3ds&quot; );
++			Global.obj_btn_close = s3d_import_model_file( &quot;objs/btn_close.3ds&quot; );
++
++			Global.obj_s3d_url = s3d_import_model_file( &quot;objs/s3d_berlios_de.3ds&quot; );
++
++			s3d_translate( Global.obj_s3d_url, 0.75, -0.75, -1 );
++			s3d_scale( Global.obj_s3d_url, 0.07 );
++			s3d_link( Global.obj_s3d_url, 0 );
++			s3d_flags_on( Global.obj_s3d_url, S3D_OF_VISIBLE );
++
++			/* create_search_widget( 0, 0, 300 ); */
++
++			Global.obj_zero_point = s3d_new_object();
++//			Output_border[0] = Output_border[1] = Output_border[2] = Output_border[3] = -1;
++
++			s3d_mainloop(mainloop);
++			s3d_quit();
++			net_quit();
++		}
++	}
++	return(0);
++}
+\ No newline at end of file
+
+Added: trunk/apps/meshs3d/meshs3d.h
+===================================================================
+--- trunk/apps/meshs3d/meshs3d.h	2007-03-04 20:25:19 UTC (rev 583)
++++ trunk/apps/meshs3d/meshs3d.h	2007-03-10 17:45:52 UTC (rev 584)
+@@ -0,0 +1,115 @@
++/*
++ * meshs3d.h
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *                         Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
++ *                         Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
++ *
++ * This file is part of meshs3d, an olsr/batman topology visualizer for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * olsrs3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * olsrs3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with olsrs3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#define max(x,y) {((x)&gt;(y)?(x):(y))}
++#define min(x,y) {((x)&lt;(y)?(x):(y))}
++#define NAMEMAX		128
++#define MAXLINESIZE 1000		/* lines in a digraph just shouldn't get that longer ... */
++#define MAXDATASIZE 100			/* max number of bytes we can get at once  */
++
++/* linked list for the all connections */
++struct olsr_con 
++{
++	struct olsr_con *next_olsr_con;			/* pointer to next connection */
++	struct olsr_con *prev_olsr_con;			/* pointer to previous connection */
++	struct olsr_node *left_olsr_node;		/* pointer to left end point of the connection */
++	struct olsr_node *right_olsr_node;		/* pointer to right end point of the connection */
++	float left_etx;							/* etx of left olsr node */
++	float right_etx;						/* etx of right olsr node */
++	float left_etx_sqrt;					/* sqrt of etx of left olsr node */
++	float right_etx_sqrt;					/* sqrt etx of right olsr node */
++	int obj_id;								/* id of connection object in s3d */
++	int color;
++	float rgb;
++};
++
++
++/* linked list for the neighbours of each olsr node */
++struct olsr_neigh_list
++{
++	struct olsr_neigh_list *next_olsr_neigh_list;		/* pointer to next neighbour */
++	struct olsr_con *olsr_con;							/* pointer to the connection */
++};
++
++
++/* we contruct a binary tree to handle the nodes */
++struct olsr_node 
++{
++	struct olsr_node *left;
++	struct olsr_node *right;
++	char ip[NAMEMAX];				/* host ip */
++	int node_type;					/* normal = 0, internet gateway = 1, via hna announced network = 2 */
++	int node_type_modified;			/* node_type modified flag */
++	int last_seen;					/* last seen counter */
++	int visible;					/* is this node visible or vanished */
++	float pos_vec[3];				/* position vector in 3d &quot;space&quot; */
++	float mov_vec[3];				/* move vector */
++	int obj_id;						/* id of node object in s3d */
++	int desc_id;					/* id of node description object in s3d */
++	float desc_length;				/* length of node description object in s3d */
++	struct olsr_neigh_list *olsr_neigh_list;	/* pointer to first neighbour */
++};
++
++
++struct obj_to_ip
++{
++	int id;
++	struct olsr_node *olsr_node;
++	struct obj_to_ip *next;
++	struct obj_to_ip *prev;
++};
++
++struct glob {
++	int debug;
++	int	obj_node_normal;
++	int	obj_node_inet;
++	int	obj_node_hna;
++	int	obj_btn_close;
++	int	obj_s3d_url;
++	int obj_zero_point;
++};
++
++extern char lbuf[MAXLINESIZE];
++extern struct glob Global;
++
++/* process.c */
++//void lst_initialize();
++//void lst_add(int id,struct olsr_node **olsr_node);
++//void lst_del(int id);
++//struct olsr_node *lst_search(int id);
++//void lst_out();
++//struct olsr_node *move_lst_ptr(int *id);
++//int process_main();
++
++/* net.c */
++int net_init(char *host);
++int net_main();
++int net_quit();
++
++/* main */
++//void out_of_mem( void );
++//void print_etx( void );
++//float dist(float p1[], float p2[]);
++//void window_error(char *msg);
+
+Added: trunk/apps/meshs3d/net.c
+===================================================================
+--- trunk/apps/meshs3d/net.c	2007-03-04 20:25:19 UTC (rev 583)
++++ trunk/apps/meshs3d/net.c	2007-03-10 17:45:52 UTC (rev 584)
+@@ -0,0 +1,130 @@
++/*
++ * net.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *                         Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
++ *                         Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
++ *
++ * This file is part of meshs3d, an olsr/batman topology visualizer for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * olsrs3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * olsrs3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with olsrs3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#include &lt;stdio.h&gt;
++#include &lt;stdlib.h&gt;
++#include &lt;unistd.h&gt;
++#include &lt;errno.h&gt;
++#include &lt;string.h&gt;
++#include &lt;netdb.h&gt;
++#include &lt;sys/types.h&gt;
++#include &lt;netinet/in.h&gt;
++#include &lt;sys/socket.h&gt;
++#include &lt;fcntl.h&gt;
++#include &quot;meshs3d.h&quot;
++
++#define PORT 2004
++char buf[MAXDATASIZE];
++
++
++int sockfd, numbytes;
++
++int net_init(char *host)
++{
++    struct hostent *he;
++    struct sockaddr_in their_addr; /* connector's address information  */
++
++    if ((he=gethostbyname(host)) == NULL) {  /* get the host info  */
++        herror(&quot;gethostbyname&quot;);
++        return(1);
++    }
++
++    if ((sockfd = socket(PF_INET, SOCK_STREAM, 0)) == -1) {
++        perror(&quot;socket&quot;);
++        return(1);
++    }
++
++    their_addr.sin_family = AF_INET;    /* host byte order  */
++    their_addr.sin_port = htons(PORT);  /* short, network byte order  */
++    their_addr.sin_addr = *((struct in_addr *)he-&gt;h_addr);
++    memset(&amp;(their_addr.sin_zero), '\0', 8);  /* zero the rest of the struct */
++
++    if (connect(sockfd, (struct sockaddr *)&amp;their_addr,
++                                          sizeof(struct sockaddr)) == -1) {
++        perror(&quot;connect&quot;);
++        return(1);
++    }
++	fcntl(sockfd,F_SETFL, O_NONBLOCK);
++	return(0);
++}
++
++int net_main() {
++	static int net_read_count = 0;
++	
++	if ((numbytes=recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
++		if (errno==EAGAIN)
++			return(0); /* well, that's okay ... */
++		perror(&quot;recv&quot;);
++		return(-1);
++	}
++
++	if (numbytes==0) {
++		printf(&quot;connection reset\n&quot;);
++		return(-1);
++	}
++
++	buf[numbytes] = '\0';
++
++	/* check for potential buffer overflow */
++	if ( ( strlen( lbuf ) + strlen( buf ) ) &lt; MAXLINESIZE ) {
++
++		strncat( lbuf, buf, MAXLINESIZE );
++
++	} else {
++
++		/* hope that carriage return is now in buf */
++		if ( strlen( lbuf ) &lt; MAXLINESIZE ) {
++
++			if ( Global.debug ) printf( &quot;WARNING: lbuf almost filled without *any* carriage return within that data !\nAppending truncated buf to lbuf to prevent buffer overflow.\n&quot; );
++			strncat( lbuf, buf, MAXLINESIZE - strlen( lbuf ) );
++
++		} else {
++
++			if ( Global.debug ) printf( &quot;ERROR: lbuf filled without *any* carriage return within that data !\nClearing lbuf to prevent buffer overflow.\n&quot; );
++			strncpy( lbuf, buf, MAXLINESIZE );
++
++		}
++
++	}
++
++	process_main();
++
++	if ( ++net_read_count &gt; 5 ) {
++		net_read_count = 0;
++		return(0);   /* continue mainloop */
++	} else {
++		return(1);   /* continue reading data from socket */
++	}
++
++}
++
++int net_quit()
++{
++    close(sockfd);
++
++    return 0;
++}
++
++
+
+Added: trunk/apps/meshs3d/process.c
+===================================================================
+--- trunk/apps/meshs3d/process.c	2007-03-04 20:25:19 UTC (rev 583)
++++ trunk/apps/meshs3d/process.c	2007-03-10 17:45:52 UTC (rev 584)
+@@ -0,0 +1,527 @@
++/*
++ * process.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *                         Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
++ *                         Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
++ *
++ * This file is part of meshs3d, an olsr/batman topology visualizer for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * olsrs3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * olsrs3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with olsrs3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
++
++#include &lt;stdio.h&gt; 	/* NULL */
++#include &lt;string.h&gt; 	/* strlen(), memmove() */
++#include &lt;stdlib.h&gt; 	/* rand(), malloc(), realloc(), free() */
++#include &lt;s3d.h&gt;
++#include &lt;math.h&gt;       /* sqrt() */
++#include &lt;sys/socket.h&gt;
++#include &lt;netinet/in.h&gt;
++#include &lt;arpa/inet.h&gt;
++#include &quot;meshs3d.h&quot;
++
++
++char lbuf[MAXLINESIZE];
++
++
++
++/***
++ *
++ * create new or alter connection between 2 nodes
++ *
++ *   con_from =&gt;   current node
++ *   con_to   =&gt;   node to connect to
++ *   etx      =&gt;   ETX
++ *
++ ***/
++
++//int add_olsr_con( struct olsr_node *con_from, struct olsr_node *con_to, float etx ) {
++//
++//	struct olsr_con **olsr_con = &amp;Con_begin;
++//	struct olsr_con *prev_olsr_con = NULL;   /* previous olsr connection */
++//	struct olsr_neigh_list **olsr_neigh_list;
++//
++//	while ( (*olsr_con) != NULL ) {
++//
++//		/* connection already exists */
++//		if ( ( strncmp( (*olsr_con)-&gt;left_olsr_node-&gt;ip, con_from-&gt;ip, NAMEMAX ) == 0 ) &amp;&amp; ( strncmp( (*olsr_con)-&gt;right_olsr_node-&gt;ip, con_to-&gt;ip, NAMEMAX ) == 0 ) ) {
++//			(*olsr_con)-&gt;left_etx = etx;
++//			(*olsr_con)-&gt;left_etx_sqrt = (etx==-1000.00)? 10.0 : sqrt( etx ) ;
++//			break;
++//
++//		} else if ( ( strncmp( (*olsr_con)-&gt;right_olsr_node-&gt;ip, con_from-&gt;ip, NAMEMAX ) == 0 ) &amp;&amp; ( strncmp( (*olsr_con)-&gt;left_olsr_node-&gt;ip, con_to-&gt;ip, NAMEMAX ) == 0 ) ) {
++//
++//			(*olsr_con)-&gt;right_etx = etx;
++//			(*olsr_con)-&gt;right_etx_sqrt = (etx==-1000.00)? 10.0 : sqrt( etx ) ;
++//			break;
++//
++//		}
++//
++//		/* save previous olsr connection for later use */
++//		prev_olsr_con = (*olsr_con);
++//
++//		olsr_con = &amp;(*olsr_con)-&gt;next_olsr_con;
++//
++//	}
++//
++//	/* new connection */
++//	if ( (*olsr_con) == NULL ) {
++//
++//		(*olsr_con) = malloc( sizeof( struct olsr_con ) );
++//		if ( (*olsr_con) == NULL ) out_of_mem();
++//
++//		/* create connection object */
++//		(*olsr_con)-&gt;obj_id = s3d_new_object();
++//
++//		/* add olsr node to new olsr connection in order to access the nodes from the connection list */
++//		(*olsr_con)-&gt;left_olsr_node = con_from;
++//		(*olsr_con)-&gt;right_olsr_node = con_to;
++//
++//		/* add connection color */
++//		(*olsr_con)-&gt;color = 0;
++//		s3d_push_material( (*olsr_con)-&gt;obj_id,
++//				  1.0,1.0,1.0,
++//				  1.0,1.0,1.0,
++//				  1.0,1.0,1.0);
++//
++//		/* add connection endpoints */
++//		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[0], (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[1], (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[2] );
++//		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[0], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[1], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[2] );
++//
++//		s3d_push_line( (*olsr_con)-&gt;obj_id, 0,1,0 );
++//
++//		s3d_flags_on( (*olsr_con)-&gt;obj_id, S3D_OF_VISIBLE );
++//
++//		s3d_link( (*olsr_con)-&gt;obj_id,  ZeroPoint );
++//
++//		/* HNA */
++//		if ( etx == -1000.00 ) {
++//
++//			(*olsr_con)-&gt;left_etx = etx;
++//			(*olsr_con)-&gt;left_etx_sqrt = 10.0;
++//			(*olsr_con)-&gt;right_etx = etx;
++//			(*olsr_con)-&gt;right_etx_sqrt = 10.0;
++//
++//		} else {
++//
++//			(*olsr_con)-&gt;left_etx = etx;
++//			(*olsr_con)-&gt;left_etx_sqrt = sqrt( etx );
++//			(*olsr_con)-&gt;right_etx = 999.0;
++//			(*olsr_con)-&gt;right_etx_sqrt = sqrt( 999.0 );
++//
++//		}
++//
++//		(*olsr_con)-&gt;next_olsr_con = NULL;
++//		(*olsr_con)-&gt;prev_olsr_con = prev_olsr_con;
++//
++//		/* add new olsr connection to olsr nodes in order to access the connection from the olsr node */
++//		olsr_neigh_list = &amp;(*olsr_con)-&gt;left_olsr_node-&gt;olsr_neigh_list;
++//		while ( (*olsr_neigh_list) != NULL ) olsr_neigh_list = &amp;(*olsr_neigh_list)-&gt;next_olsr_neigh_list;
++//		(*olsr_neigh_list) = malloc( sizeof( struct olsr_neigh_list ) );
++//		if ( (*olsr_neigh_list) == NULL ) out_of_mem();
++//		(*olsr_neigh_list)-&gt;olsr_con = (*olsr_con);
++//		(*olsr_neigh_list)-&gt;next_olsr_neigh_list = NULL;
++//
++//		olsr_neigh_list = &amp;(*olsr_con)-&gt;right_olsr_node-&gt;olsr_neigh_list;
++//		while ( (*olsr_neigh_list) != NULL ) olsr_neigh_list = &amp;(*olsr_neigh_list)-&gt;next_olsr_neigh_list;
++//		(*olsr_neigh_list) = malloc( sizeof( struct olsr_neigh_list ) );
++//		if ( (*olsr_neigh_list) == NULL ) out_of_mem();
++//		(*olsr_neigh_list)-&gt;olsr_con = (*olsr_con);
++//		(*olsr_neigh_list)-&gt;next_olsr_neigh_list = NULL;
++//
++//	}
++//
++//	return(0);
++//
++//}
++//
++//
++//
++///***
++// *
++// * get pointer to olsr node or create new node if node string could not be found
++// *
++// *   **node =&gt;   pointer to current olsr_node
++// *   *ip    =&gt;   node ip
++// *
++// *   return olsr node pointer
++// *
++// ***/
++//
++//void *get_olsr_node( struct olsr_node **olsr_node, char *ip ) {
++//
++//	int result;   /* result of strcmp */
++//
++//	while ( (*olsr_node) != NULL ) {
++//
++//		result = strncmp( (*olsr_node)-&gt;ip, ip, NAMEMAX );
++//
++//		/* we found the node */
++//		if ( result == 0 ) {
++//
++//			(*olsr_node)-&gt;last_seen = Output_block_counter;
++//
++//			/* former invisble (deleted) node */
++//			if ( (*olsr_node)-&gt;visible == 0 ) {
++//
++//				(*olsr_node)-&gt;node_type = 0;
++//				(*olsr_node)-&gt;node_type_modified = 1;
++//
++//				(*olsr_node)-&gt;visible = 1;
++//
++//				(*olsr_node)-&gt;mov_vec[0] = (*olsr_node)-&gt;mov_vec[1] = (*olsr_node)-&gt;mov_vec[2] = 0.0;
++//
++//				if ( Debug ) printf( &quot;new olsr node: %s\n&quot;, (*olsr_node)-&gt;ip );
++//
++//				Olsr_node_count++;
++//
++//			}
++//
++//			return (*olsr_node);
++//
++//		}
++//
++//		/* the searched node must be in the subtree */
++//		if ( result &lt; 0 ) {
++//			olsr_node = &amp;(*olsr_node)-&gt;right;
++//		} else {
++//			olsr_node = &amp;(*olsr_node)-&gt;left;
++//		}
++//
++//	}
++//
++//	/* if node is NULL we reached the end of the tree and must create a new olsr_node */
++//	if ( (*olsr_node) == NULL ) {
++//
++//		(*olsr_node) = malloc( sizeof( struct olsr_node ) );
++//		if ( (*olsr_node) == NULL ) out_of_mem();
++//
++//		(*olsr_node)-&gt;left = NULL;
++//		(*olsr_node)-&gt;right = NULL;
++//
++//		strncpy( (*olsr_node)-&gt;ip, ip, NAMEMAX );
++//
++//		(*olsr_node)-&gt;node_type = 0;
++//		(*olsr_node)-&gt;node_type_modified = 1;
++//
++//		(*olsr_node)-&gt;last_seen = Output_block_counter;
++//		(*olsr_node)-&gt;visible = 1;
++//
++//		if ( Debug ) printf( &quot;new olsr node: %s\n&quot;, (*olsr_node)-&gt;ip );
++//
++//		Olsr_node_count++;
++//
++//		(*olsr_node)-&gt;pos_vec[0] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
++//		(*olsr_node)-&gt;pos_vec[1] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
++//		(*olsr_node)-&gt;pos_vec[2] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
++//		(*olsr_node)-&gt;mov_vec[0] = (*olsr_node)-&gt;mov_vec[1] = (*olsr_node)-&gt;mov_vec[2] = 0.0;
++//
++//		(*olsr_node)-&gt;obj_id = -1;
++//		(*olsr_node)-&gt;desc_id = -1;
++//		(*olsr_node)-&gt;olsr_neigh_list = NULL;
++//
++//		return (*olsr_node);
++//
++//	}
++//	return(0);
++//}
++//
++///*
++// *
++// * initialize the struct for a linked list obj2ip
++// *
++// */
++//
++//void lst_initialize() {
++//	Obj_to_ip_head = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
++//	Obj_to_ip_end = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
++//	if(Obj_to_ip_head == NULL || Obj_to_ip_end == NULL)
++//		out_of_mem();
++//	Obj_to_ip_head-&gt;id = 0;
++//	Obj_to_ip_end-&gt;id = 0;
++//	Obj_to_ip_head-&gt;prev = Obj_to_ip_end-&gt;prev = Obj_to_ip_head;
++//	Obj_to_ip_head-&gt;next = Obj_to_ip_end-&gt;next = Obj_to_ip_end;
++//	List_ptr = Obj_to_ip_head;
++//}
++//
++///*
++// *
++// * add a link object_id to olsr_node, to get ip adress and coordinates per object_id
++// *                 id =&gt; object_id, returned from s3d_clone or s3d_new_object
++// *  **olsr_node =&gt; pointer to pointer of current olsr_node
++// *
++// */
++//
++//void lst_add(int id,struct olsr_node **olsr_node) {
++//	struct Obj_to_ip *new;
++//	new = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
++//	if(new == NULL)
++//		out_of_mem();
++//	new-&gt;id = id;
++//	new-&gt;olsr_node = *olsr_node;
++//	move_lst_ptr(&amp;id);
++//	new-&gt;prev = List_ptr;
++//	new-&gt;next = List_ptr-&gt;next;
++//	List_ptr-&gt;next-&gt;prev = new;
++//	List_ptr-&gt;next = new;
++//	/* printf(&quot;obj2ip: add object %d between %d .. %d ip %s to list\n&quot;,new-&gt;id,new-&gt;prev-&gt;id,new-&gt;next-&gt;id,new-&gt;olsr_node-&gt;ip); */
++//}
++//
++///*
++// *void move_lst_ptr(int *id)
++// * remove element from obj2ip linked list
++// * id =&gt; object_id, returned from s3d_clone or s3d_new_object
++// *
++// */
++//
++//void lst_del(int id) {
++//	struct Obj_to_ip *del;
++//	move_lst_ptr(&amp;id);
++//	if(id != List_ptr-&gt;id)
++//	{
++//		printf(&quot;obj2ip: remove id %d failed move_lst_ptr return id %d\n&quot;,id,List_ptr-&gt;next-&gt;id);
++//	} else {
++//		del = List_ptr;
++//		List_ptr-&gt;next-&gt;prev = List_ptr-&gt;prev;
++//		List_ptr-&gt;prev-&gt;next = List_ptr-&gt;next;
++//		/* printf(&quot;obj2ip: remove object %d --&gt; %d &lt;-- %d ip %s from list\n&quot;,List_ptr-&gt;prev-&gt;id,del-&gt;id,List_ptr-&gt;next-&gt;id,del-&gt;olsr_node-&gt;ip); */
++//		free(del);
++//	}
++//}
++//
++///*
++// *
++// * move the List_ptr one positon ahead the searched element
++// *	*id =&gt; pointer of object_id , returned from s3d_clone or s3d_new_object
++// *
++// */
++//
++//struct olsr_node *move_lst_ptr(int *id) {
++//	/* printf(&quot;obj2ip: move for %d\n&quot;,*id); */
++//	/* head to point at end or id lass then first element in linked list*/
++//	if(Obj_to_ip_head-&gt;next == Obj_to_ip_head || *id &lt; Obj_to_ip_head-&gt;next-&gt;id) {
++//		List_ptr = Obj_to_ip_head;
++//		return NULL;
++// 	/* id is greather then last element in linked list */
++//	} else if(*id &gt; Obj_to_ip_end-&gt;prev-&gt;id) {
++//		List_ptr = Obj_to_ip_end-&gt;prev;
++//		return NULL;
++//	} else {
++//		/* printf(&quot;obj2ip: ok i search deeper ;-) for id=%d\n&quot;,*id); */
++//		if((*id - (int) Obj_to_ip_head-&gt;next-&gt;id) &lt;= ((int)(Obj_to_ip_end-&gt;prev-&gt;id)-*id)) {
++//			List_ptr = Obj_to_ip_head;
++//			/* printf(&quot;obj2ip: start at head id %d - %d &lt;= %d - %d \n&quot;,*id,Obj_to_ip_head-&gt;next-&gt;id,Obj_to_ip_end-&gt;prev-&gt;id,*id); */
++//			while(*id &gt;= List_ptr-&gt;next-&gt;id) {
++//				/* printf(&quot;obj2ip: %d &gt; %d move to &quot;,*id,List_ptr-&gt;id); */
++//				List_ptr = List_ptr-&gt;next;
++//				/* printf(&quot;%d\n&quot;,List_ptr-&gt;id); */
++//			}
++//		} else {
++//			List_ptr = Obj_to_ip_end;
++//			/* printf(&quot;obj2ip: start at end id %d - %d &gt; %d - %d \n&quot;,*id,Obj_to_ip_head-&gt;next-&gt;id,Obj_to_ip_end-&gt;prev-&gt;id,*id);  */
++//			/*  do List_ptr = List_ptr-&gt;prev; while(*id &gt; List_ptr-&gt;prev-&gt;id); */
++//			while(*id &lt; List_ptr-&gt;prev-&gt;id) {
++//				/* printf(&quot;obj2ip: %d &lt; %d move to &quot;,*id,List_ptr-&gt;id); */
++//				List_ptr = List_ptr-&gt;prev;
++//				/* printf(&quot;%d\n&quot;,List_ptr-&gt;id); */
++//			}
++//			List_ptr = List_ptr-&gt;prev;
++//		}
++//
++//		if ( List_ptr-&gt;id == *id )
++//			return List_ptr-&gt;olsr_node;
++//		else
++//			return NULL;
++//
++//		/* printf(&quot;obj2ip: found id to insert between %d--&gt; .. &lt;--%d to search/delete %d--&gt; .. &lt;--%d\n&quot;,List_ptr-&gt;id,List_ptr-&gt;next-&gt;next-&gt;id,List_ptr-&gt;prev-&gt;id,List_ptr-&gt;next-&gt;id); */
++//	}
++//}
++//
++///*
++// *
++// * search a object_id in linked list and return pointer on struct olsr_node
++// *	id =&gt; object_id , returned from s3d_clone or s3d_new_object
++// *
++// * &lt;example&gt;
++// *     struct olsr_node *olsr_node;
++// *     olsr_node = *lst_search(oid);
++// *     printf(&quot;obj2ip: search return %s\n&quot;,olsr_node-&gt;ip);
++// * &lt;/example&gt;
++// *
++// */
++//
++//struct olsr_node *lst_search(int id) {
++//
++//	return( move_lst_ptr(&amp;id) );
++//
++//}
++//
++//void lst_out() {
++//	struct Obj_to_ip *ptr;
++//	ptr = Obj_to_ip_head;
++//	while(ptr != ptr-&gt;next) {
++//		printf(&quot;id-&gt; %d\n&quot;,ptr-&gt;id);
++//		ptr = ptr-&gt;next;
++//	}
++//}
++//
++int process_main()
++{
++
++	int dn;
++	float f;
++	char *lbuf_ptr, *last_cr_ptr, *con_from, *con_from_end, *con_to, *con_to_end, *etx, *etx_end, *tmpChar;
++	struct olsr_node *olsr_node1;   /* pointer to olsr nodes */
++	struct olsr_node *olsr_node2;
++	int address;
++	char hna_name[NAMEMAX];
++	char hna_node[NAMEMAX];
++
++	lbuf_ptr = lbuf;
++	last_cr_ptr = NULL;
++
++	con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
++	dn = 0;
++
++	/*printf(&quot;---lbuf-start---\n%s\n---lbuf-end---\n&quot;,lbuf);*/
++
++	while ( (*lbuf_ptr) != '\0' )
++	{
++
++		/* printf( &quot;%c&quot;,(*lbuf_ptr) ); */
++
++		if ( (*lbuf_ptr) == '\n' )
++		{
++
++			last_cr_ptr = lbuf_ptr;
++			con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
++			dn = 0;
++
++		}
++
++		if ( (*lbuf_ptr) == '&quot;' )
++		{
++			switch ( dn )
++			{
++				case 0:
++					con_from = lbuf_ptr + 1;
++					break;
++				case 1:
++					con_from_end = lbuf_ptr;
++					break;
++				case 2:
++					con_to = lbuf_ptr + 1;
++					break;
++				case 3:
++					con_to_end = lbuf_ptr;
++					break;
++				case 4:
++					etx = lbuf_ptr + 1;
++					break;
++				case 5:
++					etx_end = lbuf_ptr;
++					break;
++			}
++
++			if ( ++dn == 6 )
++			{
++
++				/* terminate strings - but not before 6 times '&quot;' */
++				(*con_from_end) = (*con_to_end) = (*etx_end) = '\0';
++
++				if( Global.debug ) printf( &quot;con_from: %s, con_to: %s, etx: %s\n&quot;, con_from, con_to, etx );
++
++				/* announced network via HNA */
++				if ( strncmp( etx, &quot;HNA&quot;, NAMEMAX ) == 0 )
++				{
++
++					/* connection to internet */
++					if ( strncmp( con_to, &quot;0.0.0.0/0.0.0.0&quot;, NAMEMAX ) == 0 )
++					{
++
++//						olsr_node1 = get_olsr_node( &amp;Olsr_root, con_from );
++
++						if ( olsr_node1-&gt;node_type != 1 )
++						{
++
++							olsr_node1-&gt;node_type = 1;
++							olsr_node1-&gt;node_type_modified = 1;
++							if ( Global.debug ) printf( &quot;new internet: %s\n&quot;, olsr_node1-&gt;ip );
++
++						}
++
++					/* normal HNA */
++					} else {
++						memmove(hna_node,con_to,NAMEMAX);
++						if( (tmpChar = strchr(hna_node, (int)'/')))
++						{
++							tmpChar++;
++							address = (int)-inet_network(tmpChar);
++							sprintf(hna_name,&quot;%d&quot;,(int)(32 - ceil(log(address)/log(2))));
++							strcpy(tmpChar,hna_name);
++						}
++
++//						olsr_node1 = get_olsr_node( &amp;Olsr_root, con_from );
++//						olsr_node2 = get_olsr_node( &amp;Olsr_root, hna_node );
++
++						if ( olsr_node2-&gt;node_type != 2 ) {
++
++							olsr_node2-&gt;node_type = 2;
++							olsr_node2-&gt;node_type_modified = 1;
++							if ( Global.debug ) printf( &quot;new hna network: %s\n&quot;, olsr_node2-&gt;ip );
++
++						}
++//						if ( olsr_node1-&gt;visible &amp;&amp; olsr_node2-&gt;visible )
++//							add_olsr_con( olsr_node1, olsr_node2, -1000.00 );
++
++					}
++
++				/* normal node */
++				} else {
++
++//					olsr_node1 = get_olsr_node( &amp;Olsr_root, con_from );
++//					olsr_node2 = get_olsr_node( &amp;Olsr_root, con_to );
++					f = strtod(etx,NULL);
++					if ( f &lt; 1.0 )
++						f = 999.0;
++//					add_olsr_con( olsr_node1, olsr_node2, f );
++				}
++				/* remove zerobyte */
++				(*con_from_end) = (*con_to_end) = (*etx_end) = '&quot;';
++
++				con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
++				dn = 0;
++				last_cr_ptr = lbuf_ptr;
++
++			}
++
++		} else if ( ( (*lbuf_ptr) == '}' ) &amp;&amp; ( (*(lbuf_ptr + 1)) == '\n' ) ) {
++
++//			Output_block_completed = 1;
++
++		}
++
++		lbuf_ptr++;
++
++	}
++
++	if ( last_cr_ptr != NULL ) memmove( lbuf, last_cr_ptr + 1, strlen( last_cr_ptr ) );
++	/*printf(&quot;---memmove-lbuf-start---\n%s\n---memmove-lbuf-end---\n&quot;,lbuf);*/
++	return(0);
++
++}
+
+Modified: trunk/configure.ac
+===================================================================
+--- trunk/configure.ac	2007-03-04 20:25:19 UTC (rev 583)
++++ trunk/configure.ac	2007-03-10 17:45:52 UTC (rev 584)
+@@ -209,6 +209,7 @@
+ 	libs3dw/Makefile
+ 	apps/Makefile
+ 	apps/olsrs3d/Makefile
++	apps/meshs3d/Makefile	
+ 	apps/s3d_x11gate/Makefile
+ 	apps/s3dvt/Makefile
+ 	apps/s3dfm/Makefile
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000575.html">[S3d-svn] r583 - in trunk: libs3d server
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#576">[ date ]</a>
+              <a href="thread.html#576">[ thread ]</a>
+              <a href="subject.html#576">[ subject ]</a>
+              <a href="author.html#576">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

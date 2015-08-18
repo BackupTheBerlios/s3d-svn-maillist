@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r424 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r424%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200609182214.k8IMELXE018090%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000416.html">
+   <LINK REL="Next"  HREF="000418.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r424 - trunk/apps/olsrs3d</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r424%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200609182214.k8IMELXE018090%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r424 - trunk/apps/olsrs3d">marec at mail.berlios.de
+       </A><BR>
+    <I>Tue Sep 19 00:14:21 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000416.html">[S3d-svn] r423 - in trunk: . Documentation server
+</A></li>
+        <LI>Next message: <A HREF="000418.html">[S3d-svn] r425 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#417">[ date ]</a>
+              <a href="thread.html#417">[ thread ]</a>
+              <a href="subject.html#417">[ subject ]</a>
+              <a href="author.html#417">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-09-19 00:14:21 +0200 (Tue, 19 Sep 2006)
+New Revision: 424
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/search.c
+Log:
+follow node onclick
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-09-18 20:56:58 UTC (rev 423)
++++ trunk/apps/olsrs3d/main.c	2006-09-18 22:14:21 UTC (rev 424)
+@@ -877,6 +877,7 @@
+ {
+ 	int oid,i;
+ 	char ip_str[50];
++	struct olsr_node *olsr_node;
+ 
+ 	s3dw_handle_click(evt);
+ /*	if( get_search_status() == WIDGET )
+@@ -887,6 +888,19 @@
+ 
+ 	oid=(int)*((unsigned long *)evt-&gt;buf);
+ 
++	if( get_search_status() != FOLLOW ){
++
++		olsr_node = NULL;
++		olsr_node = *lst_search(oid);
++
++		if ( olsr_node != NULL ) {
++			follow_node_by_click( olsr_node );
++		} else {
++			printf( &quot;clicked obj not found(%i) ?!\n&quot;, oid );
++		}
++
++	}
++
+ /*	if( oid == Btn_close_id )
+ 	{
+ 		s3d_del_object(Btn_close_id);
+
+Modified: trunk/apps/olsrs3d/search.c
+===================================================================
+--- trunk/apps/olsrs3d/search.c	2006-09-18 20:56:58 UTC (rev 423)
++++ trunk/apps/olsrs3d/search.c	2006-09-18 22:14:21 UTC (rev 424)
+@@ -346,6 +346,12 @@
+ 		set_search_status( NOTHING );
+ 	}
+ }
++/* public */
++void follow_node_by_click(struct olsr_node *olsr_node) {
++	(*search_node) = olsr_node;
++	set_search_status( FOLLOW );
++}
++
+ /* private */
+ void _search_node(s3dw_widget *dummy)
+ {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000416.html">[S3d-svn] r423 - in trunk: . Documentation server
+</A></li>
+	<LI>Next message: <A HREF="000418.html">[S3d-svn] r425 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#417">[ date ]</a>
+              <a href="thread.html#417">[ thread ]</a>
+              <a href="subject.html#417">[ subject ]</a>
+              <a href="author.html#417">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

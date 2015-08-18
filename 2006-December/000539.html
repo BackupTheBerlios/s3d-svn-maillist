@@ -1,0 +1,441 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r546 - in trunk/extras/distro/gentoo: . media-gfx/s3d	media-gfx/s3d-svn media-gfx/s3d-svn/files media-libs	media-libs/libg3d media-libs/libg3d/files
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r546%20-%20in%20trunk/extras/distro/gentoo%3A%20.%20media-gfx/s3d%0A%09media-gfx/s3d-svn%20media-gfx/s3d-svn/files%20media-libs%0A%09media-libs/libg3d%20media-libs/libg3d/files&In-Reply-To=%3C200612222148.kBMLmOIR005947%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000538.html">
+   <LINK REL="Next"  HREF="000540.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r546 - in trunk/extras/distro/gentoo: . media-gfx/s3d	media-gfx/s3d-svn media-gfx/s3d-svn/files media-libs	media-libs/libg3d media-libs/libg3d/files</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r546%20-%20in%20trunk/extras/distro/gentoo%3A%20.%20media-gfx/s3d%0A%09media-gfx/s3d-svn%20media-gfx/s3d-svn/files%20media-libs%0A%09media-libs/libg3d%20media-libs/libg3d/files&In-Reply-To=%3C200612222148.kBMLmOIR005947%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r546 - in trunk/extras/distro/gentoo: . media-gfx/s3d	media-gfx/s3d-svn media-gfx/s3d-svn/files media-libs	media-libs/libg3d media-libs/libg3d/files">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Dec 22 22:48:24 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000538.html">[S3d-svn] r545 - trunk/apps/kism3d
+</A></li>
+        <LI>Next message: <A HREF="000540.html">[S3d-svn] r547 - in trunk/extras/distro/gentoo/media-libs/libg3d: .	files
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#539">[ date ]</a>
+              <a href="thread.html#539">[ thread ]</a>
+              <a href="subject.html#539">[ subject ]</a>
+              <a href="author.html#539">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2006-12-22 22:48:23 +0100 (Fri, 22 Dec 2006)
+New Revision: 546
+
+Added:
+   trunk/extras/distro/gentoo/media-libs/
+   trunk/extras/distro/gentoo/media-libs/libg3d/
+   trunk/extras/distro/gentoo/media-libs/libg3d/ChangeLog
+   trunk/extras/distro/gentoo/media-libs/libg3d/Manifest
+   trunk/extras/distro/gentoo/media-libs/libg3d/files/
+   trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.3
+   trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.5
+   trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.6.20061222
+   trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.6.20061222-missingflexheaders.patch.bz2
+   trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.3.ebuild
+   trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.5.ebuild
+   trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.6.20061222.ebuild
+   trunk/extras/distro/gentoo/media-libs/libg3d/metadata.xml
+Modified:
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/files/digest-s3d-svn-9999
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild
+   trunk/extras/distro/gentoo/media-gfx/s3d/Manifest
+   trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.1.1.ebuild
+Log:
+- Add libg3d as dependency for s3d-svn
+- Insert libg3d ebuilds
+- Add libgps as optional dependency for s3d-svn (via use flag)
+- Add flex output for libg3d svn snapshot as workaround for autohell (like in official packages)
+- Mark libg3d as blocker for current stable s3d release
+
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d/Manifest
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d/Manifest	2006-12-22 01:41:08 UTC (rev 545)
++++ trunk/extras/distro/gentoo/media-gfx/s3d/Manifest	2006-12-22 21:48:23 UTC (rev 546)
+@@ -1,8 +1,8 @@
+ DIST s3d-0.1.1.tar.bz2 1737935 RMD160 88189600659dd4d184be044dd668597ab2b17334 SHA1 3765171848d519784a436468ac613c9bfe85c3ae SHA256 1e2be7c806deaaf07e7f00d018f6f08723a1b26332419a80e732c8b7a1a515e4
+-EBUILD s3d-0.1.1.ebuild 811 RMD160 36bf79576e7d2a2ccf0cf89c4ed537ca51bc78ab SHA1 acbea5f89f40d0647b04eb995e4231182611faf8 SHA256 34f72a57351fd53658e44632f161e591b941b6a9e8c83c953845c298ddf855ae
+-MD5 13108513bab3168db7b566ec750603a4 s3d-0.1.1.ebuild 811
+-RMD160 36bf79576e7d2a2ccf0cf89c4ed537ca51bc78ab s3d-0.1.1.ebuild 811
+-SHA256 34f72a57351fd53658e44632f161e591b941b6a9e8c83c953845c298ddf855ae s3d-0.1.1.ebuild 811
++EBUILD s3d-0.1.1.ebuild 831 RMD160 7ab28a5a7b10a86051ff35dec715524ddac33d98 SHA1 becb13dedb85a733431241c0985b285553b0df4b SHA256 661794ee708d800655fe6e4c568173d7c7f7996e7c1bda077d52028d88b9d841
++MD5 745d3278b3dc2e7ffa3e13fe8d670061 s3d-0.1.1.ebuild 831
++RMD160 7ab28a5a7b10a86051ff35dec715524ddac33d98 s3d-0.1.1.ebuild 831
++SHA256 661794ee708d800655fe6e4c568173d7c7f7996e7c1bda077d52028d88b9d841 s3d-0.1.1.ebuild 831
+ MISC ChangeLog 148 RMD160 cb8db163c4842d0f8d8d4ad41ba7516765f1b0a3 SHA1 70661ac4033b04c51f6928f82d9903bfa86eb0b3 SHA256 e61b9d97b0c64076e833b27201c5eda91b02f5d885a37b5f4d005c03a44c405c
+ MD5 31944463e2ea8d52f7172c7b838927be ChangeLog 148
+ RMD160 cb8db163c4842d0f8d8d4ad41ba7516765f1b0a3 ChangeLog 148
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.1.1.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.1.1.ebuild	2006-12-22 01:41:08 UTC (rev 545)
++++ trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.1.1.ebuild	2006-12-22 21:48:23 UTC (rev 546)
+@@ -16,6 +16,7 @@
+ 	&gt;=sys-devel/libtool-1.5
+ 	&quot;
+ RDEPEND=&quot;!media-gfx/s3d-svn
++	!media-libs/libg3d
+ 	&gt;=media-libs/libsdl-1.2.7
+ 	&gt;=media-libs/freetype-2
+ 	&gt;=dev-libs/glib-2
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest	2006-12-22 01:41:08 UTC (rev 545)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest	2006-12-22 21:48:23 UTC (rev 546)
+@@ -1,7 +1,7 @@
+-EBUILD s3d-svn-9999.ebuild 905 RMD160 34bd888b19648084ae8dc8e5d603f898a6e86774 SHA1 d228cd4a38efb52c06db1e680e5936c8ac7b55d8 SHA256 202c2a6c56bdfb6b9353dbfd755994e235cb0f9333f12d03d27c6fcabc87f447
+-MD5 518f54a8fb0a29a9a3ec6e650da58480 s3d-svn-9999.ebuild 905
+-RMD160 34bd888b19648084ae8dc8e5d603f898a6e86774 s3d-svn-9999.ebuild 905
+-SHA256 202c2a6c56bdfb6b9353dbfd755994e235cb0f9333f12d03d27c6fcabc87f447 s3d-svn-9999.ebuild 905
++EBUILD s3d-svn-9999.ebuild 986 RMD160 8e237a2e5b13cb61449016e5eff0a9924d0270c3 SHA1 112dd0180beebd50a46584ae50d7024cca4935ec SHA256 a7311f9e57c595bdc77a7bbe4ead0f972222bd33f86a16a7ad4467fdc9ebaad0
++MD5 333cca4eef0cb4e7e7bf6478e7127993 s3d-svn-9999.ebuild 986
++RMD160 8e237a2e5b13cb61449016e5eff0a9924d0270c3 s3d-svn-9999.ebuild 986
++SHA256 a7311f9e57c595bdc77a7bbe4ead0f972222bd33f86a16a7ad4467fdc9ebaad0 s3d-svn-9999.ebuild 986
+ MISC ChangeLog 295 RMD160 818b9134758d8a5d81be67d25ab990fe7cc71283 SHA1 529b5c00b3ad8067f06ce4bcc41d6a185fb2670d SHA256 cd5d36bee2dce3a94ce0f4f65ad7dc4ab8d299e48e57f48aa0a609eb06fe4885
+ MD5 569601eaa0bbba92427ed05da0dfc050 ChangeLog 295
+ RMD160 818b9134758d8a5d81be67d25ab990fe7cc71283 ChangeLog 295
+@@ -10,6 +10,6 @@
+ MD5 261031c8b7aca6f50babf7e44b35deb1 metadata.xml 239
+ RMD160 236f28d8249f562b764e2d854580d8301b150418 metadata.xml 239
+ SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f metadata.xml 239
+-MD5 68b329da9893e34099c7d8ad5cb9c940 files/digest-s3d-svn-9999 1
+-RMD160 c0da025038ed83c687ddc430da9846ecb97f3998 files/digest-s3d-svn-9999 1
+-SHA256 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b files/digest-s3d-svn-9999 1
++MD5 d41d8cd98f00b204e9800998ecf8427e files/digest-s3d-svn-9999 0
++RMD160 9c1185a5c5e9fc54612808977ee8f548b2258d31 files/digest-s3d-svn-9999 0
++SHA256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 files/digest-s3d-svn-9999 0
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/files/digest-s3d-svn-9999
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/files/digest-s3d-svn-9999	2006-12-22 01:41:08 UTC (rev 545)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/files/digest-s3d-svn-9999	2006-12-22 21:48:23 UTC (rev 546)
+@@ -1 +0,0 @@
+-
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild	2006-12-22 01:41:08 UTC (rev 545)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild	2006-12-22 21:48:23 UTC (rev 546)
+@@ -1,6 +1,6 @@
+ inherit subversion
+ 
+-IUSE=&quot;&quot;
++IUSE=&quot;gps&quot;
+ 
+ ESVN_REPO_URI=&quot;<A HREF="http://svn.berlios.de/svnroot/repos/s3d/trunk">http://svn.berlios.de/svnroot/repos/s3d/trunk</A>&quot;
+ ESVN_BOOTSTRAP=&quot;./autogen.sh --no-configure&quot;
+@@ -23,8 +23,10 @@
+ 	&gt;=media-libs/libsdl-1.2.7
+ 	&gt;=media-libs/freetype-2
+ 	&gt;=dev-libs/glib-2
++	dev-libs/libxml2
+ 	media-fonts/ttf-bitstream-vera
+ 	media-libs/fontconfig
++	&gt;=media-libs/libg3d-0.0.6
+ 	media-libs/mesa
+ 
+ 	|| ( 	(
+@@ -37,6 +39,8 @@
+ 			x11-libs/libXtst )
+ 		virtual/x11 )
+ 
++	gps? ( sci-geosciences/gpsd )	
++
+ 	virtual/glut
+ 	&quot;
+ 
+
+Added: trunk/extras/distro/gentoo/media-libs/libg3d/ChangeLog
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/ChangeLog	2006-12-22 01:41:08 UTC (rev 545)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/ChangeLog	2006-12-22 21:48:23 UTC (rev 546)
+@@ -0,0 +1,17 @@
++# ChangeLog for media-gfx/libg3d
++
++*libg3d-0.0.6.20061222 (22 Dec 2006)
++
++  22 Dec 2006; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; libg3d-0.0.6.20061222.ebuild:
++  Add snapshot to build s3d-svn.
++
++*libg3d-0.0.3 (22 Dec 2006)
++
++  22 Dec 2006; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; libg3d-0.0.3.ebuild:
++  Version bump.
++
++*libg3d-0.0.3 (22 Dec 2006)
++
++  22 Dec 2006; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; libg3d-0.0.3.ebuild:
++  Initial import.
++
+
+Added: trunk/extras/distro/gentoo/media-libs/libg3d/Manifest
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/Manifest	2006-12-22 01:41:08 UTC (rev 545)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/Manifest	2006-12-22 21:48:23 UTC (rev 546)
+@@ -0,0 +1,35 @@
++AUX libg3d-0.0.6.20061222-missingflexheaders.patch.bz2 18052 RMD160 d0d096e454917ca6a6d7938e4075f6e941c2e869 SHA1 f84a33261fb2e8a3a9eb2f6696fafd13662bfe5a SHA256 0391c8d6e62b3ec7e03d9f954363b35cc39d78a757ca14b29effedb7f6b1713b
++MD5 1ca9ec4968c57570ea04f3ede657de36 files/libg3d-0.0.6.20061222-missingflexheaders.patch.bz2 18052
++RMD160 d0d096e454917ca6a6d7938e4075f6e941c2e869 files/libg3d-0.0.6.20061222-missingflexheaders.patch.bz2 18052
++SHA256 0391c8d6e62b3ec7e03d9f954363b35cc39d78a757ca14b29effedb7f6b1713b files/libg3d-0.0.6.20061222-missingflexheaders.patch.bz2 18052
++DIST libg3d-0.0.3.tar.gz 438414 RMD160 3c1158d0b8a9580b78808152eaa179286e852a9c SHA1 768608dfc78d88f53ffb4d520bd434fe8c362c44 SHA256 d8c08448586b4d6f70c5933c89877f81e8f31d7eea8f3497b0d12357134a71e0
++DIST libg3d-0.0.5.tar.gz 475879 RMD160 505474c8187bd97126327e1e6c9225f72c1bbdff SHA1 3c1453fe41d60fb4d8ffa69fbb41aa6df2faa50a SHA256 4d19ea782ef71d862fae99291b6355b1331a309f68674ae301a9e1fd68c8c32a
++EBUILD libg3d-0.0.3.ebuild 606 RMD160 a318c6923751577442f9b684dd881a6e126b2e9c SHA1 9ca4be706d0c022f2ebd15632c78823f4c8d6750 SHA256 fc8d0e24adaa09d52c1a3c4d2f3b1765a5e0e70362cfba689abb6a9b2b91b10d
++MD5 35fca5596ed05c3d8d9ca82b7ee7e7c8 libg3d-0.0.3.ebuild 606
++RMD160 a318c6923751577442f9b684dd881a6e126b2e9c libg3d-0.0.3.ebuild 606
++SHA256 fc8d0e24adaa09d52c1a3c4d2f3b1765a5e0e70362cfba689abb6a9b2b91b10d libg3d-0.0.3.ebuild 606
++EBUILD libg3d-0.0.5.ebuild 667 RMD160 65e4eba6ff273b66cf8b6ff16693f38d4e8fa5cb SHA1 adcd841e8c3afbac819eed804b62399cd4c4c7c9 SHA256 fecae46969199e5d852fa308c1eafcbfcc9fb9f846a2311367afde8a25752af6
++MD5 2180cc92be1d9ac65d14cf2fa5ceec3f libg3d-0.0.5.ebuild 667
++RMD160 65e4eba6ff273b66cf8b6ff16693f38d4e8fa5cb libg3d-0.0.5.ebuild 667
++SHA256 fecae46969199e5d852fa308c1eafcbfcc9fb9f846a2311367afde8a25752af6 libg3d-0.0.5.ebuild 667
++EBUILD libg3d-0.0.6.20061222.ebuild 912 RMD160 4140176144360366b7dd5b042207c462ab3e3aeb SHA1 2251930c85b3df5aab0390350f20ce8bfa81f6bb SHA256 ae4e03dda245e2660adf0ee9d59b7e20577ad1bb73c90ab0dd05d6c24d551f7f
++MD5 9870cec7558a12008d2ee0f138642c11 libg3d-0.0.6.20061222.ebuild 912
++RMD160 4140176144360366b7dd5b042207c462ab3e3aeb libg3d-0.0.6.20061222.ebuild 912
++SHA256 ae4e03dda245e2660adf0ee9d59b7e20577ad1bb73c90ab0dd05d6c24d551f7f libg3d-0.0.6.20061222.ebuild 912
++MISC ChangeLog 434 RMD160 8ae5dfbf992a75eb1f54c704f9a7a65b162f2e1c SHA1 34ddae58d819a00a64e3e99b3f06b240318519bf SHA256 44259a04f04114d1d9785e93ac88c252ea5a76bb23bde8a0ba4c452cb6a8ca20
++MD5 091461b75c05b62e0d86b9ebea829443 ChangeLog 434
++RMD160 8ae5dfbf992a75eb1f54c704f9a7a65b162f2e1c ChangeLog 434
++SHA256 44259a04f04114d1d9785e93ac88c252ea5a76bb23bde8a0ba4c452cb6a8ca20 ChangeLog 434
++MISC metadata.xml 239 RMD160 236f28d8249f562b764e2d854580d8301b150418 SHA1 76f167e3abff81e9535c16a637fd1e7f91d4fda3 SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f
++MD5 261031c8b7aca6f50babf7e44b35deb1 metadata.xml 239
++RMD160 236f28d8249f562b764e2d854580d8301b150418 metadata.xml 239
++SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f metadata.xml 239
++MD5 167d7c9af354501f79ef1bc3377716de files/digest-libg3d-0.0.3 238
++RMD160 5773a2974b9a56d67ce4f310ab90672fad9a028e files/digest-libg3d-0.0.3 238
++SHA256 8e52678fd08e00de76a2b2dd2fcda7a9569a4f38c480bbad763470fd5d327efe files/digest-libg3d-0.0.3 238
++MD5 5e38c09ab217ac68f78491c99aaebe4d files/digest-libg3d-0.0.5 238
++RMD160 b72684e7e6a5c2375fe3167ac92ab4149a0ad379 files/digest-libg3d-0.0.5 238
++SHA256 9e800635187be7c188bdacb3d4e321783f5226ef12b808b7353a62cf29dcd012 files/digest-libg3d-0.0.5 238
++MD5 d41d8cd98f00b204e9800998ecf8427e files/digest-libg3d-0.0.6.20061222 0
++RMD160 9c1185a5c5e9fc54612808977ee8f548b2258d31 files/digest-libg3d-0.0.6.20061222 0
++SHA256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 files/digest-libg3d-0.0.6.20061222 0
+
+Added: trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.3
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.3	2006-12-22 01:41:08 UTC (rev 545)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.3	2006-12-22 21:48:23 UTC (rev 546)
+@@ -0,0 +1,3 @@
++MD5 f4ecf652e437cba69d905ef8e13a71eb libg3d-0.0.3.tar.gz 438414
++RMD160 3c1158d0b8a9580b78808152eaa179286e852a9c libg3d-0.0.3.tar.gz 438414
++SHA256 d8c08448586b4d6f70c5933c89877f81e8f31d7eea8f3497b0d12357134a71e0 libg3d-0.0.3.tar.gz 438414
+
+Added: trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.5
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.5	2006-12-22 01:41:08 UTC (rev 545)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.5	2006-12-22 21:48:23 UTC (rev 546)
+@@ -0,0 +1,3 @@
++MD5 f089060580dcc5730128028c3554aac3 libg3d-0.0.5.tar.gz 475879
++RMD160 505474c8187bd97126327e1e6c9225f72c1bbdff libg3d-0.0.5.tar.gz 475879
++SHA256 4d19ea782ef71d862fae99291b6355b1331a309f68674ae301a9e1fd68c8c32a libg3d-0.0.5.tar.gz 475879
+
+Added: trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.6.20061222
+===================================================================
+
+Added: trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.6.20061222-missingflexheaders.patch.bz2
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.6.20061222-missingflexheaders.patch.bz2
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.3.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.3.ebuild	2006-12-22 01:41:08 UTC (rev 545)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.3.ebuild	2006-12-22 21:48:23 UTC (rev 546)
+@@ -0,0 +1,36 @@
++IUSE=&quot;gtk&quot;
++
++SRC_URI=&quot;<A HREF="http://download.gna.org/${PN">http://download.gna.org/${PN</A>}/${P}.tar.gz&quot;
++
++DESCRIPTION=&quot;library for loading 3D models of many file types&quot;
++HOMEPAGE=&quot;<A HREF="https://gna.org/projects/libg3d/">https://gna.org/projects/libg3d/</A>&quot;
++
++LICENSE=&quot;GPL-2 LGPL&quot;
++KEYWORDS=&quot;x86&quot;
++SLOT=&quot;0&quot;
++
++DEPEND=&quot;${RDEPEND}
++	&gt;=sys-devel/autoconf-2.59
++	&gt;=sys-devel/automake-1.9
++	sys-devel/flex
++	&gt;=sys-devel/libtool-1.5
++	&quot;
++RDEPEND=&quot;!&lt;=media-gfx/s3d-0.1.1
++	&gt;=dev-libs/glib-2
++
++	gtk? ( &gt;=x11-libs/gtk+-2 )
++	&quot;
++
++src_compile() {
++	econf \
++		$(use_enable gtk gtktest) \
++		--prefix=/usr/ \
++		|| die &quot;econf failed&quot;
++
++	emake || die &quot;emake failed&quot;
++}
++
++src_install() {
++	emake DESTDIR=&quot;${D}&quot; install || die
++}
++
+
+Added: trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.5.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.5.ebuild	2006-12-22 01:41:08 UTC (rev 545)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.5.ebuild	2006-12-22 21:48:23 UTC (rev 546)
+@@ -0,0 +1,38 @@
++IUSE=&quot;gtk xml&quot;
++
++SRC_URI=&quot;<A HREF="http://download.gna.org/${PN">http://download.gna.org/${PN</A>}/${P}.tar.gz&quot;
++
++DESCRIPTION=&quot;library for loading 3D models of many file types&quot;
++HOMEPAGE=&quot;<A HREF="https://gna.org/projects/libg3d/">https://gna.org/projects/libg3d/</A>&quot;
++
++LICENSE=&quot;GPL-2 LGPL&quot;
++KEYWORDS=&quot;x86&quot;
++SLOT=&quot;0&quot;
++
++DEPEND=&quot;${RDEPEND}
++	&gt;=sys-devel/autoconf-2.59
++	&gt;=sys-devel/automake-1.9
++	sys-devel/flex
++	&gt;=sys-devel/libtool-1.5
++	&quot;
++RDEPEND=&quot;!&lt;=media-gfx/s3d-0.1.1
++	&gt;=dev-libs/glib-2
++
++	gtk? ( &gt;=x11-libs/gtk+-2 )
++	xml? ( dev-libs/libxml2 )
++	&quot;
++
++src_compile() {
++	econf \
++		$(use_enable gtk gtktest) \
++		$(use_enable xml xmltest) \
++		--prefix=/usr/ \
++		|| die &quot;econf failed&quot;
++
++	emake || die &quot;emake failed&quot;
++}
++
++src_install() {
++	emake DESTDIR=&quot;${D}&quot; install || die
++}
++
+
+Added: trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.6.20061222.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.6.20061222.ebuild	2006-12-22 01:41:08 UTC (rev 545)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.6.20061222.ebuild	2006-12-22 21:48:23 UTC (rev 546)
+@@ -0,0 +1,49 @@
++inherit subversion eutils
++
++IUSE=&quot;gtk xml&quot;
++
++ESVN_REPO_URI=&quot;<A HREF="http://svn.gna.org/svn/libg3d/trunk">http://svn.gna.org/svn/libg3d/trunk</A>&quot;
++ESVN_OPTIONS=&quot;--revision {2006-12-22}&quot;
++ESVN_BOOTSTRAP=&quot;./autogen.sh&quot;
++
++DESCRIPTION=&quot;library for loading 3D models of many file types&quot;
++HOMEPAGE=&quot;<A HREF="https://gna.org/projects/libg3d/">https://gna.org/projects/libg3d/</A>&quot;
++
++LICENSE=&quot;GPL-2 LGPL&quot;
++KEYWORDS=&quot;~x86 ~amd64&quot;
++SLOT=&quot;0&quot;
++
++DEPEND=&quot;${RDEPEND}
++	dev-util/gtk-doc
++	&gt;=sys-devel/autoconf-2.59
++	&gt;=sys-devel/automake-1.9
++	sys-devel/flex
++	&gt;=sys-devel/libtool-1.5
++	&quot;
++RDEPEND=&quot;!&lt;=media-gfx/s3d-0.1.1
++	&gt;=dev-libs/glib-2
++
++	gtk? ( &gt;=x11-libs/gtk+-2 )
++	xml? ( dev-libs/libxml2 )
++	&quot;
++
++src_unpack() {
++	subversion_src_unpack
++	cd &quot;${S}&quot;
++	epatch ${FILESDIR}/libg3d-0.0.6.20061222-missingflexheaders.patch.bz2
++}
++
++src_compile() {
++	econf \
++		$(use_enable gtk gtktest) \
++		$(use_enable xml xmltest) \
++		--prefix=/usr/ \
++		|| die &quot;econf failed&quot;
++
++	emake || die &quot;emake failed&quot;
++}
++
++src_install() {
++	emake DESTDIR=&quot;${D}&quot; install || die
++}
++
+
+Added: trunk/extras/distro/gentoo/media-libs/libg3d/metadata.xml
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/metadata.xml	2006-12-22 01:41:08 UTC (rev 545)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/metadata.xml	2006-12-22 21:48:23 UTC (rev 546)
+@@ -0,0 +1,8 @@
++&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
++&lt;!DOCTYPE pkgmetadata SYSTEM &quot;<A HREF="http://www.gentoo.org/dtd/metadata.dtd">http://www.gentoo.org/dtd/metadata.dtd</A>&quot;&gt;
++&lt;pkgmetadata&gt;
++  &lt;herd&gt;d0tslash&lt;/herd&gt;
++    &lt;maintainer&gt;
++    &lt;email&gt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&lt;/email&gt;
++  &lt;/maintainer&gt;
++&lt;/pkgmetadata&gt;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000538.html">[S3d-svn] r545 - trunk/apps/kism3d
+</A></li>
+	<LI>Next message: <A HREF="000540.html">[S3d-svn] r547 - in trunk/extras/distro/gentoo/media-libs/libg3d: .	files
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#539">[ date ]</a>
+              <a href="thread.html#539">[ thread ]</a>
+              <a href="subject.html#539">[ subject ]</a>
+              <a href="author.html#539">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

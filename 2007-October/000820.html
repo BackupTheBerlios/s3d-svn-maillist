@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r828 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r828%20-%20trunk&In-Reply-To=%3C200710261507.l9QF7Wl6024565%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000819.html">
+   <LINK REL="Next"  HREF="000821.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r828 - trunk</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r828%20-%20trunk&In-Reply-To=%3C200710261507.l9QF7Wl6024565%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r828 - trunk">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 26 17:07:32 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000819.html">[S3d-svn] r827 - in trunk: . cmake/modules
+</A></li>
+        <LI>Next message: <A HREF="000821.html">[S3d-svn] r828 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#820">[ date ]</a>
+              <a href="thread.html#820">[ thread ]</a>
+              <a href="subject.html#820">[ subject ]</a>
+              <a href="author.html#820">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-26 17:07:31 +0200 (Fri, 26 Oct 2007)
+New Revision: 828
+
+Modified:
+   trunk/ConfigureChecks.cmake
+Log:
+Sort find_packages by (required|optional) and then by name
+
+
+Modified: trunk/ConfigureChecks.cmake
+===================================================================
+--- trunk/ConfigureChecks.cmake	2007-10-26 15:07:22 UTC (rev 827)
++++ trunk/ConfigureChecks.cmake	2007-10-26 15:07:31 UTC (rev 828)
+@@ -49,13 +49,6 @@
+ endif (OPENGL_FOUND)
+ 
+ 
+-# find lib and add include dir for CWiid
+-find_package(CWiid)
+-if (CWIID_FOUND)
+-	include_directories(${CWIID_INCLUDE_DIR})
+-endif (CWIID_FOUND)
+-
+-
+ # try to find lib and add include dir for GLUT
+ find_package(GLUT)
+ if (GLUT_FOUND)
+@@ -76,6 +69,38 @@
+ endif (NOT SDL_FOUND AND NOT GLUT_FOUND)
+ 
+ 
++# find lib and add include dir for CWiid
++find_package(CWiid)
++if (CWIID_FOUND)
++	include_directories(${CWIID_INCLUDE_DIR})
++endif (CWIID_FOUND)
++
++
++# try to find docbook
++find_package(Docbook)
++
++
++# try to find lib and add include dir for GPS
++find_package(GPS)
++if (GPS_FOUND)
++	set(HAVE_GPS GPS_FOUND)
++endif (GPS_FOUND)
++
++
++# try to find lib and add include dir for PThreads
++find_package(PThreads)
++if (PTHREADS_FOUND)
++	include_directories(${PTHREADS_INCLUDE_DIR})
++endif (PTHREADS_FOUND)
++
++
++# try to find lib and add include dir for SQLite3
++find_package(SQLite3)
++if (SQLITE3_FOUND)
++	add_definitions(${SQLITE3_DEFINITIONS})
++endif (SQLITE3_FOUND)
++
++
+ # try to find lib and add include dir for LibXml2
+ find_package(LibXml2)
+ if (LIBXML2_FOUND)
+@@ -115,31 +140,6 @@
+ endif (XTST_FOUND)
+ 
+ 
+-# try to find lib and add include dir for GPS
+-find_package(GPS)
+-if (GPS_FOUND)
+-	set(HAVE_GPS GPS_FOUND)
+-endif (GPS_FOUND)
+-
+-
+-# try to find lib and add include dir for SQLite3
+-find_package(SQLite3)
+-if (SQLITE3_FOUND)
+-	add_definitions(${SQLITE3_DEFINITIONS})
+-endif (SQLITE3_FOUND)
+-
+-
+-# try to find lib and add include dir for PThreads
+-find_package(PThreads)
+-if (PTHREADS_FOUND)
+-	include_directories(${PTHREADS_INCLUDE_DIR})
+-endif (PTHREADS_FOUND)
+-
+-
+-# try to find docbook
+-find_package(Docbook)
+-
+-
+ # test for shm
+ include(TestForSHM)
+ if (HAVE_SHM)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000819.html">[S3d-svn] r827 - in trunk: . cmake/modules
+</A></li>
+	<LI>Next message: <A HREF="000821.html">[S3d-svn] r828 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#820">[ date ]</a>
+              <a href="thread.html#820">[ thread ]</a>
+              <a href="subject.html#820">[ subject ]</a>
+              <a href="author.html#820">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

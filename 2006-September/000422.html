@@ -1,0 +1,367 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r429 - in trunk: . libs3d/libg3d/plugins/import
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r429%20-%20in%20trunk%3A%20.%20libs3d/libg3d/plugins/import&In-Reply-To=%3C200609191411.k8JEBHg2005783%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000421.html">
+   <LINK REL="Next"  HREF="000423.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r429 - in trunk: . libs3d/libg3d/plugins/import</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r429%20-%20in%20trunk%3A%20.%20libs3d/libg3d/plugins/import&In-Reply-To=%3C200609191411.k8JEBHg2005783%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r429 - in trunk: . libs3d/libg3d/plugins/import">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Tue Sep 19 16:11:17 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000421.html">[S3d-svn] r428 - in trunk: . libs3d
+</A></li>
+        <LI>Next message: <A HREF="000423.html">[S3d-svn] r430 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#422">[ date ]</a>
+              <a href="thread.html#422">[ thread ]</a>
+              <a href="subject.html#422">[ subject ]</a>
+              <a href="author.html#422">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-19 16:11:17 +0200 (Tue, 19 Sep 2006)
+New Revision: 429
+
+Modified:
+   trunk/
+   trunk/libs3d/libg3d/plugins/import/imp_3ds.c
+   trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1036 at balthasar</A>:  dotslash | 2006-09-19 16:11:13 +0200
+ - merge changes from libg3d back to s3d
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1034
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1036
+
+Modified: trunk/libs3d/libg3d/plugins/import/imp_3ds.c
+===================================================================
+--- trunk/libs3d/libg3d/plugins/import/imp_3ds.c	2006-09-19 14:00:18 UTC (rev 428)
++++ trunk/libs3d/libg3d/plugins/import/imp_3ds.c	2006-09-19 14:11:17 UTC (rev 429)
+@@ -23,7 +23,6 @@
+ #include &lt;stdio.h&gt;
+ #include &lt;string.h&gt;
+ #include &lt;stdarg.h&gt;
+-#include &lt;stdlib.h&gt; /* exit() */
+ 
+ #include &lt;g3d/types.h&gt;
+ #include &lt;g3d/read.h&gt;
+@@ -42,6 +41,7 @@
+ {
+ 	FILE *f;
+ 	gint32 nbytes, magic;
++	gboolean retval;
+ 	x3ds_global_data global;
+ 	x3ds_parent_data *parent;
+ 	long int fpos;
+@@ -80,19 +80,18 @@
+ 	parent-&gt;id = magic;
+ 	parent-&gt;nb = nbytes;
+ 
+-	x3ds_read_ctnr(&amp;global, parent);
++	retval = x3ds_read_ctnr(&amp;global, parent);
+ 
+ 	g_free(parent);
+ 
+-	/*
+-	x3ds_container(f, nbytes, context, model, NULL, 1, magic);
+-	*/
++	fclose(f);
+ 
+-	fclose(f);
+ #if DEBUG &gt; 0
+-	g_printerr(&quot;imp_3ds.c: %s successfully loaded\n&quot;, filename);
++	if(retval)
++		g_printerr(&quot;imp_3ds.c: %s successfully loaded\n&quot;, filename);
+ #endif
+-	return TRUE;
++
++	return retval;
+ }
+ 
+ gchar *plugin_description(void)
+@@ -134,12 +133,11 @@
+ 				x3ds_chunks[i].container ? 'c' : ' ',
+ 				x3ds_chunks[i].callback ? 'f' : ' ',
+ 				x3ds_chunks[i].desc, chunk_len);
+-			
++
+ 			if (chunk_id==0)
+ 			{
+ 				g_printerr(&quot;error: bad chunk id\n&quot;);
+-		/*		return FALSE;*/
+-				exit(-1);
++				return FALSE;
+ 			}
+ 
+ 			subparent = g_new0(x3ds_parent_data, 1);
+@@ -161,7 +159,11 @@
+ 
+ 			if(x3ds_chunks[i].container)
+ 			{
+-				x3ds_read_ctnr(global, subparent);
++				if(x3ds_read_ctnr(global, subparent) == FALSE)
++				{
++					/* abort on error */
++					return FALSE;
++				}
+ 			}
+ 
+ 			if(subparent-&gt;nb)
+
+Modified: trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c
+===================================================================
+--- trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c	2006-09-19 14:00:18 UTC (rev 428)
++++ trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c	2006-09-19 14:11:17 UTC (rev 429)
+@@ -400,15 +400,13 @@
+ /* smoothing groups */
+ gboolean x3ds_cb_0x4150(x3ds_global_data *global, x3ds_parent_data *parent)
+ {
+-
+ 	G3DObject *object;
+ 	G3DFace *face;
+ 	GSList *oface;
+ 	gint32 i, j, k, n=0, polynum, group;
+ 	guint32 *smooth_list;
+-	gfloat *pnormal_list, *vertex_normal_buf;			 	
++	gfloat *pnormal_list, *vertex_normal_buf;
+ 	gfloat a[3],b[3], *p0,*p1,*p2,*r;
+-	gfloat len;
+ 
+ 	/* read data */
+ 	object = (G3DObject *)parent-&gt;object;
+@@ -416,106 +414,119 @@
+ 
+ 	oface=object-&gt;faces;
+ 	polynum=0;
+-	for (oface=object-&gt;faces; oface != NULL ; oface=oface-&gt;next) polynum++; /* count polygons */
++	for(oface = object-&gt;faces; oface != NULL ; oface = oface-&gt;next)
++		polynum++; /* count polygons */
+ 
+-	pnormal_list=		g_new(float, 3*polynum);							/* polygon normal list */
+-	vertex_normal_buf=	g_new0(float,3*object-&gt;vertex_count);				/* normals per vertice */
+-	smooth_list = 		g_new(guint32, polynum);
+-	for ( i=0 ; i&lt;polynum ; i++ ) 
++	/* polygon normal list */
++	pnormal_list = g_new(float, 3 * polynum);
++	/* normals per vertice */
++	vertex_normal_buf = g_new0(float, 3 * object-&gt;vertex_count);
++
++	smooth_list = g_new(guint32, polynum);
++
++	for(i = 0 ; i &lt; polynum ; i ++)
+ 		smooth_list[i] = g3d_read_int32_le(global-&gt;f);
++
+ 	parent-&gt;nb -= polynum * 4;
+-	/* first, we calculate the normal by the polygon vertices (just vector product) */
+-	i=0;
+-	for (oface=object-&gt;faces; oface != NULL ; oface=oface-&gt;next)
++	/* first, we calculate the normal by the polygon vertices (just vector
++	 * product) */
++	i = 0;
++	for(oface = object-&gt;faces; oface != NULL ; oface=oface-&gt;next)
+ 	{
+-		face=(G3DFace *)oface-&gt;data;
+-		r=&amp;(pnormal_list[i*3]);
+-		p0=&amp;(object-&gt;vertex_data[3* face-&gt;vertex_indices[0]]);
+-		p1=&amp;(object-&gt;vertex_data[3* face-&gt;vertex_indices[1]]);
+-		p2=&amp;(object-&gt;vertex_data[3* face-&gt;vertex_indices[2]]);
+-		
++		face = (G3DFace *)oface-&gt;data;
++		r = &amp;(pnormal_list[i*3]);
++		p0 = &amp;(object-&gt;vertex_data[3 * face-&gt;vertex_indices[0]]);
++		p1 = &amp;(object-&gt;vertex_data[3 * face-&gt;vertex_indices[1]]);
++		p2 = &amp;(object-&gt;vertex_data[3 * face-&gt;vertex_indices[2]]);
++
+ 		a[0]=p1[0] - p0[0];
+ 		a[1]=p1[1] - p0[1];
+ 		a[2]=p1[2] - p0[2];
+ 		b[0]=p2[0] - p0[0];
+ 		b[1]=p2[1] - p0[1];
+ 		b[2]=p2[2] - p0[2];
+-		r[0]=a[1]*b[2] - a[2]*b[1];
+-		r[1]=a[2]*b[0] - a[0]*b[2];
+-		r[2]=a[0]*b[1] - a[1]*b[0];
+-	
+-		len=sqrt(r[0]*r[0]+r[1]*r[1]+r[2]*r[2]);
+-		if (len!=0.0F)
+-		{
+-			r[0]=r[0]/len;
+-			r[1]=r[1]/len;
+-			r[2]=r[2]/len;
+-		} else {
+-			r[0]=r[1]=r[2]=0.0F;
+-		}
+-		face-&gt;flags|=G3D_FLAG_FAC_NORMALS;
+-		i++;
++
++		g3d_vector_normal(a[0], a[1], a[2], b[0], b[1], b[2],
++			&amp;r[0], &amp;r[1], &amp;r[2]);
++
++		g3d_vector_unify(&amp;r[0], &amp;r[1], &amp;r[2]);
++
++		face-&gt;flags |= G3D_FLAG_FAC_NORMALS;
++		i ++;
+ 	}
++
+ 	do {
+ 		/* find a suitable group. -1 means we've already taken care */
+-		group=-1;
+-		for (i=0;i&lt;polynum;i++)
+-			if ((group=smooth_list[i])!=-1) /* found a group */
++		group = -1;
++		for(i = 0; i &lt; polynum; i ++)
++			if((group = smooth_list[i]) != -1) /* found a group */
+ 				break;
+ 		/* handle this group */
+-		if (group!=-1)
++		if(group != -1)
+ 		{
+-			/* SMOOTH */
+-			/*  we add normals of the polygons's vertices so each vertex will finally have */
+-			/*  the sum of the polygons normals where the vertex is part of. */
+-
+-			/* run0: clear the vertex_normal_buf for this group */
+-			for (i=0;i&lt;object-&gt;vertex_count*3;i++)
+-				vertex_normal_buf[i]=0.0;
+-			 /*  run1: add normals on themselves into the vertex_normal_buf */
+-			i=0;
+-			for (oface=object-&gt;faces; oface != NULL ; oface=oface-&gt;next)
++			/* SMOOTH
++			 *  we add normals of the polygons's vertices so each vertex will
++			 *  finally have
++			 *  the sum of the polygons normals where the vertex is part of.
++             *
++			 * run0: clear the vertex_normal_buf for this group */
++			for(i = 0; i &lt; object-&gt;vertex_count * 3; i ++)
++				vertex_normal_buf[i] = 0.0;
++			/* run1: add normals on themselves into the vertex_normal_buf */
++			i = 0;
++			for(oface = object-&gt;faces; oface != NULL ; oface = oface-&gt;next)
+ 			{
+-				face=(G3DFace *) oface-&gt;data;
+-				if (smooth_list[i]==group)
++				face = (G3DFace *) oface-&gt;data;
++				if(smooth_list[i] == group)
+ 				{
+-					for (j=0;j&lt;3;j++) /* for all 3 vertices of the polygon */
++					/* for all 3 vertices of the polygon */
++					for(j = 0; j &lt; 3; j ++)
+ 					{
+-						k=face-&gt;vertex_indices[j];
+-						for (n=0;n&lt;3;n++)
+-							vertex_normal_buf[ k*3+n ]+= pnormal_list[i*3 + n];
++						k = face-&gt;vertex_indices[j];
++						for(n = 0; n &lt; 3; n ++)
++							vertex_normal_buf[k * 3 + n] +=
++								pnormal_list[i * 3 + n];
+ 					}
+ 				}
+-				i++;
++				i ++;
+ 			}
+-			i=0;
+-			 /*  run2: apply to the final vertex buffer */
+-			for (oface=object-&gt;faces; oface != NULL ; oface=oface-&gt;next)
++			i = 0;
++			/* run2: apply to the final vertex buffer */
++			for(oface = object-&gt;faces; oface != NULL ; oface = oface-&gt;next)
+ 			{
+-				face=(G3DFace *)oface-&gt;data;
+-				if (smooth_list[i]==group)
++				face = (G3DFace *)oface-&gt;data;
++				if(smooth_list[i] == group)
+ 				{
+-					face-&gt;normals=g_new(gfloat,9);
+-					for (j=0;j&lt;3;j++)
++					face-&gt;normals = g_new(gfloat, 9);
++					for(j = 0; j &lt; 3; j ++)
+ 					{
+-						k=face-&gt;vertex_indices[j];
+-						len=sqrt(	vertex_normal_buf[k*3]   * vertex_normal_buf[k*3]+
+-									vertex_normal_buf[k*3+1] * vertex_normal_buf[k*3+1]+
+-									vertex_normal_buf[k*3+2] * vertex_normal_buf[k*3+2]);
+-						if (len==0.0F)   /*  this should not happen. well ... */
+-								for (n=0;n&lt;3;n++)	vertex_normal_buf[k*3 + n]=0;
+-						else	for (n=0;n&lt;3;n++)	vertex_normal_buf[k*3 + n]/=len; /* normalize it */
+-						
+-						if (len!=0.0) 	memcpy(face-&gt;normals +j*3, vertex_normal_buf+ 	k*3,sizeof(gfloat)*3);	/*  finally, we save the normal in our normal buffer */
+-						else  			memcpy(face-&gt;normals +j*3, pnormal_list+i*3,sizeof(gfloat)*3);	/*  use the pbuf normal */
++						k = face-&gt;vertex_indices[j];
++
++						g3d_vector_unify(
++							&amp;(vertex_normal_buf[k * 3 + 0]),
++							&amp;(vertex_normal_buf[k * 3 + 1]),
++							&amp;(vertex_normal_buf[k * 3 + 2]));
++
++						if(vertex_normal_buf[k * 3 + 0] != 0.0F)
++							/* finally, we save the normal in our normal
++							 * buffer */
++							memcpy(face-&gt;normals + j * 3,
++								vertex_normal_buf + k * 3,
++								sizeof(gfloat) * 3);
++						else
++							/* use the pbuf normal */
++							memcpy(face-&gt;normals + j * 3,
++								pnormal_list + i * 3,
++								sizeof(gfloat) * 3);
++
+ 					}
+-					smooth_list[i]=-1; /* finished this polygon */
++					smooth_list[i] = -1; /* finished this polygon */
+ 				}
+ 				i++;
+ 			}
+ 			/* SMOOTH END */
+ 		}
+-	} while (group!=-1);
++	} while (group != -1);
+ 
+ 	g_free(pnormal_list);
+ 	g_free(vertex_normal_buf);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000421.html">[S3d-svn] r428 - in trunk: . libs3d
+</A></li>
+	<LI>Next message: <A HREF="000423.html">[S3d-svn] r430 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#422">[ date ]</a>
+              <a href="thread.html#422">[ thread ]</a>
+              <a href="subject.html#422">[ subject ]</a>
+              <a href="author.html#422">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

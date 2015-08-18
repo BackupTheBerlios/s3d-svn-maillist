@@ -1,0 +1,40 @@
+From lazhur at mail.berlios.de  Fri Mar 19 00:00:07 2010
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Fri, 19 Mar 2010 00:00:07 +0100
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-4-4-g42e007e
+Message-ID: <201003182300.o2IN07xc023134@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  42e007ed7fb14bf2f33b20ec826fbcb5bfb44704 (commit)
+      from  c13eaaf99395fa451d914220c4031317cca25309 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 42e007ed7fb14bf2f33b20ec826fbcb5bfb44704
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Mar 18 23:58:40 2010 +0100
+
+    Enable --parallel and --list-missing for dh
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    3 +++
+ debian/control   |    2 +-
+ debian/rules     |    2 +-
+ 3 files changed, 5 insertions(+), 2 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

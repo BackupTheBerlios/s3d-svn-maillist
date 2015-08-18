@@ -1,0 +1,179 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-88-g1e877bd
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2010-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20branch%2C%20master%2C%0A%09updated.%20v0.2.1.1-88-g1e877bd&In-Reply-To=%3C201005051142.o45Bgk4C010886%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001100.html">
+   <LINK REL="Next"  HREF="001102.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-88-g1e877bd</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20branch%2C%20master%2C%0A%09updated.%20v0.2.1.1-88-g1e877bd&In-Reply-To=%3C201005051142.o45Bgk4C010886%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-88-g1e877bd">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Wed May  5 13:42:46 CEST 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001100.html">[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-18-g47ce5d7
+</A></li>
+        <LI>Next message: <A HREF="001102.html">[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-19-g20df4e6
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1101">[ date ]</a>
+              <a href="thread.html#1101">[ thread ]</a>
+              <a href="subject.html#1101">[ subject ]</a>
+              <a href="author.html#1101">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project &quot;Project s3d at BerliOS&quot;.
+
+The branch, master has been updated
+       via  1e877bd49748c38c99ddc335517e3b42f4793b9c (commit)
+       via  20df4e65f0f67e8433bb89f758eb8769e7f43131 (commit)
+       via  b42288e397e1e82fed45da172e8441c21a033e37 (commit)
+      from  c8dc95a22527185eb70ac39b6598dc0c17f4459d (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 1e877bd49748c38c99ddc335517e3b42f4793b9c
+Merge: c8dc95a22527185eb70ac39b6598dc0c17f4459d 20df4e65f0f67e8433bb89f758eb8769e7f43131
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Wed May 5 13:36:25 2010 +0200
+
+    Merge branch 'maint'
+
+commit 20df4e65f0f67e8433bb89f758eb8769e7f43131
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Wed May 5 13:33:20 2010 +0200
+
+    Correct inconsistent formatting
+
+commit b42288e397e1e82fed45da172e8441c21a033e37
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Wed May 5 13:18:36 2010 +0200
+
+    s3dvt: Reimplement PTY/TTY mode without using glibc
+    
+    s3dvt used to open a pty/pts pair by searching /dev for those files.
+    Those paths have been changed and the overall procedure to get a slave
+    pseudo terminal is now dramatically different.
+    
+    Glibc provides enough functionality to create a pair of pseudo terminal
+    master and slave without doing a lot of filesystem work. It is possible
+    that on non linux system extra functions must be implemented to get it
+    working. Those functions are getpt which should open /dev/ptmx and
+    ptsname_r which stores the name of the slave device in an extra buffer.
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ apps/dot_mcp/main.c            |    7 +-
+ apps/dot_mcp/menu.c            |    4 +-
+ apps/kism3d/gui.c              |    8 +-
+ apps/meshs3d/hash.c            |    2 +-
+ apps/meshs3d/process.c         |    7 +-
+ apps/s3d_x11gate/s3d_x11gate.c |    6 +-
+ apps/s3dfm/animation.c         |    4 +-
+ apps/s3dfm/box.c               |   12 ++--
+ apps/s3dfm/dialog.c            |   12 ++--
+ apps/s3dfm/focus.c             |   12 ++--
+ apps/s3dfm/fs.c                |   12 ++--
+ apps/s3dfm/icon.c              |   16 +++--
+ apps/s3dfm/node.c              |    6 +-
+ apps/s3dfm/parse.c             |    6 +-
+ apps/s3dfm/string.c            |    6 +-
+ apps/s3dosm/draw.c             |   25 ++++----
+ apps/s3dosm/gps.c              |    2 +-
+ apps/s3dosm/io.c               |    5 +-
+ apps/s3dosm/kismet.c           |   10 ++--
+ apps/s3dosm/nav.c              |    4 +-
+ apps/s3dosm/object.c           |    2 +-
+ apps/s3dosm/osm.c              |   14 ++--
+ apps/s3dosm/tag.c              |    2 +-
+ apps/s3dosm/ui.c               |    2 +-
+ apps/s3dvt/main.c              |   78 +++++++++++++++--------
+ apps/s3dvt/s3dvt.h             |    2 +-
+ apps/s3dvt/terminal.c          |   22 +++---
+ example/filebrowser.c          |    8 +--
+ example/nichtsnutz.c           |    8 +-
+ example/strtest.c              |    2 +-
+ example/texturetest.c          |    4 +-
+ example/wiresphere.c           |    8 +-
+ experimental/comptest/window.c |    6 +-
+ experimental/olsrs3d/main.c    |    2 +-
+ experimental/olsrs3d/process.c |    3 +-
+ experimental/olsrs3d/search.c  |    8 +-
+ experimental/testvis/testvis.c |   10 ++--
+ libs3d/event.c                 |    2 +-
+ libs3d/freetype.c              |   32 +++++-----
+ libs3d/hash.c                  |    2 +-
+ libs3d/io.c                    |    2 +-
+ libs3d/modelread.c             |    3 +-
+ libs3d/network.c               |    5 +-
+ libs3d/object_queue.c          |    8 +-
+ libs3d/proto_out.c             |   28 ++++----
+ libs3d/sei_construct.c         |   12 ++--
+ libs3d/sei_monotone.c          |    8 +-
+ libs3d/texture.c               |    2 +-
+ libs3dw/animate.c              |    4 +-
+ libs3dw/arrange.c              |   10 ++--
+ libs3dw/s3dw.h                 |    4 +-
+ libs3dw/scrollbar.c            |    8 +-
+ libs3dw/style.c                |   17 +++--
+ libs3dw/surface.c              |    4 +-
+ libs3dw/textbox.c              |    8 +-
+ libs3dw/widget.c               |    8 +-
+ server/cull.c                  |    4 +-
+ server/global.h                |    4 +-
+ server/graphics.c              |   19 +++---
+ server/main.c                  |    3 +-
+ server/matrix.c                |   28 ++++----
+ server/object.c                |  136 ++++++++++++++++++++--------------------
+ server/process.c               |   13 ++--
+ server/shm.c                   |    2 +-
+ server/tcp.c                   |   33 +++++-----
+ 65 files changed, 390 insertions(+), 366 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001100.html">[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-18-g47ce5d7
+</A></li>
+	<LI>Next message: <A HREF="001102.html">[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-19-g20df4e6
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1101">[ date ]</a>
+              <a href="thread.html#1101">[ thread ]</a>
+              <a href="subject.html#1101">[ subject ]</a>
+              <a href="author.html#1101">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

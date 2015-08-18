@@ -1,0 +1,416 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r868 - trunk/svnonly/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r868%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711210003.lAL03H5L006613%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000860.html">
+   <LINK REL="Next"  HREF="000862.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r868 - trunk/svnonly/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r868%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711210003.lAL03H5L006613%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r868 - trunk/svnonly/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Wed Nov 21 01:03:17 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000860.html">[S3d-svn] r867 - trunk/svnonly/comptest
+</A></li>
+        <LI>Next message: <A HREF="000862.html">[S3d-svn] r869 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#861">[ date ]</a>
+              <a href="thread.html#861">[ thread ]</a>
+              <a href="subject.html#861">[ subject ]</a>
+              <a href="author.html#861">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-21 01:03:16 +0100 (Wed, 21 Nov 2007)
+New Revision: 868
+
+Modified:
+   trunk/svnonly/comptest/comptest.c
+   trunk/svnonly/comptest/comptest.h
+   trunk/svnonly/comptest/window.c
+   trunk/svnonly/comptest/x11.c
+Log:
+- clean up errorhandling
+- refactor some functions
+
+
+Modified: trunk/svnonly/comptest/comptest.c
+===================================================================
+--- trunk/svnonly/comptest/comptest.c	2007-11-20 22:28:40 UTC (rev 867)
++++ trunk/svnonly/comptest/comptest.c	2007-11-21 00:03:16 UTC (rev 868)
+@@ -157,37 +157,31 @@
+ int screen_height = 0;
+ int screen_oid = -1;
+ 
++void set_screenpos() {
++	XWindowAttributes    attr;
++	XGetWindowAttributes(dpy, RootWindow(dpy, 0), &amp;attr);
++	screen_width = attr.width;
++	screen_height = attr.height;
++
++	screen_oid = s3d_new_object();
++	s3d_translate(screen_oid, -SCREEN_SCALE * (float)screen_width/((float) screen_height), SCREEN_SCALE, 0);
++	s3d_scale(screen_oid, 2* SCREEN_SCALE/((float)screen_height));
++
++}
++
+ int main(int argc, char **argv)
+ {
+-	XWindowAttributes    attr;
+-	Window        root_return, parent_return;
+-	unsigned int     nchildren;
+-	Window       *children;
+-	int     i, scr_no;
+ 
+ 
+ 	if (xinit())
+ 		return(1);
+-	XGetWindowAttributes(dpy, RootWindow(dpy, 0), &amp;attr);
+-	screen_width = attr.width;
+-	screen_height = attr.height;
+ 
+ 	if (!s3d_init(&amp;argc, &amp;argv, &quot;comptest&quot;)) {
+ 		s3d_set_callback(S3D_EVENT_KEY, key);
+-		screen_oid = s3d_new_object();
+-		s3d_translate(screen_oid, -SCREEN_SCALE * (float)screen_width/((float) screen_height), SCREEN_SCALE, 0);
+-		s3d_scale(screen_oid, 2* SCREEN_SCALE/((float)screen_height));
+-		for (scr_no = 0; scr_no &lt; ScreenCount(dpy); scr_no++) {
+-			XCompositeRedirectSubwindows(dpy, RootWindow(dpy, scr_no), CompositeRedirectAutomatic);
+-			/*   XCompositeRedirectSubwindows(dpy, RootWindow(dpy, scr_no), CompositeRedirectManual);*/
+-			XSelectInput(dpy, RootWindow(dpy, scr_no),
+-			             SubstructureNotifyMask | ExposureMask | StructureNotifyMask | PropertyChangeMask);
+ 
+-			XQueryTree(dpy, RootWindow(dpy, scr_no), &amp;root_return, &amp;parent_return, &amp;children, &amp;nchildren);
+-			for (i = 0; i &lt; (int)nchildren; i++)
+-				window_add(dpy, children[i]);
+-			XFree(children);
+-		}
++		set_screenpos();
++
++		x11_addwindows();
+ 		s3d_mainloop(mainloop);
+ 	}
+ 
+
+Modified: trunk/svnonly/comptest/comptest.h
+===================================================================
+--- trunk/svnonly/comptest/comptest.h	2007-11-20 22:28:40 UTC (rev 867)
++++ trunk/svnonly/comptest/comptest.h	2007-11-21 00:03:16 UTC (rev 868)
+@@ -61,4 +61,5 @@
+ int xinit(void);
+ int error(Display *COMPUNUSED(dpy), XErrorEvent *event);
+ int print_event(Display *COMPUNUSED(dpy), XEvent *event);
++void x11_addwindows();
+ extern Display *dpy;
+
+Modified: trunk/svnonly/comptest/window.c
+===================================================================
+--- trunk/svnonly/comptest/window.c	2007-11-20 22:28:40 UTC (rev 867)
++++ trunk/svnonly/comptest/window.c	2007-11-21 00:03:16 UTC (rev 868)
+@@ -102,7 +102,6 @@
+ 		/* window does not exit, next event is probably it's removal ... */
+ 		return;
+ 	}
+-	
+ 
+ 	/* XSelectInput(dpy, win-&gt;id, ExposureMask|ButtonPressMask|KeyPressMask*/
+ /*	XSelectInput(dpy, win-&gt;id, SubstructureNotifyMask | ExposureMask | StructureNotifyMask | PropertyChangeMask);*/
+
+Modified: trunk/svnonly/comptest/x11.c
+===================================================================
+--- trunk/svnonly/comptest/x11.c	2007-11-20 22:28:40 UTC (rev 867)
++++ trunk/svnonly/comptest/x11.c	2007-11-21 00:03:16 UTC (rev 868)
+@@ -23,11 +23,12 @@
+ 
+ #include &quot;comptest.h&quot;
+ #include &lt;stdio.h&gt;		/* printf() */
++#include &lt;X11/Xproto.h&gt;	/* X_* request defines */
+ 
+ #define XCOMPOSITE_VERSION_0_2 200
+ 
+ struct extension {
+-	int event, error;
++	int event, error, request;
+ };
+ static struct extension    xrender, xcomposite, xdamage, xfixes;
+ Display       *dpy;
+@@ -37,31 +38,14 @@
+ {
+ 	char *name = &quot;unknown&quot;;
+ 	switch (event-&gt;type &amp; 0x7f) {
+-	case CreateNotify:
+-		name = &quot;Create&quot;;
+-		break;
+-	case DestroyNotify:
+-		name = &quot;Destroy&quot;;
+-		break;
+-	case Expose:
+-		name = &quot;Expose&quot;;
+-		break;
+-	case MapNotify:
+-		name = &quot;Map&quot;;
+-		break;
+-	case UnmapNotify:
+-		name = &quot;Unmap&quot;;
+-		break;
+-	case ReparentNotify:
+-		name = &quot;Reparent&quot;;
+-		break;
+-	case CirculateNotify:
+-		name = &quot;Circulate&quot;;
+-		break;
+-	case PropertyNotify:
+-		name = &quot;PropertyNotify&quot;;
+-		return(0);
+-		break;
++	case CreateNotify:		name = &quot;Create&quot;;			break;
++	case DestroyNotify:		name = &quot;Destroy&quot;;			break;
++	case Expose:			name = &quot;Expose&quot;;			break;
++	case MapNotify:			name = &quot;Map&quot;;				break;
++	case UnmapNotify:		name = &quot;Unmap&quot;;				break;
++	case ReparentNotify:	name = &quot;Reparent&quot;;			break;
++	case CirculateNotify:	name = &quot;Circulate&quot;;			break;
++	case PropertyNotify:	name = &quot;PropertyNotify&quot;;	return(0);	break;
+ 	}
+ 	if (event-&gt;type == xdamage.event + XDamageNotify) {
+ 		name = &quot;Damage&quot;;
+@@ -76,61 +60,65 @@
+ 
+ int error(Display *COMPUNUSED(dpy), XErrorEvent *event)
+ {
+-	char *name = &quot;&quot;;
++	char *name;
+ 	char buf[256];
+-	int     o;
++	char buf_req[256];
++	char *req;
+ 
+-	o = event-&gt;error_code - xfixes.error;
+-	switch (o) {
+-	case BadRegion:
+-		name = &quot;BadRegion&quot;;
+-		break;
+-	default:
+-		break;
++	XGetErrorText(dpy, event-&gt;error_code, buf, 256);
++	name = buf;
++
++	switch (event-&gt;error_code - xfixes.error) {
++	case BadRegion:		name = &quot;BadRegion&quot;;		break;
++	default:			break;
+ 	}
+-	o = event-&gt;error_code - xdamage.error;
+-	switch (o) {
+-	case BadDamage:
+-		name = &quot;BadDamage&quot;;
+-		break;
+-	default:
+-		break;
++	switch (event-&gt;error_code - xdamage.error) {
++	case BadDamage:		name = &quot;BadDamage&quot;;		break;
++	default:			break;
+ 	}
+-	o = event-&gt;error_code - xrender.error;
+-	switch (o) {
+-	case BadPictFormat:
+-		name = &quot;BadPictFormat&quot;;
+-		break;
+-	case BadPicture:
+-		name = &quot;BadPicture&quot;;
+-		break;
+-	case BadPictOp:
+-		name = &quot;BadPictOp&quot;;
+-		break;
+-	case BadGlyphSet:
+-		name = &quot;BadGlyphSet&quot;;
+-		break;
+-	case BadGlyph:
+-		name = &quot;BadGlyph&quot;;
+-		break;
+-	default:
+-		break;
++	switch (event-&gt;error_code - xrender.error) {
++	case BadPictFormat:	name = &quot;BadPictFormat&quot;;		break;
++	case BadPicture:	name = &quot;BadPicture&quot;;		break;
++	case BadPictOp:		name = &quot;BadPictOp&quot;;			break;
++	case BadGlyphSet:	name = &quot;BadGlyphSet&quot;;		break;
++	case BadGlyph:		name = &quot;BadGlyph&quot;;			break;
++	default:			break;
+ 	}
+-	switch (event-&gt;error_code) {
+-	case BadWindow:
+-		name = &quot;BadWindow&quot;;
+-		break;
+-	case BadDrawable:
+-		name = &quot;BadDrawable&quot;;
+-		break;
+-	case BadMatch:
+-		name = &quot;BadMatch&quot;;
+-		return(0);
+-		break;
++
++	/* request code */
++	sprintf(buf_req, &quot;unknown (request %d, minor %d)&quot;, event-&gt;request_code, event-&gt;minor_code);
++	req = buf_req;
++
++	switch (event-&gt;request_code) {
++	case X_GetWindowAttributes:	req = &quot;XGetWindowAttributes()&quot;;	break;
++	case X_GetImage:			req = &quot;XGetImage()&quot;;			break;
++	default:				break;
+ 	}
+-	XGetErrorText(dpy, event-&gt;error_code, buf, 256);
+-	printf(&quot;error %d (name: %s) request %d minor %d serial %d: %s\n&quot;,
+-	       event-&gt;error_code, name, event-&gt;request_code, event-&gt;minor_code, (int)event-&gt;serial, buf);
++	if (event-&gt;request_code == xcomposite.request) {
++		switch (event-&gt;minor_code) {
++		case X_CompositeRedirectWindow:			req = &quot;XCompositeRedirectWindow()&quot;;			break;
++		case X_CompositeNameWindowPixmap:		req = &quot;XCompositeNameWindowPixmap()&quot;;		break;
++		default:				
++			sprintf(buf_req, &quot;XComposite?? unknown (request %d, minor %d)&quot;, event-&gt;request_code, event-&gt;minor_code);
++			req = buf_req;
++			break;
++		}
++	}
++
++	if (event-&gt;request_code == xdamage.request) {
++		switch (event-&gt;minor_code) {
++		case X_DamageAdd:			req = &quot;XDamageAdd()&quot;;			break;
++		case X_DamageCreate:		req = &quot;XDamageCreate()&quot;;		break;
++		case X_DamageDestroy:		req = &quot;XDamageDestroy()&quot;;		break;
++		case X_DamageSubtract:		req = &quot;XDamageSubtract()&quot;;		break;
++		default:				
++			sprintf(buf_req, &quot;XDamage?? unknown (request %d, minor %d)&quot;, event-&gt;request_code, event-&gt;minor_code);
++			req = buf_req;
++			break;
++		}
++	}
++
++	printf(&quot;ERROR at request %s [%d]: %s\n&quot;, req, event-&gt;error_code, name);
+ 	return(0);
+ }
+ 
+@@ -140,38 +128,38 @@
+ 	int composite_major, composite_minor;
+ 
+ 	dpy = XOpenDisplay(display);
++
+ 	if (!dpy) {
+ 		fprintf(stderr, &quot;Can't open display\n&quot;);
+ 		return(1);
+ 	}
+-	if (!XRenderQueryExtension(dpy, &amp;xrender.event, &amp;xrender.error)) {
++	if (!XQueryExtension (dpy, COMPOSITE_NAME, &amp;xcomposite.request, &amp;xcomposite.event, &amp;xcomposite.error)) {
++		fprintf(stderr, &quot;No composite extension\n&quot;);
++	    return(1);
++	}
++	if (!XQueryExtension (dpy, RENDER_NAME, &amp;xrender.request, &amp;xrender.event, &amp;xrender.error)) {
+ 		fprintf(stderr, &quot;No render extension\n&quot;);
+-		return(1);
++	    return(1);
+ 	}
+-
+-	if (!XCompositeQueryExtension(dpy, &amp;xcomposite.event, &amp;xcomposite.error)) {
+-		fprintf(stderr, &quot;No composite extension\n&quot;);
+-		return(1);
++	if (!XQueryExtension (dpy, DAMAGE_NAME, &amp;xdamage.request, &amp;xdamage.event, &amp;xdamage.error)) {
++		fprintf(stderr, &quot;No damage extension\n&quot;);
++	    return(1);
+ 	}
++	if (!XQueryExtension (dpy, XFIXES_NAME, &amp;xfixes.request, &amp;xfixes.event, &amp;xfixes.error)) {
++		fprintf(stderr, &quot;No fixes extension\n&quot;);
++	    return(1);
++	}
+ 
++
+ 	if (!XCompositeQueryVersion(dpy, &amp;composite_major, &amp;composite_minor)) {
+ 		fprintf(stderr, &quot;Could not check composite version\n&quot;);
+ 		return(1);
+ 	}
+-
+ 	if (XCompositeVersion() &lt; XCOMPOSITE_VERSION_0_2) {
+ 		fprintf(stderr, &quot;Could not find composite version 0.2 or better\n&quot;);
+ 		return(1);
+ 	}
+ 
+-	if (!XDamageQueryExtension(dpy, &amp;xdamage.event, &amp;xdamage.error)) {
+-		fprintf(stderr, &quot;No damage extension\n&quot;);
+-		return(1);
+-	}
+-	if (!XFixesQueryExtension(dpy, &amp;xfixes.event, &amp;xfixes.error)) {
+-		fprintf(stderr, &quot;No XFixes extension\n&quot;);
+-		return(1);
+-	}
+ 	XSetErrorHandler(error);
+ 	return(0);
+ }
+@@ -218,7 +206,6 @@
+ 			 }
+ 		case CreateNotify:{
+ 			XCreateWindowEvent *e = &amp;event.xcreatewindow;
+-			printf(&quot;override_redirect = %d\n&quot;, (int)e-&gt;override_redirect);
+ 			window_add(e-&gt;display, e-&gt;window);
+ 			break;
+ 			}
+@@ -231,4 +218,22 @@
+ 	}
+ }
+ 
++void x11_addwindows() 
++{
++	Window        root_return, parent_return;
++	unsigned int     nchildren;
++	Window       *children;
++	int     i, scr_no;
+ 
++	for (scr_no = 0; scr_no &lt; ScreenCount(dpy); scr_no++) {
++		XCompositeRedirectSubwindows(dpy, RootWindow(dpy, scr_no), CompositeRedirectAutomatic);
++		/*   XCompositeRedirectSubwindows(dpy, RootWindow(dpy, scr_no), CompositeRedirectManual);*/
++		XSelectInput(dpy, RootWindow(dpy, scr_no),
++					 SubstructureNotifyMask | ExposureMask | StructureNotifyMask | PropertyChangeMask);
++	
++		XQueryTree(dpy, RootWindow(dpy, scr_no), &amp;root_return, &amp;parent_return, &amp;children, &amp;nchildren);
++		for (i = 0; i &lt; (int)nchildren; i++)
++			window_add(dpy, children[i]);
++		XFree(children);
++	}
++}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000860.html">[S3d-svn] r867 - trunk/svnonly/comptest
+</A></li>
+	<LI>Next message: <A HREF="000862.html">[S3d-svn] r869 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#861">[ date ]</a>
+              <a href="thread.html#861">[ thread ]</a>
+              <a href="subject.html#861">[ subject ]</a>
+              <a href="author.html#861">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

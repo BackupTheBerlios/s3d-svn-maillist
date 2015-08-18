@@ -1,0 +1,1438 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r339 - in trunk: . Documentation Documentation/libg3d Documentation/libg3d/api Documentation/libg3d/api/tmpl Documentation/s3dapi libs3d/libg3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r339%20-%20in%20trunk%3A%20.%20Documentation%20Documentation/libg3d%20Documentation/libg3d/api%20Documentation/libg3d/api/tmpl%20Documentation/s3dapi%20libs3d/libg3d&In-Reply-To=%3C200606051607.k55G7Xwh018607%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000331.html">
+   <LINK REL="Next"  HREF="000333.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r339 - in trunk: . Documentation Documentation/libg3d Documentation/libg3d/api Documentation/libg3d/api/tmpl Documentation/s3dapi libs3d/libg3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r339%20-%20in%20trunk%3A%20.%20Documentation%20Documentation/libg3d%20Documentation/libg3d/api%20Documentation/libg3d/api/tmpl%20Documentation/s3dapi%20libs3d/libg3d&In-Reply-To=%3C200606051607.k55G7Xwh018607%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r339 - in trunk: . Documentation Documentation/libg3d Documentation/libg3d/api Documentation/libg3d/api/tmpl Documentation/s3dapi libs3d/libg3d">dotslash at berlios.de
+       </A><BR>
+    <I>Mon Jun  5 18:07:33 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000331.html">[S3d-svn] r338 - in trunk: . libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000333.html">[S3d-svn] r340 - in trunk: . Documentation Documentation/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#332">[ date ]</a>
+              <a href="thread.html#332">[ thread ]</a>
+              <a href="subject.html#332">[ subject ]</a>
+              <a href="author.html#332">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-05 18:07:32 +0200 (Mon, 05 Jun 2006)
+New Revision: 339
+
+Added:
+   trunk/Documentation/libg3d/
+   trunk/Documentation/libg3d/Makefile.am
+   trunk/Documentation/libg3d/api/
+   trunk/Documentation/libg3d/api/Makefile.am
+   trunk/Documentation/libg3d/api/libg3d-docs.sgml
+   trunk/Documentation/libg3d/api/libg3d-overrides.txt
+   trunk/Documentation/libg3d/api/libg3d-sections.txt
+   trunk/Documentation/libg3d/api/libg3d.types
+   trunk/Documentation/libg3d/api/tmpl/
+   trunk/Documentation/libg3d/api/tmpl/context.sgml
+   trunk/Documentation/libg3d/api/tmpl/face.sgml
+   trunk/Documentation/libg3d/api/tmpl/iff.sgml
+   trunk/Documentation/libg3d/api/tmpl/libg3d-unused.sgml
+   trunk/Documentation/libg3d/api/tmpl/material.sgml
+   trunk/Documentation/libg3d/api/tmpl/matrix.sgml
+   trunk/Documentation/libg3d/api/tmpl/model.sgml
+   trunk/Documentation/libg3d/api/tmpl/object.sgml
+   trunk/Documentation/libg3d/api/tmpl/plugins.sgml
+   trunk/Documentation/libg3d/api/tmpl/primitive.sgml
+   trunk/Documentation/libg3d/api/tmpl/read.sgml
+   trunk/Documentation/libg3d/api/tmpl/texture.sgml
+   trunk/Documentation/libg3d/api/tmpl/types.sgml
+   trunk/Documentation/libg3d/api/tmpl/vector.sgml
+   trunk/Documentation/s3dapi/Makefile.am
+Removed:
+   trunk/libs3d/libg3d/doc/
+Modified:
+   trunk/
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r729 at balthasar</A>:  dotslash | 2006-06-05 18:07:29 +0200
+ - documentation moving
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:727
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:729
+
+Added: trunk/Documentation/libg3d/Makefile.am
+===================================================================
+--- trunk/Documentation/libg3d/Makefile.am	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/libg3d/Makefile.am	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1 @@
++SUBDIRS = api
+
+Added: trunk/Documentation/libg3d/api/Makefile.am
+===================================================================
+--- trunk/Documentation/libg3d/api/Makefile.am	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/libg3d/api/Makefile.am	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1,37 @@
++AUTOMAKE_OPTIONS = 1.6
++
++DOC_MODULE = libg3d
++
++DOC_MAIN_SGML_FILE = $(DOC_MODULE)-docs.sgml
++
++DOC_SOURCE_DIR = ../../include/g3d
++
++SCANGOBJ_OPTIONS =
++
++SCAN_OPTIONS = 
++
++MKDB_OPTIONS = --sgml-mode --output-format=xml
++
++MKTMPL_OPTIONS =
++
++FIXXREF_OPTIONS =
++
++CFILE_GLOB =
++HFILE_GLOB =
++
++IGNORE_HFILES =
++
++HTML_IMAGES =
++
++content_files =
++
++expand_content_files =
++
++AM_CFLAGS = @GLIB_CFLAGS@
++INCLUDES = -I$(top_srcdir)/include
++GTKDOC_LIBS = @GLIB_LIBS@
++
++include $(top_srcdir)/gtk-doc.make
++
++EXTRA_DIST +=
++
+
+Added: trunk/Documentation/libg3d/api/libg3d-docs.sgml
+===================================================================
+--- trunk/Documentation/libg3d/api/libg3d-docs.sgml	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/libg3d/api/libg3d-docs.sgml	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1,32 @@
++&lt;?xml version=&quot;1.0&quot;?&gt;
++&lt;!DOCTYPE book PUBLIC &quot;-//OASIS//DTD DocBook XML V4.1.2//EN&quot; 
++               &quot;<A HREF="http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd</A>&quot;&gt;
++&lt;book id=&quot;index&quot; xmlns:xi=&quot;<A HREF="http://www.w3.org/2003/XInclude">http://www.w3.org/2003/XInclude</A>&quot;&gt;
++  &lt;bookinfo&gt;
++    &lt;title&gt;Libg3d Reference Manual&lt;/title&gt;
++  &lt;/bookinfo&gt;
++
++  	&lt;chapter&gt;
++    	&lt;title&gt;libg3d types and initialization&lt;/title&gt;
++	    &lt;xi:include href=&quot;xml/types.xml&quot;/&gt;	
++    	&lt;xi:include href=&quot;xml/context.xml&quot;/&gt;
++	&lt;/chapter&gt;
++
++	&lt;chapter&gt;
++		&lt;title&gt;object interface&lt;/title&gt;
++	    &lt;xi:include href=&quot;xml/model.xml&quot;/&gt;
++    	&lt;xi:include href=&quot;xml/object.xml&quot;/&gt;
++	    &lt;xi:include href=&quot;xml/face.xml&quot;/&gt;
++    	&lt;xi:include href=&quot;xml/material.xml&quot;/&gt;
++	    &lt;xi:include href=&quot;xml/texture.xml&quot;/&gt;
++	&lt;/chapter&gt;
++	&lt;chapter&gt;
++		&lt;title&gt;plugin interface&lt;/title&gt;
++    	&lt;xi:include href=&quot;xml/plugins.xml&quot;/&gt;
++	    &lt;xi:include href=&quot;xml/iff.xml&quot;/&gt;
++    	&lt;xi:include href=&quot;xml/read.xml&quot;/&gt;
++	    &lt;xi:include href=&quot;xml/matrix.xml&quot;/&gt;
++    	&lt;xi:include href=&quot;xml/vector.xml&quot;/&gt;
++	    &lt;xi:include href=&quot;xml/primitive.xml&quot;/&gt;
++	&lt;/chapter&gt;
++&lt;/book&gt;
+
+Added: trunk/Documentation/libg3d/api/libg3d-overrides.txt
+===================================================================
+
+Added: trunk/Documentation/libg3d/api/libg3d-sections.txt
+===================================================================
+--- trunk/Documentation/libg3d/api/libg3d-sections.txt	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/libg3d/api/libg3d-sections.txt	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1,127 @@
++&lt;SECTION&gt;
++&lt;FILE&gt;types&lt;/FILE&gt;
++G3D_FLAG_IMG_GREYSCALE
++G3DImage
++G3D_FLAG_MAT_TWOSIDE
++G3DMaterial
++G3D_FLAG_FAC_NORMALS
++G3D_FLAG_FAC_TEXMAP
++G3DFace
++G3DObject
++G3DSetBgColorFunc
++G3DUpdateInterfaceFunc
++G3DUpdateProgressBarFunc
++G3DContext
++G3DModel
++&lt;/SECTION&gt;
++
++&lt;SECTION&gt;
++&lt;FILE&gt;context&lt;/FILE&gt;
++g3d_context_new
++g3d_context_free
++g3d_context_set_bgcolor
++g3d_context_update_interface
++g3d_context_update_progress_bar
++g3d_context_set_set_bgcolor_func
++&lt;/SECTION&gt;
++
++&lt;SECTION&gt;
++&lt;FILE&gt;model&lt;/FILE&gt;
++g3d_model_new
++g3d_model_load
++g3d_model_check
++g3d_model_center
++g3d_model_clear
++g3d_model_free
++&lt;/SECTION&gt;
++
++&lt;SECTION&gt;
++&lt;FILE&gt;object&lt;/FILE&gt;
++g3d_object_free
++g3d_object_radius
++g3d_object_scale
++g3d_object_transform
++g3d_object_duplicate
++g3d_object_optimize
++g3d_object_smooth
++g3d_object_merge
++&lt;/SECTION&gt;
++
++&lt;SECTION&gt;
++&lt;FILE&gt;face&lt;/FILE&gt;
++g3d_face_get_normal
++g3d_face_free
++&lt;/SECTION&gt;
++
++&lt;SECTION&gt;
++&lt;FILE&gt;material&lt;/FILE&gt;
++g3d_material_new
++g3d_material_free
++&lt;/SECTION&gt;
++
++&lt;SECTION&gt;
++&lt;FILE&gt;texture&lt;/FILE&gt;
++g3d_texture_load_cached
++g3d_texture_prepare
++&lt;/SECTION&gt;
++
++&lt;SECTION&gt;
++&lt;FILE&gt;plugins&lt;/FILE&gt;
++G3D_PLUGIN_UNKNOWN
++G3D_PLUGIN_IMPORT
++G3D_PLUGIN_IMAGE
++PluginInitFunc
++PluginCleanupFunc
++PluginLoadModelFunc
++PluginLoadImageFunc
++PluginGetDescFunc
++PluginGetExtFunc
++G3DPlugin
++g3d_plugins_init
++g3d_plugins_cleanup
++g3d_plugins_load_model
++g3d_plugins_load_image
++g3d_plugins_get_image_extensions
++&lt;/SECTION&gt;
++
++&lt;SECTION&gt;
++&lt;FILE&gt;iff&lt;/FILE&gt;
++G3D_IFF_MKID
++g3d_iff_open
++g3d_iff_readchunk
++&lt;/SECTION&gt;
++
++&lt;SECTION&gt;
++&lt;FILE&gt;read&lt;/FILE&gt;
++g3d_read_int8
++g3d_read_int16_be
++g3d_read_int16_le
++g3d_read_int32_be
++g3d_read_int32_le
++g3d_read_float_be
++g3d_read_float_le
++&lt;/SECTION&gt;
++
++&lt;SECTION&gt;
++&lt;FILE&gt;primitive&lt;/FILE&gt;
++g3d_primitive_cylinder
++g3d_primitive_tube
++&lt;/SECTION&gt;
++
++&lt;SECTION&gt;
++&lt;FILE&gt;matrix&lt;/FILE&gt;
++g3d_matrix_identity
++g3d_matrix_multiply
++g3d_matrix_translate
++g3d_matrix_rotate
++g3d_matrix_rotate_xyz
++&lt;/SECTION&gt;
++
++&lt;SECTION&gt;
++&lt;FILE&gt;vector&lt;/FILE&gt;
++g3d_vector_normal
++g3d_vector_unify
++g3d_vector_transform
++&lt;/SECTION&gt;
++
++
+
+Added: trunk/Documentation/libg3d/api/libg3d.types
+===================================================================
+--- trunk/Documentation/libg3d/api/libg3d.types	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/libg3d/api/libg3d.types	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1,2 @@
++#include &lt;g3d/g3d.h&gt;
++#include &lt;glib-object.h&gt;
+
+Added: trunk/Documentation/libg3d/api/tmpl/context.sgml
+===================================================================
+--- trunk/Documentation/libg3d/api/tmpl/context.sgml	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/libg3d/api/tmpl/context.sgml	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1,78 @@
++&lt;!-- ##### SECTION Title ##### --&gt;
++context
++
++&lt;!-- ##### SECTION Short_Description ##### --&gt;
++Libg3d initialization and configuration
++
++&lt;!-- ##### SECTION Long_Description ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION See_Also ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION Stability_Level ##### --&gt;
++
++
++&lt;!-- ##### FUNCTION g3d_context_new ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_context_free ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at context</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_context_set_bgcolor ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at context</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at r</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at g</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at b</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at a</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_context_update_interface ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at context</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_context_update_progress_bar ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at context</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at percentage</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at visibility</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_context_set_set_bgcolor_func ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at context</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at func</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at user_data</A>: 
++
++
+
+Added: trunk/Documentation/libg3d/api/tmpl/face.sgml
+===================================================================
+--- trunk/Documentation/libg3d/api/tmpl/face.sgml	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/libg3d/api/tmpl/face.sgml	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1,40 @@
++&lt;!-- ##### SECTION Title ##### --&gt;
++face
++
++&lt;!-- ##### SECTION Short_Description ##### --&gt;
++Face manipulation
++
++&lt;!-- ##### SECTION Long_Description ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION See_Also ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION Stability_Level ##### --&gt;
++
++
++&lt;!-- ##### FUNCTION g3d_face_get_normal ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at face</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at object</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at nx</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at ny</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at nz</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_face_free ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at face</A>: 
++
++
+
+Added: trunk/Documentation/libg3d/api/tmpl/iff.sgml
+===================================================================
+--- trunk/Documentation/libg3d/api/tmpl/iff.sgml	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/libg3d/api/tmpl/iff.sgml	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1,52 @@
++&lt;!-- ##### SECTION Title ##### --&gt;
++iff
++
++&lt;!-- ##### SECTION Short_Description ##### --&gt;
++IFF file helper functions
++
++&lt;!-- ##### SECTION Long_Description ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION See_Also ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION Stability_Level ##### --&gt;
++
++
++&lt;!-- ##### MACRO G3D_IFF_MKID ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at a</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at b</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at c</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at d</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_iff_open ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at filename</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at id</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at len</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_iff_readchunk ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at f</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at id</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at len</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
+
+Added: trunk/Documentation/libg3d/api/tmpl/libg3d-unused.sgml
+===================================================================
+
+Added: trunk/Documentation/libg3d/api/tmpl/material.sgml
+===================================================================
+--- trunk/Documentation/libg3d/api/tmpl/material.sgml	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/libg3d/api/tmpl/material.sgml	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1,35 @@
++&lt;!-- ##### SECTION Title ##### --&gt;
++material
++
++&lt;!-- ##### SECTION Short_Description ##### --&gt;
++Material generation and manipulation
++
++&lt;!-- ##### SECTION Long_Description ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION See_Also ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION Stability_Level ##### --&gt;
++
++
++&lt;!-- ##### FUNCTION g3d_material_new ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_material_free ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at material</A>: 
++
++
+
+Added: trunk/Documentation/libg3d/api/tmpl/matrix.sgml
+===================================================================
+--- trunk/Documentation/libg3d/api/tmpl/matrix.sgml	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/libg3d/api/tmpl/matrix.sgml	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1,76 @@
++&lt;!-- ##### SECTION Title ##### --&gt;
++matrix
++
++&lt;!-- ##### SECTION Short_Description ##### --&gt;
++Matrix manipulation and calculation
++
++&lt;!-- ##### SECTION Long_Description ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION See_Also ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION Stability_Level ##### --&gt;
++
++
++&lt;!-- ##### FUNCTION g3d_matrix_identity ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at matrix</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_matrix_multiply ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at m1</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at m2</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at rm</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_matrix_translate ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at x</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at y</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at z</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at rm</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_matrix_rotate ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at angle</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at ax</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at ay</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at az</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at rm</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_matrix_rotate_xyz ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at rx</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at ry</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at rz</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at rm</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
+
+Added: trunk/Documentation/libg3d/api/tmpl/model.sgml
+===================================================================
+--- trunk/Documentation/libg3d/api/tmpl/model.sgml	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/libg3d/api/tmpl/model.sgml	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1,71 @@
++&lt;!-- ##### SECTION Title ##### --&gt;
++model
++
++&lt;!-- ##### SECTION Short_Description ##### --&gt;
++Model manipulation functions
++
++&lt;!-- ##### SECTION Long_Description ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION See_Also ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION Stability_Level ##### --&gt;
++
++
++&lt;!-- ##### FUNCTION g3d_model_new ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_model_load ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at context</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at filename</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_model_check ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at model</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_model_center ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at model</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_model_clear ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at model</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_model_free ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at model</A>: 
++
++
+
+Added: trunk/Documentation/libg3d/api/tmpl/object.sgml
+===================================================================
+--- trunk/Documentation/libg3d/api/tmpl/object.sgml	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/libg3d/api/tmpl/object.sgml	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1,93 @@
++&lt;!-- ##### SECTION Title ##### --&gt;
++object
++
++&lt;!-- ##### SECTION Short_Description ##### --&gt;
++Object manipulation
++
++&lt;!-- ##### SECTION Long_Description ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION See_Also ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION Stability_Level ##### --&gt;
++
++
++&lt;!-- ##### FUNCTION g3d_object_free ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at object</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_object_radius ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at object</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_object_scale ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at object</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at scale</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_object_transform ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at object</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at matrix</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_object_duplicate ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at object</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_object_optimize ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at object</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_object_smooth ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at object</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_object_merge ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at o1</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at o2</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
+
+Added: trunk/Documentation/libg3d/api/tmpl/plugins.sgml
+===================================================================
+--- trunk/Documentation/libg3d/api/tmpl/plugins.sgml	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/libg3d/api/tmpl/plugins.sgml	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1,165 @@
++&lt;!-- ##### SECTION Title ##### --&gt;
++plugins
++
++&lt;!-- ##### SECTION Short_Description ##### --&gt;
++Plugin interface
++
++&lt;!-- ##### SECTION Long_Description ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION See_Also ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION Stability_Level ##### --&gt;
++
++
++&lt;!-- ##### MACRO G3D_PLUGIN_UNKNOWN ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++
++
++&lt;!-- ##### MACRO G3D_PLUGIN_IMPORT ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++
++
++&lt;!-- ##### MACRO G3D_PLUGIN_IMAGE ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++
++
++&lt;!-- ##### USER_FUNCTION PluginInitFunc ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at context</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### USER_FUNCTION PluginCleanupFunc ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at user_data</A>: 
++
++
++&lt;!-- ##### USER_FUNCTION PluginLoadModelFunc ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at context</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at filename</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at model</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at user_data</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### USER_FUNCTION PluginLoadImageFunc ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at context</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at filename</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at image</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at user_data</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### USER_FUNCTION PluginGetDescFunc ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at context</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### USER_FUNCTION PluginGetExtFunc ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at context</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### STRUCT G3DPlugin ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at name</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at path</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at type</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at extensions</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at init_func</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at cleanup_func</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at loadmodel_func</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at loadimage_func</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at desc_func</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at ext_func</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at user_data</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at module</A>: 
++
++&lt;!-- ##### FUNCTION g3d_plugins_init ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at context</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_plugins_cleanup ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at context</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_plugins_load_model ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at context</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at filename</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at model</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_plugins_load_image ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at context</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at filename</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at image</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_plugins_get_image_extensions ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at context</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
+
+Added: trunk/Documentation/libg3d/api/tmpl/primitive.sgml
+===================================================================
+--- trunk/Documentation/libg3d/api/tmpl/primitive.sgml	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/libg3d/api/tmpl/primitive.sgml	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1,48 @@
++&lt;!-- ##### SECTION Title ##### --&gt;
++primitive
++
++&lt;!-- ##### SECTION Short_Description ##### --&gt;
++3D primitive generation functions
++
++&lt;!-- ##### SECTION Long_Description ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION See_Also ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION Stability_Level ##### --&gt;
++
++
++&lt;!-- ##### FUNCTION g3d_primitive_cylinder ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at radius</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at height</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at sides</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at top</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at bottom</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at material</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_primitive_tube ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at r_in</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at r_out</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at height</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at sides</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at top</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at bottom</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at material</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
+
+Added: trunk/Documentation/libg3d/api/tmpl/read.sgml
+===================================================================
+--- trunk/Documentation/libg3d/api/tmpl/read.sgml	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/libg3d/api/tmpl/read.sgml	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1,82 @@
++&lt;!-- ##### SECTION Title ##### --&gt;
++read
++
++&lt;!-- ##### SECTION Short_Description ##### --&gt;
++Binary file reading helper functions
++
++&lt;!-- ##### SECTION Long_Description ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION See_Also ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION Stability_Level ##### --&gt;
++
++
++&lt;!-- ##### FUNCTION g3d_read_int8 ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at f</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_read_int16_be ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at f</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_read_int16_le ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at f</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_read_int32_be ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at f</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_read_int32_le ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at f</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_read_float_be ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at f</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_read_float_le ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at f</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
+
+Added: trunk/Documentation/libg3d/api/tmpl/texture.sgml
+===================================================================
+--- trunk/Documentation/libg3d/api/tmpl/texture.sgml	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/libg3d/api/tmpl/texture.sgml	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1,39 @@
++&lt;!-- ##### SECTION Title ##### --&gt;
++texture
++
++&lt;!-- ##### SECTION Short_Description ##### --&gt;
++Texture loading and manipulation
++
++&lt;!-- ##### SECTION Long_Description ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION See_Also ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION Stability_Level ##### --&gt;
++
++
++&lt;!-- ##### FUNCTION g3d_texture_load_cached ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at context</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at model</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at filename</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_texture_prepare ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at texture</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
+
+Added: trunk/Documentation/libg3d/api/tmpl/types.sgml
+===================================================================
+--- trunk/Documentation/libg3d/api/tmpl/types.sgml	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/libg3d/api/tmpl/types.sgml	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1,173 @@
++&lt;!-- ##### SECTION Title ##### --&gt;
++types
++
++&lt;!-- ##### SECTION Short_Description ##### --&gt;
++All types used in libg3d
++
++&lt;!-- ##### SECTION Long_Description ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION See_Also ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION Stability_Level ##### --&gt;
++
++
++&lt;!-- ##### MACRO G3D_FLAG_IMG_GREYSCALE ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++
++
++&lt;!-- ##### STRUCT G3DImage ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at name</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at width</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at height</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at depth</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at flags</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at pixeldata</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at tex_id</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at tex_scale_u</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at tex_scale_v</A>: 
++
++&lt;!-- ##### MACRO G3D_FLAG_MAT_TWOSIDE ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++
++
++&lt;!-- ##### STRUCT G3DMaterial ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at name</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at r</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at g</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at b</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at a</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at shininess</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at specular</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at flags</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at tex_image</A>: 
++
++&lt;!-- ##### MACRO G3D_FLAG_FAC_NORMALS ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++
++
++&lt;!-- ##### MACRO G3D_FLAG_FAC_TEXMAP ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++
++
++&lt;!-- ##### STRUCT G3DFace ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at vertex_count</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at vertex_indices</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at material</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at flags</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at normals</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at tex_image</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at tex_vertex_count</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at tex_vertex_data</A>: 
++
++&lt;!-- ##### STRUCT G3DObject ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at name</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at materials</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at faces</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at objects</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at hide</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at vertex_count</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at vertex_data</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at tex_vertex_count</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at tex_vertex_data</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at tex_image</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at _normals</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at _materials</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at _num_faces</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at _indices</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at _flags</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at _tex_images</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at _tex_coords</A>: 
++
++&lt;!-- ##### USER_FUNCTION G3DSetBgColorFunc ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at r</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at g</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at b</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at a</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at user_data</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### USER_FUNCTION G3DUpdateInterfaceFunc ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at user_data</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### USER_FUNCTION G3DUpdateProgressBarFunc ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at percentage</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at show</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at user_data</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### STRUCT G3DContext ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at plugins</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at exts_import</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at exts_image</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at set_bgcolor_func</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at set_bgcolor_data</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at update_interface_func</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at update_interface_data</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at update_progress_bar_func</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at update_progress_bar_data</A>: 
++
++&lt;!-- ##### STRUCT G3DModel ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at filename</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at context</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at materials</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at objects</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at tex_images</A>: 
++
+
+Added: trunk/Documentation/libg3d/api/tmpl/vector.sgml
+===================================================================
+--- trunk/Documentation/libg3d/api/tmpl/vector.sgml	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/libg3d/api/tmpl/vector.sgml	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1,59 @@
++&lt;!-- ##### SECTION Title ##### --&gt;
++vector
++
++&lt;!-- ##### SECTION Short_Description ##### --&gt;
++Vector manipulation and calculation
++
++&lt;!-- ##### SECTION Long_Description ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION See_Also ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
++&lt;!-- ##### SECTION Stability_Level ##### --&gt;
++
++
++&lt;!-- ##### FUNCTION g3d_vector_normal ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at ax</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at ay</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at az</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at bx</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at by</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at bz</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at nx</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at ny</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at nz</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_vector_unify ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at nx</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at ny</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at nz</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
++&lt;!-- ##### FUNCTION g3d_vector_transform ##### --&gt;
++&lt;para&gt;
++
++&lt;/para&gt;
++
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at x</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at y</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at z</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at matrix</A>: 
+<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">+ at Returns</A>: 
++
++
+
+Added: trunk/Documentation/s3dapi/Makefile.am
+===================================================================
+--- trunk/Documentation/s3dapi/Makefile.am	2006-06-05 16:04:31 UTC (rev 338)
++++ trunk/Documentation/s3dapi/Makefile.am	2006-06-05 16:07:32 UTC (rev 339)
+@@ -0,0 +1,2 @@
++EXTRA_DIST	= s3dapi.docbook bookinfo.docbook
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000331.html">[S3d-svn] r338 - in trunk: . libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000333.html">[S3d-svn] r340 - in trunk: . Documentation Documentation/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#332">[ date ]</a>
+              <a href="thread.html#332">[ thread ]</a>
+              <a href="subject.html#332">[ subject ]</a>
+              <a href="author.html#332">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

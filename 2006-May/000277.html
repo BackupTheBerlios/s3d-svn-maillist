@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r284 - in trunk/Documentation: . manpages
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r284%20-%20in%20trunk/Documentation%3A%20.%20manpages&In-Reply-To=%3C200605151928.k4FJSuVD028950%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000276.html">
+   <LINK REL="Next"  HREF="000278.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r284 - in trunk/Documentation: . manpages</H1>
+    <B>timos at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r284%20-%20in%20trunk/Documentation%3A%20.%20manpages&In-Reply-To=%3C200605151928.k4FJSuVD028950%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r284 - in trunk/Documentation: . manpages">timos at berlios.de
+       </A><BR>
+    <I>Mon May 15 21:28:56 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000276.html">[S3d-svn] r283 - in trunk: . apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000278.html">[S3d-svn] r285 - trunk/apps/dot_mcp
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#277">[ date ]</a>
+              <a href="thread.html#277">[ thread ]</a>
+              <a href="subject.html#277">[ subject ]</a>
+              <a href="author.html#277">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: timos
+Date: 2006-05-15 21:28:34 +0200 (Mon, 15 May 2006)
+New Revision: 284
+
+Added:
+   trunk/Documentation/manpages/
+   trunk/Documentation/manpages/s3dmanpage.sgml
+Log:
+Added manpage for s3d, manpages for all other binaries will follow.
+
+Added: trunk/Documentation/manpages/s3dmanpage.sgml
+===================================================================
+--- trunk/Documentation/manpages/s3dmanpage.sgml	2006-05-14 22:48:29 UTC (rev 283)
++++ trunk/Documentation/manpages/s3dmanpage.sgml	2006-05-15 19:28:34 UTC (rev 284)
+@@ -0,0 +1,89 @@
++&lt;!DOCTYPE refentry PUBLIC &quot;-//OASIS//DTD DocBook V4.1//EN&quot;&gt;
++&lt;refentry id=&quot;s3d&quot;&gt; 
++
++	&lt;refmeta&gt; 
++		&lt;refentrytitle&gt;s3d&lt;/refentrytitle&gt;
++		&lt;manvolnum&gt;1&lt;/manvolnum&gt;
++	&lt;/refmeta&gt; 
++	
++	&lt;refnamediv&gt; 
++		&lt;refname&gt;s3d&lt;/refname&gt; 
++		&lt;refpurpose&gt; network display server &lt;/refpurpose&gt;
++	&lt;/refnamediv&gt;
++	
++	&lt;refsynopsisdiv&gt; 
++		&lt;cmdsynopsis&gt; 
++			&lt;command&gt;s3d&lt;/command&gt; 
++			&lt;arg choice=&quot;opt&quot;&gt;-g|--use-glut&lt;/arg&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;-s|--use-sdl&lt;/arg&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;-r|--rc&lt;/arg&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;-n|--no-rc&lt;/arg&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;-h|-?|--help&lt;/arg&gt;
++		&lt;/cmdsynopsis&gt;
++	&lt;/refsynopsisdiv&gt; 
++	
++	&lt;refsect1&gt; 
++		&lt;title&gt;DESCRIPTION&lt;/title&gt; 
++		&lt;para&gt;
++			&lt;command&gt;s3d(1)&lt;/command&gt; is a network display server which can be used as 3d desktop enviroment.
++		&lt;/para&gt;
++		&lt;para&gt; &lt;/para&gt;
++	&lt;/refsect1&gt; 
++	
++	&lt;refsect1&gt;
++		&lt;title&gt;OPTIONS&lt;/title&gt; 
++		&lt;para&gt; 
++			This program follows the usual GNU command line syntax. A summary of 
++			the options supported by &lt;command&gt;s3d&lt;/command&gt; is below. 
++		&lt;/para&gt;
++		&lt;variablelist&gt;
++			&lt;varlistentry&gt; 
++				&lt;term&gt;-h, -?, --help&lt;/term&gt; 
++				&lt;listitem&gt; 
++					&lt;para&gt; Show summary of options and exit. &lt;/para&gt; 
++				&lt;/listitem&gt; 
++			&lt;/varlistentry&gt; 
++			&lt;varlistentry&gt; 
++				&lt;term&gt;-g, --use-glut&lt;/term&gt; 
++				&lt;listitem&gt; 
++					&lt;para&gt; Tells s3d to use GLUT as graphics framework system. &lt;/para&gt;
++				&lt;/listitem&gt; 
++			&lt;/varlistentry&gt;
++			&lt;varlistentry&gt; 
++				&lt;term&gt;-s, --use-sdl&lt;/term&gt; 
++				&lt;listitem&gt; 
++					&lt;para&gt; Tells s3d to use SDL as graphics framework system. &lt;/para&gt;
++				&lt;/listitem&gt;
++			&lt;/varlistentry&gt; 
++			&lt;varlistentry&gt; 
++				&lt;term&gt;-r, --rc&lt;/term&gt; 
++				&lt;listitem&gt; 
++					&lt;para&gt; Use the specified file as rc-script. By default s3d uses ~/.s3drc as
++						   per-user rc-script and /etc/s3drc as system-wide rc-script&lt;/para&gt;
++				&lt;/listitem&gt; 
++			&lt;/varlistentry&gt;
++			&lt;varlistentry&gt; 
++				&lt;term&gt;-n, --no-rc&lt;/term&gt; 
++				&lt;listitem&gt; 
++					&lt;para&gt; Don't use rc-scripts even if the exist in the apropriate locations. &lt;/para&gt;
++				&lt;/listitem&gt; 
++			&lt;/varlistentry&gt;
++		&lt;/variablelist&gt; 
++	&lt;/refsect1&gt; 
++		
++	&lt;refsect1&gt; 
++		&lt;title&gt;SEE ALSO&lt;/title&gt;
++		&lt;para&gt; &lt;ulink url=&quot;<A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>&quot;&gt; s3d project page on berlios &lt;/ulink&gt; &lt;/para&gt;
++		&lt;!--TODO: ADD REFERENCE TO APPS AND /usr/share/doc/s3d/ --&gt;
++	&lt;/refsect1&gt;
++
++	&lt;refsect1&gt; 
++		&lt;title&gt;AUTHOR&lt;/title&gt;
++		&lt;para&gt;
++			This manual page was written by Timo Schneider &lt;email&gt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">timo.schneider at s2004.tu-chemnitz.de</A>&lt;/email&gt; 
++			for the Debian project (but may be used by others).
++		&lt;/para&gt;
++	&lt;/refsect1&gt;
++	
++&lt;/refentry&gt; 
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000276.html">[S3d-svn] r283 - in trunk: . apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000278.html">[S3d-svn] r285 - trunk/apps/dot_mcp
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#277">[ date ]</a>
+              <a href="thread.html#277">[ thread ]</a>
+              <a href="subject.html#277">[ subject ]</a>
+              <a href="author.html#277">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

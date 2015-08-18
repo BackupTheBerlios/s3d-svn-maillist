@@ -1,0 +1,246 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r317 - trunk/example
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r317%20-%20trunk/example&In-Reply-To=%3C200606031148.k53Bm36Q001593%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000309.html">
+   <LINK REL="Next"  HREF="000311.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r317 - trunk/example</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r317%20-%20trunk/example&In-Reply-To=%3C200606031148.k53Bm36Q001593%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r317 - trunk/example">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Sat Jun  3 13:48:03 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000309.html">[S3d-svn] r316 - trunk/example
+</A></li>
+        <LI>Next message: <A HREF="000311.html">[S3d-svn] r318 - in trunk: . example libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#310">[ date ]</a>
+              <a href="thread.html#310">[ thread ]</a>
+              <a href="subject.html#310">[ subject ]</a>
+              <a href="author.html#310">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-06-03 13:48:00 +0200 (Sat, 03 Jun 2006)
+New Revision: 317
+
+Added:
+   trunk/example/nichtsnutz.c
+Modified:
+   trunk/example/Makefile.am
+Log:
+nichtsnutz testing
+
+
+
+Modified: trunk/example/Makefile.am
+===================================================================
+--- trunk/example/Makefile.am	2006-06-02 19:50:51 UTC (rev 316)
++++ trunk/example/Makefile.am	2006-06-03 11:48:00 UTC (rev 317)
+@@ -1,7 +1,7 @@
+ noinst_PROGRAMS=	hudtest katze \
+ 			ptrtest radius_test s3dclock snowman \
+ 			strtest texturetest linetest widgets \
+-			3dsloader_g3d
++			3dsloader_g3d nichtsnutz
+ bin_PROGRAMS= filebrowser 3dsloader
+ 			
+ 3dsloader_SOURCES=		3dsloader.c
+@@ -17,6 +17,7 @@
+ texturetest_SOURCES=	texturetest.c
+ ptrtest_SOURCES=		ptrtest.c
+ 3dsloader_g3d_SOURCES=	3dsloader_g3d.c
++nichtsnutz_SOURCES=		nichtsnutz.c
+ 
+ CPPFLAGS=		-I$(top_srcdir)/server -I$(top_srcdir)/libs3d 
+ LIBS=			$(top_builddir)/libs3d/libs3d.la  
+
+Added: trunk/example/nichtsnutz.c
+===================================================================
+--- trunk/example/nichtsnutz.c	2006-06-02 19:50:51 UTC (rev 316)
++++ trunk/example/nichtsnutz.c	2006-06-03 11:48:00 UTC (rev 317)
+@@ -0,0 +1,144 @@
++/*
++ * nichtsnutz.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
++
++
++#include &lt;s3d.h&gt;
++#include &lt;s3d_keysym.h&gt;
++#include &lt;stdio.h&gt;
++#include &lt;math.h&gt;
++#include &lt;time.h&gt;	
++
++static struct timespec t={0,10*1000*1000}; /* 10 mili seconds */
++
++int object,foll;
++float al, r, rc, alpha,Asp,Bottom,Left,angle;
++float CamPosition[2][3],
++	  TmpCam[2][3],
++	  RotCam[2][3],
++	  CatPos[3];
++
++void mainloop()
++{
++	
++	al=(alpha*M_PI/180);
++    r = 5.0;
++	rc = 10.0;
++	
++	CatPos[0] = sin(al)*r;
++	CatPos[1] = 0;
++	CatPos[2] = cos(al)*r;
++	
++	RotCam[0][0] = sin(al)*rc;
++	RotCam[0][1] = 0;
++	RotCam[0][2] = cos(al)*rc;
++	
++	s3d_translate(object,CatPos[0] ,CatPos[1], CatPos[2]);
++	s3d_rotate(object, 0, alpha, 0);
++	alpha = alpha+0.1;
++	if (alpha&gt;360.0) alpha=0.0;
++
++	if( foll )
++	{
++		
++		CamPosition[0][0] = ((CamPosition[0][0]*4 + RotCam[0][0])/5);
++		CamPosition[0][1] = ((CamPosition[0][1]*4 + RotCam[0][1])/5);
++		CamPosition[0][2] = ((CamPosition[0][2]*4 + RotCam[0][2])/5);
++		s3d_translate(0,CamPosition[0][0],CamPosition[0][1],CamPosition[0][2]);
++	
++		angle = s3d_vector_angle(CatPos,CamPosition[0]);
++		angle = (CatPos[0] &gt; 0)?(180-(180 / M_PI * angle)):(180+(180 / M_PI * angle));
++
++		CamPosition[1][1] = (CamPosition[1][1]*4 + angle)/5;
++		s3d_rotate(0,CamPosition[1][0], CamPosition[1][1], CamPosition[1][2]);
++		/*printf(&quot;angle %f\n&quot;,angle);*/
++	}
++	nanosleep(&amp;t,NULL); 
++}
++
++void object_info(struct s3d_evt *hrmz)
++{
++	struct s3d_obj_info *inf;
++	inf=(struct s3d_obj_info *)hrmz-&gt;buf;
++	
++	if (inf-&gt;object==0)
++	{
++		CamPosition[0][0] = inf-&gt;trans_x;
++		CamPosition[0][1] = inf-&gt;trans_y;
++		CamPosition[0][2] = inf-&gt;trans_z;
++		CamPosition[1][0] = inf-&gt;rot_x;
++		CamPosition[1][1] = inf-&gt;rot_y;
++		CamPosition[1][2] = inf-&gt;rot_z;
++
++		Asp=inf-&gt;scale;
++		if (Asp&gt;1.0) /* wide screen */
++		{
++			Bottom=-1.0;
++			Left=-Asp;
++		} else {  /* high screen */
++			Bottom=(-1.0/Asp);
++			Left=-1.0;
++		}
++	}
++}
++
++
++
++void keypress(struct s3d_evt *event)
++{
++	int key;
++	key=*((unsigned short *)event-&gt;buf);
++	switch(key)
++	{
++		case 'f':
++				foll = foll ? 0 : 1;
++				if( foll )
++				{
++					TmpCam[0][0] = CamPosition[0][0];
++					TmpCam[0][1] = CamPosition[0][1];
++					TmpCam[0][2] = CamPosition[0][2];
++					TmpCam[1][0] = CamPosition[1][0];
++					TmpCam[1][1] = CamPosition[1][1];
++					TmpCam[1][2] = CamPosition[1][2];
++				}
++				break;
++	}
++}
++
++
++int main(int argc, char **argv)
++{
++	
++	if (!s3d_init(&amp;argc,&amp;argv,&quot;running cat&quot;))
++	{
++		s3d_set_callback(S3D_EVENT_KEY,keypress);
++		s3d_set_callback(S3D_EVENT_OBJ_INFO,object_info);
++		
++		object = s3d_import_3ds_file(&quot;objs/katze_body.3ds&quot;);
++		s3d_flags_on(object, S3D_OF_VISIBLE);
++		s3d_mainloop(mainloop);
++		s3d_quit();
++	}
++	return(0);
++}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000309.html">[S3d-svn] r316 - trunk/example
+</A></li>
+	<LI>Next message: <A HREF="000311.html">[S3d-svn] r318 - in trunk: . example libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#310">[ date ]</a>
+              <a href="thread.html#310">[ thread ]</a>
+              <a href="subject.html#310">[ subject ]</a>
+              <a href="author.html#310">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

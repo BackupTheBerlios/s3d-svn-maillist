@@ -1,0 +1,2828 @@
+From dotslash at mail.berlios.de  Tue Jan  1 04:07:42 2008
+From: dotslash at mail.berlios.de (dotslash at BerliOS)
+Date: Tue, 1 Jan 2008 04:07:42 +0100
+Subject: [S3d-svn] r889 - trunk/svnonly/comptest
+Message-ID: <200801010307.m0137gwQ026472@sheep.berlios.de>
+
+Author: dotslash
+Date: 2008-01-01 04:07:41 +0100 (Tue, 01 Jan 2008)
+New Revision: 889
+
+Modified:
+   trunk/svnonly/comptest/comptest.c
+Log:
+- track pointer position
+
+
+Modified: trunk/svnonly/comptest/comptest.c
+===================================================================
+--- trunk/svnonly/comptest/comptest.c	2007-12-31 19:13:55 UTC (rev 888)
++++ trunk/svnonly/comptest/comptest.c	2008-01-01 03:07:41 UTC (rev 889)
+@@ -27,6 +27,7 @@
+ #include <stdlib.h>        /* malloc(), free() */
+ #include <time.h>         /* nanosleep() */
+ #include <errno.h>			/* errno */
++#include <math.h>			/* cos(), sin() */
+ 
+ #include <sys/time.h>		/* gettimeofday() */
+ #include <time.h>			/* gettimeofday() */
+@@ -158,8 +159,95 @@
+ 
+ 	}
+ 	return(0);
++}
++void x_rot(float vec[3], float angle) 
++{
++	float bak[3];
++	float c,s;
++	bak[1] = vec[1];
++	bak[2] = vec[2];
++	c = cos(angle);
++	s = sin(angle);
++	vec[1] = c*bak[1] - s*bak[2];
++	vec[2] = s*bak[1] + c*bak[2];
++}
+ 
++void y_rot(float vec[3], float angle) 
++{
++	float bak[3];
++	float c,s;
++	bak[0] = vec[0];
++	bak[2] = vec[2];
++
++	c = cos(angle);
++	s = sin(angle);
++	vec[0] = c*bak[0]  + s*bak[2];
++	vec[2] = -s*bak[0] + c*bak[2];
+ }
++float cam_pos[3]={0,0,0};
++float cam_rot[3]={0,0,0};
++float ptr_rot[3]={0,0,0};
++float ptr_pos[3]={0,0,0};
++int cursor;
++
++static int oinfo(struct s3d_evt *evt) 
++{
++	float ptr_dir[3];
++	float t;
++	struct s3d_obj_info *oinf= (struct s3d_obj_info *)evt->buf;
++	switch (oinf->object) {
++		case 0:	/* camera */
++			cam_pos[0] = oinf->trans_x;
++			cam_pos[1] = oinf->trans_y;
++			cam_pos[2] = oinf->trans_z;
++			cam_rot[0] = M_PI/180.0*oinf->rot_x;
++			cam_rot[1] = M_PI/180.0*oinf->rot_y;
++			cam_rot[2] = M_PI/180.0*oinf->rot_z;
++			break;
++		case 1:	/* pointer */
++			ptr_rot[0] = M_PI/180.0*oinf->rot_x;
++			ptr_rot[1] = M_PI/180.0*oinf->rot_y;
++			ptr_rot[2] = M_PI/180.0*oinf->rot_z;
++			break;
++	}
++	if (oinf->object >= 2)
++		return(-1);
++
++	
++	printf("object info for object %d, name %s\n", oinf->object, oinf->name);
++	printf("trans: %3.3f %3.3f %3.3f\n", oinf->trans_x, oinf->trans_y, oinf->trans_z);
++	printf("rot:   %3.3f %3.3f %3.3f\n", oinf->rot_x, oinf->rot_y, oinf->rot_z);
++
++
++	/* TODO: ptr_r_y * ptr_r_x * cam_r_y * cam_r_x * I */
++	ptr_dir[0] = 0;
++	ptr_dir[1] = 0;
++	ptr_dir[2] = -1;
++
++
++	x_rot(ptr_dir, cam_rot[0]);
++	y_rot(ptr_dir, cam_rot[1]);
++	x_rot(ptr_dir, ptr_rot[0]);
++	y_rot(ptr_dir, ptr_rot[1]);
++
++
++
++	printf("pointer direction: %3.3f %3.3f %3.3f\n", ptr_dir[0], ptr_dir[1], ptr_dir[2]);
++
++	if (fabs(ptr_dir[2]) < 1e-3)
++		return(-1);
++
++	t = - cam_pos[2]/ptr_dir[2];
++	ptr_pos[0] = cam_pos[0] + t *ptr_dir[0];
++	ptr_pos[1] = cam_pos[1] + t *ptr_dir[1];
++	ptr_pos[2] = 0;
++
++	printf("pointer position: %3.3f %3.3f\n", ptr_pos[0], ptr_pos[1]);
++	
++	s3d_translate(cursor, ptr_pos[0], ptr_pos[1], ptr_pos[2]);
++
++	return(0);
++}
+ int screen_width = 0;
+ int screen_height = 0;
+ int screen_oid = -1;
+@@ -184,7 +272,11 @@
+ 		return(1);
+ 
+ 	if (!s3d_init(&argc, &argv, "comptest")) {
++		cursor = s3d_import_model_file("objs/arrow.3ds");
++		s3d_flags_on(cursor, S3D_OF_VISIBLE);
++
+ 		s3d_set_callback(S3D_EVENT_KEY, key);
++		s3d_set_callback(S3D_EVENT_OBJ_INFO, oinfo);
+ 
+ 		set_screenpos();
+ 
+
+
+
+From lazhur at mail.berlios.de  Tue Jan  8 00:24:15 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 8 Jan 2008 00:24:15 +0100
+Subject: [S3d-svn] r890 - in trunk: apps/dot_mcp libs3d
+Message-ID: <200801072324.m07NOFSg029134@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-01-08 00:24:15 +0100 (Tue, 08 Jan 2008)
+New Revision: 890
+
+Modified:
+   trunk/apps/dot_mcp/main.c
+   trunk/libs3d/s3dlib.h
+Log:
+Convert K&R style declarations to ansi
+
+
+Modified: trunk/apps/dot_mcp/main.c
+===================================================================
+--- trunk/apps/dot_mcp/main.c	2008-01-01 03:07:41 UTC (rev 889)
++++ trunk/apps/dot_mcp/main.c	2008-01-07 23:24:15 UTC (rev 890)
+@@ -67,7 +67,7 @@
+ static float alpha = 0;
+ static int rotate, reset, min_but, close_but, sphere, menu = -1;
+ 
+-void place_apps();
++void place_apps(void);
+ 
+ #define SIDES 60
+ #define RINGS 60
+
+Modified: trunk/libs3d/s3dlib.h
+===================================================================
+--- trunk/libs3d/s3dlib.h	2008-01-01 03:07:41 UTC (rev 889)
++++ trunk/libs3d/s3dlib.h	2008-01-07 23:24:15 UTC (rev 890)
+@@ -117,11 +117,11 @@
+ /*  fontselect.c */
+ char *s3d_findfont(char *mask);
+ /*  object_queue.c */
+-int _queue_init();
+-int _queue_fill();
++int _queue_init(void);
++int _queue_fill(void);
+ int _queue_new_object(unsigned int oid);
+-unsigned int _queue_want_object();
+-int _queue_quit();
++unsigned int _queue_want_object(void);
++int _queue_quit(void);
+ /* io.c */
+ #ifdef SIGS
+ extern int _s3d_sigio;
+@@ -135,8 +135,8 @@
+ #ifdef TCP
+ /* tcp.c */
+ int _tcp_init(char *sv, int pn);
+-int _tcp_quit();
+-int _s3d_tcp_net_receive();
++int _tcp_quit(void);
++int _s3d_tcp_net_receive(void);
+ int tcp_writen(char *str, int s);
+ int tcp_readn(char *str, int s);
+ #endif
+@@ -149,8 +149,8 @@
+ unsigned int shm_read(struct buf_t *rb, char *buf, unsigned int n);
+ /* shm.c */
+ int _shm_init(char *ftoken);
+-int _shm_quit();
+-int _shm_net_receive();
++int _shm_quit(void);
++int _shm_net_receive(void);
+ int shm_writen(char *str, int s);
+ int shm_readn(char *str, int s);
+ #endif
+
+
+
+From lazhur at mail.berlios.de  Tue Jan  8 00:24:28 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 8 Jan 2008 00:24:28 +0100
+Subject: [S3d-svn] r891 - in trunk: libs3d libs3dw
+Message-ID: <200801072324.m07NOSbQ029161@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-01-08 00:24:27 +0100 (Tue, 08 Jan 2008)
+New Revision: 891
+
+Modified:
+   trunk/libs3d/s3d.h
+   trunk/libs3d/s3dlib.h
+   trunk/libs3dw/s3dw.h
+Log:
+Manually mark functions to export for icc
+
+ICC 9.0 doesnt support gcc's pragmas to export many functions at once. We will
+produce a shared object without any exported functions when somebody tries to
+compile s3d with a new version of intels compiler suite.
+
+
+Modified: trunk/libs3d/s3d.h
+===================================================================
+--- trunk/libs3d/s3d.h	2008-01-07 23:24:15 UTC (rev 890)
++++ trunk/libs3d/s3d.h	2008-01-07 23:24:27 UTC (rev 891)
+@@ -23,6 +23,12 @@
+ #ifndef LIBS3D_H
+ #define LIBS3D_H
+ 
++#ifdef HAVE_GCCVISIBILITY
++#define S3DEXPORT __attribute__ ((visibility("default")))
++#else
++#define S3DEXPORT
++#endif
++
+ #include <stdint.h>  /* [u]intXX_t type definitions*/
+ /* definitions */
+ struct s3d_evt {
+@@ -81,113 +87,107 @@
+ };
+ 
+ /* framework functions */
+-#ifdef HAVE_GCCVISIBILITY
+-#pragma GCC visibility push(default) /* Only export following functions */
+-#endif
+-void s3d_usage(void);
+-int s3d_init(int *argc, char ***argv, char *name);
+-int s3d_quit(void);
+-int s3d_mainloop(void (*f)(void));
++S3DEXPORT void s3d_usage(void);
++S3DEXPORT int s3d_init(int *argc, char ***argv, char *name);
++S3DEXPORT int s3d_quit(void);
++S3DEXPORT int s3d_mainloop(void (*f)(void));
+ 
+ /* object manipulations */
+-int s3d_push_vertex(int object, float x, float y, float z);
+-int s3d_push_vertices(int object, float *vbuf, uint16_t n);
+-int s3d_push_material(int object,
++S3DEXPORT int s3d_push_vertex(int object, float x, float y, float z);
++S3DEXPORT int s3d_push_vertices(int object, float *vbuf, uint16_t n);
++S3DEXPORT int s3d_push_material(int object,
+                       float amb_r, float amb_g, float amb_b,
+                       float spec_r, float spec_g, float spec_b,
+                       float diff_r, float diff_g, float diff_b);
+-int s3d_pep_material(int object,
++S3DEXPORT int s3d_pep_material(int object,
+                      float amb_r, float amb_g, float amb_b,
+                      float spec_r, float spec_g, float spec_b,
+                      float diff_r, float diff_g, float diff_b);
+-int s3d_push_material_a(int object,
++S3DEXPORT int s3d_push_material_a(int object,
+                         float amb_r, float amb_g, float amb_b, float amb_a,
+                         float spec_r, float spec_g, float spec_b, float spec_a,
+                         float diff_r, float diff_g, float diff_b, float diff_a);
+-int s3d_push_materials_a(int object, float *mbuf, uint16_t n);
+-int s3d_pep_material_a(int object,
++S3DEXPORT int s3d_push_materials_a(int object, float *mbuf, uint16_t n);
++S3DEXPORT int s3d_pep_material_a(int object,
+                        float amb_r, float amb_g, float amb_b, float amb_a,
+                        float spec_r, float spec_g, float spec_b, float spec_a,
+                        float diff_r, float diff_g, float diff_b, float diff_a);
+ 
+-int s3d_pep_materials_a(int object, float *mbuf, uint16_t n);
+-int s3d_load_materials_a(int object, float *mbuf, uint32_t start, uint16_t n);
+-int s3d_push_polygon(int object, uint32_t v1, uint32_t v2, uint32_t v3, uint32_t material);
+-int s3d_push_polygons(int object, uint32_t *pbuf, uint16_t n);
+-int s3d_push_line(int object, uint32_t v1, uint32_t v2, uint32_t material);
+-int s3d_push_lines(int object, uint32_t *lbuf, uint16_t n);
+-int s3d_push_texture(int object, uint16_t w, uint16_t h);
+-int s3d_push_textures(int object, uint16_t *tbuf, uint16_t n);
+-int s3d_pop_vertex(int object, uint32_t n);
+-int s3d_pop_polygon(int object, uint32_t n);
+-int s3d_pop_material(int object, uint32_t n);
+-int s3d_pop_texture(int object, uint32_t n);
+-int s3d_pop_polygon(int object, uint32_t n);
+-int s3d_pop_line(int object, uint32_t n);
+-int s3d_pep_line_normals(int object, float *nbuf, uint16_t n);
+-int s3d_pep_polygon_normals(int object, float *nbuf, uint16_t n);
+-int s3d_pep_polygon_tex_coord(int object, float x1, float y1, float x2, float y2, float x3, float y3);
+-int s3d_pep_polygon_tex_coords(int object, float *tbuf, uint16_t n);
+-int s3d_pep_material_texture(int object, uint32_t tex);
+-int s3d_pep_vertex(int object, float x, float y, float z);
+-int s3d_pep_vertices(int object, float *vbuf, uint16_t n);
+-int s3d_pep_line(int object, int v1, int v2, int material);
+-int s3d_pep_lines(int object, uint32_t *lbuf, uint16_t n);
+-int s3d_load_line_normals(int object, float *nbuf, uint32_t start, uint16_t n);
+-int s3d_load_polygon_normals(int object, float *nbuf, uint32_t start, uint16_t n);
+-int s3d_load_polygon_tex_coords(int object, float *tbuf, uint32_t start, uint16_t n);
+-int s3d_load_texture(int object, uint32_t tex, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h, uint8_t *data);
++S3DEXPORT int s3d_pep_materials_a(int object, float *mbuf, uint16_t n);
++S3DEXPORT int s3d_load_materials_a(int object, float *mbuf, uint32_t start, uint16_t n);
++S3DEXPORT int s3d_push_polygon(int object, uint32_t v1, uint32_t v2, uint32_t v3, uint32_t material);
++S3DEXPORT int s3d_push_polygons(int object, uint32_t *pbuf, uint16_t n);
++S3DEXPORT int s3d_push_line(int object, uint32_t v1, uint32_t v2, uint32_t material);
++S3DEXPORT int s3d_push_lines(int object, uint32_t *lbuf, uint16_t n);
++S3DEXPORT int s3d_push_texture(int object, uint16_t w, uint16_t h);
++S3DEXPORT int s3d_push_textures(int object, uint16_t *tbuf, uint16_t n);
++S3DEXPORT int s3d_pop_vertex(int object, uint32_t n);
++S3DEXPORT int s3d_pop_polygon(int object, uint32_t n);
++S3DEXPORT int s3d_pop_material(int object, uint32_t n);
++S3DEXPORT int s3d_pop_texture(int object, uint32_t n);
++S3DEXPORT int s3d_pop_polygon(int object, uint32_t n);
++S3DEXPORT int s3d_pop_line(int object, uint32_t n);
++S3DEXPORT int s3d_pep_line_normals(int object, float *nbuf, uint16_t n);
++S3DEXPORT int s3d_pep_polygon_normals(int object, float *nbuf, uint16_t n);
++S3DEXPORT int s3d_pep_polygon_tex_coord(int object, float x1, float y1, float x2, float y2, float x3, float y3);
++S3DEXPORT int s3d_pep_polygon_tex_coords(int object, float *tbuf, uint16_t n);
++S3DEXPORT int s3d_pep_material_texture(int object, uint32_t tex);
++S3DEXPORT int s3d_pep_vertex(int object, float x, float y, float z);
++S3DEXPORT int s3d_pep_vertices(int object, float *vbuf, uint16_t n);
++S3DEXPORT int s3d_pep_line(int object, int v1, int v2, int material);
++S3DEXPORT int s3d_pep_lines(int object, uint32_t *lbuf, uint16_t n);
++S3DEXPORT int s3d_load_line_normals(int object, float *nbuf, uint32_t start, uint16_t n);
++S3DEXPORT int s3d_load_polygon_normals(int object, float *nbuf, uint32_t start, uint16_t n) ;
++S3DEXPORT int s3d_load_polygon_tex_coords(int object, float *tbuf, uint32_t start, uint16_t n);
++S3DEXPORT int s3d_load_texture(int object, uint32_t tex, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h, uint8_t *data);
+ 
+-int s3d_new_object(void);
+-int s3d_del_object(int oid);
++S3DEXPORT int s3d_new_object(void);
++S3DEXPORT int s3d_del_object(int oid);
+ 
+-int s3d_clone(int oid);
+-int s3d_clone_target(int oid, int toid);
++S3DEXPORT int s3d_clone(int oid);
++S3DEXPORT int s3d_clone_target(int oid, int toid);
+ 
+-int s3d_link(int oid_from, int oid_to);
+-int s3d_unlink(int oid);
++S3DEXPORT int s3d_link(int oid_from, int oid_to);
++S3DEXPORT int s3d_unlink(int oid);
+ 
+-int s3d_flags_on(int object, uint32_t flags);
+-int s3d_flags_off(int object, uint32_t flags);
+-int s3d_translate(int object, float x, float y, float z);
+-int s3d_rotate(int object, float x, float y, float z);
+-int s3d_scale(int object, float s);
++S3DEXPORT int s3d_flags_on(int object, uint32_t flags);
++S3DEXPORT int s3d_flags_off(int object, uint32_t flags);
++S3DEXPORT int s3d_translate(int object, float x, float y, float z);
++S3DEXPORT int s3d_rotate(int object, float x, float y, float z);
++S3DEXPORT int s3d_scale(int object, float s);
+ 
+ /* high-level object creating */
+-int s3d_import_model_file(char *fname);
+-int s3d_open_file(char *fname, char **pointer);
+-int s3d_select_font(char *mask);
+-int s3d_draw_string(char *str, float *xlen);
+-float s3d_strlen(char *str);
++S3DEXPORT int s3d_import_model_file(char *fname);
++S3DEXPORT int s3d_open_file(char *fname, char **pointer);
++S3DEXPORT int s3d_select_font(char *mask);
++S3DEXPORT int s3d_draw_string(char *str, float *xlen);
++S3DEXPORT float s3d_strlen(char *str);
+ 
+ /* some vector calculation helpers */
+ 
+-float s3d_vector_length(float vector[]);
+-float s3d_vector_dot_product(float vector1[], float vector2[]);
+-void s3d_vector_subtract(float vector1[], float vector2[], float result_vector[]);
+-float s3d_vector_angle(float vector1[], float vector2[]);
+-float s3d_angle_to_cam(float obj_pos[], float cam_pos[], float *angle_rad);
+-void s3d_vector_cross_product(float vector1[], float vector2[], float result_vector[]);
++S3DEXPORT float s3d_vector_length(float vector[]);
++S3DEXPORT float s3d_vector_dot_product(float vector1[], float vector2[]);
++S3DEXPORT void s3d_vector_subtract(float vector1[], float vector2[], float result_vector[]);
++S3DEXPORT float s3d_vector_angle(float vector1[], float vector2[]);
++S3DEXPORT float s3d_angle_to_cam(float obj_pos[], float cam_pos[], float *angle_rad);
++S3DEXPORT void s3d_vector_cross_product(float vector1[], float vector2[], float result_vector[]);
+ 
+ /* event handlers */
+-void s3d_push_event(struct s3d_evt *newevt);
+-struct s3d_evt *s3d_pop_event(void);
+-struct s3d_evt *s3d_find_event(uint8_t event);
+-int s3d_delete_event(struct s3d_evt *devt);
++S3DEXPORT void s3d_push_event(struct s3d_evt *newevt);
++S3DEXPORT struct s3d_evt *s3d_pop_event(void);
++S3DEXPORT struct s3d_evt *s3d_find_event(uint8_t event);
++S3DEXPORT int s3d_delete_event(struct s3d_evt *devt);
+ 
+-void s3d_set_callback(uint8_t event, s3d_cb func);
+-void s3d_clear_callback(uint8_t event);
+-void s3d_ignore_callback(uint8_t event);
+-s3d_cb s3d_get_callback(uint8_t event);
+-void s3d_process_stack(void);
++S3DEXPORT void s3d_set_callback(uint8_t event, s3d_cb func);
++S3DEXPORT void s3d_clear_callback(uint8_t event);
++S3DEXPORT void s3d_ignore_callback(uint8_t event);
++S3DEXPORT s3d_cb s3d_get_callback(uint8_t event);
++S3DEXPORT void s3d_process_stack(void);
+ 
+ /* mcp special */
+-int s3d_mcp_focus(int object);
++S3DEXPORT int s3d_mcp_focus(int object);
+ 
+ /* for apps which don't employ s3d_mainloop() */
+-int s3d_net_check(void);
+-#ifdef HAVE_GCCVISIBILITY
+-#pragma GCC visibility pop
+-#endif
++S3DEXPORT int s3d_net_check(void);
+ 
+ #endif
+
+Modified: trunk/libs3d/s3dlib.h
+===================================================================
+--- trunk/libs3d/s3dlib.h	2008-01-07 23:24:15 UTC (rev 890)
++++ trunk/libs3d/s3dlib.h	2008-01-07 23:24:27 UTC (rev 891)
+@@ -41,6 +41,12 @@
+ #endif
+ #endif
+ 
++#ifdef HAVE_GCCVISIBILITY
++#define S3DEXPORT __attribute__ ((visibility("default")))
++#else
++#define S3DEXPORT
++#endif
++
+ #define VLOW 1
+ #define LOW  2
+ #define MED  3
+@@ -90,16 +96,9 @@
+ } __attribute__((__packed__));
+ 
+ #ifdef DEBUG
+-#ifdef HAVE_GCCVISIBILITY
+-#pragma GCC visibility push(default) /* Only export following functions */
+-#endif
+-void s3dprintf(int relevance, const char *fmt, ...);
+-void errdn(int relevance, char *func, int en);
+-void errds(int relevance, char *func, const char *fmt, ...);
+-#ifdef HAVE_GCCVISIBILITY
+-#pragma GCC visibility pop
+-#endif
+-
++S3DEXPORT void s3dprintf(int relevance, const char *fmt, ...);
++S3DEXPORT void errdn(int relevance, char *func, int en);
++S3DEXPORT void errds(int relevance, char *func, const char *fmt, ...);
+ #else
+ static __inline__ void s3dprintf(int S3DUNUSED(relevance),
+                                  const char *S3DUNUSED(fmt), ...) {}
+
+Modified: trunk/libs3dw/s3dw.h
+===================================================================
+--- trunk/libs3dw/s3dw.h	2008-01-07 23:24:15 UTC (rev 890)
++++ trunk/libs3dw/s3dw.h	2008-01-07 23:24:27 UTC (rev 891)
+@@ -28,6 +28,12 @@
+ #endif
+ #include <stdint.h>  /* [u]intXX_t type definitions*/
+ 
++#ifdef HAVE_GCCVISIBILITY
++#define S3DWEXPORT __attribute__ ((visibility("default")))
++#else
++#define S3DWEXPORT
++#endif
++
+ /* we want this widget visible, as long as the widgets below are also visible.
+  * on for all widgets, except surfaces which have to be switched visible
+  * with s3dw_show() */
+@@ -160,38 +166,32 @@
+ 	float title_text_mat[12]; /* material for the text on the title bar */
+ };
+ /* button.c */
+-#ifdef HAVE_GCCVISIBILITY
+-#pragma GCC visibility push(default) /* Only export following functions */
+-#endif
+-s3dw_button   *s3dw_button_new(s3dw_surface *surface, char *text, float posx, float posy);
+-s3dw_label    *s3dw_label_new(s3dw_surface *surface, char *text, float posx, float posy);
+-s3dw_input    *s3dw_input_new(s3dw_surface *surface, float width, float posx, float posy);
+-s3dw_textbox   *s3dw_textbox_new(s3dw_surface *surface, char *text, float posx, float posy, float width, float height);
+-char     *s3dw_input_gettext(s3dw_input *input);
+-void      s3dw_input_change_text(s3dw_input *input, char *text);
+-void      s3dw_label_change_text(s3dw_label *label, char *text);
+-s3dw_surface   *s3dw_surface_new(char *title, float width, float height);
++S3DWEXPORT s3dw_button   *s3dw_button_new(s3dw_surface *surface, char *text, float posx, float posy);
++S3DWEXPORT s3dw_label    *s3dw_label_new(s3dw_surface *surface, char *text, float posx, float posy);
++S3DWEXPORT s3dw_input    *s3dw_input_new(s3dw_surface *surface, float width, float posx, float posy);
++S3DWEXPORT s3dw_textbox   *s3dw_textbox_new(s3dw_surface *surface, char *text, float posx, float posy, float width, float height);
++S3DWEXPORT char     *s3dw_input_gettext(s3dw_input *input);
++S3DWEXPORT void      s3dw_input_change_text(s3dw_input *input, char *text);
++S3DWEXPORT void      s3dw_label_change_text(s3dw_label *label, char *text);
++S3DWEXPORT s3dw_surface   *s3dw_surface_new(char *title, float width, float height);
+ 
+-s3dw_widget   *s3dw_getroot(void);
+-void     s3dw_moveit(s3dw_widget *widget);
+-void      s3dw_delete(s3dw_widget *widget);
+-void      s3dw_show(s3dw_widget *widget);
+-void      s3dw_focus(s3dw_widget *focus);
++S3DWEXPORT s3dw_widget   *s3dw_getroot(void);
++S3DWEXPORT void     s3dw_moveit(s3dw_widget *widget);
++S3DWEXPORT void      s3dw_delete(s3dw_widget *widget);
++S3DWEXPORT void      s3dw_show(s3dw_widget *widget);
++S3DWEXPORT void      s3dw_focus(s3dw_widget *focus);
+ 
+-void      s3dw_textbox_scrollup(s3dw_textbox *textbox);
+-void      s3dw_textbox_scrolldown(s3dw_textbox *textbox);
+-void      s3dw_textbox_scrollleft(s3dw_textbox *textbox);
+-void      s3dw_textbox_scrollright(s3dw_textbox *textbox);
+-void      s3dw_textbox_scrollto(s3dw_textbox *textbox, int x, int y);
+-void      s3dw_textbox_change_text(s3dw_textbox *textbox, char *text);
++S3DWEXPORT void      s3dw_textbox_scrollup(s3dw_textbox *textbox);
++S3DWEXPORT void      s3dw_textbox_scrolldown(s3dw_textbox *textbox);
++S3DWEXPORT void      s3dw_textbox_scrollleft(s3dw_textbox *textbox);
++S3DWEXPORT void      s3dw_textbox_scrollright(s3dw_textbox *textbox);
++S3DWEXPORT void      s3dw_textbox_scrollto(s3dw_textbox *textbox, int x, int y);
++S3DWEXPORT void      s3dw_textbox_change_text(s3dw_textbox *textbox, char *text);
+ 
+-int      s3dw_handle_click(struct s3d_evt *evt);
+-int      s3dw_handle_key(struct s3d_evt *evt);
+-int      s3dw_object_info(struct s3d_evt *evt);
++S3DWEXPORT int      s3dw_handle_click(struct s3d_evt *evt);
++S3DWEXPORT int      s3dw_handle_key(struct s3d_evt *evt);
++S3DWEXPORT int      s3dw_object_info(struct s3d_evt *evt);
+ 
+-void      s3dw_ani_mate(void);
+-#ifdef HAVE_GCCVISIBILITY
+-#pragma GCC visibility pop
+-#endif
++S3DWEXPORT void      s3dw_ani_mate(void);
+ 
+ #endif
+
+
+
+From lazhur at mail.berlios.de  Tue Jan  8 00:24:42 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 8 Jan 2008 00:24:42 +0100
+Subject: [S3d-svn] r892 - trunk/libs3d
+Message-ID: <200801072324.m07NOgvB029241@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-01-08 00:24:41 +0100 (Tue, 08 Jan 2008)
+New Revision: 892
+
+Modified:
+   trunk/libs3d/freetype.c
+   trunk/libs3d/sei_construct.c
+   trunk/libs3d/sei_monotone.c
+   trunk/libs3d/sei_tri.c
+Log:
+libs3d: Remove nearly unused variables
+
+
+Modified: trunk/libs3d/freetype.c
+===================================================================
+--- trunk/libs3d/freetype.c	2008-01-07 23:24:27 UTC (rev 891)
++++ trunk/libs3d/freetype.c	2008-01-07 23:24:41 UTC (rev 892)
+@@ -55,8 +55,6 @@
+ static int ft_init = 0;
+ static int face_init = 0;
+ 
+-static int v_off;   /*  the vertex number offset, to have the right vertex numbers for each character */
+-static int ch;
+ static struct t_buf tess_buf[256];
+ 
+ 
+@@ -118,7 +116,7 @@
+ static int _s3d_add_tessbuf(uint16_t a)
+ {
+ 	float norm, ar, xa, ya;
+-	int i, j, k, c, n, start, outl, s, e;
++	int i, j, k, c, n, outl, s, e;
+ 	int np, pos;
+ 	int triangles[SEI_SS*2][3]; /* more than enough ... */
+ 	int ncontours, ncon;
+@@ -139,8 +137,6 @@
+ 	}
+ 	s3dprintf(VLOW, "[T]riangulating character %c", a);
+ 	norm = 1.0 / face->glyph->metrics.vertAdvance;
+-	ch = a;
+-	v_off = 0;
+ 	if ((face->glyph->outline.n_points > 0) && (face->glyph->outline.n_points < SEI_SS)) {
+ 		tess_buf[a].vn = face->glyph->outline.n_points;
+ 		tess_buf[a].vbuf = malloc(sizeof(float) * face->glyph->outline.n_points * 3);
+@@ -148,7 +144,6 @@
+ 		j = 0;
+ 		ncontours = face->glyph->outline.n_contours;
+ 		for (c = 0;c < ncontours;c++) {
+-			start = j;  /* first point */
+ 			i = 0;
+ 			ncon = face->glyph->outline.contours[c]; /* position of the end of ths contour */
+ 			cntr[c] = ncon - j + 1;  /* how many points do we have here? */
+@@ -376,7 +371,6 @@
+ {
+ 	int i;
+ 	float xoff;
+-	int voff;
+ 	int len;
+ 	uint16_t a;
+ 	if (!ft_init)
+@@ -390,7 +384,6 @@
+ 	}
+ 	/*  standard material */
+ 	xoff = 0;
+-	voff = 0;
+ 	len = strlen(str);
+ 	for (i = 0;i < len; i++) {
+ 		a = (uint8_t)str[i];
+
+Modified: trunk/libs3d/sei_construct.c
+===================================================================
+--- trunk/libs3d/sei_construct.c	2008-01-07 23:24:27 UTC (rev 891)
++++ trunk/libs3d/sei_construct.c	2008-01-07 23:24:41 UTC (rev 892)
+@@ -423,7 +423,7 @@
+ 	int tfirstr = 0, tlastr = 0, tfirstl, tlastl;
+ 	int i1, i2, t, tn;
+ 	point_t tpt;
+-	int tritop = 0, tribot = 0, is_swapped = 0;
++	int tribot = 0, is_swapped = 0;
+ 	int tmptriseg;
+ 	int tmpseg = 1;
+ 
+@@ -488,10 +488,9 @@
+ 		tr[tu].sink = i1;
+ 		tr[tl].sink = i2;
+ 		tfirst = tl;
+-	} else    /* v0 already present */
+-	{       /* Get the topmost intersecting trapezoid */
++	} else {    /* v0 already present */
++	       /* Get the topmost intersecting trapezoid */
+ 		tfirst = locate_endpoint(&s.v0, &s.v1, s.root0);
+-		tritop = 1;
+ 	}
+ 
+ 
+@@ -632,9 +631,9 @@
+ 				}
+ 			} else {   /* fresh seg. or upward cusp */
+ 				int tmp_u = tr[t].u0;
+-				int td0, td1;
++				int td0;
+ 				if (((td0 = tr[tmp_u].d0) > 0) &&
+-				                ((td1 = tr[tmp_u].d1) > 0)) {  /* upward cusp */
++				                (tr[tmp_u].d1 > 0)) {  /* upward cusp */
+ 					if ((tr[td0].rseg > 0) &&
+ 					                !is_left_of(tr[td0].rseg, &s.v1)) {
+ 						tr[t].u0 = tr[t].u1 = tr[tn].u1 = -1;
+@@ -714,9 +713,9 @@
+ 				}
+ 			} else {   /* fresh seg. or upward cusp */
+ 				int tmp_u = tr[t].u0;
+-				int td0, td1;
++				int td0;
+ 				if (((td0 = tr[tmp_u].d0) > 0) &&
+-				                ((td1 = tr[tmp_u].d1) > 0)) {  /* upward cusp */
++				                (tr[tmp_u].d1 > 0)) {  /* upward cusp */
+ 					if ((tr[td0].rseg > 0) &&
+ 					                !is_left_of(tr[td0].rseg, &s.v1)) {
+ 						tr[t].u0 = tr[t].u1 = tr[tn].u1 = -1;
+@@ -771,15 +770,13 @@
+ 		else {
+ 			double y0, yt;
+ 			point_t tmppt;
+-			int tnext, i_d0, i_d1;
++			int tnext, i_d0;
+ 			tmpseg = tr[tr[t].d0].rseg;
+ 
+-			i_d0 = i_d1 = FALSE;
++			i_d0 = FALSE;
+ 			if (FP_EQUAL(tr[t].lo.y, s.v0.y)) {
+ 				if (tr[t].lo.x > s.v0.x)
+ 					i_d0 = TRUE;
+-				else
+-					i_d1 = TRUE;
+ 			} else {
+ 				tmppt.y = y0 = tr[t].lo.y;
+ 				yt = (y0 - s.v0.y) / (s.v1.y - s.v0.y);
+@@ -787,8 +784,6 @@
+ 
+ 				if (_less_than(&tmppt, &tr[t].lo))
+ 					i_d0 = TRUE;
+-				else
+-					i_d1 = TRUE;
+ 			}
+ 
+ 			/* check continuity from the top so that the lower-neighbour */
+@@ -824,9 +819,9 @@
+ 				}
+ 			} else {   /* fresh seg. or upward cusp */
+ 				int tmp_u = tr[t].u0;
+-				int td0, td1;
++				int td0;
+ 				if (((td0 = tr[tmp_u].d0) > 0) &&
+-				                ((td1 = tr[tmp_u].d1) > 0)) {  /* upward cusp */
++				                (tr[tmp_u].d1 > 0)) {  /* upward cusp */
+ 					if ((tr[td0].rseg > 0) &&
+ 					                !is_left_of(tr[td0].rseg, &s.v1)) {
+ 						tr[t].u0 = tr[t].u1 = tr[tn].u1 = -1;
+
+Modified: trunk/libs3d/sei_monotone.c
+===================================================================
+--- trunk/libs3d/sei_monotone.c	2008-01-07 23:24:27 UTC (rev 891)
++++ trunk/libs3d/sei_monotone.c	2008-01-07 23:24:41 UTC (rev 892)
+@@ -303,7 +303,6 @@
+ 	int mnew;
+ 	int v0, v1;
+ 	int retval = -1;
+-	int do_switch = FALSE;
+ 
+ 	if ((trnum <= 0) || visited[trnum])
+ 		return 0;
+@@ -325,7 +324,6 @@
+ 			v0 = tr[t->d1].lseg;
+ 			v1 = t->lseg;
+ 			if (from == t->d1) {
+-				do_switch = TRUE;
+ 				mnew = make_new_monotone_poly(mcur, v1, v0);
+ 				traverse_polygon(mcur, t->d1, trnum, TR_FROM_UP);
+ 				traverse_polygon(mnew, t->d0, trnum, TR_FROM_UP);
+@@ -348,7 +346,6 @@
+ 			v0 = t->rseg;
+ 			v1 = tr[t->u0].rseg;
+ 			if (from == t->u1) {
+-				do_switch = TRUE;
+ 				mnew = make_new_monotone_poly(mcur, v1, v0);
+ 				traverse_polygon(mcur, t->u1, trnum, TR_FROM_DN);
+ 				traverse_polygon(mnew, t->u0, trnum, TR_FROM_DN);
+@@ -373,7 +370,6 @@
+ 			retval = SP_2UP_2DN;
+ 			if (((dir == TR_FROM_DN) && (t->d1 == from)) ||
+ 			                ((dir == TR_FROM_UP) && (t->u1 == from))) {
+-				do_switch = TRUE;
+ 				mnew = make_new_monotone_poly(mcur, v1, v0);
+ 				traverse_polygon(mcur, t->u1, trnum, TR_FROM_DN);
+ 				traverse_polygon(mcur, t->d1, trnum, TR_FROM_UP);
+@@ -393,7 +389,6 @@
+ 
+ 				retval = SP_2UP_LEFT;
+ 				if ((dir == TR_FROM_UP) && (t->u0 == from)) {
+-					do_switch = TRUE;
+ 					mnew = make_new_monotone_poly(mcur, v1, v0);
+ 					traverse_polygon(mcur, t->u0, trnum, TR_FROM_DN);
+ 					traverse_polygon(mnew, t->d0, trnum, TR_FROM_UP);
+@@ -411,7 +406,6 @@
+ 				v1 = tr[t->u0].rseg;
+ 				retval = SP_2UP_RIGHT;
+ 				if ((dir == TR_FROM_UP) && (t->u1 == from)) {
+-					do_switch = TRUE;
+ 					mnew = make_new_monotone_poly(mcur, v1, v0);
+ 					traverse_polygon(mcur, t->u1, trnum, TR_FROM_DN);
+ 					traverse_polygon(mnew, t->d1, trnum, TR_FROM_UP);
+@@ -433,7 +427,6 @@
+ 				v1 = t->lseg;
+ 				retval = SP_2DN_LEFT;
+ 				if (!((dir == TR_FROM_DN) && (t->d0 == from))) {
+-					do_switch = TRUE;
+ 					mnew = make_new_monotone_poly(mcur, v1, v0);
+ 					traverse_polygon(mcur, t->u1, trnum, TR_FROM_DN);
+ 					traverse_polygon(mcur, t->d1, trnum, TR_FROM_UP);
+@@ -452,7 +445,6 @@
+ 
+ 				retval = SP_2DN_RIGHT;
+ 				if ((dir == TR_FROM_DN) && (t->d1 == from)) {
+-					do_switch = TRUE;
+ 					mnew = make_new_monotone_poly(mcur, v1, v0);
+ 					traverse_polygon(mcur, t->d1, trnum, TR_FROM_UP);
+ 					traverse_polygon(mnew, t->u1, trnum, TR_FROM_DN);
+@@ -473,7 +465,6 @@
+ 				v1 = t->lseg;
+ 				retval = SP_SIMPLE_LRDN;
+ 				if (dir == TR_FROM_UP) {
+-					do_switch = TRUE;
+ 					mnew = make_new_monotone_poly(mcur, v1, v0);
+ 					traverse_polygon(mcur, t->u0, trnum, TR_FROM_DN);
+ 					traverse_polygon(mcur, t->u1, trnum, TR_FROM_DN);
+@@ -493,7 +484,6 @@
+ 
+ 				retval = SP_SIMPLE_LRUP;
+ 				if (dir == TR_FROM_UP) {
+-					do_switch = TRUE;
+ 					mnew = make_new_monotone_poly(mcur, v1, v0);
+ 					traverse_polygon(mcur, t->u0, trnum, TR_FROM_DN);
+ 					traverse_polygon(mcur, t->u1, trnum, TR_FROM_DN);
+@@ -529,7 +519,7 @@
+ {
+ 	register int i;
+ 	point_t ymax, ymin;
+-	int p, vfirst, posmax, posmin, v;
++	int p, vfirst, posmax, v;
+ 	int vcount, processed;
+ 
+ 
+@@ -539,7 +529,7 @@
+ 		processed = FALSE;
+ 		vfirst = mchain[mon[i]].vnum;
+ 		ymax = ymin = vert[vfirst].pt;
+-		posmax = posmin = mon[i];
++		posmax = mon[i];
+ 		mchain[mon[i]].marked = TRUE;
+ 		p = mchain[mon[i]].next;
+ 		while ((v = mchain[p].vnum) != vfirst) {
+@@ -555,7 +545,6 @@
+ 			}
+ 			if (_less_than(&vert[v].pt, &ymin)) {
+ 				ymin = vert[v].pt;
+-				posmin = p;
+ 			}
+ 			p = mchain[p].next;
+ 			vcount++;
+
+Modified: trunk/libs3d/sei_tri.c
+===================================================================
+--- trunk/libs3d/sei_tri.c	2008-01-07 23:24:27 UTC (rev 891)
++++ trunk/libs3d/sei_tri.c	2008-01-07 23:24:41 UTC (rev 892)
+@@ -80,7 +80,7 @@
+ int sei_triangulate_polygon(int ncontours, int cntr[], double(*vertices)[2], int (*triangles)[3])
+ {
+ 	register int i;
+-	int nmonpoly, ccount, npoints, genus;
++	int nmonpoly, ccount, npoints;
+ 	int n;
+ 
+ 	memset((void *)seg, 0, sizeof(seg));
+@@ -118,7 +118,6 @@
+ 		ccount++;
+ 	}
+ 
+-	genus = ncontours - 1;
+ 	n = i - 1;
+ 
+ 	initialise(n);
+
+
+
+From lazhur at mail.berlios.de  Tue Jan  8 00:24:48 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 8 Jan 2008 00:24:48 +0100
+Subject: [S3d-svn] r893 - trunk/apps/dot_mcp
+Message-ID: <200801072324.m07NOmRj029265@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-01-08 00:24:48 +0100 (Tue, 08 Jan 2008)
+New Revision: 893
+
+Modified:
+   trunk/apps/dot_mcp/main.c
+Log:
+dot_mcp: Remove unused vectors in place_apps
+
+
+Modified: trunk/apps/dot_mcp/main.c
+===================================================================
+--- trunk/apps/dot_mcp/main.c	2008-01-07 23:24:41 UTC (rev 892)
++++ trunk/apps/dot_mcp/main.c	2008-01-07 23:24:48 UTC (rev 893)
+@@ -246,7 +246,6 @@
+ {
+ 	struct app *a = apps;
+ 	int j = 0;
+-	float u[3], v[3], ya, xa;
+ 	while (a != NULL) {
+ 		if (a->init) {
+ 			/*   printf("placing app [%d,'%s'], oid %d, r=%f\n",j,a->name,a->oid,a->r); */
+@@ -262,17 +261,6 @@
+ 	}
+ 	s3d_translate(menu, left*zoom + 0.4, (-bottom)*zoom - 0.4, -zoom);
+ 
+-	v[0] = 0;
+-	v[1] = 0;
+-	v[2] = 1;
+-	u[0] = left * zoom + 0.4;
+-	u[1] = 0;
+-	u[2] = -zoom;
+-	ya = s3d_vector_angle(v, u);
+-	u[0] = 0;
+-	u[1] = (-bottom) * zoom;
+-	u[2] = -zoom;
+-	xa = s3d_vector_angle(v, u);
+ 	s3d_rotate(menu, 0 , 30, 0);
+ }
+ 
+
+
+
+From lazhur at mail.berlios.de  Tue Jan  8 00:25:00 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 8 Jan 2008 00:25:00 +0100
+Subject: [S3d-svn] r894 - trunk/apps/kism3d
+Message-ID: <200801072325.m07NP0PD029334@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-01-08 00:24:59 +0100 (Tue, 08 Jan 2008)
+New Revision: 894
+
+Modified:
+   trunk/apps/kism3d/kism3d.c
+Log:
+kism3d: Remove unused variable end_char
+
+
+Modified: trunk/apps/kism3d/kism3d.c
+===================================================================
+--- trunk/apps/kism3d/kism3d.c	2008-01-07 23:24:48 UTC (rev 893)
++++ trunk/apps/kism3d/kism3d.c	2008-01-07 23:24:59 UTC (rev 894)
+@@ -91,7 +91,6 @@
+ 	char enable_network[] = "!0 ENABLE NETWORK bssid,type,channel,ssid\n", enable_client[] = "!0 ENABLE CLIENT bssid,mac,ip\n", enable_alert[] = "!0 ENABLE ALERT *\n";
+ 	char *read_ptr, *line_ptr, *last_cr_ptr = NULL, *parse_begin_ptr, *parse_end_ptr;
+ 	char *bssid, *channel, *type, *ssid, *mac, *ip;
+-	char end_char;
+ 	int count;
+ 
+ 	read_ptr = kismet_src->recv_buff;
+@@ -165,7 +164,6 @@
+ 				/* printf( "line: %s\n", line_ptr ); */
+ 
+ 				parse_begin_ptr = parse_end_ptr = line_ptr + strlen("*NETWORK: ");
+-				end_char = ' ';
+ 				count = 0;
+ 
+ 				while ((*parse_end_ptr) != '\0') {
+
+
+
+From lazhur at mail.berlios.de  Tue Jan  8 00:25:07 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 8 Jan 2008 00:25:07 +0100
+Subject: [S3d-svn] r895 - trunk/apps/s3dfm
+Message-ID: <200801072325.m07NP7Ml029383@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-01-08 00:25:07 +0100 (Tue, 08 Jan 2008)
+New Revision: 895
+
+Modified:
+   trunk/apps/s3dfm/focus.c
+   trunk/apps/s3dfm/parse.c
+Log:
+s3dfm: Remove nearly unused variables
+
+
+Modified: trunk/apps/s3dfm/focus.c
+===================================================================
+--- trunk/apps/s3dfm/focus.c	2008-01-07 23:24:59 UTC (rev 894)
++++ trunk/apps/s3dfm/focus.c	2008-01-07 23:25:07 UTC (rev 895)
+@@ -25,7 +25,6 @@
+ #include <s3d_keysym.h>
+ #include <stdio.h> /* printf() */
+ #include <math.h>  /* ceil(), sqrt() */
+-static int moveon = 1;
+ 
+ /* get the scale for the rootbox zoom */
+ float focus_get_scale(t_node *f)
+@@ -57,7 +56,6 @@
+ 	root.px = 0.0;
+ 	root.py = 0.0;
+ 	root.pz = 0.0;
+-	moveon = 1;
+ 	/* printf("[Z]ooming to %s\n",f->name);*/
+ 	/* box_collapse_grandkids(f);*/
+ 	root.scale = focus_get_scale(f);
+
+Modified: trunk/apps/s3dfm/parse.c
+===================================================================
+--- trunk/apps/s3dfm/parse.c	2008-01-07 23:24:59 UTC (rev 894)
++++ trunk/apps/s3dfm/parse.c	2008-01-07 23:25:07 UTC (rev 895)
+@@ -35,7 +35,7 @@
+ 	int n, i;
+ 	int oldn;
+ 	DIR  *dirhd = NULL;
+-	char *ext, *nstr = NULL;
++	char *nstr = NULL;
+ 	char path[M_DIR];
+ 	char ndir[M_DIR];
+ 
+@@ -72,18 +72,13 @@
+ 				/* find out the filetype ... very simple */
+ 				dir->sub[i]->type = T_DUNO;
+ 				dir->sub[i]->pindex = i;
+-				ext = strrchr(nstr, '.');
+ 				strncpy(ndir, path, M_DIR);
+ 				strncat(ndir, namelist[n]->d_name, M_DIR);
+ 				if ((namelist[n]->d_type == DT_DIR) || ((namelist[n]->d_type == DT_UNKNOWN)))
+ 					if ((dirhd = opendir(ndir)) != NULL) {
+ 						dir->sub[i]->type = T_FOLDER;
+ 						closedir(dirhd);
+-					} /*else if (ext!=NULL)
+-        {
+-         if (0==strncmp(ext,".3ds",strlen(ext)<4?strlen(ext):4))     dir->sub[i]->type=T_GEOMETRY;
+-         else if (0==strncmp(ext,".mp3",strlen(ext)<4?strlen(ext):4))    dir->sub[i]->type=T_MUSIC;
+-         } */
++					}
+ 				dir->sub[i]->check = 0; /* check=0 means we've already processed this item */
+ 			}
+ 			free(namelist[n]);
+
+
+
+From lazhur at mail.berlios.de  Tue Jan  8 00:25:14 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 8 Jan 2008 00:25:14 +0100
+Subject: [S3d-svn] r896 - trunk/apps/s3dosm
+Message-ID: <200801072325.m07NPEMO029467@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-01-08 00:25:13 +0100 (Tue, 08 Jan 2008)
+New Revision: 896
+
+Modified:
+   trunk/apps/s3dosm/draw.c
+   trunk/apps/s3dosm/http_fetcher.c
+   trunk/apps/s3dosm/osm.c
+Log:
+s3dosm: Remove nearly unused variables
+
+
+Modified: trunk/apps/s3dosm/draw.c
+===================================================================
+--- trunk/apps/s3dosm/draw.c	2008-01-07 23:25:07 UTC (rev 895)
++++ trunk/apps/s3dosm/draw.c	2008-01-07 23:25:13 UTC (rev 896)
+@@ -85,21 +85,17 @@
+ static int draw_icon(void *S3DOSMUNUSED(data), int argc, char **argv, char **S3DOSMUNUSED(azColName))
+ {
+ 	int i, tagid = -1, oid;
+-	int nodeid = -1, layerid = -1;
+ 	/* char query[MAXQ];*/
+ 	char s[MAXQ];
+-	float la, lo, alt;
++	float la, lo;
+ 	float x[3];
+-	la = lo = alt = 0.0;
++	la = lo = 0.0;
+ 	num_done++;
+ 	for (i = 0; i < argc; i++) {
+ 		if (argv[i]) {
+ 			if (0 == strcmp(azColName[i], "longitude"))   lo = strtod(argv[i], NULL);
+ 			else if (0 == strcmp(azColName[i], "latitude"))  la = strtod(argv[i], NULL);
+-			else if (0 == strcmp(azColName[i], "altitude"))  alt = strtod(argv[i], NULL);
+ 			else if (0 == strcmp(azColName[i], "tag_id"))    tagid = atoi(argv[i]);
+-			else if (0 == strcmp(azColName[i], "node_id"))   nodeid = atoi(argv[i]);
+-			else if (0 == strcmp(azColName[i], "layer_id"))   layerid = atoi(argv[i]);
+ 		}
+ 	}
+ 	if (0 == db_gettag(tagid, "amenity", s)) {
+@@ -121,8 +117,6 @@
+ 			s3d_link(oid, oidy);
+ 			s3d_flags_on(oid, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+ 			load_update_status((100.0*num_done) / (float)num_max);
+-			/*   snprintf(query,MAXQ,"UPDATE node SET s3doid=%d WHERE node_id=%d AND layer_id=%d;",oid,nodeid,layerid);
+-			   db_exec(query, NULL, 0);*/
+ 		}
+ 
+ 	}
+
+Modified: trunk/apps/s3dosm/http_fetcher.c
+===================================================================
+--- trunk/apps/s3dosm/http_fetcher.c	2008-01-07 23:25:07 UTC (rev 895)
++++ trunk/apps/s3dosm/http_fetcher.c	2008-01-07 23:25:13 UTC (rev 896)
+@@ -368,7 +368,7 @@
+ 	unsigned char plain[1024];
+ 	char ec64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+ 	char *b64;
+-	int i, j, c, len, n;
++	int i, j, c, len;
+ 	char o = 0;
+ 	/* base64 encode user and pass */
+ 	if ((user == NULL) || (pass == NULL)) { /* bad input or request to clean up */
+@@ -384,18 +384,18 @@
+ 	while (i < len || c != 0) {
+ 		switch (c) {
+ 		case 0:
+-			o = ec64[ n=plain[i] >> 2 ];
++			o = ec64[ plain[i] >> 2 ];
+ 			i++;
+ 			break;
+ 		case 1:
+-			o = ec64[ n=((plain[i-1] & 0x3) << 4) | (plain[i] >> 4)];
++			o = ec64[ ((plain[i-1] & 0x3) << 4) | (plain[i] >> 4)];
+ 			i++;
+ 			break;
+ 		case 2:
+-			o = (i >= len) ? '=' : ec64[ n=((plain[i-1] & 0xf) << 2) | (plain[i] >> 6)];
++			o = (i >= len) ? '=' : ec64[ ((plain[i-1] & 0xf) << 2) | (plain[i] >> 6)];
+ 			break;
+ 		case 3:
+-			o = (i >= len) ? '=' : ec64[ n=(plain[i] & 0x3f)];
++			o = (i >= len) ? '=' : ec64[ plain[i] & 0x3f];
+ 			i++;
+ 			break;
+ 		}
+
+Modified: trunk/apps/s3dosm/osm.c
+===================================================================
+--- trunk/apps/s3dosm/osm.c	2008-01-07 23:25:07 UTC (rev 895)
++++ trunk/apps/s3dosm/osm.c	2008-01-07 23:25:13 UTC (rev 896)
+@@ -116,7 +116,6 @@
+ 	xmlDocPtr doc;
+ 	xmlNodePtr cur, c;
+ 	layer_t *layer = layer_new();
+-	object_t *obj;
+ 	float n = 0;
+ 	int i = 0;
+ 
+@@ -136,7 +135,6 @@
+ 	for (c = cur->children;  c != NULL;   c = c->next)   n++; /* count */
+ 	for (cur = cur->children;cur != NULL; cur = cur->next) {
+ 		if (cur->type == XML_ELEMENT_NODE) {
+-			obj = NULL;
+ 			if (0 == strcmp((char *)cur->name, "node"))    parse_osm_node(cur);
+ 			else if (0 == strcmp((char *)cur->name, "segment"))  parse_osm_segment(cur);
+ 			else if (0 == strcmp((char *)cur->name, "way"))   parse_osm_way(cur);
+
+
+
+From lazhur at mail.berlios.de  Tue Jan  8 00:25:29 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 8 Jan 2008 00:25:29 +0100
+Subject: [S3d-svn] r897 - trunk/apps/s3dvt
+Message-ID: <200801072325.m07NPThx029533@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-01-08 00:25:28 +0100 (Tue, 08 Jan 2008)
+New Revision: 897
+
+Modified:
+   trunk/apps/s3dvt/main.c
+   trunk/apps/s3dvt/terminal.c
+Log:
+s3dvt: Remove nearly unused variables
+
+
+Modified: trunk/apps/s3dvt/main.c
+===================================================================
+--- trunk/apps/s3dvt/main.c	2008-01-07 23:25:13 UTC (rev 896)
++++ trunk/apps/s3dvt/main.c	2008-01-07 23:25:28 UTC (rev 897)
+@@ -110,9 +110,7 @@
+ 	int uid = 0, gid = 0;
+ 	char exe[] = "/bin/bash";
+ 	char curchar;
+-	char *disp;
+ 
+-	disp = getenv("DISPLAY");
+ 	uid = getuid();
+ 	gid = getgid();
+ 	term_mode = M_PTY;
+@@ -185,24 +183,20 @@
+ 
+ static int pipe_init_terminal(void)
+ {
+-	char buf[256];
+ 	int uid = 0, gid = 0;
+ 	char *exe = "/bin/bash";
+ 	char *args = "-i";
+-	char *disp;
+ 
+ 	term_mode = M_PIPE;
+ 	if ((pipe(mpipe_in) == -1) || (pipe(mpipe_out) == -1)) {
+ 		printf("pipe failed\n");
+ 		return(-1);
+ 	}
+-	disp = getenv("DISPLAY");
+ 	uid = getuid();
+ 	gid = getgid();
+ 	pid = fork();
+ 	if (pid == 0) { /*  the child */
+ 		char tmpstr[1024];
+-		buf[5] = 't';
+ 		setuid(uid);
+ 		setgid(gid);
+ 		if (setsid() < 0)
+@@ -265,7 +259,7 @@
+ {
+ 	int cline;
+ 	int c;
+-	unsigned char ch, och;
++	unsigned char ch;
+ 	unsigned int ci;
+ 	int i, line_end;
+ 
+@@ -275,7 +269,7 @@
+ 		line_end = 0;
+ 		for (c = 0;c < MAX_CHARS;c++) {
+ 			i = cline * MAX_CHARS + c;    /*  calculate position */
+-			if (((ch = line[cline].chars[c].character) != (och = last_c[i]))) {
++			if (((ch = line[cline].chars[c].character) != last_c[i])) {
+ 				if (screenbuf[i] == -1) {
+ 					screenbuf[i] = s3d_new_object();
+ 					s3d_translate(screenbuf[i], c*X_RATIO*CS - CS*X_RATIO*MAX_CHARS / 2, -cline*CS + CS*MAX_LINES / 2, 0);
+@@ -543,7 +537,6 @@
+ }
+ int main(int argc, char **argv)
+ {
+-	unsigned int b;
+ 	chars_init();
+ 	init_terminal();
+ 	s3d_set_callback(S3D_EVENT_QUIT, stop);
+@@ -555,7 +548,7 @@
+ 			printf("font not found\n");
+ 			exit(-1);
+ 		}
+-		b = draw_background();
++		draw_background();
+ 		chars_s3d_init();
+ 		s3d_mainloop(mainloop);
+ 		s3d_quit();
+
+Modified: trunk/apps/s3dvt/terminal.c
+===================================================================
+--- trunk/apps/s3dvt/terminal.c	2008-01-07 23:25:13 UTC (rev 896)
++++ trunk/apps/s3dvt/terminal.c	2008-01-07 23:25:28 UTC (rev 897)
+@@ -242,11 +242,10 @@
+ static void delete_x_letters(char *arg1)
+ {
+ 	int tmpint;
+-	t_line *pcurline;
+ 	int i;
+ 	if (arg1[0]) tmpint = atoi(arg1);
+ 	else     tmpint = 1;
+-	pcurline = (t_line*) & line + cy;
++
+ 	if (tmpint + cx > MAX_CHARS)
+ 		tmpint = MAX_CHARS - cx;
+ 	for (i = cx;i < cx + tmpint;i++)
+@@ -255,21 +254,18 @@
+ static void move_x_letters(int mode, char *arg1)
+ {
+ 	int tmpint;
+-	t_line *pcurline;
+ 	int i;
+ 	if (arg1[0])
+ 		tmpint = atoi(arg1);
+ 	else
+ 		tmpint = 1;
+-	pcurline = (t_line*) & line + cy;
++
+ 	switch (mode) {
+ 	case MOVE_RIGHT:
+ 		for (i = 0;i < tmpint;i++) {
+-			/*          pcurline->nextchar++;
+-			    lastchar++;*/
+ 			cx++;
+ 			if (cx == MAX_CHARS)
+-				pcurline = line_is_full();  /*  our line is full */
++				line_is_full();  /*  our line is full */
+ 		}
+ 		break;
+ 	case MOVE_LEFT:
+@@ -277,7 +273,6 @@
+ 			cx--;
+ 			if (cx == -1) {
+ 				cy--;
+-				pcurline = (t_line*) & line + cy;
+ 				cx = MAX_CHARS - 1;
+ 			}  /*  need to go up one line */
+ 		}
+
+
+
+From lazhur at mail.berlios.de  Tue Jan  8 00:25:36 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 8 Jan 2008 00:25:36 +0100
+Subject: [S3d-svn] r898 - trunk/example
+Message-ID: <200801072325.m07NPaMZ029601@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-01-08 00:25:35 +0100 (Tue, 08 Jan 2008)
+New Revision: 898
+
+Modified:
+   trunk/example/filebrowser.c
+   trunk/example/nichtsnutz.c
+   trunk/example/ptrtest.c
+   trunk/example/widgets.c
+Log:
+examples: Remove nearly unused variables
+
+
+Modified: trunk/example/filebrowser.c
+===================================================================
+--- trunk/example/filebrowser.c	2008-01-07 23:25:28 UTC (rev 897)
++++ trunk/example/filebrowser.c	2008-01-07 23:25:35 UTC (rev 898)
+@@ -239,9 +239,7 @@
+ }
+ int main(int argc, char **argv)
+ {
+-	int i;
+ 	if (!s3d_init(&argc, &argv, "filebrowser")) {
+-		i = 0;
+ 		/*  load the object files */
+ 		folder = s3d_import_model_file("objs/folder.3ds");
+ 		geometry = s3d_import_model_file("objs/geometry.3ds");
+
+Modified: trunk/example/nichtsnutz.c
+===================================================================
+--- trunk/example/nichtsnutz.c	2008-01-07 23:25:28 UTC (rev 897)
++++ trunk/example/nichtsnutz.c	2008-01-07 23:25:35 UTC (rev 898)
+@@ -35,11 +35,10 @@
+ }; /* 10 mili seconds */
+ 
+ static int object, foll;
+-static float al, r, rc , alpha = 0.0, Asp, Bottom, Left, angle;
++static float al, r, alpha = 0.0, angle;
+ static float CamPosition[2][3],
+ TmpMove[3],
+ Tmp[3],
+-TmpCam[2][3],
+ RotCam[2][3],
+ CatPos[3];
+ 
+@@ -50,16 +49,10 @@
+ 
+ 	al = (alpha * M_PI / 180);
+ 	r = 5.0;
+-	rc = 12.0;
+ 
+ 	CatPos[0] = sin(al) * r;
+ 	CatPos[1] = 0;
+ 	CatPos[2] = cos(al) * r;
+-	/*
+-	RotCam[0][0] = sin(al) * rc;
+-	RotCam[0][1] = 0.0;
+-	RotCam[0][2] = cos(al) * rc;
+-	*/
+ 	s3d_translate(object, CatPos[0] , CatPos[1], CatPos[2]);
+ 	s3d_rotate(object, 0, alpha, 0);
+ 	alpha = alpha + 0.1;
+@@ -113,15 +106,6 @@
+ 		CamPosition[1][0] = inf->rot_x;
+ 		CamPosition[1][1] = inf->rot_y;
+ 		CamPosition[1][2] = inf->rot_z;
+-
+-		Asp = inf->scale;
+-		if (Asp > 1.0) { /* wide screen */
+-			Bottom = -1.0;
+-			Left = -Asp;
+-		} else {  /* high screen */
+-			Bottom = (-1.0 / Asp);
+-			Left = -1.0;
+-		}
+ 	}
+ 	return(0);
+ }
+@@ -133,17 +117,7 @@
+ 	int key;
+ 	key = *((unsigned short *)event->buf);
+ 	switch (key) {
+-	case 'f':
+-		foll = foll ? 0 : 1;
+-		if (foll) {
+-			TmpCam[0][0] = CamPosition[0][0];
+-			TmpCam[0][1] = CamPosition[0][1];
+-			TmpCam[0][2] = CamPosition[0][2];
+-			TmpCam[1][0] = CamPosition[1][0];
+-			TmpCam[1][1] = CamPosition[1][1];
+-			TmpCam[1][2] = CamPosition[1][2];
+-		}
+-		break;
++	default: ;
+ 	}
+ 	return(0);
+ }
+
+Modified: trunk/example/ptrtest.c
+===================================================================
+--- trunk/example/ptrtest.c	2008-01-07 23:25:28 UTC (rev 897)
++++ trunk/example/ptrtest.c	2008-01-07 23:25:35 UTC (rev 898)
+@@ -27,10 +27,7 @@
+ #include <time.h> /* nanosleep() */
+ #include <math.h> /* sin(), cos() */
+ #include "example.h" /* S3DUNUSED */
+-static int i;
+ static int o;
+-static float bottom = -1.0;
+-static float left = -1.0;
+ static float asp = 1.0;
+ static float len = 1.0;
+ static int alpha = 0;
+@@ -61,13 +58,6 @@
+ 		if (asp != inf->scale) {
+ 			asp = inf->scale;
+ 			printf("screen aspect: %f\n", asp);
+-			if (asp > 1.0) { /* wide screen */
+-				bottom = -1.0;
+-				left = -asp;
+-			} else {  /* high screen */
+-				bottom = (-1.0 / asp);
+-				left = -1.0;
+-			}
+ 		}
+ 	}
+ 	if (inf->object == 1) { /* of course, a link s3d_link(o,1 would be much easier ... */
+@@ -93,7 +83,6 @@
+ }
+ int main(int argc, char **argv)
+ {
+-	i = 0;
+ 	if (!s3d_init(&argc, &argv, "ptr and cam test")) {
+ 		s3d_set_callback(S3D_EVENT_OBJ_INFO, object_info);
+ 		s3d_set_callback(S3D_EVENT_MBUTTON, mbutton_press);
+
+Modified: trunk/example/widgets.c
+===================================================================
+--- trunk/example/widgets.c	2008-01-07 23:25:28 UTC (rev 897)
++++ trunk/example/widgets.c	2008-01-07 23:25:35 UTC (rev 898)
+@@ -134,7 +134,6 @@
+ int main(int argc, char **argv)
+ {
+ 	s3dw_button *button;
+-	s3dw_textbox *textbox;
+ 	if (!s3d_init(&argc, &argv, "widgettest")) {
+ 		s3d_set_callback(S3D_EVENT_OBJ_CLICK, click);
+ 		s3d_set_callback(S3D_EVENT_KEY, key);
+@@ -163,7 +162,7 @@
+ 		/* we will tell him how sad we are ... */
+ 		button->onclick = no_button;
+ 		/* create some textbox at (1,10) widh width 18 and height 8 */
+-		textbox = s3dw_textbox_new(surface, text, 1, 10, 18, 8);
++		s3dw_textbox_new(surface, text, 1, 10, 18, 8);
+ 
+ 		/* this widget is focused (of course, it's our only one ... */
+ 		s3dw_focus(S3DWIDGET(surface));
+
+
+
+From lazhur at mail.berlios.de  Tue Jan  8 00:25:52 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 8 Jan 2008 00:25:52 +0100
+Subject: [S3d-svn] r899 - trunk/example
+Message-ID: <200801072325.m07NPqQq029623@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-01-08 00:25:51 +0100 (Tue, 08 Jan 2008)
+New Revision: 899
+
+Modified:
+   trunk/example/filebrowser.c
+   trunk/example/katze.c
+   trunk/example/modelloader.c
+   trunk/example/nichtsnutz.c
+   trunk/example/ptrtest.c
+   trunk/example/radius_test.c
+   trunk/example/s3dclock.c
+   trunk/example/snowman.c
+   trunk/example/strtest.c
+   trunk/example/texturetest.c
+   trunk/example/wiresphere.c
+Log:
+examples: Try not to mix float and double arithmetic
+
+
+Modified: trunk/example/filebrowser.c
+===================================================================
+--- trunk/example/filebrowser.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/filebrowser.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -47,6 +47,9 @@
+ 
+ #define M_DIR  512
+ #define M_NAME  256
++
++#define DEG2RAD(x) (x * ((float)M_PI / 180.0f))
++
+ static int folder, geometry, mp3, movie, duno, dot, dotdot;
+ struct t_item {
+ 	int icon_oid, descr_oid, pie_oid;
+@@ -140,26 +143,26 @@
+ 			px = posx;
+ 			py = posy;
+ 			pz = posz;
+-			alpha = ((360.0 * n) / ((float)i));
+-			radius = ((n_item * 10) / (M_PI * 4));
++			alpha = ((360.0f * n) / ((float)i));
++			radius = ((n_item * 10) / ((float)M_PI * 4));
+ 			if (n_item < 5)
+-				radius = ((50) / (M_PI * 4));
++				radius = ((50) / ((float)M_PI * 4));
+ 			else
+-				radius = ((n_item * 10) / (M_PI * 4));
+-			px = posx - sin(alpha * M_PI / 180.0) * radius;
++				radius = ((n_item * 10) / ((float)M_PI * 4));
++			px = posx - sinf(DEG2RAD(alpha)) * radius;
+ 			pz = posy;
+-			pz = posz - cos(alpha * M_PI / 180.0) * radius;
++			pz = posz - cosf(DEG2RAD(alpha)) * radius;
+ 
+ 			item[n].pie_oid = s3d_new_object();
+ 			s3d_push_vertex(item[n].pie_oid, 0, -2, 0);
+-			al = ((360.0 * (n - 0.5)) / ((float)i));
++			al = ((360.0f * (n - 0.5f)) / ((float)i));
+ 			s3d_push_vertex(item[n].pie_oid,
+-			                posx - sin(al*M_PI / 180.0)*radius, -2, posz - cos(al*M_PI / 180.0)*radius);
+-			al = ((360.0 * (n + 0.5)) / ((float)i));
++			                posx - sinf(DEG2RAD(al))*radius, -2, posz - cosf(DEG2RAD(al))*radius);
++			al = ((360.0f * (n + 0.5f)) / ((float)i));
+ 			s3d_push_vertex(item[n].pie_oid,
+-			                posx - sin(al*M_PI / 180.0)*radius, -2, posz - cos(al*M_PI / 180.0)*radius);
++			                posx - sinf(DEG2RAD(al))*radius, -2, posz - cosf(DEG2RAD(al))*radius);
+ 
+-			f = 1.0 - 0.05 * (n % 2);
++			f = 1.0f - 0.05f * (n % 2);
+ 			switch (item[n].type) {
+ 			case T_LOCALDIR:
+ 				s3d_push_material(item[n].pie_oid,  0, f, 0,   0.5, 0.5, 0.5,  f, f, f);
+@@ -176,8 +179,8 @@
+ 			}
+ 			s3d_push_polygon(item[n].pie_oid, 0, 2, 1, 0);
+ 
+-			s3d_push_vertex(item[n].pie_oid, pz, -2, 0);
+-			s3d_translate(item[n].icon_oid, px, py, pz);
++			s3d_push_vertex(item[n].pie_oid, (float)pz, -2.f, 0.f);
++			s3d_translate(item[n].icon_oid, (float)px, (float)py, (float)pz);
+ 			s3d_rotate(item[n].icon_oid, 0, alpha, 0);
+ 			s3d_flags_on(item[n].icon_oid, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+ 			s3d_flags_on(item[n].pie_oid, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+
+Modified: trunk/example/katze.c
+===================================================================
+--- trunk/example/katze.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/katze.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -38,14 +38,14 @@
+ {
+ 	float pos;
+ 	a = (a + 2) % 360;
+-	pos = sin((5 * a * M_PI) / 180) * 20;
++	pos = sinf((5.f * a * (float)M_PI) / 180.f) * 20.f;
+ 	s3d_rotate(legfr, 0, 90, 180 + pos);
+ 	s3d_rotate(legfl, 0, 90, 180 - pos);
+ 	s3d_rotate(legbr, 0, 0, 180 + pos);
+ 	s3d_rotate(legbl, 0, 0, 180 - pos);
+ 
+ 	s3d_rotate(tail, 0, 30, 110 + pos);
+-	s3d_rotate(rot_point, 0, -a, 0);
++	s3d_rotate(rot_point, 0, (float)-a, 0);
+ 	nanosleep(&t, NULL);
+ }
+ int main(int argc, char **argv)
+
+Modified: trunk/example/modelloader.c
+===================================================================
+--- trunk/example/modelloader.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/modelloader.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -34,7 +34,7 @@
+ static int i, oid;
+ static void mainloop(void)
+ {
+-	s3d_rotate(oid, 0, i, 0);
++	s3d_rotate(oid, 0, (float)i, 0);
+ 	i = (i + 1) % 360;
+ 	nanosleep(&t, NULL);
+ }
+
+Modified: trunk/example/nichtsnutz.c
+===================================================================
+--- trunk/example/nichtsnutz.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/nichtsnutz.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -47,23 +47,23 @@
+ static void mainloop(void)
+ {
+ 
+-	al = (alpha * M_PI / 180);
+-	r = 5.0;
++	al = (alpha * (float)M_PI / 180.f);
++	r = 5.0f;
+ 
+-	CatPos[0] = sin(al) * r;
++	CatPos[0] = sinf(al) * r;
+ 	CatPos[1] = 0;
+-	CatPos[2] = cos(al) * r;
++	CatPos[2] = cosf(al) * r;
+ 	s3d_translate(object, CatPos[0] , CatPos[1], CatPos[2]);
+ 	s3d_rotate(object, 0, alpha, 0);
+-	alpha = alpha + 0.1;
+-	if (alpha > 360.0) alpha = 0.0;
++	alpha = alpha + 0.1f;
++	if (alpha > 360.0f) alpha = 0.0f;
+ 
+ 	length = s3d_vector_length(CatPos);
+ 
+ 
+-	RotCam[0][0] = (CatPos[0] * 12.0) / length;
+-	RotCam[0][1] = (CatPos[1] * 12.0) / length;
+-	RotCam[0][2] = (CatPos[2] * 12.0) / length;
++	RotCam[0][0] = (CatPos[0] * 12.0f) / length;
++	RotCam[0][1] = (CatPos[1] * 12.0f) / length;
++	RotCam[0][2] = (CatPos[2] * 12.0f) / length;
+ 
+ 
+ 	if (foll) {
+@@ -82,7 +82,7 @@
+ 		Tmp[2] = CamPosition[0][2] - CatPos[2];
+ 
+ 		angle = s3d_vector_angle(Tmp, TmpMove);
+-		angle = (CatPos[0] > 0) ? (180 - (180 / M_PI * angle)) : (180 + (180 / M_PI * angle));
++		angle = (CatPos[0] > 0) ? (180.f - (180.f / (float)M_PI * angle)) : (180.f + (180.f / (float)M_PI * angle));
+ 		printf("%f %f\n", angle, al);
+ 
+ 		CamPosition[1][1] = (CamPosition[1][1] * 4 + angle) / 5;
+
+Modified: trunk/example/ptrtest.c
+===================================================================
+--- trunk/example/ptrtest.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/ptrtest.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -44,10 +44,10 @@
+ {
+ 	float a;
+ 	alpha = (alpha + 1) % 360;
+-	s3d_rotate(o, alpha, 0, 0);
+-	a = (((float)alpha) * M_PI / 180);
+-	s3d_translate(0, sin(a)*30, 0, 30 + cos(a)*30);
+-	s3d_rotate(0, sin(a)*30, alpha, 0);
++	s3d_rotate(o, (float)alpha, 0.f, 0.f);
++	a = (((float)alpha) * (float)M_PI / 180.f);
++	s3d_translate(0.f, sinf(a)*30.f, 0.f, 30.f + cosf(a)*30.f);
++	s3d_rotate(0, sinf(a)*30.f, (float)alpha, 0.f);
+ 	nanosleep(&t, NULL);
+ }
+ static int object_info(struct s3d_evt *hrmz)
+@@ -61,7 +61,7 @@
+ 		}
+ 	}
+ 	if (inf->object == 1) { /* of course, a link s3d_link(o,1 would be much easier ... */
+-		s3d_translate(o, (inf->trans_x)*2.0, (inf->trans_y)*2.0, -2);
++		s3d_translate(o, (inf->trans_x)*2.0f, (inf->trans_y)*2.0f, -2);
+ 	}
+ 	return(0);
+ }
+
+Modified: trunk/example/radius_test.c
+===================================================================
+--- trunk/example/radius_test.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/radius_test.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -34,12 +34,12 @@
+ static void mainloop(void)
+ {
+ 	float f, g, h;
+-	f = sin((M_PI * (i % 360)) / 180.0);
+-	g = cos((M_PI * (i % 360)) / 180.0);
+-	h = sin((M_PI * ((3 * i) % 360)) / 180.0);
++	f = sinf(((float)M_PI * (i % 360)) / 180.0f);
++	g = cosf(((float)M_PI * (i % 360)) / 180.0f);
++	h = sinf(((float)M_PI * ((3 * i) % 360)) / 180.0f);
+ 
+ 	s3d_translate(item1, f*10, h*2, g*5);
+-	s3d_rotate(item1, 0, i % 360, 0);
++	s3d_rotate(item1, 0, (float)(i % 360), 0);
+ 	/* s3d_scale(item1,h+3,h+3,h+3);*/
+ 
+ 	/* s3d_translate(item2,f*10,0, g*5);*/
+
+Modified: trunk/example/s3dclock.c
+===================================================================
+--- trunk/example/s3dclock.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/s3dclock.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -48,9 +48,9 @@
+ 	if (now != onow) {
+ 		o_str_oid = str_oid;
+ 		mytime = localtime(&now);
+-		s3d_rotate(lil_p, 0, 0, -((mytime->tm_hour % 12) / 12.0)*360.0);
+-		s3d_rotate(big_p, 0, 0, -(mytime->tm_min / 60.0)*360.0);
+-		s3d_rotate(sec_p, 0, 0, -(mytime->tm_sec / 60.0)*360.0);
++		s3d_rotate(lil_p, 0, 0, -((mytime->tm_hour % 12) / 12.0f)*360.0f);
++		s3d_rotate(big_p, 0, 0, -(mytime->tm_min / 60.0f)*360.0f);
++		s3d_rotate(sec_p, 0, 0, -(mytime->tm_sec / 60.0f)*360.0f);
+ 		sprintf(time_str, "%02d:%02d:%02d", mytime->tm_hour, mytime->tm_min, mytime->tm_sec);
+ 		str_oid = s3d_draw_string(time_str, NULL);
+ 		s3d_translate(str_oid, -1, -1.3, 0);
+
+Modified: trunk/example/snowman.c
+===================================================================
+--- trunk/example/snowman.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/snowman.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -37,14 +37,14 @@
+ {
+ 	float pos;
+ 	a = (a + 3) % 360;
+-	pos = sin((a * M_PI) / 180) * 5;
++	pos = sinf((a * (float)M_PI) / 180.f) * 5.f;
+ 	if (pos < 0) pos *= -1;
+-	s3d_rotate(oid_head, 0, a, 0);
+-	s3d_rotate(oid_middle, 0, a, 0);
+-	s3d_rotate(oid_foot, 0, a, 0);
+-	s3d_translate(oid_head,  0, 1.5 + 2.00*pos, 0);
+-	s3d_translate(oid_middle, 0, 0   + 1.25*pos, 0);
+-	s3d_translate(oid_foot,  0, -2  + 1.00*pos, 0);
++	s3d_rotate(oid_head, 0, (float)a, 0);
++	s3d_rotate(oid_middle, 0, (float)a, 0);
++	s3d_rotate(oid_foot, 0, (float)a, 0);
++	s3d_translate(oid_head,  0, 1.5f + 2.0f*pos, 0);
++	s3d_translate(oid_middle, 0, 0   + 1.25f*pos, 0);
++	s3d_translate(oid_foot,  0, -2  + 1.00f*pos, 0);
+ 	nanosleep(&t, NULL);
+ }
+ int main(int argc, char **argv)
+
+Modified: trunk/example/strtest.c
+===================================================================
+--- trunk/example/strtest.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/strtest.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -47,7 +47,7 @@
+ 		s3d_select_font("vera");
+ 		/*  o=s3d_draw_string("The lazy fox is bored enough to jump over everything it sees. weird, isn't it?!",NULL);  */
+ 		for (i = 0;i < 256;i++)
+-			c[255-i] = i;
++			c[255-i] = (char)i;
+ 		o = s3d_draw_string(c, NULL);
+ 		/*  o=s3d_draw_string("A",NULL);*/
+ 		s3d_flags_on(o, S3D_OF_VISIBLE);
+
+Modified: trunk/example/texturetest.c
+===================================================================
+--- trunk/example/texturetest.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/texturetest.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -34,7 +34,7 @@
+ static void mainloop(void)
+ {
+ 	i = (i + 1) % 360;
+-	s3d_rotate(oid, 0, i, 0);
++	s3d_rotate(oid, 0, (float)i, 0);
+ 	nanosleep(&t, NULL);
+ }
+ #define MAXX 24
+@@ -67,8 +67,8 @@
+ 		for (y = 0;y < MAXY;y++)
+ 			for (x = 0;x < MAXX;x++) {
+ 				data[(y*MAXX+x)*4+0] = (char)((x * 255) / MAXX);
+-				data[(y*MAXX+x)*4+1] = ((x * y) / (MAXX * MAXY));
+-				data[(y*MAXX+x)*4+2] = ((y * 255) / MAXX);
++				data[(y*MAXX+x)*4+1] = (char)((x * y) / (MAXX * MAXY));
++				data[(y*MAXX+x)*4+2] = (char)((y * 255) / MAXX);
+ 				data[(y*MAXX+x)*4+3] = 255;
+ 			}
+ 		s3d_push_texture(oid, MAXX, MAXY);
+
+Modified: trunk/example/wiresphere.c
+===================================================================
+--- trunk/example/wiresphere.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/wiresphere.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -36,7 +36,7 @@
+ static int wire_sphere(int slices, int stacks)
+ {
+ 	int x, y, i, o;
+-	int num_v, num_l;
++	unsigned int num_v, num_l;
+ 	float *v, *n;  /* vertices, normals */
+ 	float alpha, beta;
+ 	unsigned int *l; /* lines */
+@@ -47,12 +47,12 @@
+ 	l = malloc(sizeof(unsigned int) * 3 * num_l);
+ 	i = 0;
+ 	for (x = 0;x < slices;x++) {
+-		alpha = (x * 360.0 / slices) * M_PI / 180.0;
++		alpha = (x * 360.0f / slices) * (float)M_PI / 180.0f;
+ 		for (y = 0;y < (stacks + 1);y++) {
+-			beta = ((y * 180 / slices) - 90.0) * M_PI / 180.0;
+-			v[i*3+0] = cos(alpha) * cos(beta);
+-			v[i*3+1] = sin(beta);
+-			v[i*3+2] = sin(alpha) * cos(beta);
++			beta = ((y * 180 / slices) - 90.0f) * (float)M_PI / 180.0f;
++			v[i*3+0] = cosf(alpha) * cosf(beta);
++			v[i*3+1] = sinf(beta);
++			v[i*3+2] = sinf(alpha) * cosf(beta);
+ 			i++;
+ 		}
+ 	}
+@@ -91,9 +91,9 @@
+ 	s3d_push_material(o, 0, 0, 1,
+ 	                  1, 0, 0,
+ 	                  0, 1, 0);
+-	s3d_push_vertices(o, v, num_v);
+-	s3d_push_lines(o, l, num_l);
+-	s3d_load_line_normals(o, n, 0, num_l);
++	s3d_push_vertices(o, v, (uint16_t)num_v);
++	s3d_push_lines(o, l, (uint16_t)num_l);
++	s3d_load_line_normals(o, n, 0, (uint16_t)num_l);
+ 	free(v);
+ 	free(n);
+ 	free(l);
+@@ -107,7 +107,7 @@
+ static void mainloop(void)
+ {
+ 	r = (r + 1) % 360;
+-	s3d_rotate(oid, 0, r, 0);
++	s3d_rotate(oid, 0, (float)r, 0);
+ 	nanosleep(&t, NULL);
+ 
+ }
+
+
+
+From lazhur at mail.berlios.de  Tue Jan  8 00:26:04 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 8 Jan 2008 00:26:04 +0100
+Subject: [S3d-svn] r900 - trunk/server
+Message-ID: <200801072326.m07NQ4Aw029728@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-01-08 00:26:04 +0100 (Tue, 08 Jan 2008)
+New Revision: 900
+
+Modified:
+   trunk/server/graphics_sdl.c
+   trunk/server/object.c
+   trunk/server/user.c
+   trunk/server/user_sdl.c
+Log:
+server: Remove nearly unused variables
+
+
+Modified: trunk/server/graphics_sdl.c
+===================================================================
+--- trunk/server/graphics_sdl.c	2008-01-07 23:25:51 UTC (rev 899)
++++ trunk/server/graphics_sdl.c	2008-01-07 23:26:04 UTC (rev 900)
+@@ -32,7 +32,6 @@
+ {
+ 	SDL_Surface *GLwin = NULL;
+ 	SDL_VideoInfo *VideoInfo;
+-	int rgb_size[3];      /*  for SDL_GL attributes */
+ 	int buffers, samples;
+ 	s3dprintf(MED, "Using SDL driver ...");
+ 
+@@ -54,13 +53,6 @@
+ 
+ 
+ 	/*  set some opengl-attributes */
+-	/* SDL_GL_SetAttribute( SDL_GL_RED_SIZE, rgb_size[0] );
+-	 SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, rgb_size[1] );
+-	 SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, rgb_size[2] );*/
+-	/*  SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 5); */
+-	/*  SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 5); */
+-	/*  SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 5); */
+-	/*  SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 ); */
+ 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+ 	do {
+ 		if (aa_level > 0) {
+@@ -79,24 +71,6 @@
+ 				errsf("SDL_SetVideoMode()", SDL_GetError());
+ 		}
+ 	} while (GLwin == NULL);
+-	switch (SDL_GetVideoInfo()->vfmt->BitsPerPixel) {
+-	case 8:
+-		rgb_size[0] = 3;
+-		rgb_size[1] = 3;
+-		rgb_size[2] = 2;
+-		break;
+-	case 15:
+-	case 16:
+-		rgb_size[0] = 5;
+-		rgb_size[1] = 5;
+-		rgb_size[2] = 5;
+-		break;
+-	default:
+-		rgb_size[0] = 8;
+-		rgb_size[1] = 8;
+-		rgb_size[2] = 8;
+-		break;
+-	}
+ 	if (aa_level > 0) {
+ 		SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &buffers);
+ 		SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &samples);
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2008-01-07 23:25:51 UTC (rev 899)
++++ trunk/server/object.c	2008-01-07 23:26:04 UTC (rev 900)
+@@ -1499,13 +1499,11 @@
+ /* checks if a normal is set for a line object, or set some default if not */
+ static int check_line_normal(struct t_obj *obj, uint32_t pn)
+ {
+-	struct t_vertex *v[2];
+ 	int i, vp;
+ 	for (i = 0;i < 2;i++) { /*  set and check */
+ 		vp = obj->p_line[pn].v[i]; /*  ... get the vertices ... */
+-		if (vp < (int)obj->n_vertex)
+-			v[i] = &(obj->p_vertex[vp]);
+-		else return(-1);
++		if (vp >= (int)obj->n_vertex)
++			return(-1);
+ 	}
+ 	if ((obj->p_line[pn].n[0].x*obj->p_line[pn].n[0].x +
+ 	                obj->p_line[pn].n[0].y*obj->p_line[pn].n[0].y +
+
+Modified: trunk/server/user.c
+===================================================================
+--- trunk/server/user.c	2008-01-07 23:25:51 UTC (rev 899)
++++ trunk/server/user.c	2008-01-07 23:26:04 UTC (rev 900)
+@@ -25,7 +25,6 @@
+ #include "global.h"
+ /*  this file reads user input */
+ static int ox, oy;
+-static int pressed;
+ int but = -1;
+ int user_init(void)
+ {
+@@ -38,7 +37,6 @@
+ 	default:
+ 		return(-1);
+ 	}
+-	pressed = 0;
+ 	ox = oy = 0xFFFFFF;
+ 	return(0);
+ }
+
+Modified: trunk/server/user_sdl.c
+===================================================================
+--- trunk/server/user_sdl.c	2008-01-07 23:25:51 UTC (rev 899)
++++ trunk/server/user_sdl.c	2008-01-07 23:26:04 UTC (rev 900)
+@@ -35,7 +35,6 @@
+ int user_main_sdl(void)
+ {
+ 	SDL_Event  event;
+-	SDL_Surface *GLwin = NULL;
+ 	while (SDL_PollEvent(&event)) {
+ 		switch (event.type) {
+ 		case SDL_MOUSEMOTION:
+@@ -125,7 +124,7 @@
+ 			s3dprintf(VLOW, "SDL_SYSWMEVENT");
+ 			break;
+ 		case SDL_VIDEORESIZE:
+-			if ((GLwin = SDL_SetVideoMode(event.resize.w, event.resize.h, 16, SDLFlags)) == NULL)
++			if (SDL_SetVideoMode(event.resize.w, event.resize.h, 16, SDLFlags) == NULL)
+ 				errsf("SDL_SetVideoMode()", SDL_GetError());
+ 			graphics_reshape(event.resize.w, event.resize.h);
+ 			break;
+
+
+
+From lazhur at mail.berlios.de  Tue Jan  8 00:26:16 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 8 Jan 2008 00:26:16 +0100
+Subject: [S3d-svn] r901 - trunk/libs3d
+Message-ID: <200801072326.m07NQGXr029832@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-01-08 00:26:16 +0100 (Tue, 08 Jan 2008)
+New Revision: 901
+
+Modified:
+   trunk/libs3d/io.c
+Log:
+libs3d: Don't use char as receiving variable for getopt
+
+char will be unsigned on some architectures and getopt returns signed numbers
+after it finished reading the arguments.
+
+
+Modified: trunk/libs3d/io.c
+===================================================================
+--- trunk/libs3d/io.c	2008-01-07 23:26:04 UTC (rev 900)
++++ trunk/libs3d/io.c	2008-01-07 23:26:16 UTC (rev 901)
+@@ -73,7 +73,7 @@
+ 
+ static int parse_args(int *argc, char ***argv)
+ {
+-	char     c;
++	int     c;
+ 	int      lopt_idx;
+ 	struct option long_options[] = {
+ 		{"s3d-url", 1, NULL, 0
+
+
+
+From lazhur at mail.berlios.de  Tue Jan  8 00:26:30 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 8 Jan 2008 00:26:30 +0100
+Subject: [S3d-svn] r902 - trunk/libs3d
+Message-ID: <200801072326.m07NQUOZ029921@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-01-08 00:26:30 +0100 (Tue, 08 Jan 2008)
+New Revision: 902
+
+Modified:
+   trunk/libs3d/io.c
+Log:
+server: Don't write beyond the end of an array
+
+
+Modified: trunk/libs3d/io.c
+===================================================================
+--- trunk/libs3d/io.c	2008-01-07 23:26:16 UTC (rev 901)
++++ trunk/libs3d/io.c	2008-01-07 23:26:30 UTC (rev 902)
+@@ -137,7 +137,7 @@
+ 		}
+ 	} else {
+ 		strncpy(urlc, url, 256);  /*  this should keep buffer overflows away, maybe */
+-		urlc[256] = 0;  /*  just to make sure */
++		urlc[255] = '\0';  /*  just to make sure */
+ 		if (!strncmp(urlc, "s3d:// ", 6)) {
+ 			if (s3d_net_init(urlc) == CON_NULL) return(-1);
+ 		} else {
+
+
+
+From lazhur at mail.berlios.de  Tue Jan  8 20:52:30 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 8 Jan 2008 20:52:30 +0100
+Subject: [S3d-svn] r903 - in trunk: apps/s3dfm libs3d server
+	svnonly/comptest svnonly/testvis
+Message-ID: <200801081952.m08JqUQo015732@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-01-08 20:52:29 +0100 (Tue, 08 Jan 2008)
+New Revision: 903
+
+Modified:
+   trunk/apps/s3dfm/fs.c
+   trunk/apps/s3dfm/node.c
+   trunk/libs3d/network.c
+   trunk/server/user.c
+   trunk/svnonly/comptest/window.c
+   trunk/svnonly/testvis/testvis.c
+Log:
+Remove unreachable return statements
+
+
+Modified: trunk/apps/s3dfm/fs.c
+===================================================================
+--- trunk/apps/s3dfm/fs.c	2008-01-07 23:26:30 UTC (rev 902)
++++ trunk/apps/s3dfm/fs.c	2008-01-08 19:52:29 UTC (rev 903)
+@@ -313,8 +313,6 @@
+ 	}
+ 
+ 	return(r);
+-
+-	return(0);
+ }
+ 
+ /* write an error and wait for a reaction */
+
+Modified: trunk/apps/s3dfm/node.c
+===================================================================
+--- trunk/apps/s3dfm/node.c	2008-01-07 23:26:30 UTC (rev 902)
++++ trunk/apps/s3dfm/node.c	2008-01-08 19:52:29 UTC (rev 903)
+@@ -134,7 +134,6 @@
+ 	default:
+ 		return(-1);
+ 	}
+-	dir->disp = 0;
+ }
+ 
+ /* delete a node and all its kids internally, remove the graphics, reorder the parents etc ... */
+
+Modified: trunk/libs3d/network.c
+===================================================================
+--- trunk/libs3d/network.c	2008-01-07 23:26:30 UTC (rev 902)
++++ trunk/libs3d/network.c	2008-01-08 19:52:29 UTC (rev 903)
+@@ -63,7 +63,6 @@
+ static int _s3d_net_receive(void)
+ {
+ 	return(_s3d_tcp_net_receive());
+-	return(0);
+ }
+ #endif
+ int s3d_net_check(void)
+
+Modified: trunk/server/user.c
+===================================================================
+--- trunk/server/user.c	2008-01-07 23:26:30 UTC (rev 902)
++++ trunk/server/user.c	2008-01-08 19:52:29 UTC (rev 903)
+@@ -50,7 +50,6 @@
+ 	default:
+ 		return(0);
+ 	}
+-	return(0);
+ }
+ void user_key(uint16_t key, uint16_t unicode, uint16_t mod, int state)
+ {
+
+Modified: trunk/svnonly/comptest/window.c
+===================================================================
+--- trunk/svnonly/comptest/window.c	2008-01-07 23:26:30 UTC (rev 902)
++++ trunk/svnonly/comptest/window.c	2008-01-08 19:52:29 UTC (rev 903)
+@@ -265,8 +265,6 @@
+ 				}
+ 			}
+ 			break;
+-
+-		return(0);
+ 	}
+ 	return(-1);
+ }
+
+Modified: trunk/svnonly/testvis/testvis.c
+===================================================================
+--- trunk/svnonly/testvis/testvis.c	2008-01-07 23:26:30 UTC (rev 902)
++++ trunk/svnonly/testvis/testvis.c	2008-01-08 19:52:29 UTC (rev 903)
+@@ -150,8 +150,6 @@
+ 
+ 		}
+ 	}
+-
+-	return NULL;
+ }
+ 
+ int main(void)
+
+
+
+From lazhur at mail.berlios.de  Fri Jan 11 21:27:59 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Fri, 11 Jan 2008 21:27:59 +0100
+Subject: [S3d-svn] r904 - in trunk/extras/distro/gentoo: media-gfx/s3d
+	media-gfx/s3d/files media-gfx/s3d-svn media-libs/libg3d
+	media-libs/libg3d/files
+Message-ID: <200801112027.m0BKRxe1022557@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-01-11 21:27:58 +0100 (Fri, 11 Jan 2008)
+New Revision: 904
+
+Modified:
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild
+   trunk/extras/distro/gentoo/media-gfx/s3d/Manifest
+   trunk/extras/distro/gentoo/media-gfx/s3d/files/digest-s3d-0.1.1
+   trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.1.1.ebuild
+   trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.2.ebuild
+   trunk/extras/distro/gentoo/media-libs/libg3d/Manifest
+   trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.3
+   trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.5
+   trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.6
+   trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.3.ebuild
+   trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.5.ebuild
+   trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.6.ebuild
+Log:
+Follow Gentoo coding guidelines in ebuilds
+
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d/Manifest
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d/Manifest	2008-01-08 19:52:29 UTC (rev 903)
++++ trunk/extras/distro/gentoo/media-gfx/s3d/Manifest	2008-01-11 20:27:58 UTC (rev 904)
+@@ -1,24 +1,18 @@
+-DIST s3d-0.1.1.tar.bz2 1737935 RMD160 88189600659dd4d184be044dd668597ab2b17334 SHA1 3765171848d519784a436468ac613c9bfe85c3ae SHA256 1e2be7c806deaaf07e7f00d018f6f08723a1b26332419a80e732c8b7a1a515e4
++DIST s3d-0.1.1.tar.bz2 1737935 SHA1 3765171848d519784a436468ac613c9bfe85c3ae SHA256 1e2be7c806deaaf07e7f00d018f6f08723a1b26332419a80e732c8b7a1a515e4
+ DIST s3d-0.2.tar.bz2 1715297 RMD160 166ad7a3657916bdfda29e1b5de6a676449b76a4 SHA1 c288902d4b93180628a805ef00fd295eaabe2c88 SHA256 0f7db68fbd760b765e63f912391c99e674b8bf9c7425de4b6eb24d53f3a32e89
+-EBUILD s3d-0.1.1.ebuild 831 RMD160 7ab28a5a7b10a86051ff35dec715524ddac33d98 SHA1 becb13dedb85a733431241c0985b285553b0df4b SHA256 661794ee708d800655fe6e4c568173d7c7f7996e7c1bda077d52028d88b9d841
+-MD5 745d3278b3dc2e7ffa3e13fe8d670061 s3d-0.1.1.ebuild 831
+-RMD160 7ab28a5a7b10a86051ff35dec715524ddac33d98 s3d-0.1.1.ebuild 831
+-SHA256 661794ee708d800655fe6e4c568173d7c7f7996e7c1bda077d52028d88b9d841 s3d-0.1.1.ebuild 831
+-EBUILD s3d-0.2.ebuild 952 RMD160 aaff9d97ab87ac49d57151d61b63a8bf2401a7e2 SHA1 17e1c5b1d36c415c74a8ab6e08085d17e393c5de SHA256 0de17aac96eabb657514209fd1aaebda0df86f1cbef56cf473abaa076f503474
+-MD5 3fdbf6456ce8c49565c35a515a0d2eb6 s3d-0.2.ebuild 952
+-RMD160 aaff9d97ab87ac49d57151d61b63a8bf2401a7e2 s3d-0.2.ebuild 952
+-SHA256 0de17aac96eabb657514209fd1aaebda0df86f1cbef56cf473abaa076f503474 s3d-0.2.ebuild 952
+-MISC ChangeLog 269 RMD160 a641084011215012185fc32525f40da6b1632c1f SHA1 b512e2389b04e048b7d683b0a1416f80a53d3435 SHA256 2eba9fc8b0f109bdcf26c1fb1ed44868a3d43f6d269c9b4a13f11c300a5a0399
++EBUILD s3d-0.1.1.ebuild 931 SHA1 0c533b80a56b4ed3ecff88e624906e1e8e132535 SHA256 401b78e1575ed07fcf14f1cab349a7c7cba5c38c512bd9066a8e8895252cf1d4
++MD5 eb25e91a7003c21f0911543fba605788 s3d-0.1.1.ebuild 931
++SHA256 401b78e1575ed07fcf14f1cab349a7c7cba5c38c512bd9066a8e8895252cf1d4 s3d-0.1.1.ebuild 931
++EBUILD s3d-0.2.ebuild 1051 SHA1 f7196e8e580bc5d75c4f97132d77a807a417857a SHA256 202adfbbbaf16e6446398c8ae85bbf7e4c3e4e9e6e7a14294e8cf76ab4281832
++MD5 e36150234193ece267396986e9322efb s3d-0.2.ebuild 1051
++SHA256 202adfbbbaf16e6446398c8ae85bbf7e4c3e4e9e6e7a14294e8cf76ab4281832 s3d-0.2.ebuild 1051
++MISC ChangeLog 269 SHA1 b512e2389b04e048b7d683b0a1416f80a53d3435 SHA256 2eba9fc8b0f109bdcf26c1fb1ed44868a3d43f6d269c9b4a13f11c300a5a0399
+ MD5 05e75cd56fedba5d551a4187070179a5 ChangeLog 269
+-RMD160 a641084011215012185fc32525f40da6b1632c1f ChangeLog 269
+ SHA256 2eba9fc8b0f109bdcf26c1fb1ed44868a3d43f6d269c9b4a13f11c300a5a0399 ChangeLog 269
+-MISC metadata.xml 239 RMD160 236f28d8249f562b764e2d854580d8301b150418 SHA1 76f167e3abff81e9535c16a637fd1e7f91d4fda3 SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f
++MISC metadata.xml 239 SHA1 76f167e3abff81e9535c16a637fd1e7f91d4fda3 SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f
+ MD5 261031c8b7aca6f50babf7e44b35deb1 metadata.xml 239
+-RMD160 236f28d8249f562b764e2d854580d8301b150418 metadata.xml 239
+ SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f metadata.xml 239
+-MD5 423924e2e8645a03c8a35c37406b0700 files/digest-s3d-0.1.1 235
+-RMD160 5fae00369c6a80caa87cabd4836537d213a68e0f files/digest-s3d-0.1.1 235
+-SHA256 26e3661db664bbb79e6f5bb1b18e01f558f9ee4fe21e842351dc22629b0567a4 files/digest-s3d-0.1.1 235
++MD5 8f11054c68c6571988b3cb2a11b069a7 files/digest-s3d-0.1.1 161
++SHA256 3f8e76c387a464443ec32bf5603a2b09d72c0b2547deffc52d33ef23b2983cd5 files/digest-s3d-0.1.1 161
+ MD5 5b7e96796275ed1eac96754e64bdc7cb files/digest-s3d-0.2 229
+-RMD160 8aa0410e944113dc421fa7f89f6f2b35651d44ac files/digest-s3d-0.2 229
+ SHA256 02a2e5021f0f2b799d9cfc44878c8ca9cc34a9da091d2adc772bc3657076da9c files/digest-s3d-0.2 229
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d/files/digest-s3d-0.1.1
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d/files/digest-s3d-0.1.1	2008-01-08 19:52:29 UTC (rev 903)
++++ trunk/extras/distro/gentoo/media-gfx/s3d/files/digest-s3d-0.1.1	2008-01-11 20:27:58 UTC (rev 904)
+@@ -1,3 +1,2 @@
+ MD5 5105ff41059f57394b7a9346ff64f277 s3d-0.1.1.tar.bz2 1737935
+-RMD160 88189600659dd4d184be044dd668597ab2b17334 s3d-0.1.1.tar.bz2 1737935
+ SHA256 1e2be7c806deaaf07e7f00d018f6f08723a1b26332419a80e732c8b7a1a515e4 s3d-0.1.1.tar.bz2 1737935
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.1.1.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.1.1.ebuild	2008-01-08 19:52:29 UTC (rev 903)
++++ trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.1.1.ebuild	2008-01-11 20:27:58 UTC (rev 904)
+@@ -1,13 +1,14 @@
+-IUSE=""
++# Copyright 2004-2008 S3D Team
++# Distributed under the terms of the GNU General Public License v2
+ 
+-SRC_URI="http://download.berlios.de/${PN}/${P}.tar.bz2"
+-
+ DESCRIPTION="a 3d network display server"
+ HOMEPAGE="http://s3d.berlios.de/"
++SRC_URI="http://download.berlios.de/${PN}/${P}.tar.bz2"
+ 
+-LICENSE="GPL-2 LGPL"
++LICENSE="GPL-2 LGPL-2.1"
++SLOT="0"
+ KEYWORDS="x86"
+-SLOT="0"
++IUSE=""
+ 
+ DEPEND="${RDEPEND}
+ 	>=sys-devel/autoconf-2.59
+@@ -48,4 +49,3 @@
+ src_install() {
+ 	emake DESTDIR="${D}" install || die
+ }
+-
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.2.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.2.ebuild	2008-01-08 19:52:29 UTC (rev 903)
++++ trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.2.ebuild	2008-01-11 20:27:58 UTC (rev 904)
+@@ -1,13 +1,14 @@
+-IUSE="gps doc"
++# Copyright 2004-2008 S3D Team
++# Distributed under the terms of the GNU General Public License v2
+ 
+-SRC_URI="http://download.berlios.de/${PN}/${P}.tar.bz2"
+-
+ DESCRIPTION="a 3d network display server"
+ HOMEPAGE="http://s3d.berlios.de/"
++SRC_URI="http://download.berlios.de/${PN}/${P}.tar.bz2"
+ 
+-LICENSE="GPL-2 LGPL"
++LICENSE="GPL-2 LGPL-2.1"
++SLOT="0"
+ KEYWORDS="x86 amd64"
+-SLOT="0"
++IUSE="gps doc"
+ 
+ DEPEND="${RDEPEND}
+ 	sys-devel/flex
+@@ -35,7 +36,7 @@
+ 		virtual/x11 )
+ 
+ 	doc? ( app-text/docbook-sgml-utils )
+-	gps? ( sci-geosciences/gpsd )	
++	gps? ( sci-geosciences/gpsd )
+ 	virtual/glut
+ 	"
+ 
+@@ -48,4 +49,3 @@
+ 	emake DESTDIR="${D}" install || die
+ 	dodoc ChangeLog README TODO
+ }
+-
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest	2008-01-08 19:52:29 UTC (rev 903)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest	2008-01-11 20:27:58 UTC (rev 904)
+@@ -1,15 +1,11 @@
+-EBUILD s3d-svn-9999.ebuild 1061 RMD160 81acf0f98dc368f04501e8afc7c66891de33cd39 SHA1 4c572320e14913fe400819ec815f9e234a7658c1 SHA256 8e1755c6bb0b1f4ed4a6af2670f8e39726afb1143e4c8d224501ff95d740d48b
+-MD5 f957f6fc776836e338ad33af8076ee78 s3d-svn-9999.ebuild 1061
+-RMD160 81acf0f98dc368f04501e8afc7c66891de33cd39 s3d-svn-9999.ebuild 1061
+-SHA256 8e1755c6bb0b1f4ed4a6af2670f8e39726afb1143e4c8d224501ff95d740d48b s3d-svn-9999.ebuild 1061
+-MISC ChangeLog 717 RMD160 732719801434d2f34762040a3d76224a376eafe9 SHA1 e3f6ae8c96e94d078c05f06a26c4671126bf2ae0 SHA256 50813962433038ee35016fdbd5a738f99f8ef5da1dbb6db01c35b258ca180587
++EBUILD s3d-svn-9999.ebuild 1161 SHA1 45b2cf8fb152f56b017adfe0463975b17ac8a56b SHA256 3c8621c9a7e595b155d06cf3833a283c363897f776de3d957447b3f09e821afb
++MD5 3c7fe8df2ec71993013d7b6d32f71f8d s3d-svn-9999.ebuild 1161
++SHA256 3c8621c9a7e595b155d06cf3833a283c363897f776de3d957447b3f09e821afb s3d-svn-9999.ebuild 1161
++MISC ChangeLog 717 SHA1 e3f6ae8c96e94d078c05f06a26c4671126bf2ae0 SHA256 50813962433038ee35016fdbd5a738f99f8ef5da1dbb6db01c35b258ca180587
+ MD5 29def1ab7084d3f1a14f46b8e18774a9 ChangeLog 717
+-RMD160 732719801434d2f34762040a3d76224a376eafe9 ChangeLog 717
+ SHA256 50813962433038ee35016fdbd5a738f99f8ef5da1dbb6db01c35b258ca180587 ChangeLog 717
+-MISC metadata.xml 239 RMD160 236f28d8249f562b764e2d854580d8301b150418 SHA1 76f167e3abff81e9535c16a637fd1e7f91d4fda3 SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f
++MISC metadata.xml 239 SHA1 76f167e3abff81e9535c16a637fd1e7f91d4fda3 SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f
+ MD5 261031c8b7aca6f50babf7e44b35deb1 metadata.xml 239
+-RMD160 236f28d8249f562b764e2d854580d8301b150418 metadata.xml 239
+ SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f metadata.xml 239
+ MD5 d41d8cd98f00b204e9800998ecf8427e files/digest-s3d-svn-9999 0
+-RMD160 9c1185a5c5e9fc54612808977ee8f548b2258d31 files/digest-s3d-svn-9999 0
+ SHA256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 files/digest-s3d-svn-9999 0
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild	2008-01-08 19:52:29 UTC (rev 903)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild	2008-01-11 20:27:58 UTC (rev 904)
+@@ -1,15 +1,16 @@
++# Copyright 2004-2008 S3D Team
++# Distributed under the terms of the GNU General Public License v2
++
+ inherit subversion
+ 
+-IUSE="gps doc xcomposite"
+-
+-ESVN_REPO_URI="http://svn.berlios.de/svnroot/repos/s3d/trunk"
+-
+ DESCRIPTION="a 3d network display server"
+ HOMEPAGE="http://s3d.berlios.de/"
++ESVN_REPO_URI="http://svn.berlios.de/svnroot/repos/s3d/trunk"
+ 
+-LICENSE="GPL-2 LGPL"
++LICENSE="GPL-2 LGPL-2.1"
++SLOT="0"
+ KEYWORDS="~x86 ~amd64"
+-SLOT="0"
++IUSE="gps doc xcomposite"
+ 
+ DEPEND="${RDEPEND}
+ 	sys-devel/flex
+@@ -54,4 +55,3 @@
+ 	emake DESTDIR="${D}" install || die
+ 	dodoc ChangeLog README TODO
+ }
+-
+
+Modified: trunk/extras/distro/gentoo/media-libs/libg3d/Manifest
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/Manifest	2008-01-08 19:52:29 UTC (rev 903)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/Manifest	2008-01-11 20:27:58 UTC (rev 904)
+@@ -1,32 +1,24 @@
+-DIST libg3d-0.0.3.tar.gz 438414 RMD160 3c1158d0b8a9580b78808152eaa179286e852a9c SHA1 768608dfc78d88f53ffb4d520bd434fe8c362c44 SHA256 d8c08448586b4d6f70c5933c89877f81e8f31d7eea8f3497b0d12357134a71e0
+-DIST libg3d-0.0.5.tar.gz 475879 RMD160 505474c8187bd97126327e1e6c9225f72c1bbdff SHA1 3c1453fe41d60fb4d8ffa69fbb41aa6df2faa50a SHA256 4d19ea782ef71d862fae99291b6355b1331a309f68674ae301a9e1fd68c8c32a
+-DIST libg3d-0.0.6.tar.gz 490091 RMD160 3cd681bfd35f8faf60b57257f5173078e101b034 SHA1 7fba70067fe32e4eacda0ada1d7fee073422e76e SHA256 d3ea0037e56cee9d38ed55d81416d22ec960e65a85b9166f2b25bab8e7d22884
+-EBUILD libg3d-0.0.3.ebuild 606 RMD160 a318c6923751577442f9b684dd881a6e126b2e9c SHA1 9ca4be706d0c022f2ebd15632c78823f4c8d6750 SHA256 fc8d0e24adaa09d52c1a3c4d2f3b1765a5e0e70362cfba689abb6a9b2b91b10d
+-MD5 35fca5596ed05c3d8d9ca82b7ee7e7c8 libg3d-0.0.3.ebuild 606
+-RMD160 a318c6923751577442f9b684dd881a6e126b2e9c libg3d-0.0.3.ebuild 606
+-SHA256 fc8d0e24adaa09d52c1a3c4d2f3b1765a5e0e70362cfba689abb6a9b2b91b10d libg3d-0.0.3.ebuild 606
+-EBUILD libg3d-0.0.5.ebuild 667 RMD160 65e4eba6ff273b66cf8b6ff16693f38d4e8fa5cb SHA1 adcd841e8c3afbac819eed804b62399cd4c4c7c9 SHA256 fecae46969199e5d852fa308c1eafcbfcc9fb9f846a2311367afde8a25752af6
+-MD5 2180cc92be1d9ac65d14cf2fa5ceec3f libg3d-0.0.5.ebuild 667
+-RMD160 65e4eba6ff273b66cf8b6ff16693f38d4e8fa5cb libg3d-0.0.5.ebuild 667
+-SHA256 fecae46969199e5d852fa308c1eafcbfcc9fb9f846a2311367afde8a25752af6 libg3d-0.0.5.ebuild 667
+-EBUILD libg3d-0.0.6.ebuild 673 RMD160 7b7cd299dd52e2d1bc144cda1f291002a10a4444 SHA1 0e54709b17c807bbd32242331e080278a60daa01 SHA256 52329c3fa783661ffbd41d846a58208e8cf935eec116633ad497445506172b7c
+-MD5 308bc3d4836f9ae1fef1ec26b2810310 libg3d-0.0.6.ebuild 673
+-RMD160 7b7cd299dd52e2d1bc144cda1f291002a10a4444 libg3d-0.0.6.ebuild 673
+-SHA256 52329c3fa783661ffbd41d846a58208e8cf935eec116633ad497445506172b7c libg3d-0.0.6.ebuild 673
+-MISC ChangeLog 835 RMD160 17388ce0404ccfa8c24aba354c84ea80e3f7e741 SHA1 793fc91993282fe848cda93290aa30f89bfd53cc SHA256 ab9068b8c43c89667261596ad3cbab278ddcbb6ad72d8bc07af47b55a3180f34
++DIST libg3d-0.0.3.tar.gz 438414 SHA1 768608dfc78d88f53ffb4d520bd434fe8c362c44 SHA256 d8c08448586b4d6f70c5933c89877f81e8f31d7eea8f3497b0d12357134a71e0
++DIST libg3d-0.0.5.tar.gz 475879 SHA1 3c1453fe41d60fb4d8ffa69fbb41aa6df2faa50a SHA256 4d19ea782ef71d862fae99291b6355b1331a309f68674ae301a9e1fd68c8c32a
++DIST libg3d-0.0.6.tar.gz 490091 SHA1 7fba70067fe32e4eacda0ada1d7fee073422e76e SHA256 d3ea0037e56cee9d38ed55d81416d22ec960e65a85b9166f2b25bab8e7d22884
++EBUILD libg3d-0.0.3.ebuild 707 SHA1 5bda4c7ba209004b7acbc7a792e1cd628a3b612f SHA256 f54462ab71a82749ba3d5669461314333aead258ecdce2efb7ef525589379f14
++MD5 fdf3c87fe169098d5edc4d9dc5d1b2c6 libg3d-0.0.3.ebuild 707
++SHA256 f54462ab71a82749ba3d5669461314333aead258ecdce2efb7ef525589379f14 libg3d-0.0.3.ebuild 707
++EBUILD libg3d-0.0.5.ebuild 768 SHA1 7be98b9ca97e5be6d520ea7ca5427c268b4e5669 SHA256 2ff33c2ceca87f795f508caf3197ba65484681958d5622b07b7a2decccb3a10b
++MD5 2a717f2c173706d8b9aff10e4c924838 libg3d-0.0.5.ebuild 768
++SHA256 2ff33c2ceca87f795f508caf3197ba65484681958d5622b07b7a2decccb3a10b libg3d-0.0.5.ebuild 768
++EBUILD libg3d-0.0.6.ebuild 774 SHA1 811a790deb68bc4477eeff5291d389ff13a30f57 SHA256 d456849f73a5d0c1d783f3abaa6016db6354c604f9997b654f393cd7f97ef152
++MD5 b06058d9f78982e4e0292ce46bd74e7d libg3d-0.0.6.ebuild 774
++SHA256 d456849f73a5d0c1d783f3abaa6016db6354c604f9997b654f393cd7f97ef152 libg3d-0.0.6.ebuild 774
++MISC ChangeLog 835 SHA1 793fc91993282fe848cda93290aa30f89bfd53cc SHA256 ab9068b8c43c89667261596ad3cbab278ddcbb6ad72d8bc07af47b55a3180f34
+ MD5 0b4ef44260884042fdb448c4a4616a38 ChangeLog 835
+-RMD160 17388ce0404ccfa8c24aba354c84ea80e3f7e741 ChangeLog 835
+ SHA256 ab9068b8c43c89667261596ad3cbab278ddcbb6ad72d8bc07af47b55a3180f34 ChangeLog 835
+-MISC metadata.xml 239 RMD160 236f28d8249f562b764e2d854580d8301b150418 SHA1 76f167e3abff81e9535c16a637fd1e7f91d4fda3 SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f
++MISC metadata.xml 239 SHA1 76f167e3abff81e9535c16a637fd1e7f91d4fda3 SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f
+ MD5 261031c8b7aca6f50babf7e44b35deb1 metadata.xml 239
+-RMD160 236f28d8249f562b764e2d854580d8301b150418 metadata.xml 239
+ SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f metadata.xml 239
+-MD5 167d7c9af354501f79ef1bc3377716de files/digest-libg3d-0.0.3 238
+-RMD160 5773a2974b9a56d67ce4f310ab90672fad9a028e files/digest-libg3d-0.0.3 238
+-SHA256 8e52678fd08e00de76a2b2dd2fcda7a9569a4f38c480bbad763470fd5d327efe files/digest-libg3d-0.0.3 238
+-MD5 5e38c09ab217ac68f78491c99aaebe4d files/digest-libg3d-0.0.5 238
+-RMD160 b72684e7e6a5c2375fe3167ac92ab4149a0ad379 files/digest-libg3d-0.0.5 238
+-SHA256 9e800635187be7c188bdacb3d4e321783f5226ef12b808b7353a62cf29dcd012 files/digest-libg3d-0.0.5 238
+-MD5 f6f95b508e2a76671d1452accbbd487d files/digest-libg3d-0.0.6 238
+-RMD160 8bc5b2042e461d43735114b9ac6c12b39c07648e files/digest-libg3d-0.0.6 238
+-SHA256 e89fd3d46d79fe20a5f3ab19714bf18ba4f888544b3fc66e63f364742886b15c files/digest-libg3d-0.0.6 238
++MD5 0faa6a459c85288e4ee43afc0ad2f201 files/digest-libg3d-0.0.3 163
++SHA256 535406aca6aab011e2d7aa33983e6fa4055f90b689f4a958c0c2264dd8809c71 files/digest-libg3d-0.0.3 163
++MD5 8fd66559cd9c7b18189b8651d01e9f85 files/digest-libg3d-0.0.5 163
++SHA256 4c8b6c90058c0ec6e4cbe655a2b67b9730808eff6827a1c3ba73b7f32f956036 files/digest-libg3d-0.0.5 163
++MD5 8bb05848892e40480fd69316672a2dde files/digest-libg3d-0.0.6 163
++SHA256 00ec8933c1f6245e1176d31eacb1288a791357993970735ae880cdb9b163fd75 files/digest-libg3d-0.0.6 163
+
+Modified: trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.3
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.3	2008-01-08 19:52:29 UTC (rev 903)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.3	2008-01-11 20:27:58 UTC (rev 904)
+@@ -1,3 +1,2 @@
+ MD5 f4ecf652e437cba69d905ef8e13a71eb libg3d-0.0.3.tar.gz 438414
+-RMD160 3c1158d0b8a9580b78808152eaa179286e852a9c libg3d-0.0.3.tar.gz 438414
+ SHA256 d8c08448586b4d6f70c5933c89877f81e8f31d7eea8f3497b0d12357134a71e0 libg3d-0.0.3.tar.gz 438414
+
+Modified: trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.5
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.5	2008-01-08 19:52:29 UTC (rev 903)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.5	2008-01-11 20:27:58 UTC (rev 904)
+@@ -1,3 +1,2 @@
+ MD5 f089060580dcc5730128028c3554aac3 libg3d-0.0.5.tar.gz 475879
+-RMD160 505474c8187bd97126327e1e6c9225f72c1bbdff libg3d-0.0.5.tar.gz 475879
+ SHA256 4d19ea782ef71d862fae99291b6355b1331a309f68674ae301a9e1fd68c8c32a libg3d-0.0.5.tar.gz 475879
+
+Modified: trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.6
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.6	2008-01-08 19:52:29 UTC (rev 903)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/files/digest-libg3d-0.0.6	2008-01-11 20:27:58 UTC (rev 904)
+@@ -1,3 +1,2 @@
+ MD5 037f02240c8aadc2113c3b0fcd0fe004 libg3d-0.0.6.tar.gz 490091
+-RMD160 3cd681bfd35f8faf60b57257f5173078e101b034 libg3d-0.0.6.tar.gz 490091
+ SHA256 d3ea0037e56cee9d38ed55d81416d22ec960e65a85b9166f2b25bab8e7d22884 libg3d-0.0.6.tar.gz 490091
+
+Modified: trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.3.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.3.ebuild	2008-01-08 19:52:29 UTC (rev 903)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.3.ebuild	2008-01-11 20:27:58 UTC (rev 904)
+@@ -1,13 +1,14 @@
+-IUSE="gtk"
++# Copyright 2004-2008 S3D Team
++# Distributed under the terms of the GNU General Public License v2
+ 
+-SRC_URI="http://download.gna.org/${PN}/${P}.tar.gz"
+-
+ DESCRIPTION="library for loading 3D models of many file types"
+ HOMEPAGE="https://gna.org/projects/libg3d/"
++SRC_URI="http://download.gna.org/${PN}/${P}.tar.gz"
+ 
+-LICENSE="GPL-2 LGPL"
++LICENSE="GPL-2 LGPL-2.1"
++SLOT="0"
+ KEYWORDS="x86"
+-SLOT="0"
++IUSE="gtk"
+ 
+ DEPEND="${RDEPEND}
+ 	>=sys-devel/autoconf-2.59
+
+Modified: trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.5.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.5.ebuild	2008-01-08 19:52:29 UTC (rev 903)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.5.ebuild	2008-01-11 20:27:58 UTC (rev 904)
+@@ -1,13 +1,14 @@
+-IUSE="gtk xml"
++# Copyright 2004-2008 S3D Team
++# Distributed under the terms of the GNU General Public License v2
+ 
+-SRC_URI="http://download.gna.org/${PN}/${P}.tar.gz"
+-
+ DESCRIPTION="library for loading 3D models of many file types"
+ HOMEPAGE="https://gna.org/projects/libg3d/"
++SRC_URI="http://download.gna.org/${PN}/${P}.tar.gz"
+ 
+-LICENSE="GPL-2 LGPL"
++LICENSE="GPL-2 LGPL-2.1"
++SLOT="0"
+ KEYWORDS="x86"
+-SLOT="0"
++IUSE="gtk xml"
+ 
+ DEPEND="${RDEPEND}
+ 	>=sys-devel/autoconf-2.59
+
+Modified: trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.6.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.6.ebuild	2008-01-08 19:52:29 UTC (rev 903)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.6.ebuild	2008-01-11 20:27:58 UTC (rev 904)
+@@ -1,13 +1,14 @@
+-IUSE="gtk xml"
++# Copyright 2004-2008 S3D Team
++# Distributed under the terms of the GNU General Public License v2
+ 
+-SRC_URI="http://download.gna.org/${PN}/${P}.tar.gz"
+-
+ DESCRIPTION="library for loading 3D models of many file types"
+ HOMEPAGE="https://gna.org/projects/libg3d/"
++SRC_URI="http://download.gna.org/${PN}/${P}.tar.gz"
+ 
+-LICENSE="GPL-2 LGPL"
++LICENSE="GPL-2 LGPL-2.1"
++SLOT="0"
+ KEYWORDS="x86 amd64"
+-SLOT="0"
++IUSE="gtk xml"
+ 
+ DEPEND="${RDEPEND}
+ 	>=sys-devel/autoconf-2.59
+
+
+
+From lazhur at mail.berlios.de  Fri Jan 11 22:36:22 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Fri, 11 Jan 2008 22:36:22 +0100
+Subject: [S3d-svn] r905 - in trunk/extras/distro/gentoo/media-libs/libg3d: .
+	files
+Message-ID: <200801112136.m0BLaM4Z026524@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-01-11 22:36:21 +0100 (Fri, 11 Jan 2008)
+New Revision: 905
+
+Added:
+   trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.3-link_math.patch
+   trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.6-link_math.patch
+Modified:
+   trunk/extras/distro/gentoo/media-libs/libg3d/ChangeLog
+   trunk/extras/distro/gentoo/media-libs/libg3d/Manifest
+   trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.3.ebuild
+   trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.5.ebuild
+   trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.6.ebuild
+Log:
+Force libg3d to link against math library
+
+
+Modified: trunk/extras/distro/gentoo/media-libs/libg3d/ChangeLog
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/ChangeLog	2008-01-11 20:27:58 UTC (rev 904)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/ChangeLog	2008-01-11 21:36:21 UTC (rev 905)
+@@ -1,5 +1,11 @@
+ # ChangeLog for media-gfx/libg3d
+ 
++  23 Dec 2006; Sven Eckelmann <sven.eckelmann at gmx.de> libg3d-0.0.3.ebuild,
++  libg3d-0.0.5.ebuild, libg3d-0.0.6.ebuild, +libg3d-0.0.3-link_math.patch,
++  +libg3d-0.0.6-link_math.patch:
++  Force direct linking against math library to protect against errors
++  in conjunktion with ld's "--as-needed".
++
+   23 Dec 2006; Sven Eckelmann <sven.eckelmann at gmx.de> libg3d-0.0.6.ebuild:
+   Mark amd64 as stable.
+ 
+
+Modified: trunk/extras/distro/gentoo/media-libs/libg3d/Manifest
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/Manifest	2008-01-11 20:27:58 UTC (rev 904)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/Manifest	2008-01-11 21:36:21 UTC (rev 905)
+@@ -1,18 +1,24 @@
++AUX libg3d-0.0.3-link_math.patch 690 SHA1 6f877c85df8e44f69ad1de96188457ecc83f8b3a SHA256 937b958723aac82489a9363db90474e131fa0aca0be7a8c1c46446c33fb2fc9d
++MD5 99a08582f303f2813a479020a12cdf87 files/libg3d-0.0.3-link_math.patch 690
++SHA256 937b958723aac82489a9363db90474e131fa0aca0be7a8c1c46446c33fb2fc9d files/libg3d-0.0.3-link_math.patch 690
++AUX libg3d-0.0.6-link_math.patch 683 SHA1 b512f5603ef9c01b1cefb63b12ad7676b4c375e0 SHA256 46315c654f634ff68e149657257f49a0e40bac1b1e244ad15c7f02fb7ce397c1
++MD5 a84e68703a64a2f5c52a1b03357f6a73 files/libg3d-0.0.6-link_math.patch 683
++SHA256 46315c654f634ff68e149657257f49a0e40bac1b1e244ad15c7f02fb7ce397c1 files/libg3d-0.0.6-link_math.patch 683
+ DIST libg3d-0.0.3.tar.gz 438414 SHA1 768608dfc78d88f53ffb4d520bd434fe8c362c44 SHA256 d8c08448586b4d6f70c5933c89877f81e8f31d7eea8f3497b0d12357134a71e0
+ DIST libg3d-0.0.5.tar.gz 475879 SHA1 3c1453fe41d60fb4d8ffa69fbb41aa6df2faa50a SHA256 4d19ea782ef71d862fae99291b6355b1331a309f68674ae301a9e1fd68c8c32a
+ DIST libg3d-0.0.6.tar.gz 490091 SHA1 7fba70067fe32e4eacda0ada1d7fee073422e76e SHA256 d3ea0037e56cee9d38ed55d81416d22ec960e65a85b9166f2b25bab8e7d22884
+-EBUILD libg3d-0.0.3.ebuild 707 SHA1 5bda4c7ba209004b7acbc7a792e1cd628a3b612f SHA256 f54462ab71a82749ba3d5669461314333aead258ecdce2efb7ef525589379f14
+-MD5 fdf3c87fe169098d5edc4d9dc5d1b2c6 libg3d-0.0.3.ebuild 707
+-SHA256 f54462ab71a82749ba3d5669461314333aead258ecdce2efb7ef525589379f14 libg3d-0.0.3.ebuild 707
+-EBUILD libg3d-0.0.5.ebuild 768 SHA1 7be98b9ca97e5be6d520ea7ca5427c268b4e5669 SHA256 2ff33c2ceca87f795f508caf3197ba65484681958d5622b07b7a2decccb3a10b
+-MD5 2a717f2c173706d8b9aff10e4c924838 libg3d-0.0.5.ebuild 768
+-SHA256 2ff33c2ceca87f795f508caf3197ba65484681958d5622b07b7a2decccb3a10b libg3d-0.0.5.ebuild 768
+-EBUILD libg3d-0.0.6.ebuild 774 SHA1 811a790deb68bc4477eeff5291d389ff13a30f57 SHA256 d456849f73a5d0c1d783f3abaa6016db6354c604f9997b654f393cd7f97ef152
+-MD5 b06058d9f78982e4e0292ce46bd74e7d libg3d-0.0.6.ebuild 774
+-SHA256 d456849f73a5d0c1d783f3abaa6016db6354c604f9997b654f393cd7f97ef152 libg3d-0.0.6.ebuild 774
+-MISC ChangeLog 835 SHA1 793fc91993282fe848cda93290aa30f89bfd53cc SHA256 ab9068b8c43c89667261596ad3cbab278ddcbb6ad72d8bc07af47b55a3180f34
+-MD5 0b4ef44260884042fdb448c4a4616a38 ChangeLog 835
+-SHA256 ab9068b8c43c89667261596ad3cbab278ddcbb6ad72d8bc07af47b55a3180f34 ChangeLog 835
++EBUILD libg3d-0.0.3.ebuild 773 SHA1 e93f85795c0bb809d0a43e365a8b9a88de5c6793 SHA256 91097dc950c84801b7596c33c74d4dd42a962e7ddf55b69b3431a6f5be1d2060
++MD5 cf5eb095c4ea6bfc1eb1561b157c11aa libg3d-0.0.3.ebuild 773
++SHA256 91097dc950c84801b7596c33c74d4dd42a962e7ddf55b69b3431a6f5be1d2060 libg3d-0.0.3.ebuild 773
++EBUILD libg3d-0.0.5.ebuild 835 SHA1 a0c272a5c5390221cf8d3ba1132c7562903ef394 SHA256 fea18cb3409c1c3bf060bde5f423239e8cb3dacdc9c405054f7019b4141828c9
++MD5 847988b7c07c4965a2ab151946942103 libg3d-0.0.5.ebuild 835
++SHA256 fea18cb3409c1c3bf060bde5f423239e8cb3dacdc9c405054f7019b4141828c9 libg3d-0.0.5.ebuild 835
++EBUILD libg3d-0.0.6.ebuild 841 SHA1 153ab83b97e3c4f8b4abed87755ac62c0f4db8f0 SHA256 6243d8874925ca98426dd0c64444985687c11eb4f15cee53af720a450147989d
++MD5 09f9dfd0a29a8e6b58881af0bb09d7de libg3d-0.0.6.ebuild 841
++SHA256 6243d8874925ca98426dd0c64444985687c11eb4f15cee53af720a450147989d libg3d-0.0.6.ebuild 841
++MISC ChangeLog 1131 SHA1 2b0c4db8b2d5bd1a4a2719b1599daf7298fac130 SHA256 df3951de540cb85bc4c366c118bf8d5f9deebcc0179de450bd0f49d873d7cbe7
++MD5 5fd08a71baac4207fa5f7a6e0e52c0a8 ChangeLog 1131
++SHA256 df3951de540cb85bc4c366c118bf8d5f9deebcc0179de450bd0f49d873d7cbe7 ChangeLog 1131
+ MISC metadata.xml 239 SHA1 76f167e3abff81e9535c16a637fd1e7f91d4fda3 SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f
+ MD5 261031c8b7aca6f50babf7e44b35deb1 metadata.xml 239
+ SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f metadata.xml 239
+
+Added: trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.3-link_math.patch
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.3-link_math.patch	2008-01-11 20:27:58 UTC (rev 904)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.3-link_math.patch	2008-01-11 21:36:21 UTC (rev 905)
+@@ -0,0 +1,23 @@
++diff -ruN libg3d-0.0.3.orig/src/Makefile.am libg3d-0.0.3/src/Makefile.am
++--- libg3d-0.0.3.orig/src/Makefile.am	2008-01-11 21:21:55.000000000 +0000
+++++ libg3d-0.0.3/src/Makefile.am	2008-01-11 21:22:23.000000000 +0000
++@@ -26,4 +26,5 @@
++ 	-version-number "$(subst .,:, at VERSION@)"
++ 
++ libg3d_la_LIBADD = \
++-	@GLIB_LIBS@
+++	@GLIB_LIBS@ \
+++	-lm
++diff -ruN libg3d-0.0.3.orig/src/Makefile.in libg3d-0.0.3/src/Makefile.in
++--- libg3d-0.0.3.orig/src/Makefile.in	2008-01-11 21:21:55.000000000 +0000
+++++ libg3d-0.0.3/src/Makefile.in	2008-01-11 21:22:14.000000000 +0000
++@@ -183,7 +183,8 @@
++ 
++ 
++ libg3d_la_LIBADD = \
++-	@GLIB_LIBS@
+++	@GLIB_LIBS@ \
+++	-lm
++ 
++ subdir = src
++ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
+
+Added: trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.6-link_math.patch
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.6-link_math.patch	2008-01-11 20:27:58 UTC (rev 904)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.6-link_math.patch	2008-01-11 21:36:21 UTC (rev 905)
+@@ -0,0 +1,24 @@
++diff -ruN libg3d-0.0.6.orig/src/Makefile.am libg3d-0.0.6/src/Makefile.am
++--- libg3d-0.0.6.orig/src/Makefile.am	2008-01-11 20:56:28.000000000 +0000
+++++ libg3d-0.0.6/src/Makefile.am	2008-01-11 20:58:57.000000000 +0000
++@@ -28,5 +28,6 @@
++ 
++ libg3d_la_LIBADD = \
++ 	@GLIB_LIBS@ \
++-	@MAGIC_LIBS@
+++	@MAGIC_LIBS@ \
+++	-lm
++ 
++diff -ruN libg3d-0.0.6.orig/src/Makefile.in libg3d-0.0.6/src/Makefile.in
++--- libg3d-0.0.6.orig/src/Makefile.in	2008-01-11 20:56:28.000000000 +0000
+++++ libg3d-0.0.6/src/Makefile.in	2008-01-11 20:58:57.000000000 +0000
++@@ -200,7 +200,8 @@
++ 
++ libg3d_la_LIBADD = \
++ 	@GLIB_LIBS@ \
++-	@MAGIC_LIBS@
+++	@MAGIC_LIBS@ \
+++	-lm
++ 
++ subdir = src
++ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
+
+Modified: trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.3.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.3.ebuild	2008-01-11 20:27:58 UTC (rev 904)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.3.ebuild	2008-01-11 21:36:21 UTC (rev 905)
+@@ -1,6 +1,8 @@
+ # Copyright 2004-2008 S3D Team
+ # Distributed under the terms of the GNU General Public License v2
+ 
++inherit eutils
++
+ DESCRIPTION="library for loading 3D models of many file types"
+ HOMEPAGE="https://gna.org/projects/libg3d/"
+ SRC_URI="http://download.gna.org/${PN}/${P}.tar.gz"
+@@ -23,6 +25,8 @@
+ 	"
+ 
+ src_compile() {
++	epatch "${FILESDIR}"/${PN}-0.0.3-link_math.patch
++
+ 	econf \
+ 		$(use_enable gtk gtktest) \
+ 		--prefix=/usr/ \
+@@ -34,4 +38,3 @@
+ src_install() {
+ 	emake DESTDIR="${D}" install || die
+ }
+-
+
+Modified: trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.5.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.5.ebuild	2008-01-11 20:27:58 UTC (rev 904)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.5.ebuild	2008-01-11 21:36:21 UTC (rev 905)
+@@ -1,6 +1,8 @@
+ # Copyright 2004-2008 S3D Team
+ # Distributed under the terms of the GNU General Public License v2
+ 
++inherit eutils
++
+ DESCRIPTION="library for loading 3D models of many file types"
+ HOMEPAGE="https://gna.org/projects/libg3d/"
+ SRC_URI="http://download.gna.org/${PN}/${P}.tar.gz"
+@@ -24,6 +26,8 @@
+ 	"
+ 
+ src_compile() {
++	epatch "${FILESDIR}"/${PN}-0.0.3-link_math.patch
++
+ 	econf \
+ 		$(use_enable gtk gtktest) \
+ 		$(use_enable xml xmltest) \
+
+Modified: trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.6.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.6.ebuild	2008-01-11 20:27:58 UTC (rev 904)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.6.ebuild	2008-01-11 21:36:21 UTC (rev 905)
+@@ -1,6 +1,8 @@
+ # Copyright 2004-2008 S3D Team
+ # Distributed under the terms of the GNU General Public License v2
+ 
++inherit eutils
++
+ DESCRIPTION="library for loading 3D models of many file types"
+ HOMEPAGE="https://gna.org/projects/libg3d/"
+ SRC_URI="http://download.gna.org/${PN}/${P}.tar.gz"
+@@ -24,6 +26,8 @@
+ 	"
+ 
+ src_compile() {
++	epatch "${FILESDIR}"/${PN}-0.0.6-link_math.patch
++
+ 	econf \
+ 		$(use_enable gtk gtktest) \
+ 		$(use_enable xml xmltest) \
+
+
+
+From dotslash at mail.berlios.de  Thu Jan 17 19:29:44 2008
+From: dotslash at mail.berlios.de (dotslash at BerliOS)
+Date: Thu, 17 Jan 2008 19:29:44 +0100
+Subject: [S3d-svn] r906 - trunk/server
+Message-ID: <200801171829.m0HITitw006692@sheep.berlios.de>
+
+Author: dotslash
+Date: 2008-01-17 19:29:44 +0100 (Thu, 17 Jan 2008)
+New Revision: 906
+
+Modified:
+   trunk/server/global.h
+   trunk/server/network.c
+   trunk/server/shm.c
+Log:
+- SDL timeout seems not to work on some SuSE box, also check 
+  number of iterations
+
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2008-01-11 21:36:21 UTC (rev 905)
++++ trunk/server/global.h	2008-01-17 18:29:44 UTC (rev 906)
+@@ -203,7 +203,7 @@
+ /*  network.c */
+ extern uint8_t ibuf[MAXPLEN];
+ extern uint8_t obuf[MAXPLEN];
+-extern int turn;
++extern volatile int turn;
+ void sigpipe_handler(int);
+ void sigio_handler(int);
+ int network_init(void);
+
+Modified: trunk/server/network.c
+===================================================================
+--- trunk/server/network.c	2008-01-11 21:36:21 UTC (rev 905)
++++ trunk/server/network.c	2008-01-17 18:29:44 UTC (rev 906)
+@@ -81,7 +81,7 @@
+ #endif
+ 	return(0);
+ }
+-int      turn;
++volatile int      turn;
+ int net_turn_off(int S3DUNUSED(interval))
+ {
+ 	s3dprintf(VLOW, "Warning: High traffic on Network, interrupting read.");
+
+Modified: trunk/server/shm.c
+===================================================================
+--- trunk/server/shm.c	2008-01-11 21:36:21 UTC (rev 905)
++++ trunk/server/shm.c	2008-01-17 18:29:44 UTC (rev 906)
+@@ -175,11 +175,14 @@
+ 	struct buf_t   *dai; /* data in, data out */
+ 	struct t_process *new_p;
+ 	struct shmid_ds   d;
++	int iterations;
+ 	/* do*/
+ 	{
+ 		/*  found=0;*/
+ 		turn = 1;
++		iterations = 0;
+ 		for (i = 0;i < procs_n;i++) {
++			iterations++;
+ #ifdef G_SDL
+ 			SDL_SetTimer(100, (SDL_TimerCallback) net_turn_off);
+ #endif
+@@ -193,6 +196,7 @@
+ 						i--; /* evil hack: decrease i so it will be our turn again in the next round */
+ 					else {
+ 						s3dprintf(MED, "client %d [%s] seems to want to keep us busy ... ", i, procs_p[i].name);
++						SDL_SetTimer(100, (SDL_TimerCallback) net_turn_off);	/* restart timer */
+ 						turn = 1; /* don't decrease, it's next connections turn */
+ 					}
+ 				} else {
+@@ -207,6 +211,11 @@
+ 					}
+ 				}
+ 			}
++			if (iterations > 500) {
++				turn = 0;
++				iterations = 0;
++			}
++/*			s3dprintf(MED, "iterations: %d, turn = %d, i = %d\n", iterations, turn, i);*/
+ 		}
+ #ifdef G_SDL
+ 		SDL_SetTimer(0, NULL);
+
+
+
+From dotslash at mail.berlios.de  Thu Jan 17 19:58:07 2008
+From: dotslash at mail.berlios.de (dotslash at BerliOS)
+Date: Thu, 17 Jan 2008 19:58:07 +0100
+Subject: [S3d-svn] r907 - trunk/libs3d
+Message-ID: <200801171858.m0HIw7Sv009192@sheep.berlios.de>
+
+Author: dotslash
+Date: 2008-01-17 19:58:07 +0100 (Thu, 17 Jan 2008)
+New Revision: 907
+
+Modified:
+   trunk/libs3d/texture.c
+Log:
+- FIX: set tex_hash to NULL to prevent crash when called twice
+
+
+Modified: trunk/libs3d/texture.c
+===================================================================
+--- trunk/libs3d/texture.c	2008-01-17 18:29:44 UTC (rev 906)
++++ trunk/libs3d/texture.c	2008-01-17 18:58:07 UTC (rev 907)
+@@ -144,5 +144,6 @@
+ 	if (tex_hash == NULL)
+ 		return(-1);
+ 	_s3d_hash_delete(tex_hash, _s3d_free_s3dtex);
++	tex_hash= NULL;
+ 	return(0);
+ }
+
+
+

@@ -1,0 +1,1268 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r856 - trunk/svnonly/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r856%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711131042.lADAgQZJ006147%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000848.html">
+   <LINK REL="Next"  HREF="000850.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r856 - trunk/svnonly/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r856%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711131042.lADAgQZJ006147%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r856 - trunk/svnonly/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Tue Nov 13 11:42:26 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000848.html">[S3d-svn] r855 - trunk/svnonly/comptest
+</A></li>
+        <LI>Next message: <A HREF="000850.html">[S3d-svn] r857 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#849">[ date ]</a>
+              <a href="thread.html#849">[ thread ]</a>
+              <a href="subject.html#849">[ subject ]</a>
+              <a href="author.html#849">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-13 11:42:25 +0100 (Tue, 13 Nov 2007)
+New Revision: 856
+
+Added:
+   trunk/svnonly/comptest/comptest.h
+   trunk/svnonly/comptest/window.c
+   trunk/svnonly/comptest/x11.c
+Modified:
+   trunk/svnonly/comptest/CMakeLists.txt
+   trunk/svnonly/comptest/comptest.c
+Log:
+- split comptest into multiple files
+
+
+Modified: trunk/svnonly/comptest/CMakeLists.txt
+===================================================================
+--- trunk/svnonly/comptest/CMakeLists.txt	2007-11-13 10:24:39 UTC (rev 855)
++++ trunk/svnonly/comptest/CMakeLists.txt	2007-11-13 10:42:25 UTC (rev 856)
+@@ -3,7 +3,7 @@
+ if (XCOMPOSITE_FOUND AND XDAMAGE_FOUND AND XFIXES_FOUND AND XRENDER_FOUND)
+ 	include_directories(${s3d_SOURCE_DIR}/libs3d)
+ 
+-	add_executable(comptest comptest.c)
++	add_executable(comptest comptest.c window.c x11.c)
+ 	target_link_libraries(comptest s3d ${XCOMPOSITE_LIBRARIES}
+ 		${XFIXES_LIBRARIES} ${XDAMAGE_LIBRARIES} ${XRENDER_LIBRARIES})
+ 
+
+Modified: trunk/svnonly/comptest/comptest.c
+===================================================================
+--- trunk/svnonly/comptest/comptest.c	2007-11-13 10:24:39 UTC (rev 855)
++++ trunk/svnonly/comptest/comptest.c	2007-11-13 10:42:25 UTC (rev 856)
+@@ -21,225 +21,28 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#include &quot;comptest.h&quot;
+ #include &lt;stdio.h&gt;
+ #include &lt;stdlib.h&gt;        /* malloc(), free() */
+ #include &lt;time.h&gt;         /* nanosleep() */
+ #include &lt;errno.h&gt;			/* errno */
+-#include &lt;s3d.h&gt;
+-#include &lt;X11/Xlib.h&gt;       /* Ximage, Display, X*() */
+-#include &lt;X11/Xutil.h&gt;       /* XDestroyImage() */
+-#include &lt;X11/Xatom.h&gt;
+-#include &lt;X11/extensions/Xcomposite.h&gt;
+-#include &lt;X11/extensions/Xdamage.h&gt;
+-#include &lt;X11/extensions/Xrender.h&gt;
+-#include &lt;config-s3d.h&gt;
+ 
+-#ifndef COMPUNUSED
+-#if defined(UNUSEDPARAM_ATTRIBUTE)
+-#define COMPUNUSED(x) (x)__attribute__((unused))
+-#elif defined(UNUSEDPARAM_OMIT)
+-#define COMPUNUSED(x) /* x */
+-#else
+-#define COMPUNUSED(x) x
+-#endif
+-#endif
+ 
+-#define MAXEVENTS 50  /* maximum events per loop. */
+ 
+-/* must be 2^x */
+-#define TEXW 256
+-#define TEXH 256
+-#define TEXNUM(win, x, y) \
+-  ((((win-&gt;attr.height + TEXH - 1)&amp; ~(TEXH-1))/TEXH) * ((int)(x/TEXH)) + ((int)(y/TEXW)))
+ 
+-struct extension {
+-	int event, error;
+-};
+ 
+-struct window {
+-	Window        id;
+-	XWindowAttributes    attr;   /* position, size etc. */
+-	XImage      *image;
+-	Damage       damage;  /* damage notification */
+-	XRenderPictureAttributes  pa;
+-	XRenderPictFormat    *format;
+-	Picture       picture;
+-	int     already_updated;
+-	int        oid;
+-	int        no;
+-
+-	struct window     *next;
+-};
+-
+-static struct extension    xrender, xcomposite, xdamage, xfixes;
+-static struct window   *window_head = NULL;
+-static Display       *dpy;
+-static char    *display = NULL;
+-
+-static int     win_no = 0;    /* XXX: REMOVE */
+ static struct timespec t = {
+ 	0, 50*1000*1000
+ }; /* 50 mili seconds */
+ 
+-int xinit(void);
+-void window_update_content(struct window *win, int x, int y, int width, int height);
+-static void window_set_position(struct window *win);
+-static int print_event(Display *dpy, XEvent *event);
+-void event();
+-
+ static void mainloop(void)
+ {
+ 	event();
+ 	nanosleep(&amp;t, NULL);
+ }
+ 
+-static int get_shift(unsigned long t)
++void deco_box(struct window *win)
+ {
+-	int i;
+-	for (i = 0; t ; i++)
+-		t &gt;&gt;= 1;
+-	return(i);
+-}
+-
+-static int print_event(Display *COMPUNUSED(dpy), XEvent *event)
+-{
+-	char *name = &quot;unknown&quot;;
+-	switch (event-&gt;type &amp; 0x7f) {
+-	case CreateNotify:
+-		name = &quot;Create&quot;;
+-		break;
+-	case DestroyNotify:
+-		name = &quot;Destroy&quot;;
+-		break;
+-	case Expose:
+-		name = &quot;Expose&quot;;
+-		break;
+-	case MapNotify:
+-		name = &quot;Map&quot;;
+-		break;
+-	case UnmapNotify:
+-		name = &quot;Unmap&quot;;
+-		break;
+-	case ReparentNotify:
+-		name = &quot;Reparent&quot;;
+-		break;
+-	case CirculateNotify:
+-		name = &quot;Circulate&quot;;
+-		break;
+-	case PropertyNotify:
+-		name = &quot;PropertyNotify&quot;;
+-		return(0);
+-		break;
+-	}
+-	if (event-&gt;type == xdamage.event + XDamageNotify) {
+-		name = &quot;Damage&quot;;
+-		return(0); /* don't report this. */
+-	} else if (event-&gt;type == ConfigureNotify) {
+-		name = &quot;Configure&quot;;
+-	}
+-
+-	printf(&quot;Event: %s (%d)\n&quot;, name, event-&gt;type);
+-	return(0);
+-}
+-
+-static int error(Display *COMPUNUSED(dpy), XErrorEvent *event)
+-{
+-	char *name = &quot;&quot;;
+-	char buf[256];
+-	int     o;
+-
+-	o = event-&gt;error_code - xfixes.error;
+-	switch (o) {
+-	case BadRegion:
+-		name = &quot;BadRegion&quot;;
+-		break;
+-	default:
+-		break;
+-	}
+-	o = event-&gt;error_code - xdamage.error;
+-	switch (o) {
+-	case BadDamage:
+-		name = &quot;BadDamage&quot;;
+-		break;
+-	default:
+-		break;
+-	}
+-	o = event-&gt;error_code - xrender.error;
+-	switch (o) {
+-	case BadPictFormat:
+-		name = &quot;BadPictFormat&quot;;
+-		break;
+-	case BadPicture:
+-		name = &quot;BadPicture&quot;;
+-		break;
+-	case BadPictOp:
+-		name = &quot;BadPictOp&quot;;
+-		break;
+-	case BadGlyphSet:
+-		name = &quot;BadGlyphSet&quot;;
+-		break;
+-	case BadGlyph:
+-		name = &quot;BadGlyph&quot;;
+-		break;
+-	default:
+-		break;
+-	}
+-	switch (event-&gt;error_code) {
+-	case BadWindow:
+-		name = &quot;BadWindow&quot;;
+-		break;
+-	case BadDrawable:
+-		name = &quot;BadDrawable&quot;;
+-		break;
+-	case BadMatch:
+-		name = &quot;BadMatch&quot;;
+-		return(0);
+-		break;
+-	}
+-	XGetErrorText(dpy, event-&gt;error_code, buf, 256);
+-	printf(&quot;error %d (name: %s) request %d minor %d serial %d: %s\n&quot;,
+-	       event-&gt;error_code, name, event-&gt;request_code, event-&gt;minor_code, (int)event-&gt;serial, buf);
+-	return(0);
+-}
+-
+-
+-int xinit(void)
+-{
+-	dpy = XOpenDisplay(display);
+-	if (!dpy) {
+-		fprintf(stderr, &quot;Can't open display\n&quot;);
+-		return(1);
+-	}
+-	if (!XRenderQueryExtension(dpy, &amp;xrender.event, &amp;xrender.error)) {
+-		fprintf(stderr, &quot;No render extension\n&quot;);
+-		return(1);
+-	}
+-	/*    XCompositeQueryVersion (dpy, &amp;composite_major, &amp;composite_minor); */
+-
+-	if (!XCompositeQueryExtension(dpy, &amp;xcomposite.event, &amp;xcomposite.error)) {
+-		fprintf(stderr, &quot;No composite extension\n&quot;);
+-		return(1);
+-	}
+-
+-	if (!XDamageQueryExtension(dpy, &amp;xdamage.event, &amp;xdamage.error)) {
+-		fprintf(stderr, &quot;No damage extension\n&quot;);
+-		return(1);
+-	}
+-	if (!XFixesQueryExtension(dpy, &amp;xfixes.event, &amp;xfixes.error)) {
+-		fprintf(stderr, &quot;No XFixes extension\n&quot;);
+-		return(1);
+-	}
+-	XSetErrorHandler(error);
+-	return(0);
+-}
+-
+-static void window_set_position(struct window *win) {
+-	s3d_translate(win-&gt;oid, win-&gt;attr.x / 20, -win-&gt;attr.y / 20, -0.01 * win-&gt;no);
+-}
+-
+-
+-static void deco_box(struct window *win)
+-{
+ 	/* float vertices[8*3] = {
+ 	  0, 0, 0,
+ 	  1, 0, 0,
+@@ -333,329 +136,6 @@
+ 	s3d_flags_on(win-&gt;oid, S3D_OF_VISIBLE);
+ }
+ 
+-void window_restack(struct window *win, Window above) 
+-{
+-	struct window **wp;
+-	Window old_above;
+-	int i;
+-	if (win-&gt;next == NULL)		old_above = None;
+-	else						old_above = win-&gt;next-&gt;id;
+-
+-	if (old_above == above)		return;
+-
+-	/* unlink from list */
+-	for (wp = &amp;window_head; *wp != NULL; wp = &amp;(*wp)-&gt;next) 
+-		if (*wp == win)
+-			break;
+-
+-	if (*wp == NULL) return;
+-	*wp = win-&gt;next;
+-
+-	/* relink in front of the new &quot;above&quot; window */
+-	for (wp = &amp;window_head; *wp != NULL; wp = &amp;(*wp)-&gt;next) 
+-		if ((*wp)-&gt;id == above)
+-			break;
+-
+-	win-&gt;next = *wp;
+-	*wp = win;
+-
+-	for (i=0, wp = &amp;window_head; *wp != NULL; wp = &amp;(*wp)-&gt;next, i++)
+-		if (i != (*wp)-&gt;no) {
+-			(*wp)-&gt;no = i;
+-			if ((*wp)-&gt;oid != -1)
+-				window_set_position(*wp);
+-		}
+-}
+-static struct window *window_find(Window id) 
+-{
+-	struct window *window;
+-	for (window = window_head; window != NULL; window = window-&gt;next) {
+-		if (window-&gt;id == id)
+-			return(window);
+-	}
+-	return(NULL);
+-
+-}
+-
+-
+-static void window_add(Display *dpy, Window id)
+-{
+-	struct window *win;
+-	win = malloc(sizeof(struct window));
+-	if (!win)
+-		return;
+-
+-	if (window_find(id) != NULL) {
+-		printf(&quot;!!!! Window already added\n&quot;);
+-		return;
+-	}
+-	win-&gt;id = id;
+-	XGetWindowAttributes(dpy, win-&gt;id, &amp;win-&gt;attr);
+-
+-	win-&gt;no = win_no++;
+-	/* XSelectInput(dpy, win-&gt;id, ExposureMask|ButtonPressMask|KeyPressMask*/
+-/*	XSelectInput(dpy, win-&gt;id, SubstructureNotifyMask | ExposureMask | StructureNotifyMask | PropertyChangeMask);*/
+-	XSelectInput(dpy, win-&gt;id, 0);
+-
+-	win-&gt;damage = XDamageCreate(dpy, win-&gt;id, XDamageReportNonEmpty);
+-	win-&gt;format = XRenderFindVisualFormat(dpy, win-&gt;attr.visual);
+-
+-	if (win-&gt;format != NULL) {
+-		/* printf(&quot;add window: %d:%d size: %dx%d\n&quot;, win-&gt;attr.x, win-&gt;attr.y, win-&gt;attr.width, win-&gt;attr.height);*/
+-		win-&gt;pa.subwindow_mode = IncludeInferiors;
+-		win-&gt;picture = XRenderCreatePicture(dpy, win-&gt;id, win-&gt;format, CPSubwindowMode, &amp;win-&gt;pa);
+-	}
+-	win-&gt;oid = -1;
+-	win-&gt;next = window_head;
+-	window_head = win;
+-	win-&gt;already_updated = 0;
+-	window_update_content(win, 0, 0, win-&gt;attr.width, win-&gt;attr.height);
+-	printf(&quot;window (%d) added\n&quot;, (int)id);
+-
+-
+-
+-}
+-
+-static void window_remove(Window id)
+-{
+-	struct window **wp, *window;
+-	for (wp = &amp;window_head; *wp != NULL; wp = &amp;(*wp)-&gt;next) 
+-		if ((*wp)-&gt;id == id)
+-			break;
+-
+-	if (*wp == NULL) {
+-		printf(&quot;!!!! not found (window %d) for removal.\n&quot;, (int)id);
+-		return;
+-	}
+-	window = *wp;
+-	*wp = window-&gt;next;
+-
+-	printf(&quot;window (%d) removed\n&quot;, id);
+-
+-	/* TODO: properly cleanup */
+-	if (window-&gt;oid != -1)
+-		s3d_del_object(window-&gt;oid);
+-	if (window-&gt;picture)
+-		XRenderFreePicture(dpy, window-&gt;picture);
+-	if (window-&gt;damage)
+-		XDamageDestroy(dpy, window-&gt;damage);
+-
+-	free(window);
+-}
+-static void window_update_geometry(struct window *win, int x, int y, int width, int height)
+-{
+-
+-	printf(&quot;window_update_geometry()\n&quot;);
+-	if (win-&gt;oid == -1) {
+-		win-&gt;attr.x = x;
+-		win-&gt;attr.y = y;
+-		win-&gt;attr.width = width;
+-		win-&gt;attr.height = height;
+-
+-		window_update_content(win, 0, 0, width, height);
+-		return;
+-	}
+-	if ((win-&gt;attr.width == width) &amp;&amp; (win-&gt;attr.height == height)) {
+-		if ((win-&gt;attr.x == x) &amp;&amp; (win-&gt;attr.y == y)) {
+-			printf(&quot;position did not change\n&quot;);
+-			return;
+-		} else {
+-			win-&gt;attr.x = x;
+-			win-&gt;attr.y = y;
+-			window_set_position(win);
+-		}
+-	} else {
+-		win-&gt;attr.x = x;
+-		win-&gt;attr.y = y;
+-		win-&gt;attr.width = width;
+-		win-&gt;attr.height = height;
+-
+-		s3d_del_object(win-&gt;oid); /* delete the window and redraw */
+-		win-&gt;oid = -1;
+-		window_update_content(win, 0, 0, width, height);
+-
+-	}
+-}
+-/* convert X-format to s3ds RGBA 32bit format */
+-static int image_convert(XImage *image, char *bitmap)
+-{
+-	int x, y;
+-	int rs, gs, bs;
+-	int bpp;
+-	char *img_ptr, *bmp_ptr;
+-	unsigned long *s;
+-	uint32_t *t;
+-
+-
+-	if (image-&gt;format == ZPixmap) {
+-		/*  printf(&quot;XImage: %dx%d, format %d (%d), bpp: %d, depth %d, pad %d\n&quot;,
+-		         image-&gt;width, image-&gt;height, image-&gt;format,
+-		         ZPixmap, image-&gt;bits_per_pixel, image-&gt;depth, image-&gt;bitmap_pad);*/
+-		rs = get_shift(image-&gt;red_mask) - 8;
+-		gs = get_shift(image-&gt;green_mask) - 8;
+-		bs = get_shift(image-&gt;blue_mask) - 8;
+-
+-		bpp = (image-&gt;bits_per_pixel / 8);
+-		/* rgb is not bgr */
+-		rs = rs;
+-		gs = gs - 8;
+-		bs = bs - 16;
+-		/*  printf(&quot;Ximage: rgb: %d|%d|%d\n&quot;, rs, gs, bs);;*/
+-		/*  printf(&quot;red: size %d, offset %d\n&quot;,rs,roff);
+-		  printf(&quot;green: size %d, offset %d\n&quot;,gs,goff);
+-		  printf(&quot;blue: size %d, offset %d\n&quot;,bs,boff);
+-		  printf(&quot;bits per pixel:%d\n&quot;,bpp);*/
+-		for (y = 0; y &lt; image-&gt;height ; y++) {
+-			img_ptr = image-&gt;data + (y * image-&gt;width) * bpp;
+-			bmp_ptr = bitmap + (y * image-&gt;width) * sizeof(uint32_t);
+-			for (x = 0; x &lt; image-&gt;width; x++) {
+-				s = (unsigned long *) img_ptr;
+-				t = (uint32_t *)  bmp_ptr;
+-				/*    bmp_ptr[0] = (rs &gt; 0 ? ((*d &amp; image-&gt;red_mask) &gt;&gt; rs)  : ((*d  &amp; image-&gt;red_mask) &lt;&lt; -rs)) ;
+-				 bmp_ptr[1] = (gs &gt; 0 ? ((*d &amp; image-&gt;green_mask) &gt;&gt; gs) : ((*d  &amp; image-&gt;green_mask) &lt;&lt; -gs)) ;
+-				 bmp_ptr[2] = (bs &gt; 0 ? ((*d &amp; image-&gt;blue_mask) &gt;&gt; bs)  : ((*d  &amp; image-&gt;blue_mask) &lt;&lt; -bs));
+-				 bmp_ptr[3] = 255 ;*/
+-				*t = (rs &gt; 0 ? ((*s &amp; image-&gt;red_mask) &gt;&gt; rs)  : ((*s  &amp; image-&gt;red_mask) &lt;&lt; -rs)) |
+-				     (gs &gt; 0 ? ((*s &amp; image-&gt;green_mask) &gt;&gt; gs) : ((*s  &amp; image-&gt;green_mask) &lt;&lt; -gs)) |
+-				     (bs &gt; 0 ? ((*s &amp; image-&gt;blue_mask) &gt;&gt; bs)  : ((*s  &amp; image-&gt;blue_mask) &lt;&lt; -bs)) |
+-				     255 &lt;&lt; 24;
+-
+-				bmp_ptr += sizeof(uint32_t);
+-				img_ptr += bpp;
+-			}
+-		}
+-		return(0);
+-	}
+-	return(-1);
+-}
+-
+-/* takes a bounding box and updates its window contents */
+-void window_update_content(struct window *win, int x, int y, int width, int height)
+-{
+-	int chunk_width, chunk_height;
+-	int xleft, xright;
+-	int ytop, ybottom;
+-	char *bitmap;
+-	XImage *image;
+-
+-	if (win-&gt;attr.map_state == IsUnmapped)	/* not mapped images can't be grabbed */
+-		return;
+-
+-	if (win-&gt;attr.class == InputOnly)		/* can't grab image from this source */
+-		return;
+-
+-	/* update the whole window for now. */
+-	/* x = 50;
+-	 y = 50;
+-	 width = win-&gt;attr.width;
+-	 height = win-&gt;attr.height;*/
+-	if (x &lt; 0) x = 0;
+-	if (y &lt; 0) y = 0;
+-	if (width &gt; win-&gt;attr.width - x)   width = win-&gt;attr.width - x;
+-	if (height &gt; win-&gt;attr.height - y)   height = win-&gt;attr.height - y;
+-
+-	if (x == 0 &amp;&amp; y == 0 &amp;&amp; width == win-&gt;attr.width &amp;&amp; height == win-&gt;attr.height) {
+-		if (win-&gt;already_updated)
+-			return;
+-		else
+-			win-&gt;already_updated = 1;
+-	}
+-
+-	/* if (!win-&gt;oid)
+-	  deco_box(win);
+-	*/
+-	bitmap = malloc(TEXW * height * sizeof(uint32_t));
+-	for (xleft = x; xleft &lt; x + width ; xleft = xright) {
+-		xright = (xleft + TEXW) &amp; ~(TEXW - 1);
+-		if (xright &gt; (x + width))
+-			xright = x + width;
+-		chunk_width = xright - xleft;
+-/*		printf(&quot;map-state = %d, backing_store = %d\n&quot;, win-&gt;attr.map_state);
+-		printf(&quot;request image: xleft = %d, xright = %d, width = %d, x:y = %d:%d, width:height = %d:%d, ~TEXW = %08x\n&quot;,
+-		       xleft, xright, width, x, y, width, height, ~TEXW);*/
+-		image = XGetImage(dpy, win-&gt;id, xleft, y, chunk_width, height, AllPlanes, ZPixmap);
+-		if (!image) {
+-/*			printf(&quot;XGetImage Error: xleft = %d, xright = %d, width = %d, x:y = %d:%d, width:height = %d:%d\n&quot;,
+-							xleft, xright, width, x, y, width, height);*/
+-			return;
+-		}
+-		if (win-&gt;oid == -1)
+-			deco_box(win);
+-		/*  printf(&quot;image_convert\n&quot;);*/
+-		image_convert(image, bitmap);
+-		/*  printf(&quot;load textures ...\n&quot;);*/
+-		for (ytop = y; ytop &lt; y + height; ytop = ybottom) {
+-			ybottom = (ytop + TEXH) &amp; ~(TEXH - 1);
+-			if (ybottom &gt; y + height)
+-				ybottom = y + height;
+-			chunk_height = ybottom - ytop;
+-			s3d_load_texture(win-&gt;oid, TEXNUM(win, xleft, ytop), xleft % TEXW, ytop % TEXH,
+-			                 chunk_width, chunk_height, (unsigned char *)bitmap + chunk_width * (ytop - y) * 4);
+-			/*   printf(&quot;s3d_load_texture(%d, %d, %d, %d, %d, %d, %010p);\n&quot;,
+-			       win-&gt;oid, TEXNUM(win, xleft, ytop), xleft % TEXW, ytop % TEXH,
+-			        chunk_width, chunk_height, (unsigned char *)bitmap + chunk_width * (ytop - y) * 4);*/
+-		}
+-		/*  printf(&quot;done loading textures\n&quot;); */
+-		XDestroyImage(image);
+-	}
+-	free(bitmap);
+-}
+-
+-
+-void event(void)
+-{
+-	XEvent event;
+-	struct window *window;
+-	int i;
+-	for (window = window_head; window != NULL; window = window-&gt;next)
+-		window-&gt;already_updated = 0;
+-
+-	for (i = 0; i &lt; MAXEVENTS &amp;&amp; XPending(dpy); i++) {
+-		XNextEvent(dpy, &amp;event);
+-		print_event(dpy, &amp;event);
+-		switch (event.type - xdamage.event) {
+-		case XDamageNotify:{
+-			XDamageNotifyEvent *e = (XDamageNotifyEvent*) &amp; event;
+-			/*   printf(&quot;window = %d, geometry = %d:%d (at %d:%d), area = %d:%d (at %d:%d)\n&quot;,
+-			          (int)e-&gt;drawable, e-&gt;geometry.width, e-&gt;geometry.height, e-&gt;geometry.x, e-&gt;geometry.y,
+-			          e-&gt;area.width, e-&gt;area.height, e-&gt;area.x, e-&gt;area.y);*/
+-			XDamageSubtract(dpy, e-&gt;damage, None, None);
+-			window = window_find(e-&gt;drawable);
+-			if (window != NULL)
+-				window_update_content(window, e-&gt;area.x, e-&gt;area.y, e-&gt;area.width, e-&gt;area.height);
+-			break;
+-		   }
+-
+-		}
+-		switch (event.type) {
+-		case ConfigureNotify:{
+-			XConfigureEvent *e = &amp;event.xconfigure;
+-			window = window_find(e-&gt;window);
+-			if (window != NULL) {
+-				/*    printf(&quot;Configure: window = %d, geometry = %d:%d (at %d:%d)\n&quot;,
+-				           (int)e-&gt;window, e-&gt;width, e-&gt;height, e-&gt;x, e-&gt;y);*/
+-				window_restack(window, e-&gt;above);
+-				window_update_geometry(window, e-&gt;x, e-&gt;y, e-&gt;width, e-&gt;height);
+-			} else {
+-				printf(&quot;Configure: Could not find window to configure.\n&quot;);
+-			}
+-			break;
+-			 }
+-		case CreateNotify:{
+-			XCreateWindowEvent *e = &amp;event.xcreatewindow;
+-			window_add(e-&gt;display, e-&gt;window);
+-			break;
+-			}
+-		case DestroyNotify:{
+-			XDestroyWindowEvent *e = &amp;event.xdestroywindow;
+-			window_remove(e-&gt;window);
+-			break;
+-		   }
+-		}
+-	}
+-}
+-
+-
+ int main(int argc, char **argv)
+ {
+ 	Window        root_return, parent_return;
+@@ -666,7 +146,7 @@
+ 
+ 	if (xinit())
+ 		return(1);
+-	if (!s3d_init(&amp;argc, &amp;argv, &quot;compotest&quot;)) {
++	if (!s3d_init(&amp;argc, &amp;argv, &quot;comptest&quot;)) {
+ 		for (scr_no = 0; scr_no &lt; ScreenCount(dpy); scr_no++) {
+ 			XCompositeRedirectSubwindows(dpy, RootWindow(dpy, scr_no), CompositeRedirectAutomatic);
+ 			/*   XCompositeRedirectSubwindows(dpy, RootWindow(dpy, scr_no), CompositeRedirectManual);*/
+
+Added: trunk/svnonly/comptest/comptest.h
+===================================================================
+--- trunk/svnonly/comptest/comptest.h	2007-11-13 10:24:39 UTC (rev 855)
++++ trunk/svnonly/comptest/comptest.h	2007-11-13 10:42:25 UTC (rev 856)
+@@ -0,0 +1,62 @@
++#include &lt;s3d.h&gt;
++#include &lt;X11/Xlib.h&gt;       /* Ximage, Display, X*() */
++#include &lt;X11/Xutil.h&gt;       /* XDestroyImage() */
++#include &lt;X11/Xatom.h&gt;
++#include &lt;config-s3d.h&gt;
++#include &lt;X11/extensions/Xcomposite.h&gt;
++#include &lt;X11/extensions/Xdamage.h&gt;
++#include &lt;X11/extensions/Xrender.h&gt;
++#ifndef COMPUNUSED
++#if defined(UNUSEDPARAM_ATTRIBUTE)
++#define COMPUNUSED(x) (x)__attribute__((unused))
++#elif defined(UNUSEDPARAM_OMIT)
++#define COMPUNUSED(x) /* x */
++#else
++#define COMPUNUSED(x) x
++#endif
++#endif
++
++#define MAXEVENTS 50  /* maximum events per loop. */
++
++/* must be 2^x */
++#define TEXW 256
++#define TEXH 256
++#define TEXNUM(win, x, y) \
++  ((((win-&gt;attr.height + TEXH - 1)&amp; ~(TEXH-1))/TEXH) * ((int)(x/TEXH)) + ((int)(y/TEXW)))
++
++
++struct window {
++	Window        id;
++	XWindowAttributes    attr;   /* position, size etc. */
++	XImage      *image;
++	Damage       damage;  /* damage notification */
++	XRenderPictureAttributes  pa;
++	XRenderPictFormat    *format;
++	Picture       picture;
++	int     already_updated;
++	int        oid;
++	int		   no;
++
++	struct window     *next;
++};
++
++/* comptest.c */
++void deco_box(struct window *win);
++/* window.c */
++void window_update_content(struct window *win, int x, int y, int width, int height);
++void window_set_position(struct window *win);
++void window_restack(struct window *win, Window above);
++struct window *window_find(Window id);
++struct window *window_find(Window id);
++void window_add(Display *dpy, Window id);
++void window_remove(Window id);
++void window_update_content(struct window *win, int x, int y, int width, int height);
++void window_update_geometry(struct window *win, int x, int y, int width, int height);
++
++extern struct window   *window_head;
++/* x11.c */
++void event(void);
++int xinit(void);
++int error(Display *COMPUNUSED(dpy), XErrorEvent *event);
++int print_event(Display *COMPUNUSED(dpy), XEvent *event);
++extern Display *dpy;
+
+Added: trunk/svnonly/comptest/window.c
+===================================================================
+--- trunk/svnonly/comptest/window.c	2007-11-13 10:24:39 UTC (rev 855)
++++ trunk/svnonly/comptest/window.c	2007-11-13 10:42:25 UTC (rev 856)
+@@ -0,0 +1,306 @@
++/*
++ * window.c
++ *
++ * Copyright (C) 2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of comptest, a proof-of-concept composite manager hack.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * comptest is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * comptest is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with comptest; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#include &quot;comptest.h&quot;
++#include &lt;stdlib.h&gt;	/* malloc(), free() */
++#include &lt;stdio.h&gt;	/* printf() */
++struct window   *window_head = NULL;
++
++void window_set_position(struct window *win) {
++	s3d_translate(win-&gt;oid, win-&gt;attr.x / 20, -win-&gt;attr.y / 20, -0.01 * win-&gt;no);
++}
++
++void window_restack(struct window *win, Window above) 
++{
++	struct window **wp;
++	Window old_above;
++	int i;
++	if (win-&gt;next == NULL)		old_above = None;
++	else						old_above = win-&gt;next-&gt;id;
++
++	if (old_above == above)		return;
++
++	/* unlink from list */
++	for (wp = &amp;window_head; *wp != NULL; wp = &amp;(*wp)-&gt;next) 
++		if (*wp == win)
++			break;
++
++	if (*wp == NULL) return;
++	*wp = win-&gt;next;
++
++	/* relink in front of the new &quot;above&quot; window */
++	for (wp = &amp;window_head; *wp != NULL; wp = &amp;(*wp)-&gt;next) 
++		if ((*wp)-&gt;id == above)
++			break;
++
++	win-&gt;next = *wp;
++	*wp = win;
++
++	for (i=0, wp = &amp;window_head; *wp != NULL; wp = &amp;(*wp)-&gt;next, i++)
++		if (i != (*wp)-&gt;no) {
++			(*wp)-&gt;no = i;
++			if ((*wp)-&gt;oid != -1)
++				window_set_position(*wp);
++		}
++}
++struct window *window_find(Window id) 
++{
++	struct window *window;
++	for (window = window_head; window != NULL; window = window-&gt;next) {
++		if (window-&gt;id == id)
++			return(window);
++	}
++	return(NULL);
++
++}
++
++void window_add(Display *dpy, Window id)
++{
++	struct window *win;
++	win = malloc(sizeof(struct window));
++	if (!win)
++		return;
++
++	if (window_find(id) != NULL) {
++		printf(&quot;!!!! Window already added\n&quot;);
++		return;
++	}
++	win-&gt;id = id;
++	XGetWindowAttributes(dpy, win-&gt;id, &amp;win-&gt;attr);
++
++	/* XSelectInput(dpy, win-&gt;id, ExposureMask|ButtonPressMask|KeyPressMask*/
++/*	XSelectInput(dpy, win-&gt;id, SubstructureNotifyMask | ExposureMask | StructureNotifyMask | PropertyChangeMask);*/
++	XSelectInput(dpy, win-&gt;id, 0);
++
++	win-&gt;damage = XDamageCreate(dpy, win-&gt;id, XDamageReportNonEmpty);
++	win-&gt;format = XRenderFindVisualFormat(dpy, win-&gt;attr.visual);
++
++	if (win-&gt;format != NULL) {
++		/* printf(&quot;add window: %d:%d size: %dx%d\n&quot;, win-&gt;attr.x, win-&gt;attr.y, win-&gt;attr.width, win-&gt;attr.height);*/
++		win-&gt;pa.subwindow_mode = IncludeInferiors;
++		win-&gt;picture = XRenderCreatePicture(dpy, win-&gt;id, win-&gt;format, CPSubwindowMode, &amp;win-&gt;pa);
++	}
++	win-&gt;no = 0;
++	win-&gt;oid = -1;
++	win-&gt;next = window_head;
++	window_head = win;
++	win-&gt;already_updated = 0;
++	window_update_content(win, 0, 0, win-&gt;attr.width, win-&gt;attr.height);
++	printf(&quot;window (%d) added\n&quot;, (int)id);
++}
++
++void window_remove(Window id)
++{
++	struct window **wp, *window;
++	for (wp = &amp;window_head; *wp != NULL; wp = &amp;(*wp)-&gt;next) 
++		if ((*wp)-&gt;id == id)
++			break;
++
++	if (*wp == NULL) {
++		printf(&quot;!!!! not found (window %d) for removal.\n&quot;, (int)id);
++		return;
++	}
++	window = *wp;
++	*wp = window-&gt;next;
++
++	printf(&quot;window (%d) removed\n&quot;, (int)id);
++
++	/* TODO: properly cleanup */
++	if (window-&gt;oid != -1)
++		s3d_del_object(window-&gt;oid);
++	if (window-&gt;picture)
++		XRenderFreePicture(dpy, window-&gt;picture);
++	if (window-&gt;damage)
++		XDamageDestroy(dpy, window-&gt;damage);
++
++	free(window);
++}
++void window_update_geometry(struct window *win, int x, int y, int width, int height)
++{
++
++	printf(&quot;window_update_geometry()\n&quot;);
++	if (win-&gt;oid == -1) {
++		win-&gt;attr.x = x;
++		win-&gt;attr.y = y;
++		win-&gt;attr.width = width;
++		win-&gt;attr.height = height;
++
++		window_update_content(win, 0, 0, width, height);
++		return;
++	}
++	if ((win-&gt;attr.width == width) &amp;&amp; (win-&gt;attr.height == height)) {
++		if ((win-&gt;attr.x == x) &amp;&amp; (win-&gt;attr.y == y)) {
++			printf(&quot;position did not change\n&quot;);
++			return;
++		} else {
++			win-&gt;attr.x = x;
++			win-&gt;attr.y = y;
++			window_set_position(win);
++		}
++	} else {
++		win-&gt;attr.x = x;
++		win-&gt;attr.y = y;
++		win-&gt;attr.width = width;
++		win-&gt;attr.height = height;
++
++		s3d_del_object(win-&gt;oid); /* delete the window and redraw */
++		win-&gt;oid = -1;
++		window_update_content(win, 0, 0, width, height);
++
++	}
++}
++
++static int get_shift(unsigned long t)
++{
++	int i;
++	for (i = 0; t ; i++)
++		t &gt;&gt;= 1;
++	return(i);
++}
++
++
++/* convert X-format to s3ds RGBA 32bit format */
++static int image_convert(XImage *image, char *bitmap)
++{
++	int x, y;
++	int rs, gs, bs;
++	int bpp;
++	char *img_ptr, *bmp_ptr;
++	unsigned long *s;
++	uint32_t *t;
++
++
++	if (image-&gt;format == ZPixmap) {
++		/*  printf(&quot;XImage: %dx%d, format %d (%d), bpp: %d, depth %d, pad %d\n&quot;,
++		         image-&gt;width, image-&gt;height, image-&gt;format,
++		         ZPixmap, image-&gt;bits_per_pixel, image-&gt;depth, image-&gt;bitmap_pad);*/
++		rs = get_shift(image-&gt;red_mask) - 8;
++		gs = get_shift(image-&gt;green_mask) - 8;
++		bs = get_shift(image-&gt;blue_mask) - 8;
++
++		bpp = (image-&gt;bits_per_pixel / 8);
++		/* rgb is not bgr */
++		rs = rs;
++		gs = gs - 8;
++		bs = bs - 16;
++		/*  printf(&quot;Ximage: rgb: %d|%d|%d\n&quot;, rs, gs, bs);;*/
++		/*  printf(&quot;red: size %d, offset %d\n&quot;,rs,roff);
++		  printf(&quot;green: size %d, offset %d\n&quot;,gs,goff);
++		  printf(&quot;blue: size %d, offset %d\n&quot;,bs,boff);
++		  printf(&quot;bits per pixel:%d\n&quot;,bpp);*/
++		for (y = 0; y &lt; image-&gt;height ; y++) {
++			img_ptr = image-&gt;data + (y * image-&gt;width) * bpp;
++			bmp_ptr = bitmap + (y * image-&gt;width) * sizeof(uint32_t);
++			for (x = 0; x &lt; image-&gt;width; x++) {
++				s = (unsigned long *) img_ptr;
++				t = (uint32_t *)  bmp_ptr;
++				/*    bmp_ptr[0] = (rs &gt; 0 ? ((*d &amp; image-&gt;red_mask) &gt;&gt; rs)  : ((*d  &amp; image-&gt;red_mask) &lt;&lt; -rs)) ;
++				 bmp_ptr[1] = (gs &gt; 0 ? ((*d &amp; image-&gt;green_mask) &gt;&gt; gs) : ((*d  &amp; image-&gt;green_mask) &lt;&lt; -gs)) ;
++				 bmp_ptr[2] = (bs &gt; 0 ? ((*d &amp; image-&gt;blue_mask) &gt;&gt; bs)  : ((*d  &amp; image-&gt;blue_mask) &lt;&lt; -bs));
++				 bmp_ptr[3] = 255 ;*/
++				*t = (rs &gt; 0 ? ((*s &amp; image-&gt;red_mask) &gt;&gt; rs)  : ((*s  &amp; image-&gt;red_mask) &lt;&lt; -rs)) |
++				     (gs &gt; 0 ? ((*s &amp; image-&gt;green_mask) &gt;&gt; gs) : ((*s  &amp; image-&gt;green_mask) &lt;&lt; -gs)) |
++				     (bs &gt; 0 ? ((*s &amp; image-&gt;blue_mask) &gt;&gt; bs)  : ((*s  &amp; image-&gt;blue_mask) &lt;&lt; -bs)) |
++				     255 &lt;&lt; 24;
++
++				bmp_ptr += sizeof(uint32_t);
++				img_ptr += bpp;
++			}
++		}
++		return(0);
++	}
++	return(-1);
++}
++
++/* takes a bounding box and updates its window contents */
++void window_update_content(struct window *win, int x, int y, int width, int height)
++{
++	int chunk_width, chunk_height;
++	int xleft, xright;
++	int ytop, ybottom;
++	char *bitmap;
++	XImage *image;
++
++	if (win-&gt;attr.map_state == IsUnmapped)	/* not mapped images can't be grabbed */
++		return;
++
++	if (win-&gt;attr.class == InputOnly)		/* can't grab image from this source */
++		return;
++
++	/* update the whole window for now. */
++	/* x = 50;
++	 y = 50;
++	 width = win-&gt;attr.width;
++	 height = win-&gt;attr.height;*/
++	if (x &lt; 0) x = 0;
++	if (y &lt; 0) y = 0;
++	if (width &gt; win-&gt;attr.width - x)   width = win-&gt;attr.width - x;
++	if (height &gt; win-&gt;attr.height - y)   height = win-&gt;attr.height - y;
++
++	if (x == 0 &amp;&amp; y == 0 &amp;&amp; width == win-&gt;attr.width &amp;&amp; height == win-&gt;attr.height) {
++		if (win-&gt;already_updated)
++			return;
++		else
++			win-&gt;already_updated = 1;
++	}
++
++	/* if (!win-&gt;oid)
++	  deco_box(win);
++	*/
++	bitmap = malloc(TEXW * height * sizeof(uint32_t));
++	for (xleft = x; xleft &lt; x + width ; xleft = xright) {
++		xright = (xleft + TEXW) &amp; ~(TEXW - 1);
++		if (xright &gt; (x + width))
++			xright = x + width;
++		chunk_width = xright - xleft;
++/*		printf(&quot;map-state = %d, backing_store = %d\n&quot;, win-&gt;attr.map_state);
++		printf(&quot;request image: xleft = %d, xright = %d, width = %d, x:y = %d:%d, width:height = %d:%d, ~TEXW = %08x\n&quot;,
++		       xleft, xright, width, x, y, width, height, ~TEXW);*/
++		image = XGetImage(dpy, win-&gt;id, xleft, y, chunk_width, height, AllPlanes, ZPixmap);
++		if (!image) {
++/*			printf(&quot;XGetImage Error: xleft = %d, xright = %d, width = %d, x:y = %d:%d, width:height = %d:%d\n&quot;,
++							xleft, xright, width, x, y, width, height);*/
++			return;
++		}
++		if (win-&gt;oid == -1)
++			deco_box(win);
++		/*  printf(&quot;image_convert\n&quot;);*/
++		image_convert(image, bitmap);
++		/*  printf(&quot;load textures ...\n&quot;);*/
++		for (ytop = y; ytop &lt; y + height; ytop = ybottom) {
++			ybottom = (ytop + TEXH) &amp; ~(TEXH - 1);
++			if (ybottom &gt; y + height)
++				ybottom = y + height;
++			chunk_height = ybottom - ytop;
++			s3d_load_texture(win-&gt;oid, TEXNUM(win, xleft, ytop), xleft % TEXW, ytop % TEXH,
++			                 chunk_width, chunk_height, (unsigned char *)bitmap + chunk_width * (ytop - y) * 4);
++			/*   printf(&quot;s3d_load_texture(%d, %d, %d, %d, %d, %d, %010p);\n&quot;,
++			       win-&gt;oid, TEXNUM(win, xleft, ytop), xleft % TEXW, ytop % TEXH,
++			        chunk_width, chunk_height, (unsigned char *)bitmap + chunk_width * (ytop - y) * 4);*/
++		}
++		/*  printf(&quot;done loading textures\n&quot;); */
++		XDestroyImage(image);
++	}
++	free(bitmap);
++}
++
+
+Added: trunk/svnonly/comptest/x11.c
+===================================================================
+--- trunk/svnonly/comptest/x11.c	2007-11-13 10:24:39 UTC (rev 855)
++++ trunk/svnonly/comptest/x11.c	2007-11-13 10:42:25 UTC (rev 856)
+@@ -0,0 +1,220 @@
++/*
++ * x11.c
++ *
++ * Copyright (C) 2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of comptest, a proof-of-concept composite manager hack.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * comptest is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * comptest is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with comptest; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#include &quot;comptest.h&quot;
++#include &lt;stdio.h&gt;		/* printf() */
++
++struct extension {
++	int event, error;
++};
++static struct extension    xrender, xcomposite, xdamage, xfixes;
++Display       *dpy;
++static char    *display = NULL;
++
++int print_event(Display *COMPUNUSED(dpy), XEvent *event)
++{
++	char *name = &quot;unknown&quot;;
++	switch (event-&gt;type &amp; 0x7f) {
++	case CreateNotify:
++		name = &quot;Create&quot;;
++		break;
++	case DestroyNotify:
++		name = &quot;Destroy&quot;;
++		break;
++	case Expose:
++		name = &quot;Expose&quot;;
++		break;
++	case MapNotify:
++		name = &quot;Map&quot;;
++		break;
++	case UnmapNotify:
++		name = &quot;Unmap&quot;;
++		break;
++	case ReparentNotify:
++		name = &quot;Reparent&quot;;
++		break;
++	case CirculateNotify:
++		name = &quot;Circulate&quot;;
++		break;
++	case PropertyNotify:
++		name = &quot;PropertyNotify&quot;;
++		return(0);
++		break;
++	}
++	if (event-&gt;type == xdamage.event + XDamageNotify) {
++		name = &quot;Damage&quot;;
++		return(0); /* don't report this. */
++	} else if (event-&gt;type == ConfigureNotify) {
++		name = &quot;Configure&quot;;
++	}
++
++	printf(&quot;Event: %s (%d)\n&quot;, name, event-&gt;type);
++	return(0);
++}
++
++int error(Display *COMPUNUSED(dpy), XErrorEvent *event)
++{
++	char *name = &quot;&quot;;
++	char buf[256];
++	int     o;
++
++	o = event-&gt;error_code - xfixes.error;
++	switch (o) {
++	case BadRegion:
++		name = &quot;BadRegion&quot;;
++		break;
++	default:
++		break;
++	}
++	o = event-&gt;error_code - xdamage.error;
++	switch (o) {
++	case BadDamage:
++		name = &quot;BadDamage&quot;;
++		break;
++	default:
++		break;
++	}
++	o = event-&gt;error_code - xrender.error;
++	switch (o) {
++	case BadPictFormat:
++		name = &quot;BadPictFormat&quot;;
++		break;
++	case BadPicture:
++		name = &quot;BadPicture&quot;;
++		break;
++	case BadPictOp:
++		name = &quot;BadPictOp&quot;;
++		break;
++	case BadGlyphSet:
++		name = &quot;BadGlyphSet&quot;;
++		break;
++	case BadGlyph:
++		name = &quot;BadGlyph&quot;;
++		break;
++	default:
++		break;
++	}
++	switch (event-&gt;error_code) {
++	case BadWindow:
++		name = &quot;BadWindow&quot;;
++		break;
++	case BadDrawable:
++		name = &quot;BadDrawable&quot;;
++		break;
++	case BadMatch:
++		name = &quot;BadMatch&quot;;
++		return(0);
++		break;
++	}
++	XGetErrorText(dpy, event-&gt;error_code, buf, 256);
++	printf(&quot;error %d (name: %s) request %d minor %d serial %d: %s\n&quot;,
++	       event-&gt;error_code, name, event-&gt;request_code, event-&gt;minor_code, (int)event-&gt;serial, buf);
++	return(0);
++}
++
++
++int xinit(void)
++{
++	dpy = XOpenDisplay(display);
++	if (!dpy) {
++		fprintf(stderr, &quot;Can't open display\n&quot;);
++		return(1);
++	}
++	if (!XRenderQueryExtension(dpy, &amp;xrender.event, &amp;xrender.error)) {
++		fprintf(stderr, &quot;No render extension\n&quot;);
++		return(1);
++	}
++	/*    XCompositeQueryVersion (dpy, &amp;composite_major, &amp;composite_minor); */
++
++	if (!XCompositeQueryExtension(dpy, &amp;xcomposite.event, &amp;xcomposite.error)) {
++		fprintf(stderr, &quot;No composite extension\n&quot;);
++		return(1);
++	}
++
++	if (!XDamageQueryExtension(dpy, &amp;xdamage.event, &amp;xdamage.error)) {
++		fprintf(stderr, &quot;No damage extension\n&quot;);
++		return(1);
++	}
++	if (!XFixesQueryExtension(dpy, &amp;xfixes.event, &amp;xfixes.error)) {
++		fprintf(stderr, &quot;No XFixes extension\n&quot;);
++		return(1);
++	}
++	XSetErrorHandler(error);
++	return(0);
++}
++
++
++void event(void)
++{
++	XEvent event;
++	struct window *window;
++	int i;
++	for (window = window_head; window != NULL; window = window-&gt;next)
++		window-&gt;already_updated = 0;
++
++	for (i = 0; i &lt; MAXEVENTS &amp;&amp; XPending(dpy); i++) {
++		XNextEvent(dpy, &amp;event);
++		print_event(dpy, &amp;event);
++		switch (event.type - xdamage.event) {
++		case XDamageNotify:{
++			XDamageNotifyEvent *e = (XDamageNotifyEvent*) &amp; event;
++			/*   printf(&quot;window = %d, geometry = %d:%d (at %d:%d), area = %d:%d (at %d:%d)\n&quot;,
++			          (int)e-&gt;drawable, e-&gt;geometry.width, e-&gt;geometry.height, e-&gt;geometry.x, e-&gt;geometry.y,
++			          e-&gt;area.width, e-&gt;area.height, e-&gt;area.x, e-&gt;area.y);*/
++			XDamageSubtract(dpy, e-&gt;damage, None, None);
++			window = window_find(e-&gt;drawable);
++			if (window != NULL)
++				window_update_content(window, e-&gt;area.x, e-&gt;area.y, e-&gt;area.width, e-&gt;area.height);
++			break;
++		   }
++
++		}
++		switch (event.type) {
++		case ConfigureNotify:{
++			XConfigureEvent *e = &amp;event.xconfigure;
++			window = window_find(e-&gt;window);
++			if (window != NULL) {
++				/*    printf(&quot;Configure: window = %d, geometry = %d:%d (at %d:%d)\n&quot;,
++				           (int)e-&gt;window, e-&gt;width, e-&gt;height, e-&gt;x, e-&gt;y);*/
++				window_restack(window, e-&gt;above);
++				window_update_geometry(window, e-&gt;x, e-&gt;y, e-&gt;width, e-&gt;height);
++			} else {
++				printf(&quot;Configure: Could not find window to configure.\n&quot;);
++			}
++			break;
++			 }
++		case CreateNotify:{
++			XCreateWindowEvent *e = &amp;event.xcreatewindow;
++			window_add(e-&gt;display, e-&gt;window);
++			break;
++			}
++		case DestroyNotify:{
++			XDestroyWindowEvent *e = &amp;event.xdestroywindow;
++			window_remove(e-&gt;window);
++			break;
++		   }
++		}
++	}
++}
++
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000848.html">[S3d-svn] r855 - trunk/svnonly/comptest
+</A></li>
+	<LI>Next message: <A HREF="000850.html">[S3d-svn] r857 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#849">[ date ]</a>
+              <a href="thread.html#849">[ thread ]</a>
+              <a href="subject.html#849">[ subject ]</a>
+              <a href="author.html#849">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

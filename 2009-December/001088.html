@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-14-g3a39868
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2009-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20branch%2C%20maint%2C%0A%09updated.%20v0.2.1.1-14-g3a39868&In-Reply-To=%3C200912082021.nB8KLnaH019615%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001087.html">
+   <LINK REL="Next"  HREF="001089.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-14-g3a39868</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20branch%2C%20maint%2C%0A%09updated.%20v0.2.1.1-14-g3a39868&In-Reply-To=%3C200912082021.nB8KLnaH019615%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-14-g3a39868">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Dec  8 21:21:49 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001087.html">[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-12-gabd4912
+</A></li>
+        <LI>Next message: <A HREF="001089.html">[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-78-g49e45b0
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1088">[ date ]</a>
+              <a href="thread.html#1088">[ thread ]</a>
+              <a href="subject.html#1088">[ subject ]</a>
+              <a href="author.html#1088">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project &quot;Project s3d at BerliOS&quot;.
+
+The branch, maint has been updated
+       via  3a398686a496dfb8c5262ff5e9bb30c30f7d3006 (commit)
+       via  7e7dff28b9f1be643e7c762cee7fdd647da2bbf6 (commit)
+      from  abd491235c15efe708a1c5f43304e3b777bcc253 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 3a398686a496dfb8c5262ff5e9bb30c30f7d3006
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Tue Dec 8 21:21:22 2009 +0100
+
+    Start release notes for 0.2.1.2
+
+commit 7e7dff28b9f1be643e7c762cee7fdd647da2bbf6
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Tue Dec 8 21:04:35 2009 +0100
+
+    Depend on libgps 2.90 for s3dosm GPS support
+    
+    gpsd as stated with version 2.90 that the binary breakage with nearly
+    each update should stop and that they want to have a better binary
+    stability by now.
+    
+    As this is the first hard break in the development of it, we start to
+    support only the current version and all following compatible versions
+    instead of fixing each small breakage using cmake checks due to the old
+    development model with each minor update of gpsd.
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ ConfigureChecks.cmake              |    6 +---
+ Documentation/RelNotes-0.2.1.2.txt |   18 +++++++++++++++++
+ apps/s3dosm/gps.c                  |   37 +++++------------------------------
+ cmake/modules/FindGPS.cmake        |   23 ----------------------
+ config.h.cmake                     |    1 -
+ 5 files changed, 26 insertions(+), 59 deletions(-)
+ create mode 100644 Documentation/RelNotes-0.2.1.2.txt
+ delete mode 100644 cmake/modules/FindGPS.cmake
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001087.html">[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-12-gabd4912
+</A></li>
+	<LI>Next message: <A HREF="001089.html">[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-78-g49e45b0
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1088">[ date ]</a>
+              <a href="thread.html#1088">[ thread ]</a>
+              <a href="subject.html#1088">[ subject ]</a>
+              <a href="author.html#1088">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

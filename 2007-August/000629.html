@@ -1,0 +1,192 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r637 - in trunk: . cmake/modules
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r637%20-%20in%20trunk%3A%20.%20cmake/modules&In-Reply-To=%3C200708191016.l7JAGQ9X025219%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000628.html">
+   <LINK REL="Next"  HREF="000630.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r637 - in trunk: . cmake/modules</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r637%20-%20in%20trunk%3A%20.%20cmake/modules&In-Reply-To=%3C200708191016.l7JAGQ9X025219%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r637 - in trunk: . cmake/modules">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Aug 19 12:16:26 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000628.html">[S3d-svn] r636 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000630.html">[S3d-svn] r638 - in trunk: . libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#629">[ date ]</a>
+              <a href="thread.html#629">[ thread ]</a>
+              <a href="subject.html#629">[ subject ]</a>
+              <a href="author.html#629">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-08-19 12:16:26 +0200 (Sun, 19 Aug 2007)
+New Revision: 637
+
+Added:
+   trunk/cmake/modules/LateErrors.cmake
+Modified:
+   trunk/ConfigureChecks.cmake
+Log:
+Print all missing packages after configure
+
+Print all error messages about missing packages at the end of cmake configure.
+A user can now resolve all missing dependencies at once instead of incrementally at one dependencies after each configure.
+We also show a (debian) package name to help the user to find the correct package he needs to install.
+
+
+Modified: trunk/ConfigureChecks.cmake
+===================================================================
+--- trunk/ConfigureChecks.cmake	2007-08-19 10:16:25 UTC (rev 636)
++++ trunk/ConfigureChecks.cmake	2007-08-19 10:16:26 UTC (rev 637)
+@@ -1,35 +1,52 @@
++include(LateErrors)
++
+ # find required lib and add include dir for FREETYPE
+-find_package(FREETYPE REQUIRED)
+-include_directories(${FREETYPE_INCLUDE_DIR})
++find_package(FREETYPE)
++if (FREETYPE_FOUND)
++	include_directories(${FREETYPE_INCLUDE_DIR})
++else (FREETYPE_FOUND)
++	PkgError_Later(&quot;Could not find FreeType (pkg name: libfreetype6-dev)&quot;)
++endif (FREETYPE_FOUND)
+ 
+ 
+ # find required lib and add include dir for FONTCONFIG
+-find_package(Fontconfig REQUIRED)
+-include_directories(${FONTCONFIG_INCLUDE_DIR})
++find_package(Fontconfig)
++if (FONTCONFIG_FOUND)
++	include_directories(${FONTCONFIG_INCLUDE_DIR})
++else (FONTCONFIG_FOUND)
++	PkgError_Later(&quot;Could not find Fontconfig (pkg name: libfontconfig-dev)&quot;)
++endif (FONTCONFIG_FOUND)
+ 
+ 
+ # find required lib and add include dir for GLIB
+-find_package(GLIB REQUIRED)
+-include_directories(${GLIB2_INCLUDE_DIR})
+-add_definitions(${GLIB2_DEFINITIONS})
++find_package(GLIB)
++if (GLIB2_FOUND)
++	include_directories(${GLIB2_INCLUDE_DIR})
++	add_definitions(${GLIB2_DEFINITIONS})
++else (GLIB2_FOUND)
++	PkgError_Later(&quot;Could not find GLIB (pkg name: libglib-dev)&quot;)
++endif (GLIB2_FOUND)
+ 
+ 
+ # find required lib and add include dir for G3D
+-find_package(G3D REQUIRED)
+-include_directories(${G3D_INCLUDE_DIR})
+-add_definitions(${G3D_DEFINITIONS})
++find_package(G3D)
++if (G3D_FOUND)
++	include_directories(${G3D_INCLUDE_DIR})
++	add_definitions(${G3D_DEFINITIONS})
++else (G3D_FOUND)
++	PkgError_Later(&quot;Could not find G3D (pkg name: libg3d-dev)&quot;)
++endif (G3D_FOUND)
+ 
+ 
+ # find required lib and add include dir for OPENGL
+-find_package(OpenGL REQUIRED)
+-include_directories(${OPENGL_INCLUDE_DIR})
++find_package(OpenGL)
++if (OPENGL_FOUND)
++	include_directories(${OPENGL_INCLUDE_DIR})
++else (OPENGL_FOUND)
++	PkgError_Later(&quot;Could not find OpenGL libs and headers&quot;)
++endif (OPENGL_FOUND)
+ 
+-## FindOpenGL.cmake doesnt support REQUIRED in cmake 2.4
+-if (NOT OPENGL_FOUND)
+-	message(FATAL_ERROR &quot;Could not find OpenGL-Header and/or OpenGL-Libs&quot;)
+-endif (NOT OPENGL_FOUND)
+ 
+-
+ # try to find lib and add include dir for GLUT
+ find_package(GLUT)
+ if (GLUT_FOUND)
+@@ -46,7 +63,7 @@
+ 
+ # we need SDL and/or GLUT
+ if (NOT SDL_FOUND AND NOT GLUT_FOUND)
+-	message(FATAL_ERROR &quot;Could NOT find SDL or GLUT&quot;)
++	PkgError_Later(&quot;Could not find SDL (pkg name: libsdl-dev) or GLUT (pkg name: libglut-dev)&quot;)
+ endif (NOT SDL_FOUND AND NOT GLUT_FOUND)
+ 
+ 
+@@ -115,6 +132,9 @@
+ link_libraries(m)
+ 
+ 
++# print errors (if found)
++Collected_PkgErrors()
++
+ # Create config.h and add path to config.h to include search path
+ configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-s3d.h)
+ include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+Added: trunk/cmake/modules/LateErrors.cmake
+===================================================================
+--- trunk/cmake/modules/LateErrors.cmake	2007-08-19 10:16:25 UTC (rev 636)
++++ trunk/cmake/modules/LateErrors.cmake	2007-08-19 10:16:26 UTC (rev 637)
+@@ -0,0 +1,15 @@
++# Defines the following macros:
++#
++# PkgError_Later(errmsg)
++# Collected_PkgErrors()
++
++macro(PkgError_Later _errmsg)
++	set(pgk_error &quot;${pgk_error}\n\t${_errmsg}&quot;)
++endmacro(PkgError_Later _errmsg)
++
++macro(Collected_PkgErrors)
++	if (pgk_error)
++		message(FATAL_ERROR &quot;Following required packages could not be found: ${pgk_error}\n&quot;
++			&quot;The exact names can differ depending on the distribution.&quot;)
++	endif (pgk_error)
++endmacro(Collected_PkgErrors)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000628.html">[S3d-svn] r636 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000630.html">[S3d-svn] r638 - in trunk: . libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#629">[ date ]</a>
+              <a href="thread.html#629">[ thread ]</a>
+              <a href="subject.html#629">[ subject ]</a>
+              <a href="author.html#629">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

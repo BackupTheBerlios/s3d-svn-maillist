@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r979 - trunk/Documentation/manpages
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r979%20-%20trunk/Documentation/manpages&In-Reply-To=%3C200808291700.m7TH0R14017085%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000958.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r979 - trunk/Documentation/manpages</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r979%20-%20trunk/Documentation/manpages&In-Reply-To=%3C200808291700.m7TH0R14017085%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r979 - trunk/Documentation/manpages">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Aug 29 19:00:27 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000958.html">[S3d-svn] r978 - trunk/Documentation/manpages
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#959">[ date ]</a>
+              <a href="thread.html#959">[ thread ]</a>
+              <a href="subject.html#959">[ subject ]</a>
+              <a href="author.html#959">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-08-29 19:00:25 +0200 (Fri, 29 Aug 2008)
+New Revision: 979
+
+Modified:
+   trunk/Documentation/manpages/s3dosm.1
+   trunk/Documentation/manpages/s3dosmmanpage.sgml
+Log:
+Fix missing line break introduced by docbook-to-man
+
+Modified: trunk/Documentation/manpages/s3dosm.1
+===================================================================
+--- trunk/Documentation/manpages/s3dosm.1	2008-08-29 16:42:32 UTC (rev 978)
++++ trunk/Documentation/manpages/s3dosm.1	2008-08-29 17:00:25 UTC (rev 979)
+@@ -29,7 +29,8 @@
+ $  
+ .ft B 
+ s3osm \-\-osm \fI12.90142,50.82475,12.93352,50.84592\fR 
+-.ft$  
++.ft  
++$  
+ .ft B 
+ s3osm \fIosmdata\fR.xml 
+ .ft 
+@@ -41,4 +42,4 @@
+ \fBs3d\fR(1). 
+ .PP 
+ \fI s3d project page on berlios  (link to URL <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>) \fR  
+-.\&quot; created by instant / docbook-to-man, Fri 29 Aug 2008, 18:39 
++.\&quot; created by instant / docbook-to-man, Fri 29 Aug 2008, 18:58 
+
+Modified: trunk/Documentation/manpages/s3dosmmanpage.sgml
+===================================================================
+--- trunk/Documentation/manpages/s3dosmmanpage.sgml	2008-08-29 16:42:32 UTC (rev 978)
++++ trunk/Documentation/manpages/s3dosmmanpage.sgml	2008-08-29 17:00:25 UTC (rev 979)
+@@ -68,6 +68,7 @@
+ 		&lt;para&gt;
+ 		&lt;screen
+ &gt;&lt;prompt&gt;$ &lt;/prompt&gt;&lt;userinput&gt;s3osm --osm &lt;replaceable&gt;12.90142,50.82475,12.93352,50.84592&lt;/replaceable&gt;&lt;/userinput&gt;
++
+ &lt;prompt&gt;$ &lt;/prompt&gt;&lt;userinput&gt;s3osm &lt;replaceable&gt;osmdata&lt;/replaceable&gt;.xml&lt;/userinput&gt;
+ &lt;/screen&gt;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000958.html">[S3d-svn] r978 - trunk/Documentation/manpages
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#959">[ date ]</a>
+              <a href="thread.html#959">[ thread ]</a>
+              <a href="subject.html#959">[ subject ]</a>
+              <a href="author.html#959">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,256 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r578 - in trunk: . config example libs3d server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r578%20-%20in%20trunk%3A%20.%20config%20example%20libs3d%20server&In-Reply-To=%3C200703032145.l23Ljuq2020871%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000571.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r578 - in trunk: . config example libs3d server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r578%20-%20in%20trunk%3A%20.%20config%20example%20libs3d%20server&In-Reply-To=%3C200703032145.l23Ljuq2020871%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r578 - in trunk: . config example libs3d server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sat Mar  3 22:45:56 CET 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000571.html">[S3d-svn] r579 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#570">[ date ]</a>
+              <a href="thread.html#570">[ thread ]</a>
+              <a href="subject.html#570">[ subject ]</a>
+              <a href="author.html#570">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-03-03 22:45:56 +0100 (Sat, 03 Mar 2007)
+New Revision: 578
+
+Added:
+   trunk/config/openGL.m4
+Modified:
+   trunk/Makefile.am
+   trunk/config.h.in
+   trunk/configure.ac
+   trunk/example/wiresphere.c
+   trunk/libs3d/Makefile.am
+   trunk/libs3d/shm.c
+   trunk/server/Makefile.am
+Log:
+- use frescos opengl m4 check instead of old mdl (maybe it works better?)
+- some minor changes
+
+Modified: trunk/Makefile.am
+===================================================================
+--- trunk/Makefile.am	2007-02-10 13:08:24 UTC (rev 577)
++++ trunk/Makefile.am	2007-03-03 21:45:56 UTC (rev 578)
+@@ -9,8 +9,7 @@
+ 
+ EXTRA_DIST=	gpl.txt \
+ 		config/libtool15.m4 config/mdl_have_opengl.m4 \
+-		config/pkg.m4 config/pthread.m4 config/sdl.m4 \
+-		config/simage.m4
++		config/pkg.m4 config/pthread.m4 config/sdl.m4 
+ 
+ dist_sysconf_DATA=	s3drc
+ 
+
+Added: trunk/config/openGL.m4
+===================================================================
+--- trunk/config/openGL.m4	2007-02-10 13:08:24 UTC (rev 577)
++++ trunk/config/openGL.m4	2007-03-03 21:45:56 UTC (rev 578)
+@@ -0,0 +1,60 @@
++dnl
++dnl This source file is a part of the Fresco Project.
++dnl Copyright (C) 1999 Stefan Seefeld &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">stefan at fresco.org</A>&gt; 
++dnl <A HREF="http://www.fresco.org">http://www.fresco.org</A>
++dnl
++dnl This library is free software; you can redistribute it and/or
++dnl modify it under the terms of the GNU Library General Public
++dnl License as published by the Free Software Foundation; either
++dnl version 2 of the License, or (at your option) any later version.
++dnl
++dnl This library is distributed in the hope that it will be useful,
++dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
++dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++dnl Library General Public License for more details.
++dnl
++dnl You should have received a copy of the GNU Library General Public
++dnl License along with this library; if not, write to the
++dnl Free Software Foundation, Inc., 675 Mass Ave, Cambridge,
++dnl MA 02139, USA.
++
++dnl
++dnl FRESCO_OPENGL_CHECK
++dnl
++AC_DEFUN([FRESCO_OPENGL_CHECK],
++  [AC_ARG_WITH(opengl-prefix,
++	       AC_HELP_STRING([--with-opengl-prefix],[Prefix for openGL]),
++               [opengl_prefix=&quot;$withval&quot;])
++
++   dnl Check for opengl includes
++   if test x$opengl_prefix != x ; then
++     GL_CPPFLAGS=-I$opengl_prefix/include
++   fi
++   save_CPPFLAGS=&quot;$CPPFLAGS&quot;
++   CPPFLAGS=&quot;$GL_CPPFLAGS $CPPFLAGS&quot;
++   AC_CHECK_HEADER(GL/gl.h,,no_gl=yes)
++   AC_CHECK_HEADER(GL/glu.h,,no_gl=yes)
++   CPPFLAGS=&quot;$save_CPPFLAGS&quot;
++   
++   dnl Check for opengl libs
++   if test &quot;x$no_gl&quot; = x ; then
++   
++     if test x$opengl_prefix != x ; then
++       GL_LIBS=-L$opengl_prefix/lib
++     fi
++     save_LDFLAGS=&quot;$LDFLAGS&quot;
++     LDFLAGS=&quot;$GL_LIBS $LDFLAGS&quot;
++     AC_CHECK_LIB(GL, glLoadIdentity, :, no_gl=yes)
++     AC_CHECK_LIB(GLU, gluNewTess, :, no_gl=yes, [-lGL])
++     LDFLAGS=&quot;$save_LDFLAGS&quot;
++   fi
++   
++   if test &quot;x$no_gl&quot; = xyes ; then
++   
++     AC_SUBST(HAVE_GL, 0)
++   else
++     AC_SUBST(HAVE_GL, 1)
++     AC_SUBST(GL_CPPFLAGS, &quot;$GL_CPPFLAGS&quot;)
++     AC_SUBST(GL_LIBS, &quot;$GL_LIBS -lGL -lGLU&quot;)
++   fi
++])
+
+Modified: trunk/config.h.in
+===================================================================
+--- trunk/config.h.in	2007-02-10 13:08:24 UTC (rev 577)
++++ trunk/config.h.in	2007-03-03 21:45:56 UTC (rev 578)
+@@ -134,9 +134,6 @@
+ /* Version number of package */
+ #undef VERSION
+ 
+-/* Define to 1 if the X Window System is missing or not being used. */
+-#undef X_DISPLAY_MISSING
+-
+ /* Define like PROTOTYPES; this can be used by system headers. */
+ #undef __PROTOTYPES
+ 
+
+Modified: trunk/configure.ac
+===================================================================
+--- trunk/configure.ac	2007-02-10 13:08:24 UTC (rev 577)
++++ trunk/configure.ac	2007-03-03 21:45:56 UTC (rev 578)
+@@ -75,7 +75,9 @@
+ AC_CHECK_LIBM
+ AC_SUBST(LIBM)
+ 
+- MDL_HAVE_OPENGL
++dnl #### MDL_HAVE_OPENGL
++FRESCO_OPENGL_CHECK
++
+ AC_SEARCH_LIBS(glutInit, glut, [
+ HAVE_glut=&quot;yes&quot;
+ GLUT_CFLAGS=
+
+Modified: trunk/example/wiresphere.c
+===================================================================
+--- trunk/example/wiresphere.c	2007-02-10 13:08:24 UTC (rev 577)
++++ trunk/example/wiresphere.c	2007-03-03 21:45:56 UTC (rev 578)
+@@ -111,7 +111,7 @@
+ }
+ int main (int argc, char **argv)
+ {
+-	if (!s3d_init(&amp;argc,&amp;argv,&quot;clock&quot;))	
++	if (!s3d_init(&amp;argc,&amp;argv,&quot;wiresphere&quot;))	
+ 	{
+ 		oid=wire_sphere(30,30);
+ 		s3d_scale(oid,10);
+
+Modified: trunk/libs3d/Makefile.am
+===================================================================
+--- trunk/libs3d/Makefile.am	2007-02-10 13:08:24 UTC (rev 577)
++++ trunk/libs3d/Makefile.am	2007-03-03 21:45:56 UTC (rev 578)
+@@ -8,6 +8,7 @@
+ include_HEADERS= s3d.h s3d_keysym.h
+ noinst_HEADERS=		config.h s3dlib.h sei_triangulate.h sei_interface.h
+ 
++# for proto.h
+ 
+ libs3d_la_CPPFLAGS=	-I${top_srcdir}/server
+ #fontconfig_lo_CFLAGS=	@FONTCONFIG_CFLAGS@
+
+Modified: trunk/libs3d/shm.c
+===================================================================
+--- trunk/libs3d/shm.c	2007-02-10 13:08:24 UTC (rev 577)
++++ trunk/libs3d/shm.c	2007-03-03 21:45:56 UTC (rev 578)
+@@ -132,8 +132,8 @@
+ 			s3dprintf(HIGH,&quot;shm_writen():waited too long ...&quot;);
+ 			return(-1);
+ 		}
+-		if (wait&gt;10)
+-			nanosleep(&amp;t,NULL); 
++/*		if (wait&gt;10)
++			nanosleep(&amp;t,NULL); */
+ 	}
+ 	return(s - no_left);
+ }
+@@ -155,8 +155,8 @@
+ 			s3dprintf(HIGH,&quot;shm_readn():waited too long ...&quot;);
+ 			return(-1);
+ 		}
+-		if (wait&gt;10)
+-			nanosleep(&amp;t,NULL); 
++/*		if (wait&gt;10)
++			nanosleep(&amp;t,NULL); */
+ 	}
+ 	return(s - no_left);
+ }
+
+Modified: trunk/server/Makefile.am
+===================================================================
+--- trunk/server/Makefile.am	2007-02-10 13:08:24 UTC (rev 577)
++++ trunk/server/Makefile.am	2007-03-03 21:45:56 UTC (rev 578)
+@@ -22,6 +22,6 @@
+ 	allocate.c
+ 
+ s3d_LDADD=	@LIBM@ @GL_LIBS@ ${MAYBE_SDL_LIBS} ${MAYBE_GLUT_LIBS}
+-s3d_CFLAGS=	@GL_CFLAGS@ ${MAYBE_SDL_CFLAGS} ${MAYBE_GLUT_CFLAGS} ${DEVEL_CFLAGS} 
++s3d_CFLAGS=	@GL_CPPFLAGS@ ${MAYBE_SDL_CFLAGS} ${MAYBE_GLUT_CFLAGS} ${DEVEL_CFLAGS} 
+ 
+ noinst_HEADERS=	config.h global.h proto.h
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000571.html">[S3d-svn] r579 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#570">[ date ]</a>
+              <a href="thread.html#570">[ thread ]</a>
+              <a href="subject.html#570">[ subject ]</a>
+              <a href="author.html#570">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

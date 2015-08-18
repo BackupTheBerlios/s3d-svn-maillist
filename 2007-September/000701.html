@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r709 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r709%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200709241904.l8OJ4nn9023746%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000700.html">
+   <LINK REL="Next"  HREF="000702.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r709 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r709%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200709241904.l8OJ4nn9023746%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r709 - in trunk: . server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 24 21:04:49 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000700.html">[S3d-svn] r708 - in trunk: . server
+</A></li>
+        <LI>Next message: <A HREF="000702.html">[S3d-svn] r710 - in trunk: . apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#701">[ date ]</a>
+              <a href="thread.html#701">[ thread ]</a>
+              <a href="subject.html#701">[ subject ]</a>
+              <a href="author.html#701">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-09-24 21:04:48 +0200 (Mon, 24 Sep 2007)
+New Revision: 709
+
+Modified:
+   trunk/
+   trunk/server/object.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r2473 at kero</A>:  dotslash | 2007-09-24 21:04:44 +0200
+ - don't generate textures while compiling the display list. 
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2471
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2473
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2007-09-24 18:37:48 UTC (rev 708)
++++ trunk/server/object.c	2007-09-24 19:04:48 UTC (rev 709)
+@@ -1500,7 +1500,37 @@
+ 	}
+ 	free(buf);
+ }
++/* generate textures */
++void texture_gen(struct t_obj *obj) 
++{
++	GLuint t;
++	int i;
++	struct t_tex *tex = NULL;
++	for (i=0; i &lt; obj-&gt;n_tex; i++) {
++		tex = &amp;obj-&gt;p_tex[i];
++		if (tex-&gt;gl_texnum == -1) {
++			glGenTextures(1, &amp;t);
++			glBindTexture(GL_TEXTURE_2D, t);
++			tex-&gt;gl_texnum = t;
++			s3dprintf(HIGH, &quot;generated texture %d [%dx%d, in memory %dx%d]&quot;, t, tex-&gt;tw, tex-&gt;th, tex-&gt;w, tex-&gt;h);
++			/*    for (j=0;j&lt;tex-&gt;th;j++)
++			    for (i=0;i&lt;tex-&gt;tw;i++)
++			    {
++			     s3dprintf(MED,&quot;pixel[%d,%d], %d %d %d %d&quot;,i,j,
++			         tex-&gt;buf[(j*tex-&gt;w+i)*4+0],
++			         tex-&gt;buf[(j*tex-&gt;w+i)*4+1],
++			         tex-&gt;buf[(j*tex-&gt;w+i)*4+2],
++			         tex-&gt;buf[(j*tex-&gt;w+i)*4+3]);
++			    }*/
++			/*  texture has to be generated yet ... */
++			tex_build_mipmaps(tex);
++/*			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
++			             tex-&gt;w, tex-&gt;h, 0,  / *  no border. * /
++			             GL_RGBA, GL_UNSIGNED_BYTE, tex-&gt;buf);*/
+ 
++		}
++	}
++}
+ /* activate/bind texture for object */
+ struct t_tex *get_texture(struct t_obj *obj, struct t_mat *m) {
+ 	GLuint t;
+@@ -1509,7 +1539,7 @@
+ 	/*  int i,j; */
+ 	if (m-&gt;tex &lt; obj-&gt;n_tex) {
+ 		tex = &amp;obj-&gt;p_tex[m-&gt;tex];
+-		if (tex-&gt;buf != NULL) { /*  texture seems to be okay, select it. */
++		if (tex-&gt;buf != NULL &amp;&amp; tex-&gt;gl_texnum != -1) { /*  texture seems to be okay, select it. */
+ 			matgl[0] = 1.0f;
+ 			matgl[1] = 1.0f;
+ 			matgl[2] = 1.0f;
+@@ -1517,35 +1547,14 @@
+ 			glMaterialfv(GL_FRONT, GL_AMBIENT, matgl);
+ 			glMaterialfv(GL_FRONT, GL_DIFFUSE, matgl);
+ 			glMaterialfv(GL_FRONT, GL_SPECULAR, matgl);
+-			if (tex-&gt;gl_texnum != -1) {
+-				s3dprintf(HIGH, &quot;already have texture %d [%dx%d, in memory %dx%d]&quot;, tex-&gt;gl_texnum, tex-&gt;tw, tex-&gt;th, tex-&gt;w, tex-&gt;h);
+-				glBindTexture(GL_TEXTURE_2D, tex-&gt;gl_texnum);
+-			} else {
+-				glGenTextures(1, &amp;t);
+-				glBindTexture(GL_TEXTURE_2D, t);
+-				tex-&gt;gl_texnum = t;
+-				s3dprintf(HIGH, &quot;generated texture %d [%dx%d, in memory %dx%d]&quot;, t, tex-&gt;tw, tex-&gt;th, tex-&gt;w, tex-&gt;h);
+-				/*    for (j=0;j&lt;tex-&gt;th;j++)
+-				    for (i=0;i&lt;tex-&gt;tw;i++)
+-				    {
+-				     s3dprintf(MED,&quot;pixel[%d,%d], %d %d %d %d&quot;,i,j,
+-				         tex-&gt;buf[(j*tex-&gt;w+i)*4+0],
+-				         tex-&gt;buf[(j*tex-&gt;w+i)*4+1],
+-				         tex-&gt;buf[(j*tex-&gt;w+i)*4+2],
+-				         tex-&gt;buf[(j*tex-&gt;w+i)*4+3]);
+-				    }*/
+-				/*  texture has to be generated yet ... */
+-				tex_build_mipmaps(tex);
+-/*				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+-				             tex-&gt;w, tex-&gt;h, 0,  / *  no border. * /
+-				             GL_RGBA, GL_UNSIGNED_BYTE, tex-&gt;buf);*/
+-
+-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+-			}
+-		} else { /* . can't use a texture  */
++			s3dprintf(VLOW, &quot;already have texture %d [%dx%d, in memory %dx%d]&quot;, tex-&gt;gl_texnum, tex-&gt;tw, tex-&gt;th, tex-&gt;w, tex-&gt;h);
++			glBindTexture(GL_TEXTURE_2D, tex-&gt;gl_texnum);
++			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
++			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
++			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
++			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
++			
++		} else { /* can't use a texture  */
+ 			tex = NULL;
+ 		}
+ 	}
+@@ -1572,6 +1581,7 @@
+ 	if (obj-&gt;oflags&amp;OF_SYSTEM)  return(-1);      /* can't render system objects */
+ 	if (obj-&gt;oflags&amp;OF_CLONE)  obj = p-&gt;object[obj-&gt;n_vertex];  /* it's a clone - draw the clone! */
+ 	if (!obj-&gt;dplist) {
++		texture_gen(obj);
+ 		obj-&gt;dplist = glGenLists(1);
+ 		if (obj-&gt;dplist) glNewList(obj-&gt;dplist, GL_COMPILE); /* only compile and calling later should save time. maybe. */
+ 		else     s3dprintf(LOW, &quot;couldn't get a new list :/&quot;);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000700.html">[S3d-svn] r708 - in trunk: . server
+</A></li>
+	<LI>Next message: <A HREF="000702.html">[S3d-svn] r710 - in trunk: . apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#701">[ date ]</a>
+              <a href="thread.html#701">[ thread ]</a>
+              <a href="subject.html#701">[ subject ]</a>
+              <a href="author.html#701">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

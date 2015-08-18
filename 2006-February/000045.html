@@ -1,0 +1,379 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r49 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r49%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602110328.k1B3SgCT008337%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000044.html">
+   <LINK REL="Next"  HREF="000046.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r49 - trunk/apps/olsrs3d</H1>
+    <B>nichtsnutz at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r49%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602110328.k1B3SgCT008337%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r49 - trunk/apps/olsrs3d">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Sat Feb 11 04:28:42 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000044.html">[S3d-svn] r48 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000046.html">[S3d-svn] r50 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#45">[ date ]</a>
+              <a href="thread.html#45">[ thread ]</a>
+              <a href="subject.html#45">[ subject ]</a>
+              <a href="author.html#45">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-02-11 04:28:16 +0100 (Sat, 11 Feb 2006)
+New Revision: 49
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+Log:
+add linked list to link obj_id with olsr_node.
+add eventhandler for object_clicked
+link nodes with a hidden object.
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-02-11 02:53:15 UTC (rev 48)
++++ trunk/apps/olsrs3d/main.c	2006-02-11 03:28:16 UTC (rev 49)
+@@ -1,20 +1,18 @@
+ #include &lt;stdio.h&gt;
+ #include &lt;s3d.h&gt;
+-#include &lt;unistd.h&gt;		/* sleep() */
+-#include &lt;string.h&gt; 		/* strncpy() */
++#include &lt;unistd.h&gt;	/* sleep() */
++#include &lt;string.h&gt;	/* strncpy() */
+ #include &lt;math.h&gt;		/* sqrt() */
+-#include &lt;getopt.h&gt;		/* getopt() */
++#include &lt;getopt.h&gt;	/* getopt() */
+ #include &quot;olsrs3d.h&quot;
+ #define SPEED		10.0
+ 
+ int Debug = 0;
+ 
+-char Olsr_host[256];   /* ip or hostname of olsr node with running dot_draw plugin */
++char Olsr_host[256];   													/* ip or hostname of olsr node with running dot_draw plugin */
++struct olsr_node *Root = NULL;   									/* top of olsr node tree */
++struct Obj_to_ip *Obj_to_ip_head, *Obj_to_ip_end;			/* needed pointer for linked list */
+ 
+-struct olsr_node *Root = NULL;   /* top of olsr node tree */
+-int *obj_to_ip;   /* save pointer to olsr nodes */
+-
+-
+ int node_count=-1;
+ int alpha=0;
+ int Olsr_node_obj,Olsr_node_inet_obj,mesh;
+@@ -22,8 +20,13 @@
+ float bottom=-1.0;
+ float left=-1.0;
+ 
++float CamPosition[2][3];													/* CamPosition[trans|rot][x-z] */
++float ZeroPosition[3] = {0,0,0};										/* current position zero position */
++int ZeroPoint;																	/* object zeropoint */
+ 
+ 
++
++
+ /***
+  *
+  * print usage info
+@@ -52,7 +55,7 @@
+ void out_of_mem( void ) {
+ 
+ 	printf( &quot;Sorry - you ran out of memory !\n&quot; );
+-	exit( 8 );
++	exit(8);
+ 
+ }
+ 
+@@ -146,7 +149,7 @@
+ 	float f, distance;
+ 	float tmp_mov_vec[3];
+ 	struct olsr_con **olsr_con;
+-
++	
+ 	/* no more nodes left */
+ 	if ( olsr_node == NULL ) return;
+ 
+@@ -155,9 +158,8 @@
+ 
+ 		/* delete old shape */
+ 		if ( olsr_node-&gt;obj_id != -1 ) {
++			lst_del(olsr_node-&gt;obj_id);
+ 			s3d_del_object( olsr_node-&gt;obj_id );
+-		} else {
+-			obj_to_ip = realloc( obj_to_ip, sizeof( int ) * sizeof( obj_to_ip ) + 1 );
+ 		}
+ 
+ 		if ( olsr_node-&gt;desc_id != -1 ) s3d_del_object( olsr_node-&gt;desc_id );
+@@ -166,15 +168,17 @@
+ 		if ( olsr_node-&gt;inet_gw ) {
+ 			/* olsr node offers internet access */
+ 			olsr_node-&gt;obj_id = s3d_clone( Olsr_node_inet_obj );
++			s3d_link(olsr_node-&gt;obj_id,ZeroPoint);
+ 		} else {
+ 			/* normal olsr node */
+ 			olsr_node-&gt;obj_id = s3d_clone( Olsr_node_obj );
++			s3d_link(olsr_node-&gt;obj_id,ZeroPoint);
+ 		}
+ 
+-		s3d_flags_on( olsr_node-&gt;obj_id, S3D_OF_VISIBLE );
+-
+-		obj_to_ip[ olsr_node-&gt;obj_id ] = olsr_node;
+-
++		s3d_flags_on( olsr_node-&gt;obj_id, S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++		/* add object_id and olsr_node to linked list */
++		lst_add(olsr_node-&gt;obj_id,&amp;olsr_node);
++		
+ 		/* create olsr node text and attach (link) it to the node */
+ 		olsr_node-&gt;desc_id = s3d_draw_string( olsr_node-&gt;ip, &amp;f );
+ 		s3d_link( olsr_node-&gt;desc_id, olsr_node-&gt;obj_id );
+@@ -194,6 +198,7 @@
+ 	while ( (*olsr_con) != NULL ) {
+ 
+ 		distance = dirt( olsr_node-&gt;pos_vec, (*olsr_con)-&gt;olsr_node-&gt;pos_vec, tmp_mov_vec );
++		/* f = (*olsr_con)-&gt;etx / distance; */
+ 		f = (*olsr_con)-&gt;etx * 5.0 / distance;
+ 		if ( f &lt; 0.3 ) f = 0.3;
+ 		mov_add( olsr_node-&gt;mov_vec, tmp_mov_vec, 1/f-1);
+@@ -212,13 +217,13 @@
+ 		s3d_pop_vertex( (*olsr_con)-&gt;obj_id, 6 );
+ 		s3d_pop_polygon( (*olsr_con)-&gt;obj_id, 2 );
+ 
+-		s3d_push_vertex( (*olsr_con)-&gt;obj_id, olsr_node-&gt;pos_vec[0], olsr_node-&gt;pos_vec[1], olsr_node-&gt;pos_vec[2] );
+-		s3d_push_vertex( (*olsr_con)-&gt;obj_id, olsr_node-&gt;pos_vec[0]+0.2, olsr_node-&gt;pos_vec[1], olsr_node-&gt;pos_vec[2] );
+-		s3d_push_vertex( (*olsr_con)-&gt;obj_id, olsr_node-&gt;pos_vec[0]-0.2, olsr_node-&gt;pos_vec[1], olsr_node-&gt;pos_vec[2] );
++		s3d_push_vertex( (*olsr_con)-&gt;obj_id, olsr_node-&gt;pos_vec[0]+ ZeroPosition[0], olsr_node-&gt;pos_vec[1]+ ZeroPosition[1], olsr_node-&gt;pos_vec[2]+ ZeroPosition[2] );
++		s3d_push_vertex( (*olsr_con)-&gt;obj_id, olsr_node-&gt;pos_vec[0]+0.2+ ZeroPosition[0], olsr_node-&gt;pos_vec[1]+ ZeroPosition[1], olsr_node-&gt;pos_vec[2]+ ZeroPosition[2] );
++		s3d_push_vertex( (*olsr_con)-&gt;obj_id, olsr_node-&gt;pos_vec[0]-0.2+ ZeroPosition[0], olsr_node-&gt;pos_vec[1]+ ZeroPosition[1], olsr_node-&gt;pos_vec[2]+ ZeroPosition[2] );
+ 
+-		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;olsr_node-&gt;pos_vec[0], (*olsr_con)-&gt;olsr_node-&gt;pos_vec[1], (*olsr_con)-&gt;olsr_node-&gt;pos_vec[2] );
+-		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;olsr_node-&gt;pos_vec[0], (*olsr_con)-&gt;olsr_node-&gt;pos_vec[1]+0.2, (*olsr_con)-&gt;olsr_node-&gt;pos_vec[2] );
+-		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;olsr_node-&gt;pos_vec[0], (*olsr_con)-&gt;olsr_node-&gt;pos_vec[1]-0.2, (*olsr_con)-&gt;olsr_node-&gt;pos_vec[2] );
++		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;olsr_node-&gt;pos_vec[0]+ ZeroPosition[0], (*olsr_con)-&gt;olsr_node-&gt;pos_vec[1]+ ZeroPosition[1], (*olsr_con)-&gt;olsr_node-&gt;pos_vec[2]+ ZeroPosition[2] );
++		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;olsr_node-&gt;pos_vec[0]+ ZeroPosition[0], (*olsr_con)-&gt;olsr_node-&gt;pos_vec[1]+0.2+ ZeroPosition[1], (*olsr_con)-&gt;olsr_node-&gt;pos_vec[2] + ZeroPosition[2]);
++		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;olsr_node-&gt;pos_vec[0]+ ZeroPosition[0], (*olsr_con)-&gt;olsr_node-&gt;pos_vec[1]-0.2+ ZeroPosition[1], (*olsr_con)-&gt;olsr_node-&gt;pos_vec[2] + ZeroPosition[2]);
+ 
+ 		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 0,4,5,0);
+ 		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 3,1,2,0);
+@@ -232,8 +237,6 @@
+ 
+ }
+ 
+-
+-
+ void mainloop()
+ {
+ 	int i,j,o,r;
+@@ -315,12 +318,45 @@
+ /*	sleep(1);*/
+ 	return;
+ }
++
++/***
++ *
++ * eventhandler when object clicked
++ *
++ ***/
++
++void object_click(struct s3d_evt *evt) 
++{
++	int oid;
++	oid=(int)*((unsigned long *)evt-&gt;buf);
++	/*s3d_translate(ZeroPoint,0,50,40);
++	ZeroPosition[0] = 0;
++	ZeroPosition[1] = 50;
++	ZeroPosition[2] = 40;*/
++	struct olsr_node *olsr_node;
++	olsr_node = *lst_search(oid);
++	printf(&quot;obj2ip: search return %s\n&quot;,olsr_node-&gt;ip);
++}
++
++/***
++ *
++ * eventhandler when object change by user
++ * such as Cam
++ *
++ ***/
++
+ void object_info(struct s3d_evt *hrmz)
+ {
+ 	struct s3d_obj_info *inf;
+ 	inf=(struct s3d_obj_info *)hrmz-&gt;buf;
+ 	if (inf-&gt;object==0)
+ 	{
++		CamPosition[0][0] = inf-&gt;trans_x;
++		CamPosition[0][1] = inf-&gt;trans_y;
++		CamPosition[0][2] = inf-&gt;trans_z;
++		CamPosition[1][0] = inf-&gt;rot_x;
++		CamPosition[1][1] = inf-&gt;rot_y;
++		CamPosition[1][2] = inf-&gt;rot_z;
+ 		asp=inf-&gt;scale;
+ 		if (asp&gt;1.0) /* wide screen */
+ 		{
+@@ -336,6 +372,97 @@
+ 	}
+ }
+ 
++/***
++ *
++ * initialize the struct for a linked list obj2ip
++ *
++ ***/
++
++void lst_initialize() {
++	Obj_to_ip_head = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
++	Obj_to_ip_end = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
++	if(Obj_to_ip_head == NULL || Obj_to_ip_end == NULL) {
++		printf(&quot;not enough memory to initialize struct list\n&quot;);
++		exit(8);
++	}
++	Obj_to_ip_head-&gt;next = Obj_to_ip_end-&gt;next = Obj_to_ip_end;
++}
++
++/***
++ *
++ * add a link object_id to olsr_node, to get ip adress and coordinates per object_id
++ *                 id =&gt; object_id, returned from s3d_clone or s3d_new_object
++ *  **olsr_node =&gt; pointer to pointer of current olsr_node 
++ *
++ ***/
++
++void lst_add(int id,struct olsr_node **olsr_node) {
++	struct Obj_to_ip *new, *lst_ptr;
++	new = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
++	if(new == NULL) {
++		printf(&quot;not enough memory to add element to struct list\n&quot;);
++		exit(8);
++	}
++	new-&gt;id = id;
++	new-&gt;olsr_node = *olsr_node;
++	printf(&quot;obj2ip: add object %d ip %s to list\n&quot;,new-&gt;id,new-&gt;olsr_node-&gt;ip);
++	lst_ptr = Obj_to_ip_head;
++	while(lst_ptr-&gt;next != lst_ptr-&gt;next-&gt;next) {
++		if(id &gt; lst_ptr-&gt;next-&gt;id)
++			break;
++		lst_ptr = lst_ptr-&gt;next;
++	}
++	new-&gt;next = lst_ptr-&gt;next;
++	lst_ptr-&gt;next = new;
++}
++
++/***
++ *
++ * remove element from obj2ip linked list
++ * id =&gt; object_id, returned from s3d_clone or s3d_new_object
++ *	
++ ***/
++
++void lst_del(int id) {
++	struct Obj_to_ip *del, *lst_ptr;
++	lst_ptr = Obj_to_ip_head;
++	while(lst_ptr != lst_ptr-&gt;next) {
++		if(id == lst_ptr-&gt;next-&gt;id)
++			break;
++		lst_ptr = lst_ptr-&gt;next;
++	}
++	if(lst_ptr == lst_ptr-&gt;next)
++		printf(&quot;obj2ip: id to remove not found in list\n&quot;);
++	else {
++		printf(&quot;obj2ip: remove object %d ip %s from list\n&quot;,lst_ptr-&gt;next-&gt;id,lst_ptr-&gt;next-&gt;olsr_node-&gt;ip);
++		del = lst_ptr-&gt;next;
++		lst_ptr-&gt;next = lst_ptr-&gt;next-&gt;next;
++		free(del);
++	}
++}
++
++/***
++ *
++ * search a object_id in linked list and return pointer on struct olsr_node
++ *	id =&gt; object_id , returned from s3d_clone or s3d_new_object
++ * 
++ ***/
++
++struct olsr_node **lst_search(int id) {
++	struct Obj_to_ip *lst_ptr;
++	lst_ptr = Obj_to_ip_head;
++	while(lst_ptr != lst_ptr-&gt;next) {
++		if(id == lst_ptr-&gt;next-&gt;id)
++			break;
++		lst_ptr = lst_ptr-&gt;next;
++	}
++	if(lst_ptr == lst_ptr-&gt;next)
++		printf(&quot;obj2ip: search id....id not found\n&quot;);
++	else
++		printf(&quot;obj2ip: search found objekt_id=%d objekt_ip=%s\n&quot;,id,lst_ptr-&gt;next-&gt;olsr_node-&gt;ip);
++	return(&amp;lst_ptr-&gt;next-&gt;olsr_node);
++}
++
+ int main( int argc, char *argv[] ) {
+ 
+ 	int optchar;
+@@ -363,7 +490,9 @@
+ 	}
+ 
+ 	if ( Debug ) printf( &quot;debug mode enabled ...\n&quot; );
+-
++	/* initialize obj2ip linked list */
++	/* TODO: next step is a double linked list to search,add, remove faster */
++	lst_initialize();
+ 	/* delete olsrs3d options */
+ 	while ( ( optind &lt; argc ) &amp;&amp; ( argv[optind][0] != '-' ) ) optind++;   /* optind may point to ip addr of '-H' */
+ 	optind--;
+@@ -380,15 +509,15 @@
+ 		if (!s3d_init(&amp;argc,&amp;argv,&quot;olsrs3d&quot;))
+ 		{
+ 			s3d_set_callback(S3D_EVENT_OBJ_INFO,object_info);
++			s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
+ 			if (s3d_select_font(&quot;vera&quot;))
+ 				printf(&quot;font not found\n&quot;);
+-
+ 			Olsr_node_obj=s3d_import_3ds_file(&quot;accesspoint.3ds&quot;);
+ 			Olsr_node_inet_obj=s3d_import_3ds_file(&quot;accesspoint_inet.3ds&quot;);
+ 			mesh=s3d_import_3ds_file(&quot;meshnode.3ds&quot;);
+ 			s3d_link(mesh,0);
+ 			s3d_scale(mesh,0.15);
+-
++			ZeroPoint = s3d_new_object();
+ 			s3d_mainloop(mainloop);
+ 			s3d_quit();
+ 			net_quit();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000044.html">[S3d-svn] r48 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000046.html">[S3d-svn] r50 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#45">[ date ]</a>
+              <a href="thread.html#45">[ thread ]</a>
+              <a href="subject.html#45">[ subject ]</a>
+              <a href="author.html#45">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

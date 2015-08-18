@@ -1,0 +1,195 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r421 - in trunk: . libs3d/libg3d/plugins/import
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r421%20-%20in%20trunk%3A%20.%20libs3d/libg3d/plugins/import&In-Reply-To=%3C200609182011.k8IKB3DL003869%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000413.html">
+   <LINK REL="Next"  HREF="000415.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r421 - in trunk: . libs3d/libg3d/plugins/import</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r421%20-%20in%20trunk%3A%20.%20libs3d/libg3d/plugins/import&In-Reply-To=%3C200609182011.k8IKB3DL003869%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r421 - in trunk: . libs3d/libg3d/plugins/import">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 18 22:11:03 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000413.html">[S3d-svn] r420 - in trunk: . libs3d/libg3d/plugins/import
+</A></li>
+        <LI>Next message: <A HREF="000415.html">[S3d-svn] r422 - in trunk: . libs3d/libg3d/plugins/import
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#414">[ date ]</a>
+              <a href="thread.html#414">[ thread ]</a>
+              <a href="subject.html#414">[ subject ]</a>
+              <a href="author.html#414">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-18 22:11:03 +0200 (Mon, 18 Sep 2006)
+New Revision: 421
+
+Removed:
+   trunk/libs3d/libg3d/plugins/import/img_bmp.c
+Modified:
+   trunk/
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1021 at balthasar</A>:  dotslash | 2006-09-18 22:10:54 +0200
+ - what is bmp doing here? remove
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1017
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1021
+
+Deleted: trunk/libs3d/libg3d/plugins/import/img_bmp.c
+===================================================================
+--- trunk/libs3d/libg3d/plugins/import/img_bmp.c	2006-09-18 20:08:15 UTC (rev 420)
++++ trunk/libs3d/libg3d/plugins/import/img_bmp.c	2006-09-18 20:11:03 UTC (rev 421)
+@@ -1,108 +0,0 @@
+-#include &lt;stdio.h&gt;
+-#include &lt;string.h&gt;
+-#include &lt;errno.h&gt;
+-
+-#include &lt;g3d/types.h&gt;
+-#include &lt;g3d/read.h&gt;
+-
+-gboolean plugin_load_image(G3DContext *context, const gchar *filename,
+-	G3DImage *image, gpointer user_data)
+-{
+-	FILE *f;
+-	guint32 filesize, offset, headsize, compression;
+-	guint32 x, y;
+-
+-	f = fopen(filename, &quot;r&quot;);
+-	if(f == NULL)
+-	{
+-		g_printerr(&quot;couldn't open image file '%s': %s\n&quot;, filename,
+-			strerror(errno));
+-		return FALSE;
+-	}
+-
+-	/* bitmap file always starts with 'BM' */
+-	if(g3d_read_int16_le(f) != ('B' | ('M' &lt;&lt; 8)))
+-	{
+-		g_printerr(&quot;bitmap magic not found: image seems to be corrupt\n&quot;);
+-		return FALSE;
+-	}
+-
+-	image-&gt;name = g_strdup(filename);
+-
+-	filesize = g3d_read_int32_le(f);      /* file size */
+-	g3d_read_int32_le(f);                 /* 2 x UINT16 reserved */
+-	offset   = g3d_read_int32_le(f);      /* offset of data */
+-	headsize = g3d_read_int32_le(f);      /* size of header */
+-	image-&gt;width  = g3d_read_int32_le(f); /* width */
+-	image-&gt;height = g3d_read_int32_le(f); /* height */
+-	g3d_read_int16_le(f);                               /* num of color planes */
+-	image-&gt;depth  = g3d_read_int16_le(f); /* bits per pixel */
+-	compression   = g3d_read_int32_le(f); /* compression */
+-	g3d_read_int32_le(f);                 /* image size */
+-	g3d_read_int32_le(f);                 /* v/res (dpi) */
+-	g3d_read_int32_le(f);                 /* h/res (dpi) */
+-
+-	fseek(f, offset, SEEK_SET);
+-
+-#define ALL32BIT
+-#ifndef ALL32BIT /* always 32bit for now.. */
+-	image-&gt;pixeldata = g_malloc0(image-&gt;width*image-&gt;height*(image-&gt;depth/8));
+-#else
+-	image-&gt;pixeldata = g_malloc0(image-&gt;width * image-&gt;height * 4);
+-#endif
+-
+-	for(y=image-&gt;height-1; y&gt;=0; y--)
+-	{
+-#if DEBUG &gt; 5
+-		g_printerr(&quot;| &quot;);
+-#endif
+-		for(x=0; x&lt;image-&gt;width; x++)
+-		{
+-			switch(image-&gt;depth)
+-			{
+-				case 8:
+-#ifndef ALL32BIT
+-					image-&gt;pixeldata[y*image-&gt;width+x] = g3d_read_int8(f);
+-#else
+-					image-&gt;pixeldata[(y*image-&gt;width+x)*4+0] = g3d_read_int8(f);
+-					image-&gt;pixeldata[(y*image-&gt;width+x)*4+3] = 0xFF;
+-#endif
+-#if DEBUG &gt; 5
+-					g_printerr(&quot;%2.2X &quot;, image-&gt;pixeldata[y*image-&gt;width+x]);
+-#endif
+-					break;
+-				case 24:
+-					image-&gt;pixeldata[(y*image-&gt;width+x)*4+0] = g3d_read_int8(f);
+-					image-&gt;pixeldata[(y*image-&gt;width+x)*4+1] = g3d_read_int8(f);
+-					image-&gt;pixeldata[(y*image-&gt;width+x)*4+2] = g3d_read_int8(f);
+-					image-&gt;pixeldata[(y*image-&gt;width+x)*4+3] = 0xFF;
+-					break;
+-				default:
+-					break;
+-			}
+-		}
+-#if DEBUG &gt; 5
+-		g_printerr(&quot;\n&quot;);
+-#endif
+-	}
+-	image-&gt;depth = 32;
+-#if DEBUG &gt; 2
+-	g_printerr(&quot;bitmap successfully loaded\n&quot;);
+-#endif
+-
+-	return TRUE;
+-}
+-
+-gchar *plugin_description(G3DContext *context)
+-{ 
+-	return g_strdup(
+-		&quot;Plugin to read Windows Bitmap (.bmp) images\n&quot;
+-		&quot;(for use as textures or height fields)\n&quot;
+-		&quot;Author: Markus Dahms&quot;);
+-}
+-
+-gchar **plugin_extensions(G3DContext *context)
+-{
+-	return g_strsplit(&quot;bmp&quot;, &quot;:&quot;, 0);
+-}
+-
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000413.html">[S3d-svn] r420 - in trunk: . libs3d/libg3d/plugins/import
+</A></li>
+	<LI>Next message: <A HREF="000415.html">[S3d-svn] r422 - in trunk: . libs3d/libg3d/plugins/import
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#414">[ date ]</a>
+              <a href="thread.html#414">[ thread ]</a>
+              <a href="subject.html#414">[ subject ]</a>
+              <a href="author.html#414">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

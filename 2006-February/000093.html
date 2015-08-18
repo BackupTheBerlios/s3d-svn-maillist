@@ -1,0 +1,235 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r97 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r97%20-%20trunk&In-Reply-To=%3C200602212152.k1LLqWTX018834%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000092.html">
+   <LINK REL="Next"  HREF="000094.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r97 - trunk</H1>
+    <B>ankon at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r97%20-%20trunk&In-Reply-To=%3C200602212152.k1LLqWTX018834%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r97 - trunk">ankon at berlios.de
+       </A><BR>
+    <I>Tue Feb 21 22:52:32 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000092.html">[S3d-svn] r96 - in trunk: . apps/dot_mcp
+</A></li>
+        <LI>Next message: <A HREF="000094.html">[S3d-svn] r98 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#93">[ date ]</a>
+              <a href="thread.html#93">[ thread ]</a>
+              <a href="subject.html#93">[ subject ]</a>
+              <a href="author.html#93">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: ankon
+Date: 2006-02-21 22:52:28 +0100 (Tue, 21 Feb 2006)
+New Revision: 97
+
+Added:
+   trunk/configure.ac
+Removed:
+   trunk/configure.in
+Log:
+Rename. .ac is the offizial and endorsed extension...and i keep typing 
+vi configure.ac 
+way to often...
+
+
+
+Copied: trunk/configure.ac (from rev 96, trunk/configure.in)
+
+Deleted: trunk/configure.in
+===================================================================
+--- trunk/configure.in	2006-02-21 21:27:22 UTC (rev 96)
++++ trunk/configure.in	2006-02-21 21:52:28 UTC (rev 97)
+@@ -1,151 +0,0 @@
+-dnl Process this file with autoconf to produce a configure script.
+-AC_INIT(server/main.c)
+-
+-AC_CANONICAL_HOST
+-AC_CANONICAL_TARGET
+-
+-AM_INIT_AUTOMAKE([s3d], [0.1])
+-
+-dnl Checks for programs.
+-AC_PROG_CC
+-AC_PROG_INSTALL
+-AC_PROG_LN_S
+-AC_PROG_MAKE_SET
+-AC_PATH_X
+-AC_PATH_XTRA
+-AC_PROG_LIBTOOL
+-AC_HEADER_DIRENT
+-AC_HEADER_STDC
+-AC_CHECK_HEADERS(fcntl.h sys/ioctl.h sys/time.h unistd.h)
+-
+-dnl Checks for typedefs, structures, and compiler characteristics.
+-AC_C_CONST
+-AC_HEADER_TIME
+-AC_STRUCT_TM
+-
+-dnl Checks for library functions.
+-AC_PROG_GCC_TRADITIONAL
+-AC_FUNC_SETVBUF_REVERSED
+-AC_TYPE_SIGNAL
+-AC_CHECK_FUNCS(select socket strerror strtod strtol)
+-
+-WARNS=&quot;&quot;
+-CFLAGS=&quot;$CFLAGS $X_CFLAGS&quot;
+-LIBS=&quot;$X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS $LIBS&quot;
+-
+-###
+-### Optional features 
+-###
+-DEVEL_CFLAGS=
+-DEVEL_LDFLAGS=
+-# XXX: switch default and help string for releases.
+-AC_ARG_ENABLE([devel], AS_HELP_STRING([--disable-debug],[Disables debugging flags]), [enable_debug=$enableval], [enable_debug=yes])
+-if test x$enable_debug = xyes; then
+-	DEVEL_CFLAGS=&quot;$DEVEL_CFLAGS -ggdb&quot;
+-	DEVEL_LDFLAGS=&quot;$DEVEL_LDFLAGS -ggdb&quot;
+-fi
+-
+-AC_ARG_ENABLE([profiling], AS_HELP_STRING([--enable-profiling], [Enable building for profiling]), [enable_profiling=$enableval], [enable_profiling=no])
+-if test x$enable_profiling = xyes; then
+-	DEVEL_CFLAGS=&quot;$DEVEL_CFLAGS -pg&quot;
+-	DEVEL_LDFLAGS=&quot;$DEVEL_LDFLAGS -pg&quot;
+-fi
+-
+-AC_SUBST(DEVEL_CFLAGS)
+-AC_SUBST(DEVEL_LDFLAGS)
+-dnl ##################################### SERVER #######################################
+-AC_CHECK_LIBM
+-AC_SUBST(LIBM)
+-
+-MDL_HAVE_OPENGL
+-AC_SEARCH_LIBS(glutInit, glut, [
+-HAVE_glut=x
+-GLUT_CFLAGS=
+-GLUT_LIBS=-lglut
+-], [
+-HAVE_glut=
+-GLUT_CFLAGS=
+-GLUT_LIBS=
+-])
+-AC_SUBST(GLUT_CFLAGS)
+-AC_SUBST(GLUT_LIBS)
+-
+-SDL_VERSION=1.2.7
+-AM_PATH_SDL($SDL_VERSION, [HAVE_SDL=&quot;x&quot;], [])
+-if test &quot;x${HAVE_glut}${HAVE_SDL}&quot; = &quot;x&quot;; then
+-	AC_MSG_ERROR([No OpenGL Framework found. Try installing GLUT or SDL, or both])
+-fi
+-
+-AM_CONDITIONAL([BUILD_SDL], test x&quot;${HAVE_SDL}&quot; != x)
+-AM_CONDITIONAL([BUILD_GLUT], test x&quot;${HAVE_glut}&quot; != x)
+-
+-dnl ##################################### CLIENT #######################################
+-
+-PKG_CHECK_MODULES(FONTCONFIG, fontconfig &gt;= 2.3.0, [:], [AC_MSG_ERROR([Please install fontconfig (version 2.3.0 or higher)])])
+-PKG_CHECK_MODULES(FREETYPE, freetype2 &gt;= 9.5.0, [:], [AC_MSG_ERROR([Please install freetype2 (version 9.5.0 or higher)])])
+-
+-dnl if test &quot;x${HAVE_glut}&quot; = &quot;x&quot;; then
+-dnl     AC_MSG_ERROR([Sorry, we need glut for the client in for Glyph Tesselation ...])
+-dnl fi
+-
+-dnl ##################################### EXAMPLES / APPS ######################
+-
+-AC_CHECK_LIB(gps, main, [HAVE_GPS=yes], [HAVE_GPS=no])
+-if test x$HAVE_GPS = xyes; then
+-	GPS_CFLAGS=
+-	GPS_LIBS=-lgps	
+-	AC_SUBST(GPS_CFLAGS)
+-	AC_SUBST(GPS_LIBS)
+-else
+-	WARNS=&quot;$WARNS
+- ### Sorry, you lack the gps library to compile the s3dgps application.&quot;
+-fi
+-SIM_AC_HAVE_SIMAGE_IFELSE([
+-	SIMAGE_CFLAGS=$sim_ac_simage_cppflags
+-	SIMAGE_LIBS=&quot;$sim_ac_simage_ldflags $sim_ac_simage_libs&quot;
+-	AC_SUBST(SIMAGE_CFLAGS)
+-	AC_SUBST(SIMAGE_LIBS)
+-],[
+-	WARNS=&quot;$WARNS
+- ### Sorry, you lack the simage library to compile the s3dgps application.&quot;
+-])
+-AM_CONDITIONAL([BUILD_S3DGPS], [test x$HAVE_GPS = xyes &amp;&amp; test x$sim_ac_simage_avail = xtrue])
+-
+-AC_CHECK_LIB(Xtst, main, [HAVE_Xtst=yes], [HAVE_Xtst=no], [$X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS])
+-if test x$HAVE_Xtst = xyes; then
+-	XTST_CFLAGS=
+-	XTST_LIBS=&quot;$X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS -lXtst&quot;
+-	AC_SUBST(XTST_CFLAGS)
+-	AC_SUBST(XTST_LIBS)
+-else
+-	WARNS=&quot;$WARNS
+- ### Sorry, you lack the Xtest Extension to compile the s3d to X11 Gateway.&quot;
+-fi
+-AM_CONDITIONAL([BUILD_X11GATE], [test x$HAVE_Xtst = xyes])
+-
+-HAVE_PTHREAD
+-
+-AC_ARG_WITH([examples], AS_HELP_STRING([--with-examples], [build examples]), [with_examples=$withval], [with_examples=yes])
+-AM_CONDITIONAL([BUILD_EXAMPLES], [test x$with_examples = xyes])
+-
+-AC_CONFIG_HEADER(config.h)
+-AC_CONFIG_FILES([
+-	Makefile
+-	server/Makefile
+-	client/Makefile
+-	apps/Makefile
+-	apps/olsrs3d/Makefile
+-	apps/s3d_x11gate/Makefile
+-	apps/s3dgps/Makefile
+-	apps/s3dvt/Makefile
+-	apps/dot_mcp/Makefile
+-	example/Makefile
+-	objs/Makefile])
+-AC_OUTPUT
+-
+-echo &quot;
+---------------------------------------------------------------------------------
+-$WARNS
+---------------------------------------------------------------------------------
+-&quot;
+-echo &quot;now use 'make' to compile and 'make install' to install&quot;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000092.html">[S3d-svn] r96 - in trunk: . apps/dot_mcp
+</A></li>
+	<LI>Next message: <A HREF="000094.html">[S3d-svn] r98 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#93">[ date ]</a>
+              <a href="thread.html#93">[ thread ]</a>
+              <a href="subject.html#93">[ subject ]</a>
+              <a href="author.html#93">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

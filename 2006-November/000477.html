@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r484 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r484%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200611261145.kAQBjHc6031472%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000476.html">
+   <LINK REL="Next"  HREF="000478.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r484 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r484%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200611261145.kAQBjHc6031472%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r484 - in trunk: . server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 26 12:45:17 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000476.html">[S3d-svn] r483 - trunk/apps/kism3d
+</A></li>
+        <LI>Next message: <A HREF="000478.html">[S3d-svn] r485 - trunk/apps/kism3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#477">[ date ]</a>
+              <a href="thread.html#477">[ thread ]</a>
+              <a href="subject.html#477">[ subject ]</a>
+              <a href="author.html#477">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-11-26 12:45:17 +0100 (Sun, 26 Nov 2006)
+New Revision: 484
+
+Modified:
+   trunk/
+   trunk/server/user_sdl.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1156 at kero</A>:  dotslash | 2006-11-26 12:44:54 +0100
+ - SDL_VIDEO_EXPOSE to VLOW debug level
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1150
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1156
+
+Modified: trunk/server/user_sdl.c
+===================================================================
+--- trunk/server/user_sdl.c	2006-11-21 16:42:26 UTC (rev 483)
++++ trunk/server/user_sdl.c	2006-11-26 11:45:17 UTC (rev 484)
+@@ -115,7 +115,7 @@
+ 										errsf(&quot;SDL_SetVideoMode()&quot;,SDL_GetError());
+ 									graphics_reshape(event.resize.w,event.resize.h);
+ 									break;
+-		case SDL_VIDEOEXPOSE:		s3dprintf(LOW,&quot;SDL_VIDEOEXPOSE&quot;);break;
++		case SDL_VIDEOEXPOSE:		s3dprintf(VLOW,&quot;SDL_VIDEOEXPOSE&quot;);break;
+ 		case SDL_USEREVENT:			s3dprintf(VLOW,&quot;SDL_USEREVENT&quot;);break;
+ 		case SDL_JOYAXISMOTION:		s3dprintf(VLOW,&quot;SDL_JOYAXISMOTION&quot;);break;
+ 		case SDL_JOYBALLMOTION:		s3dprintf(VLOW,&quot;SDL_JOYBALLMOTION&quot;);break;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000476.html">[S3d-svn] r483 - trunk/apps/kism3d
+</A></li>
+	<LI>Next message: <A HREF="000478.html">[S3d-svn] r485 - trunk/apps/kism3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#477">[ date ]</a>
+              <a href="thread.html#477">[ thread ]</a>
+              <a href="subject.html#477">[ subject ]</a>
+              <a href="author.html#477">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

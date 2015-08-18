@@ -1,0 +1,387 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r542 - in trunk: . libs3d libs3dw server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r542%20-%20in%20trunk%3A%20.%20libs3d%20libs3dw%20server&In-Reply-To=%3C200612211346.kBLDktku024847%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000534.html">
+   <LINK REL="Next"  HREF="000536.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r542 - in trunk: . libs3d libs3dw server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r542%20-%20in%20trunk%3A%20.%20libs3d%20libs3dw%20server&In-Reply-To=%3C200612211346.kBLDktku024847%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r542 - in trunk: . libs3d libs3dw server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Thu Dec 21 14:46:55 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000534.html">[S3d-svn] r541 - in trunk: . apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000536.html">[S3d-svn] r543 - in trunk: . libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#535">[ date ]</a>
+              <a href="thread.html#535">[ thread ]</a>
+              <a href="subject.html#535">[ subject ]</a>
+              <a href="author.html#535">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-12-21 14:46:54 +0100 (Thu, 21 Dec 2006)
+New Revision: 542
+
+Removed:
+   trunk/libs3d/libg3d/
+Modified:
+   trunk/
+   trunk/config.h.in
+   trunk/configure.ac
+   trunk/libs3d/Makefile.am
+   trunk/libs3d/io.c
+   trunk/libs3d/modelread.c
+   trunk/libs3dw/animate.c
+   trunk/libs3dw/arrange.c
+   trunk/server/Makefile.am
+   trunk/server/network.c
+   trunk/server/shm.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1305 at kero</A>:  dotslash | 2006-12-21 14:46:49 +0100
+ - general cleanup of autohell things (somehow)
+ - remove our old libg3d-fork, use it as external dependency, and using g3d_model_load_full()
+ - telling which process uses too much network load
+ - asserting oid 0 (cam) in widget library
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1303
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1305
+
+Modified: trunk/config.h.in
+===================================================================
+--- trunk/config.h.in	2006-12-20 22:11:40 UTC (rev 541)
++++ trunk/config.h.in	2006-12-21 13:46:54 UTC (rev 542)
+@@ -6,8 +6,6 @@
+ /* Use SDL */
+ #undef G_SDL
+ 
+-#undef HAVE_GPS
+-
+ /* Define to 1 if you have the &lt;dirent.h&gt; header file, and it defines `DIR'.
+    */
+ #undef HAVE_DIRENT_H
+@@ -18,6 +16,9 @@
+ /* Define to 1 if you have the &lt;fcntl.h&gt; header file. */
+ #undef HAVE_FCNTL_H
+ 
++/* Have gps support */
++#undef HAVE_GPS
++
+ /* Define to 1 if you have the &lt;inttypes.h&gt; header file. */
+ #undef HAVE_INTTYPES_H
+ 
+
+Modified: trunk/configure.ac
+===================================================================
+--- trunk/configure.ac	2006-12-20 22:11:40 UTC (rev 541)
++++ trunk/configure.ac	2006-12-21 13:46:54 UTC (rev 542)
+@@ -24,8 +24,8 @@
+ AC_PROG_INSTALL
+ AC_PROG_LN_S
+ AC_PROG_MAKE_SET
+-AC_PATH_X
+-AC_PATH_XTRA
++dnl AC_PATH_X
++dnl AC_PATH_XTRA
+ AC_PROG_LIBTOOL
+ 
+ AC_HEADER_DIRENT
+@@ -44,8 +44,10 @@
+ AC_CHECK_FUNCS([select socket strerror strtod strtol shmget signal]) # XXX: the previous test should have established the existence of signal() already. just be safe here.
+ 
+ WARNS=&quot;&quot;
+-CFLAGS=&quot;$CFLAGS $X_CFLAGS -Wall -pedantic&quot;
+-LIBS=&quot;$X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS $LIBS&quot;
++dnl CFLAGS=&quot;$CFLAGS $X_CFLAGS -Wall -pedantic&quot;
++CFLAGS=&quot;$CFLAGS -Wall -pedantic&quot;
++dnl LIBS=&quot;$X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS $LIBS&quot;
++LIBS=&quot;$LIBS&quot;
+ 
+ ###
+ ### Optional features 
+@@ -103,8 +105,10 @@
+ 
+ dnl ##################################### LIBS3D #######################################
+ 
++PKG_CHECK_MODULES(G3D, libg3d &gt;= 0.0.6, [:], [AC_MSG_ERROR([Please install libg3d 0.0.6 or higher. (<A HREF="https://gna.org/projects/libg3d/">https://gna.org/projects/libg3d/</A>)])])
+ PKG_CHECK_MODULES(FONTCONFIG, fontconfig &gt;= 2.1.0, [:], [AC_MSG_ERROR([Please install fontconfig (version 2.1.0 or higher)])])
+ PKG_CHECK_MODULES(FREETYPE, freetype2 &gt;= 9.5.0, [:], [AC_MSG_ERROR([Please install freetype2 (version 9.5.0 or higher)])])
++AM_PATH_GLIB_2_0(2.0.0,,AC_MSG_ERROR([Please install glib &gt;= 2.0]), gmodule gobject)
+ 
+ PKG_CHECK_MODULES(SQLITE3, sqlite3 &gt;= 3.0, [HAVE_SQLITE3=&quot;yes&quot;], [HAVE_SQLITE3=&quot;no&quot;])
+ # libxml2
+@@ -166,37 +170,14 @@
+ 
+ AC_ARG_WITH([examples], AS_HELP_STRING([--with-examples], [build examples]), [with_examples=$withval], [with_examples=yes])
+ AM_CONDITIONAL([BUILD_EXAMPLES], [test x$with_examples = xyes])
+-########################################### LIBG3D ################
+-AM_PROG_LEX
+ 
+-## gtk-doc
+-# GTK_DOC_CHECK
+-
+-# glib
+-AM_PATH_GLIB_2_0(2.0.0,,AC_MSG_ERROR([glib &gt;= 2.0 is needed]), gmodule gobject)
+-
+-# gdk-pixbuf
+-#AM_PATH_GTK_2_0(2.0.0, have_gtk2=true)
+-#if test &quot;x$have_gtk2&quot; = &quot;xtrue&quot; ; then
+-#GDKPIXBUF_CFLAGS=$GTK_CFLAGS
+-#GDKPIXBUF_LIBS=$GTK_LIBS
+-#AC_SUBST(GDKPIXBUF_CFLAGS)
+-#AC_SUBST(GDKPIXBUF_LIBS)
+-#fi
+-#AM_CONDITIONAL([HAVE_GDKPIXBUF], test &quot;x$have_gtk2&quot; = &quot;xtrue&quot;)
+-
+-# AC_DEFINE_DIR(PLUGIN_DIR, libdir/$PACKAGE/plugins, [Plugin directory])
+-
+ AC_OUTPUT(
+ )
+ 
+-DBG_CFLAGS=&quot;&quot;
+-AC_SUBST(DBG_CFLAGS)
+-DEBUG=0
+-AC_SUBST(DEBUG)
+-AC_DEFINE_DIR(PLUGIN_DIR, libdir/$PACKAGE/plugins, [Plugin directory])
+-PLUGINS_LDFLAGS=&quot;-avoid-version -export-dynamic&quot;
+-AC_SUBST(PLUGINS_LDFLAGS)
++#DBG_CFLAGS=&quot;&quot;
++#AC_SUBST(DBG_CFLAGS)
++#DEBUG=0
++#AC_SUBST(DEBUG)
+ 
+ ###
+ ### This part just defined some things in config.h
+@@ -215,7 +196,7 @@
+ 	AC_DEFINE([SIGS], 1, [Define if signal code should be compiled])
+ fi
+ 
+-AC_CONFIG_HEADERS(libs3d/libg3d/include/g3d/config.h config.h)
++AC_CONFIG_HEADERS(config.h)
+ AC_CONFIG_FILES([
+ 	Makefile
+ 	server/Makefile
+@@ -232,21 +213,9 @@
+ 	example/Makefile
+ 	objs/Makefile
+ 	Documentation/Makefile
+-	libs3d/libg3d/Makefile
+-	libs3d/libg3d/include/Makefile
+-	libs3d/libg3d/include/g3d/Makefile
+-	libs3d/libg3d/plugins/Makefile
+-	libs3d/libg3d/plugins/image/Makefile
+-	libs3d/libg3d/plugins/import/Makefile
+-	libs3d/libg3d/src/Makefile
+-	libs3d/libg3d/libg3d.pc
+ 	s3drc])
+ AC_OUTPUT
+-# libg3d
+-#	libs3d/libg3d/doc/Makefile
+-#	libs3d/libg3d/doc/api/Makefile
+-#	libs3d/libg3d/m4/Makefile
+-#	libs3d/libg3d/tests/Makefile
++
+ if test &quot;x$WARNS&quot; != x; then
+ echo &quot;
+ --------------------------------------------------------------------------------
+
+Modified: trunk/libs3d/Makefile.am
+===================================================================
+--- trunk/libs3d/Makefile.am	2006-12-20 22:11:40 UTC (rev 541)
++++ trunk/libs3d/Makefile.am	2006-12-21 13:46:54 UTC (rev 542)
+@@ -1,4 +1,3 @@
+-SUBDIRS= libg3d
+ lib_LTLIBRARIES=	libs3d.la
+ 
+ libs3d_la_SOURCES=	modelread.c callback.c error.c event.c fontselect.c \
+@@ -9,9 +8,12 @@
+ include_HEADERS= s3d.h s3d_keysym.h
+ noinst_HEADERS=		config.h s3dlib.h sei_triangulate.h sei_interface.h
+ 
++
+ libs3d_la_CPPFLAGS=	-I${top_srcdir}/server
+-libs3d_la_CFLAGS=	@FONTCONFIG_CFLAGS@ @FREETYPE_CFLAGS@ -I$(top_srcdir)/libs3d/libg3d/include @GLIB_CFLAGS@
+-libs3d_la_LIBADD=	@FONTCONFIG_LIBS@ @FREETYPE_LIBS@ @LIBM@ 
+-libs3d_la_LDFLAGS=	$(top_builddir)/libs3d/libg3d/src/libg3d.la
++#fontconfig_lo_CFLAGS=	@FONTCONFIG_CFLAGS@
++#freetype_lo_CFLAGS=	@FREETYPE_CFLAGS@
++#modelread_lo_CFLAGS=	@GLIB_CFLAGS@ @G3D_CFLAGS@
++libs3d_la_CFLAGS=		@FONTCONFIG_CFLAGS@ @FREETYPE_CFLAGS@ @GLIB_CFLAGS@ @G3D_CFLAGS@
++libs3d_la_LIBADD=		@FONTCONFIG_LIBS@ @FREETYPE_LIBS@ @LIBM@ @G3D_LIBS@
+ 
+ EXTRA_DIST=		lgpl.txt
+
+Modified: trunk/libs3d/io.c
+===================================================================
+--- trunk/libs3d/io.c	2006-12-20 22:11:40 UTC (rev 541)
++++ trunk/libs3d/io.c	2006-12-21 13:46:54 UTC (rev 542)
+@@ -221,7 +221,7 @@
+ 	if (fstat(fileno(fp),&amp;bf))
+ 	{ errdn(VLOW,&quot;s3d_open_file():fstat()&quot;,errno); return(-1);}
+ 	filesize=bf.st_size;
+-	s3dprintf(LOW, &quot;opening %s, filesize is %d&quot;,fname, filesize);
++/*	s3dprintf(LOW, &quot;opening %s, filesize is %d&quot;,fname, filesize);*/
+ 	if ((buf=malloc(filesize))==NULL)
+ 	{
+ 		errn(&quot;s3d_open_3ds_file():malloc()&quot;,errno);
+
+Modified: trunk/libs3d/modelread.c
+===================================================================
+--- trunk/libs3d/modelread.c	2006-12-20 22:11:40 UTC (rev 541)
++++ trunk/libs3d/modelread.c	2006-12-21 13:46:54 UTC (rev 542)
+@@ -136,7 +136,7 @@
+ 
+ 	context = g3d_context_new();
+ 	obj_id=-1;
+-	model = g3d_model_load(context, file);
++	model = g3d_model_load_full(context, file, 0);
+ 
+ 	if ( model ) {
+ 
+
+Modified: trunk/libs3dw/animate.c
+===================================================================
+--- trunk/libs3dw/animate.c	2006-12-20 22:11:40 UTC (rev 541)
++++ trunk/libs3dw/animate.c	2006-12-21 13:46:54 UTC (rev 542)
+@@ -45,6 +45,11 @@
+ /* add an item on the animation stack */
+ void s3dw_ani_add(s3dw_widget *f)
+ {
++
++	if ((f-&gt;oid == 0) &amp;&amp; (f-&gt;type!=S3DW_TCAM)) {
++		s3dprintf(HIGH,&quot;s3dw_ani_add() assert failed: weird, moving cam but its not a cam obeject?&quot;);
++		return;
++	}
+ 	if ((ani_n&lt;MAXANI) &amp;&amp; (animation_on))
+ 	{
+ 		if (s3dw_ani_onstack(f))
+@@ -72,8 +77,11 @@
+ void s3dw_ani_doit(s3dw_widget *f)
+ {
+ 	if ((f-&gt;oid == 0) &amp;&amp; (f-&gt;type!=S3DW_TCAM)) {
+-		s3dprintf(HIGH,&quot;assert failed: weird, moving cam but its not a cam obeject?&quot;);
++		s3dprintf(HIGH,&quot;s3dw_ani_doit() assert failed: weird, moving cam but its not a cam obeject?&quot;);
+ 	} else {
++		if (f-&gt;oid==0) {
++			s3dprintf(HIGH,&quot;moving cam&quot;);
++		}
+ 		s3d_translate(	f-&gt;oid, f-&gt;ax,f-&gt;ay,f-&gt;az);
+ 		s3d_rotate(		f-&gt;oid, f-&gt;arx,f-&gt;ary,f-&gt;arz);
+ 		s3d_scale(		f-&gt;oid, f-&gt;as);
+
+Modified: trunk/libs3dw/arrange.c
+===================================================================
+--- trunk/libs3dw/arrange.c	2006-12-20 22:11:40 UTC (rev 541)
++++ trunk/libs3dw/arrange.c	2006-12-21 13:46:54 UTC (rev 542)
+@@ -177,10 +177,10 @@
+ 	{
+ 		w1=root-&gt;pobj[i];
+ 		arranged=1;
+-		for (j=0;j&lt;root-&gt;nobj;j++)
+-			if (i!=j)
++		for (j=0;j&lt;root-&gt;nobj;j++) {
++			w2=root-&gt;pobj[j];
++			if ((i!=j) &amp;&amp; ((w1-&gt;oid!=0) &amp;&amp; (w2-&gt;oid!=0)))
+ 			{
+-				w2=root-&gt;pobj[j];
+ 				s3dw_arr_widgetcenter(w1,f1);
+ 				s3dw_arr_widgetcenter(w2,f2);
+ 				len1=s3d_vector_length(f1);
+@@ -225,6 +225,7 @@
+ 					}
+ 				}
+ 			}
++		}
+ 		if (arranged)
+ 			w1-&gt;flags|=S3DW_ARRANGED;
+ 	}
+
+Modified: trunk/server/Makefile.am
+===================================================================
+--- trunk/server/Makefile.am	2006-12-20 22:11:40 UTC (rev 541)
++++ trunk/server/Makefile.am	2006-12-21 13:46:54 UTC (rev 542)
+@@ -19,6 +19,6 @@
+ 	shm.c shm_ringbuf.c tcp.c user.c
+ 
+ s3d_LDADD=	@LIBM@ @GL_LIBS@ ${MAYBE_SDL_LIBS} ${MAYBE_GLUT_LIBS}
+-s3d_CFLAGS=	@GL_CFLAGS@ ${MAYBE_SDL_CFLAGS} ${MAYBE_GLUT_CFLAGS} ${DEVEL_CFLAGS} -I$(top_srcdir)/libs3d
++s3d_CFLAGS=	@GL_CFLAGS@ ${MAYBE_SDL_CFLAGS} ${MAYBE_GLUT_CFLAGS} ${DEVEL_CFLAGS} 
+ 
+ noinst_HEADERS=	config.h global.h proto.h
+
+Modified: trunk/server/network.c
+===================================================================
+--- trunk/server/network.c	2006-12-20 22:11:40 UTC (rev 541)
++++ trunk/server/network.c	2006-12-21 13:46:54 UTC (rev 542)
+@@ -84,7 +84,7 @@
+ int					 turn;
+ int	net_turn_off(int interval)
+ {
+-	s3dprintf(HIGH,&quot;Warning: High traffic on Network, interrupting read.&quot;);
++	s3dprintf(VLOW,&quot;Warning: High traffic on Network, interrupting read.&quot;);
+ 	turn=0;
+ 	return(0);
+ }
+
+Modified: trunk/server/shm.c
+===================================================================
+--- trunk/server/shm.c	2006-12-20 22:11:40 UTC (rev 541)
++++ trunk/server/shm.c	2006-12-21 13:46:54 UTC (rev 542)
+@@ -196,8 +196,10 @@
+ 					shm_prot_com_in(&amp;procs_p[i]);
+ 					if (turn)
+ 						i--; /* evil hack: decrease i so it will be our turn again in the next round */
+-					else
++					else {
++						s3dprintf(MED,&quot;client %d [%s] seems to want to keep us busy ... &quot;,i, procs_p[i].name);
+ 						turn=1; /* don't decrease, it's next connections turn */
++					}
+ 				} else {
+ 					if (procs_p[i].shmsock.idle++&gt;MAX_IDLE)
+ 					{ /* maybe the function timed out somehow ...? let's check ...*/
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000534.html">[S3d-svn] r541 - in trunk: . apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000536.html">[S3d-svn] r543 - in trunk: . libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#535">[ date ]</a>
+              <a href="thread.html#535">[ thread ]</a>
+              <a href="subject.html#535">[ subject ]</a>
+              <a href="author.html#535">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

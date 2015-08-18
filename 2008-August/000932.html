@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r947 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r947%20-%20trunk/server&In-Reply-To=%3C200808162203.m7GM3bST001128%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000930.html">
+   <LINK REL="Next"  HREF="000928.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r947 - trunk/server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r947%20-%20trunk/server&In-Reply-To=%3C200808162203.m7GM3bST001128%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r947 - trunk/server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Aug 17 00:03:37 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000930.html">[S3d-svn] r946 - trunk/apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000928.html">[S3d-svn] r948 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#932">[ date ]</a>
+              <a href="thread.html#932">[ thread ]</a>
+              <a href="subject.html#932">[ subject ]</a>
+              <a href="author.html#932">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-08-17 00:03:37 +0200 (Sun, 17 Aug 2008)
+New Revision: 947
+
+Modified:
+   trunk/server/object.c
+Log:
+Fix null pointer dereferences
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2008-08-16 22:03:30 UTC (rev 946)
++++ trunk/server/object.c	2008-08-16 22:03:37 UTC (rev 947)
+@@ -1909,9 +1909,6 @@
+ 		p-&gt;object[pos] = obj;
+ 		s3dprintf(VLOW, &quot;pid %d added new object %d at %010p [pos %d]&quot;, p-&gt;id, pos, obj, pos);
+ 		return (pos);
+-	} else {
+-		s3dprintf(HIGH, &quot;obj_new(): no such process %d&quot;, p-&gt;id);
+-		return(-1);
+ 	}
+ }
+ 
+@@ -2044,7 +2041,6 @@
+ 		if (i == o-&gt;lsub) {
+ 			s3dprintf(HIGH, &quot;something is wrong!!&quot;);
+ 			o = NULL; /* segfault */
+-			o-&gt;lsub = -1;
+ 		}
+ 	}
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000930.html">[S3d-svn] r946 - trunk/apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000928.html">[S3d-svn] r948 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#932">[ date ]</a>
+              <a href="thread.html#932">[ thread ]</a>
+              <a href="subject.html#932">[ subject ]</a>
+              <a href="author.html#932">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

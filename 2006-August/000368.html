@@ -1,0 +1,190 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r375 - in trunk: . libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r375%20-%20in%20trunk%3A%20.%20libs3d&In-Reply-To=%3C200608051954.k75JstQK004848%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000367.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r375 - in trunk: . libs3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r375%20-%20in%20trunk%3A%20.%20libs3d&In-Reply-To=%3C200608051954.k75JstQK004848%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r375 - in trunk: . libs3d">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sat Aug  5 21:54:55 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000367.html">[S3d-svn] r374 - trunk/libs3d
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#368">[ date ]</a>
+              <a href="thread.html#368">[ thread ]</a>
+              <a href="subject.html#368">[ subject ]</a>
+              <a href="author.html#368">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-08-05 21:54:52 +0200 (Sat, 05 Aug 2006)
+New Revision: 375
+
+Modified:
+   trunk/
+   trunk/libs3d/fontselect.c
+   trunk/libs3d/freetype.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r887 at balthasar</A>:  dotslash | 2006-08-05 21:54:26 +0200
+ - debugging messages in fontselect and stuff, cleaned error report
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:875
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:887
+
+Modified: trunk/libs3d/fontselect.c
+===================================================================
+--- trunk/libs3d/fontselect.c	2006-08-03 19:18:41 UTC (rev 374)
++++ trunk/libs3d/fontselect.c	2006-08-05 19:54:52 UTC (rev 375)
+@@ -47,6 +47,8 @@
+   pattern = FcNameParse((FcChar8 *)mask);
+   FcConfigSubstitute(0,pattern,FcMatchPattern);
+   FcDefaultSubstitute(pattern);
++  s3dprintf(LOW,&quot;Looking for font %s&quot;,mask);
++
+   if (!(match=FcFontMatch(0,pattern,0))) 
+ 	return NULL;
+   if (FcPatternGetString(match,FC_FILE,0,&amp;file)!=FcResultMatch)
+
+Modified: trunk/libs3d/freetype.c
+===================================================================
+--- trunk/libs3d/freetype.c	2006-08-03 19:18:41 UTC (rev 374)
++++ trunk/libs3d/freetype.c	2006-08-05 19:54:52 UTC (rev 375)
+@@ -30,6 +30,19 @@
+ #include &lt;math.h&gt;			/*  atan2() */
+ #include &quot;ft2build.h&quot;
+ #include FT_FREETYPE_H
++#undef __FTERRORS_H__                
++#define FT_ERRORDEF( e, v, s )  { e, s },                    
++#define FT_ERROR_START_LIST     {                           
++#define FT_ERROR_END_LIST       { 0, 0 } };                
++                                                          
++const struct                                             
++{                                                       
++    int          err_code;                             
++    const char*  err_msg                                        
++} ft_errors[] =                                                
++                                                              
++#include FT_ERRORS_H                                         
++
+ #ifndef CALLBACK 
+ #define CALLBACK
+ #endif
+@@ -75,20 +88,13 @@
+ 	}
+ 	face_init=0;
+ 	error= FT_New_Memory_Face(library,(unsigned char *)memory_font,memory_font_size,0,&amp;face);
+-	switch (error)
++	if (error)
+ 	{
+-		case 0:
+-				face_init=1;
+-				break;
+-		case FT_Err_Unknown_File_Format:
+-				errds(HIGH,&quot;s3d_ft_load_font()&quot;,&quot;bad font file format&quot;);
+-				return(-1);
+-				break;
+-		default:
+-				errds(HIGH,&quot;s3d_ft_load_font()&quot;,&quot;couldn't load font for some reason (error %d)&quot;,error);
+-				return(-1);
+-				break;
++		errds(VHIGH,&quot;s3d_ft_load_font():FT_New_Memory_Face&quot;,&quot;can't load font : (%d) %s&quot;,ft_errors[error].err_code,ft_errors[error].err_msg);
++		return(-1);
+ 	}
++	s3dprintf(LOW,&quot;Load Font successful ...&quot;);
++	face_init=1;
+ 	return(0);
+ }
+ 
+@@ -110,6 +116,7 @@
+ }
+ 
+ 
++
+ /* renders a character with seidels algorithm and stores it in the tess_buf for later
+  * usage */
+ int _s3d_add_tessbuf(unsigned short a)
+@@ -126,14 +133,16 @@
+ 	float area[SEI_SS];
+ 	double vertices[SEI_SS+1][2];
+ 	double nvertices[SEI_SS+1][2];
++	FT_Error error;
+ 	
+-
+-	if (FT_Load_Char(face,a,	FT_LOAD_NO_BITMAP|FT_LOAD_NO_SCALE))
++	error= FT_Load_Char(face,a, FT_LOAD_NO_BITMAP|FT_LOAD_NO_SCALE);
++	if (error)
+ 	{
+-		errds(VHIGH,&quot;s3d_add_tessbuf():FT_Load_Char()&quot;,&quot;can't load character&quot;);
++		
++		errds(VHIGH,&quot;_s3d_add_tessbuf():FT_Load_Char()&quot;,&quot;can't load character %d : (%d) %s&quot;,a,ft_errors[error].err_code,ft_errors[error].err_msg);
+ 		return(-1);
+ 	} 
+-	s3dprintf(VLOW,&quot;[T]riangulating character %c&quot;,a);
++	s3dprintf(LOW,&quot;[T]riangulating character %c&quot;,a);
+ 	norm=1.0/face-&gt;glyph-&gt;metrics.vertAdvance;
+ 	ch=a;
+ 	v_off=0;
+@@ -329,6 +338,7 @@
+ 	 /*  yse (system-specific?!) font grabber */
+ 	if (((c=s3d_findfont(path))!=NULL))
+ 	{
++		s3dprintf(LOW,&quot;Loading Font %s ... &quot;,c);
+ 		_s3d_clear_tessbuf(); /* free and clear the tessbuf */
+ 		p=&amp;memory_font;
+ 		if ((memory_font_size=s3d_open_file(c,p))&gt;0)
+@@ -341,6 +351,8 @@
+ 				memory_font=oldfont;
+ 				memory_font_size=oldsize;
+ 			}
++		} else {
++			errds(VHIGH,&quot;s3d_select_font()&quot;,&quot;Could not open fontfile %s&quot;,c);
+ 		}
+ 	}
+ 	return(-1);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000367.html">[S3d-svn] r374 - trunk/libs3d
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#368">[ date ]</a>
+              <a href="thread.html#368">[ thread ]</a>
+              <a href="subject.html#368">[ subject ]</a>
+              <a href="author.html#368">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

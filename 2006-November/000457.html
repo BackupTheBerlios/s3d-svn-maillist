@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r464 - trunk/apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r464%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200611092003.kA9K3MY1015430%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000456.html">
+   <LINK REL="Next"  HREF="000458.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r464 - trunk/apps/s3dosm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r464%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200611092003.kA9K3MY1015430%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r464 - trunk/apps/s3dosm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Thu Nov  9 21:03:22 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000456.html">[S3d-svn] r463 - trunk/apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000458.html">[S3d-svn] r465 - in trunk: . apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#457">[ date ]</a>
+              <a href="thread.html#457">[ thread ]</a>
+              <a href="subject.html#457">[ subject ]</a>
+              <a href="author.html#457">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-11-09 21:03:22 +0100 (Thu, 09 Nov 2006)
+New Revision: 464
+
+Added:
+   trunk/apps/s3dosm/kismet.c
+Log:
+- forgot to add kismet.c to repository
+
+Added: trunk/apps/s3dosm/kismet.c
+===================================================================
+--- trunk/apps/s3dosm/kismet.c	2006-11-07 21:42:44 UTC (rev 463)
++++ trunk/apps/s3dosm/kismet.c	2006-11-09 20:03:22 UTC (rev 464)
+@@ -0,0 +1,101 @@
++#include &quot;s3dosm.h&quot;
++#include &lt;string.h&gt;			/* strcmp() */
++#include &lt;stdlib.h&gt;			/* strtof(),strtod(),strtol() */
++#include &lt;libxml/parser.h&gt;
++#include &lt;libxml/tree.h&gt;
++void add_tag(object_t *obj,char *k, char *v)
++{
++	tag_t *t;
++	obj-&gt;tag_n++;
++	obj-&gt;tag_p=realloc(obj-&gt;tag_p,obj-&gt;tag_n*sizeof(tag_t));
++	if (k!=NULL &amp;&amp; v!=NULL)
++	{
++		t=&amp;(obj-&gt;tag_p[obj-&gt;tag_n-1]);
++		t-&gt;ttype=TAG_UNKNOWN;
++		t-&gt;k=strdup(k);
++		t-&gt;v=strdup(v);
++		t-&gt;d.s=v;
++		if (0==strcmp(k,&quot;name&quot;))	t-&gt;ttype=TAG_NAME;
++	}
++
++}
++object_t *parse_kismet_node(xmlNodePtr cur)
++{
++	node_t *node;
++	xmlAttrPtr attr;
++	xmlNodePtr kids,gpskids;
++
++	node=node_new();
++	attr=cur-&gt;properties;
++	
++	for (attr=cur-&gt;properties;attr;attr=attr-&gt;next)
++	{
++		if (0==strcmp((char *)attr-&gt;name,&quot;number&quot;)) 		node-&gt;base.id=		strtol((char *)attr-&gt;children-&gt;content,NULL,10);
++		else if (0==strcmp((char *)attr-&gt;name,&quot;wep&quot;)) 		add_tag(OBJECT_T(node),&quot;wep&quot;,(char *)attr-&gt;children-&gt;content);
++	}
++	for (kids=cur-&gt;children;kids;kids=kids-&gt;next)
++	{
++		if (0==strcmp((char *)kids-&gt;name,&quot;SSID&quot;)) 			add_tag(OBJECT_T(node),&quot;SSID&quot;,(char *)xmlNodeGetContent(kids-&gt;children));
++		if (0==strcmp((char *)kids-&gt;name,&quot;BSSID&quot;)) 			add_tag(OBJECT_T(node),&quot;BSSID&quot;,(char *)xmlNodeGetContent(kids-&gt;children));
++		if (0==strcmp((char *)kids-&gt;name,&quot;gps-info&quot;))
++		{
++			for (gpskids=kids-&gt;children;gpskids;gpskids=gpskids-&gt;next)
++			{
++				/* get median value */
++				if (0==strcmp((char *)gpskids-&gt;name,&quot;min-lat&quot;)) 		node-&gt;lat=node-&gt;lat + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
++				if (0==strcmp((char *)gpskids-&gt;name,&quot;max-lat&quot;)) 		node-&gt;lat=node-&gt;lat + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
++				if (0==strcmp((char *)gpskids-&gt;name,&quot;min-lon&quot;)) 		node-&gt;lon=node-&gt;lon + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
++				if (0==strcmp((char *)gpskids-&gt;name,&quot;max-lon&quot;)) 		node-&gt;lon=node-&gt;lon + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
++				if (0==strcmp((char *)gpskids-&gt;name,&quot;min-alt&quot;)) 		node-&gt;alt=node-&gt;alt + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
++				if (0==strcmp((char *)gpskids-&gt;name,&quot;max-alt&quot;)) 		node-&gt;alt=node-&gt;alt + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
++
++
++			}
++		}
++	}
++
++	if (node-&gt;base.id&gt;0 &amp;&amp; (node-&gt;lon!=0.0) &amp;&amp; (node-&gt;lat!=0.0)) /* really, i don't want to discriminate anyone at 0 lat 0 lon running a wifi hotspot, even
++																	if it's in the middle of the ocean. i'm very sorry. */
++		return(OBJECT_T(node));
++	else {
++		node_free(node);
++		return(NULL);
++	}
++}
++
++/* parse the osm input file */
++layer_t *parse_kismet(char *buf, int length)
++{
++	xmlDocPtr doc;
++	xmlNodePtr cur;
++	layer_t *layer=layer_new();
++	object_t *obj;
++	
++
++	doc = xmlReadMemory(buf, length, &quot;noname.xml&quot;, NULL, 0);
++	if (doc == NULL) {
++		fprintf(stderr,&quot;Document not parsed successfully.\n&quot;);
++		return(NULL);
++	}
++	cur = xmlDocGetRootElement(doc);
++	if (cur == NULL) {
++		fprintf(stderr,&quot;empty document\n&quot;);
++		xmlFreeDoc(doc);
++		return(NULL);
++	}
++	for (cur=cur-&gt;children;cur!=NULL; cur=cur-&gt;next)
++	{
++		if (cur-&gt;type==XML_ELEMENT_NODE)
++		{
++			if (0==strcmp((char *)cur-&gt;name,&quot;wireless-network&quot;))
++			{
++				if (NULL!=(obj=parse_kismet_node(cur)))
++					layer-&gt;tree=avl_insert(layer-&gt;tree, obj);
++				else fprintf(stderr,&quot;bad node\n&quot;); 
++			} 
++		}
++	}
++	xmlFreeDoc(doc);
++
++	return(layer);
++}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000456.html">[S3d-svn] r463 - trunk/apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000458.html">[S3d-svn] r465 - in trunk: . apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#457">[ date ]</a>
+              <a href="thread.html#457">[ thread ]</a>
+              <a href="subject.html#457">[ subject ]</a>
+              <a href="author.html#457">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

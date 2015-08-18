@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r33 - trunk/client
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r33%20-%20trunk/client&In-Reply-To=%3C200602081837.k18IbRxd002106%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000028.html">
+   <LINK REL="Next"  HREF="000029.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r33 - trunk/client</H1>
+    <B>marec at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r33%20-%20trunk/client&In-Reply-To=%3C200602081837.k18IbRxd002106%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r33 - trunk/client">marec at berlios.de
+       </A><BR>
+    <I>Wed Feb  8 19:37:27 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000028.html">[S3d-svn] r32 - in trunk: . client
+</A></li>
+        <LI>Next message: <A HREF="000029.html">[S3d-svn] r34 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#30">[ date ]</a>
+              <a href="thread.html#30">[ thread ]</a>
+              <a href="subject.html#30">[ subject ]</a>
+              <a href="author.html#30">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-02-08 19:37:23 +0100 (Wed, 08 Feb 2006)
+New Revision: 33
+
+Modified:
+   trunk/client/io.c
+Log:
+s3d_usage fix
+
+Modified: trunk/client/io.c
+===================================================================
+--- trunk/client/io.c	2006-02-08 18:04:45 UTC (rev 32)
++++ trunk/client/io.c	2006-02-08 18:37:23 UTC (rev 33)
+@@ -18,7 +18,7 @@
+ 	#include &lt;netdb.h&gt;		 /*  gethostbyname()  */
+ #endif
+ 
+-static char				*url=NULL; 
++static char				*url=NULL;
+ extern int 				con_type;
+ /*  this file is the client-lib-implementation which holds the function to connect and control the server. */
+ #ifdef WITH_SIGNALS
+@@ -39,16 +39,16 @@
+ #endif
+ int s3d_usage()
+ {
+-	printf(&quot;s3d-parameters:&quot;);
+-	printf(&quot; --s3d-url &lt;url&gt;: skip S3D enviroment and connect to this url&quot;);
+-	printf(&quot; --help, -?, -h, --s3d-help: this helpful text&quot;);
++	printf(&quot;s3d-parameters:\n&quot;);
++	printf(&quot; --s3d-url &lt;url&gt;: skip S3D enviroment and connect to this url\n&quot;);
++	printf(&quot; --help, -?, -h, --s3d-help: this helpful text\n&quot;);
+ }
+ 
+ static int parse_args(int *argc, char ***argv)
+ {
+ 	char				 c;
+ 	int					 lopt_idx;
+-	struct option long_options[] = 
++	struct option long_options[] =
+ 	{
+ 		{&quot;s3d-url&quot;,1,0,0},
+ 		{&quot;help&quot;,0,0,'h'},
+@@ -67,7 +67,7 @@
+ 					url=optarg;
+ 					dprintf(HIGH,&quot;connecting to %s&quot;,url);
+ 				}
+-			} 
++			}
+ 			break;
+ 		case '?':
+ 		case 'h':
+@@ -81,7 +81,7 @@
+ 		*argc-=(optind-1); 				 /*  hide s3d-options */
+ 		(*argv)[optind-1]=(*argv)[0]; 	 /*  restore program path */
+ 		*argv+=(optind-1); 				 /*  set the string pointer at the right position */
+-	}	
++	}
+ 	return(0);
+ }
+ /*  external functions go here ... */
+@@ -121,7 +121,7 @@
+ 	} else {
+ 		strncpy(urlc,url,256);	 /*  this should keep buffer overflows away, maybe */
+ 		urlc[256]=0;			 /*  just to make sure */
+-		if (!strncmp(urlc, &quot;s3<A HREF="d://">d://</A> &quot;,6)) 
++		if (!strncmp(urlc, &quot;s3<A HREF="d://">d://</A> &quot;,6))
+ 		{
+ 			if (s3d_net_init(urlc)==CON_NULL) return(-1);
+ 		} else {
+@@ -135,9 +135,9 @@
+ 	 /*  TODO: we should wait for the INIT-event here before proceeding. */
+ 	_queue_init();
+ #ifdef SIGNAL
+-    if (signal(SIGINT, (sig_t)sigint_handler) == SIG_ERR) 
++    if (signal(SIGINT, (sig_t)sigint_handler) == SIG_ERR)
+ 		errn(&quot;s3d_init():signal()&quot;,errno);
+-    if (signal(SIGTERM, (sig_t)sigint_handler) == SIG_ERR) 
++    if (signal(SIGTERM, (sig_t)sigint_handler) == SIG_ERR)
+ 		errn(&quot;s3d_init():signal()&quot;,errno);
+ 
+ #endif
+@@ -201,7 +201,7 @@
+ 	{
+ 		errn(&quot;s3d_open_3ds_file():malloc()&quot;,errno);
+ 		exit(-1);
+-	} 
++	}
+ 	fread(buf, filesize, 1, fp);
+ 	fclose(fp);
+ 	*pointer=buf;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000028.html">[S3d-svn] r32 - in trunk: . client
+</A></li>
+	<LI>Next message: <A HREF="000029.html">[S3d-svn] r34 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#30">[ date ]</a>
+              <a href="thread.html#30">[ thread ]</a>
+              <a href="subject.html#30">[ subject ]</a>
+              <a href="author.html#30">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

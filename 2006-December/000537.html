@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r544 - in trunk: . libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r544%20-%20in%20trunk%3A%20.%20libs3d%20libs3dw&In-Reply-To=%3C200612211623.kBLGNu2x021940%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000536.html">
+   <LINK REL="Next"  HREF="000538.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r544 - in trunk: . libs3d libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r544%20-%20in%20trunk%3A%20.%20libs3d%20libs3dw&In-Reply-To=%3C200612211623.kBLGNu2x021940%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r544 - in trunk: . libs3d libs3dw">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Thu Dec 21 17:23:56 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000536.html">[S3d-svn] r543 - in trunk: . libs3d
+</A></li>
+        <LI>Next message: <A HREF="000538.html">[S3d-svn] r545 - trunk/apps/kism3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#537">[ date ]</a>
+              <a href="thread.html#537">[ thread ]</a>
+              <a href="subject.html#537">[ subject ]</a>
+              <a href="author.html#537">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-12-21 17:23:56 +0100 (Thu, 21 Dec 2006)
+New Revision: 544
+
+Added:
+   trunk/libs3d/libs3d.pc.in
+   trunk/libs3dw/libs3dw.pc.in
+Modified:
+   trunk/
+   trunk/configure.ac
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1309 at kero</A>:  dotslash | 2006-12-21 17:23:47 +0100
+ - add package-config things for libs3d and libs3dw
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1307
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1309
+
+Modified: trunk/configure.ac
+===================================================================
+--- trunk/configure.ac	2006-12-21 14:34:42 UTC (rev 543)
++++ trunk/configure.ac	2006-12-21 16:23:56 UTC (rev 544)
+@@ -1,6 +1,6 @@
+ dnl Process this file with autoconf to produce a configure script.
+ AC_PREREQ(2.5)
+-AC_INIT([s3d], [0.1.1])
++AC_INIT([s3d], [0.2.0])
+ AC_CONFIG_SRCDIR(server/main.c)
+ 
+ AC_CANONICAL_HOST
+@@ -213,6 +213,8 @@
+ 	example/Makefile
+ 	objs/Makefile
+ 	Documentation/Makefile
++	libs3d/libs3d.pc
++	libs3dw/libs3dw.pc
+ 	s3drc])
+ AC_OUTPUT
+ 
+
+Added: trunk/libs3d/libs3d.pc.in
+===================================================================
+--- trunk/libs3d/libs3d.pc.in	2006-12-21 14:34:42 UTC (rev 543)
++++ trunk/libs3d/libs3d.pc.in	2006-12-21 16:23:56 UTC (rev 544)
+@@ -0,0 +1,11 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@
++
++Name: libs3d
++Version: @VERSION@
++Description: Client library for the s3d server
++Requires: libg3d
++Libs: -L${libdir} -ls3d
++Cflags: -I${includedir}
+
+Added: trunk/libs3dw/libs3dw.pc.in
+===================================================================
+--- trunk/libs3dw/libs3dw.pc.in	2006-12-21 14:34:42 UTC (rev 543)
++++ trunk/libs3dw/libs3dw.pc.in	2006-12-21 16:23:56 UTC (rev 544)
+@@ -0,0 +1,11 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@
++
++Name: libs3dw
++Version: @VERSION@
++Description: Widget library based on libs3d
++Requires: libs3d
++Libs: -L${libdir} -ls3dw
++Cflags: -I${includedir}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000536.html">[S3d-svn] r543 - in trunk: . libs3d
+</A></li>
+	<LI>Next message: <A HREF="000538.html">[S3d-svn] r545 - trunk/apps/kism3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#537">[ date ]</a>
+              <a href="thread.html#537">[ thread ]</a>
+              <a href="subject.html#537">[ subject ]</a>
+              <a href="author.html#537">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

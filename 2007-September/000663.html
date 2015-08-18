@@ -1,0 +1,273 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r671 - trunk/apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r671%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200709221606.l8MG6RBS008170%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000662.html">
+   <LINK REL="Next"  HREF="000664.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r671 - trunk/apps/s3dosm</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r671%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200709221606.l8MG6RBS008170%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r671 - trunk/apps/s3dosm">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep 22 18:06:27 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000662.html">[S3d-svn] r670 - in trunk: . apps/s3dosm libs3d libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000664.html">[S3d-svn] r672 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#663">[ date ]</a>
+              <a href="thread.html#663">[ thread ]</a>
+              <a href="subject.html#663">[ subject ]</a>
+              <a href="author.html#663">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-09-22 18:06:25 +0200 (Sat, 22 Sep 2007)
+New Revision: 671
+
+Modified:
+   trunk/apps/s3dosm/http_error_codes.c
+   trunk/apps/s3dosm/http_error_codes.h
+   trunk/apps/s3dosm/http_fetcher.c
+   trunk/apps/s3dosm/http_fetcher.h
+Log:
+Changed license of http_* from Lyle Hanson to GPL2
+
+Files are used in a GPL2 program and are now licensed under GPL2 according to LGPL2 section 3
+
+
+Modified: trunk/apps/s3dosm/http_error_codes.c
+===================================================================
+--- trunk/apps/s3dosm/http_error_codes.c	2007-09-22 16:05:56 UTC (rev 670)
++++ trunk/apps/s3dosm/http_error_codes.c	2007-09-22 16:06:25 UTC (rev 671)
+@@ -1,19 +1,24 @@
+ /* http_error_codes.c - Error code declarations
+-
+- HTTP Fetcher
+-  Copyright (C) 2001 Lyle Hanson (<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lhanson at cs.nmu.edu</A>)
+-
+- This library is free software; you can redistribute it and/or
+- modify it under the terms of the GNU Library General Public
+- License as published by the Free Software Foundation; either
+- version 2 of the License, or (at your option) any later version.
+-
+- This library is distributed in the hope that it will be useful,
+- but WITHOUT ANY WARRANTY; without even the implied warranty of
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- Library General Public License for more details.
+-
+- See LICENSE file for details
++ *
++ * HTTP Fetcher
++ *  Copyright (C) 2001 Lyle Hanson (<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lhanson at cs.nmu.edu</A>)
++ *
++ * This file is part of s3dosm, a gps card application for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * s3dosm is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * s3dosm is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with s3dosm; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
+ 
+
+Modified: trunk/apps/s3dosm/http_error_codes.h
+===================================================================
+--- trunk/apps/s3dosm/http_error_codes.h	2007-09-22 16:05:56 UTC (rev 670)
++++ trunk/apps/s3dosm/http_error_codes.h	2007-09-22 16:06:25 UTC (rev 671)
+@@ -1,19 +1,23 @@
+ /* http_error_codes.h - Error code definitions
+-
+- Copyright (C) 2001 Lyle Hanson (<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lhanson at cs.nmu.edu</A>)
+-
+- This library is free software; you can redistribute it and/or
+- modify it under the terms of the GNU Library General Public
+- License as published by the Free Software Foundation; either
+- version 2 of the License, or (at your option) any later version.
+-
+- This library is distributed in the hope that it will be useful,
+- but WITHOUT ANY WARRANTY; without even the implied warranty of
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- Library General Public License for more details.
+-
+- See LICENSE file for details
+-
++ *
++ * Copyright (C) 2001 Lyle Hanson (<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lhanson at cs.nmu.edu</A>)
++ *
++ * This file is part of s3dosm, a gps card application for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * s3dosm is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * s3dosm is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with s3dosm; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
+ #ifndef HTTP_ERROR_CODES_H
+
+Modified: trunk/apps/s3dosm/http_fetcher.c
+===================================================================
+--- trunk/apps/s3dosm/http_fetcher.c	2007-09-22 16:05:56 UTC (rev 670)
++++ trunk/apps/s3dosm/http_fetcher.c	2007-09-22 16:06:25 UTC (rev 671)
+@@ -1,23 +1,28 @@
+ /* http_fetcher.c - HTTP handling functions
+-
+- Copyright (C) 2001 Lyle Hanson (<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lhanson at cs.nmu.edu</A>)
+-
+- This library is free software; you can redistribute it and/or
+- modify it under the terms of the GNU Library General Public
+- License as published by the Free Software Foundation; either
+- version 2 of the License, or (at your option) any later version.
+-
+- This library is distributed in the hope that it will be useful,
+- but WITHOUT ANY WARRANTY; without even the implied warranty of
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- Library General Public License for more details.
+-
+- See included LICENSE file for details
+-
+- Changes:
+-  Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+-  + added http_setAuth() to support basic http-authentication and some minor fixes
+-
++ *
++ * Copyright (C) 2001 Lyle Hanson (<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lhanson at cs.nmu.edu</A>)
++ *
++ * This file is part of s3dosm, a gps card application for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * s3dosm is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * s3dosm is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with s3dosm; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ *
++ * Changes:
++ *  Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *  + added http_setAuth() to support basic http-authentication and some minor fixes
+  */
+ 
+ #include &lt;stdlib.h&gt;
+
+Modified: trunk/apps/s3dosm/http_fetcher.h
+===================================================================
+--- trunk/apps/s3dosm/http_fetcher.h	2007-09-22 16:05:56 UTC (rev 670)
++++ trunk/apps/s3dosm/http_fetcher.h	2007-09-22 16:06:25 UTC (rev 671)
+@@ -1,24 +1,29 @@
+ /* http_fetcher.h - HTTP handling functions
+-
+- HTTP Fetcher
+- Copyright (C) 2001 Lyle Hanson (<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lhanson at cs.nmu.edu</A>)
+-
+- This library is free software; you can redistribute it and/or
+- modify it under the terms of the GNU Library General Public
+- License as published by the Free Software Foundation; either
+- version 2 of the License, or (at your option) any later version.
+-
+- This library is distributed in the hope that it will be useful,
+- but WITHOUT ANY WARRANTY; without even the implied warranty of
+- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- Library General Public License for more details.
+-
+- See LICENSE file for details
+-
+- Changes:
+-  Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+-  + added http_setAuth() to support basic http-authentication and some minor fixes
+-
++ *
++ * HTTP Fetcher
++ * Copyright (C) 2001 Lyle Hanson (<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lhanson at cs.nmu.edu</A>)
++ *
++ * This file is part of s3dosm, a gps card application for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * s3dosm is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * s3dosm is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with s3dosm; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ *
++ * Changes:
++ *  Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *  + added http_setAuth() to support basic http-authentication and some minor fixes
+  */
+ 
+ #ifndef HTTP_FETCHER_H
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000662.html">[S3d-svn] r670 - in trunk: . apps/s3dosm libs3d libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000664.html">[S3d-svn] r672 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#663">[ date ]</a>
+              <a href="thread.html#663">[ thread ]</a>
+              <a href="subject.html#663">[ subject ]</a>
+              <a href="author.html#663">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

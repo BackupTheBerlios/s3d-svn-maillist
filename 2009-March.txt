@@ -1,0 +1,117 @@
+From lazhur at mail.berlios.de  Tue Mar 17 22:17:16 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 17 Mar 2009 22:17:16 +0100
+Subject: [S3d-svn] r1054 - trunk
+Message-ID: <200903172117.n2HLHGJm010506@sheep.berlios.de>
+
+Author: lazhur
+Date: 2009-03-17 22:17:15 +0100 (Tue, 17 Mar 2009)
+New Revision: 1054
+
+Modified:
+   trunk/CMakeLists.txt
+   trunk/ConfigureChecks.cmake
+Log:
+Fix FTBFS with cmake 2.6.3
+
+cmake 2.6.3 changes the behaviour slightly by using the new PkgConfig
+makro to utilise pkg-config. This changes the names of the previously
+internal used variables. ConfigureChecks.cmake used some of them by
+accident instead of the ones written in the documentation.
+ConfigureChecks.cmake also doesn't use all possible variables to find
+headers. This could have lead to further build failures in the future.
+
+Modified: trunk/CMakeLists.txt
+===================================================================
+--- trunk/CMakeLists.txt	2009-02-15 11:08:16 UTC (rev 1053)
++++ trunk/CMakeLists.txt	2009-03-17 21:17:15 UTC (rev 1054)
+@@ -1,8 +1,8 @@
+ project(s3d C)
+ set(VERSION 0.2.1)
+ 
+-# we require cmake 2.4.4 or higher
+-cmake_minimum_required(VERSION 2.4.7)
++# we require cmake 2.6.3 or higher
++cmake_minimum_required(VERSION 2.6.3)
+ 
+ # set cmake policies
+ if(COMMAND cmake_policy)
+
+Modified: trunk/ConfigureChecks.cmake
+===================================================================
+--- trunk/ConfigureChecks.cmake	2009-02-15 11:08:16 UTC (rev 1053)
++++ trunk/ConfigureChecks.cmake	2009-03-17 21:17:15 UTC (rev 1054)
+@@ -51,7 +51,7 @@
+ # find required lib and add include dir for OPENGL
+ find_package(OpenGL)
+ if (OPENGL_FOUND)
+-	include_directories(${OPENGL_INCLUDE_DIRS})
++	include_directories(${OPENGL_INCLUDE_DIR})
+ else (OPENGL_FOUND)
+ 	PkgError_Later("Could not find OpenGL libs and headers")
+ endif (OPENGL_FOUND)
+@@ -95,6 +95,7 @@
+ # try to find lib and add include dir for SQLite3
+ find_package(SQLite3)
+ if (SQLITE3_FOUND)
++	include_directories(${SQLITE3_INCLUDE_DIRS})
+ 	add_definitions(${SQLITE3_DEFINITIONS})
+ endif (SQLITE3_FOUND)
+ 
+@@ -102,7 +103,7 @@
+ # try to find lib and add include dir for LibXml2
+ find_package(LibXml2)
+ if (LIBXML2_FOUND)
+-	include_directories(${LIBXML2_INCLUDE_DIRS})
++	include_directories(${LIBXML2_INCLUDE_DIR})
+ 	add_definitions(${LIBXML2_DEFINITIONS})
+ endif (LIBXML2_FOUND)
+ 
+@@ -110,37 +111,43 @@
+ # try to find lib and add include dir for Xcomposite
+ find_package(Xcomposite)
+ if (XCOMPOSITE_FOUND)
++	include_directories(${XCOMPOSITE_INCLUDE_DIRS})
+ 	add_definitions(${XCOMPOSITE_DEFINITIONS})
+ endif (XCOMPOSITE_FOUND)
+ 
+ # try to find lib and add include dir for Xdamage
+ find_package(Xdamage)
+ if (XDAMAGE_FOUND)
++	include_directories(${XDAMAGE_INCLUDE_DIRS})
+ 	add_definitions(${XDAMAGE_DEFINITIONS})
+ endif (XDAMAGE_FOUND)
+ 
+ # try to find lib and add include dir for Xfixes
+ find_package(Xfixes)
+ if (XFIXES_FOUND)
++	include_directories(${XFIXES_INCLUDE_DIRS})
+ 	add_definitions(${XFIXES_DEFINITIONS})
+ endif (XFIXES_FOUND)
+ 
+ # try to find lib and add include dir for Xrender
+ find_package(Xrender)
+ if (XRENDER_FOUND)
++	include_directories(${XRENDER_INCLUDE_DIRS})
+ 	add_definitions(${XRENDER_DEFINITIONS})
+ endif (XRENDER_FOUND)
+ 
+ # try to find lib and add include dir for Xtst
+ find_package(Xtst)
+ if (XTST_FOUND)
++	include_directories(${XTST_INCLUDE_DIRS})
+ 	add_definitions(${XTST_DEFINITIONS})
+ endif (XTST_FOUND)
+ 
+ # try to find lib and add include dir for Xtst
+ find_package(X11)
+ if (X11_FOUND)
+-	add_definitions(${XTST_DEFINITIONS})
++	include_directories(${X11_INCLUDE_DIRS})
++	add_definitions(${X11_DEFINITIONS})
+ endif (X11_FOUND)
+ 
+ 
+
+
+

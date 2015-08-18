@@ -1,0 +1,208 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r510 - in trunk: . apps/kism3d libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r510%20-%20in%20trunk%3A%20.%20apps/kism3d%20libs3d&In-Reply-To=%3C200612042220.kB4MKYlA020824%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000502.html">
+   <LINK REL="Next"  HREF="000504.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r510 - in trunk: . apps/kism3d libs3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r510%20-%20in%20trunk%3A%20.%20apps/kism3d%20libs3d&In-Reply-To=%3C200612042220.kB4MKYlA020824%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r510 - in trunk: . apps/kism3d libs3d">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Dec  4 23:20:34 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000502.html">[S3d-svn] r509 - in trunk: . server
+</A></li>
+        <LI>Next message: <A HREF="000504.html">[S3d-svn] r511 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#503">[ date ]</a>
+              <a href="thread.html#503">[ thread ]</a>
+              <a href="subject.html#503">[ subject ]</a>
+              <a href="author.html#503">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-12-04 23:20:34 +0100 (Mon, 04 Dec 2006)
+New Revision: 510
+
+Modified:
+   trunk/
+   trunk/apps/kism3d/gui.c
+   trunk/libs3d/freetype.c
+   trunk/libs3d/proto_out.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1210 at kero</A>:  dotslash | 2006-12-04 23:20:25 +0100
+ - invisible clickpoints for kisms3d gui
+ - small warning-fixes in libs3d
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1209
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1210
+
+Modified: trunk/apps/kism3d/gui.c
+===================================================================
+--- trunk/apps/kism3d/gui.c	2006-12-04 22:20:31 UTC (rev 509)
++++ trunk/apps/kism3d/gui.c	2006-12-04 22:20:34 UTC (rev 510)
+@@ -122,7 +122,8 @@
+ 	float tmp_mov_vec[3], desc_norm_vec[3] = { 0, 0, -1 };
+ 	float real_node_pos_x, real_node_pos_z, angle, angle_rad;
+ 	int network_index = 0;
+-	char *label_str;
++	char label_str[101];	/* safe to do as long as we use strn* functions */
++	float maxlen,templen;
+ 
+ 
+ 	pthread_mutex_lock( &amp;Network_list_mutex );
+@@ -165,7 +166,13 @@
+ 			}
+ 
+ 			if ( wlan_network-&gt;props_changed ) {
++				snprintf( label_str, 100, &quot;Type: %s, CH: %i, Clients: %i&quot;, ( wlan_network-&gt;type == 0 ? &quot;Managed&quot; : ( wlan_network-&gt;type == 1 ? &quot;Ad-Hoc&quot; : ( wlan_network-&gt;type == 2 ? &quot;Prober&quot; : &quot;unknown&quot; ) ) ), wlan_network-&gt;chan, wlan_network-&gt;num_wlan_clients );
+ 
++				/* determine our longest string which we draw */
++				maxlen=s3d_strlen(label_str);
++				if ((templen=s3d_strlen(wlan_network-&gt;ssid))  &gt; maxlen ) maxlen=templen;
++				if ((templen=s3d_strlen(wlan_network-&gt;bssid)) &gt; maxlen ) maxlen=templen;
++
+ 				wlan_network-&gt;props_changed = 0;
+ 
+ 				if ( wlan_network-&gt;ssid_id != -1 )
+@@ -177,23 +184,26 @@
+ 
+ 				if ( wlan_network-&gt;bssid_id == -1 ) {
+ 
+-					wlan_network-&gt;bssid_id = s3d_draw_string( wlan_network-&gt;bssid, &amp;wlan_network-&gt;bssid_len );
++					wlan_network-&gt;bssid_id = s3d_draw_string( wlan_network-&gt;bssid, NULL );
++					/* NEW!! XXX NEW!! */
++					wlan_network-&gt;bssid_len= maxlen; /* we store maxlen here. the other strings might be longer, so we use the longest string for
++														calculating our rotation. TODO: maybe rename this field to something like textblock_width? :) */
+ 					s3d_link( wlan_network-&gt;bssid_id, wlan_network-&gt;obj_id );
+-					s3d_translate( wlan_network-&gt;bssid_id, - wlan_network-&gt;bssid_len / 2, 2 + wlan_network-&gt;scale_fac, 0 );
++					s3d_translate( wlan_network-&gt;bssid_id, - maxlen / 2, 2 + wlan_network-&gt;scale_fac, 0 );
+ 					s3d_scale( wlan_network-&gt;bssid_id, NETWORK_TEXT_SCALE );
+ 					s3d_flags_on( wlan_network-&gt;bssid_id, S3D_OF_VISIBLE );
+ 
+ 					wlan_network-&gt;click_id = s3d_new_object();
+-					s3d_link( wlan_network-&gt;click_id, wlan_network-&gt;obj_id );
+-					/* s3d_translate( wlan_network-&gt;bssid_id, - wlan_network-&gt;bssid_len / 2, 2+ wlan_network-&gt;scale_fac, 0 ); */
+-					s3d_push_vertex( wlan_network-&gt;click_id, 0, 0, 0.1 );
+-					s3d_push_vertex( wlan_network-&gt;click_id, wlan_network-&gt;bssid_len, 0, 0.1 );
+-					s3d_push_vertex( wlan_network-&gt;click_id, wlan_network-&gt;bssid_len, 1, 0.1 );
++					s3d_link( wlan_network-&gt;click_id, wlan_network-&gt;bssid_id );
++					s3d_push_material( wlan_network-&gt;click_id, 0,0,0,  0,0,0,  0,0,0);
+ 					s3d_push_vertex( wlan_network-&gt;click_id, 0, 1, 0.1 );
++					s3d_push_vertex( wlan_network-&gt;click_id, maxlen, 1, 0.1 );
++					s3d_push_vertex( wlan_network-&gt;click_id, maxlen, -2.5, 0.1 ); /* 3 lines of text + some mor space for low characters, like g,q,p ... */
++					s3d_push_vertex( wlan_network-&gt;click_id, 0, -2.5, 0.1 );
+ 					s3d_push_polygon( wlan_network-&gt;click_id, 0, 1, 2, 0 );
+ 					s3d_push_polygon( wlan_network-&gt;click_id, 0, 2, 3, 0 );
+ 
+-					s3d_flags_on( wlan_network-&gt;click_id, S3D_OF_SELECTABLE | S3D_OF_VISIBLE );
++					s3d_flags_on( wlan_network-&gt;click_id, S3D_OF_SELECTABLE );
+ 
+ 				}
+ 
+@@ -202,8 +212,6 @@
+ 				s3d_translate( wlan_network-&gt;ssid_id, 0, -1, 0 );
+ 				s3d_flags_on( wlan_network-&gt;ssid_id, S3D_OF_VISIBLE );
+ 
+-				label_str = alloc_memory( 100 );
+-				snprintf( label_str, 100, &quot;Type: %s, CH: %i, Clients: %i&quot;, ( wlan_network-&gt;type == 0 ? &quot;Managed&quot; : ( wlan_network-&gt;type == 1 ? &quot;Ad-Hoc&quot; : ( wlan_network-&gt;type == 2 ? &quot;Prober&quot; : &quot;unknown&quot; ) ) ), wlan_network-&gt;chan, wlan_network-&gt;num_wlan_clients );
+ 
+ 				wlan_network-&gt;misc_id = s3d_draw_string( label_str, NULL );
+ 				s3d_link( wlan_network-&gt;misc_id, wlan_network-&gt;ssid_id );
+@@ -336,7 +344,7 @@
+ 
+ 	s3dw_handle_click( evt );
+ 
+-
++	printf(&quot;id which was clicked: %d\n&quot;,clicked_id);
+ 	/* emulate double click */
+ 	if ( ( Last_Click_Oid == clicked_id ) &amp;&amp; ( Last_Click_Time + 250 &gt; get_time() ) ) {
+ 
+
+Modified: trunk/libs3d/freetype.c
+===================================================================
+--- trunk/libs3d/freetype.c	2006-12-04 22:20:31 UTC (rev 509)
++++ trunk/libs3d/freetype.c	2006-12-04 22:20:34 UTC (rev 510)
+@@ -36,11 +36,11 @@
+ #define FT_ERROR_START_LIST     {                           
+ #define FT_ERROR_END_LIST       { 0, 0 } };                
+                                                           
+-const struct                                             
++const struct 
+ {                                                       
+     int          err_code;                             
+-    const char*  err_msg                                        
+-} ft_errors[] =                                                
++    const char*  err_msg;
++} ft_errors[] = 
+                                                               
+ #include FT_ERRORS_H                                         
+ 
+
+Modified: trunk/libs3d/proto_out.c
+===================================================================
+--- trunk/libs3d/proto_out.c	2006-12-04 22:20:31 UTC (rev 509)
++++ trunk/libs3d/proto_out.c	2006-12-04 22:20:34 UTC (rev 510)
+@@ -309,7 +309,7 @@
+ }
+ int s3d_push_textures(int object, uint16_t *tbuf, uint16_t n)
+ {
+-	uint16_t		buf[(MF_LEN+4)/2];
++	uint32_t		buf[(MF_LEN+4)/4];
+ 	uint16_t		*s,*d;
+ 
+ 	int					f,i,j,len=n*2*2;
+@@ -320,7 +320,7 @@
+ 	f=len/(MF_LEN-4)+1;  /*  how many fragments? */
+ 
+ 	*((uint32_t *)buf)=htonl(object);
+-	d=buf+2;
++	d=(uint16_t *)(buf+1);
+ 
+ 	for (i=0;i&lt;f;i++)
+ 	{
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000502.html">[S3d-svn] r509 - in trunk: . server
+</A></li>
+	<LI>Next message: <A HREF="000504.html">[S3d-svn] r511 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#503">[ date ]</a>
+              <a href="thread.html#503">[ thread ]</a>
+              <a href="subject.html#503">[ subject ]</a>
+              <a href="author.html#503">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

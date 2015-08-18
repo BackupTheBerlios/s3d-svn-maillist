@@ -1,0 +1,2499 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r990 - in trunk: Documentation Documentation/libs3dw	Documentation/manpages/man3 libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r990%20-%20in%20trunk%3A%20Documentation%20Documentation/libs3dw%0A%09Documentation/manpages/man3%20libs3d%20libs3dw&In-Reply-To=%3C200809042335.m84NZrxq004036%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000969.html">
+   <LINK REL="Next"  HREF="000971.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r990 - in trunk: Documentation Documentation/libs3dw	Documentation/manpages/man3 libs3d libs3dw</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r990%20-%20in%20trunk%3A%20Documentation%20Documentation/libs3dw%0A%09Documentation/manpages/man3%20libs3d%20libs3dw&In-Reply-To=%3C200809042335.m84NZrxq004036%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r990 - in trunk: Documentation Documentation/libs3dw	Documentation/manpages/man3 libs3d libs3dw">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep  5 01:35:53 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000969.html">[S3d-svn] r989 - trunk/Documentation
+</A></li>
+        <LI>Next message: <A HREF="000971.html">[S3d-svn] r991 - in trunk: Documentation/libs3d	Documentation/manpages/man3 libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#970">[ date ]</a>
+              <a href="thread.html#970">[ thread ]</a>
+              <a href="subject.html#970">[ subject ]</a>
+              <a href="author.html#970">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-05 01:35:44 +0200 (Fri, 05 Sep 2008)
+New Revision: 990
+
+Modified:
+   trunk/Documentation/extractdefinitions.py
+   trunk/Documentation/libs3dw/functions.docbook
+   trunk/Documentation/manpages/man3/s3d_angle_to_cam.3
+   trunk/Documentation/manpages/man3/s3d_clear_callback.3
+   trunk/Documentation/manpages/man3/s3d_clone.3
+   trunk/Documentation/manpages/man3/s3d_clone_target.3
+   trunk/Documentation/manpages/man3/s3d_del_object.3
+   trunk/Documentation/manpages/man3/s3d_delete_event.3
+   trunk/Documentation/manpages/man3/s3d_draw_string.3
+   trunk/Documentation/manpages/man3/s3d_find_event.3
+   trunk/Documentation/manpages/man3/s3d_flags_off.3
+   trunk/Documentation/manpages/man3/s3d_flags_on.3
+   trunk/Documentation/manpages/man3/s3d_get_callback.3
+   trunk/Documentation/manpages/man3/s3d_ignore_callback.3
+   trunk/Documentation/manpages/man3/s3d_import_model_file.3
+   trunk/Documentation/manpages/man3/s3d_init.3
+   trunk/Documentation/manpages/man3/s3d_link.3
+   trunk/Documentation/manpages/man3/s3d_load_line_normals.3
+   trunk/Documentation/manpages/man3/s3d_load_materials_a.3
+   trunk/Documentation/manpages/man3/s3d_load_polygon_normals.3
+   trunk/Documentation/manpages/man3/s3d_load_polygon_tex_coords.3
+   trunk/Documentation/manpages/man3/s3d_load_texture.3
+   trunk/Documentation/manpages/man3/s3d_mainloop.3
+   trunk/Documentation/manpages/man3/s3d_mcp_focus.3
+   trunk/Documentation/manpages/man3/s3d_net_check.3
+   trunk/Documentation/manpages/man3/s3d_new_object.3
+   trunk/Documentation/manpages/man3/s3d_open_file.3
+   trunk/Documentation/manpages/man3/s3d_pep_line.3
+   trunk/Documentation/manpages/man3/s3d_pep_line_normals.3
+   trunk/Documentation/manpages/man3/s3d_pep_lines.3
+   trunk/Documentation/manpages/man3/s3d_pep_material.3
+   trunk/Documentation/manpages/man3/s3d_pep_material_a.3
+   trunk/Documentation/manpages/man3/s3d_pep_material_texture.3
+   trunk/Documentation/manpages/man3/s3d_pep_materials_a.3
+   trunk/Documentation/manpages/man3/s3d_pep_polygon_normals.3
+   trunk/Documentation/manpages/man3/s3d_pep_polygon_tex_coord.3
+   trunk/Documentation/manpages/man3/s3d_pep_polygon_tex_coords.3
+   trunk/Documentation/manpages/man3/s3d_pep_vertex.3
+   trunk/Documentation/manpages/man3/s3d_pep_vertices.3
+   trunk/Documentation/manpages/man3/s3d_pop_event.3
+   trunk/Documentation/manpages/man3/s3d_pop_line.3
+   trunk/Documentation/manpages/man3/s3d_pop_material.3
+   trunk/Documentation/manpages/man3/s3d_pop_polygon.3
+   trunk/Documentation/manpages/man3/s3d_pop_texture.3
+   trunk/Documentation/manpages/man3/s3d_pop_vertex.3
+   trunk/Documentation/manpages/man3/s3d_process_stack.3
+   trunk/Documentation/manpages/man3/s3d_push_event.3
+   trunk/Documentation/manpages/man3/s3d_push_line.3
+   trunk/Documentation/manpages/man3/s3d_push_lines.3
+   trunk/Documentation/manpages/man3/s3d_push_material.3
+   trunk/Documentation/manpages/man3/s3d_push_material_a.3
+   trunk/Documentation/manpages/man3/s3d_push_materials_a.3
+   trunk/Documentation/manpages/man3/s3d_push_polygon.3
+   trunk/Documentation/manpages/man3/s3d_push_polygons.3
+   trunk/Documentation/manpages/man3/s3d_push_texture.3
+   trunk/Documentation/manpages/man3/s3d_push_textures.3
+   trunk/Documentation/manpages/man3/s3d_push_vertex.3
+   trunk/Documentation/manpages/man3/s3d_push_vertices.3
+   trunk/Documentation/manpages/man3/s3d_quit.3
+   trunk/Documentation/manpages/man3/s3d_rotate.3
+   trunk/Documentation/manpages/man3/s3d_scale.3
+   trunk/Documentation/manpages/man3/s3d_select_font.3
+   trunk/Documentation/manpages/man3/s3d_set_callback.3
+   trunk/Documentation/manpages/man3/s3d_strlen.3
+   trunk/Documentation/manpages/man3/s3d_translate.3
+   trunk/Documentation/manpages/man3/s3d_unlink.3
+   trunk/Documentation/manpages/man3/s3d_usage.3
+   trunk/Documentation/manpages/man3/s3d_vector_angle.3
+   trunk/Documentation/manpages/man3/s3d_vector_cross_product.3
+   trunk/Documentation/manpages/man3/s3d_vector_dot_product.3
+   trunk/Documentation/manpages/man3/s3d_vector_length.3
+   trunk/Documentation/manpages/man3/s3d_vector_subtract.3
+   trunk/Documentation/manpages/man3/s3dw_ani_mate.3
+   trunk/Documentation/manpages/man3/s3dw_button_new.3
+   trunk/Documentation/manpages/man3/s3dw_delete.3
+   trunk/Documentation/manpages/man3/s3dw_focus.3
+   trunk/Documentation/manpages/man3/s3dw_getroot.3
+   trunk/Documentation/manpages/man3/s3dw_handle_click.3
+   trunk/Documentation/manpages/man3/s3dw_handle_key.3
+   trunk/Documentation/manpages/man3/s3dw_input_change_text.3
+   trunk/Documentation/manpages/man3/s3dw_input_gettext.3
+   trunk/Documentation/manpages/man3/s3dw_input_new.3
+   trunk/Documentation/manpages/man3/s3dw_label_change_text.3
+   trunk/Documentation/manpages/man3/s3dw_label_new.3
+   trunk/Documentation/manpages/man3/s3dw_moveit.3
+   trunk/Documentation/manpages/man3/s3dw_object_info.3
+   trunk/Documentation/manpages/man3/s3dw_show.3
+   trunk/Documentation/manpages/man3/s3dw_surface_new.3
+   trunk/Documentation/manpages/man3/s3dw_textbox_change_text.3
+   trunk/Documentation/manpages/man3/s3dw_textbox_new.3
+   trunk/Documentation/manpages/man3/s3dw_textbox_scrolldown.3
+   trunk/Documentation/manpages/man3/s3dw_textbox_scrollleft.3
+   trunk/Documentation/manpages/man3/s3dw_textbox_scrollright.3
+   trunk/Documentation/manpages/man3/s3dw_textbox_scrollto.3
+   trunk/Documentation/manpages/man3/s3dw_textbox_scrollup.3
+   trunk/libs3d/callback.c
+   trunk/libs3d/event.c
+   trunk/libs3d/freetype.c
+   trunk/libs3d/io.c
+   trunk/libs3d/modelread.c
+   trunk/libs3d/network.c
+   trunk/libs3d/proto_out.c
+   trunk/libs3d/vector.c
+   trunk/libs3dw/animate.c
+   trunk/libs3dw/button.c
+   trunk/libs3dw/event.c
+   trunk/libs3dw/input.c
+   trunk/libs3dw/label.c
+   trunk/libs3dw/root.c
+   trunk/libs3dw/surface.c
+   trunk/libs3dw/textbox.c
+   trunk/libs3dw/widget.c
+Log:
+Add brief descriptions for function manpages
+
+Modified: trunk/Documentation/extractdefinitions.py
+===================================================================
+--- trunk/Documentation/extractdefinitions.py	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/extractdefinitions.py	2008-09-04 23:35:44 UTC (rev 990)
+@@ -261,7 +261,7 @@
+ 		if node.attributes['kind'].nodeValue != 'function':
+ 			continue
+ 
+-		function = {'return': '', 'name': '', 'param': [], 'help': []}
++		function = {'return': '', 'name': '', 'param': [], 'brief': '', 'help': []}
+ 		for node2 in node.childNodes:
+ 			if node2.nodeName == &quot;name&quot;:
+ 				function['name'] = get_text(node2)
+@@ -272,6 +272,9 @@
+ 			if node2.nodeName == &quot;param&quot;:
+ 				function['param'].append(function_param(node2))
+ 
++			if node2.nodeName == &quot;briefdescription&quot;:
++				function['brief'] = get_text(node2)
++
+ 			if node2.nodeName == 'detaileddescription':
+ 				function['help'] = detaileddescription(node2)
+ 
+@@ -286,7 +289,7 @@
+ 	structlist = []
+ 	# find refs (names of xml files) of structs
+ 	for node in dom.getElementsByTagName(&quot;innerclass&quot;):
+-		struct = {'name': '', 'ref': '', 'elements': [], 'help': []}
++		struct = {'name': '', 'ref': '', 'elements': [], 'brief': '', 'help': []}
+ 		struct['name'] = get_text(node)
+ 		struct['ref'] = node.attributes['refid'].nodeValue
+ 		structlist.append(struct)
+@@ -296,6 +299,9 @@
+ 		dom = xml.dom.minidom.parse(&quot;xml/&quot;+struct['ref']+&quot;.xml&quot;)
+ 
+ 		for node in dom.getElementsByTagName('compounddef')[0].childNodes:
++			if node.nodeName == &quot;briefdescription&quot;:
++				struct['brief'] = get_text(node)
++
+ 			if node.nodeName == 'detaileddescription':
+ 				struct['help'] = detaileddescription(node)
+ 
+@@ -507,7 +513,7 @@
+ 	def generate_sgml(function, synopsis):
+ 		sgml = xml.dom.minidom.Document()
+ 
+-		(refentry, funcsynopsis) = manpage_header(sgml, function['name'], '3', function['name'], &quot;&quot;, &quot;#include &lt;&quot;+synopsis+&quot;&gt;&quot;)
++		(refentry, funcsynopsis) = manpage_header(sgml, function['name'], '3', function['name'], function['brief'].strip(), &quot;#include &lt;&quot;+synopsis+&quot;&gt;&quot;)
+ 
+ 		# prototype
+ 		funcprototype = create_append(funcsynopsis, 'funcprototype')
+
+Modified: trunk/Documentation/libs3dw/functions.docbook
+===================================================================
+--- trunk/Documentation/libs3dw/functions.docbook	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/libs3dw/functions.docbook	2008-09-04 23:35:44 UTC (rev 990)
+@@ -5,7 +5,7 @@
+  root-&gt;y=5;
+  root-&gt;z=0;
+  s3dw_moveit(root);
+-&lt;/programlisting&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_moveit&quot;&gt;&lt;title&gt;s3dw_moveit&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_moveit&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_widget *&lt;parameter&gt;widget&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Moves/translates the widget as you specified in it's private s3dw_widget structure. Should be casted with S3DWIDGET().         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_delete&quot;&gt;&lt;title&gt;s3dw_delete&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_delete&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_widget *&lt;parameter&gt;widget&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Deletes any widget. Should be casted with S3DWIDGET().         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_show&quot;&gt;&lt;title&gt;s3dw_show&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;fun!
+ ction&gt;s3dw_show&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_widget *&lt;parameter&gt;widget&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Switches a widget visible. Should be casted with S3DWIDGET().         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_focus&quot;&gt;&lt;title&gt;s3dw_focus&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_focus&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_widget *&lt;parameter&gt;focus&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Gives focus to the widget, relative to its parent. That means you can focus a surface, and each surface can focus one of its element, e.g. an input field. Should be casted with S3DWIDGET().         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_textbox_scrollup&quot;&gt;&lt;title&gt;s3dw_textbox_scrollup&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_textbox_scrollup&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_textbox *&lt;parameter&gt;tex!
+ tbox&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;par!
+ a&gt;Scroll
+s the text in the textbox up by one line, if possible.         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_textbox_scrolldown&quot;&gt;&lt;title&gt;s3dw_textbox_scrolldown&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_textbox_scrolldown&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_textbox *&lt;parameter&gt;textbox&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Scrolls the text in the textbox down by one line, if possible.         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_textbox_scrollleft&quot;&gt;&lt;title&gt;s3dw_textbox_scrollleft&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_textbox_scrollleft&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_textbox *&lt;parameter&gt;textbox&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Scrolls the text in the textbox to the left by one character, if possible.         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_textbox_scrollright&quot;&gt;&lt;title&gt;s3dw_textbox_scro!
+ llright&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_textbox_scrollright&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_textbox *&lt;parameter&gt;textbox&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Scrolls the text in the textbox to the right by one character, if possible.         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_textbox_scrollto&quot;&gt;&lt;title&gt;s3dw_textbox_scrollto&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_textbox_scrollto&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_textbox *&lt;parameter&gt;textbox&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;x&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;y&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Scrolls the text in the textbox so that the character in row y, column x is in the top left corner of the textbox.         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_textbox_change_text&quot;&gt;&lt;title&gt;s3dw_te!
+ xtbox_change_text&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#incl!
+ ude &lt;
+s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_textbox_change_text&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_textbox *&lt;parameter&gt;textbox&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const char *&lt;parameter&gt;text&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Change the text in the referenced textbox to the specified text.         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_handle_click&quot;&gt;&lt;title&gt;s3dw_handle_click&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3dw_handle_click&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const struct s3d_evt *&lt;parameter&gt;event&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;If you want your widgets on mouseclicks (believe me, you want that), you have to call this either in your clickhandler-function or specifiy it itself as the clickhandler.&lt;/para&gt;&lt;programlisting&gt; // way 1:
++&lt;/programlisting&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_moveit&quot;&gt;&lt;title&gt;s3dw_moveit&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_moveit&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_widget *&lt;parameter&gt;widget&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Moves/translates the widget as you specified in it's private s3dw_widget structure. Should be casted with S3DWIDGET().         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_delete&quot;&gt;&lt;title&gt;s3dw_delete&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_delete&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_widget *&lt;parameter&gt;widget&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Deletes any widget. Should be casted with S3DWIDGET().         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_show&quot;&gt;&lt;title&gt;s3dw_show&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;fun!
+ ction&gt;s3dw_show&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_widget *&lt;parameter&gt;widget&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Switches a widget visible. Should be casted with S3DWIDGET().         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_focus&quot;&gt;&lt;title&gt;s3dw_focus&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_focus&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_widget *&lt;parameter&gt;focus&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Gives focus to the widget, relative to its parent. That means you can focus a surface, and each surface can focus one of its element, e.g. an input field. Should be casted with S3DWIDGET().         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_textbox_scrollup&quot;&gt;&lt;title&gt;s3dw_textbox_scrollup&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_textbox_scrollup&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_textbox *&lt;parameter&gt;tex!
+ tbox&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;par!
+ a&gt;Scroll
+s the text in the textbox up by one line, if possible.         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_textbox_scrolldown&quot;&gt;&lt;title&gt;s3dw_textbox_scrolldown&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_textbox_scrolldown&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_textbox *&lt;parameter&gt;textbox&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Scrolls the text in the textbox down by one line, if possible.         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_textbox_scrollleft&quot;&gt;&lt;title&gt;s3dw_textbox_scrollleft&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_textbox_scrollleft&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_textbox *&lt;parameter&gt;textbox&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Scrolls the text in the textbox to the left by one character, if possible.         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_textbox_scrollright&quot;&gt;&lt;title&gt;s3dw_textbox_scro!
+ llright&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_textbox_scrollright&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_textbox *&lt;parameter&gt;textbox&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Scrolls the text in the textbox to the right by one character, if possible.         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_textbox_scrollto&quot;&gt;&lt;title&gt;s3dw_textbox_scrollto&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_textbox_scrollto&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_textbox *&lt;parameter&gt;textbox&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;x&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;y&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Scrolls the text in the textbox so that the character in row y, column x is in the top left corner of the textbox.         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_textbox_change_text&quot;&gt;&lt;title&gt;s3dw_te!
+ xtbox_change_text&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#incl!
+ ude &lt;
+s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_textbox_change_text&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_textbox *&lt;parameter&gt;textbox&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const char *&lt;parameter&gt;text&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Change the text in the referenced textbox to the specified text.         &lt;/para&gt;&lt;/sect2&gt;&lt;sect2 id=&quot;s3dw_handle_click&quot;&gt;&lt;title&gt;s3dw_handle_click&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3dw_handle_click&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const struct s3d_evt *&lt;parameter&gt;event&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;If you want your widgets on mouseclicks (believe me, you want that), you have to call this either in your clickhandler-function or specify it itself as the clickhandler.&lt;/para&gt;&lt;programlisting&gt; // way 1:
+  s3d_set_callback(S3D_EVENT_OBJ_CLICK,s3dw_handle_click);
+ 
+  // way 2:
+
+Modified: trunk/Documentation/manpages/man3/s3d_angle_to_cam.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_angle_to_cam.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_angle_to_cam.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_angle_to_cam&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_angle_to_cam \(em  
++s3d_angle_to_cam \(em calculate angle between vector and cam 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_clear_callback.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_clear_callback.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_clear_callback.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_clear_callback&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_clear_callback \(em  
++s3d_clear_callback \(em clears a callback 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_clone.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_clone.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_clone.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_clone&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_clone \(em  
++s3d_clone \(em clone object 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_clone_target.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_clone_target.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_clone_target.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_clone_target&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_clone_target \(em  
++s3d_clone_target \(em changes the target of a clone-object 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_del_object.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_del_object.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_del_object.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_del_object&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_del_object \(em  
++s3d_del_object \(em delete an object 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_delete_event.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_delete_event.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_delete_event.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_delete_event&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_delete_event \(em  
++s3d_delete_event \(em delete event from stack 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_draw_string.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_draw_string.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_draw_string.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_draw_string&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_draw_string \(em  
++s3d_draw_string \(em draw a simple string 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_find_event.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_find_event.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_find_event.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_find_event&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_find_event \(em  
++s3d_find_event \(em find eevnt on stack 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_flags_off.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_flags_off.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_flags_off.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_flags_off&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_flags_off \(em  
++s3d_flags_off \(em disable flags of object 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_flags_on.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_flags_on.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_flags_on.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_flags_on&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_flags_on \(em  
++s3d_flags_on \(em enable flags of object 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_get_callback.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_get_callback.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_get_callback.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_get_callback&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_get_callback \(em  
++s3d_get_callback \(em get callback of event 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_ignore_callback.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_ignore_callback.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_ignore_callback.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_ignore_callback&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_ignore_callback \(em  
++s3d_ignore_callback \(em ignores an event 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_import_model_file.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_import_model_file.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_import_model_file.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_import_model_file&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_import_model_file \(em  
++s3d_import_model_file \(em read model from file 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_init.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_init.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_init.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_init&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_init \(em  
++s3d_init \(em initialize s3d library 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_link.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_link.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_link.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_link&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_link \(em  
++s3d_link \(em link object to another one 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_load_line_normals.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_load_line_normals.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_load_line_normals.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_load_line_normals&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_load_line_normals \(em  
++s3d_load_line_normals \(em add normals to line 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_load_materials_a.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_load_materials_a.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_load_materials_a.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_load_materials_a&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_load_materials_a \(em  
++s3d_load_materials_a \(em add materials with alpha to polygons 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_load_polygon_normals.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_load_polygon_normals.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_load_polygon_normals.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_load_polygon_normals&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_load_polygon_normals \(em  
++s3d_load_polygon_normals \(em add normals to polygon 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_load_polygon_tex_coords.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_load_polygon_tex_coords.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_load_polygon_tex_coords.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_load_polygon_tex_coords&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_load_polygon_tex_coords \(em  
++s3d_load_polygon_tex_coords \(em add texture coordinates to polygons 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_load_texture.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_load_texture.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_load_texture.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_load_texture&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_load_texture \(em  
++s3d_load_texture \(em load texture from memory 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_mainloop.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_mainloop.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_mainloop.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_mainloop&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_mainloop \(em  
++s3d_mainloop \(em set mainloop of program 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_mcp_focus.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_mcp_focus.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_mcp_focus.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_mcp_focus&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_mcp_focus \(em  
++s3d_mcp_focus \(em focus mcp object 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_net_check.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_net_check.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_net_check.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_net_check&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_net_check \(em  
++s3d_net_check \(em get events from server 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_new_object.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_new_object.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_new_object.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_new_object&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_new_object \(em  
++s3d_new_object \(em create new object 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_open_file.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_open_file.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_open_file.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_open_file&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_open_file \(em  
++s3d_open_file \(em copy file into memory 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_line.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_line.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_pep_line.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_pep_line&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_pep_line \(em  
++s3d_pep_line \(em rewrite line 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_line_normals.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_line_normals.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_pep_line_normals.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_pep_line_normals&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_pep_line_normals \(em  
++s3d_pep_line_normals \(em add normals to lines 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_lines.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_lines.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_pep_lines.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_pep_lines&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_pep_lines \(em  
++s3d_pep_lines \(em rewrite lines 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_material.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_material.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_pep_material.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_pep_material&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_pep_material \(em  
++s3d_pep_material \(em rewrite material 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_material_a.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_material_a.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_pep_material_a.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_pep_material_a&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_pep_material_a \(em  
++s3d_pep_material_a \(em rewrite material with alpha 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_material_texture.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_material_texture.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_pep_material_texture.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_pep_material_texture&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_pep_material_texture \(em  
++s3d_pep_material_texture \(em add texture to material 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_materials_a.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_materials_a.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_pep_materials_a.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_pep_materials_a&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_pep_materials_a \(em  
++s3d_pep_materials_a \(em rewrite materials with alpha 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_polygon_normals.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_polygon_normals.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_pep_polygon_normals.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_pep_polygon_normals&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_pep_polygon_normals \(em  
++s3d_pep_polygon_normals \(em add normals to polygon 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_polygon_tex_coord.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_polygon_tex_coord.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_pep_polygon_tex_coord.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_pep_polygon_tex_coord&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_pep_polygon_tex_coord \(em  
++s3d_pep_polygon_tex_coord \(em add texture coordinates to polygon 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_polygon_tex_coords.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_polygon_tex_coords.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_pep_polygon_tex_coords.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_pep_polygon_tex_coords&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_pep_polygon_tex_coords \(em  
++s3d_pep_polygon_tex_coords \(em add texture coordinates to polygons 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_vertex.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_vertex.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_pep_vertex.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_pep_vertex&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_pep_vertex \(em  
++s3d_pep_vertex \(em rewrite vertex 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_vertices.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_vertices.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_pep_vertices.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_pep_vertices&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_pep_vertices \(em  
++s3d_pep_vertices \(em rewrite lines 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pop_event.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pop_event.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_pop_event.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_pop_event&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_pop_event \(em  
++s3d_pop_event \(em pop event from stack 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pop_line.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pop_line.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_pop_line.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_pop_line&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_pop_line \(em  
++s3d_pop_line \(em remove lines 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pop_material.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pop_material.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_pop_material.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_pop_material&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_pop_material \(em  
++s3d_pop_material \(em remove materials 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pop_polygon.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pop_polygon.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_pop_polygon.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_pop_polygon&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_pop_polygon \(em  
++s3d_pop_polygon \(em remove polygons 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pop_texture.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pop_texture.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_pop_texture.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_pop_texture&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_pop_texture \(em  
++s3d_pop_texture \(em remove textures 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pop_vertex.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pop_vertex.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_pop_vertex.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_pop_vertex&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_pop_vertex \(em  
++s3d_pop_vertex \(em remove vertices 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_process_stack.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_process_stack.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_process_stack.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_process_stack&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_process_stack \(em  
++s3d_process_stack \(em process all events on stack 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_event.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_event.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_push_event.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_push_event&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_push_event \(em  
++s3d_push_event \(em push event onto stack 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_line.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_line.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_push_line.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_push_line&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_push_line \(em  
++s3d_push_line \(em push line 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_lines.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_lines.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_push_lines.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_push_lines&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_push_lines \(em  
++s3d_push_lines \(em push many lines 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_material.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_material.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_push_material.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_push_material&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_push_material \(em  
++s3d_push_material \(em push material 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_material_a.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_material_a.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_push_material_a.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_push_material_a&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_push_material_a \(em  
++s3d_push_material_a \(em push material with alpha 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_materials_a.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_materials_a.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_push_materials_a.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_push_materials_a&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_push_materials_a \(em  
++s3d_push_materials_a \(em push many materials 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_polygon.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_polygon.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_push_polygon.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_push_polygon&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_push_polygon \(em  
++s3d_push_polygon \(em push polygon 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_polygons.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_polygons.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_push_polygons.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_push_polygons&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_push_polygons \(em  
++s3d_push_polygons \(em push many polygons 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_texture.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_texture.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_push_texture.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_push_texture&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_push_texture \(em  
++s3d_push_texture \(em push texture 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_textures.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_textures.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_push_textures.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_push_textures&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_push_textures \(em  
++s3d_push_textures \(em push many textures 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_vertex.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_vertex.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_push_vertex.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_push_vertex&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_push_vertex \(em  
++s3d_push_vertex \(em push vertex 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_vertices.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_vertices.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_push_vertices.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_push_vertices&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_push_vertices \(em  
++s3d_push_vertices \(em push many vertices 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_quit.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_quit.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_quit.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_quit&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_quit \(em  
++s3d_quit \(em shutdown s3d library 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_rotate.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_rotate.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_rotate.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_rotate&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_rotate \(em  
++s3d_rotate \(em rotate object 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_scale.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_scale.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_scale.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_scale&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_scale \(em  
++s3d_scale \(em scale object 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_select_font.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_select_font.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_select_font.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_select_font&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_select_font \(em  
++s3d_select_font \(em select font 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_set_callback.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_set_callback.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_set_callback.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_set_callback&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_set_callback \(em  
++s3d_set_callback \(em sets a callback 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_strlen.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_strlen.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_strlen.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_strlen&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_strlen \(em  
++s3d_strlen \(em get rendered string size 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_translate.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_translate.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_translate.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_translate&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_translate \(em  
++s3d_translate \(em move object to absolute position 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_unlink.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_unlink.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_unlink.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_unlink&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_unlink \(em  
++s3d_unlink \(em removes link from another object 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_usage.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_usage.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_usage.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_usage&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_usage \(em  
++s3d_usage \(em print s3d parameter 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_vector_angle.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_vector_angle.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_vector_angle.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_vector_angle&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_vector_angle \(em  
++s3d_vector_angle \(em calculate angle between two vectors 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_vector_cross_product.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_vector_cross_product.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_vector_cross_product.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_vector_cross_product&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_vector_cross_product \(em  
++s3d_vector_cross_product \(em calculate cross product of two vectors 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_vector_dot_product.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_vector_dot_product.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_vector_dot_product.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_vector_dot_product&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_vector_dot_product \(em  
++s3d_vector_dot_product \(em calculate dot product of two vectors 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_vector_length.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_vector_length.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_vector_length.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_vector_length&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_vector_length \(em  
++s3d_vector_length \(em calculate length of vector 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3d_vector_subtract.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_vector_subtract.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3d_vector_subtract.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3d_vector_subtract&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3d_vector_subtract \(em  
++s3d_vector_subtract \(em substract two vectors 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_ani_mate.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_ani_mate.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_ani_mate.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_ani_mate&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_ani_mate \(em  
++s3dw_ani_mate \(em doing the whole animation thing 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_button_new.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_button_new.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_button_new.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_button_new&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_button_new \(em  
++s3dw_button_new \(em create a new button in the surface 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_delete.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_delete.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_delete.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_delete&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_delete \(em  
++s3dw_delete \(em delete widget 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_focus.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_focus.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_focus.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_focus&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_focus \(em  
++s3dw_focus \(em give widget focus 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_getroot.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_getroot.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_getroot.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_getroot&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_getroot \(em  
++s3dw_getroot \(em get the root 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_handle_click.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_handle_click.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_handle_click.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_handle_click&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_handle_click \(em  
++s3dw_handle_click \(em handle click on widget 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+@@ -11,7 +11,7 @@
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+-If you want your widgets on mouseclicks (believe me, you want that), you have to call this either in your clickhandler-function or specifiy it itself as the clickhandler. 
++If you want your widgets on mouseclicks (believe me, you want that), you have to call this either in your clickhandler-function or specify it itself as the clickhandler. 
+ .PP 
+ .nf 
+ // way 1: 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_handle_key.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_handle_key.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_handle_key.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_handle_key&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_handle_key \(em  
++s3dw_handle_key \(em handle key input on widget 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_input_change_text.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_input_change_text.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_input_change_text.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_input_change_text&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_input_change_text \(em  
++s3dw_input_change_text \(em changes the text of the input 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_input_gettext.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_input_gettext.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_input_gettext.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_input_gettext&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_input_gettext \(em  
++s3dw_input_gettext \(em get text of input 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_input_new.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_input_new.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_input_new.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_input_new&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_input_new \(em  
++s3dw_input_new \(em create a new input in the surface 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_label_change_text.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_label_change_text.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_label_change_text.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_label_change_text&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_label_change_text \(em  
++s3dw_label_change_text \(em change label text 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_label_new.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_label_new.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_label_new.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_label_new&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_label_new \(em  
++s3dw_label_new \(em create a new label in the surface 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_moveit.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_moveit.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_moveit.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_moveit&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_moveit \(em  
++s3dw_moveit \(em apply widgets moving function 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_object_info.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_object_info.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_object_info.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_object_info&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_object_info \(em  
++s3dw_object_info \(em handle object info events 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_show.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_show.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_show.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_show&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_show \(em  
++s3dw_show \(em make widget visible 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_surface_new.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_surface_new.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_surface_new.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_surface_new&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_surface_new \(em  
++s3dw_surface_new \(em create a new surface 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_textbox_change_text.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_textbox_change_text.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_textbox_change_text.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_textbox_change_text&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_textbox_change_text \(em  
++s3dw_textbox_change_text \(em change text 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_textbox_new.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_textbox_new.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_textbox_new.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_textbox_new&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_textbox_new \(em  
++s3dw_textbox_new \(em create a new textbox in the surface 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_textbox_scrolldown.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_textbox_scrolldown.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_textbox_scrolldown.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_textbox_scrolldown&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_textbox_scrolldown \(em  
++s3dw_textbox_scrolldown \(em scroll text down 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_textbox_scrollleft.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_textbox_scrollleft.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_textbox_scrollleft.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_textbox_scrollleft&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_textbox_scrollleft \(em  
++s3dw_textbox_scrollleft \(em scroll text left 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_textbox_scrollright.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_textbox_scrollright.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_textbox_scrollright.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_textbox_scrollright&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_textbox_scrollright \(em  
++s3dw_textbox_scrollright \(em scroll text right 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_textbox_scrollto.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_textbox_scrollto.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_textbox_scrollto.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_textbox_scrollto&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_textbox_scrollto \(em  
++s3dw_textbox_scrollto \(em scroll text to position 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_textbox_scrollup.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_textbox_scrollup.3	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/Documentation/manpages/man3/s3dw_textbox_scrollup.3	2008-09-04 23:35:44 UTC (rev 990)
+@@ -1,6 +1,6 @@
+ .TH &quot;s3dw_textbox_scrollup&quot; &quot;3&quot; 
+ .SH &quot;NAME&quot; 
+-s3dw_textbox_scrollup \(em  
++s3dw_textbox_scrollup \(em scroll text up 
+ .SH &quot;SYNOPSIS&quot; 
+ .PP 
+ .nf 
+
+Modified: trunk/libs3d/callback.c
+===================================================================
+--- trunk/libs3d/callback.c	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/libs3d/callback.c	2008-09-04 23:35:44 UTC (rev 990)
+@@ -57,7 +57,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief sets a callback
++ *
+  * sets a callback for a certain event. this is very useful for event-oriented
+  * applications. event callbacks will not interrupt each other or the mainloop.
+  *
+@@ -81,7 +82,8 @@
+ 	s3d_process_stack();
+ }
+ 
+-/**
++/** \brief clears a callback
++ *
+  * Clears the callback which is associated with the event.
+  */
+ void s3d_clear_callback(uint8_t event)
+@@ -89,7 +91,8 @@
+ 	s3d_cb_list[(int)event] = S3D_CBNIL;
+ }
+ 
+-/**
++/** \brief ignores an event
++ *
+  * Sets the callback on ignore, that means it won't be queued up for later use.
+  * An incoming event of this type will simply be skipped.
+  */
+@@ -98,7 +101,8 @@
+ 	s3d_set_callback(event, _s3d_ignore);
+ }
+ 
+-/**
++/** \brief get callback of event
++ *
+  * Returns the Callback-function of the event.
+  *
+  * \code
+
+Modified: trunk/libs3d/event.c
+===================================================================
+--- trunk/libs3d/event.c	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/libs3d/event.c	2008-09-04 23:35:44 UTC (rev 990)
+@@ -30,7 +30,8 @@
+ static struct s3d_evt *s3d_stack;
+ int cb_lock = 2;  /*  callback lock */
+ 
+-/**
++/** \brief push event onto stack
++ *
+  * Pushes an event onto the event-stack. Usually you don't need to do this
+  * manually.
+  */
+@@ -62,7 +63,8 @@
+ 		s3d_stack = newevt;
+ }
+ 
+-/**
++/** \brief pop event from stack
++ *
+  * Pops the latest event from the stack. Don't forget to free() both the event
+  * and its buffer! Returns a pointer to struct s3d_evt.
+  */
+@@ -73,7 +75,8 @@
+ 	return ret;
+ }
+ 
+-/**
++/** \brief find eevnt on stack
++ *
+  * Finds the latest occurence of an event, giving the event type as argument.
+  * Returns a pointer to struct s3d_evt.
+  */
+@@ -88,7 +91,8 @@
+ 	return(NULL);
+ }
+ 
+-/**
++/** \brief delete event from stack
++ *
+  * deletes an event, the argument is the pointer to the event which is to be
+  * deleted (maybe obtained from s3d_find_event).
+  */
+@@ -114,7 +118,8 @@
+ 	return(-1);
+ }
+ 
+-/**
++/** \brief process all events on stack
++ *
+  * This function goes through all function of the event-stack and will call
+  * functions. this is useful when you define a new function but still have a lot
+  * of events of this type on the stack.
+
+Modified: trunk/libs3d/freetype.c
+===================================================================
+--- trunk/libs3d/freetype.c	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/libs3d/freetype.c	2008-09-04 23:35:44 UTC (rev 990)
+@@ -302,7 +302,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief select font
++ *
+  * This selects a font for the s3d_draw_string() function.
+  *
+  * \remarks Of course, you won't forget to toggle it visible, won't you?
+@@ -347,7 +348,8 @@
+ 	return(-1);
+ }
+ 
+-/**
++/** \brief draw a simple string
++ *
+  * Renders the string str with in Truetype format with the height 1, returns the
+  * length of the rendered string in *xlen (or set len=NULL to disable this).
+  *
+@@ -389,7 +391,8 @@
+ 	return(f_oid);
+ }
+ 
+-/**
++/** \brief get rendered string size
++ *
+  * Returns the length of the string if it were rendered with the currently
+  * selected font. That might be useful to estimate the size used for a text and
+  * render the background or bounding box before inserting the text.
+
+Modified: trunk/libs3d/io.c
+===================================================================
+--- trunk/libs3d/io.c	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/libs3d/io.c	2008-09-04 23:35:44 UTC (rev 990)
+@@ -65,7 +65,8 @@
+ 
+ #endif
+ 
+-/**
++/** \brief print s3d parameter
++ *
+  * Prints the possible parameter for the client library (which can be passed in
+  * s3d_init())
+  */
+@@ -115,7 +116,8 @@
+ 	return(0);
+ }
+ /*  external functions go here ... */
+-/**
++/** \brief initialize s3d library
++ *
+  * This will initialize the s3d-library and the connection to the Server. It
+  * will return 0 on success in Server initializion. name specifies the your
+  * programs name.
+@@ -188,7 +190,8 @@
+ 	return(-1);
+ }
+ 
+-/**
++/** \brief shutdown s3d library
++ *
+  * closes the connection and cleares the event-stack. it can also be used to
+  * leave the s3d_mainloop().
+  */
+@@ -223,7 +226,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief set mainloop of program
++ *
+  * takes a function as argument. it will loop this function until a quit-event
+  * is received. you can pass NULL if you have no function to be looped, but its
+  * better to sleep some time if you have nothing to do anyway to save cpu-time.
+@@ -250,7 +254,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief copy file into memory
++ *
+  * This opens the file fname, setting *pointer to it's memory position. the
+  * function will return the size of buffer. you can free() the pointer when
+  * you're finished.
+
+Modified: trunk/libs3d/modelread.c
+===================================================================
+--- trunk/libs3d/modelread.c	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/libs3d/modelread.c	2008-09-04 23:35:44 UTC (rev 990)
+@@ -42,7 +42,8 @@
+ 
+ #define MAXSTRN  20
+ static int model_load(char *file);
+-/**
++/** \brief read model from file
++ *
+  * Imports an 3d object file and returns the object number. Quite a number of
+  * formats are supported, like 3D Studio (.3ds, .prj), Lightwave (.lw, .lwb,
+  * .lwo), Quake Models (.md3), or simply everything libg3d supports. :)
+
+Modified: trunk/libs3d/network.c
+===================================================================
+--- trunk/libs3d/network.c	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/libs3d/network.c	2008-09-04 23:35:44 UTC (rev 990)
+@@ -65,7 +65,8 @@
+ 	return(_s3d_tcp_net_receive());
+ }
+ #endif
+-/**
++/** \brief get events from server
++ *
+  * This functions is for programs which do not employ a mainloop, hence they
+  * need to check for new events on their own. Programs like these must make sure
+  * to call this function from time to time to convince the server that they did
+
+Modified: trunk/libs3d/proto_out.c
+===================================================================
+--- trunk/libs3d/proto_out.c	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/libs3d/proto_out.c	2008-09-04 23:35:44 UTC (rev 990)
+@@ -38,7 +38,8 @@
+ 
+ #define MF_LEN 65530  /*  maximum fragmentation length */
+ 
+-/**
++/** \brief create new object
++ *
+  * Creates a new object, returning the object id.
+  *
+  * \remarks Of course, you won't forget to toggle it visible, won't you?
+@@ -53,7 +54,8 @@
+ 	return(oid);
+ }
+ 
+-/**
++/** \brief clone object
++ *
+  * Clones an already exisiting object. They get just look the same as the
+  * parent-object and will change when the parent-object changes. Cloning
+  * especially makes sense if you want to use the same object a lot of times.
+@@ -68,7 +70,8 @@
+ 	return(res);
+ }
+ 
+-/**
++/** \brief changes the target of a clone-object
++ *
+  * Changes the clone target of oid to another object (toid). This assumes you've
+  * got oid from s3d_clone before.
+  */
+@@ -82,7 +85,8 @@
+ 	return oid;
+ }
+ 
+-/**
++/** \brief delete an object
++ *
+  * Deletes the object referenced by oid.
+  */
+ int s3d_del_object(int oid)
+@@ -92,7 +96,8 @@
+ 	return oid;
+ }
+ 
+-/**
++/** \brief link object to another one
++ *
+  * A linked object will move along with it's link parent. For example if you
+  * have a book on a table, you can link the book to the table so the book will
+  * &quot;keep on the table&quot; if you move the table around in space. It will also
+@@ -107,7 +112,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief removes link from another object
++ *
+  * Remove the link of object oid to its target.
+  */
+ int s3d_unlink(int oid)
+@@ -119,7 +125,8 @@
+ }
+ /*  pushing functions */
+ 
+-/**
++/** \brief push vertex
++ *
+  * pushes a vertex onto the vertex stack. make sure that you count how many
+  * vertices you've pushed because you'll need that for referencing when you push
+  * your polygons.
+@@ -142,7 +149,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief push many vertices
++ *
+  * push some vertices from an array. that's much better for performing than
+  * using s3d_push_vertex() if you have a lot of vertices (and that's probably
+  * the usual case).
+@@ -178,7 +186,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief push material
++ *
+  * pushes a material for an object. you will have to count them yourself too,
+  * as polygons will ask for the material index number. the material properties
+  * are given in rgb (red/green/blue) color codes, in float. 0.0 is the minimum,
+@@ -229,7 +238,8 @@
+ 	return(0);  /*  nothing yet */
+ }
+ 
+-/**
++/** \brief push material with alpha
++ *
+  * Same as s3d_push_material, but color has alpha value added. Use
+  * s3d_push_materials_a() if you have a lot of materials to push.
+  */
+@@ -275,7 +285,8 @@
+ 	return(0);  /*  nothing yet */
+ }
+ 
+-/**
++/** \brief push many materials
++ *
+  * Pushes a buffer of Materials. Those Materials are in the format float[n*12],
+  * with
+  * - mbuf[n*12 + 0-3] - ambience
+@@ -324,7 +335,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief push polygon
++ *
+  * push one polygon on the polygonstack of the object. it takes 3 vertex-index
+  * numbers and one material material-index-nr. as argument.
+  *
+@@ -358,7 +370,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief push line
++ *
+  * Push one line on the linestack of the object. It takes 2 vertex-index-
+  * numbers and one material material-index-nr. as argument. If you have a lot of
+  * lines to push, use s3d_push_lines()
+@@ -381,7 +394,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief push many polygons
++ *
+  * as for vertices, you can push arrays of polygons to have greater performance. the pbuf should contain n polygons which consist of 4 uint32_t values of 3 vertices indices and 1 material index.
+  *
+  * \code
+@@ -421,7 +435,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief push many lines
++ *
+  * Pushing n lines on the linestack of the object, each lbuf has a size of n*3,
+  * each entry has the index number of the first vertex, second vertex and
+  * material number just as in s3d_push_line().
+@@ -454,7 +469,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief push texture
++ *
+  * Adds a new texture with height w and height h on the texturestack.
+  */
+ int s3d_push_texture(int object, uint16_t w, uint16_t h)
+@@ -472,7 +488,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief push many textures
++ *
+  * As for vertices, you can push arrays of textures on the texture stack to have
+  * greater performance. The tbuf should contain n texture sizes which consist of
+  * 2 uint16_t values for width and height for each texture.
+@@ -506,7 +523,8 @@
+ }
+ /*  popping functions  */
+ 
+-/**
++/** \brief remove vertices
++ *
+  * Deletes the latest n vertices from the vertex stack of the object.
+  */
+ int s3d_pop_vertex(int object, uint32_t n)
+@@ -519,7 +537,8 @@
+ 
+ }
+ 
+-/**
++/** \brief remove materials
++ *
+  * Deletes the latest n material from the material stack of the object.
+  */
+ int s3d_pop_material(int object, uint32_t n)
+@@ -532,7 +551,8 @@
+ 
+ }
+ 
+-/**
++/** \brief remove polygons
++ *
+  * Deletes the latest n polygon from the polygon stack of the object.
+  */
+ int s3d_pop_polygon(int object, uint32_t n)
+@@ -545,7 +565,8 @@
+ 
+ }
+ 
+-/**
++/** \brief remove lines
++ *
+  * Deletes the latest n lines from the line stack of the object.
+  */
+ int s3d_pop_line(int object, uint32_t n)
+@@ -558,7 +579,8 @@
+ 
+ }
+ 
+-/**
++/** \brief remove textures
++ *
+  * Deletes the latest n textures from the texture stack of the object.
+  */
+ int s3d_pop_texture(int object, uint32_t n)
+@@ -572,7 +594,8 @@
+ }
+ /*  pepping/loading functions */
+ 
+-/**
++/** \brief rewrite material
++ *
+  * Overwriting the latest pushed Material, overwriting the current value with
+  * the specified one. See s3d_pep_materials_a if you want to pep more materials.
+  */
+@@ -618,7 +641,8 @@
+ 	return(0);  /*  nothing yet */
+ }
+ 
+-/**
++/** \brief rewrite material with alpha
++ *
+  * Overwriting the latest pushed Material, overwriting the current value with
+  * the specified one, with alpha value in contrast to s3d_pep_material See
+  * s3d_push_materials_a if you want to pep more materials.
+@@ -665,7 +689,8 @@
+ 	return(0);  /*  nothing yet */
+ }
+ 
+-/**
++/** \brief rewrite materials with alpha
++ *
+  * Alters the last n pushed Materials. See s3d_push_materials_a() for more
+  * information how mbuf should look like. Use s3d_pep_material_a() if you only
+  * want to alter the latest material.
+@@ -683,7 +708,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief add normals to polygon
++ *
+  * Adds normal information to polygons, giving each vertex of a polygon a normal
+  * information. With this, you can achieve smoothed edge effects.
+  *
+@@ -708,7 +734,8 @@
+ 
+ }
+ 
+-/**
++/** \brief add normals to lines
++ *
+  * Adds normal information to lines, giving each vertex of a line a normal
+  * information. This makes lines somewhat nicer, you'll need that especially
+  * when you're going to build wireframe models.
+@@ -731,7 +758,8 @@
+ 
+ }
+ 
+-/**
++/** \brief rewrite vertex
++ *
+  * Alter the latest pushed vertex, overwriting with the supplied values.
+  */
+ int s3d_pep_vertex(int object, float x, float y, float z)
+@@ -752,7 +780,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief rewrite line
++ *
+  * Alter the latest pushed line, overwriting with the supplied values.
+  */
+ int s3d_pep_line(int object, int v1, int v2, int material)
+@@ -774,7 +803,8 @@
+ }
+ 
+ 
+-/**
++/** \brief rewrite lines
++ *
+  * Alter the latest n pushed lines. lbuf holds the values which are used to
+  * overwrite the old data, n entries with each 3 uint32_t specifying first,
+  * second vertex and material of each line.
+@@ -795,7 +825,8 @@
+ 
+ }
+ 
+-/**
++/** \brief rewrite lines
++ *
+  * Alter the latest n pushed vertex. vbuf holds the values which are used to
+  * overwrite the old data, n entries with each 3 floats specifying x,y,z of the
+  * vertices.
+@@ -814,7 +845,8 @@
+ 
+ }
+ 
+-/**
++/** \brief add texture coordinates to polygon
++ *
+  * Pimp the last polygon pushed with some textures coordinates, x and y values
+  * for each vertex point respectively. Those values may be between 0 and 1 and
+  * are vertex points on the  texture defined in the material of the polygon. If
+@@ -843,7 +875,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief add texture coordinates to polygons
++ *
+  * Pimp the latest n polygons with texture coordinates. tbuf has 6*n float
+  * values for its entries, which are supplied in the order as in
+  * s3d_pep_polygon_tex_coord()
+@@ -861,7 +894,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief add normals to polygon
++ *
+  * Just as s3d_pep_polygon_normals(), with the difference you won't alter the
+  * latest n polygons but n polygons starting with index start.
+  */
+@@ -893,7 +927,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief add normals to line
++ *
+  * Just as s3d_pep_line_normals(), with the difference you won't alter the
+  * latest n lines but n lines starting with index start.
+  */
+@@ -925,7 +960,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief add texture coordinates to polygons
++ *
+  * Just as s3d_pep_polygon_tex_coords(), with the difference you won't alter the
+  * latest n polygons but n polygons starting with index start.
+  */
+@@ -957,7 +993,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief add materials with alpha to polygons
++ *
+  * Loads n materials starting from index position start into the Material stack.
+  * See s3d_push_materials_a for more informatino about the values in mbuf.
+  */
+@@ -989,7 +1026,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief add texture to material
++ *
+  * Assign the latest material a texture referenced by the index tex. Of course,
+  * you will have pushed this texture with s3d_push_texture()
+  */
+@@ -1025,7 +1063,8 @@
+ 
+ }
+ 
+-/**
++/** \brief load texture from memory
++ *
+  * Creates a new object, returning the object id.
+  *
+  * \remarks Of course, you won't forget to toggle it visible, won't you?
+@@ -1064,7 +1103,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief enable flags of object
++ *
+  * turn some flags on for object.
+  *
+  * \remarks If you don't toggle OF_VISIBLE on, you won't see your object. usually
+@@ -1086,7 +1126,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief disable flags of object
++ *
+  * turn some flags off for object.
+  */
+ int s3d_flags_off(int object, uint32_t flags)
+@@ -1105,7 +1146,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief move object to absolute position
++ *
+  * Move the object to some position in space. when you create an object, it's
+  * always located at 0.0 , 0.0, 0.0.
+  *
+@@ -1135,7 +1177,8 @@
+ 
+ }
+ 
+-/**
++/** \brief rotate object
++ *
+  * rotate an object around the x, y and z-axis respectively. x,y,z may have
+  * values between [0,360] degrees.
+  *
+@@ -1171,7 +1214,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief scale object
++ *
+  * Scales the object. about factor s. s=1 will be the original size, -1 will
+  * mirror it.
+  *
+@@ -1190,7 +1234,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief focus mcp object
++ *
+  * This is an mcp-only function. It gives focus (for receiving key-strokes etc.)
+  * to an app referenced by it's mcp-object-id.
+  */
+
+Modified: trunk/libs3d/vector.c
+===================================================================
+--- trunk/libs3d/vector.c	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/libs3d/vector.c	2008-09-04 23:35:44 UTC (rev 990)
+@@ -26,7 +26,8 @@
+ #include &lt;math.h&gt;  /* sqrt() */
+ #include &quot;s3d.h&quot;
+ 
+-/**
++/** \brief calculate length of vector
++ *
+  * Calculates and returns the length of the given vector (which should be of the
+  * type float[3]). More info on wikipedia
+  * <A HREF="http://en.wikipedia.org/wiki/Vector_(spatial">http://en.wikipedia.org/wiki/Vector_(spatial</A>)
+@@ -38,7 +39,8 @@
+ 
+ }
+ 
+-/**
++/** \brief substract two vectors
++ *
+  * Subtracts vector1 from vector2, writing result into result_vector. All vectors
+  * should have the format float[3]. More info on wikipedia.
+  * <A HREF="http://en.wikipedia.org/wiki/Vector_(spatial">http://en.wikipedia.org/wiki/Vector_(spatial</A>)
+@@ -52,7 +54,8 @@
+ 
+ }
+ 
+-/**
++/** \brief calculate dot product of two vectors
++ *
+  * Calculates and returns the dot product of vector1 and vector2. All vectors
+  * should have the format float[3]. More info on wikipedia.
+  * <A HREF="http://en.wikipedia.org/wiki/Vector_(spatial">http://en.wikipedia.org/wiki/Vector_(spatial</A>)
+@@ -62,7 +65,8 @@
+ 	return (vector1[0] * vector2[0] + vector1[1] * vector2[1] + vector1[2] * vector2[2]);
+ }
+ 
+-/**
++/** \brief calculate cross product of two vectors
++ *
+  * Calculates and returns the cross product of vector1 and vector2. All vectors
+  * should have the format float[3]. More info on wikipedia.
+  * <A HREF="http://en.wikipedia.org/wiki/Vector_(spatial">http://en.wikipedia.org/wiki/Vector_(spatial</A>)
+@@ -74,7 +78,8 @@
+ 	result_vector[2] = vector1[0] * vector2[1] - vector1[1] * vector2[0];
+ }
+ 
+-/**
++/** \brief calculate angle between two vectors
++ *
+  * Calculates and returns the angle between vector1 and vector2. Please note that
+  * the resulting angle is between 0 and PI, therefore not covering the whole
+  * period! To convert in degrees just do result*180/M_PI. All vectors should
+@@ -88,7 +93,8 @@
+ 
+ }
+ 
+-/**
++/** \brief calculate angle between vector and cam
++ *
+  * Given obj_pos and cam_pos in the format float[3], angle_rad about which angle
+  * the object should be rotated around the y-axis so that it faces the camera.
+  * This might become handy if you have some text floating in space and want it
+
+Modified: trunk/libs3dw/animate.c
+===================================================================
+--- trunk/libs3dw/animate.c	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/libs3dw/animate.c	2008-09-04 23:35:44 UTC (rev 990)
+@@ -143,7 +143,8 @@
+ 
+ }
+ 
+-/**
++/** \brief doing the whole animation thing
++ *
+  * Just call this in your mainloop if you want some nice window sliding
+  * animations. it's somewhat bloating, but you don't want to miss it ;)
+  *
+
+Modified: trunk/libs3dw/button.c
+===================================================================
+--- trunk/libs3dw/button.c	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/libs3dw/button.c	2008-09-04 23:35:44 UTC (rev 990)
+@@ -86,7 +86,8 @@
+ 	widget-&gt;height = 2;
+ }
+ 
+-/**
++/** \brief create a new button in the surface
++ *
+  * Creates a new button on the surface, with &quot;text&quot; written on it and the upper
+  * left corner at (posx,posy) on the surface.
+  *
+
+Modified: trunk/libs3dw/event.c
+===================================================================
+--- trunk/libs3dw/event.c	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/libs3dw/event.c	2008-09-04 23:35:44 UTC (rev 990)
+@@ -25,9 +25,10 @@
+ #include &lt;s3dw.h&gt;
+ #include &lt;s3dw_int.h&gt;
+ 
+-/**
++/** \brief handle click on widget
++ *
+  * If you want your widgets on mouseclicks (believe me, you want that), you have
+- * to call this either in your clickhandler-function or specifiy it itself as
++ * to call this either in your clickhandler-function or specify it itself as
+  * the clickhandler.
+  *
+  * \code
+@@ -53,7 +54,8 @@
+ 	return(s3dw_widget_event_click(s3dw_getroot(), oid));
+ }
+ 
+-/**
++/** \brief handle key input on widget
++ *
+  * This is somehow useful to call in your keyhandler functions if you want to
+  * have input-boxes work. ;)
+  *
+@@ -80,7 +82,8 @@
+ 	return(s3dw_widget_event_key(s3dw_getroot(), keys));
+ }
+ 
+-/**
++/** \brief handle object info events
++ *
+  * This can be used to let s3dw handle S3D_EVENT_OBJ_INFO-events. With this,
+  * s3dw can consider the camera position and makes things like following the
+  * camera possible.
+
+Modified: trunk/libs3dw/input.c
+===================================================================
+--- trunk/libs3dw/input.c	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/libs3dw/input.c	2008-09-04 23:35:44 UTC (rev 990)
+@@ -138,7 +138,8 @@
+ 	s3d_flags_off(input-&gt;oid_text, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+ }
+ 
+-/**
++/** \brief create a new input in the surface
++ *
+  * Creates a new input-box on the surface with a input width of &quot;width&quot;, the
+  * upper left corner at (posx,posy) on the surface. The input-box is empty on
+  * creation and can be change with s3dw_input_change_text, and received with
+@@ -181,7 +182,8 @@
+ 	free(input);
+ }
+ 
+-/**
++/** \brief changes the text of the input
++ *
+  * Change the text in the referenced input-box to the specified text.
+  */
+ void s3dw_input_change_text(s3dw_input *input, const char *text)
+@@ -244,7 +246,8 @@
+ 	return(0);
+ }
+ 
+-/**
++/** \brief get text of input
++ *
+  * Returns the text which is currently entered in the referenced input-box.
+  */
+ char *s3dw_input_gettext(s3dw_input *input)
+
+Modified: trunk/libs3dw/label.c
+===================================================================
+--- trunk/libs3dw/label.c	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/libs3dw/label.c	2008-09-04 23:35:44 UTC (rev 990)
+@@ -50,7 +50,8 @@
+ 	s3d_flags_off(widget-&gt;oid, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+ }
+ 
+-/**
++/** \brief change label text
++ *
+  * Change the text in the referenced label to the specified text.
+  */
+ void s3dw_label_change_text(s3dw_label *label, const char *text)
+@@ -66,7 +67,8 @@
+ 		s3dw_label_show(widget);
+ }
+ 
+-/**
++/** \brief create a new label in the surface
++ *
+  * Creates a new label on the surface, with &quot;text&quot; written on it and the upper
+  * left corner at (posx,posy) on the surface.
+  *
+
+Modified: trunk/libs3dw/root.c
+===================================================================
+--- trunk/libs3dw/root.c	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/libs3dw/root.c	2008-09-04 23:35:44 UTC (rev 990)
+@@ -76,7 +76,8 @@
+ 	return(NULL);
+ }
+ 
+-/**
++/** \brief get the root
++ *
+  * Returns the root-widget, which holds all the surfaces. E.g. if you want to
+  * move all widgets at once, adjust the root-widgets x,y,z and use s3dw_moveit()
+  *
+
+Modified: trunk/libs3dw/surface.c
+===================================================================
+--- trunk/libs3dw/surface.c	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/libs3dw/surface.c	2008-09-04 23:35:44 UTC (rev 990)
+@@ -126,7 +126,8 @@
+ 	s3d_flags_off(surface-&gt;oid_tbar, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+ }
+ 
+-/**
++/** \brief create a new surface
++ *
+  * Creates a new surface (a new window) with title &quot;title&quot; and dimension &quot;width&quot;
+  * x &quot;height&quot;.
+  *
+
+Modified: trunk/libs3dw/textbox.c
+===================================================================
+--- trunk/libs3dw/textbox.c	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/libs3dw/textbox.c	2008-09-04 23:35:44 UTC (rev 990)
+@@ -195,7 +195,8 @@
+ 	s3dw_textbox_scrollright((s3dw_textbox *)widget-&gt;parent);
+ }
+ 
+-/**
++/** \brief create a new textbox in the surface
++ *
+  * Creates a new textbox on the surface, with &quot;text&quot; written on it and the upper
+  * left corner at (posx,posy) on the surface. Width and height define the size
+  * of the textbox including scrollbars which are rendered around the textfield.
+@@ -238,7 +239,8 @@
+ 		s3dw_textbox_show(widget);
+ }
+ 
+-/**
++/** \brief scroll text up
++ *
+  * Scrolls the text in the textbox up by one line, if possible.
+  */
+ void s3dw_textbox_scrollup(s3dw_textbox *textbox)
+@@ -248,7 +250,8 @@
+ 	s3dw_textbox_redraw(S3DWIDGET(textbox));
+ }
+ 
+-/**
++/** \brief scroll text down
++ *
+  * Scrolls the text in the textbox down by one line, if possible.
+  */
+ void s3dw_textbox_scrolldown(s3dw_textbox *textbox)
+@@ -258,7 +261,8 @@
+ 
+ }
+ 
+-/**
++/** \brief scroll text left
++ *
+  * Scrolls the text in the textbox to the left by one character, if possible.
+  */
+ void s3dw_textbox_scrollleft(s3dw_textbox *textbox)
+@@ -268,7 +272,8 @@
+ 	s3dw_textbox_redraw(S3DWIDGET(textbox));
+ }
+ 
+-/**
++/** \brief scroll text right
++ *
+  * Scrolls the text in the textbox to the right by one character, if possible.
+  */
+ void s3dw_textbox_scrollright(s3dw_textbox *textbox)
+@@ -277,7 +282,8 @@
+ 	s3dw_textbox_redraw(S3DWIDGET(textbox));
+ }
+ 
+-/**
++/** \brief scroll text to position
++ *
+  * Scrolls the text in the textbox so that the character in row y, column x is
+  * in the top left corner of the textbox.
+  */
+@@ -291,7 +297,8 @@
+ 	s3dw_textbox_redraw(widget);
+ }
+ 
+-/**
++/** \brief change text
++ *
+  * Change the text in the referenced textbox to the specified text.
+  */
+ void s3dw_textbox_change_text(s3dw_textbox *textbox, const char *text)
+
+Modified: trunk/libs3dw/widget.c
+===================================================================
+--- trunk/libs3dw/widget.c	2008-09-03 15:46:07 UTC (rev 989)
++++ trunk/libs3dw/widget.c	2008-09-04 23:35:44 UTC (rev 990)
+@@ -98,7 +98,8 @@
+ 		}
+ }
+ 
+-/**
++/** \brief delete widget
++ *
+  * Deletes any widget. Should be casted with S3DWIDGET().
+  */
+ void s3dw_delete(s3dw_widget *widget)
+@@ -111,7 +112,8 @@
+ 	s3dwcb_destroy[widget-&gt;type](widget); /* type-specific destroy */
+ }
+ 
+-/**
++/** \brief make widget visible
++ *
+  * Switches a widget visible. Should be casted with S3DWIDGET().
+  */
+ void s3dw_show(s3dw_widget *widget)
+@@ -120,7 +122,8 @@
+ 	s3dw_widget_visible(widget);
+ }
+ 
+-/**
++/** \brief give widget focus
++ *
+  * Gives focus to the widget, relative to its parent. That means you can focus a
+  * surface, and each surface can focus one of its element, e.g. an input field.
+  * Should be casted with S3DWIDGET().
+@@ -149,7 +152,8 @@
+ 	s3dwcb_show[widget-&gt;type](widget);
+ }
+ 
+-/**
++/** \brief apply widgets moving function
++ *
+  * Moves/translates the widget as you specified in it's private s3dw_widget
+  * structure. Should be casted with S3DWIDGET().
+  */
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000969.html">[S3d-svn] r989 - trunk/Documentation
+</A></li>
+	<LI>Next message: <A HREF="000971.html">[S3d-svn] r991 - in trunk: Documentation/libs3d	Documentation/manpages/man3 libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#970">[ date ]</a>
+              <a href="thread.html#970">[ thread ]</a>
+              <a href="subject.html#970">[ subject ]</a>
+              <a href="author.html#970">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

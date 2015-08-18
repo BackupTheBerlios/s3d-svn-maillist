@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r772 - trunk/apps/kism3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r772%20-%20trunk/apps/kism3d&In-Reply-To=%3C200710182359.l9INxcMH030900%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000763.html">
+   <LINK REL="Next"  HREF="000765.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r772 - trunk/apps/kism3d</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r772%20-%20trunk/apps/kism3d&In-Reply-To=%3C200710182359.l9INxcMH030900%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r772 - trunk/apps/kism3d">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 01:59:38 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000763.html">[S3d-svn] r771 - trunk/apps/dot_mcp
+</A></li>
+        <LI>Next message: <A HREF="000765.html">[S3d-svn] r773 - trunk/apps/kism3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#764">[ date ]</a>
+              <a href="thread.html#764">[ thread ]</a>
+              <a href="subject.html#764">[ subject ]</a>
+              <a href="author.html#764">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 01:59:38 +0200 (Fri, 19 Oct 2007)
+New Revision: 772
+
+Modified:
+   trunk/apps/kism3d/gui.c
+   trunk/apps/kism3d/kism3d.c
+Log:
+kism3d: Mark local functions and variables as static
+
+
+Modified: trunk/apps/kism3d/gui.c
+===================================================================
+--- trunk/apps/kism3d/gui.c	2007-10-18 23:59:28 UTC (rev 771)
++++ trunk/apps/kism3d/gui.c	2007-10-18 23:59:38 UTC (rev 772)
+@@ -34,22 +34,22 @@
+ 
+ 
+ 
+-float CamPosition[2][3];          /* CamPosition[trans|rot][x-z] */
++static float CamPosition[2][3];          /* CamPosition[trans|rot][x-z] */
+ 
+-int Last_Click_Oid = 0;
+-unsigned int Last_Click_Time = 0;
++static int Last_Click_Oid = 0;
++static unsigned int Last_Click_Time = 0;
+ 
+-void *Cam_target = NULL;
++static void *Cam_target = NULL;
+ 
+-int Client_obj;
++static int Client_obj;
+ 
+-struct timespec sleeptime = {
++static struct timespec sleeptime = {
+ 	0, 100 * 1000 * 1000
+ };   /* 100 mili seconds */
+ 
+ 
+ 
+-int wire_sphere(int slices, int stacks)
++static int wire_sphere(int slices, int stacks)
+ {
+ 	int x, y, i, o;
+ 	int num_v, num_l;
+@@ -118,7 +118,7 @@
+ 
+ 
+ 
+-int handle_networks(void)
++static int handle_networks(void)
+ {
+ 
+ 	struct list_head *network_pos;
+@@ -246,7 +246,7 @@
+ 
+ 
+ 
+-int handle_clients(void)
++static int handle_clients(void)
+ {
+ 
+ 	struct list_head *client_pos;
+@@ -310,7 +310,7 @@
+  *
+  ***/
+ 
+-int object_click(struct s3d_evt *evt)
++static int object_click(struct s3d_evt *evt)
+ {
+ 
+ 	struct list_head *network_pos;
+@@ -354,7 +354,7 @@
+  *
+  ***/
+ 
+-int object_info(struct s3d_evt *hrmz)
++static int object_info(struct s3d_evt *hrmz)
+ {
+ 
+ 	struct s3d_obj_info *inf;
+@@ -380,7 +380,7 @@
+ 
+ 
+ 
+-void mainloop(void)
++static void mainloop(void)
+ {
+ 
+ 	float angle, diff_vec[3], tmp_vec[3] = { 0.0, 0.0, -1.0 };
+
+Modified: trunk/apps/kism3d/kism3d.c
+===================================================================
+--- trunk/apps/kism3d/kism3d.c	2007-10-18 23:59:28 UTC (rev 771)
++++ trunk/apps/kism3d/kism3d.c	2007-10-18 23:59:38 UTC (rev 772)
+@@ -38,17 +38,17 @@
+ 
+ 
+ 
+-DEFINE_LIST_HEAD(kismet_src_list);
++static DEFINE_LIST_HEAD(kismet_src_list);
+ DEFINE_LIST_HEAD(Network_list);
+ DEFINE_LIST_HEAD(Client_list);
+ 
+-pthread_t s3d_thread_id;
++static pthread_t s3d_thread_id;
+ pthread_mutex_t Network_list_mutex = PTHREAD_MUTEX_INITIALIZER;
+ pthread_mutex_t Client_list_mutex = PTHREAD_MUTEX_INITIALIZER;
+ 
+-int thread_running = 0;
++static int thread_running = 0;
+ int Kism3d_aborted = 0;
+-int Num_networks = 0;
++ int Num_networks = 0;
+ 
+ 
+ 
+@@ -70,7 +70,7 @@
+ 
+ 
+ 
+-void *realloc_memory(void *ptr, int len)
++static void* realloc_memory(void *ptr, int len)
+ {
+ 
+ 	void *res = realloc(ptr, len);
+@@ -101,7 +101,7 @@
+ 
+ 
+ 
+-void parse_buffer(struct kismet_src *kismet_src)
++static void parse_buffer(struct kismet_src *kismet_src)
+ {
+ 
+ 	struct wlan_network *wlan_network;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000763.html">[S3d-svn] r771 - trunk/apps/dot_mcp
+</A></li>
+	<LI>Next message: <A HREF="000765.html">[S3d-svn] r773 - trunk/apps/kism3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#764">[ date ]</a>
+              <a href="thread.html#764">[ thread ]</a>
+              <a href="subject.html#764">[ subject ]</a>
+              <a href="author.html#764">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

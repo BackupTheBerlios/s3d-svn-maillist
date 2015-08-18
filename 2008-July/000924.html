@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r930 - trunk/libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r930%20-%20trunk/libs3d&In-Reply-To=%3C200807211951.m6LJp79s018616%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000923.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r930 - trunk/libs3d</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r930%20-%20trunk/libs3d&In-Reply-To=%3C200807211951.m6LJp79s018616%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r930 - trunk/libs3d">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Jul 21 21:51:07 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000923.html">[S3d-svn] r929 - trunk/Documentation
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#924">[ date ]</a>
+              <a href="thread.html#924">[ thread ]</a>
+              <a href="subject.html#924">[ subject ]</a>
+              <a href="author.html#924">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-07-21 21:51:07 +0200 (Mon, 21 Jul 2008)
+New Revision: 930
+
+Modified:
+   trunk/libs3d/libs3d.pc.cmake
+Log:
+Add sdl to requirements of libs3d in pkg-config
+
+Modified: trunk/libs3d/libs3d.pc.cmake
+===================================================================
+--- trunk/libs3d/libs3d.pc.cmake	2008-07-20 10:56:05 UTC (rev 929)
++++ trunk/libs3d/libs3d.pc.cmake	2008-07-21 19:51:07 UTC (rev 930)
+@@ -6,6 +6,6 @@
+ Name: libs3d
+ Version: @VERSION@
+ Description: Client library for the s3d server
+-Requires: libg3d freetype2 fontconfig
++Requires: libg3d freetype2 fontconfig sdl
+ Libs: -L${libdir} -ls3d
+ Cflags: -I${includedir}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000923.html">[S3d-svn] r929 - trunk/Documentation
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#924">[ date ]</a>
+              <a href="thread.html#924">[ thread ]</a>
+              <a href="subject.html#924">[ subject ]</a>
+              <a href="author.html#924">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r196 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r196%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603162044.k2GKiGXQ005496%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000191.html">
+   <LINK REL="Next"  HREF="000193.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r196 - trunk/apps/olsrs3d</H1>
+    <B>marec at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r196%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603162044.k2GKiGXQ005496%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r196 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Thu Mar 16 21:44:16 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000191.html">[S3d-svn] r195 - in trunk: . client objs/martin_stern
+</A></li>
+        <LI>Next message: <A HREF="000193.html">[S3d-svn] r197 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#192">[ date ]</a>
+              <a href="thread.html#192">[ thread ]</a>
+              <a href="subject.html#192">[ subject ]</a>
+              <a href="author.html#192">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-03-16 21:43:04 +0100 (Thu, 16 Mar 2006)
+New Revision: 196
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/vector.c
+Log:
+some code cleaning
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-03-16 00:15:43 UTC (rev 195)
++++ trunk/apps/olsrs3d/main.c	2006-03-16 20:43:04 UTC (rev 196)
+@@ -323,17 +323,19 @@
+ 
+ 		}
+ 
+-		vector_substract( olsr_node-&gt;pos_vec, CamPosition[0], tmp_mov_vec );
+-		tmp_mov_vec[1]=0; /* we are not interested in the y value */
+-		angle = 180.0/M_PI * vector_angle( desc_norm_vec, tmp_mov_vec );
+-		if (tmp_mov_vec[0]&gt;0)
+-			angle=180-angle;
+-		else
+-			angle=180+angle;
++
++		/* rotate node description so that they are always readable */
++		tmp_mov_vec[0] = CamPosition[0][0] - olsr_node-&gt;pos_vec[0];
++		tmp_mov_vec[1] = 0;   /* we are not interested in the y value */
++		tmp_mov_vec[2] = CamPosition[0][2] - olsr_node-&gt;pos_vec[2];
++
++		/* take care of inverse cosinus */
++		angle = ( tmp_mov_vec[0] &gt; 0 ? 180 - ( 180.0/M_PI * vector_angle( desc_norm_vec, tmp_mov_vec ) ) : 180 + ( 180.0/M_PI * vector_angle( desc_norm_vec, tmp_mov_vec ) ) );
++
+ 		s3d_rotate( olsr_node-&gt;desc_id, 0, angle , 0 );
+ 		s3d_translate( olsr_node-&gt;desc_id, -cos(angle*M_PI/180)*olsr_node-&gt;desc_length/2 ,-1.5, sin(angle*M_PI/180)*olsr_node-&gt;desc_length/2 );
+-// 		printf( &quot;olsr node (%s) angle: %f\n&quot;, olsr_node-&gt;ip, angle * 180 / M_PI );
+ 
++
+ 		/* drift away from unrelated nodes */
+ 		Obj_to_ip_curr = Obj_to_ip_head-&gt;next;
+ 		while ( Obj_to_ip_curr != Obj_to_ip_end ) {
+@@ -576,6 +578,7 @@
+ 
+ 				/* wtf - dark grey */
+ 				} else {
++
+ 					if(olsr_con-&gt;color != 7) {
+ 						s3d_pep_material( olsr_con-&gt;obj_id,
+ 								0.3,0.3,0.3,
+
+Modified: trunk/apps/olsrs3d/vector.c
+===================================================================
+--- trunk/apps/olsrs3d/vector.c	2006-03-16 00:15:43 UTC (rev 195)
++++ trunk/apps/olsrs3d/vector.c	2006-03-16 20:43:04 UTC (rev 196)
+@@ -1,5 +1,5 @@
+ /*
+- * net.c
++ * vector.c
+  *
+  * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *                         Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
+@@ -43,7 +43,7 @@
+  ***/
+ 
+ float vector_length( float vector[] ) {
+-// printf( &quot;length = %f\n&quot;, sqrt( vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2] ) );
++
+ 	return ( sqrt( vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2] ) );
+ 
+ }
+@@ -65,7 +65,7 @@
+ 	result_vector[0] = vector2[0] - vector1[0];
+ 	result_vector[1] = vector2[1] - vector1[1];
+ 	result_vector[2] = vector2[2] - vector1[2];
+-// 	printf( &quot;vektor2 (%f,%f,%f) - vektor1 (%f,%f,%f) = result_vektor (%f,%f,%f)\n&quot;, vector2[0], vector2[1], vector2[2], vector1[0], vector1[1], vector1[2], result_vector[0], result_vector[1], result_vector[2] );
++
+ }
+ 
+ 
+@@ -82,7 +82,7 @@
+  ***/
+ 
+ float vector_dot_product( float vector1[], float vector2[] ) {
+-// 	printf( &quot;dot product = %f\n&quot;, vector1[0] * vector2[0] + vector1[1] * vector2[1] + vector1[2] * vector2[2] );
++
+ 	return ( vector1[0] * vector2[0] + vector1[1] * vector2[1] + vector1[2] * vector2[2] );
+ 
+ }
+@@ -96,12 +96,12 @@
+  *   vector1   =&gt;   given vector1
+  *   vector2   =&gt;   given vector2
+  *
+- *   return angle
++ *   return angle (0-180 due to acos!)
+  *
+  ***/
+ 
+ float vector_angle( float vector1[], float vector2[] ) {
+-// 	printf( &quot;angle = %f\n&quot;, ( vector_dot_product( vector1, vector2 ) / ( vector_length( vector1 ) * vector_length( vector2 ) ) ) );
++
+ 	return ( acos( vector_dot_product( vector1, vector2 ) / ( vector_length( vector1 ) * vector_length( vector2 ) ) ) );
+ 
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000191.html">[S3d-svn] r195 - in trunk: . client objs/martin_stern
+</A></li>
+	<LI>Next message: <A HREF="000193.html">[S3d-svn] r197 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#192">[ date ]</a>
+              <a href="thread.html#192">[ thread ]</a>
+              <a href="subject.html#192">[ subject ]</a>
+              <a href="author.html#192">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

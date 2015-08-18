@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r463 - trunk/apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r463%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200611072142.kA7Lgjcu028443%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000455.html">
+   <LINK REL="Next"  HREF="000457.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r463 - trunk/apps/s3dosm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r463%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200611072142.kA7Lgjcu028443%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r463 - trunk/apps/s3dosm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Tue Nov  7 22:42:45 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000455.html">[S3d-svn] r462 - in trunk/apps: s3dfm s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000457.html">[S3d-svn] r464 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#456">[ date ]</a>
+              <a href="thread.html#456">[ thread ]</a>
+              <a href="subject.html#456">[ subject ]</a>
+              <a href="author.html#456">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-11-07 22:42:44 +0100 (Tue, 07 Nov 2006)
+New Revision: 463
+
+Removed:
+   trunk/apps/s3dosm/.draw.c.swp
+   trunk/apps/s3dosm/.http_fetcher.c.swp
+Modified:
+   trunk/apps/s3dosm/Makefile
+   trunk/apps/s3dosm/main.c
+   trunk/apps/s3dosm/object.c
+   trunk/apps/s3dosm/osm.c
+   trunk/apps/s3dosm/s3dosm.h
+Log:
+- add parser for kismet files to s3dosm
+- remove vim swapfile which i accidently uploaded
+
+Deleted: trunk/apps/s3dosm/.draw.c.swp
+===================================================================
+(Binary files differ)
+
+Deleted: trunk/apps/s3dosm/.http_fetcher.c.swp
+===================================================================
+(Binary files differ)
+
+Modified: trunk/apps/s3dosm/Makefile
+===================================================================
+--- trunk/apps/s3dosm/Makefile	2006-11-06 16:20:13 UTC (rev 462)
++++ trunk/apps/s3dosm/Makefile	2006-11-07 21:42:44 UTC (rev 463)
+@@ -1,6 +1,6 @@
+ BIN=s3dosm
+ VERS=0.0.1
+-SOURCES=main.c http_fetcher.c http_error_codes.c osm.c avl.c object.c draw.c
++SOURCES=main.c http_fetcher.c http_error_codes.c osm.c avl.c object.c draw.c kismet.c
+ HEADERS=s3dosm.h http_fetcher.h
+ OBJS=$(SOURCES:.c=.o)
+ CFLAGS=-Wall -ggdb -pedantic `xml2-config --cflags`
+
+Modified: trunk/apps/s3dosm/main.c
+===================================================================
+--- trunk/apps/s3dosm/main.c	2006-11-06 16:20:13 UTC (rev 462)
++++ trunk/apps/s3dosm/main.c	2006-11-07 21:42:44 UTC (rev 463)
+@@ -54,12 +54,12 @@
+ 	char *file=NULL;
+ 	layer_t *layer;
+ 	int length;
+-	file=read_file(&quot;sachsen.osm&quot;,&amp;length);
++	file=read_file(&quot;kismet_sample.xml&quot;,&amp;length);
+ /*	printf(&quot;reading data from server ...\n&quot;);
+ 	file=read_osm(11.610952060700235,49.409270464751515,14.453271808922661,52.338403146460365,&amp;length);
+ 	file=read_osm(12.8,50.6,13,51,&amp;length);*/
+ 	printf(&quot;okay, parsing data...\n&quot;);
+-	layer=parse_osm(file,length);
++	layer=parse_kismet(file,length);
+ 	printf(&quot;okay, drawing layer...\n&quot;);
+ 	if (!s3d_init(&amp;argc,&amp;argv,&quot;s3dosm&quot;))
+ 	{
+
+Modified: trunk/apps/s3dosm/object.c
+===================================================================
+--- trunk/apps/s3dosm/object.c	2006-11-06 16:20:13 UTC (rev 462)
++++ trunk/apps/s3dosm/object.c	2006-11-07 21:42:44 UTC (rev 463)
+@@ -2,6 +2,10 @@
+ #include &lt;stdlib.h&gt; /* malloc() */
+ 
+ /* ########### object ############### */
++void object_free(object_t *nobjs)
++{
++	/* TODO: remove taglist etc */
++}
+ void object_init(object_t *nobj)
+ {
+ 	nobj-&gt;bal=0;
+
+Modified: trunk/apps/s3dosm/osm.c
+===================================================================
+--- trunk/apps/s3dosm/osm.c	2006-11-06 16:20:13 UTC (rev 462)
++++ trunk/apps/s3dosm/osm.c	2006-11-07 21:42:44 UTC (rev 463)
+@@ -167,6 +167,8 @@
+ 				 break;
+ 				 
+ 	}
++	for (i=0;i&lt;obj-&gt;tag_n;i++)
++		printf(&quot;tag %d: %s -&gt; %s\n&quot;,i,obj-&gt;tag_p[i].k,obj-&gt;tag_p[i].v);
+ }
+ /* parse the osm input file */
+ layer_t *parse_osm(char *buf, int length)
+
+Modified: trunk/apps/s3dosm/s3dosm.h
+===================================================================
+--- trunk/apps/s3dosm/s3dosm.h	2006-11-06 16:20:13 UTC (rev 462)
++++ trunk/apps/s3dosm/s3dosm.h	2006-11-07 21:42:44 UTC (rev 463)
+@@ -90,7 +90,10 @@
+ void 		 segment_free(segment_t *segment);
+ void 		 way_free(way_t *way);
+ /* osm.c */
++void debug_obj(object_t *obj, void *dummy);
+ layer_t *parse_osm(char *buf, int length);
++/* kismet.c */
++layer_t *parse_kismet(char *buf, int length);
+ /* void xml_parse(xmlNode *a_node); */
+ void 		 avl_tree_trav(object_t *t, avl_func func, void *data);
+ object_t 	*avl_find(object_t *t, int val);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000455.html">[S3d-svn] r462 - in trunk/apps: s3dfm s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000457.html">[S3d-svn] r464 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#456">[ date ]</a>
+              <a href="thread.html#456">[ thread ]</a>
+              <a href="subject.html#456">[ subject ]</a>
+              <a href="author.html#456">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

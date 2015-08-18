@@ -1,0 +1,4384 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r341 - in trunk: . Documentation Documentation/libs3d Documentation/libs3dw Documentation/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r341%20-%20in%20trunk%3A%20.%20Documentation%20Documentation/libs3d%20Documentation/libs3dw%20Documentation/server&In-Reply-To=%3C200606052009.k55K9wrM011037%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000333.html">
+   <LINK REL="Next"  HREF="000335.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r341 - in trunk: . Documentation Documentation/libs3d Documentation/libs3dw Documentation/server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r341%20-%20in%20trunk%3A%20.%20Documentation%20Documentation/libs3d%20Documentation/libs3dw%20Documentation/server&In-Reply-To=%3C200606052009.k55K9wrM011037%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r341 - in trunk: . Documentation Documentation/libs3d Documentation/libs3dw Documentation/server">dotslash at berlios.de
+       </A><BR>
+    <I>Mon Jun  5 22:09:58 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000333.html">[S3d-svn] r340 - in trunk: . Documentation Documentation/libs3d
+</A></li>
+        <LI>Next message: <A HREF="000335.html">[S3d-svn] r342 - in trunk: . libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#334">[ date ]</a>
+              <a href="thread.html#334">[ thread ]</a>
+              <a href="subject.html#334">[ subject ]</a>
+              <a href="author.html#334">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-05 22:09:53 +0200 (Mon, 05 Jun 2006)
+New Revision: 341
+
+Added:
+   trunk/Documentation/README
+   trunk/Documentation/TODO
+   trunk/Documentation/bookinfo.docbook
+   trunk/Documentation/libs3d/libs3d.docbook
+   trunk/Documentation/libs3dw/
+   trunk/Documentation/libs3dw/libs3dw.docbook
+   trunk/Documentation/server/
+   trunk/Documentation/server/server.docbook
+Removed:
+   trunk/Documentation/OPEN_PROBLEMS.txt
+   trunk/Documentation/for_icon_designer.txt
+   trunk/Documentation/libs3d/Makefile.am
+   trunk/Documentation/libs3d/README
+   trunk/Documentation/libs3d/TODO
+   trunk/Documentation/libs3d/bookinfo.docbook
+   trunk/Documentation/libs3d/s3dapi.docbook
+   trunk/Documentation/movement.txt
+   trunk/Documentation/s3drc.txt
+Modified:
+   trunk/
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r733 at balthasar</A>:  dotslash | 2006-06-05 22:09:45 +0200
+ - new documentation
+ - move small doc files in the large docbook
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:731
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:733
+
+Deleted: trunk/Documentation/OPEN_PROBLEMS.txt
+===================================================================
+--- trunk/Documentation/OPEN_PROBLEMS.txt	2006-06-05 16:14:23 UTC (rev 340)
++++ trunk/Documentation/OPEN_PROBLEMS.txt	2006-06-05 20:09:53 UTC (rev 341)
+@@ -1,27 +0,0 @@
+-Of course we have a lot of problems which are yet unsolved,
+-and maybe you're experienced in this topic and can help out.
+-We need any comment and idea, so please help us! 
+-
+-You can find Contact Information in the README file.
+-
+-
+-ANTI-ALIASING WITH OPENGL?
+---------------------------
+-
+-Right now, rendering is not really pretty (as you can probably see),
+-so we would like to have some anti-aliasing. Is there a (performant)
+-way to do so?
+-
+-ALPHA SORTING
+--------------
+-
+-Alpha polygons are blended in the order as they are drawn by opengl-calls,
+-not in their z-order. Is there any easy way to do so?
+-
+-DOCUMENTATION
+--------------
+-
+-I'd like to convert the old s3dlib.txt in some new format so we can export this 
+-into man, html, latex (pdf,ps) etc ...
+-Can you recommend any System? Doxygen? Docbook? I've fiddled with doxygen,
+-but it slightly confused me ...
+
+Added: trunk/Documentation/README
+===================================================================
+--- trunk/Documentation/README	2006-06-05 16:14:23 UTC (rev 340)
++++ trunk/Documentation/README	2006-06-05 20:09:53 UTC (rev 341)
+@@ -0,0 +1,8 @@
++You can read this online on
++
++<A HREF="http://s3d.berlios.de/doc">http://s3d.berlios.de/doc</A>
++
++or compile it yourself, for example with
++
++docbook2html s3d.docbook
++
+
+Added: trunk/Documentation/TODO
+===================================================================
+--- trunk/Documentation/TODO	2006-06-05 16:14:23 UTC (rev 340)
++++ trunk/Documentation/TODO	2006-06-05 20:09:53 UTC (rev 341)
+@@ -0,0 +1,2 @@
++* libs3d
++  - texture start position
+
+Added: trunk/Documentation/bookinfo.docbook
+===================================================================
+--- trunk/Documentation/bookinfo.docbook	2006-06-05 16:14:23 UTC (rev 340)
++++ trunk/Documentation/bookinfo.docbook	2006-06-05 20:09:53 UTC (rev 341)
+@@ -0,0 +1,27 @@
++&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
++&lt;bookinfo&gt;
++&lt;title&gt;S3D - a 3D Desktop Enviroment&lt;/title&gt;
++&lt;authorgroup&gt;
++&lt;author&gt;
++&lt;firstname&gt;Simon&lt;/firstname&gt;
++&lt;surname&gt;Wunderlich&lt;/surname&gt;
++&lt;/author&gt;
++&lt;/authorgroup&gt;
++
++&lt;date&gt;06/05/2006&lt;/date&gt;
++&lt;releaseinfo&gt;0.2&lt;/releaseinfo&gt;
++
++&lt;abstract&gt;
++&lt;para&gt;
++This is the Documentation for the S3D and it's Developer Libraries.
++&lt;/para&gt;
++&lt;/abstract&gt;
++
++&lt;keywordset&gt;
++&lt;keyword&gt;s3d&lt;/keyword&gt;
++&lt;keyword&gt;API&lt;/keyword&gt;
++&lt;keyword&gt;handbook&lt;/keyword&gt;
++&lt;keyword&gt;guide&lt;/keyword&gt;
++&lt;/keywordset&gt;
++
++&lt;/bookinfo&gt;
+
+Deleted: trunk/Documentation/for_icon_designer.txt
+===================================================================
+--- trunk/Documentation/for_icon_designer.txt	2006-06-05 16:14:23 UTC (rev 340)
++++ trunk/Documentation/for_icon_designer.txt	2006-06-05 20:09:53 UTC (rev 341)
+@@ -1,15 +0,0 @@
+-I hope this gives some useful Information for Icon designer:
+-
+-- We currently only support 3ds file format.
+-- All Icons coordinates should be within [-1,-1,-1], [1,1,1]
+-  so we always have the same size. Its no problem
+-  to scale them bigger or smaller in s3d.
+-- middle of the icon is located at [0,0,0]
+-- please see objs/cube.3ds for a size reference. this cube is exactly
+-  filling the [-1,-1,-1], [1,1,1] space
+-- Textures are (not yet) supported.
+-- Alpha blending works somehow, but not very well (see OPEN_PROBLEMS)
+-- Please keep Polygon number low ... if possible, under 50,
+-  but always under 100. Icons should not bloat the User workspace.
+-
+-
+
+Deleted: trunk/Documentation/libs3d/Makefile.am
+===================================================================
+--- trunk/Documentation/libs3d/Makefile.am	2006-06-05 16:14:23 UTC (rev 340)
++++ trunk/Documentation/libs3d/Makefile.am	2006-06-05 20:09:53 UTC (rev 341)
+@@ -1,2 +0,0 @@
+-EXTRA_DIST	= s3dapi.docbook bookinfo.docbook
+-
+
+Deleted: trunk/Documentation/libs3d/README
+===================================================================
+--- trunk/Documentation/libs3d/README	2006-06-05 16:14:23 UTC (rev 340)
++++ trunk/Documentation/libs3d/README	2006-06-05 20:09:53 UTC (rev 341)
+@@ -1,8 +0,0 @@
+-You can read this online on
+-
+-<A HREF="http://s3d.berlios.de/doc">http://s3d.berlios.de/doc</A>
+-
+-or compile it yourself, for example with
+-
+-docbook2html s3dapi.docbook
+-
+
+Deleted: trunk/Documentation/libs3d/TODO
+===================================================================
+--- trunk/Documentation/libs3d/TODO	2006-06-05 16:14:23 UTC (rev 340)
++++ trunk/Documentation/libs3d/TODO	2006-06-05 20:09:53 UTC (rev 341)
+@@ -1 +0,0 @@
+-- texture start position
+
+Deleted: trunk/Documentation/libs3d/bookinfo.docbook
+===================================================================
+--- trunk/Documentation/libs3d/bookinfo.docbook	2006-06-05 16:14:23 UTC (rev 340)
++++ trunk/Documentation/libs3d/bookinfo.docbook	2006-06-05 20:09:53 UTC (rev 341)
+@@ -1,26 +0,0 @@
+-&lt;bookinfo&gt;
+-&lt;title&gt;The s3d manual&lt;/title&gt;
+-&lt;authorgroup&gt;
+-&lt;author&gt;
+-&lt;firstname&gt;Simon&lt;/firstname&gt;
+-&lt;surname&gt;Wunderlich&lt;/surname&gt;
+-&lt;/author&gt;
+-&lt;/authorgroup&gt;
+-
+-&lt;date&gt;03/19/2006&lt;/date&gt;
+-&lt;releaseinfo&gt;0.1&lt;/releaseinfo&gt;
+-
+-&lt;abstract&gt;
+-&lt;para&gt;
+-This Manual is the programmers guide to the s3d API.
+-&lt;/para&gt;
+-&lt;/abstract&gt;
+-
+-&lt;keywordset&gt;
+-&lt;keyword&gt;s3d&lt;/keyword&gt;
+-&lt;keyword&gt;API&lt;/keyword&gt;
+-&lt;keyword&gt;handbook&lt;/keyword&gt;
+-&lt;keyword&gt;guide&lt;/keyword&gt;
+-&lt;/keywordset&gt;
+-
+-&lt;/bookinfo&gt;
+
+Added: trunk/Documentation/libs3d/libs3d.docbook
+===================================================================
+--- trunk/Documentation/libs3d/libs3d.docbook	2006-06-05 16:14:23 UTC (rev 340)
++++ trunk/Documentation/libs3d/libs3d.docbook	2006-06-05 20:09:53 UTC (rev 341)
+@@ -0,0 +1,1709 @@
++&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
++&lt;chapter id=&quot;libs3d&quot;&gt;
++&lt;title&gt;libs3d - The S3D API&lt;/title&gt;
++&lt;sect1 id=&quot;using&quot;&gt;
++&lt;title&gt;Using the &lt;application&gt;s3d&lt;/application&gt; library&lt;/title&gt;
++&lt;sect2 id=&quot;setup&quot;&gt;
++&lt;title&gt;Setting &lt;application&gt;s3d&lt;/application&gt; up&lt;/title&gt;
++ &lt;para&gt;
++ Install the lib using the usual usual mechanism:
++ &lt;programlisting&gt;
++ ./configure
++ make
++ make install
++ &lt;/programlisting&gt;
++ You might need to have superuser rights in order to do make install. You should now have the server,
++ the library and some applications installed somewhere.
++ &lt;/para&gt;
++&lt;/sect2&gt;
++&lt;sect2 id=&quot;gettingstarted&quot;&gt;
++&lt;title&gt;Getting started&lt;/title&gt;
++&lt;para&gt;
++ After having &lt;application&gt;s3d&lt;/application&gt; installed, you can write your own &lt;application&gt;s3d&lt;/application&gt; programs (yeah, that is what this guide is about ;)
++ &lt;programlisting&gt;
++ &lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;
++ &lt;/programlisting&gt;
++ should be enough to access the 3d functions. If you want to use keyboard interaction, do
++ &lt;programlisting&gt;
++ &lt;![CDATA[#include &lt;s3d_keysym.h&gt;]]&gt;
++ &lt;/programlisting&gt;
++ for the keycode table.
++ Now you can compile your program with 
++ &lt;screen&gt;
++ &lt;prompt&gt;bash$&lt;/prompt&gt; &lt;command&gt; gcc &lt;replaceable&gt;program&lt;/replaceable&gt;.c -ls3d -o &lt;replaceable&gt;program&lt;/replaceable&gt; &lt;/command&gt;
++ That wasn't that hard, wasn't it?
++ &lt;/screen&gt;
++&lt;/para&gt;
++&lt;/sect2&gt;
++&lt;/sect1&gt;
++
++
++&lt;sect1 id=&quot;functions&quot;&gt;
++&lt;title&gt;function reference&lt;/title&gt;
++
++&lt;sect2 id=&quot;s3d_init&quot;&gt;
++&lt;title&gt;s3d_init&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_init&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int *&lt;parameter&gt;argc&lt;/parameter&gt;.
++char ***&lt;parameter&gt;argv&lt;/parameter&gt;
++char *&lt;parameter&gt;name&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++This will initialize the &lt;application&gt;s3d&lt;/application&gt;-library and the connection to the Server. It will return 0 on
++success in Server initializion. name specifies the your programs name.
++&lt;/para&gt;
++&lt;programlisting&gt;
++int main(char argc, char **argv)
++{
++	if (!&lt;emphasis&gt;s3d_init(&lt;![CDATA[&amp;argc,&amp;argv]]&gt;,&quot;Hello world&quot;)&lt;/emphasis&gt;) 
++	{
++		...
++		&lt;link linkend=&quot;s3d_quit&quot;&gt;s3d_quit()&lt;/link&gt;;
++	}
++	return(0);
++}
++			   
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3d_quit&quot;&gt;
++&lt;title&gt;s3d_quit&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_quit&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;void &lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++closes the connection and cleares the event-stack. it can also be used to leave
++the &lt;link linkend=&quot;s3d_mainloop&quot;&gt;s3d_mainloop&lt;/link&gt;.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_usage&quot;&gt;
++&lt;title&gt;s3d_usage&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;void &lt;function&gt;s3d_usage&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;void &lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Prints the possible parameter for the client library (which can be passed in 
++&lt;link linkend=&quot;s3d_init&quot;&gt;s3d_init()&lt;/link&gt;)
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_mainloop&quot;&gt;
++&lt;title&gt;s3d_mainloop&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_mainloop&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;void (*&lt;parameter&gt;f&lt;/parameter&gt;)()&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++takes a function as argument. it will loop this function until a quit-event is
++received. you can pass NULL if you have no function to be looped, but its
++better to sleep some time if you have nothing to do anyway to save cpu-time.
++&lt;/para&gt;
++&lt;programlisting&gt;
++void mainloop()
++{
++    usleep(1000); // sleep 1 ms in every cycle
++}
++...
++
++&lt;emphasis&gt;s3d_mainloop&lt;/emphasis&gt;(mainloop());
++
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3d_push_vertex&quot;&gt;
++&lt;title&gt;s3d_push_vertex&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_push_vertex&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, float &lt;parameter&gt;x&lt;/parameter&gt;, float &lt;parameter&gt;y&lt;/parameter&gt;, float &lt;parameter&gt;z&lt;/parameter&gt;&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++pushes a vertex onto the vertex stack. make sure that you count how many
++vertices you've pushed because you'll need that for referencing when you push
++your polygons.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_push_vertices&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_push_vertices&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, float *&lt;parameter&gt;vbuf&lt;/parameter&gt;, unsigned short &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++push some vertices from an array. that's much better for performing than
++using &lt;link linkend=&quot;s3d_push_vertex&quot;&gt;s3d_push_vertex()&lt;/link&gt; if you have a lot of vertices (and that's probably the
++usual case).
++&lt;/para&gt;
++&lt;programlisting&gt;
++float vertices[] = { 0.0, 0.0, 0.0,
++                     1.0, 2.0, 3,0,
++                     3.0, 2.0, 1.0};
++&lt;emphasis&gt;s3d_push_vertices&lt;/emphasis&gt;(object, vertices, 3); /* pushing 3 vertices */
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3d_push_material&quot;&gt;
++&lt;title&gt;s3d_push_material&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_push_material&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
++float &lt;parameter&gt;amb_r&lt;/parameter&gt;,
++float &lt;parameter&gt;amb_g&lt;/parameter&gt;,
++float &lt;parameter&gt;amb_b&lt;/parameter&gt;,
++float &lt;parameter&gt;spec_r&lt;/parameter&gt;,
++float &lt;parameter&gt;spec_g&lt;/parameter&gt;,
++float &lt;parameter&gt;spec_b&lt;/parameter&gt;,
++float &lt;parameter&gt;diff_r&lt;/parameter&gt;,
++float &lt;parameter&gt;diff_g&lt;/parameter&gt;,
++float &lt;parameter&gt;diff_b&lt;/parameter&gt;,
++
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++pushes a material for an object. you will have to count them yourself too, as
++polygons will ask for the material index number. the material properties are
++given in rgb (red/green/blue) color codes, in float. 0.0 is the minimum,
++1.0 is the maximum a color value can be.
++the specular color is the color which is directly reflected from the light
++source. the diffuse color is the color which can be seen in the bright side
++of the object, and the ambience color is the color of the shadow side of the
++object.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_push_material_a&quot;&gt;
++&lt;title&gt;s3d_push_material_a&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_push_material_a&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
++float &lt;parameter&gt;amb_r&lt;/parameter&gt;,
++float &lt;parameter&gt;amb_g&lt;/parameter&gt;,
++float &lt;parameter&gt;amb_b&lt;/parameter&gt;,
++float &lt;parameter&gt;amb_a&lt;/parameter&gt;,
++float &lt;parameter&gt;spec_r&lt;/parameter&gt;,
++float &lt;parameter&gt;spec_g&lt;/parameter&gt;,
++float &lt;parameter&gt;spec_b&lt;/parameter&gt;,
++float &lt;parameter&gt;spec_a&lt;/parameter&gt;,
++float &lt;parameter&gt;diff_r&lt;/parameter&gt;,
++float &lt;parameter&gt;diff_g&lt;/parameter&gt;,
++float &lt;parameter&gt;diff_b&lt;/parameter&gt;,
++float &lt;parameter&gt;diff_a&lt;/parameter&gt;
++
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Same as &lt;link linkend=&quot;s3d_push_material&quot;&gt;s3d_push_material&lt;/link&gt;, but color has &lt;link linkend=&quot;alpha&quot;&gt;alpha value&lt;/link&gt; added.
++Use &lt;link linkend=&quot;s3d_push_materials_a&quot;&gt;s3d_push_materials_a()&lt;/link&gt; if you have a lot of materials to push.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3d_push_materials_a&quot;&gt;
++&lt;title&gt;s3d_push_materials_a&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_push_materials_a&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;, 
++float *&lt;parameter&gt;mbuf&lt;/parameter&gt;, 
++unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Pushes a buffer of Materials. Those Materials are in the format float[n*12], with
++&lt;itemizedlist&gt;
++&lt;listitem&gt;&lt;para&gt;mbuf[n*12 + 0-3] - ambience&lt;/para&gt;&lt;/listitem&gt;
++&lt;listitem&gt;&lt;para&gt;mbuf[n*12 + 4-7] - specular&lt;/para&gt;&lt;/listitem&gt;
++&lt;listitem&gt;&lt;para&gt;mbuf[n *12 + 8-11] - diffusion values &lt;/para&gt;&lt;/listitem&gt;
++&lt;/itemizedlist&gt;
++of each entry. n is the number of materials pushed. The values are in the order r,g,b,a.
++If you only want to push one material, use the more easy &lt;link linkend=&quot;s3d_push_material_a&quot;&gt;s3d_push_material_a()&lt;/link&gt;
++function.
++&lt;/para&gt;
++&lt;programlisting&gt;
++/* each line has r,g,b,a value */
++float bla[24]=
++	{1,0,0,1,
++	 1,0,0,1,
++	 1,0,0,1,
++	 0,1,1,1,
++	 0,1,1,1,
++	 0,1,1,1};
++
++s3d_push_materials_a(object,mbuf,2); /* push a red and a cyan material */
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_push_polygon&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_push_polygon&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
++int &lt;parameter&gt;v1&lt;/parameter&gt;,
++int &lt;parameter&gt;v2&lt;/parameter&gt;,
++int &lt;parameter&gt;v3&lt;/parameter&gt;,
++int &lt;parameter&gt;material&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++push one polygon on the polygonstack of the object. it takes 3 vertex-index-
++numbers and one material material-index-nr. as argument.
++&lt;/para&gt;
++&lt;programlisting&gt;
++int oid=&lt;link linkend=&quot;s3d_new_object&quot;&gt;s3d_new_object&lt;/link&gt;();   /* create a new object */
++&lt;link linkend=&quot;s3d_push_vertex&quot;&gt;s3d_push_vertex&lt;/link&gt;(oid,0.0,0.0,0.0);
++&lt;link linkend=&quot;s3d_push_vertex&quot;&gt;s3d_push_vertex&lt;/link&gt;(oid,0.0,1.0,0.0);
++&lt;link linkend=&quot;s3d_push_vertex&quot;&gt;s3d_push_vertex&lt;/link&gt;(oid,1.0,0.0,0.0);
++&lt;link linkend=&quot;s3d_push_material&quot;&gt;s3d_push_material&lt;/link&gt;(oid,0.3,0.0,0.0, 1.0,1.0,1.0, 1.0,0.0,0.0);
++&lt;emphasis&gt;s3d_push_polygon&lt;/emphasis&gt;(oid,0,1,2,0);
++/* this will create a red polygon */
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_push_polygons&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_push_polygons&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
++unsigned long &lt;parameter&gt;*pbuf&lt;/parameter&gt;,
++unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++as for vertices, you can push arrays of polygons to have greater performance.
++the pbuf should contain n polygons which consist of 4 unsigned long values
++of 3 vertices indeces and 1 material index.
++&lt;/para&gt;
++&lt;programlisting&gt;
++unsigned long pbuf[] = { 0,1,2,0};
++int oid=&lt;link linkend=&quot;s3d_new_object&quot;&gt;s3d_new_object&lt;/link&gt;();   /* create a new object */
++&lt;link linkend=&quot;s3d_push_vertex&quot;&gt;s3d_push_vertex&lt;/link&gt;(oid,0.0,0.0,0.0);
++&lt;link linkend=&quot;s3d_push_vertex&quot;&gt;s3d_push_vertex&lt;/link&gt;(oid,0.0,1.0,0.0);
++&lt;link linkend=&quot;s3d_push_vertex&quot;&gt;s3d_push_vertex&lt;/link&gt;(oid,1.0,0.0,0.0);
++&lt;link linkend=&quot;s3d_push_material&quot;&gt;s3d_push_material&lt;/link&gt;(oid,0.3,0.0,0.0, 1.0,1.0,1.0, 1.0,0.0,0.0);
++&lt;emphasis&gt;s3d_push_polygons&lt;/emphasis&gt;(oid,pbuf,1);
++/* push one polygon with the pbuf data */
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3d_push_line&quot;&gt;
++&lt;title&gt;s3d_push_line&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_push_line&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
++int &lt;parameter&gt;v1&lt;/parameter&gt;,
++int &lt;parameter&gt;v2&lt;/parameter&gt;,
++int &lt;parameter&gt;material&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Push one line on the linestack of the object. It takes 2 vertex-index-
++numbers and one material material-index-nr. as argument. If you have
++a lot of lines to push, use &lt;link linkend=&quot;s3d_push_lines&quot;&gt;s3d_push_lines()&lt;/link&gt;
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_push_lines&quot;&gt;
++&lt;title&gt;s3d_push_lines&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_push_line&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
++unsigned  long *&lt;parameter&gt;*lbuf&lt;/parameter&gt;,
++unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Pushing n lines on the linestack of the object, each lbuf has a size of n*3,
++each entry has the index number of the first vertex, second vertex and material number just
++as in &lt;link linkend=&quot;s3d_push_line&quot;&gt;s3d_push_line()&lt;/link&gt;.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_push_texture&quot;&gt;
++&lt;title&gt;s3d_push_texture&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_push_texture&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
++int &lt;parameter&gt;w&lt;/parameter&gt;,
++int &lt;parameter&gt;h&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Adds a new texture with height w and height h on the texturestack.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_pop_vertex&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pop_vertex&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
++unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Deletes the latest n vertices from the vertex stack of the object.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_pop_polygon&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pop_polygon&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
++unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Deletes the latest n polygon from the polygon stack of the object.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_pop_material&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pop_material&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
++unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Deletes the latest n material from the material stack of the object.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_pop_texture&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pop_texture&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
++unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Deletes the latest n textures from the texture stack of the object.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_pop_line&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pop_line&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
++unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Deletes the latest n lines from the line stack of the object.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_pep_polygon_normals&quot;&gt;
++&lt;title&gt;s3d_pep_polygon_normals&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pep_polygon_normals&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;, 
++float *&lt;parameter&gt;nbuf&lt;/parameter&gt;,
++unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Adds normal information to polygons, giving each vertex of a polygon a normal information. With this, you can
++achieve smoothed edge effects. 
++&lt;/para&gt;
++&lt;para&gt;
++nbuf should contain n * 9 float values, for each vertex a normal vector (x,y,z), and you have 
++3 Vertices for each Polygon so that makes 9 float values per Polygon in Total.	
++Don't worry if you don't use this, it's kind of hard to calculate and the server will always use some
++proper normal values (same for every vertex, calculated by the plane which is defined by the 3 points of the polygon.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_pep_polygon_tex_coord&quot;&gt;
++&lt;title&gt;s3d_pep_polygon_tex_coord&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pep_polygon_tex_coord&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;, 
++float &lt;parameter&gt;x1&lt;/parameter&gt;, 
++float &lt;parameter&gt;y1&lt;/parameter&gt;, 
++float &lt;parameter&gt;x2&lt;/parameter&gt;, 
++float &lt;parameter&gt;y2&lt;/parameter&gt;, 
++float &lt;parameter&gt;x3&lt;/parameter&gt;, 
++float &lt;parameter&gt;y3&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Pimp the last polygon pushed with some textures coordinates, x and y values for each vertex point respectively.
++Those values may be between 0 and 1 and are vertex points on the &lt;link linkend=&quot;s3d_pep_material_texture&quot;&gt;
++texture defined in the material&lt;/link&gt; of the polygon. If you have more polygons which should get a texture, use
++&lt;link linkend=&quot;s3d_pep_polygon_tex_coords&quot;&gt;s3d_pep_polygon_tex_coords()&lt;/link&gt;
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_pep_polygon_tex_coords&quot;&gt;
++&lt;title&gt;s3d_pep_polygon_tex_coords&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pep_polygon_tex_coords&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;, 
++float *&lt;parameter&gt;tbuf&lt;/parameter&gt;, 
++int &lt;parameter&gt;n&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Pimp the latest n polygons with texture coordinates. tbuf has 6*n float values for its entries, which are supplied in the order
++as in &lt;link linkend=&quot;s3d_pep_polygon_tex_coord&quot;&gt;s3d_pep_polygon_tex_coord()&lt;/link&gt;
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_pep_material_texture&quot;&gt;
++&lt;title&gt;s3d_pep_material_texture&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pep_material_texture&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;, 
++unsigned long &lt;parameter&gt;tex&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Assign the latest material a texture referenced by the index tex. Of course, you will
++have pushed this texture with &lt;link linkend=&quot;s3d_push_texture&quot;&gt;s3d_push_texture&lt;/link&gt;
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3d_pep_vertex&quot;&gt;
++&lt;title&gt;s3d_pep_vertex&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pep_vertex&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;, 
++float &lt;parameter&gt;x&lt;/parameter&gt;,
++float &lt;parameter&gt;y&lt;/parameter&gt;,
++float &lt;parameter&gt;z&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Alter the latest pushed vertex, overwriting with the supplied values.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_pep_vertices&quot;&gt;
++&lt;title&gt;s3d_pep_vertices&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pep_vertices&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;, 
++float *&lt;parameter&gt;vbuf&lt;/parameter&gt;,
++unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Alter the latest n pushed vertex. vbuf holds the values which
++are used to overwrite the old data, n entries with each 3 floats
++specifying x,y,z of the vertices.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_pep_line&quot;&gt;
++&lt;title&gt;s3d_pep_line&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pep_line&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;, 
++unsigned long &lt;parameter&gt;v1&lt;/parameter&gt;,
++unsigned long &lt;parameter&gt;v2&lt;/parameter&gt;,
++unsigned long &lt;parameter&gt;material&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Alter the latest pushed line, overwriting with the supplied values.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_pep_lines&quot;&gt;
++&lt;title&gt;s3d_pep_lines&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pep_lines&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;, 
++unsigned long *&lt;parameter&gt;lbuf&lt;/parameter&gt;,
++unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Alter the latest n pushed lines. lbuf holds the values which
++are used to overwrite the old data, n entries with each 3 unsigned longs
++specifying first, second vertex and material of each line.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_pep_line_normals&quot;&gt;
++&lt;title&gt;s3d_pep_line_normals&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pep_line_normals&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;, 
++float *&lt;parameter&gt;nbuf&lt;/parameter&gt;,
++unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Adds normal information to lines, giving each vertex of a line a normal information. This makes 
++lines somewhat nicer, you'll need that especially when you're going to build wireframe models.
++&lt;/para&gt;
++&lt;para&gt;
++nbuf should contain n * 6 float values, for each vertex a normal vector (x,y,z), and you have 
++2 Vertices for each line so that makes 6 float values per line in Total.	
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_load_line_normals&quot;&gt;
++&lt;title&gt;s3d_load_line_normals&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_load_line_normals&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;, 
++float *&lt;parameter&gt;nbuf&lt;/parameter&gt;,
++int &lt;parameter&gt;start&lt;/parameter&gt;,
++unsigned short &lt;parameter&gt;n&lt;/parameter&gt;,
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Just as &lt;link linkend=&quot;s3d_pep_line_normals&quot;&gt;s3d_pep_line_normals()&lt;/link&gt;, with the difference you won't alter 
++the latest n lines but n lines starting with index start.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3d_pep_material&quot;&gt;
++&lt;title&gt;s3d_pep_material&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pep_material&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;, 
++float &lt;parameter&gt;amb_r&lt;/parameter&gt;,
++float &lt;parameter&gt;amb_g&lt;/parameter&gt;,
++float &lt;parameter&gt;amb_b&lt;/parameter&gt;,
++float &lt;parameter&gt;spec_r&lt;/parameter&gt;,
++float &lt;parameter&gt;spec_g&lt;/parameter&gt;,
++float &lt;parameter&gt;spec_b&lt;/parameter&gt;,
++float &lt;parameter&gt;diff_r&lt;/parameter&gt;,
++float &lt;parameter&gt;diff_g&lt;/parameter&gt;,
++float &lt;parameter&gt;diff_b&lt;/parameter&gt;,
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Overwriting the latest pushed Material, overwriting the current value with the specified one.
++See &lt;link linkend=&quot;s3d_pep_materials_a&quot;&gt;s3d_pep_materials_a&lt;/link&gt; if you want to pep more materials.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++
++&lt;sect2 id=&quot;s3d_pep_material_a&quot;&gt;
++&lt;title&gt;s3d_pep_material_a&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pep_material_a&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;, 
++float &lt;parameter&gt;amb_r&lt;/parameter&gt;,
++float &lt;parameter&gt;amb_g&lt;/parameter&gt;,
++float &lt;parameter&gt;amb_b&lt;/parameter&gt;,
++float &lt;parameter&gt;amb_a&lt;/parameter&gt;,
++float &lt;parameter&gt;spec_r&lt;/parameter&gt;,
++float &lt;parameter&gt;spec_g&lt;/parameter&gt;,
++float &lt;parameter&gt;spec_b&lt;/parameter&gt;,
++float &lt;parameter&gt;spec_a&lt;/parameter&gt;,
++float &lt;parameter&gt;diff_r&lt;/parameter&gt;,
++float &lt;parameter&gt;diff_g&lt;/parameter&gt;,
++float &lt;parameter&gt;diff_b&lt;/parameter&gt;,
++float &lt;parameter&gt;diff_a&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Overwriting the latest pushed Material, overwriting the current value with the specified one, with 
++&lt;link linkend=&quot;alpha&quot;&gt;alpha value&lt;/link&gt; in contrast to &lt;link linkend=&quot;s3d_pep_material&quot;&gt;s3d_pep_material&lt;/link&gt;
++See &lt;link linkend=&quot;s3d_pep_materials_a&quot;&gt;s3d_push_materials_a&lt;/link&gt; if you want to pep more materials.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_pep_materials_a&quot;&gt;
++&lt;title&gt;s3d_pep_materials_a&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pep_materials_a&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;, 
++float *&lt;parameter&gt;mbuf&lt;/parameter&gt;, 
++unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Alters the last n pushed Materials. See &lt;link linkend=&quot;s3d_push_materials_a&quot;&gt;s3d_push_materials_a()&lt;/link&gt; for
++more information how mbuf should look like. Use &lt;link linkend=&quot;s3d_pep_material_a&quot;&gt;s3d_pep_material_a()&lt;/link&gt;
++if you only want to alter the latest material.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_load_materials_a&quot;&gt;
++&lt;title&gt;s3d_load_materials_a&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_load_materials_a&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;, 
++float *&lt;parameter&gt;mbuf&lt;/parameter&gt;, 
++unsigned longs &lt;parameter&gt;start&lt;/parameter&gt;,
++unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Loads n materials starting from index position start into the Material stack.
++See &lt;link linkend=&quot;s3d_push_materials_a&quot;&gt;s3d_push_materials_a&lt;/link&gt; for more informatino about the values in mbuf.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++
++&lt;sect2 id=&quot;s3d_load_polygon_normals&quot;&gt;
++&lt;title&gt;s3d_load_polygon_normals&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_load_polygon_normals&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;, 
++float *&lt;parameter&gt;nbuf&lt;/parameter&gt;,
++int &lt;parameter&gt;start&lt;/parameter&gt;,
++unsigned short &lt;parameter&gt;n&lt;/parameter&gt;,
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Just as &lt;link linkend=&quot;s3d_pep_polygon_normals&quot;&gt;s3d_pep_polygon_normals()&lt;/link&gt;, with the difference you won't alter 
++the latest n polygons but n polygons starting with index start.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3d_load_tex_coords&quot;&gt;
++&lt;title&gt;s3d_load_tex_coords&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_load_tex_coords&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;, 
++float *&lt;parameter&gt;tbuf&lt;/parameter&gt;, 
++int &lt;parameter&gt;start&lt;/parameter&gt;,
++int &lt;parameter&gt;n&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Just as &lt;link linkend=&quot;s3d_pep_polygon_tex_coords&quot;&gt;s3d_pep_polygon_tex_coords()&lt;/link&gt;, with the difference you won't alter 
++the latest n polygons but n polygons starting with index start.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_load_texture&quot;&gt;
++&lt;title&gt;s3d_load_texture&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_load_texture&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;, 
++unsigned long &lt;parameter&gt;tex&lt;/parameter&gt;,
++unsigned short &lt;parameter&gt;xpos&lt;/parameter&gt;,
++unsigned short &lt;parameter&gt;ypos&lt;/parameter&gt;,
++unsigned short &lt;parameter&gt;w&lt;/parameter&gt;,
++unsigned short &lt;parameter&gt;h&lt;/parameter&gt;,
++unsgined char *&lt;parameter&gt;data&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++This will load an 32bit rgba image supplied in data at position xpos,ypos of the texture tex. The image has
++the width w and height h. This can be used to update only parts of the texture. It's no problem to supply big textures,
++as the image will be sent to server in fragments. Of course, you will have created the texture with 
++&lt;link linkend=&quot;s3d_push_texture&quot;&gt;s3d_push_texture&lt;/link&gt;, have an material assigned to the texture with &lt;link linkend=&quot;s3d_pep_material_texture&quot;&gt;
++s3d_pep_material_texture()&lt;/link&gt; and have your polygons set sane polygon texture coords 
++using &lt;link linkend=&quot;s3d_pep_polygon_tex_coord&quot;&gt;s3d_pep_polygon_tex_coord()&lt;/link&gt;.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3d_new_object&quot;&gt;
++&lt;title&gt;s3d_new_object&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_new_object&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++void
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Creates a new object, returning the object id.
++&lt;warning&gt;&lt;para&gt;Of course, you won't forget to &lt;link linkend=&quot;s3d_flags_on&quot;&gt;toggle&lt;/link&gt; it &lt;link linkend=&quot;S3D_OF_VISIBLE&quot;&gt;visible&lt;/link&gt;, won't you?&lt;/para&gt;&lt;/warning&gt;
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_del_object&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_del_object&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;oid&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Deletes the object referenced by oid.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3d_clone_object&quot;&gt;
++&lt;title&gt;s3d_clone_object&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_clone_object&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;oid&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Clones an already exisiting object. They get just look the same as the
++parent-object and will change when the parent-object changes.
++Cloning especially makes sense if you want to use the same object a lot of
++times. Move and transform is independent from the parent.
++The function returns the childs object id.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_clone_object_target&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_clone_object_target&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;oid&lt;/parameter&gt;,
++int &lt;parameter&gt;toid&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Changes the clone target of oid to another object (toid). This assumes you've got
++oid from &lt;link linkend=&quot;s3d_clone_object&quot;&gt;s3d_clone_object&lt;/link&gt; before.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_link&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_link&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;oid_from&lt;/parameter&gt;,
++int &lt;parameter&gt;oid_to&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++A linked object will move along with it's link parent. For example if you have
++a book on a table, you can link the book to the table so the book will 
++&quot;keep on the table&quot; if you move the table around in space.
++It will also rotate with the table etc.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_unlink&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_unlink&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;oid&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Remove the link of object oid to its target.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_import_3ds&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_import_3ds&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++char *&lt;parameter&gt;buf&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Imports a 3ds-file from memory (assuming that you have already loaded the 3ds-file and it's located at *buf).
++&lt;/para&gt;
++&lt;warning&gt;&lt;para&gt;Of course, you won't forget to &lt;link linkend=&quot;s3d_flags_on&quot;&gt;toggle&lt;/link&gt; it &lt;link linkend=&quot;S3D_OF_VISIBLE&quot;&gt;visible&lt;/link&gt;, won't you?&lt;/para&gt;&lt;/warning&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_import_3ds_file&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_import_3ds_file&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++char *&lt;parameter&gt;fname&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Opens the 3ds file referenced by 3ds. The function will also look in your object directories (maybe /usr/share/s3d, depending
++on your installation), so you can also use relative paths.
++&lt;/para&gt;
++&lt;warning&gt;&lt;para&gt;Of course, you won't forget to &lt;link linkend=&quot;s3d_flags_on&quot;&gt;toggle&lt;/link&gt; it &lt;link linkend=&quot;S3D_OF_VISIBLE&quot;&gt;visible&lt;/link&gt;, won't you?&lt;/para&gt;&lt;/warning&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3d_select_font&quot;&gt;
++&lt;title&gt;s3d_select_font&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_select_font&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++char *&lt;parameter&gt;mask&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++This selects a font for the &lt;link linkend=&quot;s3d_draw_string&quot;&gt;s3d_draw_string()&lt;/link&gt; function.
++&lt;/para&gt;
++&lt;warning&gt;&lt;para&gt;Of course, you won't forget to &lt;link linkend=&quot;s3d_flags_on&quot;&gt;toggle&lt;/link&gt; it &lt;link linkend=&quot;S3D_OF_VISIBLE&quot;&gt;visible&lt;/link&gt;, won't you?&lt;/para&gt;&lt;/warning&gt;
++&lt;programlisting&gt;
++    s3d_select_font(&quot;vera&quot;); /* will use the vera font face */
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3d_draw_string&quot;&gt;
++&lt;title&gt;s3d_draw_string&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_draw_string&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++char *&lt;parameter&gt;str&lt;/parameter&gt;,
++float *&lt;parameter&gt;len&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Renders the string str with in Truetype format with the height 1, returns
++the length of the rendered string in *len (or set len=NULL to disable this).
++
++&lt;/para&gt;
++&lt;programlisting&gt;
++	char str=&quot;hello world!&quot;;
++	float len;
++	&lt;link linkend=&quot;s3d_select_font&quot;&gt;s3d_select_font&lt;/link&gt;(&quot;vera&quot;);
++	&lt;emphasis&gt;s3d_draw_string&lt;/emphasis&gt;(str,len);
++
++	/* not interested in the length? do that:
++	 * &lt;emphasis&gt;s3d_draw_string&lt;/emphasis&gt;(str,NULL); */
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_open_file&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_open_file&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++char *&lt;parameter&gt;fname&lt;/parameter&gt;,
++char **&lt;parameter&gt;pointer&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++This opens the file fname, setting *pointer to it's memory position. the
++function will return the size of buffer. you can free() the pointer when
++you're finished.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++
++&lt;sect2 id=&quot;s3d_flags_on&quot;&gt;
++&lt;title&gt;s3d_flags_on&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_flags_on&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;,
++unsigned long &lt;parameter&gt;flags&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++turn some flags on for object.
++&lt;/para&gt;
++&lt;warning&gt;&lt;para&gt;if you don't toggle OF_VISIBLE on, you won't see your object. usually you want this. 
++(at least after you *push()d all your content)&lt;/para&gt;&lt;/warning&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_flags_off&quot;&gt;
++&lt;title&gt;s3d_flags_off&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_flags_off&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;,
++unsigned long &lt;parameter&gt;flags&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++turn some flags off for object.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_translate&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_translate&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;,
++float &lt;parameter&gt;x&lt;/parameter&gt;,
++float &lt;parameter&gt;y&lt;/parameter&gt;,
++float &lt;parameter&gt;z&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Move the object to some position in space. when you create an object, it's 
++always located at 0.0 , 0.0, 0.0.
++&lt;/para&gt;
++&lt;important&gt;&lt;para&gt;Translation is absolute, not relative!&lt;/para&gt;&lt;/important&gt;
++&lt;programlisting&gt;
++&lt;emphasis&gt;s3d_translate&lt;/emphasis&gt;(object,2,0,0);
++&lt;emphasis&gt;s3d_translate&lt;/emphasis&gt;(object,4,0,0);
++/* object will end up at 4,0,0 and not 6,0,0!! */
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_rotate&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_rotate&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;,
++float &lt;parameter&gt;x&lt;/parameter&gt;,
++float &lt;parameter&gt;y&lt;/parameter&gt;,
++float &lt;parameter&gt;z&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++rotate an object around the x, y and z-axis respectively. x,y,z may have values
++between [0,360] degrees. 
++&lt;/para&gt;
++&lt;para&gt;
++You will usually only rotate around one axis, leaving the unused fields on 0, I guess. 
++If you want to rotate around more than one axis, please note: The order of the rotation
++applies is y-axis, x-axis, and then z-axis. You can think of it as the earth position coordinates:
++x is the longitude, y is the latitude, and z is the rotation at this point of the earth around your
++bodies axis. (I wonder if that makes it any clearer ;)
++&lt;/para&gt;
++&lt;important&gt;&lt;para&gt;Rotate is absolute, not relative!&lt;/para&gt;&lt;/important&gt;
++&lt;programlisting&gt;
++&lt;emphasis&gt;s3d_rotate&lt;/emphasis&gt;(object,90,0,0);
++&lt;emphasis&gt;s3d_rotate&lt;/emphasis&gt;(object,180,0,0);
++/* object will be rotated 180 degrees around the x-axis, not 270 degress! */
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_scale&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_scale&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;,
++float &lt;parameter&gt;s&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Scales the object. about factor s. s=1 will be the original size, -1 will mirror it.
++&lt;/para&gt;
++&lt;important&gt;&lt;para&gt;s=0 is forbidden and will be ignored! s3d_scale is also absolute, not relative!&lt;/para&gt;&lt;/important&gt;
++&lt;/sect2&gt;
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_push_event&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_push_event&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++		struct s3d_evt *&lt;parameter&gt;newevt&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Pushes an &lt;link linkend=&quot;s3d_evt&quot;&gt;event&lt;/link&gt; onto the event-stack. Usually you don't need to do this manually.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_pop_event&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;struct s3d_evt *&lt;function&gt;s3d_pop_event&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;void
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Pops the latest event from the stack. Don't forget to free() both the event
++and its buffer! Returns a pointer to &lt;link linkend=&quot;s3d_evt&quot;&gt;struct s3d_evt&lt;/link&gt;.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_find_event&quot;&gt;
++&lt;title&gt;s3d_find_event&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;struct s3d_evt *&lt;function&gt;s3d_find_event&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++unsigned char &lt;parameter&gt;event&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Finds the latest occurence of an event, giving the event type as argument.
++Returns a pointer to &lt;link linkend=&quot;s3d_evt&quot;&gt;struct s3d_evt&lt;/link&gt;.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_delete_event&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_delete_event&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++struct s3d_evt *&lt;parameter&gt;devt&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++deletes an event, the argument is the pointer to the &lt;link linkend=&quot;s3d_evt&quot;&gt;event&lt;/link&gt; which is to be 
++deleted (maybe obtained from &lt;link linkend=&quot;s3d_find_event&quot;&gt;s3d_find_event&lt;/link&gt;).
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_set_callback&quot;&gt;
++&lt;title&gt;s3d_set_callback&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_set_callback&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++unsigned char &lt;parameter&gt;event&lt;/parameter&gt;
++s3d_cb &lt;parameter&gt;func&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++sets a &lt;link linkend=&quot;s3d_cb&quot;&gt;callback&lt;/link&gt; for a certain event. this is very useful for event-oriented 
++applications. event callbacks will not interrupt each other or the mainloop.
++&lt;/para&gt;
++&lt;important&gt;&lt;para&gt;Defining callbacks will only work after calling &lt;link linkend=&quot;s3d_init&quot;&gt;s3d_init()&lt;/link&gt;&lt;/para&gt;&lt;/important&gt;
++&lt;programlisting&gt;
++void obj_click(&lt;link linkend=&quot;s3d_evt&quot;&gt;struct s3d_evt&lt;/link&gt; event)
++{
++	printf(&quot;object id %d got clicked&quot;, *((unsigned long *)event-&gt;buf));
++}
++...
++	&lt;link linkend=&quot;s3d_set_callback&quot;&gt;s3d_set_callback&lt;/link&gt;(&lt;link linkend=&quot;S3D_EVENT_NEW_OBJECT&quot;&gt;S3D_EVENT_NEW_OBJECT&lt;/link&gt;, obj_click);
++
++/* this will tell you when a object got clicked */
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_clear_callback&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;void &lt;function&gt;s3d_clear_callback&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++unsigned char &lt;parameter&gt;event&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Clears the callback which is associated with the event.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_get_callback&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;s3d_cb &lt;function&gt;s3d_get_callback&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++unsigned char &lt;parameter&gt;event&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Returns the &lt;link linkend=&quot;s3d_cb&quot;&gt;Callback-function&lt;/link&gt; of the event.
++&lt;/para&gt;
++&lt;programlisting&gt;
++	&lt;link linkend=&quot;s3d_evt&quot;&gt;struct s3d_evt&lt;/link&gt; e;
++	...
++	&lt;emphasis&gt;s3d_get_callback&lt;/emphasis&gt;(&lt;link linkend=&quot;S3D_EVENT_KEY&quot;&gt;S3D_EVENT_KEY&lt;/link&gt;)(e);
++	/* will call the key-handling function with argument e.  */
++
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_process_stack&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;void &lt;function&gt;s3d_process_callback&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;void
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++This function goes through all function of the event-stack and will call 
++functions. this is useful when you define a new function but still have a lot 
++of events of this type on the stack. 
++&lt;/para&gt;
++&lt;note&gt;&lt;para&gt;This is probably obsolete&lt;/para&gt;&lt;/note&gt;
++&lt;/sect2&gt;
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_vector_length&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;float &lt;function&gt;s3d_vector_length&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++float &lt;parameter&gt;vector&lt;/parameter&gt;[]
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Calculates and returns the length of the given vector (which should be of the type float[3]).
++More info &lt;ulink url=&quot;<A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Length_of_a_vector">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Length_of_a_vector</A>&quot;&gt;on wikipedia&lt;/ulink&gt;.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_vector_substract&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;void &lt;function&gt;s3d_vector_substract&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++float &lt;parameter&gt;vector1&lt;/parameter&gt;[],
++float &lt;parameter&gt;vector2&lt;/parameter&gt;[],
++float &lt;parameter&gt;result_vector&lt;/parameter&gt;[]
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Substracts vector1 from vector2, writing result into result_vector.
++All vectors should have the format  float[3].
++More info &lt;ulink url=&quot;<A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Vector_addition_and_subtraction">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Vector_addition_and_subtraction</A>&quot;&gt;on wikipedia&lt;/ulink&gt;.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_vector_dot_product&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;float &lt;function&gt;s3d_vector_dot_product&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++float &lt;parameter&gt;vector1&lt;/parameter&gt;[],
++float &lt;parameter&gt;vector2&lt;/parameter&gt;[]
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Calculates and returns the dot product of vector1 and vector2.
++All vectors should have the format  float[3].
++More info &lt;ulink url=&quot;<A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Dot_product">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Dot_product</A>&quot;&gt;on wikipedia&lt;/ulink&gt;.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_vector_angle&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;float &lt;function&gt;s3d_vector_angle&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++float &lt;parameter&gt;vector1&lt;/parameter&gt;[],
++float &lt;parameter&gt;vector2&lt;/parameter&gt;[]
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++Calculates and returns the angle between vector1 and vector2. Please note that the resulting angle is between 0 and PI, therefore not covering the whole period! To convert in degrees just do result*180/M_PI.
++All vectors should have the format  float[3].
++More info &lt;ulink url=&quot;<A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Dot_product">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Dot_product</A>&quot;&gt;on wikipedia&lt;/ulink&gt;.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2&gt;
++&lt;title&gt;s3d_mcp_focus&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_mcp_focus&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++int &lt;parameter&gt;object&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++This is an mcp-only function. It gives focus (for receiving key-strokes etc.)
++to an app referenced by it's mcp-object-id. 
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;/sect1&gt;
++
++
++&lt;sect1 id=&quot;data_types&quot;&gt;
++&lt;title&gt;Data types&lt;/title&gt;
++
++&lt;sect2 id=&quot;s3d_obj_info&quot;&gt;
++&lt;title&gt;struct s3d_but_info&lt;/title&gt;
++&lt;programlisting&gt;
++struct s3d_obj_info 
++{
++	unsigned long object;
++	unsigned long flags;
++	float trans_x,trans_y,trans_z;
++	float rot_x,rot_y,rot_z;
++	float scale;
++	float r;
++	char name[256]; 
++};
++&lt;/programlisting&gt;
++&lt;para&gt;
++Can be used on the buffer of an &lt;link linkend=&quot;s3d_evt&quot;&gt;event&lt;/link&gt; of type &lt;link linkend=&quot;S3D_EVENT_OBJ_INFO&quot;&gt;S3D_EVENT_OBJ_INFO&lt;/link&gt;.
++name will usually contain nothing for usual objects, but mcp objects will contain the applications names here. r is the radius of the convex sphere
++an object, which will also be interesting for the mcp.
++&lt;/para&gt;
++&lt;para&gt;
++Special objects like camera, pointer will have the &quot;sys_&quot; prefix in the name and will be named &quot;pointer0&quot;, &quot;pointer1&quot; ... or &quot;cam0&quot;, &quot;cam1&quot; ...
++For cam object, scale will contain the aspect ratio.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++
++&lt;sect2 id=&quot;s3d_but_info&quot;&gt;
++&lt;title&gt;struct s3d_but_info&lt;/title&gt;
++&lt;programlisting&gt;
++struct s3d_but_info     
++{                       
++    unsigned char button, state;
++};                      
++&lt;/programlisting&gt;
++&lt;para&gt;
++Can be used on the buffer of an &lt;link linkend=&quot;s3d_evt&quot;&gt;event&lt;/link&gt; of type &lt;link linkend=&quot;S3D_EVENT_MBUTTON&quot;&gt;S3D_EVENT_MBUTTON&lt;/link&gt;.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;mcp_object&quot;&gt;
++&lt;title&gt;struct mcp_object&lt;/title&gt;
++&lt;programlisting&gt;
++struct mcp_object 
++{
++	unsigned long object;
++	float trans_x,trans_y,trans_z;
++	float r;
++	char name[256]; 
++};
++
++&lt;/programlisting&gt;
++&lt;para&gt;
++obsolete, deprecated, don't use, to be removed soon (use &lt;link linkend=&quot;s3d_but_info&quot;&gt;struct s3d_but_info&lt;/link&gt;). ;)
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_evt&quot;&gt;
++&lt;title&gt;struct s3d_evt&lt;/title&gt;
++&lt;programlisting&gt;
++struct s3d_evt {
++	unsigned char event;
++	int length;
++	char *buf;
++	struct s3d_evt *next;
++};
++&lt;/programlisting&gt;
++&lt;para&gt;
++
++This is the event information holder. 
++&lt;variablelist&gt;
++&lt;varlistentry&gt;
++&lt;term&gt;event&lt;/term&gt;
++&lt;listitem&gt;&lt;para&gt;gives the &lt;link linkend=&quot;s3d_events&quot;&gt;event type&lt;/link&gt;&lt;/para&gt;&lt;/listitem&gt;
++&lt;/varlistentry&gt;
++&lt;varlistentry&gt;
++&lt;term&gt;length&lt;/term&gt;
++&lt;listitem&gt;&lt;para&gt;gives the length of the buffer *buf&lt;/para&gt;&lt;/listitem&gt;
++&lt;/varlistentry&gt;
++&lt;varlistentry&gt;
++&lt;term&gt;*buf&lt;/term&gt;
++&lt;listitem&gt;&lt;para&gt;is the pointer to the multiple purpose buffer, which will have more specific information about the object&lt;/para&gt;&lt;/listitem&gt;
++&lt;/varlistentry&gt;
++&lt;varlistentry&gt;
++&lt;term&gt;*next&lt;/term&gt;
++&lt;listitem&gt;&lt;para&gt;can be safely ignored ;)&lt;/para&gt;&lt;/listitem&gt;
++&lt;/varlistentry&gt;
++&lt;/variablelist&gt;
++
++Depending on the event, buf can contain the keycode pressed on keyboard event, the &lt;link linkend=&quot;s3d_but_info&quot;&gt;mouse button state&lt;/link&gt; on a mouse event, &lt;link linkend=&quot;s3d_obj_info&quot;&gt;object information&lt;/link&gt; etc.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3d_cb&quot;&gt;
++&lt;title&gt;typedef s3d_cb&lt;/title&gt;
++&lt;programlisting&gt;
++typedef void (*&lt;emphasis&gt;s3d_cb&lt;/emphasis&gt;)(&lt;link linkend=&quot;s3d_evt&quot;&gt;struct s3d_evt&lt;/link&gt; *);
++&lt;/programlisting&gt;
++&lt;para&gt;
++This defines the callback format. Each callback should return void and take an argument of &lt;link linkend=&quot;s3d_evt&quot;&gt;struct s3d_evt *&lt;/link&gt;.
++Callbacks can be defined with &lt;link linkend=&quot;s3d_set_callback&quot;&gt;s3d_set_callback()&lt;/link&gt;.
++&lt;/para&gt;
++&lt;programlisting&gt;
++/* a callback handler could look like this: */
++void my_key_handler(struct s3d_evt *event_data)
++{
++	...
++}
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++&lt;/sect1&gt;
++
++
++
++
++&lt;sect1 id=&quot;definitions&quot;&gt;
++&lt;title&gt;Definitions&lt;/title&gt;
++
++
++
++
++&lt;sect2 id=&quot;s3d_events&quot;&gt;
++&lt;title&gt;S3D events&lt;/title&gt;
++&lt;para&gt;
++This defines the callback format. Each callback should return void and take an argument of &lt;link linkend=&quot;s3d_evt&quot;&gt;struct s3d_evt *&lt;/link&gt;.
++Callbacks can be defined with &lt;link linkend=&quot;s3d_set_callback&quot;&gt;s3d_set_callback()&lt;/link&gt;.
++&lt;variablelist&gt;
++
++&lt;varlistentry&gt;
++&lt;term&gt;&lt;anchor id=&quot;S3D_EVENT_OBJ_CLICK&quot;/&gt;S3D_EVENT_OBJ_CLICK&lt;/term&gt;
++&lt;listitem&gt;&lt;para&gt;
++An object got clicked (when you set the flag &lt;link linkend=&quot;S3D_OF_SELECTABLE&quot;&gt;S3D_OF_SELECTABLE&lt;/link&gt;), buf will contain the object id
++of the object which got clicked (unsigned long, 4 byte)
++&lt;/para&gt;&lt;/listitem&gt;
++&lt;/varlistentry&gt;
++
++&lt;varlistentry&gt;
++&lt;term&gt;&lt;anchor id=&quot;S3D_EVENT_KEY&quot;/&gt;S3D_EVENT_KEY&lt;/term&gt;
++&lt;listitem&gt;&lt;para&gt;
++A key was pressed, buf will contain a keycode. use  &lt;![CDATA[#include &lt;s3d_keysym.h&gt;]]&gt; to have the keycodes available. buf is a 2 byte unsigned short keycode.
++&lt;/para&gt;&lt;/listitem&gt;
++&lt;/varlistentry&gt;
++
++
++&lt;varlistentry&gt;
++&lt;term&gt;&lt;anchor id=&quot;S3D_EVENT_MBUTTON&quot;/&gt;S3D_EVENT_MBUTTON&lt;/term&gt;
++&lt;listitem&gt;&lt;para&gt;
++A mouse button was clicked. Use &lt;link linkend=&quot;s3d_but_info&quot;&gt;struct s3d_but_info&lt;/link&gt; on buf to get more info.
++&lt;/para&gt;&lt;/listitem&gt;
++&lt;/varlistentry&gt;
++
++&lt;varlistentry&gt;
++&lt;term&gt;&lt;anchor id=&quot;S3D_EVENT_NEW_OBJECT&quot;/&gt;S3D_EVENT_NEW_OBJECT&lt;/term&gt;
++&lt;listitem&gt;&lt;para&gt;
++deprecated, will use &lt;link linkend=&quot;S3D_EVENT_OBJ_INFO&quot;&gt;S3D_EVENT_OBJ_INFO&lt;/link&gt;
++&lt;/para&gt;&lt;/listitem&gt;
++&lt;/varlistentry&gt;
++
++
++&lt;varlistentry&gt;
++&lt;term&gt;&lt;anchor id=&quot;S3D_EVENT_OBJ_INFO&quot;/&gt;S3D_EVENT_OBJ_INFO&lt;/term&gt;
++&lt;listitem&gt;&lt;para&gt;
++Something happened to an object. This can happen if the camera was moved, the mouse (pointer) was moved or an application appeared/changed in the mcp
++
++&lt;/para&gt;&lt;/listitem&gt;
++&lt;/varlistentry&gt;
++
++&lt;varlistentry&gt;
++&lt;term&gt;&lt;anchor id=&quot;S3D_MCP_OBJECT&quot;/&gt;S3D_MCP_OBJECT&lt;/term&gt;
++&lt;listitem&gt;&lt;para&gt;
++As the name suggests, those will only happen to the MCP. 
++This tells it about new/changed application object. &lt;link linkend=&quot;mcp_object&quot;&gt;struct mcp_object&lt;/link&gt;
++can be used on buf. To be removed in the future.
++&lt;/para&gt;&lt;/listitem&gt;
++&lt;/varlistentry&gt;
++
++&lt;varlistentry&gt;
++&lt;term&gt;&lt;anchor id=&quot;S3D_MCP_DEL_OBJECT&quot;/&gt;S3D_MCP_DEL_OBJECT&lt;/term&gt;
++&lt;listitem&gt;&lt;para&gt;
++As the name suggests, those will only happen to the MCP. 
++This tells it about deleted application object. &lt;link linkend=&quot;mcp_object&quot;&gt;struct mcp_object&lt;/link&gt;
++can be used on buf. To be removed in the future.
++&lt;/para&gt;&lt;/listitem&gt;
++&lt;/varlistentry&gt;
++
++
++&lt;varlistentry&gt;
++&lt;term&gt;&lt;anchor id=&quot;S3D_EVENT_QUIT&quot;/&gt;S3D_EVENT_QUIT&lt;/term&gt;
++&lt;listitem&gt;&lt;para&gt;
++Server sent the quit signal, or the connection was terminated. Usually, this is only processed internally.
++&lt;/para&gt;&lt;/listitem&gt;
++&lt;/varlistentry&gt;
++
++
++
++&lt;/variablelist&gt;
++&lt;/para&gt;
++&lt;programlisting&gt;
++/* a callback handler could look like this: */
++void my_key_handler(struct s3d_evt *event_data)
++{
++	...
++}
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3d_object_flags&quot;&gt;
++&lt;title&gt;S3D Object Flags&lt;/title&gt;
++&lt;para&gt;
++Objects can have several flags to change their behaviour in the server and can be set with 
++&lt;link linkend=&quot;s3d_flags_on&quot;&gt;s3d_flags_on()&lt;/link&gt; and
++&lt;link linkend=&quot;s3d_flags_off&quot;&gt;s3d_flags_off()&lt;/link&gt;
++&lt;variablelist&gt;
++&lt;varlistentry&gt;
++&lt;term&gt;&lt;anchor id=&quot;S3D_OF_VISIBLE&quot;/&gt;S3D_OF_VISIBLE&lt;/term&gt;
++&lt;listitem&gt;&lt;para&gt;default:off&lt;/para&gt;&lt;para&gt;
++Obviously, if this flag is toggled the user can see it, if not it will be hidden. ;)
++&lt;/para&gt;&lt;para&gt;
++When an object is created it's turned off, so you will be able push your geometry data and
++turn it on after you're done. That avaoids flickering and stuff.
++&lt;/para&gt;&lt;/listitem&gt;
++&lt;/varlistentry&gt;
++
++&lt;varlistentry&gt;
++&lt;term&gt;&lt;anchor id=&quot;S3D_OF_SELECTABLE&quot;/&gt;S3D_OF_SELECTABLE&lt;/term&gt;
++&lt;listitem&gt;&lt;para&gt;default:off&lt;/para&gt;&lt;para&gt;
++When this is toggled on, you will receive &lt;link linkend=&quot;S3D_EVENT_OBJ_CLICK&quot;&gt;click events&lt;/link&gt;.
++Don't use it if you don't need it, it will eat performance.
++&lt;/para&gt;&lt;/listitem&gt;
++&lt;/varlistentry&gt;
++
++&lt;varlistentry&gt;
++&lt;term&gt;&lt;anchor id=&quot;S3D_OF_POINTABLE&quot;/&gt;S3D_OF_POINTABLE&lt;/term&gt;
++&lt;listitem&gt;&lt;para&gt;default:off&lt;/para&gt;&lt;para&gt;
++Placeholder for pointer (onmouseover-event enabler) events. Not implemented yet.
++&lt;/para&gt;&lt;/listitem&gt;
++&lt;/varlistentry&gt;
++
++&lt;/variablelist&gt;
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;/sect1&gt;
++
++&lt;sect1 id=&quot;Notes&quot;&gt;
++&lt;title&gt;Additional Notes&lt;/title&gt;
++&lt;sect2 id=&quot;alpha&quot;&gt;
++&lt;title&gt;About alpha transparency&lt;/title&gt;
++&lt;para&gt;
++Alpha transparency works, but polygons don't get ordered in view direction on the server yet. So please don't
++use this feature yet. If you have an easy idea how to do that with opengl please drop me a line.
++&lt;/para&gt;
++&lt;/sect2&gt;
++&lt;/sect1&gt;
++
++
++
++
++&lt;/chapter&gt;
+
+Deleted: trunk/Documentation/libs3d/s3dapi.docbook
+===================================================================
+--- trunk/Documentation/libs3d/s3dapi.docbook	2006-06-05 16:14:23 UTC (rev 340)
++++ trunk/Documentation/libs3d/s3dapi.docbook	2006-06-05 20:09:53 UTC (rev 341)
+@@ -1,1741 +0,0 @@
+-&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+-&lt;!DOCTYPE book PUBLIC &quot;-//OASIS//DTD DocBook XML V4.2//EN&quot; [
+-  &lt;!ENTITY introduction SYSTEM &quot;bookinfo.docbook&quot;&gt;
+-]&gt;
+-&lt;book id=&quot;s3dapi&quot; lang=&quot;en&quot;&gt;
+- 
+-&lt;bookinfo&gt;
+-&lt;title&gt;The &lt;application&gt;s3d&lt;/application&gt; API manual&lt;/title&gt;
+-&lt;/bookinfo&gt;
+-&lt;chapter id=&quot;introduction&quot;&gt;
+-&lt;title&gt;Introduction&lt;/title&gt;
+- &lt;para&gt;I'm trying to cover as much as possible, please drop me a line if 
+- there is something missing or not clear enough. please beware: anything may change anytime,
+- as i'm sometimes in the mood of changing deep internal things.
+- &lt;/para&gt;
+- &lt;para&gt;
+- Thanks to David Rugge, Mark Glassi and Eric Bischoff for their great &lt;ulink url=&quot;<A HREF="http://opensource.bureau-cornavin.com/crash-course/">http://opensource.bureau-cornavin.com/crash-course/</A>&quot;&gt;Docbook Crash Course&lt;/ulink&gt;, this Doc wouldn't be here without that :)
+- &lt;/para&gt;
+- &lt;para&gt;
+- And of course THANKS to the whole s3d team - Yd, Marek, 2x Andreas, Mog - and all the people who support &lt;application&gt;s3d&lt;/application&gt;!!
+- &lt;/para&gt;
+-&lt;/chapter&gt;
+-&lt;chapter id=&quot;using&quot;&gt;
+-&lt;title&gt;Using the &lt;application&gt;s3d&lt;/application&gt; library&lt;/title&gt;
+-&lt;sect1 id=&quot;setup&quot;&gt;
+-&lt;title&gt;Setting &lt;application&gt;s3d&lt;/application&gt; up&lt;/title&gt;
+- &lt;para&gt;
+- Install the lib using the usual usual mechanism:
+- &lt;programlisting&gt;
+- ./configure
+- make
+- make install
+- &lt;/programlisting&gt;
+- You might need to have superuser rights in order to do make install. You should now have the server,
+- the library and some applications installed somewhere.
+- &lt;/para&gt;
+-&lt;/sect1&gt;
+-&lt;sect1 id=&quot;gettingstarted&quot;&gt;
+-&lt;title&gt;Getting started&lt;/title&gt;
+-&lt;para&gt;
+- After having &lt;application&gt;s3d&lt;/application&gt; installed, you can write your own &lt;application&gt;s3d&lt;/application&gt; programs (yeah, that is what this guide is about ;)
+- &lt;programlisting&gt;
+- &lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;
+- &lt;/programlisting&gt;
+- should be enough to access the 3d functions. If you want to use keyboard interaction, do
+- &lt;programlisting&gt;
+- &lt;![CDATA[#include &lt;s3d_keysym.h&gt;]]&gt;
+- &lt;/programlisting&gt;
+- for the keycode table.
+- Now you can compile your program with 
+- &lt;screen&gt;
+- &lt;prompt&gt;bash$&lt;/prompt&gt; &lt;command&gt; gcc &lt;replaceable&gt;program&lt;/replaceable&gt;.c -ls3d -o &lt;replaceable&gt;program&lt;/replaceable&gt; &lt;/command&gt;
+- That wasn't that hard, wasn't it?
+- &lt;/screen&gt;
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-&lt;/chapter&gt;
+-
+-
+-&lt;chapter id=&quot;functions&quot;&gt;
+-&lt;title&gt;function reference&lt;/title&gt;
+-
+-&lt;sect1 id=&quot;s3d_init&quot;&gt;
+-&lt;title&gt;s3d_init&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_init&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int *&lt;parameter&gt;argc&lt;/parameter&gt;.
+-char ***&lt;parameter&gt;argv&lt;/parameter&gt;
+-char *&lt;parameter&gt;name&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-This will initialize the &lt;application&gt;s3d&lt;/application&gt;-library and the connection to the Server. It will return 0 on
+-success in Server initializion. name specifies the your programs name.
+-&lt;/para&gt;
+-&lt;programlisting&gt;
+-int main(char argc, char **argv)
+-{
+-	if (!&lt;emphasis&gt;s3d_init(&lt;![CDATA[&amp;argc,&amp;argv]]&gt;,&quot;Hello world&quot;)&lt;/emphasis&gt;) 
+-	{
+-		...
+-		&lt;link linkend=&quot;s3d_quit&quot;&gt;s3d_quit()&lt;/link&gt;;
+-	}
+-	return(0);
+-}
+-			   
+-&lt;/programlisting&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1 id=&quot;s3d_quit&quot;&gt;
+-&lt;title&gt;s3d_quit&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_quit&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;void &lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-closes the connection and cleares the event-stack. it can also be used to leave
+-the &lt;link linkend=&quot;s3d_mainloop&quot;&gt;s3d_mainloop&lt;/link&gt;.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_usage&quot;&gt;
+-&lt;title&gt;s3d_usage&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;void &lt;function&gt;s3d_usage&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;void &lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Prints the possible parameter for the client library (which can be passed in 
+-&lt;link linkend=&quot;s3d_init&quot;&gt;s3d_init()&lt;/link&gt;)
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_mainloop&quot;&gt;
+-&lt;title&gt;s3d_mainloop&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_mainloop&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;void (*&lt;parameter&gt;f&lt;/parameter&gt;)()&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-takes a function as argument. it will loop this function until a quit-event is
+-received. you can pass NULL if you have no function to be looped, but its
+-better to sleep some time if you have nothing to do anyway to save cpu-time.
+-&lt;/para&gt;
+-&lt;programlisting&gt;
+-void mainloop()
+-{
+-    usleep(1000); // sleep 1 ms in every cycle
+-}
+-...
+-
+-&lt;emphasis&gt;s3d_mainloop&lt;/emphasis&gt;(mainloop());
+-
+-&lt;/programlisting&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1 id=&quot;s3d_push_vertex&quot;&gt;
+-&lt;title&gt;s3d_push_vertex&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_push_vertex&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, float &lt;parameter&gt;x&lt;/parameter&gt;, float &lt;parameter&gt;y&lt;/parameter&gt;, float &lt;parameter&gt;z&lt;/parameter&gt;&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-pushes a vertex onto the vertex stack. make sure that you count how many
+-vertices you've pushed because you'll need that for referencing when you push
+-your polygons.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_push_vertices&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_push_vertices&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, float *&lt;parameter&gt;vbuf&lt;/parameter&gt;, unsigned short &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-push some vertices from an array. that's much better for performing than
+-using &lt;link linkend=&quot;s3d_push_vertex&quot;&gt;s3d_push_vertex()&lt;/link&gt; if you have a lot of vertices (and that's probably the
+-usual case).
+-&lt;/para&gt;
+-&lt;programlisting&gt;
+-float vertices[] = { 0.0, 0.0, 0.0,
+-                     1.0, 2.0, 3,0,
+-                     3.0, 2.0, 1.0};
+-&lt;emphasis&gt;s3d_push_vertices&lt;/emphasis&gt;(object, vertices, 3); /* pushing 3 vertices */
+-&lt;/programlisting&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1 id=&quot;s3d_push_material&quot;&gt;
+-&lt;title&gt;s3d_push_material&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_push_material&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float &lt;parameter&gt;amb_r&lt;/parameter&gt;,
+-float &lt;parameter&gt;amb_g&lt;/parameter&gt;,
+-float &lt;parameter&gt;amb_b&lt;/parameter&gt;,
+-float &lt;parameter&gt;spec_r&lt;/parameter&gt;,
+-float &lt;parameter&gt;spec_g&lt;/parameter&gt;,
+-float &lt;parameter&gt;spec_b&lt;/parameter&gt;,
+-float &lt;parameter&gt;diff_r&lt;/parameter&gt;,
+-float &lt;parameter&gt;diff_g&lt;/parameter&gt;,
+-float &lt;parameter&gt;diff_b&lt;/parameter&gt;,
+-
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-pushes a material for an object. you will have to count them yourself too, as
+-polygons will ask for the material index number. the material properties are
+-given in rgb (red/green/blue) color codes, in float. 0.0 is the minimum,
+-1.0 is the maximum a color value can be.
+-the specular color is the color which is directly reflected from the light
+-source. the diffuse color is the color which can be seen in the bright side
+-of the object, and the ambience color is the color of the shadow side of the
+-object.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_push_material_a&quot;&gt;
+-&lt;title&gt;s3d_push_material_a&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_push_material_a&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float &lt;parameter&gt;amb_r&lt;/parameter&gt;,
+-float &lt;parameter&gt;amb_g&lt;/parameter&gt;,
+-float &lt;parameter&gt;amb_b&lt;/parameter&gt;,
+-float &lt;parameter&gt;amb_a&lt;/parameter&gt;,
+-float &lt;parameter&gt;spec_r&lt;/parameter&gt;,
+-float &lt;parameter&gt;spec_g&lt;/parameter&gt;,
+-float &lt;parameter&gt;spec_b&lt;/parameter&gt;,
+-float &lt;parameter&gt;spec_a&lt;/parameter&gt;,
+-float &lt;parameter&gt;diff_r&lt;/parameter&gt;,
+-float &lt;parameter&gt;diff_g&lt;/parameter&gt;,
+-float &lt;parameter&gt;diff_b&lt;/parameter&gt;,
+-float &lt;parameter&gt;diff_a&lt;/parameter&gt;
+-
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Same as &lt;link linkend=&quot;s3d_push_material&quot;&gt;s3d_push_material&lt;/link&gt;, but color has &lt;link linkend=&quot;alpha&quot;&gt;alpha value&lt;/link&gt; added.
+-Use &lt;link linkend=&quot;s3d_push_materials_a&quot;&gt;s3d_push_materials_a()&lt;/link&gt; if you have a lot of materials to push.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1 id=&quot;s3d_push_materials_a&quot;&gt;
+-&lt;title&gt;s3d_push_materials_a&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_push_materials_a&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;mbuf&lt;/parameter&gt;, 
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
+-
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Pushes a buffer of Materials. Those Materials are in the format float[n*12], with
+-&lt;itemizedlist&gt;
+-&lt;listitem&gt;&lt;para&gt;mbuf[n*12 + 0-3] - ambience&lt;/para&gt;&lt;/listitem&gt;
+-&lt;listitem&gt;&lt;para&gt;mbuf[n*12 + 4-7] - specular&lt;/para&gt;&lt;/listitem&gt;
+-&lt;listitem&gt;&lt;para&gt;mbuf[n *12 + 8-11] - diffusion values &lt;/para&gt;&lt;/listitem&gt;
+-&lt;/itemizedlist&gt;
+-of each entry. n is the number of materials pushed. The values are in the order r,g,b,a.
+-If you only want to push one material, use the more easy &lt;link linkend=&quot;s3d_push_material_a&quot;&gt;s3d_push_material_a()&lt;/link&gt;
+-function.
+-&lt;/para&gt;
+-&lt;programlisting&gt;
+-/* each line has r,g,b,a value */
+-float bla[24]=
+-	{1,0,0,1,
+-	 1,0,0,1,
+-	 1,0,0,1,
+-	 0,1,1,1,
+-	 0,1,1,1,
+-	 0,1,1,1};
+-
+-s3d_push_materials_a(object,mbuf,2); /* push a red and a cyan material */
+-&lt;/programlisting&gt;
+-&lt;/sect1&gt;
+-
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_push_polygon&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_push_polygon&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-int &lt;parameter&gt;v1&lt;/parameter&gt;,
+-int &lt;parameter&gt;v2&lt;/parameter&gt;,
+-int &lt;parameter&gt;v3&lt;/parameter&gt;,
+-int &lt;parameter&gt;material&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-push one polygon on the polygonstack of the object. it takes 3 vertex-index-
+-numbers and one material material-index-nr. as argument.
+-&lt;/para&gt;
+-&lt;programlisting&gt;
+-int oid=&lt;link linkend=&quot;s3d_new_object&quot;&gt;s3d_new_object&lt;/link&gt;();   /* create a new object */
+-&lt;link linkend=&quot;s3d_push_vertex&quot;&gt;s3d_push_vertex&lt;/link&gt;(oid,0.0,0.0,0.0);
+-&lt;link linkend=&quot;s3d_push_vertex&quot;&gt;s3d_push_vertex&lt;/link&gt;(oid,0.0,1.0,0.0);
+-&lt;link linkend=&quot;s3d_push_vertex&quot;&gt;s3d_push_vertex&lt;/link&gt;(oid,1.0,0.0,0.0);
+-&lt;link linkend=&quot;s3d_push_material&quot;&gt;s3d_push_material&lt;/link&gt;(oid,0.3,0.0,0.0, 1.0,1.0,1.0, 1.0,0.0,0.0);
+-&lt;emphasis&gt;s3d_push_polygon&lt;/emphasis&gt;(oid,0,1,2,0);
+-/* this will create a red polygon */
+-&lt;/programlisting&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_push_polygons&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_push_polygons&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned long &lt;parameter&gt;*pbuf&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-as for vertices, you can push arrays of polygons to have greater performance.
+-the pbuf should contain n polygons which consist of 4 unsigned long values
+-of 3 vertices indeces and 1 material index.
+-&lt;/para&gt;
+-&lt;programlisting&gt;
+-unsigned long pbuf[] = { 0,1,2,0};
+-int oid=&lt;link linkend=&quot;s3d_new_object&quot;&gt;s3d_new_object&lt;/link&gt;();   /* create a new object */
+-&lt;link linkend=&quot;s3d_push_vertex&quot;&gt;s3d_push_vertex&lt;/link&gt;(oid,0.0,0.0,0.0);
+-&lt;link linkend=&quot;s3d_push_vertex&quot;&gt;s3d_push_vertex&lt;/link&gt;(oid,0.0,1.0,0.0);
+-&lt;link linkend=&quot;s3d_push_vertex&quot;&gt;s3d_push_vertex&lt;/link&gt;(oid,1.0,0.0,0.0);
+-&lt;link linkend=&quot;s3d_push_material&quot;&gt;s3d_push_material&lt;/link&gt;(oid,0.3,0.0,0.0, 1.0,1.0,1.0, 1.0,0.0,0.0);
+-&lt;emphasis&gt;s3d_push_polygons&lt;/emphasis&gt;(oid,pbuf,1);
+-/* push one polygon with the pbuf data */
+-&lt;/programlisting&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1 id=&quot;s3d_push_line&quot;&gt;
+-&lt;title&gt;s3d_push_line&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_push_line&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-int &lt;parameter&gt;v1&lt;/parameter&gt;,
+-int &lt;parameter&gt;v2&lt;/parameter&gt;,
+-int &lt;parameter&gt;material&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Push one line on the linestack of the object. It takes 2 vertex-index-
+-numbers and one material material-index-nr. as argument. If you have
+-a lot of lines to push, use &lt;link linkend=&quot;s3d_push_lines&quot;&gt;s3d_push_lines()&lt;/link&gt;
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_push_lines&quot;&gt;
+-&lt;title&gt;s3d_push_lines&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_push_line&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned  long *&lt;parameter&gt;*lbuf&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Pushing n lines on the linestack of the object, each lbuf has a size of n*3,
+-each entry has the index number of the first vertex, second vertex and material number just
+-as in &lt;link linkend=&quot;s3d_push_line&quot;&gt;s3d_push_line()&lt;/link&gt;.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_push_texture&quot;&gt;
+-&lt;title&gt;s3d_push_texture&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_push_texture&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-int &lt;parameter&gt;w&lt;/parameter&gt;,
+-int &lt;parameter&gt;h&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Adds a new texture with height w and height h on the texturestack.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_pop_vertex&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pop_vertex&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Deletes the latest n vertices from the vertex stack of the object.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_pop_polygon&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pop_polygon&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Deletes the latest n polygon from the polygon stack of the object.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_pop_material&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pop_material&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Deletes the latest n material from the material stack of the object.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_pop_texture&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pop_texture&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Deletes the latest n textures from the texture stack of the object.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_pop_line&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pop_line&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Deletes the latest n lines from the line stack of the object.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_pep_polygon_normals&quot;&gt;
+-&lt;title&gt;s3d_pep_polygon_normals&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pep_polygon_normals&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;nbuf&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Adds normal information to polygons, giving each vertex of a polygon a normal information. With this, you can
+-achieve smoothed edge effects. 
+-&lt;/para&gt;
+-&lt;para&gt;
+-nbuf should contain n * 9 float values, for each vertex a normal vector (x,y,z), and you have 
+-3 Vertices for each Polygon so that makes 9 float values per Polygon in Total.	
+-Don't worry if you don't use this, it's kind of hard to calculate and the server will always use some
+-proper normal values (same for every vertex, calculated by the plane which is defined by the 3 points of the polygon.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_pep_polygon_tex_coord&quot;&gt;
+-&lt;title&gt;s3d_pep_polygon_tex_coord&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pep_polygon_tex_coord&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float &lt;parameter&gt;x1&lt;/parameter&gt;, 
+-float &lt;parameter&gt;y1&lt;/parameter&gt;, 
+-float &lt;parameter&gt;x2&lt;/parameter&gt;, 
+-float &lt;parameter&gt;y2&lt;/parameter&gt;, 
+-float &lt;parameter&gt;x3&lt;/parameter&gt;, 
+-float &lt;parameter&gt;y3&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Pimp the last polygon pushed with some textures coordinates, x and y values for each vertex point respectively.
+-Those values may be between 0 and 1 and are vertex points on the &lt;link linkend=&quot;s3d_pep_material_texture&quot;&gt;
+-texture defined in the material&lt;/link&gt; of the polygon. If you have more polygons which should get a texture, use
+-&lt;link linkend=&quot;s3d_pep_polygon_tex_coords&quot;&gt;s3d_pep_polygon_tex_coords()&lt;/link&gt;
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_pep_polygon_tex_coords&quot;&gt;
+-&lt;title&gt;s3d_pep_polygon_tex_coords&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pep_polygon_tex_coords&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;tbuf&lt;/parameter&gt;, 
+-int &lt;parameter&gt;n&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Pimp the latest n polygons with texture coordinates. tbuf has 6*n float values for its entries, which are supplied in the order
+-as in &lt;link linkend=&quot;s3d_pep_polygon_tex_coord&quot;&gt;s3d_pep_polygon_tex_coord()&lt;/link&gt;
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_pep_material_texture&quot;&gt;
+-&lt;title&gt;s3d_pep_material_texture&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pep_material_texture&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned long &lt;parameter&gt;tex&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Assign the latest material a texture referenced by the index tex. Of course, you will
+-have pushed this texture with &lt;link linkend=&quot;s3d_push_texture&quot;&gt;s3d_push_texture&lt;/link&gt;
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1 id=&quot;s3d_pep_vertex&quot;&gt;
+-&lt;title&gt;s3d_pep_vertex&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pep_vertex&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float &lt;parameter&gt;x&lt;/parameter&gt;,
+-float &lt;parameter&gt;y&lt;/parameter&gt;,
+-float &lt;parameter&gt;z&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Alter the latest pushed vertex, overwriting with the supplied values.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_pep_vertices&quot;&gt;
+-&lt;title&gt;s3d_pep_vertices&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pep_vertices&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;vbuf&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Alter the latest n pushed vertex. vbuf holds the values which
+-are used to overwrite the old data, n entries with each 3 floats
+-specifying x,y,z of the vertices.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_pep_line&quot;&gt;
+-&lt;title&gt;s3d_pep_line&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pep_line&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned long &lt;parameter&gt;v1&lt;/parameter&gt;,
+-unsigned long &lt;parameter&gt;v2&lt;/parameter&gt;,
+-unsigned long &lt;parameter&gt;material&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Alter the latest pushed line, overwriting with the supplied values.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_pep_lines&quot;&gt;
+-&lt;title&gt;s3d_pep_lines&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pep_lines&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned long *&lt;parameter&gt;lbuf&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Alter the latest n pushed lines. lbuf holds the values which
+-are used to overwrite the old data, n entries with each 3 unsigned longs
+-specifying first, second vertex and material of each line.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_pep_line_normals&quot;&gt;
+-&lt;title&gt;s3d_pep_line_normals&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pep_line_normals&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;nbuf&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Adds normal information to lines, giving each vertex of a line a normal information. This makes 
+-lines somewhat nicer, you'll need that especially when you're going to build wireframe models.
+-&lt;/para&gt;
+-&lt;para&gt;
+-nbuf should contain n * 6 float values, for each vertex a normal vector (x,y,z), and you have 
+-2 Vertices for each line so that makes 6 float values per line in Total.	
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_load_line_normals&quot;&gt;
+-&lt;title&gt;s3d_load_line_normals&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_load_line_normals&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;nbuf&lt;/parameter&gt;,
+-int &lt;parameter&gt;start&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;,
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Just as &lt;link linkend=&quot;s3d_pep_line_normals&quot;&gt;s3d_pep_line_normals()&lt;/link&gt;, with the difference you won't alter 
+-the latest n lines but n lines starting with index start.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1 id=&quot;s3d_pep_material&quot;&gt;
+-&lt;title&gt;s3d_pep_material&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pep_material&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float &lt;parameter&gt;amb_r&lt;/parameter&gt;,
+-float &lt;parameter&gt;amb_g&lt;/parameter&gt;,
+-float &lt;parameter&gt;amb_b&lt;/parameter&gt;,
+-float &lt;parameter&gt;spec_r&lt;/parameter&gt;,
+-float &lt;parameter&gt;spec_g&lt;/parameter&gt;,
+-float &lt;parameter&gt;spec_b&lt;/parameter&gt;,
+-float &lt;parameter&gt;diff_r&lt;/parameter&gt;,
+-float &lt;parameter&gt;diff_g&lt;/parameter&gt;,
+-float &lt;parameter&gt;diff_b&lt;/parameter&gt;,
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Overwriting the latest pushed Material, overwriting the current value with the specified one.
+-See &lt;link linkend=&quot;s3d_pep_materials_a&quot;&gt;s3d_pep_materials_a&lt;/link&gt; if you want to pep more materials.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-
+-&lt;sect1 id=&quot;s3d_pep_material_a&quot;&gt;
+-&lt;title&gt;s3d_pep_material_a&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pep_material_a&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float &lt;parameter&gt;amb_r&lt;/parameter&gt;,
+-float &lt;parameter&gt;amb_g&lt;/parameter&gt;,
+-float &lt;parameter&gt;amb_b&lt;/parameter&gt;,
+-float &lt;parameter&gt;amb_a&lt;/parameter&gt;,
+-float &lt;parameter&gt;spec_r&lt;/parameter&gt;,
+-float &lt;parameter&gt;spec_g&lt;/parameter&gt;,
+-float &lt;parameter&gt;spec_b&lt;/parameter&gt;,
+-float &lt;parameter&gt;spec_a&lt;/parameter&gt;,
+-float &lt;parameter&gt;diff_r&lt;/parameter&gt;,
+-float &lt;parameter&gt;diff_g&lt;/parameter&gt;,
+-float &lt;parameter&gt;diff_b&lt;/parameter&gt;,
+-float &lt;parameter&gt;diff_a&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Overwriting the latest pushed Material, overwriting the current value with the specified one, with 
+-&lt;link linkend=&quot;alpha&quot;&gt;alpha value&lt;/link&gt; in contrast to &lt;link linkend=&quot;s3d_pep_material&quot;&gt;s3d_pep_material&lt;/link&gt;
+-See &lt;link linkend=&quot;s3d_pep_materials_a&quot;&gt;s3d_push_materials_a&lt;/link&gt; if you want to pep more materials.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_pep_materials_a&quot;&gt;
+-&lt;title&gt;s3d_pep_materials_a&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pep_materials_a&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;mbuf&lt;/parameter&gt;, 
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
+-
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Alters the last n pushed Materials. See &lt;link linkend=&quot;s3d_push_materials_a&quot;&gt;s3d_push_materials_a()&lt;/link&gt; for
+-more information how mbuf should look like. Use &lt;link linkend=&quot;s3d_pep_material_a&quot;&gt;s3d_pep_material_a()&lt;/link&gt;
+-if you only want to alter the latest material.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_load_materials_a&quot;&gt;
+-&lt;title&gt;s3d_load_materials_a&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_load_materials_a&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;mbuf&lt;/parameter&gt;, 
+-unsigned longs &lt;parameter&gt;start&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Loads n materials starting from index position start into the Material stack.
+-See &lt;link linkend=&quot;s3d_push_materials_a&quot;&gt;s3d_push_materials_a&lt;/link&gt; for more informatino about the values in mbuf.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-
+-&lt;sect1 id=&quot;s3d_load_polygon_normals&quot;&gt;
+-&lt;title&gt;s3d_load_polygon_normals&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_load_polygon_normals&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;nbuf&lt;/parameter&gt;,
+-int &lt;parameter&gt;start&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;,
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Just as &lt;link linkend=&quot;s3d_pep_polygon_normals&quot;&gt;s3d_pep_polygon_normals()&lt;/link&gt;, with the difference you won't alter 
+-the latest n polygons but n polygons starting with index start.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1 id=&quot;s3d_load_tex_coords&quot;&gt;
+-&lt;title&gt;s3d_load_tex_coords&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_load_tex_coords&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;tbuf&lt;/parameter&gt;, 
+-int &lt;parameter&gt;start&lt;/parameter&gt;,
+-int &lt;parameter&gt;n&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Just as &lt;link linkend=&quot;s3d_pep_polygon_tex_coords&quot;&gt;s3d_pep_polygon_tex_coords()&lt;/link&gt;, with the difference you won't alter 
+-the latest n polygons but n polygons starting with index start.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_load_texture&quot;&gt;
+-&lt;title&gt;s3d_load_texture&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_load_texture&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned long &lt;parameter&gt;tex&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;xpos&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;ypos&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;w&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;h&lt;/parameter&gt;,
+-unsgined char *&lt;parameter&gt;data&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-This will load an 32bit rgba image supplied in data at position xpos,ypos of the texture tex. The image has
+-the width w and height h. This can be used to update only parts of the texture. It's no problem to supply big textures,
+-as the image will be sent to server in fragments. Of course, you will have created the texture with 
+-&lt;link linkend=&quot;s3d_push_texture&quot;&gt;s3d_push_texture&lt;/link&gt;, have an material assigned to the texture with &lt;link linkend=&quot;s3d_pep_material_texture&quot;&gt;
+-s3d_pep_material_texture()&lt;/link&gt; and have your polygons set sane polygon texture coords 
+-using &lt;link linkend=&quot;s3d_pep_polygon_tex_coord&quot;&gt;s3d_pep_polygon_tex_coord()&lt;/link&gt;.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1 id=&quot;s3d_new_object&quot;&gt;
+-&lt;title&gt;s3d_new_object&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_new_object&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-void
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Creates a new object, returning the object id.
+-&lt;warning&gt;&lt;para&gt;Of course, you won't forget to &lt;link linkend=&quot;s3d_flags_on&quot;&gt;toggle&lt;/link&gt; it &lt;link linkend=&quot;S3D_OF_VISIBLE&quot;&gt;visible&lt;/link&gt;, won't you?&lt;/para&gt;&lt;/warning&gt;
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_del_object&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_del_object&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;oid&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Deletes the object referenced by oid.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1 id=&quot;s3d_clone_object&quot;&gt;
+-&lt;title&gt;s3d_clone_object&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_clone_object&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;oid&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Clones an already exisiting object. They get just look the same as the
+-parent-object and will change when the parent-object changes.
+-Cloning especially makes sense if you want to use the same object a lot of
+-times. Move and transform is independent from the parent.
+-The function returns the childs object id.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_clone_object_target&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_clone_object_target&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;oid&lt;/parameter&gt;,
+-int &lt;parameter&gt;toid&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Changes the clone target of oid to another object (toid). This assumes you've got
+-oid from &lt;link linkend=&quot;s3d_clone_object&quot;&gt;s3d_clone_object&lt;/link&gt; before.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_link&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_link&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;oid_from&lt;/parameter&gt;,
+-int &lt;parameter&gt;oid_to&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-A linked object will move along with it's link parent. For example if you have
+-a book on a table, you can link the book to the table so the book will 
+-&quot;keep on the table&quot; if you move the table around in space.
+-It will also rotate with the table etc.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_unlink&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_unlink&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;oid&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Remove the link of object oid to its target.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_import_3ds&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_import_3ds&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-char *&lt;parameter&gt;buf&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Imports a 3ds-file from memory (assuming that you have already loaded the 3ds-file and it's located at *buf).
+-&lt;/para&gt;
+-&lt;warning&gt;&lt;para&gt;Of course, you won't forget to &lt;link linkend=&quot;s3d_flags_on&quot;&gt;toggle&lt;/link&gt; it &lt;link linkend=&quot;S3D_OF_VISIBLE&quot;&gt;visible&lt;/link&gt;, won't you?&lt;/para&gt;&lt;/warning&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_import_3ds_file&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_import_3ds_file&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-char *&lt;parameter&gt;fname&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Opens the 3ds file referenced by 3ds. The function will also look in your object directories (maybe /usr/share/s3d, depending
+-on your installation), so you can also use relative paths.
+-&lt;/para&gt;
+-&lt;warning&gt;&lt;para&gt;Of course, you won't forget to &lt;link linkend=&quot;s3d_flags_on&quot;&gt;toggle&lt;/link&gt; it &lt;link linkend=&quot;S3D_OF_VISIBLE&quot;&gt;visible&lt;/link&gt;, won't you?&lt;/para&gt;&lt;/warning&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1 id=&quot;s3d_select_font&quot;&gt;
+-&lt;title&gt;s3d_select_font&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_select_font&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-char *&lt;parameter&gt;mask&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-This selects a font for the &lt;link linkend=&quot;s3d_draw_string&quot;&gt;s3d_draw_string()&lt;/link&gt; function.
+-&lt;/para&gt;
+-&lt;warning&gt;&lt;para&gt;Of course, you won't forget to &lt;link linkend=&quot;s3d_flags_on&quot;&gt;toggle&lt;/link&gt; it &lt;link linkend=&quot;S3D_OF_VISIBLE&quot;&gt;visible&lt;/link&gt;, won't you?&lt;/para&gt;&lt;/warning&gt;
+-&lt;programlisting&gt;
+-    s3d_select_font(&quot;vera&quot;); /* will use the vera font face */
+-&lt;/programlisting&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1 id=&quot;s3d_draw_string&quot;&gt;
+-&lt;title&gt;s3d_draw_string&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_draw_string&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-char *&lt;parameter&gt;str&lt;/parameter&gt;,
+-float *&lt;parameter&gt;len&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Renders the string str with in Truetype format with the height 1, returns
+-the length of the rendered string in *len (or set len=NULL to disable this).
+-
+-&lt;/para&gt;
+-&lt;programlisting&gt;
+-	char str=&quot;hello world!&quot;;
+-	float len;
+-	&lt;link linkend=&quot;s3d_select_font&quot;&gt;s3d_select_font&lt;/link&gt;(&quot;vera&quot;);
+-	&lt;emphasis&gt;s3d_draw_string&lt;/emphasis&gt;(str,len);
+-
+-	/* not interested in the length? do that:
+-	 * &lt;emphasis&gt;s3d_draw_string&lt;/emphasis&gt;(str,NULL); */
+-&lt;/programlisting&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_open_file&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_open_file&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-char *&lt;parameter&gt;fname&lt;/parameter&gt;,
+-char **&lt;parameter&gt;pointer&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-This opens the file fname, setting *pointer to it's memory position. the
+-function will return the size of buffer. you can free() the pointer when
+-you're finished.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-
+-&lt;sect1 id=&quot;s3d_flags_on&quot;&gt;
+-&lt;title&gt;s3d_flags_on&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_flags_on&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;,
+-unsigned long &lt;parameter&gt;flags&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-turn some flags on for object.
+-&lt;/para&gt;
+-&lt;warning&gt;&lt;para&gt;if you don't toggle OF_VISIBLE on, you won't see your object. usually you want this. 
+-(at least after you *push()d all your content)&lt;/para&gt;&lt;/warning&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_flags_off&quot;&gt;
+-&lt;title&gt;s3d_flags_off&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_flags_off&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;,
+-unsigned long &lt;parameter&gt;flags&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-turn some flags off for object.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_translate&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_translate&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;,
+-float &lt;parameter&gt;x&lt;/parameter&gt;,
+-float &lt;parameter&gt;y&lt;/parameter&gt;,
+-float &lt;parameter&gt;z&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Move the object to some position in space. when you create an object, it's 
+-always located at 0.0 , 0.0, 0.0.
+-&lt;/para&gt;
+-&lt;important&gt;&lt;para&gt;Translation is absolute, not relative!&lt;/para&gt;&lt;/important&gt;
+-&lt;programlisting&gt;
+-&lt;emphasis&gt;s3d_translate&lt;/emphasis&gt;(object,2,0,0);
+-&lt;emphasis&gt;s3d_translate&lt;/emphasis&gt;(object,4,0,0);
+-/* object will end up at 4,0,0 and not 6,0,0!! */
+-&lt;/programlisting&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_rotate&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_rotate&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;,
+-float &lt;parameter&gt;x&lt;/parameter&gt;,
+-float &lt;parameter&gt;y&lt;/parameter&gt;,
+-float &lt;parameter&gt;z&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-rotate an object around the x, y and z-axis respectively. x,y,z may have values
+-between [0,360] degrees. 
+-&lt;/para&gt;
+-&lt;para&gt;
+-You will usually only rotate around one axis, leaving the unused fields on 0, I guess. 
+-If you want to rotate around more than one axis, please note: The order of the rotation
+-applies is y-axis, x-axis, and then z-axis. You can think of it as the earth position coordinates:
+-x is the longitude, y is the latitude, and z is the rotation at this point of the earth around your
+-bodies axis. (I wonder if that makes it any clearer ;)
+-&lt;/para&gt;
+-&lt;important&gt;&lt;para&gt;Rotate is absolute, not relative!&lt;/para&gt;&lt;/important&gt;
+-&lt;programlisting&gt;
+-&lt;emphasis&gt;s3d_rotate&lt;/emphasis&gt;(object,90,0,0);
+-&lt;emphasis&gt;s3d_rotate&lt;/emphasis&gt;(object,180,0,0);
+-/* object will be rotated 180 degrees around the x-axis, not 270 degress! */
+-&lt;/programlisting&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_scale&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_scale&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;,
+-float &lt;parameter&gt;s&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Scales the object. about factor s. s=1 will be the original size, -1 will mirror it.
+-&lt;/para&gt;
+-&lt;important&gt;&lt;para&gt;s=0 is forbidden and will be ignored! s3d_scale is also absolute, not relative!&lt;/para&gt;&lt;/important&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_push_event&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_push_event&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-struct s3d_evt &lt;parameter&gt;*newevt&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Pushes an &lt;link linkend=&quot;s3d_evt&quot;&gt;event&lt;/link&gt; onto the event-stack. Usually you don't need to do this manually.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_pop_event&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;struct s3d_evt *&lt;function&gt;s3d_pop_event&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;void
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Pops the latest event from the stack. Don't forget to free() both the event
+-and its buffer! Returns a pointer to &lt;link linkend=&quot;s3d_evt&quot;&gt;struct s3d_evt&lt;/link&gt;.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_find_event&quot;&gt;
+-&lt;title&gt;s3d_find_event&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;struct s3d_evt *&lt;function&gt;s3d_find_event&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-unsigned char &lt;parameter&gt;event&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Finds the latest occurence of an event, giving the event type as argument.
+-Returns a pointer to &lt;link linkend=&quot;s3d_evt&quot;&gt;struct s3d_evt&lt;/link&gt;.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_delete_event&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_delete_event&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-struct s3d_evt *&lt;parameter&gt;devt&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-deletes an event, the argument is the pointer to the &lt;link linkend=&quot;s3d_evt&quot;&gt;event&lt;/link&gt; which is to be 
+-deleted (maybe obtained from &lt;link linkend=&quot;s3d_find_event&quot;&gt;s3d_find_event&lt;/link&gt;).
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_set_callback&quot;&gt;
+-&lt;title&gt;s3d_set_callback&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_set_callback&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-unsigned char &lt;parameter&gt;event&lt;/parameter&gt;
+-s3d_cb &lt;parameter&gt;func&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-sets a &lt;link linkend=&quot;s3d_cb&quot;&gt;callback&lt;/link&gt; for a certain event. this is very useful for event-oriented 
+-applications. event callbacks will not interrupt each other or the mainloop.
+-&lt;/para&gt;
+-&lt;important&gt;&lt;para&gt;Defining callbacks will only work after calling &lt;link linkend=&quot;s3d_init&quot;&gt;s3d_init()&lt;/link&gt;&lt;/para&gt;&lt;/important&gt;
+-&lt;programlisting&gt;
+-void obj_click(&lt;link linkend=&quot;s3d_evt&quot;&gt;struct s3d_evt&lt;/link&gt; event)
+-{
+-	printf(&quot;object id %d got clicked&quot;, *((unsigned long *)event-&gt;buf));
+-}
+-...
+-	&lt;link linkend=&quot;s3d_set_callback&quot;&gt;s3d_set_callback&lt;/link&gt;(&lt;link linkend=&quot;S3D_EVENT_NEW_OBJECT&quot;&gt;S3D_EVENT_NEW_OBJECT&lt;/link&gt;, obj_click);
+-
+-/* this will tell you when a object got clicked */
+-&lt;/programlisting&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_clear_callback&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;void &lt;function&gt;s3d_clear_callback&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-unsigned char &lt;parameter&gt;event&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Clears the callback which is associated with the event.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_get_callback&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;s3d_cb &lt;function&gt;s3d_get_callback&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-unsigned char &lt;parameter&gt;event&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Returns the &lt;link linkend=&quot;s3d_cb&quot;&gt;Callback-function&lt;/link&gt; of the event.
+-&lt;/para&gt;
+-&lt;programlisting&gt;
+-	&lt;link linkend=&quot;s3d_evt&quot;&gt;struct s3d_evt&lt;/link&gt; e;
+-	...
+-	&lt;emphasis&gt;s3d_get_callback&lt;/emphasis&gt;(&lt;link linkend=&quot;S3D_EVENT_KEY&quot;&gt;S3D_EVENT_KEY&lt;/link&gt;)(e);
+-	/* will call the key-handling function with argument e.  */
+-
+-&lt;/programlisting&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_process_stack&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;void &lt;function&gt;s3d_process_callback&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;void
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-This function goes through all function of the event-stack and will call 
+-functions. this is useful when you define a new function but still have a lot 
+-of events of this type on the stack. 
+-&lt;/para&gt;
+-&lt;note&gt;&lt;para&gt;This is probably obsolete&lt;/para&gt;&lt;/note&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_vector_length&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;float &lt;function&gt;s3d_vector_length&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-float &lt;parameter&gt;vector&lt;/parameter&gt;[]
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Calculates and returns the length of the given vector (which should be of the type float[3]).
+-More info &lt;ulink url=&quot;<A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Length_of_a_vector">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Length_of_a_vector</A>&quot;&gt;on wikipedia&lt;/ulink&gt;.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_vector_substract&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;void &lt;function&gt;s3d_vector_substract&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-float &lt;parameter&gt;vector1&lt;/parameter&gt;[],
+-float &lt;parameter&gt;vector2&lt;/parameter&gt;[],
+-float &lt;parameter&gt;result_vector&lt;/parameter&gt;[]
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Substracts vector1 from vector2, writing result into result_vector.
+-All vectors should have the format  float[3].
+-More info &lt;ulink url=&quot;<A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Vector_addition_and_subtraction">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Vector_addition_and_subtraction</A>&quot;&gt;on wikipedia&lt;/ulink&gt;.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_vector_dot_product&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;float &lt;function&gt;s3d_vector_dot_product&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-float &lt;parameter&gt;vector1&lt;/parameter&gt;[],
+-float &lt;parameter&gt;vector2&lt;/parameter&gt;[]
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Calculates and returns the dot product of vector1 and vector2.
+-All vectors should have the format  float[3].
+-More info &lt;ulink url=&quot;<A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Dot_product">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Dot_product</A>&quot;&gt;on wikipedia&lt;/ulink&gt;.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_vector_angle&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;float &lt;function&gt;s3d_vector_angle&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-float &lt;parameter&gt;vector1&lt;/parameter&gt;[],
+-float &lt;parameter&gt;vector2&lt;/parameter&gt;[]
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-Calculates and returns the angle between vector1 and vector2. Please note that the resulting angle is between 0 and PI, therefore not covering the whole period! To convert in degrees just do result*180/M_PI.
+-All vectors should have the format  float[3].
+-More info &lt;ulink url=&quot;<A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Dot_product">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Dot_product</A>&quot;&gt;on wikipedia&lt;/ulink&gt;.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1&gt;
+-&lt;title&gt;s3d_mcp_focus&lt;/title&gt;
+-&lt;funcsynopsis&gt;
+-&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+-&lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_mcp_focus&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;
+-int &lt;parameter&gt;object&lt;/parameter&gt;
+-&lt;/paramdef&gt;
+-&lt;/funcprototype&gt;
+-&lt;/funcsynopsis&gt;
+-&lt;para&gt;
+-This is an mcp-only function. It gives focus (for receiving key-strokes etc.)
+-to an app referenced by it's mcp-object-id. 
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;/chapter&gt;
+-
+-
+-&lt;chapter id=&quot;data_types&quot;&gt;
+-&lt;title&gt;Data types&lt;/title&gt;
+-
+-&lt;sect1 id=&quot;s3d_obj_info&quot;&gt;
+-&lt;title&gt;struct s3d_but_info&lt;/title&gt;
+-&lt;programlisting&gt;
+-struct s3d_obj_info 
+-{
+-	unsigned long object;
+-	unsigned long flags;
+-	float trans_x,trans_y,trans_z;
+-	float rot_x,rot_y,rot_z;
+-	float scale;
+-	float r;
+-	char name[256]; 
+-};
+-&lt;/programlisting&gt;
+-&lt;para&gt;
+-Can be used on the buffer of an &lt;link linkend=&quot;s3d_evt&quot;&gt;event&lt;/link&gt; of type &lt;link linkend=&quot;S3D_EVENT_OBJ_INFO&quot;&gt;S3D_EVENT_OBJ_INFO&lt;/link&gt;.
+-name will usually contain nothing for usual objects, but mcp objects will contain the applications names here. r is the radius of the convex sphere
+-an object, which will also be interesting for the mcp.
+-&lt;/para&gt;
+-&lt;para&gt;
+-Special objects like camera, pointer will have the &quot;sys_&quot; prefix in the name and will be named &quot;pointer0&quot;, &quot;pointer1&quot; ... or &quot;cam0&quot;, &quot;cam1&quot; ...
+-For cam object, scale will contain the aspect ratio.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-
+-&lt;sect1 id=&quot;s3d_but_info&quot;&gt;
+-&lt;title&gt;struct s3d_but_info&lt;/title&gt;
+-&lt;programlisting&gt;
+-struct s3d_but_info     
+-{                       
+-    unsigned char button, state;
+-};                      
+-&lt;/programlisting&gt;
+-&lt;para&gt;
+-Can be used on the buffer of an &lt;link linkend=&quot;s3d_evt&quot;&gt;event&lt;/link&gt; of type &lt;link linkend=&quot;S3D_EVENT_MBUTTON&quot;&gt;S3D_EVENT_MBUTTON&lt;/link&gt;.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1 id=&quot;mcp_object&quot;&gt;
+-&lt;title&gt;struct mcp_object&lt;/title&gt;
+-&lt;programlisting&gt;
+-struct mcp_object 
+-{
+-	unsigned long object;
+-	float trans_x,trans_y,trans_z;
+-	float r;
+-	char name[256]; 
+-};
+-
+-&lt;/programlisting&gt;
+-&lt;para&gt;
+-obsolete, deprecated, don't use, to be removed soon (use &lt;link linkend=&quot;s3d_but_info&quot;&gt;struct s3d_but_info&lt;/link&gt;). ;)
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_evt&quot;&gt;
+-&lt;title&gt;struct s3d_evt&lt;/title&gt;
+-&lt;programlisting&gt;
+-struct s3d_evt {
+-	unsigned char event;
+-	int length;
+-	char *buf;
+-	struct s3d_evt *next;
+-};
+-&lt;/programlisting&gt;
+-&lt;para&gt;
+-
+-This is the event information holder. 
+-&lt;variablelist&gt;
+-&lt;varlistentry&gt;
+-&lt;term&gt;event&lt;/term&gt;
+-&lt;listitem&gt;&lt;para&gt;gives the &lt;link linkend=&quot;s3d_events&quot;&gt;event type&lt;/link&gt;&lt;/para&gt;&lt;/listitem&gt;
+-&lt;/varlistentry&gt;
+-&lt;varlistentry&gt;
+-&lt;term&gt;length&lt;/term&gt;
+-&lt;listitem&gt;&lt;para&gt;gives the length of the buffer *buf&lt;/para&gt;&lt;/listitem&gt;
+-&lt;/varlistentry&gt;
+-&lt;varlistentry&gt;
+-&lt;term&gt;*buf&lt;/term&gt;
+-&lt;listitem&gt;&lt;para&gt;is the pointer to the multiple purpose buffer, which will have more specific information about the object&lt;/para&gt;&lt;/listitem&gt;
+-&lt;/varlistentry&gt;
+-&lt;varlistentry&gt;
+-&lt;term&gt;*next&lt;/term&gt;
+-&lt;listitem&gt;&lt;para&gt;can be safely ignored ;)&lt;/para&gt;&lt;/listitem&gt;
+-&lt;/varlistentry&gt;
+-&lt;/variablelist&gt;
+-
+-Depending on the event, buf can contain the keycode pressed on keyboard event, the &lt;link linkend=&quot;s3d_but_info&quot;&gt;mouse button state&lt;/link&gt; on a mouse event, &lt;link linkend=&quot;s3d_obj_info&quot;&gt;object information&lt;/link&gt; etc.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;sect1 id=&quot;s3d_cb&quot;&gt;
+-&lt;title&gt;typedef s3d_cb&lt;/title&gt;
+-&lt;programlisting&gt;
+-typedef void (*&lt;emphasis&gt;s3d_cb&lt;/emphasis&gt;)(&lt;link linkend=&quot;s3d_evt&quot;&gt;struct s3d_evt&lt;/link&gt; *);
+-&lt;/programlisting&gt;
+-&lt;para&gt;
+-This defines the callback format. Each callback should return void and take an argument of &lt;link linkend=&quot;s3d_evt&quot;&gt;struct s3d_evt *&lt;/link&gt;.
+-Callbacks can be defined with &lt;link linkend=&quot;s3d_set_callback&quot;&gt;s3d_set_callback()&lt;/link&gt;.
+-&lt;/para&gt;
+-&lt;programlisting&gt;
+-/* a callback handler could look like this: */
+-void my_key_handler(struct s3d_evt *event_data)
+-{
+-	...
+-}
+-&lt;/programlisting&gt;
+-&lt;/sect1&gt;
+-&lt;/chapter&gt;
+-
+-
+-
+-
+-&lt;chapter id=&quot;definitions&quot;&gt;
+-&lt;title&gt;Definitions&lt;/title&gt;
+-
+-
+-
+-
+-&lt;sect1 id=&quot;s3d_events&quot;&gt;
+-&lt;title&gt;S3D events&lt;/title&gt;
+-&lt;para&gt;
+-This defines the callback format. Each callback should return void and take an argument of &lt;link linkend=&quot;s3d_evt&quot;&gt;struct s3d_evt *&lt;/link&gt;.
+-Callbacks can be defined with &lt;link linkend=&quot;s3d_set_callback&quot;&gt;s3d_set_callback()&lt;/link&gt;.
+-&lt;variablelist&gt;
+-
+-&lt;varlistentry&gt;
+-&lt;term&gt;&lt;anchor id=&quot;S3D_EVENT_OBJ_CLICK&quot;/&gt;S3D_EVENT_OBJ_CLICK&lt;/term&gt;
+-&lt;listitem&gt;&lt;para&gt;
+-An object got clicked (when you set the flag &lt;link linkend=&quot;S3D_OF_SELECTABLE&quot;&gt;S3D_OF_SELECTABLE&lt;/link&gt;), buf will contain the object id
+-of the object which got clicked (unsigned long, 4 byte)
+-&lt;/para&gt;&lt;/listitem&gt;
+-&lt;/varlistentry&gt;
+-
+-&lt;varlistentry&gt;
+-&lt;term&gt;&lt;anchor id=&quot;S3D_EVENT_KEY&quot;/&gt;S3D_EVENT_KEY&lt;/term&gt;
+-&lt;listitem&gt;&lt;para&gt;
+-A key was pressed, buf will contain a keycode. use  &lt;![CDATA[#include &lt;s3d_keysym.h&gt;]]&gt; to have the keycodes available. buf is a 2 byte unsigned short keycode.
+-&lt;/para&gt;&lt;/listitem&gt;
+-&lt;/varlistentry&gt;
+-
+-
+-&lt;varlistentry&gt;
+-&lt;term&gt;&lt;anchor id=&quot;S3D_EVENT_MBUTTON&quot;/&gt;S3D_EVENT_MBUTTON&lt;/term&gt;
+-&lt;listitem&gt;&lt;para&gt;
+-A mouse button was clicked. Use &lt;link linkend=&quot;s3d_but_info&quot;&gt;struct s3d_but_info&lt;/link&gt; on buf to get more info.
+-&lt;/para&gt;&lt;/listitem&gt;
+-&lt;/varlistentry&gt;
+-
+-&lt;varlistentry&gt;
+-&lt;term&gt;&lt;anchor id=&quot;S3D_EVENT_NEW_OBJECT&quot;/&gt;S3D_EVENT_NEW_OBJECT&lt;/term&gt;
+-&lt;listitem&gt;&lt;para&gt;
+-deprecated, will use &lt;link linkend=&quot;S3D_EVENT_OBJ_INFO&quot;&gt;S3D_EVENT_OBJ_INFO&lt;/link&gt;
+-&lt;/para&gt;&lt;/listitem&gt;
+-&lt;/varlistentry&gt;
+-
+-
+-&lt;varlistentry&gt;
+-&lt;term&gt;&lt;anchor id=&quot;S3D_EVENT_OBJ_INFO&quot;/&gt;S3D_EVENT_OBJ_INFO&lt;/term&gt;
+-&lt;listitem&gt;&lt;para&gt;
+-Something happened to an object. This can happen if the camera was moved, the mouse (pointer) was moved or an application appeared/changed in the mcp
+-
+-&lt;/para&gt;&lt;/listitem&gt;
+-&lt;/varlistentry&gt;
+-
+-&lt;varlistentry&gt;
+-&lt;term&gt;&lt;anchor id=&quot;S3D_MCP_OBJECT&quot;/&gt;S3D_MCP_OBJECT&lt;/term&gt;
+-&lt;listitem&gt;&lt;para&gt;
+-As the name suggests, those will only happen to the MCP. 
+-This tells it about new/changed application object. &lt;link linkend=&quot;mcp_object&quot;&gt;struct mcp_object&lt;/link&gt;
+-can be used on buf. To be removed in the future.
+-&lt;/para&gt;&lt;/listitem&gt;
+-&lt;/varlistentry&gt;
+-
+-&lt;varlistentry&gt;
+-&lt;term&gt;&lt;anchor id=&quot;S3D_MCP_DEL_OBJECT&quot;/&gt;S3D_MCP_DEL_OBJECT&lt;/term&gt;
+-&lt;listitem&gt;&lt;para&gt;
+-As the name suggests, those will only happen to the MCP. 
+-This tells it about deleted application object. &lt;link linkend=&quot;mcp_object&quot;&gt;struct mcp_object&lt;/link&gt;
+-can be used on buf. To be removed in the future.
+-&lt;/para&gt;&lt;/listitem&gt;
+-&lt;/varlistentry&gt;
+-
+-
+-&lt;varlistentry&gt;
+-&lt;term&gt;&lt;anchor id=&quot;S3D_EVENT_QUIT&quot;/&gt;S3D_EVENT_QUIT&lt;/term&gt;
+-&lt;listitem&gt;&lt;para&gt;
+-Server sent the quit signal, or the connection was terminated. Usually, this is only processed internally.
+-&lt;/para&gt;&lt;/listitem&gt;
+-&lt;/varlistentry&gt;
+-
+-
+-
+-&lt;/variablelist&gt;
+-&lt;/para&gt;
+-&lt;programlisting&gt;
+-/* a callback handler could look like this: */
+-void my_key_handler(struct s3d_evt *event_data)
+-{
+-	...
+-}
+-&lt;/programlisting&gt;
+-&lt;/sect1&gt;
+-
+-
+-&lt;sect1 id=&quot;s3d_object_flags&quot;&gt;
+-&lt;title&gt;S3D Object Flags&lt;/title&gt;
+-&lt;para&gt;
+-Objects can have several flags to change their behaviour in the server and can be set with 
+-&lt;link linkend=&quot;s3d_flags_on&quot;&gt;s3d_flags_on()&lt;/link&gt; and
+-&lt;link linkend=&quot;s3d_flags_off&quot;&gt;s3d_flags_off()&lt;/link&gt;
+-&lt;variablelist&gt;
+-&lt;varlistentry&gt;
+-&lt;term&gt;&lt;anchor id=&quot;S3D_OF_VISIBLE&quot;/&gt;S3D_OF_VISIBLE&lt;/term&gt;
+-&lt;listitem&gt;&lt;para&gt;default:off&lt;/para&gt;&lt;para&gt;
+-Obviously, if this flag is toggled the user can see it, if not it will be hidden. ;)
+-&lt;/para&gt;&lt;para&gt;
+-When an object is created it's turned off, so you will be able push your geometry data and
+-turn it on after you're done. That avaoids flickering and stuff.
+-&lt;/para&gt;&lt;/listitem&gt;
+-&lt;/varlistentry&gt;
+-
+-&lt;varlistentry&gt;
+-&lt;term&gt;&lt;anchor id=&quot;S3D_OF_SELECTABLE&quot;/&gt;S3D_OF_SELECTABLE&lt;/term&gt;
+-&lt;listitem&gt;&lt;para&gt;default:off&lt;/para&gt;&lt;para&gt;
+-When this is toggled on, you will receive &lt;link linkend=&quot;S3D_EVENT_OBJ_CLICK&quot;&gt;click events&lt;/link&gt;.
+-Don't use it if you don't need it, it will eat performance.
+-&lt;/para&gt;&lt;/listitem&gt;
+-&lt;/varlistentry&gt;
+-
+-&lt;varlistentry&gt;
+-&lt;term&gt;&lt;anchor id=&quot;S3D_OF_POINTABLE&quot;/&gt;S3D_OF_POINTABLE&lt;/term&gt;
+-&lt;listitem&gt;&lt;para&gt;default:off&lt;/para&gt;&lt;para&gt;
+-Placeholder for pointer (onmouseover-event enabler) events. Not implemented yet.
+-&lt;/para&gt;&lt;/listitem&gt;
+-&lt;/varlistentry&gt;
+-
+-&lt;/variablelist&gt;
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-
+-&lt;/chapter&gt;
+-
+-&lt;chapter id=&quot;Notes&quot;&gt;
+-&lt;title&gt;Additional Notes&lt;/title&gt;
+-&lt;sect1 id=&quot;alpha&quot;&gt;
+-&lt;title&gt;About alpha transparency&lt;/title&gt;
+-&lt;para&gt;
+-Alpha transparency works, but polygons don't get ordered in view direction on the server yet. So please don't
+-use this feature yet. If you have an easy idea how to do that with opengl please drop me a line.
+-&lt;/para&gt;
+-&lt;/sect1&gt;
+-&lt;/chapter&gt;
+-
+-
+-
+-
+-&lt;chapter id=&quot;About&quot;&gt;
+-&lt;title&gt;About&lt;/title&gt;
+-&lt;para&gt;
+-Copyright &#169; 2006 Simon Wunderlich &lt;email&gt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&lt;/email&gt;
+-&lt;/para&gt;
+-&lt;para&gt;
+-All Rights reserved. That is, because I currently don't know how to license this. You may distribute or copy it as long this 
+-Documentation is unmodified and complete (I'd love to receive patches and corrections though). Don't hesitate to ask
+-if you want to use this doc in any way or have some license recommendation.
+-&lt;/para&gt;
+-&lt;/chapter&gt;
+-
+-&lt;/book&gt;
+-
+
+Added: trunk/Documentation/libs3dw/libs3dw.docbook
+===================================================================
+--- trunk/Documentation/libs3dw/libs3dw.docbook	2006-06-05 16:14:23 UTC (rev 340)
++++ trunk/Documentation/libs3dw/libs3dw.docbook	2006-06-05 20:09:53 UTC (rev 341)
+@@ -0,0 +1,525 @@
++&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
++&lt;chapter id=&quot;libs3dw&quot;&gt;
++&lt;title&gt;libs3wd - The S3D Widget Library&lt;/title&gt;
++&lt;sect1 id=&quot;using_3dw&quot;&gt;
++&lt;title&gt;Using the &lt;application&gt;s3d&lt;/application&gt; widget library&lt;/title&gt;
++&lt;sect2 id=&quot;gettingstarted_s3dw&quot;&gt;
++&lt;title&gt;Getting started&lt;/title&gt;
++&lt;para&gt;
++	Assuming you have already read about the lowlevel &lt;link linkend=&quot;libs3d&quot;&gt;libs3d s3d api&lt;/link&gt;, the s3d widget library is 
++	build on top of it and should be (hopefully) easy to use as any other widget library.
++	Just include
++	
++ 	&lt;programlisting&gt;
++	  &lt;![CDATA[#include &lt;s3dw.h&gt;]]&gt;
++	 &lt;/programlisting&gt;
++
++	 and link with -ls3dw -ls3d, and everything should be fine. :)
++	 &lt;screen&gt;
++	 &lt;prompt&gt;bash$&lt;/prompt&gt; &lt;command&gt; gcc &lt;replaceable&gt;program&lt;/replaceable&gt;.c -ls3dw -ls3d -o &lt;replaceable&gt;program&lt;/replaceable&gt; &lt;/command&gt;
++ 	&lt;/screen&gt;
++&lt;/para&gt;
++&lt;/sect2&gt;
++&lt;/sect1&gt;
++
++
++&lt;sect1 id=&quot;functions_s3dw&quot;&gt;
++&lt;title&gt;function reference&lt;/title&gt;
++
++
++
++&lt;sect2 id=&quot;s3dw_surface_new&quot;&gt;
++&lt;title&gt;s3dw_surface_new&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3dw.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;s3dw_surface *&lt;function&gt;s3dw_surface_new&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++char         *&lt;parameter&gt;title&lt;/parameter&gt;,
++float		  &lt;parameter&gt;width&lt;/parameter&gt;,
++float		  &lt;parameter&gt;height&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++		Creates a new surface (a new window) with title &quot;title&quot; and dimension &quot;width&quot; x &quot;height&quot;.
++&lt;/para&gt;
++&lt;para&gt;
++		See &lt;link linkend=&quot;s3dw_surface&quot;&gt;s3dw_surface&lt;/link&gt; for information about callbacks which may be defined.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3dw_button_new&quot;&gt;
++&lt;title&gt;s3dw_button_new&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3dw.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;s3dw_button *&lt;function&gt;s3dw_button_new&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;,
++char         *&lt;parameter&gt;text&lt;/parameter&gt;,
++float		  &lt;parameter&gt;posx&lt;/parameter&gt;,
++float		  &lt;parameter&gt;posy&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++		Creates a new button on the &lt;link linkend=&quot;s3dw_surface&quot;&gt;surface&lt;/link&gt;, 
++		with &quot;text&quot; written on it and the upper left 
++		corner at (posx,posy) on the &lt;link linkend=&quot;s3dw_surface&quot;&gt;surface&lt;/link&gt;.
++&lt;/para&gt;
++&lt;para&gt;
++		See &lt;link linkend=&quot;s3dw_button&quot;&gt;s3dw_button&lt;/link&gt; for information about callbacks which may be defined.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3dw_input_new&quot;&gt;
++&lt;title&gt;s3dw_input_new&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3dw.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;s3dw_input *&lt;function&gt;s3dw_input_new&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;,
++float		  &lt;parameter&gt;width&lt;/parameter&gt;,
++float		  &lt;parameter&gt;posx&lt;/parameter&gt;,
++float		  &lt;parameter&gt;posy&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++		Creates a new input-box on the &lt;link linkend=&quot;s3dw_surface&quot;&gt;surface&lt;/link&gt; with a input width of &quot;width&quot;,
++		the upper left  corner at (posx,posy) on the &lt;link linkend=&quot;s3dw_surface&quot;&gt;surface&lt;/link&gt;.
++		The input-box is empty on creation and can be change with &lt;link linkend=&quot;s3dw_input_change_text&quot;&gt;s3dw_input_change_text&lt;/link&gt;,
++		and received with &lt;link linkend=&quot;s3dw_input_gettext&quot;&gt;s3dw_input_gettext&lt;/link&gt;
++&lt;/para&gt;
++&lt;para&gt;
++		See &lt;link linkend=&quot;s3dw_input&quot;&gt;s3dw_input&lt;/link&gt; for information about callbacks which may be defined.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3dw_label_new&quot;&gt;
++&lt;title&gt;s3dw_label_new&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3dw.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;s3dw_label *&lt;function&gt;s3dw_label_new&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;,
++char         *&lt;parameter&gt;text&lt;/parameter&gt;,
++float		  &lt;parameter&gt;posx&lt;/parameter&gt;,
++float		  &lt;parameter&gt;posy&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++		Creates a new label on the &lt;link linkend=&quot;s3dw_surface&quot;&gt;surface&lt;/link&gt;, 
++		with &quot;text&quot; written on it and the upper left 
++		corner at (posx,posy) on the &lt;link linkend=&quot;s3dw_surface&quot;&gt;surface&lt;/link&gt;.
++&lt;/para&gt;
++&lt;para&gt;
++		See &lt;link linkend=&quot;s3dw_label&quot;&gt;s3dw_label&lt;/link&gt; for information about callbacks which may be defined.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3dw_getroot&quot;&gt;
++&lt;title&gt;s3dw_getroot&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3dw.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++	&lt;funcdef&gt;s3dw_widget *&lt;function&gt;s3dw_getroot&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++		void
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++		Returns the root-&lt;link linkend=&quot;s3dw_widget&quot;&gt;widget&lt;/link&gt;, which holds all the surfaces. E.g. if you want
++		to move all widgets at once, adjust the root-widgets x,y,z and use &lt;link linkend=&quot;s3dw_moveit&quot;&gt;s3dw_moveit()&lt;/link&gt;
++&lt;/para&gt;
++&lt;programlisting&gt;
++		&lt;link linkend=&quot;s3dw_widget&quot;&gt;s3dw_widget&lt;/link&gt; *root = &lt;emphasis&gt;s3dw_getroot&lt;/emphasis&gt;();
++		/* move &lt;link linkend=&quot;s3dw_widget&quot;&gt;widget&lt;/link&gt; center to (0,5,0). upon creation, it's centered at (0,0,0), 
++		 * so this might move it up */
++		root-&gt;x=0;
++		root-&gt;y=5;
++		root-&gt;z=0;
++		&lt;link linkend=&quot;s3dw_moveit&quot;&gt;s3dw_moveit&lt;/link&gt;(root);
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3dw_input_gettext&quot;&gt;
++&lt;title&gt;s3dw_input_gettext&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3dw.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;char *&lt;function&gt;s3dw_input_gettext&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++		s3dw_input *&lt;parameter&gt;input&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++		Returns the text which is currently entered in the referenced &lt;link linkend=&quot;s3dw_input&quot;&gt;input-box&lt;/link&gt;.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3dw_input_change_text&quot;&gt;
++&lt;title&gt;s3dw_input_change_text&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3dw.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;void &lt;function&gt;s3dw_input_change_text&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++		s3dw_input *&lt;parameter&gt;input&lt;/parameter&gt;,
++		char *&lt;parameter&gt;text&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++		Change the text in the referenced &lt;link linkend=&quot;s3dw_input&quot;&gt;input-box&lt;/link&gt; to the specified text.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3dw_delete&quot;&gt;
++&lt;title&gt;s3dw_delete&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3dw.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;void &lt;function&gt;s3dw_delete&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++		s3dw_widget *&lt;parameter&gt;widget&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++	Deletes any widget. Should be casted with &lt;link linkend=&quot;S3DWIDGET&quot;&gt;S3DWIDGET()&lt;/link&gt;.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3dw_moveit&quot;&gt;
++&lt;title&gt;s3dw_moveit&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3dw.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;void &lt;function&gt;s3dw_moveit&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++		s3dw_widget *&lt;parameter&gt;widget&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++		Moves/translates the widget as you specified in it's private &lt;link linkend=&quot;s3dw_widget&quot;&gt;s3dw_widget structure&lt;/link&gt;.
++		Should be casted with &lt;link linkend=&quot;S3DWIDGET&quot;&gt;S3DWIDGET()&lt;/link&gt;.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3dw_show&quot;&gt;
++&lt;title&gt;s3dw_show&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3dw.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;void &lt;function&gt;s3dw_show&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++		s3dw_widget *&lt;parameter&gt;widget&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++		Switches a &lt;link linkend=&quot;s3dw_widget&quot;&gt;widget&lt;/link&gt; visible. Should be casted with &lt;link linkend=&quot;S3DWIDGET&quot;&gt;S3DWIDGET()&lt;/link&gt;.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3dw_focus&quot;&gt;
++&lt;title&gt;s3dw_focus&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3dw.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;void &lt;function&gt;s3dw_focus&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++		s3dw_widget *&lt;parameter&gt;widget&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++		Gives focus to the &lt;link linkend=&quot;s3dw_widget&quot;&gt;widget&lt;/link&gt;, relative to its parent. That means you can focus a 
++		&lt;link linkend=&quot;s3dw_surface&quot;&gt;surface&lt;/link&gt;, and each &lt;link linkend=&quot;s3dw_surface&quot;&gt;surface&lt;/link&gt; can focus 
++		one of its element, e.g. an input field. 
++		Should be casted with &lt;link linkend=&quot;S3DWIDGET&quot;&gt;S3DWIDGET()&lt;/link&gt;.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3dw_handle_click&quot;&gt;
++&lt;title&gt;s3dw_handle_click&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3dw.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;void &lt;function&gt;s3dw_handle_click&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++		struct s3d_evt *&lt;parameter&gt;event&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++	If you want your widgets on mouseclicks (believe me, you want that), you have to call this
++	either in your clickhandler-function or specifiy it itself as the clickhandler.
++&lt;/para&gt;
++&lt;programlisting&gt;
++/* way 1: */
++&lt;link linkend=&quot;s3d_set_callback&quot;&gt;s3d_set_callback&lt;/link&gt;(&lt;link linkend=&quot;S3D_EVENT_OBJ_CLICK&quot;&gt;S3D_EVENT_OBJ_CLICK&lt;/link&gt;,&lt;emphasis&gt;s3dw_handle_click&lt;/emphasis&gt;);
++
++/* way 2: */
++...
++void click(&lt;link linkend=&quot;s3d_evt&quot;&gt;struct s3d_evt&lt;/link&gt; *evt)
++{
++	&lt;emphasis&gt;s3dw_handle_click&lt;/emphasis&gt;(evt);
++	.... 
++	/* your own clickhandler code */
++	...
++}
++....
++&lt;link linkend=&quot;s3d_set_callback&quot;&gt;s3d_set_callback&lt;/link&gt;(&lt;link linkend=&quot;S3D_EVENT_OBJ_CLICK&quot;&gt;S3D_EVENT_OBJ_CLICK&lt;/link&gt;,click);
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3dw_handle_key&quot;&gt;
++&lt;title&gt;s3dw_handle_key&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3dw.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;void &lt;function&gt;s3dw_handle_key&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;
++		struct s3d_evt *&lt;parameter&gt;event&lt;/parameter&gt;
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++	This is somehow useful to call in your keyhandler functions if you want to 
++	have input-boxes work. ;)
++&lt;/para&gt;
++&lt;programlisting&gt;
++/* way 1: */
++&lt;link linkend=&quot;s3d_set_callback&quot;&gt;s3d_set_callback&lt;/link&gt;(&lt;link linkend=&quot;S3D_EVENT_KEY&quot;&gt;S3D_EVENT_KEY&lt;/link&gt;,&lt;emphasis&gt;s3dw_handle_key&lt;/emphasis&gt;);
++
++/* way 2: */
++...
++void key(&lt;link linkend=&quot;s3d_evt&quot;&gt;struct s3d_evt&lt;/link&gt; *evt)
++{
++	&lt;emphasis&gt;s3dw_handle_key&lt;/emphasis&gt;(evt);
++	.... 
++	/* your own keyhandler code */
++	...
++}
++....
++&lt;link linkend=&quot;s3d_set_callback&quot;&gt;s3d_set_callback&lt;/link&gt;(&lt;link linkend=&quot;S3D_EVENT_KEY&quot;&gt;S3D_EVENT_KEY&lt;/link&gt;,key);
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3dw_ani_mate&quot;&gt;
++&lt;title&gt;s3dw_ani_mate&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3dw.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;void &lt;function&gt;s3dw_ani_mate&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;void
++&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++	Just call this in your mainloop if you want
++	some nice window sliding animations. it's somewhat bloating, but you don't want to miss it ;)
++&lt;/para&gt;
++&lt;programlisting&gt;
++&lt;![CDATA[#include &lt;time.h&gt;]]&gt;   /* nanosleep() */
++static struct timespec t={0,33*1000*1000}; /* 33 mili seconds */
++void mainloop()
++{
++    /* keep this in your mainloop. this will do smooth animations for you ... */
++    s3dw_ani_mate();
++    nanosleep(&lt;![CDATA[&amp;t,NULL]]&gt;);
++}
++
++....
++&lt;link linkend=&quot;s3d_mainloop&quot;&gt;s3d_mainloop&lt;/link&gt;(mainloop);
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++
++&lt;/sect1&gt;
++&lt;sect1 id=&quot;data_types_s3dw&quot;&gt;
++&lt;title&gt;Data types&lt;/title&gt;
++
++
++
++&lt;sect2 id=&quot;s3dw_widget&quot;&gt;
++&lt;title&gt;s3dw_widget&lt;/title&gt;
++&lt;programlisting&gt;
++struct _s3dw_widget {   
++		/* private .. */
++		int          type;
++		&lt;emphasis&gt;s3dw_widget&lt;/emphasis&gt; *parent;        
++		&lt;link linkend=&quot;s3dw_style&quot;&gt;s3dw_style&lt;/link&gt;  *style;
++		int                   nobj; /* number of children objects */
++		&lt;emphasis&gt;s3dw_widget&lt;/emphasis&gt;         **pobj; /* pointer to list of children objects */
++		int          focus;         /* index of the widget focused in pobj */
++		int          flags;         /* flags like visibility */
++		float        ax,ay,az;      /* current position for animation */
++		float        as;            /* current scale factor */
++		float        arx,ary,arz;   /* current rotation */
++		float        width,height;  /* width and height of the widget, outer size */
++		unsigned long oid;          /* the main object which is used for transformations etc ...*/
++		/* public */
++		float        x,y,z;         /* position, relative to the surface usually */
++		float        s;             /* scale factor */
++		float        rx,ry,rz;      /* rotation around the axis */
++};
++typedef struct _s3dw_widget     s3dw_widget;
++
++/* type may be one of the following ... */		
++
++enum {
++    S3DW_TROOT,
++    S3DW_TSURFACE,
++    S3DW_TBUTTON,
++    S3DW_TLABEL,
++    S3DW_TINPUT,
++    S3DW_NTYPES
++};
++&lt;anchor id=&quot;S3DWIDGET&quot;/&gt;
++#define     S3DWIDGET(x)    (s3dw_widget *)x
++						
++&lt;/programlisting&gt;
++&lt;para&gt;
++		This is the most basic widget type, it contains all the &quot;general&quot; widget information. If you want to move a widget, you'd
++		change x,y,z,s and rx,ry,rz and call &lt;link linkend=&quot;s3dw_moveit&quot;&gt;s3dw_moveit&lt;/link&gt; to turn your action reality. Every other
++		widget has this type as first entry, so a simple typecast to &lt;emphasis&gt;s3dw_widget&lt;/emphasis&gt; will give you the widgets &quot;general&quot;
++		information. For typecast, you may use S3DWIDGET()
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3dw_button&quot;&gt;
++&lt;title&gt;s3dw_button&lt;/title&gt;
++&lt;programlisting&gt;
++typedef struct _s3dw_button     s3dw_button;
++struct _s3dw_button {
++    /* private */
++	&lt;link linkend=&quot;s3dw_widget&quot;&gt;s3dw_widget&lt;/link&gt;      widget;
++	char            *text;
++	unsigned long    oid_text;
++	/* public */
++	&lt;link linkend=&quot;s3dw_callback&quot;&gt;s3dw_callback&lt;/link&gt;    onclick;
++};
++&lt;/programlisting&gt;
++&lt;para&gt;
++	The buttons is just a button as you would expect it in a 2D widget library. It only reacts on clicks.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3dw_input&quot;&gt;
++&lt;title&gt;s3dw_input&lt;/title&gt;
++&lt;programlisting&gt;
++typedef struct _s3dw_input     s3dw_input;
++struct _s3dw_input {
++    /* private */
++	&lt;link linkend=&quot;s3dw_widget&quot;&gt;s3dw_widget&lt;/link&gt;      widget;
++	char            *text;
++	unsigned long    oid_text;
++	/* public */
++	&lt;link linkend=&quot;s3dw_callback&quot;&gt;s3dw_callback&lt;/link&gt;    onclick;
++	&lt;link linkend=&quot;s3dw_callback&quot;&gt;s3dw_callback&lt;/link&gt;    onedit;
++};
++&lt;/programlisting&gt;
++&lt;para&gt;
++		The inputs is an input-field where a user may type things. onclick reacts on click in the field,
++		onedit notifies you when someone writes in the field.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3dw_label&quot;&gt;
++&lt;title&gt;s3dw_label&lt;/title&gt;
++&lt;programlisting&gt;
++typedef struct _s3dw_label     s3dw_label;
++struct _s3dw_label {
++    /* private */
++	&lt;link linkend=&quot;s3dw_widget&quot;&gt;s3dw_widget&lt;/link&gt;      widget;
++	char            *text;
++	/* public */
++	&lt;link linkend=&quot;s3dw_callback&quot;&gt;s3dw_callback&lt;/link&gt;    onclick;
++};
++&lt;/programlisting&gt;
++&lt;para&gt;
++		The labels is an label-field where a user may type things. onclick reacts on click in the field,
++		onedit notifies you when someone writes in the field.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3dw_surface&quot;&gt;
++&lt;title&gt;s3dw_surface&lt;/title&gt;
++&lt;programlisting&gt;
++typedef struct _s3dw_surface     s3dw_surface;
++struct _s3dw_surface {
++    /* private */
++	&lt;link linkend=&quot;s3dw_widget&quot;&gt;s3dw_widget&lt;/link&gt;      widget;
++	unsigned long         oid_title;
++	unsigned long         oid_tbar;
++	char            *text;
++};
++&lt;/programlisting&gt;
++&lt;para&gt;
++	A surface is the window of this widget library, holding all of our elements like &lt;link linkend=&quot;s3dw_button&quot;&gt;buttons&lt;/link&gt;, 
++	&lt;link linkend=&quot;s3dw_input&quot;&gt;inputfields&lt;/link&gt; etc ...
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++
++&lt;sect2 id=&quot;s3dw_style&quot;&gt;
++&lt;title&gt;s3dw_style&lt;/title&gt;
++&lt;programlisting&gt;
++typedef struct _s3dw_style     s3dw_style;
++/* style */
++struct _s3dw_style {
++    char *name;                 /* name of the style ... kind of redundant */
++    char *fontface;             /* font face for all used fonts */
++    float surface_mat[12];      /* material for the surface background */
++    float input_mat[12];        /* material for buttonboxes and other widgets */
++    float inputback_mat[12];    /* material for inputfield background */
++    float text_mat[12];         /* material for the text on buttons and inputs */
++    float title_mat[12];        /* material for the title bar */
++    float title_text_mat[12];   /* material for the text on the title bar */
++};
++
++&lt;/programlisting&gt;
++&lt;para&gt;
++	With s3dw_style you can change the colors/materials of your widgets. materials are in the same as in 
++	&lt;link linkend=&quot;s3d_push_materials_a&quot;&gt;s3d_push_materials_a&lt;/link&gt;, that means red,green,blue and alpha float values 
++	(between 0.0 and 1.0) for Ambience, Specular and Diffuse Color.
++&lt;/para&gt;
++&lt;/sect2&gt;
++
++&lt;sect2 id=&quot;s3dw_callback&quot;&gt;
++&lt;title&gt;s3dw_callback&lt;/title&gt;
++&lt;programlisting&gt;
++typedef void (*s3dw_callback)(s3dw_widget *);
++
++&lt;/programlisting&gt;
++&lt;para&gt;
++	The callback type. Receive the widget which is affected as argument.
++&lt;/para&gt;
++&lt;programlisting&gt;
++/* example */
++void my_handler(&lt;link linkend=&quot;s3dw_widget&quot;&gt;s3dw_widget&lt;/link&gt; *widget)
++{
++	/* do something with the widget */
++	...
++}
++&lt;/programlisting&gt;
++&lt;/sect2&gt;
++
++
++&lt;/sect1&gt;
++&lt;/chapter&gt;
+
+Deleted: trunk/Documentation/movement.txt
+===================================================================
+--- trunk/Documentation/movement.txt	2006-06-05 16:14:23 UTC (rev 340)
++++ trunk/Documentation/movement.txt	2006-06-05 20:09:53 UTC (rev 341)
+@@ -1,8 +0,0 @@
+-this is not the final version for movement, but ...
+-
+-- hold middle mouse button (or left+right at once if you have middle-mousebutton-emulation) and move
+-  your mouse to move around the world
+-- hold right mouse button and move mouse to rotate the mouse (look around)
+-- left mouse button is for clicking :)
+-- presse f1 to get in ego-shooter mode :D you can use w,a,s,d for movement now. f1 again to deactivate.
+-  this only works with dot_mcp, the others above work out-of-the box within the server.
+
+Deleted: trunk/Documentation/s3drc.txt
+===================================================================
+--- trunk/Documentation/s3drc.txt	2006-06-05 16:14:23 UTC (rev 340)
++++ trunk/Documentation/s3drc.txt	2006-06-05 20:09:53 UTC (rev 341)
+@@ -1,20 +0,0 @@
+-You can automatically fire up the mcp or anything you want with s3d and 
+-have it closed when s3d goes down or vice versa:
+-
+-just create a shellscript at position /etc/s3drc or ~/.s3drc, for example
+-have it starting the mcp. Don't forget to toggle it executable (chmod 755 
+-or so).
+-
+-When s3d starts, it will look for ~/.s3drc or /etc/s3drc (in this order),
+-and will start it along with the server. E.g. when you log out off your mcp,
+-the s3d server is shut down too.
+-
+-You can disable this behavior with s3d --no-rc
+-
+-For example my .s3drc looks like this:
+-
+-$ cat ~/.s3drc 
+-#!/bin/sh
+-cd ~/msrc/s3d/apps/dot_mcp/
+-./dot_mcp
+-
+
+Added: trunk/Documentation/server/server.docbook
+===================================================================
+--- trunk/Documentation/server/server.docbook	2006-06-05 16:14:23 UTC (rev 340)
++++ trunk/Documentation/server/server.docbook	2006-06-05 20:09:53 UTC (rev 341)
+@@ -0,0 +1,76 @@
++&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
++&lt;chapter id=&quot;introduction&quot;&gt;
++&lt;title&gt;s3d - the server&lt;/title&gt;
++&lt;sect1 id=&quot;client_server&quot;&gt;
++&lt;title&gt;Client-Server Architecture&lt;/title&gt;
++ &lt;para&gt;&lt;application&gt;s3d&lt;/application&gt; is build as client-server architecture, similar to the xserver.
++ 	The s3d-server is the program executed on the users desktop and waits for incoming connections, the applications,
++	which give their content they want to have displayed to the server. The server will then display the content to the 
++	user, who can move to the 3D space, and interact (mouse moving/clicking, keyboard), and the client will receive these 
++	signals over the network from the server.
++ &lt;/para&gt;
++ &lt;para&gt;
++	Just like on the X-Server, it may seem unusual to have the &quot;server&quot; on the own machine, while the &quot;client&quot; may be 
++	on any other machine with network connection. But this makes features possible like browsing files on your 
++	file server or even access point. ;)
++&lt;/para&gt;
++&lt;para&gt;
++	Don't let the server-client thing confuse you too much for now, on a properly installed system the s3d will startup with
++	the mcp (which is the window manager in s3d-terms) which will give you a complete look and feel just as you would expect.
++&lt;/para&gt;
++&lt;para&gt;
++	More (internal) information about the server will be presented here as soon as someone is interested. ;)
++&lt;/para&gt;
++&lt;/sect1&gt;
++&lt;sect1 id=&quot;Moving&quot;&gt;
++&lt;title&gt;Moving in s3d&lt;/title&gt;
++&lt;para&gt;
++this is not the final version for movement, but ...
++
++&lt;itemizedlist&gt;
++&lt;listitem&gt;&lt;para&gt;
++hold middle mouse button (or left+right at once if you have middle-mousebutton-emulation) and move your mouse to move around the world
++&lt;/para&gt;&lt;/listitem&gt;
++&lt;listitem&gt;&lt;para&gt;
++hold right mouse button and move mouse to rotate the mouse (look around)
++&lt;/para&gt;&lt;/listitem&gt;
++&lt;listitem&gt;&lt;para&gt;
++left mouse button is for clicking :)
++&lt;/para&gt;&lt;/listitem&gt;
++&lt;listitem&gt;&lt;para&gt;
++presse f1 to get in ego-shooter mode :D you can use w,a,s,d for movement now. f1 again to deactivate.
++this only works with dot_mcp, the others above work out-of-the box within the server.
++&lt;/para&gt;&lt;/listitem&gt;
++&lt;/itemizedlist&gt;
++&lt;/para&gt;
++&lt;/sect1&gt;
++&lt;sect1 id=&quot;s3drc&quot;&gt;
++&lt;title&gt;The s3drc file&lt;/title&gt;
++&lt;para&gt;
++You can automatically fire up the mcp or anything you want with s3d and 
++have it closed when s3d goes down or vice versa:
++&lt;/para&gt;
++&lt;para&gt;
++just create a shellscript at position /etc/s3drc or ~/.s3drc, for example
++have it starting the mcp. Don't forget to toggle it executable (chmod 755 
++or so).
++&lt;/para&gt;
++&lt;para&gt;
++When s3d starts, it will look for ~/.s3drc or /etc/s3drc (in this order),
++and will start it along with the server. E.g. when you log out off your mcp,
++the s3d server is shut down too.
++&lt;/para&gt;
++&lt;para&gt;
++You can disable this behavior with s3d --no-rc
++&lt;/para&gt;
++&lt;para&gt;
++For example my .s3drc looks like this:
++&lt;/para&gt;
++ &lt;screen&gt;
++&lt;prompt&gt;$&lt;/prompt&gt; cat ~/.s3drc 
++ #!/bin/sh
++cd ~/msrc/s3d/apps/dot_mcp/
++./dot_mcp
++&lt;/screen&gt;
++&lt;/sect1&gt;
++&lt;/chapter&gt;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000333.html">[S3d-svn] r340 - in trunk: . Documentation Documentation/libs3d
+</A></li>
+	<LI>Next message: <A HREF="000335.html">[S3d-svn] r342 - in trunk: . libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#334">[ date ]</a>
+              <a href="thread.html#334">[ thread ]</a>
+              <a href="subject.html#334">[ subject ]</a>
+              <a href="author.html#334">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

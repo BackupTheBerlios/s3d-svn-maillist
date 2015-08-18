@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r836 - trunk/cmake/modules
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r836%20-%20trunk/cmake/modules&In-Reply-To=%3C200711022204.lA2M4MMh030162%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000828.html">
+   <LINK REL="Next"  HREF="000830.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r836 - trunk/cmake/modules</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r836%20-%20trunk/cmake/modules&In-Reply-To=%3C200711022204.lA2M4MMh030162%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r836 - trunk/cmake/modules">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Nov  2 23:04:22 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000828.html">[S3d-svn] r835 - in trunk: . cmake/modules
+</A></li>
+        <LI>Next message: <A HREF="000830.html">[S3d-svn] r837 - in trunk/svnonly: . comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#829">[ date ]</a>
+              <a href="thread.html#829">[ thread ]</a>
+              <a href="subject.html#829">[ subject ]</a>
+              <a href="author.html#829">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-11-02 23:04:21 +0100 (Fri, 02 Nov 2007)
+New Revision: 836
+
+Added:
+   trunk/cmake/modules/FindBluetooth.cmake
+Modified:
+   trunk/cmake/modules/FindCWiid.cmake
+Log:
+Added cmake test for libbluetooth
+
+
+Added: trunk/cmake/modules/FindBluetooth.cmake
+===================================================================
+--- trunk/cmake/modules/FindBluetooth.cmake	2007-11-02 17:00:18 UTC (rev 835)
++++ trunk/cmake/modules/FindBluetooth.cmake	2007-11-02 22:04:21 UTC (rev 836)
+@@ -0,0 +1,36 @@
++# Try to find Bluetooth
++#  BLUETOOTH_FOUND - If false, do not try to use Bluetooth.
++#  BLUETOOTH_INCLUDE_DIR - where to find bluetooth/bluetooth.h
++#  BLUETOOTH_LIBRARIES - the libraries to link against
++
++
++if (BLUETOOTH_LIBRARIES AND BLUETOOTH_INCLUDE_DIR)
++	# path set by user or was found in the past
++	set(BLUETOOTH_FOUND TRUE)
++else (BLUETOOTH_LIBRARIES AND BLUETOOTH_INCLUDE_DIR)
++	find_path(BLUETOOTH_INCLUDE_DIR
++		NAMES bluetooth/bluetooth.h
++	)
++
++	find_library(BLUETOOTH_LIBRARIES
++		NAMES bluetooth
++	)
++
++	if (BLUETOOTH_INCLUDE_DIR AND BLUETOOTH_LIBRARIES)
++		set(BLUETOOTH_FOUND TRUE)
++	endif (BLUETOOTH_INCLUDE_DIR AND BLUETOOTH_LIBRARIES)
++
++	if (BLUETOOTH_FOUND)
++		if (NOT BLUETOOTH_FIND_QUIETLY)
++			message(STATUS &quot;Found Bluetooth: ${BLUETOOTH_LIBRARIES}&quot;)
++		endif (NOT BLUETOOTH_FIND_QUIETLY)
++	else (BLUETOOTH_FOUND)
++		if (BLUETOOTH_FIND_REQUIRED)
++			message(FATAL_ERROR &quot;Could not find Bluetooth&quot;)
++		endif (BLUETOOTH_FIND_REQUIRED)
++	endif (BLUETOOTH_FOUND)
++
++	# set visibility in cache
++	mark_as_advanced(BLUETOOTH_INCLUDE_DIR BLUETOOTH_LIBRARIES)
++
++endif (BLUETOOTH_LIBRARIES AND BLUETOOTH_INCLUDE_DIR)
+
+Modified: trunk/cmake/modules/FindCWiid.cmake
+===================================================================
+--- trunk/cmake/modules/FindCWiid.cmake	2007-11-02 17:00:18 UTC (rev 835)
++++ trunk/cmake/modules/FindCWiid.cmake	2007-11-02 22:04:21 UTC (rev 836)
+@@ -3,11 +3,12 @@
+ #  CWIID_INCLUDE_DIR - where to find cwiid.h
+ #  CWIID_LIBRARIES - the libraries to link against
+ 
++find_package(Bluetooth)
+ 
+-if (CWIID_LIBRARIES AND CWIID_INCLUDE_DIR)
++if (CWIID_LIBRARIES AND CWIID_INCLUDE_DIR AND BLUETOOTH_FOUND)
+ 	# path set by user or was found in the past
+ 	set(CWIID_FOUND TRUE)
+-else (CWIID_LIBRARIES AND CWIID_INCLUDE_DIR)
++else (CWIID_LIBRARIES AND CWIID_INCLUDE_DIR AND BLUETOOTH_FOUND)
+ 	find_path(CWIID_INCLUDE_DIR
+ 		NAMES cwiid.h
+ 	)
+@@ -16,9 +17,9 @@
+ 		NAMES cwiid
+ 	)
+ 
+-	if (CWIID_INCLUDE_DIR AND CWIID_LIBRARIES)
++	if (CWIID_INCLUDE_DIR AND CWIID_LIBRARIES AND BLUETOOTH_FOUND)
+ 		set(CWIID_FOUND TRUE)
+-	endif (CWIID_INCLUDE_DIR AND CWIID_LIBRARIES)
++	endif (CWIID_INCLUDE_DIR AND CWIID_LIBRARIES AND BLUETOOTH_FOUND)
+ 
+ 	if (CWIID_FOUND)
+ 		if (NOT CWIID_FIND_QUIETLY)
+@@ -26,11 +27,15 @@
+ 		endif (NOT CWIID_FIND_QUIETLY)
+ 	else (CWIID_FOUND)
+ 		if (CWIID_FIND_REQUIRED)
+-			message(FATAL_ERROR &quot;Could not find CWiid&quot;)
++			if (NOT BLUETOOTH_FOUND)
++				message(FATAL_ERROR &quot;Could not find dependency Bluetooth for CWiid&quot;)
++			else (NOT BLUETOOTH_FOUND)
++				message(FATAL_ERROR &quot;Could not find CWiid&quot;)
++			endif (NOT BLUETOOTH_FOUND)
+ 		endif (CWIID_FIND_REQUIRED)
+ 	endif (CWIID_FOUND)
+ 
+ 	# set visibility in cache
+ 	mark_as_advanced(CWIID_INCLUDE_DIR CWIID_LIBRARIES)
+ 
+-endif (CWIID_LIBRARIES AND CWIID_INCLUDE_DIR)
++endif (CWIID_LIBRARIES AND CWIID_INCLUDE_DIR AND BLUETOOTH_FOUND)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000828.html">[S3d-svn] r835 - in trunk: . cmake/modules
+</A></li>
+	<LI>Next message: <A HREF="000830.html">[S3d-svn] r837 - in trunk/svnonly: . comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#829">[ date ]</a>
+              <a href="thread.html#829">[ thread ]</a>
+              <a href="subject.html#829">[ subject ]</a>
+              <a href="author.html#829">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

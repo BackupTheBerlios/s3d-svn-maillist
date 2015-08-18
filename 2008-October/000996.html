@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1016 - in trunk: libs3d libs3dw server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1016%20-%20in%20trunk%3A%20libs3d%20libs3dw%20server&In-Reply-To=%3C200810232328.m9NNSoYK000709%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000995.html">
+   <LINK REL="Next"  HREF="000997.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1016 - in trunk: libs3d libs3dw server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1016%20-%20in%20trunk%3A%20libs3d%20libs3dw%20server&In-Reply-To=%3C200810232328.m9NNSoYK000709%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1016 - in trunk: libs3d libs3dw server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 24 01:28:50 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000995.html">[S3d-svn] r1015 - trunk/libs3d
+</A></li>
+        <LI>Next message: <A HREF="000997.html">[S3d-svn] r1017 - in trunk: apps/meshs3d apps/s3dosm	experimental/olsrs3d libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#996">[ date ]</a>
+              <a href="thread.html#996">[ thread ]</a>
+              <a href="subject.html#996">[ subject ]</a>
+              <a href="author.html#996">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-10-24 01:28:50 +0200 (Fri, 24 Oct 2008)
+New Revision: 1016
+
+Modified:
+   trunk/libs3d/proto_in.c
+   trunk/libs3dw/animate.c
+   trunk/libs3dw/widget.c
+   trunk/server/graphics.c
+   trunk/server/object.c
+Log:
+Fix obvious format string errors
+
+Only format string errors which gcc noticed where fixed. Many %d should also be
+changed to the corresponding inttypes.h PRIdXX definition.
+
+Modified: trunk/libs3d/proto_in.c
+===================================================================
+--- trunk/libs3d/proto_in.c	2008-10-23 23:28:44 UTC (rev 1015)
++++ trunk/libs3d/proto_in.c	2008-10-23 23:28:50 UTC (rev 1016)
+@@ -28,6 +28,7 @@
+ #include &lt;netinet/in.h&gt;  /*  htons(),htonl() */
+ #include &lt;errno.h&gt;   /*  errno */
+ #include &lt;stdlib.h&gt;   /*  malloc(), free() */
++#include &lt;inttypes.h&gt;
+ 
+ /*  this proccesses the commands and pushes s3d-events, or does other things ;) */
+ int net_prot_in(uint8_t opcode, uint16_t length, char *buf)
+@@ -118,7 +119,7 @@
+ 				s3dprintf(VLOW, &quot;S3D_P_MCP_OBEJCT: something is happening to object %d, name %s&quot;,  mo-&gt;object, mo-&gt;name);
+ 
+ 			}
+-		} else s3dprintf(MED, &quot;wrong length for S3D_P_MCP_OBJECT length %d != %d&quot;, length, sizeof(struct mcp_object));
++		} else s3dprintf(MED, &quot;wrong length for S3D_P_MCP_OBJECT length %&quot;PRId16&quot; != %d&quot;, length, (int)sizeof(struct mcp_object));
+ 		break;
+ 	case S3D_P_S_OINFO:
+ 		if (length == sizeof(struct s3d_obj_info)) {
+@@ -141,7 +142,7 @@
+ 				         );
+ 
+ 			}
+-		} else s3dprintf(MED, &quot;wrong length for S3D_P_S_OINFO length %d != %d&quot;, length, sizeof(struct s3d_obj_info));
++		} else s3dprintf(MED, &quot;wrong length for S3D_P_S_OINFO length %&quot;PRId16&quot; != %d&quot;, length, (int)sizeof(struct s3d_obj_info));
+ 		break;
+ 	case S3D_P_S_SHMTEX:
+ 		if (length == sizeof(struct s3d_texshm)) {
+@@ -162,7 +163,7 @@
+ 			free(buf);
+ 
+ 		} else
+-			s3dprintf(MED, &quot;wrong length for S3D_P_S_SHMTEX length %d != %d&quot;, length, sizeof(struct s3d_texshm));
++			s3dprintf(MED, &quot;wrong length for S3D_P_S_SHMTEX length %&quot;PRId16&quot; != %d&quot;, length, (int)sizeof(struct s3d_texshm));
+ 		break;
+ 
+ 
+
+Modified: trunk/libs3dw/animate.c
+===================================================================
+--- trunk/libs3dw/animate.c	2008-10-23 23:28:44 UTC (rev 1015)
++++ trunk/libs3dw/animate.c	2008-10-23 23:28:50 UTC (rev 1016)
+@@ -47,7 +47,7 @@
+ void s3dw_ani_add(s3dw_widget *f)
+ {
+ 
+-	s3dprintf(VLOW, &quot;[A]ni ADD (%010p), oid = %d, ani_n = %d, type is %s\n&quot;, f, f-&gt;oid, ani_n, s3dw_get_type_string(f-&gt;type));
++	s3dprintf(VLOW, &quot;[A]ni ADD (%10p), oid = %d, ani_n = %d, type is %s\n&quot;, (void*)f, f-&gt;oid, ani_n, s3dw_get_type_string(f-&gt;type));
+ 	if ((f-&gt;oid == 0) &amp;&amp; (f-&gt;type != S3DW_TCAM)) {
+ 		s3dprintf(HIGH, &quot;s3dw_ani_add() assert failed: weird, moving cam but its not a cam object?&quot;);
+ 		return;
+
+Modified: trunk/libs3dw/widget.c
+===================================================================
+--- trunk/libs3dw/widget.c	2008-10-23 23:28:44 UTC (rev 1015)
++++ trunk/libs3dw/widget.c	2008-10-23 23:28:50 UTC (rev 1016)
+@@ -51,7 +51,7 @@
+ int s3dw_widget_event_click(s3dw_widget *widget, uint32_t oid)
+ {
+ 	int i;
+-	s3dprintf(VLOW, &quot;processing click event for widget %010p of type %d, oid %d (%d), subobjects: %d&quot;, widget, widget-&gt;type, widget-&gt;oid, oid, widget-&gt;nobj);
++	s3dprintf(VLOW, &quot;processing click event for widget %10p of type %d, oid %d (%d), subobjects: %d&quot;, (void*)widget, widget-&gt;type, widget-&gt;oid, oid, widget-&gt;nobj);
+ 	if (s3dwcb_click[widget-&gt;type](widget, oid)) return(1);
+ 	for (i = 0;i &lt; widget-&gt;nobj;i++)
+ 		if (s3dw_widget_event_click(widget-&gt;pobj[i], oid)) return(1);
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2008-10-23 23:28:44 UTC (rev 1015)
++++ trunk/server/graphics.c	2008-10-23 23:28:50 UTC (rev 1016)
+@@ -125,7 +125,7 @@
+ 	glGetFloatv(GL_MODELVIEW_MATRIX, m);
+ 	cull_get_planes();
+ 	if (NULL == (ap = get_proc_by_pid(o-&gt;virtual_pid))) { /*  the clean way */
+-		errds(HIGH, &quot;render_by_mcp()&quot;, &quot;not existing pid (%d) referenced by mcp-object!!&quot;, o);
++		errds(HIGH, &quot;render_by_mcp()&quot;, &quot;not existing pid (%p) referenced by mcp-object!!&quot;, (void*)o);
+ 	} else {
+ 		/*  now go throu the objects of our app  */
+ 		for (j = 0;j &lt; ap-&gt;n_obj;j++) {
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2008-10-23 23:28:44 UTC (rev 1015)
++++ trunk/server/object.c	2008-10-23 23:28:50 UTC (rev 1016)
+@@ -287,7 +287,7 @@
+ void texture_delete(struct t_tex *tex)
+ {
+ 	GLuint t;
+-	s3dprintf(HIGH, &quot;texture delete: shmid = %d, buf = %010p\n&quot;, tex-&gt;shmid, tex-&gt;buf);
++	s3dprintf(HIGH, &quot;texture delete: shmid = %d, buf = %10p\n&quot;, tex-&gt;shmid, (void*)tex-&gt;buf);
+ #ifdef SHM
+ 	if (tex-&gt;shmid != -1) {
+ 		if (tex-&gt;buf != NULL) {
+@@ -1319,7 +1319,7 @@
+ 					}
+ 				}
+ 			if (found) {
+-				s3dprintf(VLOW, &quot;there is a new biggest object in [%d:\&quot;\&quot;]&quot;, p-&gt;id, p-&gt;name);
++				s3dprintf(VLOW, &quot;there is a new biggest object in [%d:\&quot;%s\&quot;]&quot;, p-&gt;id, p-&gt;name);
+ 				mcp_o-&gt;r = r;  /*  save the new size */
+ 				mcp_rep_object(p-&gt;mcp_oid);   /*  and tell the mcp */
+ 			}
+@@ -1403,7 +1403,7 @@
+ 	struct t_obj   *ao, *o;
+ 	struct t_process *ap;
+ 	o = p-&gt;object[oid];
+-	s3dprintf(VLOW, &quot;[obj_pos_upd|pid %d] %d&quot;, p-&gt;id, oid, first_oid);
++	s3dprintf(VLOW, &quot;[obj_pos_upd|pid %d] %d, %d&quot;, p-&gt;id, oid, first_oid);
+ 	o-&gt;m_uptodate = 0;
+ 	obj_recalc_tmat(p, oid);
+ 	if (p-&gt;id != MCP) {/*  mcp does not need that. */
+@@ -1858,7 +1858,7 @@
+ 			p-&gt;n_obj++;      /*  increment counter */
+ 		}
+ 		p-&gt;object[pos] = obj;
+-		s3dprintf(VLOW, &quot;pid %d added new object %d at %010p [pos %d]&quot;, p-&gt;id, pos, obj, pos);
++		s3dprintf(VLOW, &quot;pid %d added new object %d at %10p [pos %d]&quot;, p-&gt;id, pos, (void*)obj, pos);
+ 		return (pos);
+ 	} else {
+ 		return(-1);
+@@ -1879,7 +1879,7 @@
+ 		/*  get obj pointer and check for availability of the other object. */
+ 		if (((already_clone = (o-&gt;oflags &amp; OF_CLONE)) || (!(o-&gt;n_vertex | o-&gt;n_mat | o-&gt;n_poly | o-&gt;n_tex))) &amp;&amp; (!(o-&gt;oflags &amp; OF_VIRTUAL))) {
+ 			if (no-&gt;oflags&amp;OF_CLONE) {  /*  target is clone */
+-				errds(VHIGH, &quot;obj_clone_change()&quot;, &quot;couldn't clone %d from %d (on pid %d): clone target is already clone.&quot;, oid, toid, p-&gt;id, oid);
++				errds(VHIGH, &quot;obj_clone_change()&quot;, &quot;couldn't clone %d from %d (on pid %d): clone target is already clone.&quot;, oid, toid, p-&gt;id);
+ 				return(-1);
+ 			}
+ 			if (!already_clone) { /*  some other object could link to us, so we check the other objects and forward them just in case. */
+@@ -1889,7 +1889,7 @@
+ 						if (p-&gt;object[i] != NULL)
+ 							if ((p-&gt;object[i]-&gt;oflags&amp;OF_CLONE) &amp;&amp; (p-&gt;object[i]-&gt;clone_ooid == oid)) { /*  it's linking to our object! */
+ 								errds(VHIGH, &quot;obj_clone_change()&quot;, &quot;couldn't clone %d from %d (on pid %d): object %d is already cloning from object %d.&quot;,
+-								      oid, toid, p-&gt;id, oid, i, oid);
++								      oid, toid, p-&gt;id, oid, i);
+ 								return(-1);
+ 							}
+ 					if (!is_clnsrc) {
+@@ -1906,7 +1906,7 @@
+ 				s3dprintf(LOW, &quot;changed clone-target of obj %d to %d of process %d&quot;, oid, toid, p-&gt;id);
+ 				if (p-&gt;id != MCP) obj_check_biggest_object(p, oid);
+ 			} else {
+-				errds(MED, &quot;obj_clone_change()&quot;, &quot;couldn't clone %d from %d (on pid %d): cloning from itself doesn't make sense!&quot;, oid, toid, p-&gt;id, oid);
++				errds(MED, &quot;obj_clone_change()&quot;, &quot;couldn't clone %d from %d (on pid %d): cloning from itself doesn't make sense!&quot;, oid, toid, p-&gt;id);
+ 				return(-1);
+ 			}
+ 		} else {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000995.html">[S3d-svn] r1015 - trunk/libs3d
+</A></li>
+	<LI>Next message: <A HREF="000997.html">[S3d-svn] r1017 - in trunk: apps/meshs3d apps/s3dosm	experimental/olsrs3d libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#996">[ date ]</a>
+              <a href="thread.html#996">[ thread ]</a>
+              <a href="subject.html#996">[ subject ]</a>
+              <a href="author.html#996">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

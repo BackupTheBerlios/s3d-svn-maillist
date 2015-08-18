@@ -1,0 +1,2111 @@
+From lazhur at mail.berlios.de  Tue Jul  1 13:56:09 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 1 Jul 2008 13:56:09 +0200
+Subject: [S3d-svn] r916 - trunk/Documentation
+Message-ID: <200807011156.m61Bu9GL005362@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-07-01 13:56:08 +0200 (Tue, 01 Jul 2008)
+New Revision: 916
+
+Modified:
+   trunk/Documentation/s3d.docbook
+Log:
+Add complete identifier to docbook
+
+Modified: trunk/Documentation/s3d.docbook
+===================================================================
+--- trunk/Documentation/s3d.docbook	2008-06-16 12:05:26 UTC (rev 915)
++++ trunk/Documentation/s3d.docbook	2008-07-01 11:56:08 UTC (rev 916)
+@@ -1,5 +1,7 @@
+ <?xml version="1.0" encoding="UTF-8" ?>
+-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" [
++<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
++  "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"
++[
+   <!ENTITY bookinfo SYSTEM "bookinfo.docbook">
+   <!ENTITY server SYSTEM "server/server.docbook">
+   <!ENTITY libs3d SYSTEM "libs3d/libs3d.docbook">
+
+
+
+From lazhur at mail.berlios.de  Thu Jul 10 17:35:31 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 10 Jul 2008 17:35:31 +0200
+Subject: [S3d-svn] r917 - in trunk: . experimental
+Message-ID: <200807101535.m6AFZVCs030392@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-07-10 17:35:31 +0200 (Thu, 10 Jul 2008)
+New Revision: 917
+
+Added:
+   trunk/experimental/
+Removed:
+   trunk/experimental/meshs3d_testdata/
+   trunk/experimental/vistest/
+   trunk/svnonly/
+Modified:
+   trunk/CMakeLists.txt
+Log:
+Move svnonly to vcs neutral name experimental
+
+
+Modified: trunk/CMakeLists.txt
+===================================================================
+--- trunk/CMakeLists.txt	2008-07-01 11:56:08 UTC (rev 916)
++++ trunk/CMakeLists.txt	2008-07-10 15:35:31 UTC (rev 917)
+@@ -29,7 +29,7 @@
+ add_subdirectory(libs3d)
+ add_subdirectory(libs3dw)
+ add_subdirectory(apps)
+-add_subdirectory(svnonly)
++add_subdirectory(experimental)
+ add_subdirectory(cmake)
+ add_subdirectory(Documentation)
+ add_subdirectory(example)
+
+Copied: trunk/experimental (from rev 916, trunk/svnonly)
+
+
+Property changes on: trunk/experimental
+___________________________________________________________________
+Name: svn:mergeinfo
+   + 
+
+
+
+From lazhur at mail.berlios.de  Thu Jul 10 17:49:29 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 10 Jul 2008 17:49:29 +0200
+Subject: [S3d-svn] r918 - in trunk: . Documentation Documentation/libg3d
+	Documentation/libg3d/api Documentation/libg3d/api/tmpl
+	Documentation/libs3d Documentation/libs3dw
+	Documentation/manpages Documentation/server apps apps/dot_mcp
+	apps/kism3d apps/meshs3d apps/s3d_x11gate apps/s3dfm
+	apps/s3dosm apps/s3dvt cmake cmake/modules example
+	experimental experimental/comptest experimental/olsrs3d
+	experimental/testvis experimental/wiitest extras
+	extras/mplayer extras/swig libs3d libs3dw objs
+	objs/martin_stern server
+Message-ID: <200807101549.m6AFnTXh031527@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-07-10 17:49:28 +0200 (Thu, 10 Jul 2008)
+New Revision: 918
+
+Added:
+   trunk/.gitignore
+Modified:
+   trunk/
+   trunk/Documentation/
+   trunk/Documentation/libg3d/
+   trunk/Documentation/libg3d/api/
+   trunk/Documentation/libg3d/api/tmpl/
+   trunk/Documentation/libs3d/
+   trunk/Documentation/libs3dw/
+   trunk/Documentation/manpages/
+   trunk/Documentation/server/
+   trunk/apps/
+   trunk/apps/dot_mcp/
+   trunk/apps/kism3d/
+   trunk/apps/meshs3d/
+   trunk/apps/s3d_x11gate/
+   trunk/apps/s3dfm/
+   trunk/apps/s3dosm/
+   trunk/apps/s3dvt/
+   trunk/cmake/
+   trunk/cmake/modules/
+   trunk/example/
+   trunk/experimental/
+   trunk/experimental/comptest/
+   trunk/experimental/olsrs3d/
+   trunk/experimental/testvis/
+   trunk/experimental/wiitest/
+   trunk/extras/
+   trunk/extras/mplayer/
+   trunk/extras/swig/
+   trunk/libs3d/
+   trunk/libs3dw/
+   trunk/objs/
+   trunk/objs/martin_stern/
+   trunk/server/
+Log:
+Add svn:ignore for much cleaner "svn status" output in in-source-builds
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+Added: trunk/.gitignore
+===================================================================
+--- trunk/.gitignore	2008-07-10 15:35:31 UTC (rev 917)
++++ trunk/.gitignore	2008-07-10 15:49:28 UTC (rev 918)
+@@ -0,0 +1,11 @@
++*.[oa]
++*~
++*.so
++*.pc
++CMakeFiles
++cmake_install.cmake
++Makefile
++CMakeCache.txt
++config-s3d.h
++doc_output
++s3drc
+
+
+Property changes on: trunk/Documentation
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/Documentation/libg3d
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/Documentation/libg3d/api
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/Documentation/libg3d/api/tmpl
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/Documentation/libs3d
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/Documentation/libs3dw
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/Documentation/manpages
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/Documentation/server
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/apps
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/apps/dot_mcp
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/apps/kism3d
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/apps/meshs3d
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/apps/s3d_x11gate
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/apps/s3dfm
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/apps/s3dosm
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/apps/s3dvt
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/cmake
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/cmake/modules
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/example
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/experimental
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/experimental/comptest
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/experimental/olsrs3d
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/experimental/testvis
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/experimental/wiitest
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/extras
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/extras/mplayer
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/extras/swig
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/libs3d
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/libs3dw
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/objs
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/objs/martin_stern
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+Property changes on: trunk/server
+___________________________________________________________________
+Name: svn:ignore
+   + *.[oa]
+*~
+*.so
+*.pc
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+config-s3d.h
+doc_output
+s3drc
+
+
+
+
+From lazhur at mail.berlios.de  Thu Jul 10 18:55:18 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 10 Jul 2008 18:55:18 +0200
+Subject: [S3d-svn] r919 - in trunk: . cmake/modules
+Message-ID: <200807101655.m6AGtIAM004392@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-07-10 18:55:16 +0200 (Thu, 10 Jul 2008)
+New Revision: 919
+
+Modified:
+   trunk/CMakeLists.txt
+   trunk/cmake/modules/EnableProfiling.cmake
+   trunk/cmake/modules/SetC9X.cmake
+Log:
+Use list(APPEND ..,) instead of set to append item to variable in cmake
+
+Modified: trunk/CMakeLists.txt
+===================================================================
+--- trunk/CMakeLists.txt	2008-07-10 15:49:28 UTC (rev 918)
++++ trunk/CMakeLists.txt	2008-07-10 16:55:16 UTC (rev 919)
+@@ -5,7 +5,7 @@
+ cmake_minimum_required(VERSION 2.4.4)
+ 
+ # Add directory with library checks to search path
+-set(CMAKE_MODULE_PATH "${s3d_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
++list(APPEND CMAKE_MODULE_PATH "${s3d_SOURCE_DIR}/cmake/modules")
+ 
+ # set path to objects
+ set(OBJECTPATH "${CMAKE_INSTALL_PREFIX}/share/s3d/objs:${s3d_SOURCE_DIR}/objs")
+
+Modified: trunk/cmake/modules/EnableProfiling.cmake
+===================================================================
+--- trunk/cmake/modules/EnableProfiling.cmake	2008-07-10 15:49:28 UTC (rev 918)
++++ trunk/cmake/modules/EnableProfiling.cmake	2008-07-10 16:55:16 UTC (rev 919)
+@@ -8,7 +8,7 @@
+ 	check_c_compiler_flag("-pg" SUPPORT_PG)
+ 	if (SUPPORT_PG)
+ 		add_definitions("-pg")
+-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
++		list(APPEND CMAKE_EXE_LINKER_FLAGS "-pg")
+ 	else (SUPPORT_PG)
+ 		message(FATAL_ERROR "Compiler doesn't understand -pg")
+ 	endif (SUPPORT_PG)
+
+Modified: trunk/cmake/modules/SetC9X.cmake
+===================================================================
+--- trunk/cmake/modules/SetC9X.cmake	2008-07-10 15:49:28 UTC (rev 918)
++++ trunk/cmake/modules/SetC9X.cmake	2008-07-10 16:55:16 UTC (rev 919)
+@@ -3,7 +3,7 @@
+ # Enable c99/c9x
+ check_c_compiler_flag("-std=c9x" SUPPORT_C9X)
+ if (SUPPORT_C9X)
+-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c9x ")
++	list(APPEND CMAKE_C_FLAGS "-std=c9x ")
+ else (SUPPORT_C9X)
+ 	message(STATUS "Could not enable c9x support")
+ endif (SUPPORT_C9X)
+
+
+
+From lazhur at mail.berlios.de  Thu Jul 10 18:55:28 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 10 Jul 2008 18:55:28 +0200
+Subject: [S3d-svn] r920 - trunk
+Message-ID: <200807101655.m6AGtRJJ004557@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-07-10 18:55:24 +0200 (Thu, 10 Jul 2008)
+New Revision: 920
+
+Added:
+   trunk/.gitattributes
+Modified:
+   trunk/CMakeLists.txt
+Log:
+Only include experimental in build when it can be found
+
+It is possible to create a new release without the experimental folder
+and without changing any other file. This should make it possible to
+create a new release archive with git (>= 1.6.0) by calling
+
+export V=0.3; git archive --format=tar --prefix=s3d-$V/ v$V | gzip -9 > s3d-$V.tar.gz
+
+Added: trunk/.gitattributes
+===================================================================
+--- trunk/.gitattributes	2008-07-10 16:55:16 UTC (rev 919)
++++ trunk/.gitattributes	2008-07-10 16:55:24 UTC (rev 920)
+@@ -0,0 +1,3 @@
++experimental	export-ignore
++.gitignore	export-ignore
++.gitattributes	export-ignore
+
+Modified: trunk/CMakeLists.txt
+===================================================================
+--- trunk/CMakeLists.txt	2008-07-10 16:55:16 UTC (rev 919)
++++ trunk/CMakeLists.txt	2008-07-10 16:55:24 UTC (rev 920)
+@@ -29,13 +29,17 @@
+ add_subdirectory(libs3d)
+ add_subdirectory(libs3dw)
+ add_subdirectory(apps)
+-add_subdirectory(experimental)
+ add_subdirectory(cmake)
+ add_subdirectory(Documentation)
+ add_subdirectory(example)
+ add_subdirectory(objs)
+ add_subdirectory(server)
+ 
++file(GLOB INCLUDE_EXPERIMENTAL experimental)
++if (INCLUDE_EXPERIMENTAL)
++	add_subdirectory(experimental)
++endif (INCLUDE_EXPERIMENTAL)
++
+ # Generate s3drc
+ configure_file(s3drc.cmake ${s3d_BINARY_DIR}/s3drc)
+ install(FILES ${s3d_BINARY_DIR}/s3drc DESTINATION /etc)
+
+
+
+From lazhur at mail.berlios.de  Sun Jul 13 19:45:41 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun, 13 Jul 2008 19:45:41 +0200
+Subject: [S3d-svn] r920 - trunk
+Message-ID: <200807131745.m6DHjfWb018554@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-07-10 18:55:24 +0200 (Thu, 10 Jul 2008)
+New Revision: 920
+
+Added:
+   trunk/.gitattributes
+Modified:
+   trunk/CMakeLists.txt
+Log:
+Only include experimental in build when it can be found
+
+It is possible to create a new release without the experimental folder
+and without changing any other file. This should make it possible to
+create a new release archive with git (>= 1.6.0) by calling
+
+export V=0.3; git archive --format=tar --prefix=s3d-$V/ v$V | gzip -9 > s3d-$V.tar.gz
+
+Added: trunk/.gitattributes
+===================================================================
+--- trunk/.gitattributes	2008-07-10 16:55:16 UTC (rev 919)
++++ trunk/.gitattributes	2008-07-10 16:55:24 UTC (rev 920)
+@@ -0,0 +1,3 @@
++experimental	export-ignore
++.gitignore	export-ignore
++.gitattributes	export-ignore
+
+Modified: trunk/CMakeLists.txt
+===================================================================
+--- trunk/CMakeLists.txt	2008-07-10 16:55:16 UTC (rev 919)
++++ trunk/CMakeLists.txt	2008-07-10 16:55:24 UTC (rev 920)
+@@ -29,13 +29,17 @@
+ add_subdirectory(libs3d)
+ add_subdirectory(libs3dw)
+ add_subdirectory(apps)
+-add_subdirectory(experimental)
+ add_subdirectory(cmake)
+ add_subdirectory(Documentation)
+ add_subdirectory(example)
+ add_subdirectory(objs)
+ add_subdirectory(server)
+ 
++file(GLOB INCLUDE_EXPERIMENTAL experimental)
++if (INCLUDE_EXPERIMENTAL)
++	add_subdirectory(experimental)
++endif (INCLUDE_EXPERIMENTAL)
++
+ # Generate s3drc
+ configure_file(s3drc.cmake ${s3d_BINARY_DIR}/s3drc)
+ install(FILES ${s3d_BINARY_DIR}/s3drc DESTINATION /etc)
+
+
+
+From lazhur at mail.berlios.de  Sat Jul 19 21:04:48 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 19 Jul 2008 21:04:48 +0200
+Subject: [S3d-svn] r921 - in trunk: libs3d libs3dw
+Message-ID: <200807191904.m6JJ4mWI000761@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-07-19 21:04:47 +0200 (Sat, 19 Jul 2008)
+New Revision: 921
+
+Modified:
+   trunk/libs3d/CMakeLists.txt
+   trunk/libs3dw/CMakeLists.txt
+Log:
+Add soversion to library names
+
+Modified: trunk/libs3d/CMakeLists.txt
+===================================================================
+--- trunk/libs3d/CMakeLists.txt	2008-07-10 16:55:24 UTC (rev 920)
++++ trunk/libs3d/CMakeLists.txt	2008-07-19 19:04:47 UTC (rev 921)
+@@ -7,6 +7,7 @@
+ 	sei_construct.c sei_misc.c sei_monotone.c sei_tri.c shm.c
+ 	shm_ringbuf.c tcp.c vector.c hash.c texture.c)
+ target_link_libraries(s3d ${S3D_LIBRARY_DEPENDENCIES})
++set_target_properties(s3d PROPERTIES VERSION ${VERSION} SOVERSION 2)
+ set(S3D_LIBRARIES ${S3D_LIBRARY_DEPENDENCIES} s3d CACHE PATHS "Path to libraries")
+ 
+ # install
+
+Modified: trunk/libs3dw/CMakeLists.txt
+===================================================================
+--- trunk/libs3dw/CMakeLists.txt	2008-07-10 16:55:24 UTC (rev 920)
++++ trunk/libs3dw/CMakeLists.txt	2008-07-19 19:04:47 UTC (rev 921)
+@@ -2,6 +2,7 @@
+ 
+ add_library(s3dw SHARED animate.c arrange.c button.c event.c input.c
+ 	label.c root.c scrollbar.c style.c surface.c textbox.c widget.c)
++set_target_properties(s3dw PROPERTIES VERSION ${VERSION} SOVERSION 2)
+ set(S3DW_LIBRARIES s3dw CACHE PATHS "Path to libraries")
+ 
+ # install
+
+
+
+From lazhur at mail.berlios.de  Sun Jul 20 01:16:19 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun, 20 Jul 2008 01:16:19 +0200
+Subject: [S3d-svn] r922 - trunk/libs3dw
+Message-ID: <200807192316.m6JNGJUk016867@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-07-20 01:16:18 +0200 (Sun, 20 Jul 2008)
+New Revision: 922
+
+Modified:
+   trunk/libs3dw/CMakeLists.txt
+Log:
+Link libs3dw against libs3d
+
+Modified: trunk/libs3dw/CMakeLists.txt
+===================================================================
+--- trunk/libs3dw/CMakeLists.txt	2008-07-19 19:04:47 UTC (rev 921)
++++ trunk/libs3dw/CMakeLists.txt	2008-07-19 23:16:18 UTC (rev 922)
+@@ -1,7 +1,10 @@
+ include_directories(${s3d_SOURCE_DIR}/libs3d ${s3d_SOURCE_DIR}/libs3dw)
+ 
++set(S3DW_LIBRARY_DEPENDENCIES s3d ${S3D_LIBRARY_DEPENDENCIES})
++
+ add_library(s3dw SHARED animate.c arrange.c button.c event.c input.c
+ 	label.c root.c scrollbar.c style.c surface.c textbox.c widget.c)
++target_link_libraries(s3dw ${S3DW_LIBRARY_DEPENDENCIES})
+ set_target_properties(s3dw PROPERTIES VERSION ${VERSION} SOVERSION 2)
+ set(S3DW_LIBRARIES s3dw CACHE PATHS "Path to libraries")
+ 
+
+
+
+From lazhur at mail.berlios.de  Sun Jul 20 11:14:49 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun, 20 Jul 2008 11:14:49 +0200
+Subject: [S3d-svn] r923 - trunk
+Message-ID: <200807200914.m6K9EnOg017663@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-07-20 11:14:48 +0200 (Sun, 20 Jul 2008)
+New Revision: 923
+
+Modified:
+   trunk/CMakeLists.txt
+Log:
+Make s3drc executable after installation
+
+Modified: trunk/CMakeLists.txt
+===================================================================
+--- trunk/CMakeLists.txt	2008-07-19 23:16:18 UTC (rev 922)
++++ trunk/CMakeLists.txt	2008-07-20 09:14:48 UTC (rev 923)
+@@ -42,4 +42,4 @@
+ 
+ # Generate s3drc
+ configure_file(s3drc.cmake ${s3d_BINARY_DIR}/s3drc)
+-install(FILES ${s3d_BINARY_DIR}/s3drc DESTINATION /etc)
++install(PROGRAMS ${s3d_BINARY_DIR}/s3drc DESTINATION /etc)
+
+
+
+From lazhur at mail.berlios.de  Sun Jul 20 11:14:53 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun, 20 Jul 2008 11:14:53 +0200
+Subject: [S3d-svn] r924 - trunk/experimental
+Message-ID: <200807200914.m6K9ErPK017696@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-07-20 11:14:53 +0200 (Sun, 20 Jul 2008)
+New Revision: 924
+
+Modified:
+   trunk/experimental/CMakeLists.txt
+Log:
+Allow to disable experimental progams in build
+
+Modified: trunk/experimental/CMakeLists.txt
+===================================================================
+--- trunk/experimental/CMakeLists.txt	2008-07-20 09:14:48 UTC (rev 923)
++++ trunk/experimental/CMakeLists.txt	2008-07-20 09:14:53 UTC (rev 924)
+@@ -1,4 +1,8 @@
+-add_subdirectory(comptest)
+-add_subdirectory(olsrs3d)
+-add_subdirectory(testvis)
+-add_subdirectory(wiitest)
++option(BUILD_EXPERIMENTAL "Enable/disable build of experimental programs" ON)
++
++if (BUILD_EXPERIMENTAL)
++	add_subdirectory(comptest)
++	add_subdirectory(olsrs3d)
++	add_subdirectory(testvis)
++	add_subdirectory(wiitest)
++endif (BUILD_EXPERIMENTAL)
+
+
+
+From lazhur at mail.berlios.de  Sun Jul 20 11:14:58 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun, 20 Jul 2008 11:14:58 +0200
+Subject: [S3d-svn] r925 - trunk/apps/dot_mcp
+Message-ID: <200807200914.m6K9EwaW017731@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-07-20 11:14:58 +0200 (Sun, 20 Jul 2008)
+New Revision: 925
+
+Modified:
+   trunk/apps/dot_mcp/menu.c
+Log:
+Replace dot_mcp menu entries with new programs
+
+Modified: trunk/apps/dot_mcp/menu.c
+===================================================================
+--- trunk/apps/dot_mcp/menu.c	2008-07-20 09:14:53 UTC (rev 924)
++++ trunk/apps/dot_mcp/menu.c	2008-07-20 09:14:58 UTC (rev 925)
+@@ -37,8 +37,11 @@
+ static int go = -1;
+ static int act;
+ static struct menu_entry menu[] = {
+-	{"objs/comp.3ds", "terminal", "s3dvt",    0, 0
+-	}, {"objs/comp.3ds", "olsrs3d", "olsrs3d",    0, 0}, {"objs/comp.3ds", "s3d_x11gate", "s3d_x11gate",  0, 0}, {"objs/comp.3ds", "filebrowser", "filebrowser",  0, 0}, {"objs/comp.3ds", "logout", "LOGOUT",     0, 0},
++	{"objs/comp.3ds", "terminal", "s3dvt",    0, 0},
++	{"objs/comp.3ds", "meshs3d", "meshs3d",    0, 0},
++	{"objs/comp.3ds", "s3d_x11gate", "s3d_x11gate",  0, 0},
++	{"objs/comp.3ds", "s3dfm", "s3dfm",  0, 0},
++	{"objs/comp.3ds", "logout", "LOGOUT",     0, 0},
+ };
+ 
+ void menu_click(int oid)
+
+
+
+From lazhur at mail.berlios.de  Sun Jul 20 11:15:04 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun, 20 Jul 2008 11:15:04 +0200
+Subject: [S3d-svn] r926 - in trunk: Documentation Documentation/manpages
+	libs3d
+Message-ID: <200807200915.m6K9F4bs017806@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-07-20 11:15:04 +0200 (Sun, 20 Jul 2008)
+New Revision: 926
+
+Modified:
+   trunk/Documentation/bookinfo.docbook
+   trunk/Documentation/manpages/s3d.1
+   trunk/Documentation/manpages/s3dmanpage.sgml
+   trunk/libs3d/io.c
+Log:
+Fix typo enviroment -> environment
+
+Modified: trunk/Documentation/bookinfo.docbook
+===================================================================
+--- trunk/Documentation/bookinfo.docbook	2008-07-20 09:14:58 UTC (rev 925)
++++ trunk/Documentation/bookinfo.docbook	2008-07-20 09:15:04 UTC (rev 926)
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8" ?>
+ <bookinfo>
+-<title>S3D - a 3D Desktop Enviroment</title>
++<title>S3D - a 3D Desktop Environment</title>
+ <authorgroup>
+ <author>
+ <firstname>Simon</firstname>
+
+Modified: trunk/Documentation/manpages/s3d.1
+===================================================================
+--- trunk/Documentation/manpages/s3d.1	2008-07-20 09:14:58 UTC (rev 925)
++++ trunk/Documentation/manpages/s3d.1	2008-07-20 09:15:04 UTC (rev 926)
+@@ -13,7 +13,7 @@
+ 
+ .SH "DESCRIPTION"
+ .PP
+-\fBs3d(1)\fR is a network display server which can be used as 3d desktop enviroment.
++\fBs3d(1)\fR is a network display server which can be used as 3d desktop environment.
+ .PP
+ .SH "OPTIONS"
+ .PP
+
+Modified: trunk/Documentation/manpages/s3dmanpage.sgml
+===================================================================
+--- trunk/Documentation/manpages/s3dmanpage.sgml	2008-07-20 09:14:58 UTC (rev 925)
++++ trunk/Documentation/manpages/s3dmanpage.sgml	2008-07-20 09:15:04 UTC (rev 926)
+@@ -24,7 +24,7 @@
+ 	<refsect1> 
+ 		<title>DESCRIPTION</title> 
+ 		<para>
+-			<command>s3d(1)</command> is a network display server which can be used as 3d desktop enviroment.
++			<command>s3d(1)</command> is a network display server which can be used as 3d desktop environment.
+ 		</para>
+ 		<para> </para>
+ 	</refsect1> 
+
+Modified: trunk/libs3d/io.c
+===================================================================
+--- trunk/libs3d/io.c	2008-07-20 09:14:58 UTC (rev 925)
++++ trunk/libs3d/io.c	2008-07-20 09:15:04 UTC (rev 926)
+@@ -67,7 +67,7 @@
+ void s3d_usage(void)
+ {
+ 	printf("s3d-parameters:\n");
+-	printf(" --s3d-url <url>: skip S3D enviroment and connect to this url\n");
++	printf(" --s3d-url <url>: skip S3D environment and connect to this url\n");
+ 	printf(" --help, -?, -h, --s3d-help: this helpful text\n");
+ }
+ 
+@@ -123,7 +123,7 @@
+ 
+ 	cb_lock = 1; /* don't bother while initiating ... is set to 0 after INIT packet received. */
+ 	if (NULL != (s = getenv("S3D"))) {
+-		s3dprintf(VLOW, "at least we have the enviroment variable ... %s", s);
++		s3dprintf(VLOW, "at least we have the environment variable ... %s", s);
+ 		url = s;
+ 	}
+ 	parse_args(argc, argv);
+
+
+
+From lazhur at mail.berlios.de  Sun Jul 20 12:55:43 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun, 20 Jul 2008 12:55:43 +0200
+Subject: [S3d-svn] r927 - trunk
+Message-ID: <200807201055.m6KAthpl025282@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-07-20 12:55:41 +0200 (Sun, 20 Jul 2008)
+New Revision: 927
+
+Modified:
+   trunk/s3drc.cmake
+Log:
+Make s3drc a shell script
+
+Modified: trunk/s3drc.cmake
+===================================================================
+--- trunk/s3drc.cmake	2008-07-20 09:15:04 UTC (rev 926)
++++ trunk/s3drc.cmake	2008-07-20 10:55:41 UTC (rev 927)
+@@ -1 +1,2 @@
++#! /bin/sh
+ @CMAKE_INSTALL_PREFIX@/bin/dot_mcp
+
+
+
+From lazhur at mail.berlios.de  Sun Jul 20 12:55:59 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun, 20 Jul 2008 12:55:59 +0200
+Subject: [S3d-svn] r928 - trunk/Documentation/manpages
+Message-ID: <200807201055.m6KAtxkE025890@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-07-20 12:55:58 +0200 (Sun, 20 Jul 2008)
+New Revision: 928
+
+Added:
+   trunk/Documentation/manpages/dot_mcp.1
+   trunk/Documentation/manpages/dot_mcpmanpage.sgml
+   trunk/Documentation/manpages/kism3d.1
+   trunk/Documentation/manpages/kism3dmanpage.sgml
+   trunk/Documentation/manpages/meshs3d.1
+   trunk/Documentation/manpages/meshs3dmanpage.sgml
+   trunk/Documentation/manpages/s3d_x11gate.1
+   trunk/Documentation/manpages/s3d_x11gate.sgml
+   trunk/Documentation/manpages/s3dfm.1
+   trunk/Documentation/manpages/s3dfmmanpage.sgml
+   trunk/Documentation/manpages/s3dosm.1
+   trunk/Documentation/manpages/s3dosmmanpage.sgml
+   trunk/Documentation/manpages/s3dvt.1
+   trunk/Documentation/manpages/s3dvtmanpage.sgml
+Modified:
+   trunk/Documentation/manpages/CMakeLists.txt
+   trunk/Documentation/manpages/s3d.1
+Log:
+Add manpage stubs
+
+Modified: trunk/Documentation/manpages/CMakeLists.txt
+===================================================================
+--- trunk/Documentation/manpages/CMakeLists.txt	2008-07-20 10:55:41 UTC (rev 927)
++++ trunk/Documentation/manpages/CMakeLists.txt	2008-07-20 10:55:58 UTC (rev 928)
+@@ -1 +1,8 @@
++install(FILES "dot_mcp.1" DESTINATION share/man/man1)
++install(FILES "kism3d.1" DESTINATION share/man/man1)
++install(FILES "meshs3d.1" DESTINATION share/man/man1)
++install(FILES "s3dfm.1" DESTINATION share/man/man1)
+ install(FILES "s3d.1" DESTINATION share/man/man1)
++install(FILES "s3dosm.1" DESTINATION share/man/man1)
++install(FILES "s3dvt.1" DESTINATION share/man/man1)
++install(FILES "s3d_x11gate.1" DESTINATION share/man/man1)
+
+Added: trunk/Documentation/manpages/dot_mcp.1
+===================================================================
+--- trunk/Documentation/manpages/dot_mcp.1	2008-07-20 10:55:41 UTC (rev 927)
++++ trunk/Documentation/manpages/dot_mcp.1	2008-07-20 10:55:58 UTC (rev 928)
+@@ -0,0 +1,31 @@
++.\" This manpage has been automatically generated by docbook2man 
++.\" from a DocBook document.  This tool can be found at:
++.\" <http://shell.ipoline.com/~elmert/comp/docbook2X/> 
++.\" Please send any bug reports, improvements, comments, patches, 
++.\" etc. to Steve Cheng <steve at ggi-project.org>.
++.TH "DOT_MCP" "1" "20 July 2008" "" ""
++
++.SH NAME
++dot_mcp \- mcp for s3d
++.SH SYNOPSIS
++
++\fBmeshs3d\fR [ \fB--s3d-url\fR ]
++
++.SH "OPTIONS"
++.PP
++This program follows the usual GNU command line syntax. A summary of
++the options supported by \fBmeshs3d\fR is below.
++.TP
++\fB--s3d-url\fR
++skip S3D environment and connect to this url 
++.SH "DESCRIPTION"
++.PP
++\fBdot_mcp(1)\fR is a 
++.PP
++.SH "SEE ALSO"
++.PP
++s3d project page on berlios  <URL:http://s3d.berlios.de/> 
++.SH "AUTHOR"
++.PP
++This manual page was written by Timo Schneider <timo.schneider at s2004.tu-chemnitz.de> 
++for the Debian project (but may be used by others).
+
+Added: trunk/Documentation/manpages/dot_mcpmanpage.sgml
+===================================================================
+--- trunk/Documentation/manpages/dot_mcpmanpage.sgml	2008-07-20 10:55:41 UTC (rev 927)
++++ trunk/Documentation/manpages/dot_mcpmanpage.sgml	2008-07-20 10:55:58 UTC (rev 928)
+@@ -0,0 +1,60 @@
++<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN">
++<refentry id="dotmcp">
++
++	<refmeta> 
++		<refentrytitle>dot_mcp</refentrytitle>
++		<manvolnum>1</manvolnum>
++	</refmeta> 
++	
++	<refnamediv> 
++		<refname>dot_mcp</refname>
++		<refpurpose> mcp for s3d </refpurpose>
++	</refnamediv>
++
++	<refsynopsisdiv>
++		<cmdsynopsis>
++			<command>meshs3d</command>
++			<arg choice="opt">--s3d-url</arg>
++		</cmdsynopsis>
++	</refsynopsisdiv>
++
++	<refsect1>
++		<title>OPTIONS</title>
++		<para>
++			This program follows the usual GNU command line syntax. A summary of
++			the options supported by <command>meshs3d</command> is below.
++		</para>
++		<variablelist>
++			<varlistentry>
++				<term>--s3d-url</term>
++				<listitem>
++					<para> skip S3D environment and connect to this url </para>
++				</listitem>
++			</varlistentry>
++		</variablelist>
++	</refsect1> 
++	
++	<refsect1> 
++		<title>DESCRIPTION</title> 
++		<para>
++			<command>dot_mcp(1)</command> is a <!-- TODO -->
++		</para>
++		<para> </para>
++	</refsect1> 
++	
++	<refsect1>
++		<title>SEE ALSO</title>
++		<para> <ulink url="http://s3d.berlios.de/"> s3d project page on berlios </ulink> </para>
++		<!--TODO: ADD REFERENCE TO APPS AND /usr/share/doc/s3d/ -->
++	</refsect1>
++
++	<refsect1> 
++		<title>AUTHOR</title>
++		<para>
++			This manual page was written by Timo Schneider <email>timo.schneider at s2004.tu-chemnitz.de</email> 
++			for the Debian project (but may be used by others).
++		</para>
++	</refsect1>
++	
++</refentry> 
++
+
+Copied: trunk/Documentation/manpages/kism3d.1 (from rev 927, trunk/Documentation/manpages/s3d.1)
+===================================================================
+--- trunk/Documentation/manpages/s3d.1	2008-07-20 10:55:41 UTC (rev 927)
++++ trunk/Documentation/manpages/kism3d.1	2008-07-20 10:55:58 UTC (rev 928)
+@@ -0,0 +1,35 @@
++.\" This manpage has been automatically generated by docbook2man 
++.\" from a DocBook document.  This tool can be found at:
++.\" <http://shell.ipoline.com/~elmert/comp/docbook2X/> 
++.\" Please send any bug reports, improvements, comments, patches, 
++.\" etc. to Steve Cheng <steve at ggi-project.org>.
++.TH "KISM3D" "1" "20 July 2008" "" ""
++
++.SH NAME
++kism3d \- 802.11 visualizer for s3d
++.SH SYNOPSIS
++
++\fBkism3d\fR [ \fBHOST:PORT\fR ] [ \fB--s3d-url\fR ]
++
++.SH "DESCRIPTION"
++.PP
++\fBkism3d(1)\fR is a  
++.PP
++.SH "OPTIONS"
++.PP
++This program follows the usual GNU command line syntax. A summary of 
++the options supported by \fBkism3d\fR is below.
++.TP
++\fBHOST\fR
++.TP
++\fBPORT\fR
++.TP
++\fB--s3d-url\fR
++skip S3D environment and connect to this url 
++.SH "SEE ALSO"
++.PP
++s3d project page on berlios  <URL:http://s3d.berlios.de/> 
++.SH "AUTHOR"
++.PP
++This manual page was written by Timo Schneider <timo.schneider at s2004.tu-chemnitz.de> 
++for the Debian project (but may be used by others).
+
+Added: trunk/Documentation/manpages/kism3dmanpage.sgml
+===================================================================
+--- trunk/Documentation/manpages/kism3dmanpage.sgml	2008-07-20 10:55:41 UTC (rev 927)
++++ trunk/Documentation/manpages/kism3dmanpage.sgml	2008-07-20 10:55:58 UTC (rev 928)
+@@ -0,0 +1,73 @@
++<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN">
++<refentry id="kism3d">
++
++	<refmeta> 
++		<refentrytitle>kism3d</refentrytitle>
++		<manvolnum>1</manvolnum>
++	</refmeta> 
++	
++	<refnamediv> 
++		<refname>kism3d</refname>
++		<refpurpose> 802.11 visualizer for s3d </refpurpose>
++	</refnamediv>
++	
++	<refsynopsisdiv> 
++		<cmdsynopsis> 
++			<command>kism3d</command>
++			<arg choice="opt">HOST:PORT</arg>
++			<arg choice="opt">--s3d-url</arg>
++		</cmdsynopsis>
++	</refsynopsisdiv> 
++	
++	<refsect1> 
++		<title>DESCRIPTION</title> 
++		<para>
++			<command>kism3d(1)</command> is a  <!-- TODO -->
++		</para>
++		<para> </para>
++	</refsect1> 
++	
++	<refsect1>
++		<title>OPTIONS</title> 
++		<para> 
++			This program follows the usual GNU command line syntax. A summary of 
++			the options supported by <command>kism3d</command> is below.
++		</para>
++		<variablelist>
++			<varlistentry> 
++				<term>HOST</term> 
++				<listitem> 
++					<para> <!-- TODO --> </para> 
++				</listitem> 
++			</varlistentry> 
++			<varlistentry> 
++				<term>PORT</term>
++				<listitem> 
++					<para> <!-- TODO --> </para>
++				</listitem>
++			</varlistentry>
++			<varlistentry>
++				<term>--s3d-url</term>
++				<listitem>
++					<para> skip S3D environment and connect to this url </para>
++				</listitem>
++			</varlistentry>
++		</variablelist> 
++	</refsect1> 
++		
++	<refsect1> 
++		<title>SEE ALSO</title>
++		<para> <ulink url="http://s3d.berlios.de/"> s3d project page on berlios </ulink> </para>
++		<!--TODO: ADD REFERENCE TO APPS AND /usr/share/doc/s3d/ -->
++	</refsect1>
++
++	<refsect1> 
++		<title>AUTHOR</title>
++		<para>
++			This manual page was written by Timo Schneider <email>timo.schneider at s2004.tu-chemnitz.de</email> 
++			for the Debian project (but may be used by others).
++		</para>
++	</refsect1>
++	
++</refentry> 
++
+
+Copied: trunk/Documentation/manpages/meshs3d.1 (from rev 927, trunk/Documentation/manpages/s3d.1)
+===================================================================
+--- trunk/Documentation/manpages/s3d.1	2008-07-20 10:55:41 UTC (rev 927)
++++ trunk/Documentation/manpages/meshs3d.1	2008-07-20 10:55:58 UTC (rev 928)
+@@ -0,0 +1,40 @@
++.\" This manpage has been automatically generated by docbook2man 
++.\" from a DocBook document.  This tool can be found at:
++.\" <http://shell.ipoline.com/~elmert/comp/docbook2X/> 
++.\" Please send any bug reports, improvements, comments, patches, 
++.\" etc. to Steve Cheng <steve at ggi-project.org>.
++.TH "MESHS3D" "1" "20 July 2008" "" ""
++
++.SH NAME
++meshs3d \- olsr/batman topology visualizer for s3d
++.SH SYNOPSIS
++
++\fBmeshs3d\fR [ \fB-d\fR ] [ \fB-H\fR ] [ \fB-h|--help\fR ] [ \fB--s3d-url\fR ]
++
++.SH "DESCRIPTION"
++.PP
++\fBmeshs3d(1)\fR is a  
++.PP
++.SH "OPTIONS"
++.PP
++This program follows the usual GNU command line syntax. A summary of 
++the options supported by \fBmeshs3d\fR is below.
++.TP
++\fB-h, --help\fR
++Show summary of options and exit. 
++.TP
++\fB-d\fR
++Enable debug mode 
++.TP
++\fB-H\fR
++connect to olsr node. By default meshs3d uses localhost
++.TP
++\fB--s3d-url\fR
++skip S3D environment and connect to this url 
++.SH "SEE ALSO"
++.PP
++s3d project page on berlios  <URL:http://s3d.berlios.de/> 
++.SH "AUTHOR"
++.PP
++This manual page was written by Timo Schneider <timo.schneider at s2004.tu-chemnitz.de> 
++for the Debian project (but may be used by others).
+
+Added: trunk/Documentation/manpages/meshs3dmanpage.sgml
+===================================================================
+--- trunk/Documentation/manpages/meshs3dmanpage.sgml	2008-07-20 10:55:41 UTC (rev 927)
++++ trunk/Documentation/manpages/meshs3dmanpage.sgml	2008-07-20 10:55:58 UTC (rev 928)
+@@ -0,0 +1,81 @@
++<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN">
++<refentry id="meshs3d">
++
++	<refmeta> 
++		<refentrytitle>meshs3d</refentrytitle>
++		<manvolnum>1</manvolnum>
++	</refmeta> 
++	
++	<refnamediv> 
++		<refname>meshs3d</refname>
++		<refpurpose> olsr/batman topology visualizer for s3d </refpurpose>
++	</refnamediv>
++	
++	<refsynopsisdiv> 
++		<cmdsynopsis> 
++			<command>meshs3d</command>
++			<arg choice="opt">-d</arg>
++			<arg choice="opt">-H</arg>
++			<arg choice="opt">-h|--help</arg>
++			<arg choice="opt">--s3d-url</arg>
++		</cmdsynopsis>
++	</refsynopsisdiv> 
++	
++	<refsect1> 
++		<title>DESCRIPTION</title> 
++		<para>
++			<command>meshs3d(1)</command> is a  <!-- TODO -->
++		</para>
++		<para> </para>
++	</refsect1> 
++	
++	<refsect1>
++		<title>OPTIONS</title> 
++		<para> 
++			This program follows the usual GNU command line syntax. A summary of 
++			the options supported by <command>meshs3d</command> is below.
++		</para>
++		<variablelist>
++			<varlistentry> 
++				<term>-h, --help</term>
++				<listitem> 
++					<para> Show summary of options and exit. </para> 
++				</listitem> 
++			</varlistentry> 
++			<varlistentry> 
++				<term>-d</term>
++				<listitem> 
++					<para> Enable debug mode </para>
++				</listitem>
++			</varlistentry> 
++			<varlistentry> 
++				<term>-H</term> 
++				<listitem> 
++					<para> connect to olsr node. By default meshs3d uses localhost</para>
++				</listitem> 
++			</varlistentry>
++			<varlistentry>
++				<term>--s3d-url</term>
++				<listitem>
++					<para> skip S3D environment and connect to this url </para>
++				</listitem>
++			</varlistentry>
++		</variablelist> 
++	</refsect1> 
++		
++	<refsect1> 
++		<title>SEE ALSO</title>
++		<para> <ulink url="http://s3d.berlios.de/"> s3d project page on berlios </ulink> </para>
++		<!--TODO: ADD REFERENCE TO APPS AND /usr/share/doc/s3d/ -->
++	</refsect1>
++
++	<refsect1> 
++		<title>AUTHOR</title>
++		<para>
++			This manual page was written by Timo Schneider <email>timo.schneider at s2004.tu-chemnitz.de</email> 
++			for the Debian project (but may be used by others).
++		</para>
++	</refsect1>
++	
++</refentry> 
++
+
+Modified: trunk/Documentation/manpages/s3d.1
+===================================================================
+--- trunk/Documentation/manpages/s3d.1	2008-07-20 10:55:41 UTC (rev 927)
++++ trunk/Documentation/manpages/s3d.1	2008-07-20 10:55:58 UTC (rev 928)
+@@ -3,7 +3,7 @@
+ .\" <http://shell.ipoline.com/~elmert/comp/docbook2X/> 
+ .\" Please send any bug reports, improvements, comments, patches, 
+ .\" etc. to Steve Cheng <steve at ggi-project.org>.
+-.TH "S3D" "1" "16 May 2006" "" ""
++.TH "S3D" "1" "20 July 2008" "" ""
+ 
+ .SH NAME
+ s3d \- network display server
+
+Copied: trunk/Documentation/manpages/s3d_x11gate.1 (from rev 927, trunk/Documentation/manpages/s3d.1)
+===================================================================
+--- trunk/Documentation/manpages/s3d.1	2008-07-20 10:55:41 UTC (rev 927)
++++ trunk/Documentation/manpages/s3d_x11gate.1	2008-07-20 10:55:58 UTC (rev 928)
+@@ -0,0 +1,34 @@
++.\" This manpage has been automatically generated by docbook2man 
++.\" from a DocBook document.  This tool can be found at:
++.\" <http://shell.ipoline.com/~elmert/comp/docbook2X/> 
++.\" Please send any bug reports, improvements, comments, patches, 
++.\" etc. to Steve Cheng <steve at ggi-project.org>.
++.TH "S3D_X11GATE" "1" "20 July 2008" "" ""
++
++.SH NAME
++s3d_x11gate \- 3d gateway for x11 desktops
++.SH SYNOPSIS
++
++\fBs3d_x11gate\fR [ \fB-h|--help\fR ] [ \fB--s3d-url\fR ]
++
++.SH "DESCRIPTION"
++.PP
++\fBs3d_x11gate(1)\fR is a  
++.PP
++.SH "OPTIONS"
++.PP
++This program follows the usual GNU command line syntax. A summary of
++the options supported by \fBs3d_x11gate\fR is below.
++.TP
++\fB-h, --help\fR
++Show summary of options and exit. 
++.TP
++\fB--s3d-url\fR
++skip S3D environment and connect to this url 
++.SH "SEE ALSO"
++.PP
++s3d project page on berlios  <URL:http://s3d.berlios.de/> 
++.SH "AUTHOR"
++.PP
++This manual page was written by Timo Schneider <timo.schneider at s2004.tu-chemnitz.de>
++for the Debian project (but may be used by others).
+
+Added: trunk/Documentation/manpages/s3d_x11gate.sgml
+===================================================================
+--- trunk/Documentation/manpages/s3d_x11gate.sgml	2008-07-20 10:55:41 UTC (rev 927)
++++ trunk/Documentation/manpages/s3d_x11gate.sgml	2008-07-20 10:55:58 UTC (rev 928)
+@@ -0,0 +1,67 @@
++<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN">
++<refentry id="s3d_x11gate">
++
++	<refmeta>
++		<refentrytitle>s3d_x11gate</refentrytitle>
++		<manvolnum>1</manvolnum>
++	</refmeta>
++
++	<refnamediv>
++		<refname>s3d_x11gate</refname>
++		<refpurpose> 3d gateway for x11 desktops </refpurpose>
++	</refnamediv>
++
++	<refsynopsisdiv>
++		<cmdsynopsis>
++			<command>s3d_x11gate</command>
++			<arg choice="opt">-h|--help</arg>
++			<arg choice="opt">--s3d-url</arg>
++		</cmdsynopsis>
++	</refsynopsisdiv>
++
++	<refsect1>
++		<title>DESCRIPTION</title>
++		<para>
++			<command>s3d_x11gate(1)</command> is a  <!-- TODO -->
++		</para>
++		<para> </para>
++	</refsect1>
++
++	<refsect1>
++		<title>OPTIONS</title>
++		<para>
++			This program follows the usual GNU command line syntax. A summary of
++			the options supported by <command>s3d_x11gate</command> is below.
++		</para>
++		<variablelist>
++			<varlistentry>
++				<term>-h, --help</term>
++				<listitem>
++					<para> Show summary of options and exit. </para>
++				</listitem>
++			</varlistentry>
++			<varlistentry>
++				<term>--s3d-url</term>
++				<listitem>
++					<para> skip S3D environment and connect to this url </para>
++				</listitem>
++			</varlistentry>
++		</variablelist>
++	</refsect1>
++
++	<refsect1>
++		<title>SEE ALSO</title>
++		<para> <ulink url="http://s3d.berlios.de/"> s3d project page on berlios </ulink> </para>
++		<!--TODO: ADD REFERENCE TO APPS AND /usr/share/doc/s3d/ -->
++	</refsect1>
++
++	<refsect1>
++		<title>AUTHOR</title>
++		<para>
++			This manual page was written by Timo Schneider <email>timo.schneider at s2004.tu-chemnitz.de</email>
++			for the Debian project (but may be used by others).
++		</para>
++	</refsect1>
++
++</refentry>
++
+
+Copied: trunk/Documentation/manpages/s3dfm.1 (from rev 927, trunk/Documentation/manpages/s3d.1)
+===================================================================
+--- trunk/Documentation/manpages/s3d.1	2008-07-20 10:55:41 UTC (rev 927)
++++ trunk/Documentation/manpages/s3dfm.1	2008-07-20 10:55:58 UTC (rev 928)
+@@ -0,0 +1,34 @@
++.\" This manpage has been automatically generated by docbook2man 
++.\" from a DocBook document.  This tool can be found at:
++.\" <http://shell.ipoline.com/~elmert/comp/docbook2X/> 
++.\" Please send any bug reports, improvements, comments, patches, 
++.\" etc. to Steve Cheng <steve at ggi-project.org>.
++.TH "S3DFM" "1" "20 July 2008" "" ""
++
++.SH NAME
++s3dfm \- s3d file manager
++.SH SYNOPSIS
++
++\fBs3dfm\fR [ \fB-h|--help\fR ] [ \fB--s3d-url\fR ]
++
++.SH "DESCRIPTION"
++.PP
++\fBs3dfm(1)\fR is a  
++.PP
++.SH "OPTIONS"
++.PP
++This program follows the usual GNU command line syntax. A summary of 
++the options supported by \fBs3dfm\fR is below.
++.TP
++\fB-h, --help\fR
++Show summary of options and exit. 
++.TP
++\fB--s3d-url\fR
++skip S3D environment and connect to this url 
++.SH "SEE ALSO"
++.PP
++s3d project page on berlios  <URL:http://s3d.berlios.de/> 
++.SH "AUTHOR"
++.PP
++This manual page was written by Timo Schneider <timo.schneider at s2004.tu-chemnitz.de> 
++for the Debian project (but may be used by others).
+
+Added: trunk/Documentation/manpages/s3dfmmanpage.sgml
+===================================================================
+--- trunk/Documentation/manpages/s3dfmmanpage.sgml	2008-07-20 10:55:41 UTC (rev 927)
++++ trunk/Documentation/manpages/s3dfmmanpage.sgml	2008-07-20 10:55:58 UTC (rev 928)
+@@ -0,0 +1,67 @@
++<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN">
++<refentry id="s3dfm"> 
++
++	<refmeta> 
++		<refentrytitle>s3dfm</refentrytitle>
++		<manvolnum>1</manvolnum>
++	</refmeta> 
++	
++	<refnamediv> 
++		<refname>s3dfm</refname>
++		<refpurpose> s3d file manager </refpurpose>
++	</refnamediv>
++	
++	<refsynopsisdiv> 
++		<cmdsynopsis> 
++			<command>s3dfm</command>
++			<arg choice="opt">-h|--help</arg>
++			<arg choice="opt">--s3d-url</arg>
++		</cmdsynopsis>
++	</refsynopsisdiv> 
++	
++	<refsect1> 
++		<title>DESCRIPTION</title> 
++		<para>
++			<command>s3dfm(1)</command> is a  <!-- TODO -->
++		</para>
++		<para> </para>
++	</refsect1> 
++	
++	<refsect1>
++		<title>OPTIONS</title> 
++		<para> 
++			This program follows the usual GNU command line syntax. A summary of 
++			the options supported by <command>s3dfm</command> is below.
++		</para>
++		<variablelist>
++			<varlistentry> 
++				<term>-h, --help</term>
++				<listitem> 
++					<para> Show summary of options and exit. </para> 
++				</listitem> 
++			</varlistentry>
++			<varlistentry>
++				<term>--s3d-url</term>
++				<listitem>
++					<para> skip S3D environment and connect to this url </para>
++				</listitem>
++			</varlistentry>
++		</variablelist> 
++	</refsect1> 
++		
++	<refsect1> 
++		<title>SEE ALSO</title>
++		<para> <ulink url="http://s3d.berlios.de/"> s3d project page on berlios </ulink> </para>
++		<!--TODO: ADD REFERENCE TO APPS AND /usr/share/doc/s3d/ -->
++	</refsect1>
++
++	<refsect1> 
++		<title>AUTHOR</title>
++		<para>
++			This manual page was written by Timo Schneider <email>timo.schneider at s2004.tu-chemnitz.de</email> 
++			for the Debian project (but may be used by others).
++		</para>
++	</refsect1>
++	
++</refentry> 
++
+
+Copied: trunk/Documentation/manpages/s3dosm.1 (from rev 927, trunk/Documentation/manpages/s3d.1)
+===================================================================
+--- trunk/Documentation/manpages/s3d.1	2008-07-20 10:55:41 UTC (rev 927)
++++ trunk/Documentation/manpages/s3dosm.1	2008-07-20 10:55:58 UTC (rev 928)
+@@ -0,0 +1,34 @@
++.\" This manpage has been automatically generated by docbook2man 
++.\" from a DocBook document.  This tool can be found at:
++.\" <http://shell.ipoline.com/~elmert/comp/docbook2X/> 
++.\" Please send any bug reports, improvements, comments, patches, 
++.\" etc. to Steve Cheng <steve at ggi-project.org>.
++.TH "S3DOSM" "1" "20 July 2008" "" ""
++
++.SH NAME
++s3dosm \- gps card application for s3d
++.SH SYNOPSIS
++
++\fBs3dosm\fR [ \fB-h|--help\fR ] [ \fB--s3d-url\fR ]
++
++.SH "DESCRIPTION"
++.PP
++\fBs3dosm(1)\fR is a  
++.PP
++.SH "OPTIONS"
++.PP
++This program follows the usual GNU command line syntax. A summary of
++the options supported by \fBs3dosm\fR is below.
++.TP
++\fB-h, --help\fR
++Show summary of options and exit. 
++.TP
++\fB--s3d-url\fR
++skip S3D environment and connect to this url 
++.SH "SEE ALSO"
++.PP
++s3d project page on berlios  <URL:http://s3d.berlios.de/> 
++.SH "AUTHOR"
++.PP
++This manual page was written by Timo Schneider <timo.schneider at s2004.tu-chemnitz.de>
++for the Debian project (but may be used by others).
+
+Added: trunk/Documentation/manpages/s3dosmmanpage.sgml
+===================================================================
+--- trunk/Documentation/manpages/s3dosmmanpage.sgml	2008-07-20 10:55:41 UTC (rev 927)
++++ trunk/Documentation/manpages/s3dosmmanpage.sgml	2008-07-20 10:55:58 UTC (rev 928)
+@@ -0,0 +1,67 @@
++<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN">
++<refentry id="s3dosm">
++
++	<refmeta>
++		<refentrytitle>s3dosm</refentrytitle>
++		<manvolnum>1</manvolnum>
++	</refmeta>
++
++	<refnamediv>
++		<refname>s3dosm</refname>
++		<refpurpose> gps card application for s3d </refpurpose>
++	</refnamediv>
++
++	<refsynopsisdiv>
++		<cmdsynopsis>
++			<command>s3dosm</command>
++			<arg choice="opt">-h|--help</arg>
++			<arg choice="opt">--s3d-url</arg>
++		</cmdsynopsis>
++	</refsynopsisdiv>
++
++	<refsect1>
++		<title>DESCRIPTION</title>
++		<para>
++			<command>s3dosm(1)</command> is a  <!-- TODO -->
++		</para>
++		<para> </para>
++	</refsect1>
++
++	<refsect1>
++		<title>OPTIONS</title>
++		<para>
++			This program follows the usual GNU command line syntax. A summary of
++			the options supported by <command>s3dosm</command> is below.
++		</para>
++		<variablelist>
++			<varlistentry>
++				<term>-h, --help</term>
++				<listitem>
++					<para> Show summary of options and exit. </para>
++				</listitem>
++			</varlistentry>
++			<varlistentry>
++				<term>--s3d-url</term>
++				<listitem>
++					<para> skip S3D environment and connect to this url </para>
++				</listitem>
++			</varlistentry>
++		</variablelist>
++	</refsect1>
++
++	<refsect1>
++		<title>SEE ALSO</title>
++		<para> <ulink url="http://s3d.berlios.de/"> s3d project page on berlios </ulink> </para>
++		<!--TODO: ADD REFERENCE TO APPS AND /usr/share/doc/s3d/ -->
++	</refsect1>
++
++	<refsect1>
++		<title>AUTHOR</title>
++		<para>
++			This manual page was written by Timo Schneider <email>timo.schneider at s2004.tu-chemnitz.de</email>
++			for the Debian project (but may be used by others).
++		</para>
++	</refsect1>
++
++</refentry>
++
+
+Copied: trunk/Documentation/manpages/s3dvt.1 (from rev 927, trunk/Documentation/manpages/s3d.1)
+===================================================================
+--- trunk/Documentation/manpages/s3d.1	2008-07-20 10:55:41 UTC (rev 927)
++++ trunk/Documentation/manpages/s3dvt.1	2008-07-20 10:55:58 UTC (rev 928)
+@@ -0,0 +1,34 @@
++.\" This manpage has been automatically generated by docbook2man 
++.\" from a DocBook document.  This tool can be found at:
++.\" <http://shell.ipoline.com/~elmert/comp/docbook2X/> 
++.\" Please send any bug reports, improvements, comments, patches, 
++.\" etc. to Steve Cheng <steve at ggi-project.org>.
++.TH "S3DVT" "1" "20 July 2008" "" ""
++
++.SH NAME
++s3dvt \- 3d terminal emulator for s3d
++.SH SYNOPSIS
++
++\fBs3dvt\fR [ \fB-h|--help\fR ] [ \fB--s3d-url\fR ]
++
++.SH "DESCRIPTION"
++.PP
++\fBs3dvt(1)\fR is a  
++.PP
++.SH "OPTIONS"
++.PP
++This program follows the usual GNU command line syntax. A summary of
++the options supported by \fBs3dvt\fR is below.
++.TP
++\fB-h, --help\fR
++Show summary of options and exit. 
++.TP
++\fB--s3d-url\fR
++skip S3D environment and connect to this url 
++.SH "SEE ALSO"
++.PP
++s3d project page on berlios  <URL:http://s3d.berlios.de/> 
++.SH "AUTHOR"
++.PP
++This manual page was written by Timo Schneider <timo.schneider at s2004.tu-chemnitz.de>
++for the Debian project (but may be used by others).
+
+Added: trunk/Documentation/manpages/s3dvtmanpage.sgml
+===================================================================
+--- trunk/Documentation/manpages/s3dvtmanpage.sgml	2008-07-20 10:55:41 UTC (rev 927)
++++ trunk/Documentation/manpages/s3dvtmanpage.sgml	2008-07-20 10:55:58 UTC (rev 928)
+@@ -0,0 +1,67 @@
++<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN">
++<refentry id="s3dvt">
++
++	<refmeta>
++		<refentrytitle>s3dvt</refentrytitle>
++		<manvolnum>1</manvolnum>
++	</refmeta>
++
++	<refnamediv>
++		<refname>s3dvt</refname>
++		<refpurpose> 3d terminal emulator for s3d </refpurpose>
++	</refnamediv>
++
++	<refsynopsisdiv>
++		<cmdsynopsis>
++			<command>s3dvt</command>
++			<arg choice="opt">-h|--help</arg>
++			<arg choice="opt">--s3d-url</arg>
++		</cmdsynopsis>
++	</refsynopsisdiv>
++
++	<refsect1>
++		<title>DESCRIPTION</title>
++		<para>
++			<command>s3dvt(1)</command> is a  <!-- TODO -->
++		</para>
++		<para> </para>
++	</refsect1>
++
++	<refsect1>
++		<title>OPTIONS</title>
++		<para>
++			This program follows the usual GNU command line syntax. A summary of
++			the options supported by <command>s3dvt</command> is below.
++		</para>
++		<variablelist>
++			<varlistentry>
++				<term>-h, --help</term>
++				<listitem>
++					<para> Show summary of options and exit. </para>
++				</listitem>
++			</varlistentry>
++			<varlistentry>
++				<term>--s3d-url</term>
++				<listitem>
++					<para> skip S3D environment and connect to this url </para>
++				</listitem>
++			</varlistentry>
++		</variablelist>
++	</refsect1>
++
++	<refsect1>
++		<title>SEE ALSO</title>
++		<para> <ulink url="http://s3d.berlios.de/"> s3d project page on berlios </ulink> </para>
++		<!--TODO: ADD REFERENCE TO APPS AND /usr/share/doc/s3d/ -->
++	</refsect1>
++
++	<refsect1>
++		<title>AUTHOR</title>
++		<para>
++			This manual page was written by Timo Schneider <email>timo.schneider at s2004.tu-chemnitz.de</email>
++			for the Debian project (but may be used by others).
++		</para>
++	</refsect1>
++
++</refentry>
++
+
+
+
+From lazhur at mail.berlios.de  Sun Jul 20 12:56:06 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun, 20 Jul 2008 12:56:06 +0200
+Subject: [S3d-svn] r929 - trunk/Documentation
+Message-ID: <200807201056.m6KAu6ut026129@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-07-20 12:56:05 +0200 (Sun, 20 Jul 2008)
+New Revision: 929
+
+Modified:
+   trunk/Documentation/CMakeLists.txt
+Log:
+Fix installation of generated docs
+
+Modified: trunk/Documentation/CMakeLists.txt
+===================================================================
+--- trunk/Documentation/CMakeLists.txt	2008-07-20 10:55:58 UTC (rev 928)
++++ trunk/Documentation/CMakeLists.txt	2008-07-20 10:56:05 UTC (rev 929)
+@@ -23,8 +23,8 @@
+ 	)
+ 
+ 	# install
+-	file(GLOB DOCS ${Documentation_BINARY_DIR}/doc_output/*)
+-	install(FILES ${DOCS} DESTINATION share/doc/s3d)
++	set(DOC_DIR ${CMAKE_INSTALL_PREFIX}/share/doc/s3d)
++	install(CODE "file(GLOB DOCS ${Documentation_BINARY_DIR}/doc_output/*)\n foreach(file \${DOCS}) \n file(INSTALL DESTINATION ${DOC_DIR} TYPE FILE FILES \"\${file}\") \n endforeach (file \"\${DOCS}\")")
+ else (DOCBOOK2HTML_COMPILER)
+ 	PkgStatus_Later("docbook2html (pkg name: docbook-utils)")
+ 
+
+
+
+From lazhur at mail.berlios.de  Mon Jul 21 21:51:07 2008
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Mon, 21 Jul 2008 21:51:07 +0200
+Subject: [S3d-svn] r930 - trunk/libs3d
+Message-ID: <200807211951.m6LJp79s018616@sheep.berlios.de>
+
+Author: lazhur
+Date: 2008-07-21 21:51:07 +0200 (Mon, 21 Jul 2008)
+New Revision: 930
+
+Modified:
+   trunk/libs3d/libs3d.pc.cmake
+Log:
+Add sdl to requirements of libs3d in pkg-config
+
+Modified: trunk/libs3d/libs3d.pc.cmake
+===================================================================
+--- trunk/libs3d/libs3d.pc.cmake	2008-07-20 10:56:05 UTC (rev 929)
++++ trunk/libs3d/libs3d.pc.cmake	2008-07-21 19:51:07 UTC (rev 930)
+@@ -6,6 +6,6 @@
+ Name: libs3d
+ Version: @VERSION@
+ Description: Client library for the s3d server
+-Requires: libg3d freetype2 fontconfig
++Requires: libg3d freetype2 fontconfig sdl
+ Libs: -L${libdir} -ls3d
+ Cflags: -I${includedir}
+
+
+

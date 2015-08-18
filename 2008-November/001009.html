@@ -1,0 +1,437 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1029 - in trunk: . Documentation Documentation/manpages	apps/dot_mcp apps/kism3d apps/meshs3d apps/s3d_x11gate	apps/s3dfm apps/s3dosm apps/s3dvt cmake/modules	experimental/comptest experimental/olsrs3d	experimental/testvis experimental/wiitest libs3d libs3dw objs server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1029%20-%20in%20trunk%3A%20.%20Documentation%20Documentation/manpages%0A%09apps/dot_mcp%20apps/kism3d%20apps/meshs3d%20apps/s3d_x11gate%0A%09apps/s3dfm%20apps/s3dosm%20apps/s3dvt%20cmake/modules%0A%09experimental/comptest%20experimental/olsrs3d%0A%09experimental/testvis%20experimental/wiitest%20libs3d%20libs3dw%20objs%20server&In-Reply-To=%3C200811191202.mAJC2dZB014480%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001008.html">
+   <LINK REL="Next"  HREF="001010.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1029 - in trunk: . Documentation Documentation/manpages	apps/dot_mcp apps/kism3d apps/meshs3d apps/s3d_x11gate	apps/s3dfm apps/s3dosm apps/s3dvt cmake/modules	experimental/comptest experimental/olsrs3d	experimental/testvis experimental/wiitest libs3d libs3dw objs server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1029%20-%20in%20trunk%3A%20.%20Documentation%20Documentation/manpages%0A%09apps/dot_mcp%20apps/kism3d%20apps/meshs3d%20apps/s3d_x11gate%0A%09apps/s3dfm%20apps/s3dosm%20apps/s3dvt%20cmake/modules%0A%09experimental/comptest%20experimental/olsrs3d%0A%09experimental/testvis%20experimental/wiitest%20libs3d%20libs3dw%20objs%20server&In-Reply-To=%3C200811191202.mAJC2dZB014480%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1029 - in trunk: . Documentation Documentation/manpages	apps/dot_mcp apps/kism3d apps/meshs3d apps/s3d_x11gate	apps/s3dfm apps/s3dosm apps/s3dvt cmake/modules	experimental/comptest experimental/olsrs3d	experimental/testvis experimental/wiitest libs3d libs3dw objs server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Wed Nov 19 13:02:39 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001008.html">[S3d-svn] r1028 - in trunk: apps/dot_mcp apps/kism3d apps/meshs3d	apps/s3d_x11gate apps/s3dfm apps/s3dosm apps/s3dvt example	experimental/comptest experimental/olsrs3d	experimental/wiitest libs3d libs3dw
+</A></li>
+        <LI>Next message: <A HREF="001010.html">[S3d-svn] r1030 - trunk/cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1009">[ date ]</a>
+              <a href="thread.html#1009">[ thread ]</a>
+              <a href="subject.html#1009">[ subject ]</a>
+              <a href="author.html#1009">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-11-19 13:02:36 +0100 (Wed, 19 Nov 2008)
+New Revision: 1029
+
+Added:
+   trunk/cmake/modules/InstallPaths.cmake
+Modified:
+   trunk/CMakeLists.txt
+   trunk/Documentation/CMakeLists.txt
+   trunk/Documentation/manpages/CMakeLists.txt
+   trunk/apps/dot_mcp/CMakeLists.txt
+   trunk/apps/kism3d/CMakeLists.txt
+   trunk/apps/meshs3d/CMakeLists.txt
+   trunk/apps/s3d_x11gate/CMakeLists.txt
+   trunk/apps/s3dfm/CMakeLists.txt
+   trunk/apps/s3dosm/CMakeLists.txt
+   trunk/apps/s3dvt/CMakeLists.txt
+   trunk/config.h.cmake
+   trunk/experimental/comptest/CMakeLists.txt
+   trunk/experimental/olsrs3d/CMakeLists.txt
+   trunk/experimental/testvis/CMakeLists.txt
+   trunk/experimental/wiitest/CMakeLists.txt
+   trunk/libs3d/CMakeLists.txt
+   trunk/libs3dw/CMakeLists.txt
+   trunk/objs/CMakeLists.txt
+   trunk/server/CMakeLists.txt
+   trunk/server/main.c
+Log:
+Make installation (sub)paths complete configurable
+
+Modified: trunk/CMakeLists.txt
+===================================================================
+--- trunk/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/CMakeLists.txt	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -12,8 +12,11 @@
+ # Add directory with library checks to search path
+ list(APPEND CMAKE_MODULE_PATH &quot;${s3d_SOURCE_DIR}/cmake/modules&quot;)
+ 
++# Set default installation paths
++include(InstallPaths)
++
+ # set path to objects
+-set(OBJECTPATH &quot;${CMAKE_INSTALL_PREFIX}/share/s3d/objs&quot;)
++set(OBJECTPATH &quot;${S3D_DATA_INSTALL_DIR}&quot;)
+ STRING(TOUPPER &quot;${CMAKE_BUILD_TYPE}&quot; BUILD_TYPE)
+ if (NOT BUILD_TYPE MATCHES &quot;REL(WITHDEBINFO|EASE)&quot;)
+ 	set(OBJECTPATH &quot;${OBJECTPATH}:${s3d_SOURCE_DIR}/objs&quot;)
+@@ -50,5 +53,5 @@
+ endif (INCLUDE_EXPERIMENTAL)
+ 
+ # Generate s3drc
+-configure_file(s3drc.cmake ${s3d_BINARY_DIR}/s3drc)
+-install(PROGRAMS ${s3d_BINARY_DIR}/s3drc DESTINATION /etc)
++configure_file(s3drc.cmake &quot;${s3d_BINARY_DIR}/s3drc&quot;)
++install(PROGRAMS &quot;${s3d_BINARY_DIR}/s3drc&quot; DESTINATION &quot;${CFG_INSTALL_DIR}&quot;)
+
+Modified: trunk/Documentation/CMakeLists.txt
+===================================================================
+--- trunk/Documentation/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/Documentation/CMakeLists.txt	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -28,8 +28,7 @@
+ 	)
+ 
+ 	# install
+-	set(DOC_DIR &quot;${CMAKE_INSTALL_PREFIX}/share/doc/s3d&quot;)
+-	install(CODE &quot;file(GLOB DOCS ${Documentation_BINARY_DIR}/doc_output/*)\n foreach(file \${DOCS}) \n file(INSTALL DESTINATION ${DOC_DIR} TYPE FILE FILES \&quot;\${file}\&quot;) \n endforeach (file \&quot;\${DOCS}\&quot;)&quot;)
++	install(CODE &quot;file(GLOB DOCS ${Documentation_BINARY_DIR}/doc_output/*)\n foreach(file \${DOCS}) \n file(INSTALL DESTINATION \&quot;${HTML_INSTALL_DIR}\&quot; TYPE FILE FILES \&quot;\${file}\&quot;) \n endforeach (file \&quot;\${DOCS}\&quot;)&quot;)
+ else (DOCBOOK2HTML_COMPILER)
+ 	PkgStatus_Later(&quot;xmlto (pkg name: xmlto)&quot;)
+ 
+
+Modified: trunk/Documentation/manpages/CMakeLists.txt
+===================================================================
+--- trunk/Documentation/manpages/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/Documentation/manpages/CMakeLists.txt	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -1,6 +1,6 @@
+ file(GLOB man1 &quot;${Documentation_SOURCE_DIR}/manpages/man1/*.1&quot;)
+-install(FILES ${man1} DESTINATION share/man/man1)
++install(FILES ${man1} DESTINATION &quot;${MAN_INSTALL_DIR}/man1&quot;)
+ file(GLOB man3 &quot;${Documentation_SOURCE_DIR}/manpages/man3/*.3&quot;)
+-install(FILES ${man3} DESTINATION share/man/man3)
++install(FILES ${man3} DESTINATION &quot;${MAN_INSTALL_DIR}/man3&quot;)
+ file(GLOB man9 &quot;${Documentation_SOURCE_DIR}/manpages/man9/*.9&quot;)
+-install(FILES ${man9} DESTINATION share/man/man9)
++install(FILES ${man9} DESTINATION &quot;${MAN_INSTALL_DIR}/man9&quot;)
+
+Modified: trunk/apps/dot_mcp/CMakeLists.txt
+===================================================================
+--- trunk/apps/dot_mcp/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/apps/dot_mcp/CMakeLists.txt	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -6,4 +6,4 @@
+ target_link_libraries(dot_mcp s3d ${MATH_LIBRARIES})
+ 
+ # install
+-install(TARGETS dot_mcp RUNTIME DESTINATION bin)
++install(TARGETS dot_mcp RUNTIME DESTINATION &quot;${BIN_INSTALL_DIR}&quot;)
+
+Modified: trunk/apps/kism3d/CMakeLists.txt
+===================================================================
+--- trunk/apps/kism3d/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/apps/kism3d/CMakeLists.txt	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -8,7 +8,7 @@
+ 	                      ${MATH_LIBRARIES})
+ 
+ 	# install
+-	install(TARGETS kism3d RUNTIME DESTINATION bin)
++	install(TARGETS kism3d RUNTIME DESTINATION &quot;${BIN_INSTALL_DIR}&quot;)
+ else (PTHREADS_FOUND)
+ 	PkgStatus_Later(&quot;pthreads&quot;)
+ 
+
+Modified: trunk/apps/meshs3d/CMakeLists.txt
+===================================================================
+--- trunk/apps/meshs3d/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/apps/meshs3d/CMakeLists.txt	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -6,4 +6,4 @@
+ target_link_libraries(meshs3d s3d s3dw ${MATH_LIBRARIES})
+ 
+ # install
+-install(TARGETS meshs3d RUNTIME DESTINATION bin)
++install(TARGETS meshs3d RUNTIME DESTINATION &quot;${BIN_INSTALL_DIR}&quot;)
+
+Modified: trunk/apps/s3d_x11gate/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3d_x11gate/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/apps/s3d_x11gate/CMakeLists.txt	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -8,7 +8,7 @@
+ 	                      ${XTST_LIBRARIES} ${MATH_LIBRARIES})
+ 
+ 	# install
+-	install(TARGETS s3d_x11gate RUNTIME DESTINATION bin)
++	install(TARGETS s3d_x11gate RUNTIME DESTINATION &quot;${BIN_INSTALL_DIR}&quot;)
+ else (XTST_FOUND AND XTST_FOUND)
+ 	if (NOT XTST_FOUND)
+ 		PkgStatus_Later(&quot;xtst (pkg name: libxtst-dev)&quot;)
+
+Modified: trunk/apps/s3dfm/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3dfm/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/apps/s3dfm/CMakeLists.txt	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -8,7 +8,7 @@
+ 	target_link_libraries(s3dfm s3d s3dw ${PTHREADS_LIBRARIES} ${MATH_LIBRARIES})
+ 
+ 	# install
+-	install(TARGETS s3dfm RUNTIME DESTINATION bin)
++	install(TARGETS s3dfm RUNTIME DESTINATION &quot;${BIN_INSTALL_DIR}&quot;)
+ else (PTHREADS_FOUND)
+ 	PkgStatus_Later(&quot;pthreads&quot;)
+ 
+
+Modified: trunk/apps/s3dosm/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3dosm/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/apps/s3dosm/CMakeLists.txt	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -19,7 +19,7 @@
+ 
+ 	Collected_PkgStatusPartial(&quot;s3dosm&quot;)
+ 	# install
+-	install(TARGETS s3dosm RUNTIME DESTINATION bin)
++	install(TARGETS s3dosm RUNTIME DESTINATION &quot;${BIN_INSTALL_DIR}&quot;)
+ else (LIBXML2_FOUND AND SQLITE3_FOUND)
+ 	if (NOT LIBXML2_FOUND)
+ 		PkgStatus_Later(&quot;libxml2 (pkg name: libxml2-dev)&quot;)
+
+Modified: trunk/apps/s3dvt/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3dvt/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/apps/s3dvt/CMakeLists.txt	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -7,7 +7,7 @@
+ 	target_link_libraries(s3dvt s3d ${PTHREADS_LIBRARIES} ${MATH_LIBRARIES})
+ 
+ 	# install
+-	install(TARGETS s3dvt RUNTIME DESTINATION bin)
++	install(TARGETS s3dvt RUNTIME DESTINATION &quot;${BIN_INSTALL_DIR}&quot;)
+ else (PTHREADS_FOUND)
+ 	PkgStatus_Later(&quot;pthreads&quot;)
+ 
+
+Added: trunk/cmake/modules/InstallPaths.cmake
+===================================================================
+--- trunk/cmake/modules/InstallPaths.cmake	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/cmake/modules/InstallPaths.cmake	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -0,0 +1,25 @@
++# This module defines a bunch of variables used as locations for install directories.
++#
++#  BIN_INSTALL_DIR  - the directory where executables will be installed
++#  CFG_INSTALL_DIR  - the directory where executables will be installed
++#  LIB_INSTALL_DIR  - the directory where libraries will be installed
++#  INCLUDE_INSTALL_DIR  - the directory where header will be installed
++#  DATA_INSTALL_DIR - the parent directory where applications can install their data
++#  HTML_INSTALL_DIR - the HTML install dir for documentation
++#  MAN_INSTALL_DIR  - the man page install dir
++#  PKGCFG_INSTALL_DIR  - the pkg-config install dir
++
++if (WIN32)
++	set(CFG_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/etc&quot; CACHE PATH &quot;The s3d cfg install dir (default prefix/etc/)&quot;)
++	set(LIB_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/bin&quot; CACHE PATH &quot;The s3d lib install dir (default prefix/bin/)&quot;)
++else (WIN32)
++	set(CFG_INSTALL_DIR &quot;/etc&quot; CACHE PATH &quot;The s3d cfg install dir (default /etc/)&quot;)
++	set(LIB_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/lib&quot; CACHE PATH &quot;The s3d lib install dir (default prefix/lib/)&quot;)
++endif (WIN32)
++
++set(BIN_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/bin&quot; CACHE PATH &quot;The s3d man install dir (default prefix/bin/)&quot;)
++set(INCLUDE_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/include&quot; CACHE PATH &quot;The s3d header install dir (default prefix/include/)&quot;)
++set(DATA_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/share/objs&quot; CACHE PATH &quot;The s3d objs install dir (default prefix/share/objs/)&quot;)
++set(HTML_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/share/doc/s3d&quot; CACHE PATH &quot;The s3d html documentation install dir (default prefix/share/doc/s3d/)&quot;)
++set(MAN_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/share/man&quot; CACHE PATH &quot;The s3d man install dir (default prefix/share/man/)&quot;)
++set(PKGCFG_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/lib/pkgconfig&quot; CACHE PATH &quot;The s3d pkg-config install dir (default prefix/lib/pkgconfig/)&quot;)
+
+Modified: trunk/config.h.cmake
+===================================================================
+--- trunk/config.h.cmake	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/config.h.cmake	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -18,4 +18,13 @@
+ #cmakedefine UNUSEDPARAM_ATTRIBUTE 1
+ #cmakedefine UNUSEDPARAM_OMIT 1
+ 
++#cmakedefine BIN_INSTALL_DIR &quot;${BIN_INSTALL_DIR}&quot;
++#cmakedefine CFG_INSTALL_DIR &quot;${CFG_INSTALL_DIR}&quot;
++#cmakedefine LIB_INSTALL_DIR &quot;${LIB_INSTALL_DIR}&quot;
++#cmakedefine INCLUDE_INSTALL_DIR &quot;${INCLUDE_INSTALL_DIR}&quot;
++#cmakedefine DATA_INSTALL_DIR &quot;${DATA_INSTALL_DIR}&quot;
++#cmakedefine HTML_INSTALL_DIR &quot;${HTML_INSTALL_DIR}&quot;
++#cmakedefine MAN_INSTALL_DIR &quot;${MAN_INSTALL_DIR}&quot;
++#cmakedefine PKGCFG_INSTALL_DIR &quot;${PKGCFG_INSTALL_DIR}&quot;
++
+ #endif /* _CONFIG_H_ */
+
+Modified: trunk/experimental/comptest/CMakeLists.txt
+===================================================================
+--- trunk/experimental/comptest/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/experimental/comptest/CMakeLists.txt	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -9,7 +9,7 @@
+ 		${XRENDER_LIBRARIES} ${MATH_LIBRARIES})
+ 
+ 	# install
+-	install(TARGETS comptest RUNTIME DESTINATION bin)
++	install(TARGETS comptest RUNTIME DESTINATION &quot;${BIN_INSTALL_DIR}&quot;)
+ else (X11_FOUND AND XCOMPOSITE_FOUND AND XDAMAGE_FOUND AND XFIXES_FOUND AND XRENDER_FOUND)
+ 	if (NOT X11_FOUND)
+ 		PkgStatus_Later(&quot;x11 (pkg name: libx11-dev)&quot;)
+
+Modified: trunk/experimental/olsrs3d/CMakeLists.txt
+===================================================================
+--- trunk/experimental/olsrs3d/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/experimental/olsrs3d/CMakeLists.txt	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -6,4 +6,4 @@
+ target_link_libraries(olsrs3d s3d s3dw ${MATH_LIBRARIES})
+ 
+ # install
+-install(TARGETS olsrs3d RUNTIME DESTINATION bin)
++install(TARGETS olsrs3d RUNTIME DESTINATION &quot;${BIN_INSTALL_DIR}&quot;)
+
+Modified: trunk/experimental/testvis/CMakeLists.txt
+===================================================================
+--- trunk/experimental/testvis/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/experimental/testvis/CMakeLists.txt	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -5,7 +5,7 @@
+ 	target_link_libraries(testvis ${PTHREADS_LIBRARIES})
+ 
+ 	# install
+-	install(TARGETS testvis RUNTIME DESTINATION bin)
++	install(TARGETS testvis RUNTIME DESTINATION &quot;${BIN_INSTALL_DIR}&quot;)
+ else (PTHREADS_FOUND)
+ 	PkgStatus_Later(&quot;pthreads&quot;)
+ 
+
+Modified: trunk/experimental/wiitest/CMakeLists.txt
+===================================================================
+--- trunk/experimental/wiitest/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/experimental/wiitest/CMakeLists.txt	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -7,7 +7,7 @@
+ 	target_link_libraries(wiitest s3d ${CWIID_LIBRARIES} ${MATH_LIBRARIES})
+ 
+ 	# install
+-	install(TARGETS wiitest RUNTIME DESTINATION bin)
++	install(TARGETS wiitest RUNTIME DESTINATION &quot;${BIN_INSTALL_DIR}&quot;)
+ else (CWIID_FOUND)
+ 	if (NOT CWIID_FOUND)
+ 		if (NOT BLUETOOTH_FOUND)
+
+Modified: trunk/libs3d/CMakeLists.txt
+===================================================================
+--- trunk/libs3d/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/libs3d/CMakeLists.txt	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -12,12 +12,12 @@
+ 
+ # install
+ install(TARGETS s3d
+-	LIBRARY DESTINATION lib
+-	ARCHIVE DESTINATION lib
++	LIBRARY DESTINATION &quot;${LIB_INSTALL_DIR}&quot;
++	ARCHIVE DESTINATION &quot;${LIB_INSTALL_DIR}&quot;
+ )
+ 
+-install(FILES s3d.h s3d_keysym.h DESTINATION include/)
++install(FILES s3d.h s3d_keysym.h DESTINATION &quot;${INCLUDE_INSTALL_DIR}&quot;)
+ 
+ #pkg config
+ configure_file(libs3d.pc.cmake ${s3d_BINARY_DIR}/libs3d/libs3d.pc @ONLY)
+-install(FILES ${s3d_BINARY_DIR}/libs3d/libs3d.pc DESTINATION lib/pkgconfig/)
++install(FILES ${s3d_BINARY_DIR}/libs3d/libs3d.pc DESTINATION &quot;${PKGCFG_INSTALL_DIR}&quot;)
+
+Modified: trunk/libs3dw/CMakeLists.txt
+===================================================================
+--- trunk/libs3dw/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/libs3dw/CMakeLists.txt	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -10,12 +10,12 @@
+ 
+ # install
+ install(TARGETS s3dw
+-	LIBRARY DESTINATION lib
+-	ARCHIVE DESTINATION lib
++	LIBRARY DESTINATION &quot;${LIB_INSTALL_DIR}&quot;
++	ARCHIVE DESTINATION &quot;${LIB_INSTALL_DIR}&quot;
+ )
+ 
+-install(FILES s3dw.h DESTINATION include/)
++install(FILES s3dw.h DESTINATION &quot;${INCLUDE_INSTALL_DIR}&quot;)
+ 
+ #pkg config
+ configure_file(libs3dw.pc.cmake ${s3d_BINARY_DIR}/libs3dw/libs3dw.pc @ONLY)
+-install(FILES ${s3d_BINARY_DIR}/libs3dw/libs3dw.pc DESTINATION lib/pkgconfig/)
++install(FILES ${s3d_BINARY_DIR}/libs3dw/libs3dw.pc DESTINATION &quot;${PKGCFG_INSTALL_DIR}&quot;)
+
+Modified: trunk/objs/CMakeLists.txt
+===================================================================
+--- trunk/objs/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/objs/CMakeLists.txt	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -1,5 +1,5 @@
+ set(s3d-objs abs2.3ds abs.3ds accesspoint.3ds accesspoint_inet.3ds arrow2.3ds
+-	arrow.3ds AUTHORS big_p.3ds bigsphere.3ds btn_close.3ds btn_maximize.3ds
++	arrow.3ds big_p.3ds bigsphere.3ds btn_close.3ds btn_maximize.3ds
+ 	btn_minimize.3ds btn_rotate.3ds clock_bg.3ds comp.3ds cube.3ds cubey.3ds
+ 	cubeyholes.3ds dot.3ds dotdot.3ds duno.3ds film.3ds folder.3ds
+ 	geometry.3ds go_button.3ds internet.3ds katze_body.3ds katze_leg.3ds
+@@ -10,4 +10,4 @@
+ 	wtf.3ds xyz.3ds)
+ 
+ # install
+-install(FILES ${s3d-objs} DESTINATION share/s3d/objs)
++install(FILES ${s3d-objs} DESTINATION &quot;${DATA_INSTALL_DIR}&quot;)
+
+Modified: trunk/server/CMakeLists.txt
+===================================================================
+--- trunk/server/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/server/CMakeLists.txt	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -21,4 +21,4 @@
+ set_target_properties(server PROPERTIES OUTPUT_NAME &quot;s3d&quot;)
+ 
+ # install
+-install(TARGETS server RUNTIME DESTINATION bin)
++install(TARGETS server RUNTIME DESTINATION &quot;${BIN_INSTALL_DIR}&quot;)
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2008-11-18 00:37:28 UTC (rev 1028)
++++ trunk/server/main.c	2008-11-19 12:02:36 UTC (rev 1029)
+@@ -23,6 +23,7 @@
+ 
+ 
+ #include &quot;global.h&quot;    /*  contains the prototypes of all modules */
++#include &quot;config.h&quot;
+ #include &lt;time.h&gt;   /* nanosleep() */
+ #include &lt;stdlib.h&gt;   /* exit() */
+ #include &lt;unistd.h&gt;   /* sleep(), fork() */
+@@ -40,7 +41,7 @@
+ int running;
+ static const char *rc = NULL;
+ static const char *homerc = &quot;~/.s3drc&quot;;
+-static const char *etcrc = &quot;/etc/s3drc&quot;;
++static const char *etcrc = CFG_INSTALL_DIR&quot;/s3drc&quot;;
+ /*static int father_done=0;*/
+ static const char **s3drc[] = {&amp;rc, &amp;homerc, &amp;etcrc};
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001008.html">[S3d-svn] r1028 - in trunk: apps/dot_mcp apps/kism3d apps/meshs3d	apps/s3d_x11gate apps/s3dfm apps/s3dosm apps/s3dvt example	experimental/comptest experimental/olsrs3d	experimental/wiitest libs3d libs3dw
+</A></li>
+	<LI>Next message: <A HREF="001010.html">[S3d-svn] r1030 - trunk/cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1009">[ date ]</a>
+              <a href="thread.html#1009">[ thread ]</a>
+              <a href="subject.html#1009">[ subject ]</a>
+              <a href="author.html#1009">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

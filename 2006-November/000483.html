@@ -1,0 +1,450 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r490 - trunk/apps/kism3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r490%20-%20trunk/apps/kism3d&In-Reply-To=%3C200611270132.kAR1WPGm015814%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000482.html">
+   <LINK REL="Next"  HREF="000484.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r490 - trunk/apps/kism3d</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r490%20-%20trunk/apps/kism3d&In-Reply-To=%3C200611270132.kAR1WPGm015814%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r490 - trunk/apps/kism3d">marec at mail.berlios.de
+       </A><BR>
+    <I>Mon Nov 27 02:32:25 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000482.html">[S3d-svn] r489 - in trunk/extras/distro/gentoo/media-gfx: s3d	s3d-svn
+</A></li>
+        <LI>Next message: <A HREF="000484.html">[S3d-svn] r491 - trunk/apps/kism3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#483">[ date ]</a>
+              <a href="thread.html#483">[ thread ]</a>
+              <a href="subject.html#483">[ subject ]</a>
+              <a href="author.html#483">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-11-27 02:32:23 +0100 (Mon, 27 Nov 2006)
+New Revision: 490
+
+Modified:
+   trunk/apps/kism3d/gui.c
+   trunk/apps/kism3d/kism3d.c
+   trunk/apps/kism3d/kism3d.h
+   trunk/apps/kism3d/network.c
+Log:
+- input parsing improved
+
+Modified: trunk/apps/kism3d/gui.c
+===================================================================
+--- trunk/apps/kism3d/gui.c	2006-11-26 19:42:14 UTC (rev 489)
++++ trunk/apps/kism3d/gui.c	2006-11-27 01:32:23 UTC (rev 490)
+@@ -25,6 +25,7 @@
+ 
+ #include &quot;kism3d.h&quot;
+ #include &lt;s3d.h&gt;
++#include &lt;s3dw.h&gt;
+ #include &lt;math.h&gt;	/* M_PI, cos(), sin() */
+ #include &lt;stdlib.h&gt;	/* malloc(), free() */
+ #include &lt;stdio.h&gt;      /* printf() */
+@@ -33,9 +34,10 @@
+ 
+ 
+ 
+-int oid;
+-int r;
++float CamPosition[2][3];	/* CamPosition[trans|rot][x-z] */
+ 
++
++
+ int wire_sphere(int slices, int stacks)
+ {
+ 	int x,y,i,o;
+@@ -110,7 +112,8 @@
+ 
+ 	struct list_head *network_pos;
+ 	struct wlan_network *wlan_network;
+-	float real_node_pos_x, real_node_pos_z, label_str_len;
++	float tmp_mov_vec[3], desc_norm_vec[3] = { 0, 0, -1 };
++	float real_node_pos_x, real_node_pos_z, angle, angle_rad;
+ 	int network_index = 0;
+ 	char *label_str;
+ 
+@@ -127,50 +130,90 @@
+ 
+ 			if ( wlan_network-&gt;obj_id == -1 ) {
+ 
+-				wlan_network-&gt;obj_id = wire_sphere(30,30);
+-				s3d_flags_on( wlan_network-&gt;obj_id, S3D_OF_VISIBLE );
++				wlan_network-&gt;obj_id = s3d_new_object();
++				wlan_network-&gt;wrsphr_id = wire_sphere(30,30);
++				s3d_link( wlan_network-&gt;wrsphr_id, wlan_network-&gt;obj_id );
++				s3d_flags_on( wlan_network-&gt;wrsphr_id, S3D_OF_VISIBLE );
+ 
+ 			}
+ 
+-			wlan_network-&gt;scale_factor = wlan_network-&gt;num_wlan_clients;
+-			s3d_scale( wlan_network-&gt;obj_id, wlan_network-&gt;scale_factor );
+ 
++			wlan_network-&gt;scale_fac = wlan_network-&gt;num_wlan_clients + 2;
++			s3d_translate( wlan_network-&gt;wrsphr_id, 0, -6 + wlan_network-&gt;scale_fac, 0 );
++			s3d_scale( wlan_network-&gt;obj_id, wlan_network-&gt;scale_fac );
++
+ 			real_node_pos_x = sin( ( 360 / Num_networks ) * network_index ) * ( M_PI / 180 ) * ( ( ( 100 * Num_networks ) / 2 * M_PI ) );
+ 			real_node_pos_z = cos( ( 360 / Num_networks ) * network_index ) * ( M_PI / 180 ) * ( ( ( 100 * Num_networks ) / 2 * M_PI ) );
+ 
+-			if ( ( wlan_network-&gt;pos_vec[0] != real_node_pos_x ) || ( wlan_network-&gt;pos_vec[2] != real_node_pos_z ) ) {
++			if ( ( fabs( wlan_network-&gt;pos_vec[0] - real_node_pos_x ) &gt; 0.5 ) || ( fabs( wlan_network-&gt;pos_vec[2] - real_node_pos_z ) &gt; 0.5 ) ) {
+ 
+-				if ( wlan_network-&gt;pos_vec[0] != real_node_pos_x )
+-					wlan_network-&gt;pos_vec[0] += ( ( real_node_pos_x - wlan_network-&gt;pos_vec[0] ) * ( wlan_network-&gt;pos_vec[0] / real_node_pos_x ) );
++				if ( fabs( wlan_network-&gt;pos_vec[0] - real_node_pos_x ) &gt; 0.5 )
++					wlan_network-&gt;pos_vec[0] = ( ( wlan_network-&gt;pos_vec[0] * 9 + real_node_pos_x ) / 10 );
+ 
+-				if ( wlan_network-&gt;pos_vec[2] != real_node_pos_z )
+-					wlan_network-&gt;pos_vec[2] += ( ( real_node_pos_z - wlan_network-&gt;pos_vec[2] ) * ( wlan_network-&gt;pos_vec[2] / real_node_pos_z ) );
++				if ( fabs( wlan_network-&gt;pos_vec[2] - real_node_pos_z ) &gt; 0.5 )
++					wlan_network-&gt;pos_vec[2] = ( ( wlan_network-&gt;pos_vec[2] * 9 + real_node_pos_z ) / 10 );
+ 
+ 				s3d_translate( wlan_network-&gt;obj_id, wlan_network-&gt;pos_vec[0], wlan_network-&gt;pos_vec[1], wlan_network-&gt;pos_vec[2] );
+ 
+ 			}
+ 
+-			if ( wlan_network-&gt;properties_changed ) {
++			if ( wlan_network-&gt;props_changed ) {
+ 
+-				wlan_network-&gt;properties_changed = 0;
++				wlan_network-&gt;props_changed = 0;
+ 
+-				if ( wlan_network-&gt;label_id != -1 )
+-					s3d_del_object( wlan_network-&gt;label_id );
++				if ( wlan_network-&gt;ssid_id != -1 )
++					s3d_del_object( wlan_network-&gt;ssid_id );
+ 
++				if ( wlan_network-&gt;misc_id != -1 )
++					s3d_del_object( wlan_network-&gt;misc_id );
+ 
++
++				if ( wlan_network-&gt;bssid_id == -1 ) {
++
++					wlan_network-&gt;bssid_id = s3d_draw_string( wlan_network-&gt;bssid, &amp;wlan_network-&gt;bssid_len );
++					s3d_link( wlan_network-&gt;bssid_id, wlan_network-&gt;obj_id );
++					s3d_translate( wlan_network-&gt;bssid_id, - wlan_network-&gt;bssid_len / 2, -2, 0 );
++					s3d_flags_on( wlan_network-&gt;bssid_id, S3D_OF_VISIBLE );
++
++				}
++
++				wlan_network-&gt;ssid_id = s3d_draw_string( wlan_network-&gt;ssid, NULL );
++				s3d_link( wlan_network-&gt;ssid_id, wlan_network-&gt;bssid_id );
++				s3d_translate( wlan_network-&gt;ssid_id, 0, -2, 0 );
++				s3d_flags_on( wlan_network-&gt;ssid_id, S3D_OF_VISIBLE );
++
+ 				label_str = alloc_memory( 100 );
+-				snprintf( label_str, 100, &quot;%s\n%s&quot;, wlan_network-&gt;bssid, wlan_network-&gt;ssid );
+-				label_str_len = 100;
++				snprintf( label_str, 100, &quot;Type: %s, CH: %i, Clients: %i&quot;, ( wlan_network-&gt;type == 0 ? &quot;Managed&quot; : ( wlan_network-&gt;type == 1 ? &quot;Ad-Hoc&quot; : ( wlan_network-&gt;type == 2 ? &quot;Prober&quot; : &quot;unknown&quot; ) ) ), wlan_network-&gt;chan, wlan_network-&gt;num_wlan_clients );
+ 
+-				wlan_network-&gt;label_id = s3d_draw_string( label_str, &amp;label_str_len );
+-				s3d_link( wlan_network-&gt;label_id, wlan_network-&gt;obj_id );
+-				s3d_translate( wlan_network-&gt;label_id, - label_str_len / 2, -2, 0 );
+-				s3d_flags_on( wlan_network-&gt;label_id, S3D_OF_VISIBLE );
++				wlan_network-&gt;misc_id = s3d_draw_string( label_str, NULL );
++				s3d_link( wlan_network-&gt;misc_id, wlan_network-&gt;ssid_id );
++				s3d_translate( wlan_network-&gt;misc_id, 0, -2, 0 );
++				s3d_flags_on( wlan_network-&gt;misc_id, S3D_OF_VISIBLE );
+ 
+ 			}
+ 
++			/* rotate network description so that it is always readable */
++			tmp_mov_vec[0] = CamPosition[0][0] - wlan_network-&gt;pos_vec[0];
++			tmp_mov_vec[1] = 0;   /* we are not interested in the y value */
++			tmp_mov_vec[2] = CamPosition[0][2] - wlan_network-&gt;pos_vec[2];
++
++			angle = s3d_vector_angle( desc_norm_vec, tmp_mov_vec );
++
++			/* take care of inverse cosinus */
++			if ( tmp_mov_vec[0] &gt; 0 ) {
++				angle_rad = 90.0/M_PI - angle;
++				angle = 180 - ( 180.0/M_PI * angle );
++			} else {
++				angle_rad = 90.0/M_PI + angle;
++				angle = 180 + ( 180.0/M_PI * angle );
++			}
++
++			s3d_rotate( wlan_network-&gt;bssid_id, 0, angle , 0 );
++
++			s3d_translate( wlan_network-&gt;bssid_id, -cos(angle_rad) * wlan_network-&gt;bssid_len / 2 ,-1.5, sin(angle_rad) * wlan_network-&gt;bssid_len / 2 );
++
+ 			wlan_network-&gt;rotation = ( wlan_network-&gt;rotation + 1 ) % 360;
+-			s3d_rotate( wlan_network-&gt;obj_id, 0, wlan_network-&gt;rotation, 0 );
++			s3d_rotate( wlan_network-&gt;wrsphr_id, 0, wlan_network-&gt;rotation, 0 );
+ 
+ 		}
+ 
+@@ -185,6 +228,38 @@
+ 
+ 
+ 
++/***
++ *
++ * eventhandler when object change by user
++ * such as Cam
++ *
++ ***/
++
++int object_info(struct s3d_evt *hrmz) {
++
++	struct s3d_obj_info *inf;
++
++
++	inf = (struct s3d_obj_info *)hrmz-&gt;buf;
++	s3dw_object_info(hrmz);
++
++	if ( inf-&gt;object == 0 ) {
++
++		CamPosition[0][0] = inf-&gt;trans_x;
++		CamPosition[0][1] = inf-&gt;trans_y;
++		CamPosition[0][2] = inf-&gt;trans_z;
++		CamPosition[1][0] = inf-&gt;rot_x;
++		CamPosition[1][1] = inf-&gt;rot_y;
++		CamPosition[1][2] = inf-&gt;rot_z;
++
++	}
++
++	return(0);
++
++}
++
++
++
+ void mainloop() {
+ 
+ 	struct timespec sleeptime = { 0, 100 * 1000 * 1000 };   /* 100 mili seconds */
+@@ -211,6 +286,8 @@
+ 
+ 		} else {
+ 
++			s3d_set_callback( S3D_EVENT_OBJ_INFO, object_info );
++
+ 			s3d_mainloop( mainloop );
+ 
+ 		}
+
+Modified: trunk/apps/kism3d/kism3d.c
+===================================================================
+--- trunk/apps/kism3d/kism3d.c	2006-11-26 19:42:14 UTC (rev 489)
++++ trunk/apps/kism3d/kism3d.c	2006-11-27 01:32:23 UTC (rev 490)
+@@ -90,6 +90,7 @@
+ 	char enable_network[] = &quot;!0 ENABLE NETWORK bssid,type,channel,ssid\n&quot;, enable_client[] = &quot;!0 ENABLE CLIENT bssid,mac,ip\n&quot;, enable_alert[] = &quot;!0 ENABLE ALERT *\n&quot;;
+ 	char *read_ptr, *line_ptr, *last_cr_ptr = NULL, *parse_begin_ptr, *parse_end_ptr;
+ 	char *bssid, *channel, *type, *ssid, *mac, *ip;
++	char end_char;
+ 	int count;
+ 
+ 	read_ptr = kismet_src-&gt;recv_buff;
+@@ -149,7 +150,10 @@
+ 
+ 			} else if ( strncmp( line_ptr, &quot;*NETWORK: &quot;, strlen( &quot;*NETWORK: &quot; ) ) == 0 ) {
+ 
++				/* printf( &quot;line: %s\n&quot;, line_ptr ); */
++
+ 				parse_begin_ptr = parse_end_ptr = line_ptr + strlen( &quot;*NETWORK: &quot; );
++				end_char = ' ';
+ 				count = 0;
+ 
+ 				while ( (*parse_end_ptr) != '\0' ) {
+@@ -171,12 +175,24 @@
+ 								break;
+ 
+ 							case 3:
++								/* ssids with spaces are quoted by kismet */
++								if ( parse_begin_ptr[0] == '\001' ) {
++
++									parse_begin_ptr++;
++
++									parse_end_ptr = strchr( parse_begin_ptr, '\001' );
++									*parse_end_ptr = '\0';
++
++									count++;
++
++								}
++
+ 								ssid = parse_begin_ptr;
+ 								break;
+ 
+ 						}
+ 
+-						if ( count == 3 )
++						if ( count == 4 )
+ 							break;
+ 
+ 						*parse_end_ptr = '\0';
+@@ -190,29 +206,29 @@
+ 
+ 				}
+ 
++
+ 				pthread_mutex_lock( &amp;Network_list_mutex );
+ 
+ 				wlan_network = get_wlan_network( bssid );
+ 
+-				if ( ( wlan_network-&gt;type != -1 ) &amp;&amp; ( wlan_network-&gt;channel != -1 ) &amp;&amp; ( wlan_network-&gt;ssid != NULL ) ) {
++				if ( ( wlan_network-&gt;type != -1 ) &amp;&amp; ( wlan_network-&gt;chan != -1 ) &amp;&amp; ( wlan_network-&gt;ssid != NULL ) ) {
+ 
+ 					/* network properties have changed - alert user */
+ 
+ 				}
+ 
+ 				wlan_network-&gt;type = atoi( type );
+-				wlan_network-&gt;channel = atoi( channel );
++				wlan_network-&gt;chan = atoi( channel );
+ 
+-				if ( wlan_network-&gt;ssid == NULL )
+-					wlan_network-&gt;ssid = alloc_memory( strlen( ssid ) );
+-				else
+-					wlan_network-&gt;ssid = realloc_memory( wlan_network-&gt;ssid, strlen( ssid ) );
++				if ( wlan_network-&gt;ssid != NULL )
++					free( wlan_network-&gt;ssid );
+ 
+-				strncpy( wlan_network-&gt;ssid, ssid, strlen( ssid ) );
++				wlan_network-&gt;ssid = alloc_memory( strlen( ssid ) );
++				strcpy( wlan_network-&gt;ssid, ssid );
+ 
+ 				pthread_mutex_unlock( &amp;Network_list_mutex );
+ 
+-				/* printf( &quot;network found - bssid %s, type %s, channel %s, ssid %s\n&quot;, bssid, type, channel, ssid ); */
++// 				printf( &quot;network found - bssid %s, type %s, channel %s, ssid '%s' &lt;&gt; '%s'\n&quot;, bssid, type, channel, ssid, wlan_network-&gt;ssid );
+ 
+ 			} else if ( strncmp( line_ptr, &quot;*CLIENT: &quot;, strlen( &quot;*CLIENT: &quot; ) ) == 0 ) {
+ 
+@@ -268,12 +284,20 @@
+ 
+ 				if ( wlan_client-&gt;wlan_network != wlan_network ) {
+ 
+-					if ( wlan_client-&gt;wlan_network != NULL )
++					if ( wlan_client-&gt;wlan_network != NULL ) {
++
+ 						wlan_client-&gt;wlan_network-&gt;num_wlan_clients--;
++						wlan_client-&gt;wlan_network-&gt;props_changed = 1;
+ 
+-					if ( wlan_network != NULL )
++					}
++
++					if ( wlan_network != NULL ) {
++
+ 						wlan_network-&gt;num_wlan_clients++;
++						wlan_network-&gt;props_changed = 1;
+ 
++					}
++
+ 					wlan_client-&gt;wlan_network = wlan_network;
+ 
+ 				}
+
+Modified: trunk/apps/kism3d/kism3d.h
+===================================================================
+--- trunk/apps/kism3d/kism3d.h	2006-11-26 19:42:14 UTC (rev 489)
++++ trunk/apps/kism3d/kism3d.h	2006-11-27 01:32:23 UTC (rev 490)
+@@ -48,16 +48,20 @@
+ 	char bssid[18];
+ 	char *ssid;
+ 	int type;
+-	int channel;
++	int chan;
+ 	int num_wlan_clients;
+-	int properties_changed;
++	int props_changed;
+ 	int visible;
+ 	float pos_vec[3];
+ 	float mov_vec[3];
+ 	int obj_id;
+-	int label_id;
++	int wrsphr_id;
++	int bssid_id;
++	int ssid_id;
++	int misc_id;
+ 	int rotation;
+-	int scale_factor;
++	int scale_fac;
++	float bssid_len;
+ 
+ };
+ 
+
+Modified: trunk/apps/kism3d/network.c
+===================================================================
+--- trunk/apps/kism3d/network.c	2006-11-26 19:42:14 UTC (rev 489)
++++ trunk/apps/kism3d/network.c	2006-11-27 01:32:23 UTC (rev 490)
+@@ -48,7 +48,7 @@
+ 	strncpy( wlan_network-&gt;bssid, bssid, 18 );
+ 
+ 	wlan_network-&gt;type = -1;
+-	wlan_network-&gt;channel = -1;
++	wlan_network-&gt;chan = -1;
+ 
+ 	wlan_network-&gt;ssid = NULL;
+ 
+@@ -56,18 +56,20 @@
+ 
+ 	wlan_network-&gt;visible = 1;
+ 
+-	wlan_network-&gt;pos_vec[0] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
+-	wlan_network-&gt;pos_vec[1] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
+-	wlan_network-&gt;pos_vec[2] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
++	wlan_network-&gt;pos_vec[0] = 0;
++	wlan_network-&gt;pos_vec[1] = 0;
++	wlan_network-&gt;pos_vec[2] = 0;
+ 	wlan_network-&gt;mov_vec[0] = wlan_network-&gt;mov_vec[1] = wlan_network-&gt;mov_vec[2] = 0.0;
+ 
+ 	wlan_network-&gt;obj_id = -1;
+-	wlan_network-&gt;label_id = -1;
++	wlan_network-&gt;bssid_id = -1;
++	wlan_network-&gt;ssid_id = -1;
++	wlan_network-&gt;misc_id = -1;
+ 
+ 	wlan_network-&gt;rotation = 0;
+-	wlan_network-&gt;scale_factor = 0;
++	wlan_network-&gt;scale_fac = 0;
+ 
+-	wlan_network-&gt;properties_changed = 1;
++	wlan_network-&gt;props_changed = 1;
+ 
+ 	list_add_tail(&amp;wlan_network-&gt;list, &amp;Network_list);
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000482.html">[S3d-svn] r489 - in trunk/extras/distro/gentoo/media-gfx: s3d	s3d-svn
+</A></li>
+	<LI>Next message: <A HREF="000484.html">[S3d-svn] r491 - trunk/apps/kism3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#483">[ date ]</a>
+              <a href="thread.html#483">[ thread ]</a>
+              <a href="subject.html#483">[ subject ]</a>
+              <a href="author.html#483">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

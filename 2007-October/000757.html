@@ -1,0 +1,219 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r765 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r765%20-%20trunk/server&In-Reply-To=%3C200710182358.l9INwZdQ030487%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000756.html">
+   <LINK REL="Next"  HREF="000758.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r765 - trunk/server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r765%20-%20trunk/server&In-Reply-To=%3C200710182358.l9INwZdQ030487%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r765 - trunk/server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 01:58:35 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000756.html">[S3d-svn] r764 - trunk/libs3d
+</A></li>
+        <LI>Next message: <A HREF="000758.html">[S3d-svn] r766 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#757">[ date ]</a>
+              <a href="thread.html#757">[ thread ]</a>
+              <a href="subject.html#757">[ subject ]</a>
+              <a href="author.html#757">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 01:58:34 +0200 (Fri, 19 Oct 2007)
+New Revision: 765
+
+Modified:
+   trunk/server/event.c
+   trunk/server/global.h
+   trunk/server/mcp.c
+   trunk/server/process.c
+   trunk/server/proto.c
+Log:
+Use S3D_NAME_MAX instead of NAME_MAX which is also used by limits.h
+
+
+Modified: trunk/server/event.c
+===================================================================
+--- trunk/server/event.c	2007-10-18 23:58:25 UTC (rev 764)
++++ trunk/server/event.c	2007-10-18 23:58:34 UTC (rev 765)
+@@ -75,7 +75,7 @@
+ /*  tell the client something about us */
+ int event_init(struct t_process *p)
+ {
+-	char s[NAME_MAX+3];
++	char s[S3D_NAME_MAX+3];
+ 	sprintf(s, &quot;%c%c%c%s&quot;, S3D_SERVER_MAJOR, S3D_SERVER_MINOR, S3D_SERVER_PATCH, S3D_SERVER_NAME); /* thanks award */
+ 	prot_com_out(p, S3D_P_S_INIT, (uint8_t *)s, strlen(S3D_SERVER_NAME) + 4);
+ 	return(0);
+@@ -133,18 +133,18 @@
+ 
+ 		mo.r = p-&gt;object[oid]-&gt;r;
+ 
+-		memset(mo.name, 0, NAME_MAX);
++		memset(mo.name, 0, S3D_NAME_MAX);
+ 		switch (o-&gt;oflags&amp;OF_TYPE) {
+ 		case OF_VIRTUAL:
+ 			ap = get_proc_by_pid(o-&gt;n_mat);
+-			strncpy(mo.name, ap-&gt;name, NAME_MAX);
++			strncpy(mo.name, ap-&gt;name, S3D_NAME_MAX);
+ 			break;
+ 		case OF_CAM:
+ 			mo.scale = (float)((float)winw) / winh; /* give aspect ratio to program */
+-			strncpy(mo.name, &quot;sys_camera0&quot;, NAME_MAX);
++			strncpy(mo.name, &quot;sys_camera0&quot;, S3D_NAME_MAX);
+ 			break;
+ 		case OF_POINTER:
+-			strncpy(mo.name, &quot;sys_pointer0&quot;, NAME_MAX);
++			strncpy(mo.name, &quot;sys_pointer0&quot;, S3D_NAME_MAX);
+ 			break;
+ 
+ 		}
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2007-10-18 23:58:25 UTC (rev 764)
++++ trunk/server/global.h	2007-10-18 23:58:34 UTC (rev 765)
+@@ -45,7 +45,11 @@
+ #define S3DUNUSED(x) x
+ #endif
+ #endif
+-#define NAME_MAX 256   /*  limit for names [e.g. process names] */
++
++#ifndef S3D_NAME_MAX
++#define S3D_NAME_MAX 256   /*  limit for names [e.g. process names] */
++#endif /* S3D_NAME_MAX */
++
+ #define MCP   0   /*  the mcp's pid  */
+ #define TEXTURE_MAX_W 4096
+ #define TEXTURE_MAX_H 4096
+@@ -168,7 +172,7 @@
+ 
+ /*  l_* is a list-type, t_* is the type itself */
+ struct t_process {
+-	char       name[NAME_MAX];   /*  process name */
++	char       name[S3D_NAME_MAX];   /*  process name */
+ 	struct t_obj  **object;     /*  initial pointer to object list */
+ 	int32_t      n_obj;     /*  number of objects */
+ 	int32_t      biggest_obj;    /*  the biggest object */
+@@ -193,7 +197,7 @@
+ 	float rot_x, rot_y, rot_z;
+ 	float scale;
+ 	float r;
+-	char name[NAME_MAX];
++	char name[S3D_NAME_MAX];
+ };
+ enum {
+ 	zero,
+
+Modified: trunk/server/mcp.c
+===================================================================
+--- trunk/server/mcp.c	2007-10-18 23:58:25 UTC (rev 764)
++++ trunk/server/mcp.c	2007-10-18 23:58:34 UTC (rev 765)
+@@ -40,7 +40,7 @@
+ 	float trans_x, trans_y, trans_z;
+ 	float r;
+ 	/*  char event; */
+-	char name[NAME_MAX];
++	char name[S3D_NAME_MAX];
+ };
+ #define MCP_NEW_OBJECT 1
+ /*  call when a new mcp connects */
+@@ -77,7 +77,7 @@
+ 	mo.r = p-&gt;object[mcp_oid]-&gt;r;
+ 	/*  mo.event=MCP_NEW_OBJECT; */
+ 	ap = get_proc_by_pid(p-&gt;object[mcp_oid]-&gt;n_mat);
+-	strncpy(mo.name, ap-&gt;name, NAME_MAX);
++	strncpy(mo.name, ap-&gt;name, S3D_NAME_MAX);
+ 	prot_com_out(p, S3D_P_MCP_OBJECT, (uint8_t *)&amp;mo, sizeof(struct mcp_object));
+ 	return(0);
+ }
+
+Modified: trunk/server/process.c
+===================================================================
+--- trunk/server/process.c	2007-10-18 23:58:25 UTC (rev 764)
++++ trunk/server/process.c	2007-10-18 23:58:34 UTC (rev 765)
+@@ -64,7 +64,7 @@
+ 			return(NULL);
+ 		}
+ 	} else {
+-		strncpy(p-&gt;name, name, NAME_MAX);
++		strncpy(p-&gt;name, name, S3D_NAME_MAX);
+ 		process_sys_init(p);
+ 
+ 		/* register the new process in the mcp */
+@@ -224,7 +224,7 @@
+ 	procs_p = NULL;
+ 	process_add();
+ 	/* set up mcp */
+-	strncpy(mcp_p-&gt;name, &quot;mcp&quot;, NAME_MAX);
++	strncpy(mcp_p-&gt;name, &quot;mcp&quot;, S3D_NAME_MAX);
+ 	mcp_p-&gt;con_type = CON_NULL;
+ 	process_sys_init(mcp_p);
+ 	return(0);
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2007-10-18 23:58:25 UTC (rev 764)
++++ trunk/server/proto.c	2007-10-18 23:58:34 UTC (rev 765)
+@@ -43,7 +43,7 @@
+ {
+ 	uint8_t  command;
+ 	int  i;
+-	char  name[NAME_MAX];
++	char  name[S3D_NAME_MAX];
+ 	struct t_process *np;
+ 	uint8_t *buf, *cptr = NULL;
+ 	uint16_t length;
+@@ -66,8 +66,8 @@
+ 	/*  if (mcp_oid==-1) s3dprintf(HIGH,&quot;couldn't find mcp-oid for pid %d!&quot;,p-&gt;id); */
+ 	switch (command) {
+ 	case S3D_P_C_INIT:
+-		memset(name, 0, NAME_MAX);
+-		if (length &gt; NAME_MAX) i = NAME_MAX;
++		memset(name, 0, S3D_NAME_MAX);
++		if (length &gt; S3D_NAME_MAX) i = S3D_NAME_MAX;
+ 		else i = length;
+ 		strncpy(name, (char *)buf, i);
+ 		s3dprintf(LOW, &quot;[%d]\&quot;%s\&quot; logged in&quot;, p-&gt;id, name);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000756.html">[S3d-svn] r764 - trunk/libs3d
+</A></li>
+	<LI>Next message: <A HREF="000758.html">[S3d-svn] r766 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#757">[ date ]</a>
+              <a href="thread.html#757">[ thread ]</a>
+              <a href="subject.html#757">[ subject ]</a>
+              <a href="author.html#757">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

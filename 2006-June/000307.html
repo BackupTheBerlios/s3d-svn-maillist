@@ -1,0 +1,966 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r314 - in trunk: . libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r314%20-%20in%20trunk%3A%20.%20libs3dw&In-Reply-To=%3C200606021816.k52IG0Xu002170%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000306.html">
+   <LINK REL="Next"  HREF="000308.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r314 - in trunk: . libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r314%20-%20in%20trunk%3A%20.%20libs3dw&In-Reply-To=%3C200606021816.k52IG0Xu002170%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r314 - in trunk: . libs3dw">dotslash at berlios.de
+       </A><BR>
+    <I>Fri Jun  2 20:16:00 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000306.html">[S3d-svn] r313 - in trunk: . libs3d/libg3d/plugins/image libs3d/libg3d/plugins/import
+</A></li>
+        <LI>Next message: <A HREF="000308.html">[S3d-svn] r315 - in trunk: . example libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#307">[ date ]</a>
+              <a href="thread.html#307">[ thread ]</a>
+              <a href="subject.html#307">[ subject ]</a>
+              <a href="author.html#307">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-02 20:15:57 +0200 (Fri, 02 Jun 2006)
+New Revision: 314
+
+Added:
+   trunk/libs3dw/input.c
+   trunk/libs3dw/label.c
+   trunk/libs3dw/widget.c
+Removed:
+   trunk/libs3dw/object.c
+Modified:
+   trunk/
+   trunk/libs3dw/Makefile.am
+   trunk/libs3dw/animate.c
+   trunk/libs3dw/button.c
+   trunk/libs3dw/s3dw.h
+   trunk/libs3dw/s3dw_int.h
+   trunk/libs3dw/surface.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r673 at balthasar</A>:  dotslash | 2006-06-02 20:15:53 +0200
+ - object -&gt; widget
+ - add label.c, input.c
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:671
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:673
+
+Modified: trunk/libs3dw/Makefile.am
+===================================================================
+--- trunk/libs3dw/Makefile.am	2006-06-02 18:01:51 UTC (rev 313)
++++ trunk/libs3dw/Makefile.am	2006-06-02 18:15:57 UTC (rev 314)
+@@ -1,6 +1,6 @@
+ lib_LTLIBRARIES=	libs3dw.la
+ 
+-libs3dw_la_SOURCES=	button.c surface.c object.c style.c event.c animate.c label.c input.c
++libs3dw_la_SOURCES=	button.c surface.c widget.c style.c event.c animate.c label.c input.c
+ 			
+ include_HEADERS= 	s3dw.h
+ noinst_HEADERS=		s3dw_int.h
+
+Modified: trunk/libs3dw/animate.c
+===================================================================
+--- trunk/libs3dw/animate.c	2006-06-02 18:01:51 UTC (rev 313)
++++ trunk/libs3dw/animate.c	2006-06-02 18:15:57 UTC (rev 314)
+@@ -27,12 +27,12 @@
+ #include &lt;math.h&gt;
+ 
+ /* the animation stack */
+-static struct s3dw_object *ani_s[MAXANI];
++static struct s3dw_widget *ani_s[MAXANI];
+ static int ani_n=0;
+ int moveon=1;
+ 
+ /* is item f already on stack? */
+-int _s3dw_ani_onstack(struct s3dw_object *f)
++int _s3dw_ani_onstack(struct s3dw_widget *f)
+ {
+ 	int i;
+ 	for (i=0;i&lt;ani_n;i++)
+@@ -42,7 +42,7 @@
+ 
+ }
+ /* add an item on the animation stack */
+-void _s3dw_ani_add(struct s3dw_object *f)
++void _s3dw_ani_add(struct s3dw_widget *f)
+ {
+ 	if (ani_n&lt;MAXANI)
+ 	{
+@@ -68,14 +68,14 @@
+ 	}
+ }
+ /* well ... */
+-void _s3dw_ani_doit(struct s3dw_object *f)
++void _s3dw_ani_doit(struct s3dw_widget *f)
+ {
+ 	s3d_translate(	*(f-&gt;_o), f-&gt;_dx,f-&gt;_dy,f-&gt;_dz);
+ 	s3d_scale(		*(f-&gt;_o), f-&gt;_ds);
+ }
+ 
+ /* finish an animation on the stack, stack index i */
+-void _s3dw_ani_finish(struct s3dw_object *f, int i)
++void _s3dw_ani_finish(struct s3dw_widget *f, int i)
+ {
+ 	f-&gt;_dx= f-&gt;_x;
+ 	f-&gt;_dy= f-&gt;_y;
+@@ -85,7 +85,7 @@
+ 	if (i!=-1)
+ 		_s3dw_ani_del(i);
+ }
+-void _s3dw_ani_iterate(struct s3dw_object *f)
++void _s3dw_ani_iterate(struct s3dw_widget *f)
+ {
+ 	f-&gt;_dx=(f-&gt;_x + f-&gt;_dx*ZOOMS)/(ZOOMS+1);
+ 	f-&gt;_dy=(f-&gt;_y + f-&gt;_dy*ZOOMS)/(ZOOMS+1);
+@@ -95,7 +95,7 @@
+ }
+ 
+ /* checks if f is good enough */
+-int _s3dw_ani_check(struct s3dw_object *f)
++int _s3dw_ani_check(struct s3dw_widget *f)
+ {
+ 	float x,y,z;
+ 	x=f-&gt;_dx - f-&gt;_x;
+@@ -109,7 +109,7 @@
+ void s3dw_ani_mate()
+ {
+ 	int i;
+-	struct s3dw_object *f;
++	struct s3dw_widget *f;
+ 	for (i=0;i&lt;ani_n;i++)
+ 	{
+ 		f=ani_s[i];
+@@ -117,7 +117,7 @@
+ 		if (_s3dw_ani_check(f))
+ 		{
+ 			_s3dw_ani_finish(f,i);
+-			i--; /* a new object is here now, take care in the next iteration */
++			i--; /* a new widget is here now, take care in the next iteration */
+ 		} else {
+ 			_s3dw_ani_doit(f);
+ 		}
+
+Modified: trunk/libs3dw/button.c
+===================================================================
+--- trunk/libs3dw/button.c	2006-06-02 18:01:51 UTC (rev 313)
++++ trunk/libs3dw/button.c	2006-06-02 18:15:57 UTC (rev 314)
+@@ -28,9 +28,9 @@
+ #include &lt;string.h&gt; /* strdup() */
+ 
+ /* draw and setup the button */
+-void s3dw_button_draw(struct s3dw_object *object)
++void s3dw_button_draw(struct s3dw_widget *widget)
+ {
+-	struct s3dw_button *button=object-&gt;data.button;
++	struct s3dw_button *button=widget-&gt;data.button;
+ 	float length;
+ 	float vertices[8*3];
+ 	unsigned long polygons[10*4]={
+@@ -47,7 +47,7 @@
+ 	};
+ 
+ 	button-&gt;_oid_text=s3d_draw_string(button-&gt;_text,&amp;length);
+-	s3d_pep_materials_a(button-&gt;_oid_text,object-&gt;_surface-&gt;_style-&gt;text_mat,1);
++	s3d_pep_materials_a(button-&gt;_oid_text,widget-&gt;_surface-&gt;_style-&gt;text_mat,1);
+ 
+ 	/* width of the button depends on the length of the text */
+ 	vertices[0*3+0]=0.0;			vertices[0*3+1]=0.0;		vertices[0*3+2]=0.0;	
+@@ -58,44 +58,44 @@
+ 	vertices[5*3+0]=0.25;			vertices[5*3+1]=-1.75;		vertices[5*3+2]=0.25;	
+ 	vertices[6*3+0]=length+0.75;	vertices[6*3+1]=-1.75;		vertices[6*3+2]=0.25;	
+ 	vertices[7*3+0]=length+0.75;	vertices[7*3+1]=-0.25;		vertices[7*3+2]=0.25;	
+-	button-&gt;_oid_box=s3d_new_object();
+-	s3d_push_materials_a(button-&gt;_oid_box,object-&gt;_surface-&gt;_style-&gt;input_mat,1);
++	button-&gt;_oid_box=s3d_new_widget();
++	s3d_push_materials_a(button-&gt;_oid_box,widget-&gt;_surface-&gt;_style-&gt;input_mat,1);
+ 	s3d_push_vertices   (button-&gt;_oid_box,vertices,8);
+ 	s3d_push_polygons   (button-&gt;_oid_box,polygons,10);
+-	s3d_link(		   button-&gt;_oid_box,object-&gt;_surface-&gt;oid);
++	s3d_link(		   button-&gt;_oid_box,widget-&gt;_surface-&gt;oid);
+ 	s3d_link(		   button-&gt;_oid_text,button-&gt;_oid_box);
+ 	s3d_translate(button-&gt;_oid_text,0.5,-1.5,0.30);
+-	s3d_translate(button-&gt;_oid_box,object-&gt;_x,-object-&gt;_y,0);
+-	object-&gt;_o=&amp;(button-&gt;_oid_box);
+-	object-&gt;_width=length+1;
+-	object-&gt;_height=2;
++	s3d_translate(button-&gt;_oid_box,widget-&gt;_x,-widget-&gt;_y,0);
++	widget-&gt;_o=&amp;(button-&gt;_oid_box);
++	widget-&gt;_width=length+1;
++	widget-&gt;_height=2;
+     s3d_flags_on(button-&gt;_oid_box,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+     s3d_flags_on(button-&gt;_oid_text,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 
+ }
+ 
+ /* create a new button in the surface */
+-struct s3dw_object *s3dw_button_new(struct s3dw_surface *surface, char *text, float posx, float posy)
++struct s3dw_widget *s3dw_button_new(struct s3dw_surface *surface, char *text, float posx, float posy)
+ {
+ 	struct s3dw_button *button;
+-	struct s3dw_object *object;
++	struct s3dw_widget *widget;
+ 	button=(struct s3dw_button *)malloc(sizeof(struct s3dw_button));
+-	object=s3dw_object_new();
+-	object-&gt;type=S3DW_TBUTTON;
++	widget=s3dw_widget_new();
++	widget-&gt;type=S3DW_TBUTTON;
+ 	/* draw button */
+ 	button-&gt;_text=strdup(text);
+ 	button-&gt;onclick=NULL;
+-	object-&gt;_x=posx;
+-	object-&gt;_y=posy;
+-	object-&gt;data.button=button;
+-	s3dw_button_draw(object);
+-	s3dw_surface_append_obj(surface, object);
+-	return(object);
++	widget-&gt;_x=posx;
++	widget-&gt;_y=posy;
++	widget-&gt;data.button=button;
++	s3dw_button_draw(widget);
++	s3dw_surface_append_obj(surface, widget);
++	return(widget);
+ }
+ void s3dw_button_erase(struct s3dw_button *button)
+ {
+-	s3d_del_object(button-&gt;_oid_text);
+-	s3d_del_object(button-&gt;_oid_box);
++	s3d_del_widget(button-&gt;_oid_text);
++	s3d_del_widget(button-&gt;_oid_box);
+ 
+ }
+ 
+@@ -108,12 +108,12 @@
+ }
+ 
+ 
+-void s3dw_button_event_click(struct s3dw_object *object, unsigned long oid)
++void s3dw_button_event_click(struct s3dw_widget *widget, unsigned long oid)
+ {
+-	if ((object-&gt;data.button-&gt;_oid_text==oid) || (object-&gt;data.button-&gt;_oid_box==oid))
++	if ((widget-&gt;data.button-&gt;_oid_text==oid) || (widget-&gt;data.button-&gt;_oid_box==oid))
+ 	{
+-		if (object-&gt;data.button-&gt;onclick!=NULL)
+-			object-&gt;data.button-&gt;onclick(object);
++		if (widget-&gt;data.button-&gt;onclick!=NULL)
++			widget-&gt;data.button-&gt;onclick(widget);
+ 	}
+ 	
+ }
+
+Added: trunk/libs3dw/input.c
+===================================================================
+--- trunk/libs3dw/input.c	2006-06-02 18:01:51 UTC (rev 313)
++++ trunk/libs3dw/input.c	2006-06-02 18:15:57 UTC (rev 314)
+@@ -0,0 +1,117 @@
++/*
++ * input.c
++ *
++ * Copyright (C) 2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d Widgets, a Widget Library for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d Widgets is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d Widgets is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d Widgets; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
++#include &lt;s3d.h&gt;
++#include &lt;s3dw.h&gt;
++#include &lt;s3dw_int.h&gt;
++#include &lt;stdlib.h&gt; /* malloc() */
++#include &lt;string.h&gt; /* strdup() */
++
++void s3dw_input_draw(struct s3dw_widget *widget)
++{
++	struct s3dw_input *input=widget-&gt;data.input;
++	float length;
++	float vertices[8*3];
++	unsigned long polygons[10*4]={
++			0,4,5,0,
++			0,5,1,0,
++			1,5,6,0,
++			1,6,2,0,
++			2,6,7,0,
++			2,7,3,0,
++			3,7,4,0,
++			3,4,0,0,
++			4,7,6,0,
++			4,6,5,0
++	};
++	input-&gt;_oid_text=s3d_draw_string(input-&gt;_text,&amp;length);
++	s3d_pep_materials_a(input-&gt;_oid_text,widget-&gt;_surface-&gt;_style-&gt;text_mat,1);
++	/* width of the input depends on the length of the text */
++	vertices[0*3+0]=0.0;			vertices[0*3+1]=0.0;		vertices[0*3+2]=0.0;	
++	vertices[1*3+0]=0.0;			vertices[1*3+1]=-2.0;		vertices[1*3+2]=0.0;	
++	vertices[2*3+0]=length+1;		vertices[2*3+1]=-2.0;		vertices[2*3+2]=0.0;	
++	vertices[3*3+0]=length+1;		vertices[3*3+1]=0.0;		vertices[3*3+2]=0.0;	
++	vertices[4*3+0]=0.25;			vertices[4*3+1]=-0.25;		vertices[4*3+2]=0.25;	
++	vertices[5*3+0]=0.25;			vertices[5*3+1]=-1.75;		vertices[5*3+2]=0.25;	
++	vertices[6*3+0]=length+0.75;	vertices[6*3+1]=-1.75;		vertices[6*3+2]=0.25;	
++	vertices[7*3+0]=length+0.75;	vertices[7*3+1]=-0.25;		vertices[7*3+2]=0.25;	
++	input-&gt;_oid_box=s3d_new_widget();
++	s3d_push_materials_a(input-&gt;_oid_box,widget-&gt;_surface-&gt;_style-&gt;input_mat,1);
++	s3d_push_vertices   (input-&gt;_oid_box,vertices,8);
++	s3d_push_polygons   (input-&gt;_oid_box,polygons,10);
++	s3d_link(		   input-&gt;_oid_box,widget-&gt;_surface-&gt;oid);
++	s3d_link(		   input-&gt;_oid_text,input-&gt;_oid_box);
++	s3d_translate(input-&gt;_oid_text,0.5,-1.5,0.30);
++	s3d_translate(input-&gt;_oid_box,widget-&gt;_x,-widget-&gt;_y,0);
++	widget-&gt;_width=length+1;
++	widget-&gt;_height=2;
++	widget-&gt;_o=&amp;(input-&gt;_oid_box);
++    s3d_flags_on(input-&gt;_oid_box,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++    s3d_flags_on(input-&gt;_oid_text,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++
++
++}
++/* create a new input in the surface */
++struct s3dw_widget *s3dw_input_new(struct s3dw_surface *surface, char *text, float posx, float posy)
++{
++	struct s3dw_input *input;
++	struct s3dw_widget *widget;
++	input=(struct s3dw_input *)malloc(sizeof(struct s3dw_input));
++	widget=s3dw_widget_new();
++	widget-&gt;type=S3DW_TBUTTON;
++	/* draw input */
++	input-&gt;_text=strdup(text);
++	input-&gt;onclick=NULL;
++	widget-&gt;_x=posx;
++	widget-&gt;_y=posy;
++	widget-&gt;data.input=input;
++
++	s3dw_input_draw(widget);
++	s3dw_surface_append_obj(surface, widget);
++	return(widget);
++}
++void s3dw_input_erase(struct s3dw_input *input)
++{
++	s3d_del_widget(input-&gt;_oid_text);
++	s3d_del_widget(input-&gt;_oid_box);
++
++}
++/* destroy the input */
++void s3dw_input_destroy(struct s3dw_input *input)
++{
++    s3dw_input_erase(input);
++	free(input-&gt;_text);
++	free(input);
++}
++
++
++void s3dw_input_event_click(struct s3dw_widget *widget, unsigned long oid)
++{
++	if ((widget-&gt;data.input-&gt;_oid_text==oid) || (widget-&gt;data.input-&gt;_oid_box==oid))
++	{
++		if (widget-&gt;data.input-&gt;onclick!=NULL)
++			widget-&gt;data.input-&gt;onclick(widget);
++	}
++	
++}
+
+Added: trunk/libs3dw/label.c
+===================================================================
+--- trunk/libs3dw/label.c	2006-06-02 18:01:51 UTC (rev 313)
++++ trunk/libs3dw/label.c	2006-06-02 18:15:57 UTC (rev 314)
+@@ -0,0 +1,86 @@
++/*
++ * label.c
++ *
++ * Copyright (C) 2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d Widgets, a Widget Library for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d Widgets is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d Widgets is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d Widgets; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
++#include &lt;s3d.h&gt;
++#include &lt;s3dw.h&gt;
++#include &lt;s3dw_int.h&gt;
++#include &lt;stdlib.h&gt; /* malloc() */
++#include &lt;string.h&gt; /* strdup() */
++
++void s3dw_label_draw(struct s3dw_widget *widget)
++{
++	struct s3dw_label *label=widget-&gt;data.label;
++	float length;
++	label-&gt;_oid_text=s3d_draw_string(label-&gt;_text,&amp;length);
++	s3d_pep_materials_a(label-&gt;_oid_text,widget-&gt;_surface-&gt;_style-&gt;text_mat,1);
++	s3d_link(label-&gt;_oid_text,widget-&gt;_surface-&gt;oid);
++	s3d_translate(label-&gt;_oid_text,widget-&gt;_x,-widget-&gt;_y,0.1);
++	widget-&gt;_width=length+1;
++	widget-&gt;_height=2;
++
++    s3d_flags_on(label-&gt;_oid_text,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++
++}
++/* create a new label in the surface */
++struct s3dw_widget *s3dw_label_new(struct s3dw_surface *surface, char *text, float posx, float posy)
++{
++	struct s3dw_label *label;
++	struct s3dw_widget *widget;
++	label=(struct s3dw_label *)malloc(sizeof(struct s3dw_label));
++	widget=s3dw_widget_new();
++	widget-&gt;type=S3DW_TBUTTON;
++	/* draw label */
++	label-&gt;_text=strdup(text);
++	label-&gt;onclick=NULL;
++	widget-&gt;_x=posx;
++	widget-&gt;_y=posy;
++	widget-&gt;data.label=label;
++	widget-&gt;_o=&amp;(label-&gt;_oid_text);
++	s3dw_label_draw(widget);
++	s3dw_surface_append_obj(surface, widget);
++	return(widget);
++}
++
++void s3dw_label_erase(struct s3dw_label *label)
++{
++	s3d_del_widget(label-&gt;_oid_text);
++}
++/* destroy the label */
++void s3dw_label_destroy(struct s3dw_label *label)
++{
++	s3dw_label_erase(label);
++	free(label-&gt;_text);
++	free(label);
++}
++
++
++void s3dw_label_event_click(struct s3dw_widget *widget, unsigned long oid)
++{
++	if (widget-&gt;data.label-&gt;_oid_text==oid)
++	{
++		if (widget-&gt;data.label-&gt;onclick!=NULL)
++			widget-&gt;data.label-&gt;onclick(widget);
++	}
++	
++}
+
+Deleted: trunk/libs3dw/object.c
+===================================================================
+--- trunk/libs3dw/object.c	2006-06-02 18:01:51 UTC (rev 313)
++++ trunk/libs3dw/object.c	2006-06-02 18:15:57 UTC (rev 314)
+@@ -1,77 +0,0 @@
+-/*
+- * object.c
+- *
+- * Copyright (C) 2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+- *
+- * This file is part of the s3d Widgets, a Widget Library for s3d.
+- * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+- * 
+- * s3d Widgets is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU Lesser General Public License as published by
+- * the Free Software Foundation; either version 2.1 of the License, or
+- * (at your option) any later version.
+- * 
+- * s3d Widgets is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU Lesser General Public License for more details.
+- * 
+- * You should have received a copy of the GNU Lesser General Public License
+- * along with the s3d Widgets; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- */
+-
+-#include &lt;s3d.h&gt;
+-#include &lt;s3dw.h&gt;
+-#include &lt;s3dw_int.h&gt;
+-#include &lt;stdlib.h&gt; /* malloc() */
+-#include &lt;string.h&gt; /* strdup() */
+-
+-struct s3dw_object *s3dw_object_new()
+-{
+-	struct s3dw_object *object=malloc(sizeof(struct s3dw_object));
+-	object-&gt;type=-1;
+-	object-&gt;_x=object-&gt;_dx=0;
+-	object-&gt;_y=object-&gt;_dy=0;
+-	object-&gt;_z=object-&gt;_dz=0;
+-	object-&gt;_rx=object-&gt;_drx=0;
+-	object-&gt;_ry=object-&gt;_dry=0;
+-	object-&gt;_rz=object-&gt;_drz=0;
+-	object-&gt;_s=object-&gt;_ds=1;
+-	object-&gt;_o=NULL;
+-	object-&gt;_width=0;
+-	object-&gt;_height=0;
+-	object-&gt;_surface=NULL;
+-	object-&gt;data.surface=NULL;
+-	return(object);
+-}
+-void s3dw_object_destroy(struct s3dw_object *object)
+-{
+-	switch (object-&gt;type)
+-		{
+-			case S3DW_TBUTTON:		s3dw_button_destroy(object-&gt;data.button);			break;
+-			case S3DW_TSURFACE:		s3dw_surface_destroy(object-&gt;data.surface);			break;
+-			case S3DW_TLABEL:		s3dw_label_destroy(object-&gt;data.label);				break;
+-			case S3DW_TINPUT:		s3dw_input_destroy(object-&gt;data.input);				break;
+-			default:
+-					dprintf(MED,&quot;can't free this type (yet) - memory leak\n&quot;);
+-		}
+-	free(object);
+-}
+-void s3dw_object_event_click(struct s3dw_object *object, unsigned long oid)
+-{
+-	switch (object-&gt;type)
+-		{
+-			case S3DW_TBUTTON:
+-					s3dw_button_event_click(object,oid);
+-					break;
+-			case S3DW_TLABEL:
+-					s3dw_label_event_click(object,oid);
+-					break;
+-			case S3DW_TINPUT:
+-					s3dw_input_event_click(object,oid);
+-					break;
+-
+-		}
+-
+-}
+
+Modified: trunk/libs3dw/s3dw.h
+===================================================================
+--- trunk/libs3dw/s3dw.h	2006-06-02 18:01:51 UTC (rev 313)
++++ trunk/libs3dw/s3dw.h	2006-06-02 18:15:57 UTC (rev 314)
+@@ -33,7 +33,7 @@
+ 	S3DW_TINPUT
+ };
+ 
+-struct s3dw_object {
++struct s3dw_widget {
+ 	int type;
+ 	int   _flags;
+ 	struct s3dw_surface *_surface;
+@@ -50,7 +50,7 @@
+ 	unsigned long *_o;
+ };
+ 
+-typedef void (*s3dw_callback)(struct s3dw_object *);
++typedef void (*s3dw_callback)(struct s3dw_widget *);
+ 
+ struct s3dw_button {
+ 	char *_text;
+@@ -80,7 +80,7 @@
+ 	unsigned long		  _oid_tbar;
+ 	int 				  _nobj;
+ 	char				 *title;
+-	struct s3dw_object 	**_pobj;
++	struct s3dw_widget 	**_pobj;
+ 	struct s3dw_style 	 *_style;
+ };
+ 
+@@ -94,16 +94,16 @@
+ 	float title_text_mat[12];
+ };
+ /* button.c */
+-struct s3dw_object *s3dw_button_new(struct s3dw_surface *surface, char *text, float posx, float posy);
++struct s3dw_widget *s3dw_button_new(struct s3dw_surface *surface, char *text, float posx, float posy);
+ /* label.c */
+-struct s3dw_object *s3dw_label_new(struct s3dw_surface *surface, char *text, float posx, float posy);
++struct s3dw_widget *s3dw_label_new(struct s3dw_surface *surface, char *text, float posx, float posy);
+ /* input.c */
+-struct s3dw_object *s3dw_input_new(struct s3dw_surface *surface, char *text, float posx, float posy);
++struct s3dw_widget *s3dw_input_new(struct s3dw_surface *surface, char *text, float posx, float posy);
+ /* surface.c */
+-struct s3dw_object *s3dw_surface_new(char *title, float width, float height);
++struct s3dw_widget *s3dw_surface_new(char *title, float width, float height);
+ void s3dw_surface_delete(struct s3dw_surface *surface);
+-/* object.c */
+-void s3dw_object_destroy(struct s3dw_object *object);
++/* widget.c */
++void s3dw_widget_destroy(struct s3dw_widget *widget);
+ /* event.c */
+ void s3dw_click_event(struct s3d_evt *evt);
+ /* animate.c */
+
+Modified: trunk/libs3dw/s3dw_int.h
+===================================================================
+--- trunk/libs3dw/s3dw_int.h	2006-06-02 18:01:51 UTC (rev 313)
++++ trunk/libs3dw/s3dw_int.h	2006-06-02 18:15:57 UTC (rev 314)
+@@ -24,40 +24,40 @@
+ #include &lt;s3dlib.h&gt; /* dprintf() */
+ #define MAXANI		16
+ #define ZOOMS		5
+-extern	struct s3dw_object  **psurf;
++extern	struct s3dw_widget  **psurf;
+ extern	int					  nsurf;
+ 
+-/* object.c */
+-struct s3dw_object *s3dw_object_new();
+-void s3dw_object_event_click(struct s3dw_object *object, unsigned long oid);
++/* widget.c */
++struct s3dw_widget *s3dw_widget_new();
++void s3dw_widget_event_click(struct s3dw_widget *widget, unsigned long oid);
+ /* surface.c */
+ void s3dw_surface_destroy(struct s3dw_surface *surface);
+-void s3dw_surface_append_obj(struct s3dw_surface *surface, struct s3dw_object *object);
+-void s3dw_surface_event_click(struct s3dw_object *object, unsigned long oid);
+-void s3dw_surface_draw(struct s3dw_object *object);
++void s3dw_surface_append_obj(struct s3dw_surface *surface, struct s3dw_widget *widget);
++void s3dw_surface_event_click(struct s3dw_widget *widget, unsigned long oid);
++void s3dw_surface_draw(struct s3dw_widget *widget);
+ /* button.c */
+ void s3dw_button_destroy(struct s3dw_button *button);
+-void s3dw_button_event_click(struct s3dw_object *object, unsigned long oid);
+-void s3dw_button_draw(struct s3dw_object *object);
++void s3dw_button_event_click(struct s3dw_widget *widget, unsigned long oid);
++void s3dw_button_draw(struct s3dw_widget *widget);
+ void s3dw_button_erase(struct s3dw_button *button);
+ /* label.c */
+ void s3dw_label_destroy(struct s3dw_label *label);
+-void s3dw_label_event_click(struct s3dw_object *object, unsigned long oid);
+-void s3dw_label_draw(struct s3dw_object *object);
++void s3dw_label_event_click(struct s3dw_widget *widget, unsigned long oid);
++void s3dw_label_draw(struct s3dw_widget *widget);
+ /* input.c */
+ void s3dw_input_destroy(struct s3dw_input *input);
+-void s3dw_input_event_click(struct s3dw_object *object, unsigned long oid);
+-void s3dw_input_draw(struct s3dw_object *object);
++void s3dw_input_event_click(struct s3dw_widget *widget, unsigned long oid);
++void s3dw_input_draw(struct s3dw_widget *widget);
+ void s3dw_input_erase(struct s3dw_input *input);
+ 
+ 
+ /* style.c */
+ extern struct s3dw_style def_style;
+ /* animate.c */
+-int  _s3dw_ani_onstack(struct s3dw_object *f);
+-void _s3dw_ani_add(struct s3dw_object *f);
++int  _s3dw_ani_onstack(struct s3dw_widget *f);
++void _s3dw_ani_add(struct s3dw_widget *f);
+ void _s3dw_ani_del(int i);
+-void _s3dw_ani_doit(struct s3dw_object *f);
+-void _s3dw_ani_finish(struct s3dw_object *f, int i);
+-void _s3dw_ani_iterate(struct s3dw_object *f);
+-int  _s3dw_ani_check(struct s3dw_object *f);
++void _s3dw_ani_doit(struct s3dw_widget *f);
++void _s3dw_ani_finish(struct s3dw_widget *f, int i);
++void _s3dw_ani_iterate(struct s3dw_widget *f);
++int  _s3dw_ani_check(struct s3dw_widget *f);
+
+Modified: trunk/libs3dw/surface.c
+===================================================================
+--- trunk/libs3dw/surface.c	2006-06-02 18:01:51 UTC (rev 313)
++++ trunk/libs3dw/surface.c	2006-06-02 18:15:57 UTC (rev 314)
+@@ -27,12 +27,12 @@
+ #include &lt;stdlib.h&gt; /* malloc() */
+ #include &lt;string.h&gt; /* strdup() */
+ 
+-struct s3dw_object **psurf=NULL;
++struct s3dw_widget **psurf=NULL;
+ int					  nsurf=0;
+ 
+-void s3dw_surface_draw(struct s3dw_object *object)
++void s3dw_surface_draw(struct s3dw_widget *widget)
+ {
+-	struct s3dw_surface *surface=object-&gt;data.surface;
++	struct s3dw_surface *surface=widget-&gt;data.surface;
+ 	int textlen;
+ 	float length;
+ 	float vertices[8*3]={
+@@ -61,22 +61,22 @@
+ 	unsigned long tpol[10*4];
+ 	int i;
+ 
+-	surface-&gt;oid=s3d_new_object();
+-	surface-&gt;_oid_tbar=s3d_new_object();
++	surface-&gt;oid=s3d_new_widget();
++	surface-&gt;_oid_tbar=s3d_new_widget();
+ 	s3d_select_font(&quot;vera&quot;);
+ 	surface-&gt;_oid_title=s3d_draw_string(surface-&gt;title,&amp;length);
+-	while (length &gt; (object-&gt;_width+1))
++	while (length &gt; (widget-&gt;_width+1))
+ 	{
+-		dprintf(HIGH,&quot;%f &gt; %f&quot;,length,object-&gt;_width+1);
++		dprintf(HIGH,&quot;%f &gt; %f&quot;,length,widget-&gt;_width+1);
+ 		textlen=strlen(surface-&gt;title);
+-		if (length&gt;((object-&gt;_width+1)*1.3))
+-			textlen=textlen*((object-&gt;_width+1)*1.1/length);
++		if (length&gt;((widget-&gt;_width+1)*1.3))
++			textlen=textlen*((widget-&gt;_width+1)*1.1/length);
+ 		if (textlen&gt;4)
+ 		{
+ 			surface-&gt;title[textlen-2]=0;
+ 			surface-&gt;title[textlen-3]='.';
+ 			surface-&gt;title[textlen-4]='.';
+-			s3d_del_object(surface-&gt;_oid_title);
++			s3d_del_widget(surface-&gt;_oid_title);
+ 			surface-&gt;_oid_title=s3d_draw_string(surface-&gt;title,&amp;length);
+ 		} else {
+ 			break;
+@@ -85,10 +85,10 @@
+  	/* prepare vertices */
+ 	for (i=0;i&lt;8;i++)
+ 	{
+-		sver[i*3 + 0]=vertices[i*3+0] * object-&gt;_width;
+-		sver[i*3 + 1]=vertices[i*3+1] * -object-&gt;_height;
++		sver[i*3 + 0]=vertices[i*3+0] * widget-&gt;_width;
++		sver[i*3 + 1]=vertices[i*3+1] * -widget-&gt;_height;
+ 		sver[i*3 + 2]=vertices[i*3+2] * -1;
+-		tver[i*3 + 0]=vertices[i*3+0] * object-&gt;_width;
++		tver[i*3 + 0]=vertices[i*3+0] * widget-&gt;_width;
+ 		tver[i*3 + 1]=vertices[i*3+1];
+ 		tver[i*3 + 2]=vertices[i*3+2] * -1;
+ 	}
+@@ -100,7 +100,7 @@
+ 	   tpol[i*4 + 2]=polygon[i*4 + 2];
+ 	   tpol[i*4 + 3]=polygon[i*4 + 3];
+ 	}
+-	object-&gt;_o=&amp;(surface-&gt;oid);
++	widget-&gt;_o=&amp;(surface-&gt;oid);
+ 	s3d_push_vertices(surface-&gt;oid,sver,8);
+ 	s3d_push_vertices(surface-&gt;_oid_tbar,tver,8);
+ 	s3d_push_materials_a(surface-&gt;oid      ,surface-&gt;_style-&gt;surface_mat,1);
+@@ -118,10 +118,10 @@
+ 
+ }
+ /* create a new surface */
+-struct s3dw_object *s3dw_surface_new(char *title, float width, float height)
++struct s3dw_widget *s3dw_surface_new(char *title, float width, float height)
+ {
+ 	struct s3dw_surface *surface;
+-	struct s3dw_object  *object;
++	struct s3dw_widget  *widget;
+ 			
+ 	surface=(struct s3dw_surface *)malloc(sizeof(struct s3dw_surface));
+ 	surface-&gt;_nobj=0;
+@@ -130,21 +130,21 @@
+ 	surface-&gt;title=strdup(title);
+ 
+ 	nsurf++;
+-	psurf=realloc(psurf,sizeof(struct s3dw_object **)*nsurf);
+-	object=s3dw_object_new();
+-	object-&gt;type=S3DW_TSURFACE;
+-	object-&gt;data.surface=surface;
+-	object-&gt;_width=width;
+-	object-&gt;_height=height;
+-	psurf[nsurf-1]=object;
+-	s3dw_surface_draw(object);
+-	return(object);
++	psurf=realloc(psurf,sizeof(struct s3dw_widget **)*nsurf);
++	widget=s3dw_widget_new();
++	widget-&gt;type=S3DW_TSURFACE;
++	widget-&gt;data.surface=surface;
++	widget-&gt;_width=width;
++	widget-&gt;_height=height;
++	psurf[nsurf-1]=widget;
++	s3dw_surface_draw(widget);
++	return(widget);
+ }
+ void s3dw_surface_erase(struct s3dw_surface *surface)
+ {
+-	s3d_del_object(surface-&gt;oid);
+-	s3d_del_object(surface-&gt;_oid_tbar);
+-	s3d_del_object(surface-&gt;_oid_title);
++	s3d_del_widget(surface-&gt;oid);
++	s3d_del_widget(surface-&gt;_oid_tbar);
++	s3d_del_widget(surface-&gt;_oid_title);
+ }
+ /* destroy the surface */
+ void s3dw_surface_destroy(struct s3dw_surface *surface)
+@@ -154,7 +154,7 @@
+ 	{
+ 		for (i=0;i&lt;surface-&gt;_nobj;i++)
+ 		{
+-			s3dw_object_destroy(surface-&gt;_pobj[i]);
++			s3dw_widget_destroy(surface-&gt;_pobj[i]);
+ 		}
+ 		free(surface-&gt;_pobj);
+ 	}
+@@ -177,27 +177,27 @@
+ 			break;
+ 		}
+ }
+-/* append an object */
+-void s3dw_surface_append_obj(struct s3dw_surface *surface, struct s3dw_object *object)
++/* append an widget */
++void s3dw_surface_append_obj(struct s3dw_surface *surface, struct s3dw_widget *widget)
+ {
+ 	surface-&gt;_nobj++;
+-	surface-&gt;_pobj=realloc(surface-&gt;_pobj,sizeof(struct s3dw_object *)*surface-&gt;_nobj);
+-	surface-&gt;_pobj[surface-&gt;_nobj-1]=object;
+-	object-&gt;_surface=surface;
++	surface-&gt;_pobj=realloc(surface-&gt;_pobj,sizeof(struct s3dw_widget *)*surface-&gt;_nobj);
++	surface-&gt;_pobj[surface-&gt;_nobj-1]=widget;
++	widget-&gt;_surface=surface;
+ }
+-/* test objects of the surface for clicks */
+-void s3dw_surface_event_click(struct s3dw_object *object, unsigned long oid)
++/* test widgets of the surface for clicks */
++void s3dw_surface_event_click(struct s3dw_widget *widget, unsigned long oid)
+ {
+ 	int i;
+-	if (object-&gt;data.surface-&gt;oid==oid)
++	if (widget-&gt;data.surface-&gt;oid==oid)
+ 	{
+-		dprintf(MED,&quot;body %s clicked&quot;,object-&gt;data.surface-&gt;title);
++		dprintf(MED,&quot;body %s clicked&quot;,widget-&gt;data.surface-&gt;title);
+ 	}
+-	if ((object-&gt;data.surface-&gt;_oid_tbar==oid) || (object-&gt;data.surface-&gt;_oid_title==oid))
++	if ((widget-&gt;data.surface-&gt;_oid_tbar==oid) || (widget-&gt;data.surface-&gt;_oid_title==oid))
+ 	{
+-		dprintf(MED,&quot;title %s clicked&quot;,object-&gt;data.surface-&gt;title);
++		dprintf(MED,&quot;title %s clicked&quot;,widget-&gt;data.surface-&gt;title);
+ 	}
+-	for (i=0;i&lt;object-&gt;data.surface-&gt;_nobj;i++)
+-		s3dw_object_event_click(object-&gt;data.surface-&gt;_pobj[i],oid);
++	for (i=0;i&lt;widget-&gt;data.surface-&gt;_nobj;i++)
++		s3dw_widget_event_click(widget-&gt;data.surface-&gt;_pobj[i],oid);
+ }
+ 
+
+Added: trunk/libs3dw/widget.c
+===================================================================
+--- trunk/libs3dw/widget.c	2006-06-02 18:01:51 UTC (rev 313)
++++ trunk/libs3dw/widget.c	2006-06-02 18:15:57 UTC (rev 314)
+@@ -0,0 +1,77 @@
++/*
++ * widget.c
++ *
++ * Copyright (C) 2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d Widgets, a Widget Library for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d Widgets is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d Widgets is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d Widgets; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#include &lt;s3d.h&gt;
++#include &lt;s3dw.h&gt;
++#include &lt;s3dw_int.h&gt;
++#include &lt;stdlib.h&gt; /* malloc() */
++#include &lt;string.h&gt; /* strdup() */
++
++struct s3dw_widget *s3dw_widget_new()
++{
++	struct s3dw_widget *widget=malloc(sizeof(struct s3dw_widget));
++	widget-&gt;type=-1;
++	widget-&gt;_x=widget-&gt;_dx=0;
++	widget-&gt;_y=widget-&gt;_dy=0;
++	widget-&gt;_z=widget-&gt;_dz=0;
++	widget-&gt;_rx=widget-&gt;_drx=0;
++	widget-&gt;_ry=widget-&gt;_dry=0;
++	widget-&gt;_rz=widget-&gt;_drz=0;
++	widget-&gt;_s=widget-&gt;_ds=1;
++	widget-&gt;_o=NULL;
++	widget-&gt;_width=0;
++	widget-&gt;_height=0;
++	widget-&gt;_surface=NULL;
++	widget-&gt;data.surface=NULL;
++	return(widget);
++}
++void s3dw_widget_destroy(struct s3dw_widget *widget)
++{
++	switch (widget-&gt;type)
++		{
++			case S3DW_TBUTTON:		s3dw_button_destroy(widget-&gt;data.button);			break;
++			case S3DW_TSURFACE:		s3dw_surface_destroy(widget-&gt;data.surface);			break;
++			case S3DW_TLABEL:		s3dw_label_destroy(widget-&gt;data.label);				break;
++			case S3DW_TINPUT:		s3dw_input_destroy(widget-&gt;data.input);				break;
++			default:
++					dprintf(MED,&quot;can't free this type (yet) - memory leak\n&quot;);
++		}
++	free(widget);
++}
++void s3dw_widget_event_click(struct s3dw_widget *widget, unsigned long oid)
++{
++	switch (widget-&gt;type)
++		{
++			case S3DW_TBUTTON:
++					s3dw_button_event_click(widget,oid);
++					break;
++			case S3DW_TLABEL:
++					s3dw_label_event_click(widget,oid);
++					break;
++			case S3DW_TINPUT:
++					s3dw_input_event_click(widget,oid);
++					break;
++
++		}
++
++}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000306.html">[S3d-svn] r313 - in trunk: . libs3d/libg3d/plugins/image libs3d/libg3d/plugins/import
+</A></li>
+	<LI>Next message: <A HREF="000308.html">[S3d-svn] r315 - in trunk: . example libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#307">[ date ]</a>
+              <a href="thread.html#307">[ thread ]</a>
+              <a href="subject.html#307">[ subject ]</a>
+              <a href="author.html#307">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

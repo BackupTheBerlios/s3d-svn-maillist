@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1067 - trunk/apps/meshs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2009-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1067%20-%20trunk/apps/meshs3d&In-Reply-To=%3C200907040724.n647OPip017357%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001046.html">
+   <LINK REL="Next"  HREF="001048.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1067 - trunk/apps/meshs3d</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1067%20-%20trunk/apps/meshs3d&In-Reply-To=%3C200907040724.n647OPip017357%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1067 - trunk/apps/meshs3d">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sat Jul  4 09:24:25 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001046.html">[S3d-svn] r1066 - trunk/apps/meshs3d
+</A></li>
+        <LI>Next message: <A HREF="001048.html">[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1-89-g10b3abc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1047">[ date ]</a>
+              <a href="thread.html#1047">[ thread ]</a>
+              <a href="subject.html#1047">[ subject ]</a>
+              <a href="author.html#1047">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2009-07-04 09:24:24 +0200 (Sat, 04 Jul 2009)
+New Revision: 1067
+
+Modified:
+   trunk/apps/meshs3d/meshs3d.h
+   trunk/apps/meshs3d/process.c
+Log:
+meshs3d: Add mac support to data structures
+
+Modified: trunk/apps/meshs3d/meshs3d.h
+===================================================================
+--- trunk/apps/meshs3d/meshs3d.h	2009-07-03 15:54:43 UTC (rev 1066)
++++ trunk/apps/meshs3d/meshs3d.h	2009-07-04 07:24:24 UTC (rev 1067)
+@@ -37,13 +37,14 @@
+ 
+ enum node_type {
+ 	node_undefined = 0,
+-	node_ip /*,
+-	node_mac */
++	node_ip,
++	node_mac
+ };
+ 
+ struct node_id {
+ 	union {
+ 		uint32_t ip;
++		uint8_t mac[6];
+ 	} id;
+ 	enum node_type type;
+ };
+
+Modified: trunk/apps/meshs3d/process.c
+===================================================================
+--- trunk/apps/meshs3d/process.c	2009-07-03 15:54:43 UTC (rev 1066)
++++ trunk/apps/meshs3d/process.c	2009-07-04 07:24:24 UTC (rev 1067)
+@@ -58,6 +58,8 @@
+ 				return 1;
+ 			}
+ 			break;
++		case node_mac:
++			return memcmp(id1-&gt;id.mac, id2-&gt;id.mac, sizeof(id1-&gt;id.mac));
+ 		case node_undefined:
+ 			return 0;
+ 		};
+@@ -85,6 +87,13 @@
+ 			hash ^= (hash &gt;&gt; 6);
+ 		}
+ 		break;
++	case node_mac:
++		for (i = 0; i &lt; sizeof(id-&gt;id.mac); i++) {
++			hash += tmp.id.mac[i];
++			hash += (hash &lt;&lt; 10);
++			hash ^= (hash &gt;&gt; 6);
++		}
++		break;
+ 	case node_undefined:
+ 		hash = 0;
+ 	};
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001046.html">[S3d-svn] r1066 - trunk/apps/meshs3d
+</A></li>
+	<LI>Next message: <A HREF="001048.html">[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1-89-g10b3abc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1047">[ date ]</a>
+              <a href="thread.html#1047">[ thread ]</a>
+              <a href="subject.html#1047">[ subject ]</a>
+              <a href="author.html#1047">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

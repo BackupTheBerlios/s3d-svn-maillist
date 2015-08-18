@@ -1,0 +1,319 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r307 - trunk/libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r307%20-%20trunk/libs3dw&In-Reply-To=%3C200605282001.k4SK1jkL010592%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000299.html">
+   <LINK REL="Next"  HREF="000301.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r307 - trunk/libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r307%20-%20trunk/libs3dw&In-Reply-To=%3C200605282001.k4SK1jkL010592%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r307 - trunk/libs3dw">dotslash at berlios.de
+       </A><BR>
+    <I>Sun May 28 22:01:45 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000299.html">[S3d-svn] r306 - in trunk: example libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000301.html">[S3d-svn] r308 - in trunk: . example libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#300">[ date ]</a>
+              <a href="thread.html#300">[ thread ]</a>
+              <a href="subject.html#300">[ subject ]</a>
+              <a href="author.html#300">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-28 22:01:44 +0200 (Sun, 28 May 2006)
+New Revision: 307
+
+Added:
+   trunk/libs3dw/animate.c
+   trunk/libs3dw/event.c
+   trunk/libs3dw/object.c
+Log:
+- forgot to version some things ...
+
+Added: trunk/libs3dw/animate.c
+===================================================================
+--- trunk/libs3dw/animate.c	2006-05-28 19:50:34 UTC (rev 306)
++++ trunk/libs3dw/animate.c	2006-05-28 20:01:44 UTC (rev 307)
+@@ -0,0 +1,126 @@
++/*
++ * animate.c
++ *
++ * Copyright (C) 2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d Widgets, a Widget Library for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d Widgets is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d Widgets is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d Widgets; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#include &lt;s3d.h&gt;
++#include &lt;s3dw.h&gt;
++#include &lt;s3dw_int.h&gt;
++#include &lt;math.h&gt;
++
++/* the animation stack */
++static struct s3dw_object *ani_s[MAXANI];
++static int ani_n=0;
++int moveon=1;
++
++/* is item f already on stack? */
++int _s3dw_ani_onstack(struct s3dw_object *f)
++{
++	int i;
++	for (i=0;i&lt;ani_n;i++)
++		if (ani_s[i]==f)
++			return(1);		/* already in list */
++	return(0);
++
++}
++/* add an item on the animation stack */
++void _s3dw_ani_add(struct s3dw_object *f)
++{
++	if (ani_n&lt;MAXANI)
++	{
++		if (_s3dw_ani_onstack(f))
++			return;		/* already in list */
++		ani_s[ani_n]=f;
++		_s3dw_ani_iterate(f);
++		ani_n++;
++	}
++	else /* no place, finish now */
++		_s3dw_ani_finish(f,-1);
++}
++/* delete an item from the animation stack */
++void _s3dw_ani_del(int i)
++{
++	if ((i&gt;=0) &amp;&amp; (i&lt;ani_n))
++	{
++/*		printf(&quot;[A]ni DEL %d\n&quot;,i);*/
++		ani_n--;
++		ani_s[i]=ani_s[ani_n]; /* that should also work if i is the last one */
++	} else {
++		dprintf(MED,&quot;[F]ATAL: can't delete animation!\n&quot;);
++	}
++}
++/* well ... */
++void _s3dw_ani_doit(struct s3dw_object *f)
++{
++	s3d_translate(	*(f-&gt;o), f-&gt;dx,f-&gt;dy,f-&gt;dz);
++	s3d_scale(		*(f-&gt;o), f-&gt;ds);
++}
++
++/* finish an animation on the stack, stack index i */
++void _s3dw_ani_finish(struct s3dw_object *f, int i)
++{
++	f-&gt;dx= f-&gt;x;
++	f-&gt;dy= f-&gt;y;
++	f-&gt;dz= f-&gt;z;
++	f-&gt;ds= f-&gt;s;
++	_s3dw_ani_doit(f);
++	if (i!=-1)
++		_s3dw_ani_del(i);
++}
++void _s3dw_ani_iterate(struct s3dw_object *f)
++{
++	f-&gt;dx=(f-&gt;x + f-&gt;dx*ZOOMS)/(ZOOMS+1);
++	f-&gt;dy=(f-&gt;y + f-&gt;dy*ZOOMS)/(ZOOMS+1);
++	f-&gt;dz=(f-&gt;z + f-&gt;dz*ZOOMS)/(ZOOMS+1);
++	f-&gt;ds=(f-&gt;s + f-&gt;ds*ZOOMS)/(ZOOMS+1);
++
++}
++
++/* checks if f is good enough */
++int _s3dw_ani_check(struct s3dw_object *f)
++{
++	float x,y,z;
++	x=f-&gt;dx - f-&gt;x;
++	y=f-&gt;dy - f-&gt;y;
++	z=f-&gt;dz - f-&gt;z;
++	if (((fabs(f-&gt;ds - f-&gt;s)/f-&gt;s)&gt;0.01) || (sqrt(x*x+y*y+z*z) &gt; 0.01))
++		return(0);
++	return(1);
++}
++/* doing the whole animation thing */
++void s3dw_ani_mate()
++{
++	int i;
++	struct s3dw_object *f;
++	for (i=0;i&lt;ani_n;i++)
++	{
++		f=ani_s[i];
++		_s3dw_ani_iterate(f);
++		if (_s3dw_ani_check(f))
++		{
++			_s3dw_ani_finish(f,i);
++			i--; /* a new object is here now, take care in the next iteration */
++		} else {
++			_s3dw_ani_doit(f);
++		}
++	}
++}
++
+
+Added: trunk/libs3dw/event.c
+===================================================================
+--- trunk/libs3dw/event.c	2006-05-28 19:50:34 UTC (rev 306)
++++ trunk/libs3dw/event.c	2006-05-28 20:01:44 UTC (rev 307)
+@@ -0,0 +1,34 @@
++/*
++ * event.c
++ *
++ * Copyright (C) 2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d Widgets, a Widget Library for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d Widgets is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d Widgets is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d Widgets; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#include &lt;s3d.h&gt;
++#include &lt;s3dw.h&gt;
++#include &lt;s3dw_int.h&gt;
++
++void s3dw_click_event(struct s3d_evt *evt)
++{
++	int i;
++	unsigned long oid=*((unsigned long *)evt-&gt;buf);
++	for (i=0;i&lt;nsurf;i++)
++		s3dw_surface_event_click(psurf[i]-&gt;data.surface,oid);
++}
+
+Added: trunk/libs3dw/object.c
+===================================================================
+--- trunk/libs3dw/object.c	2006-05-28 19:50:34 UTC (rev 306)
++++ trunk/libs3dw/object.c	2006-05-28 20:01:44 UTC (rev 307)
+@@ -0,0 +1,69 @@
++/*
++ * object.c
++ *
++ * Copyright (C) 2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d Widgets, a Widget Library for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d Widgets is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d Widgets is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d Widgets; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#include &lt;s3d.h&gt;
++#include &lt;s3dw.h&gt;
++#include &lt;s3dw_int.h&gt;
++#include &lt;stdlib.h&gt; /* malloc() */
++#include &lt;string.h&gt; /* strdup() */
++
++struct s3dw_object *s3dw_object_new()
++{
++	struct s3dw_object *object=malloc(sizeof(struct s3dw_object));
++	object-&gt;type=-1;
++	object-&gt;x=object-&gt;dx=0;
++	object-&gt;y=object-&gt;dy=0;
++	object-&gt;z=object-&gt;dz=0;
++	object-&gt;rx=object-&gt;drx=0;
++	object-&gt;ry=object-&gt;dry=0;
++	object-&gt;rz=object-&gt;drz=0;
++	object-&gt;s=object-&gt;ds=1;
++	object-&gt;o=NULL;
++	object-&gt;width=0;
++	object-&gt;height=0;
++	object-&gt;_surface=NULL;
++	object-&gt;data.surface=NULL;
++	return(object);
++}
++void s3dw_object_destroy(struct s3dw_object *object)
++{
++	switch (object-&gt;type)
++		{
++			case S3DW_TBUTTON:
++					s3dw_button_destroy(object-&gt;data.button);
++					break;
++			default:
++					dprintf(MED,&quot;can't free this type (yet) - memory leak\n&quot;);
++		}
++	free(object);
++}
++void s3dw_object_event_click(struct s3dw_object *object, unsigned long oid)
++{
++	switch (object-&gt;type)
++		{
++			case S3DW_TBUTTON:
++					s3dw_button_event_click(object-&gt;data.button,oid);
++					break;
++		}
++
++}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000299.html">[S3d-svn] r306 - in trunk: example libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000301.html">[S3d-svn] r308 - in trunk: . example libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#300">[ date ]</a>
+              <a href="thread.html#300">[ thread ]</a>
+              <a href="subject.html#300">[ subject ]</a>
+              <a href="author.html#300">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

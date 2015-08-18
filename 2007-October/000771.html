@@ -1,0 +1,329 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r779 - trunk/apps/s3dvt
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r779%20-%20trunk/apps/s3dvt&In-Reply-To=%3C200710190000.l9J00dvM031424%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000770.html">
+   <LINK REL="Next"  HREF="000772.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r779 - trunk/apps/s3dvt</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r779%20-%20trunk/apps/s3dvt&In-Reply-To=%3C200710190000.l9J00dvM031424%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r779 - trunk/apps/s3dvt">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 02:00:39 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000770.html">[S3d-svn] r778 - trunk/apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000772.html">[S3d-svn] r780 - trunk/apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#771">[ date ]</a>
+              <a href="thread.html#771">[ thread ]</a>
+              <a href="subject.html#771">[ subject ]</a>
+              <a href="author.html#771">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 02:00:38 +0200 (Fri, 19 Oct 2007)
+New Revision: 779
+
+Modified:
+   trunk/apps/s3dvt/main.c
+   trunk/apps/s3dvt/terminal.c
+Log:
+s3dvt: Mark local functions and variables as static
+
+
+Modified: trunk/apps/s3dvt/main.c
+===================================================================
+--- trunk/apps/s3dvt/main.c	2007-10-19 00:00:31 UTC (rev 778)
++++ trunk/apps/s3dvt/main.c	2007-10-19 00:00:38 UTC (rev 779)
+@@ -65,7 +65,7 @@
+ static int    lines[MAX_LINES];
+ #endif
+ 
+-void *thread_terminal(void *S3DVTUNUSED(a))
++static void* thread_terminal(void *S3DVTUNUSED(a))
+ {
+ 	int iscon = 1, ret;
+ 	char buffer[1024];
+@@ -101,7 +101,7 @@
+ 	}
+ 	return(NULL); /* huh?! */
+ }
+-int pty_init_terminal(void)
++static int pty_init_terminal(void)
+ {
+ 	int i;
+ 	char buf[256];
+@@ -183,7 +183,7 @@
+ }
+ 
+ 
+-int pipe_init_terminal(void)
++static int pipe_init_terminal(void)
+ {
+ 	char buf[256];
+ 	int uid = 0, gid = 0;
+@@ -235,7 +235,7 @@
+ 	}
+ 	return 1;
+ }
+-int init_terminal(void)
++static int init_terminal(void)
+ {
+ 	int i;
+ 	for (i = 0;i &lt; 5;i++)
+@@ -243,7 +243,7 @@
+ 			return(0);
+ 	return(pipe_init_terminal());  /*  if not, fallback to pipe mode */
+ }
+-void term_unload(void)
++static void term_unload(void)
+ {
+ 	printf(&quot;unloading tty!!\n&quot;);
+ 	switch (term_mode) {
+@@ -374,7 +374,7 @@
+ / *   printf(&quot;\n&quot;); * /
+  }
+ }*/
+-int keypress(struct s3d_evt *event)
++static int keypress(struct s3d_evt *event)
+ {
+ 	struct s3d_key_event *keys = (struct s3d_key_event *)event-&gt;buf;
+ 	int key;
+@@ -466,8 +466,8 @@
+ 	return(0);
+ 
+ }
+-int i = 0;
+-void mainloop(void)
++static int i = 0;
++static void mainloop(void)
+ {
+ 	usleep(10000);
+ 	nanosleep(&amp;t, NULL);
+@@ -486,12 +486,12 @@
+ 		paintit();
+ 	}
+ }
+-int stop(struct s3d_evt *S3DVTUNUSED(event))
++static int stop(struct s3d_evt *S3DVTUNUSED(event))
+ {
+ 	s3d_quit();
+ 	return(0);
+ }
+-unsigned int draw_background(void)
++static unsigned int draw_background(void)
+ {
+ 	unsigned int b;
+ 	b = s3d_new_object();
+@@ -507,7 +507,7 @@
+ 	s3d_flags_on(b, S3D_OF_VISIBLE);
+ 	return(b);
+ }
+-void chars_s3d_init(void)
++static void chars_s3d_init(void)
+ {
+ #ifdef M_CHAR
+ 	char c[2];
+@@ -523,7 +523,7 @@
+ 	s3d_clone_target(cursor, charbuf['_']);
+ #endif
+ }
+-void chars_init(void)
++static void chars_init(void)
+ {
+ #ifdef M_CHAR
+ 	int x, y;
+
+Modified: trunk/apps/s3dvt/terminal.c
+===================================================================
+--- trunk/apps/s3dvt/terminal.c	2007-10-19 00:00:31 UTC (rev 778)
++++ trunk/apps/s3dvt/terminal.c	2007-10-19 00:00:38 UTC (rev 779)
+@@ -46,7 +46,7 @@
+ static int curfgcolor = DEFAULT_FGCOLOR;
+ static int curbgcolor = DEFAULT_BGCOLOR;
+ 
+-void move_all_lines_up(void)
++static void move_all_lines_up(void)
+ {
+ 	t_line *pfirstline = (t_line*) &amp; line;
+ 	t_line *psecondline = (t_line*) &amp; line + 1;
+@@ -55,28 +55,28 @@
+ 	memcpy(pfirstline, &amp;tmpline, (MAX_LINES - 1)*sizeof(struct line_struct));
+ }
+ 
+-void clear_char(int lineid, int charid)
++static void clear_char(int lineid, int charid)
+ {
+ 	line[lineid].chars[charid].character = 0;
+ 	line[lineid].chars[charid].fgcolor = DEFAULT_FGCOLOR;
+ 	line[lineid].chars[charid].bgcolor = DEFAULT_BGCOLOR;
+ }
+ 
+-void clear_line(int lineid)
++static void clear_line(int lineid)
+ {
+ 	int i;
+ 	for (i = 0;i &lt; MAX_CHARS;i++)
+ 		clear_char(lineid, i);
+ }
+ 
+-void clear_line_after_lastchar(void)
++static void clear_line_after_lastchar(void)
+ {
+ 	int i;
+ 	for (i = cx;i &lt; MAX_CHARS;i++)
+ 		clear_char(cy, i);
+ }
+ 
+-t_line* line_is_full(void)
++static t_line* line_is_full(void)
+ {
+ 	t_line *pcurline = (t_line*) &amp; line + cy;
+ 	cy++;
+@@ -93,7 +93,7 @@
+ 	return pcurline;
+ }
+ 
+-void add_char_append(char toappend)
++static void add_char_append(char toappend)
+ {
+ 	int shouldinc = 1;
+ 	t_line *pcurline = (t_line*) &amp; line + cy;
+@@ -108,7 +108,7 @@
+ 		cx++;
+ }
+ 
+-void backspace(void)
++static void backspace(void)
+ {
+ 	if (cx &gt; 0)
+ 		cx--;
+@@ -116,7 +116,7 @@
+ 		cx = 0;
+ }
+ 
+-void endansi(void)
++static void endansi(void)
+ {
+ 	printf(&quot; [/ANSI(%d)]\n&quot;, isansi2);
+ 	isansi = 0;
+@@ -133,7 +133,7 @@
+        7                                      Negative (reverse) image
+ */
+ 
+-void ansi_change_graphic(char **args)
++static void ansi_change_graphic(char **args)
+ {
+ 	int curcol;
+ 	int i;
+@@ -194,7 +194,7 @@
+ 		}
+ 	}
+ }
+-void move_up_x_lines(char *arg)
++static void move_up_x_lines(char *arg)
+ {
+ 	t_line *pfirstline;
+ 	t_line *psecondline;
+@@ -218,7 +218,7 @@
+ 	}
+ }
+ 
+-void move_down_x_lines(char *arg)
++static void move_down_x_lines(char *arg)
+ {
+ 	t_line *pfirstline;
+ 	t_line *psecondline;
+@@ -239,7 +239,7 @@
+ 		memcpy(psecondline, &amp;tmpline, (bottom - top)*sizeof(struct line_struct));
+ 	}
+ }
+-void delete_x_letters(char *arg1)
++static void delete_x_letters(char *arg1)
+ {
+ 	int tmpint;
+ 	t_line *pcurline;
+@@ -252,7 +252,7 @@
+ 	for (i = cx;i &lt; cx + tmpint;i++)
+ 		clear_char(cy, i);
+ }
+-void move_x_letters(int mode, char *arg1)
++static void move_x_letters(int mode, char *arg1)
+ {
+ 	int tmpint;
+ 	t_line *pcurline;
+@@ -292,7 +292,7 @@
+ 		break;
+ 	}
+ }
+-void remove_beginning_from_curpos(void)
++static void remove_beginning_from_curpos(void)
+ {
+ 	int i, j = cx;
+ 	for (i = cy;i &lt; MAX_LINES;i++) {
+@@ -303,7 +303,7 @@
+ 	}
+ }
+ 
+-int parseansi(char curchar)
++static int parseansi(char curchar)
+ {
+ 	static char arg1[16] = &quot;&quot;;
+ 	static char arg2[16] = &quot;&quot;;
+@@ -501,14 +501,14 @@
+ 	}
+ 	gotnewdata = 1;
+ }
+-void init_line(void)
++static void init_line(void)
+ {
+ 	int i;
+ 	for (i = 0;i &lt; MAX_LINES;i++) {
+ 		clear_line(i);
+ 	}
+ }
+-void term_addstring(char *toprint)
++static void term_addstring(char *toprint)
+ {
+ 	char *ns;
+ 	for (ns = toprint;ns[0];ns++) {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000770.html">[S3d-svn] r778 - trunk/apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000772.html">[S3d-svn] r780 - trunk/apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#771">[ date ]</a>
+              <a href="thread.html#771">[ thread ]</a>
+              <a href="subject.html#771">[ subject ]</a>
+              <a href="author.html#771">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

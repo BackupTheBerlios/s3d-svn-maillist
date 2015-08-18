@@ -1,0 +1,795 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r441 - in trunk: . apps/dot_mcp apps/olsrs3d	apps/s3d_x11gate apps/s3dfm apps/s3dvt example libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r441%20-%20in%20trunk%3A%20.%20apps/dot_mcp%20apps/olsrs3d%0A%09apps/s3d_x11gate%20apps/s3dfm%20apps/s3dvt%20example%20libs3d%20libs3dw&In-Reply-To=%3C200609281035.k8SAZ8RJ013148%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000433.html">
+   <LINK REL="Next"  HREF="000435.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r441 - in trunk: . apps/dot_mcp apps/olsrs3d	apps/s3d_x11gate apps/s3dfm apps/s3dvt example libs3d libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r441%20-%20in%20trunk%3A%20.%20apps/dot_mcp%20apps/olsrs3d%0A%09apps/s3d_x11gate%20apps/s3dfm%20apps/s3dvt%20example%20libs3d%20libs3dw&In-Reply-To=%3C200609281035.k8SAZ8RJ013148%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r441 - in trunk: . apps/dot_mcp apps/olsrs3d	apps/s3d_x11gate apps/s3dfm apps/s3dvt example libs3d libs3dw">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Thu Sep 28 12:35:08 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000433.html">[S3d-svn] r440 - in trunk: . apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000435.html">[S3d-svn] r442 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#434">[ date ]</a>
+              <a href="thread.html#434">[ thread ]</a>
+              <a href="subject.html#434">[ subject ]</a>
+              <a href="author.html#434">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-28 12:35:05 +0200 (Thu, 28 Sep 2006)
+New Revision: 441
+
+Modified:
+   trunk/
+   trunk/apps/dot_mcp/main.c
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/search.c
+   trunk/apps/olsrs3d/search.h
+   trunk/apps/s3d_x11gate/s3d_x11gate.c
+   trunk/apps/s3dfm/event.c
+   trunk/apps/s3dfm/s3dfm.h
+   trunk/apps/s3dvt/main.c
+   trunk/example/filebrowser.c
+   trunk/example/modelloader.c
+   trunk/example/nichtsnutz.c
+   trunk/example/ptrtest.c
+   trunk/example/widgets.c
+   trunk/libs3d/callback.c
+   trunk/libs3d/s3d.h
+   trunk/libs3dw/event.c
+   trunk/libs3dw/s3dw.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1071 at balthasar</A>:  dotslash | 2006-09-28 12:34:56 +0200
+ - events now return int, not void
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1069
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1071
+
+Modified: trunk/apps/dot_mcp/main.c
+===================================================================
+--- trunk/apps/dot_mcp/main.c	2006-09-28 09:45:35 UTC (rev 440)
++++ trunk/apps/dot_mcp/main.c	2006-09-28 10:35:05 UTC (rev 441)
+@@ -241,9 +241,10 @@
+ 	} 
+ 	return(a);
+ }
+-void stop()
++int stop()
+ {
+ 	s3d_quit();
++	return(0);
+ }
+ void place_apps()
+ {
+@@ -277,7 +278,7 @@
+ 	xa=s3d_vector_angle(v,u);
+ 	s3d_rotate(menu, 0 ,30,0); 
+ }
+-void mcp_object(struct s3d_evt *hrmz)
++int mcp_object(struct s3d_evt *hrmz)
+ {
+ 	struct mcp_object *mo;
+ 	struct app *a;
+@@ -311,6 +312,7 @@
+ 		}
+ 		place_apps();
+ 	}
++	return(0);
+ }
+ void app_init(struct app *a)
+ {
+@@ -348,24 +350,23 @@
+ 	else*/
+ 		place_apps();
+ }
+-void mcp_del_object(struct s3d_evt *hrmz)
++int mcp_del_object(struct s3d_evt *hrmz)
+ {
+ 	struct mcp_object *mo;
+-	printf(&quot;omg, something got deleted!!\n&quot;);
+ 	mo=(struct mcp_object *)hrmz-&gt;buf;
+ 	del_app(mo-&gt;object);
++	return(0);
+ }
+-void object_click(struct s3d_evt *hrmz)
++int object_click(struct s3d_evt *hrmz)
+ {
+ 	struct app *a;
+ 	unsigned int i, oid;
+ 	oid=*((unsigned int *)hrmz-&gt;buf);
+-	printf(&quot;%d got clicked\n&quot;,oid);
+ 	a=apps;i=0;
+ 	if (oid==rotate)
+ 	{
+ 		rot_flag=!rot_flag;
+-		return;
++		return(0);
+ 	}
+ 	if (oid==reset)
+ 	{
+@@ -377,26 +378,27 @@
+ 		if (oid==a-&gt;close_but)
+ 		{
+ 			del_app(a-&gt;oid);
+-			return;
++			return(0);
+ 		} else 	if (oid==a-&gt;min_but)
+ 		{
+ 			if (a==focus)
+ 			{
+ 				set_focus(NULL); /* nothing is focused now */
+ 			}
+-			return;
++			return(0);
+ 		} else 	if (((oid==a-&gt;title) || (oid==a-&gt;sphere)) || (oid==a-&gt;oid))
+ 		{
+ 			printf(&quot;giving focus to [%s], %d\n&quot;,a-&gt;name,oid);
+ 			set_focus(a);
+-			return;
++			return(0);
+ 		}
+ 		i++;
+ 		a=a-&gt;next;
+ 	}
+ 	menu_click(oid);
++	return(0);
+ }
+-void object_info(struct s3d_evt *hrmz)
++int object_info(struct s3d_evt *hrmz)
+ {
+ 	struct s3d_obj_info *inf;
+ 	inf=(struct s3d_obj_info *)hrmz-&gt;buf;
+@@ -424,6 +426,7 @@
+ 			place_apps(); /* replace apps */
+ 		}
+ 	}
++	return(0);
+ }
+ void mainloop()
+ {
+@@ -462,7 +465,7 @@
+ 	nanosleep(&amp;t,NULL); 
+ }
+ 
+-void keydown(struct s3d_evt *event)
++int keydown(struct s3d_evt *event)
+ {
+ 	struct s3d_key_event *keys=(struct s3d_key_event *)event-&gt;buf;
+ 	switch (keys-&gt;keysym)
+@@ -477,8 +480,9 @@
+ 		case 's':ydif+= 1.0;break;
+ 		case 'd':xdif+= 1.0;break;
+ 	}
++	return(0);
+ }
+-void keyup(struct s3d_evt *event)
++int keyup(struct s3d_evt *event)
+ {
+ 	struct s3d_key_event *keys=(struct s3d_key_event *)event-&gt;buf;
+ 	switch (keys-&gt;keysym)
+@@ -488,6 +492,7 @@
+ 		case 's':ydif-= 1.0;break;
+ 		case 'd':xdif-= 1.0;break;
+ 	}
++	return(0);
+ 
+ }
+ 
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-09-28 09:45:35 UTC (rev 440)
++++ trunk/apps/olsrs3d/main.c	2006-09-28 10:35:05 UTC (rev 441)
+@@ -29,11 +29,12 @@
+ #include &lt;s3d.h&gt;
+ #include &lt;s3d_keysym.h&gt;
+ #include &lt;s3dw.h&gt;
+-#include &lt;time.h&gt;	      /* nanosleep() */
+-#include &lt;string.h&gt;	/* strncpy() */
+-#include &lt;math.h&gt;		/* sqrt() */
+-#include &lt;getopt.h&gt;	/* getopt() */
+-#include &lt;stdlib.h&gt;	/* exit() */
++#include &lt;sys/time.h&gt;	 /* gettimeofday() */
++#include &lt;time.h&gt;	     /* nanosleep() */
++#include &lt;string.h&gt;		 /* strncpy() */
++#include &lt;math.h&gt;		 /* sqrt() */
++#include &lt;getopt.h&gt;		 /* getopt() */
++#include &lt;stdlib.h&gt;		 /* exit() */
+ #include &quot;olsrs3d.h&quot;
+ #include &quot;search.h&quot;
+ 
+@@ -181,7 +182,7 @@
+ 
+ 	struct timeval tv;
+ 
+-	gettimeofday(tv, NULL);
++	gettimeofday(&amp;tv, NULL);
+ 
+ 	return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+ 
+@@ -782,11 +783,10 @@
+ 
+ }
+ 
+-void stop() {
+-
++int stop() {
+ 	s3d_quit();
+ 	net_quit();
+-
++	return(0);
+ }
+ 
+ /***
+@@ -795,7 +795,7 @@
+  *
+  ***/
+ 
+-void keypress(struct s3d_evt *event) {
++int keypress(struct s3d_evt *event) {
+ 
+ 	struct s3d_key_event *key=(struct s3d_key_event *)event-&gt;buf;
+ 	if( get_search_status() != WIDGET )
+@@ -881,6 +881,7 @@
+ 		if( (key-&gt;keysym &gt;= S3DK_PERIOD &amp;&amp; key-&gt;keysym &lt;= S3DK_9) || key-&gt;keysym == S3DK_COMMA || key-&gt;keysym == S3DK_RETURN || key-&gt;keysym == S3DK_BACKSPACE )
+ 			search_widget_write( key-&gt;keysym );
+ 	}
++	return(0);
+ }
+ 
+ /***
+@@ -889,12 +890,13 @@
+  *
+  ***/
+ 
+-void object_click(struct s3d_evt *evt)
++int object_click(struct s3d_evt *evt)
+ {
+-	int oid, i;
++/*	int i
+ 	char ip_str[50];
++	struct timeval tv;*/
+ 	struct olsr_node *olsr_node;
+-	struct timeval tv;
++	int oid;
+ 
+ 	s3dw_handle_click(evt);
+ /*	if( get_search_status() == WIDGET )
+@@ -968,6 +970,7 @@
+ 		s3d_translate( Olsr_ip_label_obj,-Left*3.0-(Title_len * 0.2)-0.15, -Bottom*3.0-1.0, -3.0 );
+ 
+ 	}*/
++	return(0);
+ }
+ 
+ void print_etx()
+@@ -1087,7 +1090,7 @@
+  *
+  ***/
+ 
+-void object_info(struct s3d_evt *hrmz)
++int object_info(struct s3d_evt *hrmz)
+ {
+ 	struct s3d_obj_info *inf;
+ 	inf=(struct s3d_obj_info *)hrmz-&gt;buf;
+@@ -1113,14 +1116,15 @@
+ 
+ 	}
+ 	/* printf(&quot;%f %f %f\n&quot;,inf-&gt;trans_x,inf-&gt;trans_y,inf-&gt;trans_z); */
++	return(0);
+ }
+ 
+-void mbutton_press(struct s3d_evt *hrmz)
++int mbutton_press(struct s3d_evt *hrmz)
+ {
+ 	struct s3d_but_info *inf;
+ 	inf=(struct s3d_but_info *)hrmz-&gt;buf;
+ 	printf(&quot;button %d, state %d\n&quot;, inf-&gt;button,inf-&gt;state);
+-	return;
++	return(0);
+ }
+ 
+ int main( int argc, char *argv[] ) {
+
+Modified: trunk/apps/olsrs3d/search.c
+===================================================================
+--- trunk/apps/olsrs3d/search.c	2006-09-28 09:45:35 UTC (rev 440)
++++ trunk/apps/olsrs3d/search.c	2006-09-28 10:35:05 UTC (rev 441)
+@@ -111,7 +111,7 @@
+ 	s3dw_focus	( S3DWIDGET( _search_surface ) );
+ 	s3dw_show	( S3DWIDGET( _search_surface ) );
+ 
+-	_search_widget	= search_button;
++	_search_widget	= S3DWIDGET(search_button);
+ }
+ 
+ /* public */
+
+Modified: trunk/apps/olsrs3d/search.h
+===================================================================
+--- trunk/apps/olsrs3d/search.h	2006-09-28 09:45:35 UTC (rev 440)
++++ trunk/apps/olsrs3d/search.h	2006-09-28 10:35:05 UTC (rev 441)
+@@ -36,5 +36,6 @@
+ void search_widget_write(int key);
+ void set_node_root(struct olsr_node *root);
+ void follow_node(float cam_position_t[], float cam_position_r[],float rotate);
++void follow_node_by_click(struct olsr_node *olsr_node);
+ 
+ void show_search_window();
+
+Modified: trunk/apps/s3d_x11gate/s3d_x11gate.c
+===================================================================
+--- trunk/apps/s3d_x11gate/s3d_x11gate.c	2006-09-28 09:45:35 UTC (rev 440)
++++ trunk/apps/s3d_x11gate/s3d_x11gate.c	2006-09-28 10:35:05 UTC (rev 441)
+@@ -153,7 +153,7 @@
+ /*	XDestroyImage(image);*/
+ /*	nanosleep(&amp;t,NULL); */
+ }
+-void keypress(struct s3d_evt *event)
++int keypress(struct s3d_evt *event)
+ {
+ 	int key;
+ 	int kc;
+@@ -176,15 +176,17 @@
+ 	if (kc!=0)
+ 	    XTestFakeKeyEvent(dpy, kc, 1, 1);
+ /*	    XTestFakeKeyEvent(dpy, kc, 0, 1);*/
++	return(0);
+ 
+ }
+-void mouseclick(struct s3d_evt *event)
++int mouseclick(struct s3d_evt *event)
+ {
+ 	int i;
+ 	printf(&quot;thats it, collecting:\n&quot;);
+ 	for (i=0;i&lt;3;i++)
+ 		printf(&quot;[%d] %f\n&quot;,i,count[i]/iterations);
+ 	exit(0);	
++	return(0);
+ }
+ int main(int argc, char **argv)
+ {
+
+Modified: trunk/apps/s3dfm/event.c
+===================================================================
+--- trunk/apps/s3dfm/event.c	2006-09-28 09:45:35 UTC (rev 440)
++++ trunk/apps/s3dfm/event.c	2006-09-28 10:35:05 UTC (rev 441)
+@@ -30,7 +30,7 @@
+ int typeinput=0;
+ 
+ /* info packets handler, we're just interested in the cam */
+-void event_oinfo(struct s3d_evt *hrmz)
++int event_oinfo(struct s3d_evt *hrmz)
+ {
+ 	struct s3d_obj_info *inf;
+ 	inf=(struct s3d_obj_info *)hrmz-&gt;buf;
+@@ -41,17 +41,18 @@
+ 		cam.dpz=inf-&gt;trans_z;
+ 	}
+ 	s3dw_object_info(hrmz);
++	return(0);
+ }
+ 
+ /* keyevent handler */
+-void event_key(struct s3d_evt *evt)
++int event_key(struct s3d_evt *evt)
+ {
+ 	struct s3d_key_event *keys=(struct s3d_key_event *)evt-&gt;buf;
+ 	char path[M_DIR];
+ 	if (typeinput) {	/* we have some inputfield now and want the s3dw to handle our input */	
+ 			printf(&quot;inputting text ...\n&quot;);
+ 			s3dw_handle_key(evt); 
+-			return; 
++			return(0); 
+ 	}
+ 	node_path(focus,path);
+ 	switch (keys-&gt;keysym)
+@@ -91,7 +92,6 @@
+ 		case S3DK_RIGHT:
+ 		case S3DK_DOWN:
+ 				focus_by_key(keys-&gt;keysym);
+-				printf(&quot;pindex of focus = %d\n&quot;,focus-&gt;pindex);
+ 				break;
+ 		case S3DK_RETURN:
+ 		case S3DK_SPACE:
+@@ -106,10 +106,11 @@
+ 				
+ 	}
+ 	s3dw_handle_key(evt);
++	return(0);
+ }
+ 
+ /* object click handler */
+-void event_click(struct s3d_evt *evt)
++int event_click(struct s3d_evt *evt)
+ {
+ 	int oid;
+ 	t_node *f;
+@@ -120,17 +121,18 @@
+ 		if (f-&gt;objs.close==oid)
+ 		{
+ 			box_close(f,1);
+-			return;
++			return(0);
+ 		}
+ 		if (f-&gt;objs.select==oid)
+ 		{
+ 			printf(&quot;[S]electing %s\n&quot;,f-&gt;name);
+ 			node_select(f);
+-			return;
++			return(0);
+ 		}
+ 		node_select(f);
+ 	} else {
+ /*		printf(&quot;[C]ould not find :/\n&quot;);*/
+ 	}
++	return(0);
+ }
+ 
+
+Modified: trunk/apps/s3dfm/s3dfm.h
+===================================================================
+--- trunk/apps/s3dfm/s3dfm.h	2006-09-28 09:45:35 UTC (rev 440)
++++ trunk/apps/s3dfm/s3dfm.h	2006-09-28 10:35:05 UTC (rev 441)
+@@ -114,9 +114,9 @@
+ void		 window_move(char *path);
+ void		 window_info(char *path);
+ /* event.c */
+-void 		 event_click(struct s3d_evt *evt);
+-void		 event_key(struct s3d_evt *evt);
+-void		 event_oinfo(struct s3d_evt *hrmz);
++int 		 event_click(struct s3d_evt *evt);
++int			 event_key(struct s3d_evt *evt);
++int			 event_oinfo(struct s3d_evt *hrmz);
+ /* focus.c */
+ void 		 focus_by_key(int keysym);
+ float		 focus_get_scale(t_node *f);
+
+Modified: trunk/apps/s3dvt/main.c
+===================================================================
+--- trunk/apps/s3dvt/main.c	2006-09-28 09:45:35 UTC (rev 440)
++++ trunk/apps/s3dvt/main.c	2006-09-28 10:35:05 UTC (rev 441)
+@@ -395,7 +395,7 @@
+ / * 		printf(&quot;\n&quot;); * / 
+ 	}
+ }*/
+-void keypress(struct s3d_evt *event)
++int keypress(struct s3d_evt *event)
+ {
+ 	struct s3d_key_event *keys=(struct s3d_key_event *)event-&gt;buf;
+ 	int key;
+@@ -485,6 +485,7 @@
+ 			if ((char)keys-&gt;unicode)  /*  \0 is no good idea .. */
+ 				term_addchar((char)keys-&gt;unicode);
+ 	}
++	return(0);
+ 
+ }
+ int i=0;
+@@ -511,9 +512,10 @@
+ 		paintit();
+ 	}
+ }
+-void stop(struct s3d_evt *event)
++int stop(struct s3d_evt *event)
+ {
+ 	s3d_quit();
++	return(0);
+ }
+ unsigned int draw_background()
+ {
+
+Modified: trunk/example/filebrowser.c
+===================================================================
+--- trunk/example/filebrowser.c	2006-09-28 09:45:35 UTC (rev 440)
++++ trunk/example/filebrowser.c	2006-09-28 10:35:05 UTC (rev 441)
+@@ -178,7 +178,7 @@
+ 	return(0);
+ }
+ 
+-void object_click(struct s3d_evt *evt)
++int object_click(struct s3d_evt *evt)
+ {
+ 	int i,oid;
+ 	char execstr[256];
+@@ -197,25 +197,26 @@
+ 						printf(&quot;going into %s\n&quot;,item[i].name);
+ 						chdir(item[i].name);
+ 						display_dir(&quot;.&quot;,0,0,0,0);
+-						return;
++						return(0);
+ 						break;
+ 				case T_GEOMETRY:
+ 						printf(&quot;loading geometry %s\n&quot;,item[i].name);
+ 						snprintf(execstr,256,&quot;modelloader \&quot;%s\&quot;&amp;\n&quot;,item[i].name);
+ 						system(execstr);
+-						return;
++						return(0);
+ 						break;
+ 				case T_MOVIE:
+ 						printf(&quot;playing %s\n&quot;,item[i].name);
+ 						snprintf(execstr,256,&quot;mplayer -vo s3d \&quot;%s\&quot;&amp;\n&quot;,item[i].name);
+ 						system(execstr);
+-						return;
++						return(0);
+ 						break;
+ 
+ 						
+ 			}
+ 		}
+ 	}
++	return(0);
+ }
+ void mainloop()
+ {
+
+Modified: trunk/example/modelloader.c
+===================================================================
+--- trunk/example/modelloader.c	2006-09-28 09:45:35 UTC (rev 440)
++++ trunk/example/modelloader.c	2006-09-28 10:35:05 UTC (rev 441)
+@@ -35,9 +35,10 @@
+ 	i++;
+ 	nanosleep(&amp;t,NULL); 
+ }
+-void object_click(struct s3d_evt *evt)
++int object_click(struct s3d_evt *evt)
+ {
+ 	s3d_quit();
++	return(0);
+ }
+ 	
+ int main (int argc, char **argv)
+
+Modified: trunk/example/nichtsnutz.c
+===================================================================
+--- trunk/example/nichtsnutz.c	2006-09-28 09:45:35 UTC (rev 440)
++++ trunk/example/nichtsnutz.c	2006-09-28 10:35:05 UTC (rev 441)
+@@ -100,7 +100,7 @@
+ 	nanosleep(&amp;t,NULL); 
+ }
+ 
+-void object_info(struct s3d_evt *hrmz)
++int object_info(struct s3d_evt *hrmz)
+ {
+ 	struct s3d_obj_info *inf;
+ 	inf=(struct s3d_obj_info *)hrmz-&gt;buf;
+@@ -124,11 +124,12 @@
+ 			Left=-1.0;
+ 		}
+ 	}
++	return(0);
+ }
+ 
+ 
+ 
+-void keypress(struct s3d_evt *event)
++int keypress(struct s3d_evt *event)
+ {
+ 	int key;
+ 	key=*((unsigned short *)event-&gt;buf);
+@@ -147,6 +148,7 @@
+ 				}
+ 				break;
+ 	}
++	return(0);
+ }
+ 
+ 
+
+Modified: trunk/example/ptrtest.c
+===================================================================
+--- trunk/example/ptrtest.c	2006-09-28 09:45:35 UTC (rev 440)
++++ trunk/example/ptrtest.c	2006-09-28 10:35:05 UTC (rev 441)
+@@ -34,9 +34,10 @@
+ float len=1.0;
+ int alpha=0;
+ static struct timespec t={0,10*1000*1000}; /* 100 mili seconds */
+-void stop(struct s3d_evt *evt)
++int stop(struct s3d_evt *evt)
+ {
+ 	s3d_quit();
++	return(0);
+ }
+ 
+ void mainloop()
+@@ -49,7 +50,7 @@
+ 	s3d_rotate(0,sin(a)*30,alpha,0);
+ 	nanosleep(&amp;t,NULL); 
+ }
+-void object_info(struct s3d_evt *hrmz)
++int object_info(struct s3d_evt *hrmz)
+ {
+ 	struct s3d_obj_info *inf;
+ 	inf=(struct s3d_obj_info *)hrmz-&gt;buf;
+@@ -73,8 +74,9 @@
+ 	{ /* of course, a link s3d_link(o,1 would be much easier ... */
+ 		s3d_translate(o,(inf-&gt;trans_x)*2.0,(inf-&gt;trans_y)*2.0,-2);
+ 	}
++	return(0);
+ }
+-void mbutton_press(struct s3d_evt *hrmz)
++int mbutton_press(struct s3d_evt *hrmz)
+ {
+ 	struct s3d_but_info *inf;
+ 	char s[256];
+@@ -88,6 +90,7 @@
+ 	s3d_link(o,0);			/* link to cam */
+ /*	s3d_link(o,1);*/
+ 	s3d_flags_on(o,S3D_OF_VISIBLE);
++	return(0);
+ }
+ int main (int argc, char **argv)
+ {
+
+Modified: trunk/example/widgets.c
+===================================================================
+--- trunk/example/widgets.c	2006-09-28 09:45:35 UTC (rev 440)
++++ trunk/example/widgets.c	2006-09-28 10:35:05 UTC (rev 441)
+@@ -43,15 +43,15 @@
+ /* you should always put the s3dw-handler in your own event handler,
+  * if you want s3dw to react on clicks or keys ... and i'm sure you
+  * want that ... */
+-void click(struct s3d_evt *evt)
++int click(struct s3d_evt *evt)
+ {
+-	s3dw_handle_click(evt);
++	return(s3dw_handle_click(evt));
+ }
+ void key_button(s3dw_widget *button)
+ {
+ 	s3dw_delete(button-&gt;parent); /* parent =surface. this means close containing window */
+ }
+-void key(struct s3d_evt *evt)
++int key(struct s3d_evt *evt)
+ {
+ 	struct s3d_key_event *key=(struct s3d_key_event *)evt-&gt;buf;
+ 	char string[8];
+@@ -73,6 +73,7 @@
+ 		/* of couse, show it */
+ 		s3dw_show(S3DWIDGET(miniwin));
+ 	}
++	return(0);
+ 
+ }
+ 
+
+Modified: trunk/libs3d/callback.c
+===================================================================
+--- trunk/libs3d/callback.c	2006-09-28 09:45:35 UTC (rev 440)
++++ trunk/libs3d/callback.c	2006-09-28 10:35:05 UTC (rev 441)
+@@ -24,7 +24,7 @@
+ 
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
+-static void _s3d_ignore(struct s3d_evt *evt);
++static int _s3d_ignore(struct s3d_evt *evt);
+ /*  the s3d callback list */
+ /* i know it's ugly, but it's better to have ugly code somewhere than provoke
+  * race conditions in the applications code */
+@@ -50,7 +50,7 @@
+ 			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL
+ 			};
+ /* the ignore-handler ;) */
+-static void _s3d_ignore(struct s3d_evt *evt)
++static int _s3d_ignore(struct s3d_evt *evt)
+ {
+ 	/* do plain nothing */
+ }
+
+Modified: trunk/libs3d/s3d.h
+===================================================================
+--- trunk/libs3d/s3d.h	2006-09-28 09:45:35 UTC (rev 440)
++++ trunk/libs3d/s3d.h	2006-09-28 10:35:05 UTC (rev 441)
+@@ -29,7 +29,7 @@
+ 	struct s3d_evt *next;
+ };
+ 
+-typedef void (*s3d_cb)(struct s3d_evt *);
++typedef int (*s3d_cb)(struct s3d_evt *);
+ 
+ #define S3D_EVENT_OBJ_CLICK		1
+ #define S3D_EVENT_KEY			2
+
+Modified: trunk/libs3dw/event.c
+===================================================================
+--- trunk/libs3dw/event.c	2006-09-28 09:45:35 UTC (rev 440)
++++ trunk/libs3dw/event.c	2006-09-28 10:35:05 UTC (rev 441)
+@@ -24,20 +24,19 @@
+ #include &lt;s3d.h&gt;
+ #include &lt;s3dw.h&gt;
+ #include &lt;s3dw_int.h&gt;
+-static int modkey;
+ extern s3dw_widget *_s3dw_cam;
+-void s3dw_handle_click(struct s3d_evt *evt)
++int s3dw_handle_click(struct s3d_evt *evt)
+ {
+ 	unsigned long oid=*((unsigned long *)evt-&gt;buf);
+-	s3dw_widget_event_click(s3dw_getroot(),oid);
++	return(s3dw_widget_event_click(s3dw_getroot(),oid));
+ }
+-void s3dw_handle_key(struct s3d_evt *evt)
++int s3dw_handle_key(struct s3d_evt *evt)
+ {
+ 	struct s3d_key_event *keys=(struct s3d_key_event *)evt-&gt;buf;
+-	s3dw_widget_event_key(s3dw_getroot(),keys);
++	return(s3dw_widget_event_key(s3dw_getroot(),keys));
+ }
+ 
+-void s3dw_object_info(struct s3d_evt *evt)
++int s3dw_object_info(struct s3d_evt *evt)
+ {
+ 	struct s3d_obj_info *info=(struct s3d_obj_info *)evt-&gt;buf;
+ 	if (info-&gt;object==0) /* the _s3dw_cam */
+@@ -53,4 +52,5 @@
+ 		_s3dw_cam-&gt;flags&amp;=~S3DW_ARRANGED;
+ 		s3dw_ani_needarr();
+ 	}
++	return(0);
+ }
+
+Modified: trunk/libs3dw/s3dw.h
+===================================================================
+--- trunk/libs3dw/s3dw.h	2006-09-28 09:45:35 UTC (rev 440)
++++ trunk/libs3dw/s3dw.h	2006-09-28 10:35:05 UTC (rev 441)
+@@ -137,8 +137,8 @@
+ void 				 s3dw_show(s3dw_widget *widget);
+ void 				 s3dw_focus(s3dw_widget *focus);
+ 
+-void 				 s3dw_handle_click(struct s3d_evt *evt);
+-void 				 s3dw_handle_key(struct s3d_evt *evt);
+-void 				 s3dw_object_info(struct s3d_evt *evt);
++int 				 s3dw_handle_click(struct s3d_evt *evt);
++int 				 s3dw_handle_key(struct s3d_evt *evt);
++int 				 s3dw_object_info(struct s3d_evt *evt);
+ 
+ void 				 s3dw_ani_mate();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000433.html">[S3d-svn] r440 - in trunk: . apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000435.html">[S3d-svn] r442 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#434">[ date ]</a>
+              <a href="thread.html#434">[ thread ]</a>
+              <a href="subject.html#434">[ subject ]</a>
+              <a href="author.html#434">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

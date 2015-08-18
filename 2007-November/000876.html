@@ -1,0 +1,396 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r883 - trunk/libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r883%20-%20trunk/libs3d&In-Reply-To=%3C200711252117.lAPLHDNM000914%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000875.html">
+   <LINK REL="Next"  HREF="000877.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r883 - trunk/libs3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r883%20-%20trunk/libs3d&In-Reply-To=%3C200711252117.lAPLHDNM000914%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r883 - trunk/libs3d">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 25 22:17:13 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000875.html">[S3d-svn] r882 - trunk/server
+</A></li>
+        <LI>Next message: <A HREF="000877.html">[S3d-svn] r884 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#876">[ date ]</a>
+              <a href="thread.html#876">[ thread ]</a>
+              <a href="subject.html#876">[ subject ]</a>
+              <a href="author.html#876">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-25 22:17:12 +0100 (Sun, 25 Nov 2007)
+New Revision: 883
+
+Added:
+   trunk/libs3d/texture.c
+Modified:
+   trunk/libs3d/CMakeLists.txt
+   trunk/libs3d/hash.c
+   trunk/libs3d/io.c
+   trunk/libs3d/proto_in.c
+   trunk/libs3d/proto_out.c
+   trunk/libs3d/s3dlib.h
+   trunk/libs3d/tcp.c
+Log:
+- add texture.c to handle object-texture hash
+
+
+Modified: trunk/libs3d/CMakeLists.txt
+===================================================================
+--- trunk/libs3d/CMakeLists.txt	2007-11-25 21:16:02 UTC (rev 882)
++++ trunk/libs3d/CMakeLists.txt	2007-11-25 21:17:12 UTC (rev 883)
+@@ -3,7 +3,7 @@
+ add_library(s3d SHARED callback.c error.c event.c fontselect.c freetype.c
+ 	io.c modelread.c network.c object_queue.c proto_in.c proto_out.c
+ 	sei_construct.c sei_misc.c sei_monotone.c sei_tri.c shm.c
+-	shm_ringbuf.c tcp.c vector.c hash.c)
++	shm_ringbuf.c tcp.c vector.c hash.c texture.c)
+ target_link_libraries(s3d ${G3D_LIBRARIES} ${FONTCONFIG_LIBRARIES})
+ 
+ # install
+
+Modified: trunk/libs3d/hash.c
+===================================================================
+--- trunk/libs3d/hash.c	2007-11-25 21:16:02 UTC (rev 882)
++++ trunk/libs3d/hash.c	2007-11-25 21:17:12 UTC (rev 883)
+@@ -290,7 +290,6 @@
+ 	_s3d_hash_delete(hash, NULL);	/* remove hash and eventual overflow buckets but not the content itself. */
+ 
+ 	return( new_hash);
+-
+ }
+ 
+ 
+
+Modified: trunk/libs3d/io.c
+===================================================================
+--- trunk/libs3d/io.c	2007-11-25 21:16:02 UTC (rev 882)
++++ trunk/libs3d/io.c	2007-11-25 21:17:12 UTC (rev 883)
+@@ -149,6 +149,7 @@
+ 	net_send(S3D_P_C_INIT, buf, strlen(buf));
+ 
+ 	_queue_init();
++	_s3d_texture_init();
+ #ifdef SIGS
+ 	if (signal(SIGINT, (sig_t)sigint_handler) == SIG_ERR)
+ 		errdn(LOW, &quot;s3d_init():signal()&quot;, errno);
+@@ -169,6 +170,7 @@
+ int s3d_quit(void)
+ {
+ 	struct s3d_evt *ret;
++	_s3d_texture_quit();
+ 	if (con_type != CON_NULL &amp;&amp; _s3d_ready) {
+ 		net_send(S3D_P_C_QUIT, NULL, 0);
+ 		switch (con_type) {
+
+Modified: trunk/libs3d/proto_in.c
+===================================================================
+--- trunk/libs3d/proto_in.c	2007-11-25 21:16:02 UTC (rev 882)
++++ trunk/libs3d/proto_in.c	2007-11-25 21:17:12 UTC (rev 883)
+@@ -154,6 +154,8 @@
+ 
+ 			s3dprintf(MED, &quot;S3D_P_S_SHMTEX: texture %d of object %d is available under shmid %d&quot;,
+ 						tshm-&gt;tex, tshm-&gt;oid, tshm-&gt;shmid);
++			_s3d_handle_texshm(tshm);
++			free(buf);
+ 
+ 		} else 
+ 			s3dprintf(MED, &quot;wrong length for S3D_P_S_SHMTEX length %d != %d&quot;, length, sizeof(struct s3d_texshm));
+
+Modified: trunk/libs3d/proto_out.c
+===================================================================
+--- trunk/libs3d/proto_out.c	2007-11-25 21:16:02 UTC (rev 882)
++++ trunk/libs3d/proto_out.c	2007-11-25 21:17:12 UTC (rev 883)
+@@ -787,6 +787,10 @@
+ {
+ 	char    buf[MF_LEN+4], *ptr;
+ 	int     linestep, lines, i;
++	if (_s3d_load_texture_shm(object, tex, xpos, ypos, w, h, data) == 0) {
++		/* TODO: send update event to server */
++		return(0);	/* did it over shm */
++	}
+ 	linestep = (MF_LEN - 16) / (w * 4);
+ 	if (linestep == 0)
+ 		return(-1);  /*  won't do that. .. yet */
+
+Modified: trunk/libs3d/s3dlib.h
+===================================================================
+--- trunk/libs3d/s3dlib.h	2007-11-25 21:16:02 UTC (rev 882)
++++ trunk/libs3d/s3dlib.h	2007-11-25 21:17:12 UTC (rev 883)
+@@ -24,6 +24,7 @@
+ 
+ #include &lt;stdint.h&gt;
+ #include &quot;config.h&quot;
++#include &quot;hash.h&quot;
+ #ifdef __APPLE__
+ #ifdef SHM
+ #undef SHM
+@@ -77,6 +78,17 @@
+ /*  char *s3d_open_file(char *fname); */
+ int net_prot_in(uint8_t opcode, uint16_t length, char *buf);
+ 
++/* what we get from the wires */
++struct s3d_texshm {
++	int32_t oid, tex, shmid;
++	uint16_t tw, th, w, h;
++} __attribute__((__packed__));
++/* for internal use. */
++struct s3d_tex {
++	struct s3d_texshm tshm;
++	char *buf;
++} __attribute__((__packed__));
++
+ #ifdef DEBUG
+ #ifdef HAVE_GCCVISIBILITY
+ #pragma GCC visibility push(default) /* Only export following functions */
+@@ -114,11 +126,6 @@
+ #ifdef SIGS
+ extern int _s3d_sigio;
+ #endif
+-/* proto_in.c */
+-struct s3d_texshm {
+-	int32_t oid, tex, shmid;
+-	uint16_t tw, th, w, h;
+-} __attribute__((__packed__));
+ /*  network.c */
+ extern int con_type;
+ int net_send(uint8_t opcode, char *buf, uint16_t length);
+@@ -158,3 +165,9 @@
+ 	int next, prev, done;
+ };
+ int _s3d_tesselate(struct tessp_t *t, struct t_buf *b);
++/* texture.c */
++int _s3d_texture_init(void);
++int _s3d_texture_quit(void);
++void _s3d_handle_texshm(struct s3d_texshm *tshm);
++int _s3d_load_texture_shm(int object, uint32_t tid, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h, uint8_t *data);
++
+
+Modified: trunk/libs3d/tcp.c
+===================================================================
+--- trunk/libs3d/tcp.c	2007-11-25 21:16:02 UTC (rev 882)
++++ trunk/libs3d/tcp.c	2007-11-25 21:17:12 UTC (rev 883)
+@@ -66,12 +66,12 @@
+ #ifdef WIN32
+ 	WSADATA datainfo;
+ 	if (WSAStartup(257, &amp;datainfo) != 0) {
+-		errn(&quot;s3d_init():startup()&quot;, errno);
++		errn(&quot;_tcp_init()():startup()&quot;, errno);
+ 		return(-1);
+ 	}
+ #endif
+ 	if ((sd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) &lt; 0) {
+-		errn(&quot;s3d_init():socket()&quot;, errno);
++		errn(&quot;_tcp_init()():socket()&quot;, errno);
+ 		return (-1);
+ 	}
+ 	sock.sin_family = AF_INET;
+@@ -80,14 +80,14 @@
+ 	if ((server = gethostbyname(sv)))
+ 		memcpy(&amp;sock.sin_addr.s_addr, server-&gt;h_addr_list[0], 4);
+ 	else {
+-		errn(&quot;s3d_init():gethostbyname()&quot;, errno);
++		errn(&quot;_tcp_init()():gethostbyname()&quot;, errno);
+ 		return(-1);
+ 	}
+ 	sock.sin_port = htons(pn);
+ 
+ 	res = connect(sd, (struct sockaddr *) &amp; sock, sizeof(struct sockaddr_in));
+ 	if (res &lt; 0) {
+-		errn(&quot;s3d_init():connect()&quot;, errno);
++		errn(&quot;_tcp_init()():connect()&quot;, errno);
+ 		return(-1);
+ 	}
+ 	/*    if ( fcntl(sd, F_SETFL, O_ASYNC | O_NONBLOCK) &lt; 0 ) */
+
+Added: trunk/libs3d/texture.c
+===================================================================
+--- trunk/libs3d/texture.c	2007-11-25 21:16:02 UTC (rev 882)
++++ trunk/libs3d/texture.c	2007-11-25 21:17:12 UTC (rev 883)
+@@ -0,0 +1,143 @@
++/*
++ * texture.c
++ *
++ * Copyright (C) 2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * The s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ *
++ * The s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#include &quot;s3d.h&quot;
++#include &quot;s3dlib.h&quot;
++#ifdef SHM
++#include &lt;sys/types.h&gt;
++#include &lt;sys/ipc.h&gt;
++#include &lt;sys/shm.h&gt;
++#endif
++#include &lt;stdlib.h&gt;		/* malloc(), free() */
++#include &lt;errno.h&gt;		/* errno */
++#include &lt;string.h&gt;		/* memcpy() */
++
++static int _s3d_compare_cb(void *d1, void *d2);
++static int _s3d_choose_cb(void *d1, int size);
++static void _s3d_free_s3dtex(void *d1);
++static struct hashtable_t *tex_hash = NULL;
++
++static int _s3d_choose_cb(void *d1, int size) 
++{
++	struct s3d_texshm *t1 = d1;
++	return((t1-&gt;oid*32 + t1-&gt;tex)%size);
++}
++
++static int _s3d_compare_cb(void *d1, void *d2) 
++{
++	struct s3d_texshm *t1, *t2;
++	t1 = d1;
++	t2 = d2;
++	if ((t1-&gt;oid == t2-&gt;oid) &amp;&amp; (t1-&gt;tex == t2-&gt;tex))
++		return(0);
++	return(1);
++}
++
++static void _s3d_free_s3dtex(void *d1) 
++{
++	struct s3d_tex *tex = d1;
++#ifdef SHM	
++	if (tex-&gt;buf != NULL) {
++		shmdt(tex-&gt;buf);
++		tex-&gt;buf= NULL;
++	}
++	shmctl(tex-&gt;tshm.shmid, IPC_RMID, NULL);
++	free(tex);
++#endif
++	return;
++}
++
++void _s3d_handle_texshm(struct s3d_texshm *tshm) 
++{
++	struct s3d_tex *tex = NULL;
++	if (tex_hash == NULL)
++		return;
++#ifdef SHM
++	tex = _s3d_hash_remove(tex_hash, tshm);
++	if (tex != NULL)
++		_s3d_free_s3dtex(tex);
++	if (tshm-&gt;shmid == -1)
++		return;
++
++	tex = malloc(sizeof(*tex));
++	tex-&gt;tshm = *tshm;
++	tex-&gt;buf = shmat(tex-&gt;tshm.shmid, (void *)0, 0);
++    if ((key_t *)tex-&gt;buf == (key_t *)(-1)) {
++          errn(&quot;shm_init():shmat()&quot;, errno);
++		  free(tex);
++          return;
++	}
++	_s3d_hash_add(tex_hash, tex);
++#endif
++	return;
++}
++int _s3d_load_texture_shm(int object, uint32_t tid, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h, uint8_t *data)
++{
++	struct s3d_texshm check;
++	struct s3d_tex *tex;
++   	int32_t i, p1, p2, m;
++    int16_t mw, mh; 
++
++	if (tex_hash == NULL)
++		return(-1);
++	check.oid = object;
++	check.tex = tid;
++	tex = _s3d_hash_find(tex_hash, (void *)&amp;check);
++
++	/* found it, assume that it's properly attached. */
++	m = tex-&gt;tshm.w * tex-&gt;tshm.th + tex-&gt;tshm.tw;     /*  maximum: position of the last pixel in the buffer */
++	if ((xpos + w) &gt; tex-&gt;tshm.tw)	mw = (tex-&gt;tshm.tw - xpos);
++	else							mw = w;
++	if ((ypos + h) &gt; tex-&gt;tshm.th)	mh = (tex-&gt;tshm.th - ypos);
++	else							mh = h;
++	
++	if (mw &lt;= 0) { /*  nothing to do */
++		return(0);
++	}
++	for (i = 0;i &lt; mh;i++) {
++		p1 = (ypos + i) * tex-&gt;tshm.w + xpos;  /*  scanline start position */
++		p2 = mw;  /*  and length */
++		if (p1 &gt; m) {
++			break;   /*  need to break here. */
++		}
++		memcpy(	tex-&gt;buf + 4*p1,    /*  draw at p1 position ... */
++				data + 4*i*w,   /*  scanline number i ... */
++				4*p2);
++	}
++	return(0);
++}
++int _s3d_texture_init(void)
++{
++	tex_hash = _s3d_hash_new(256, _s3d_compare_cb, _s3d_choose_cb);
++	if (tex_hash == NULL)
++		return(-1);
++	else
++		return(0);
++}
++int _s3d_texture_quit(void) 
++{
++	if (tex_hash == NULL)
++		return(-1);
++	_s3d_hash_delete(tex_hash, _s3d_free_s3dtex);
++	return(0);
++}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000875.html">[S3d-svn] r882 - trunk/server
+</A></li>
+	<LI>Next message: <A HREF="000877.html">[S3d-svn] r884 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#876">[ date ]</a>
+              <a href="thread.html#876">[ thread ]</a>
+              <a href="subject.html#876">[ subject ]</a>
+              <a href="author.html#876">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

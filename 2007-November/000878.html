@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r885 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r885%20-%20trunk/server&In-Reply-To=%3C200711252209.lAPM9dfE004166%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000877.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r885 - trunk/server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r885%20-%20trunk/server&In-Reply-To=%3C200711252209.lAPM9dfE004166%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r885 - trunk/server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 25 23:09:39 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000877.html">[S3d-svn] r884 - trunk/libs3d
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#878">[ date ]</a>
+              <a href="thread.html#878">[ thread ]</a>
+              <a href="subject.html#878">[ subject ]</a>
+              <a href="author.html#878">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-25 23:09:38 +0100 (Sun, 25 Nov 2007)
+New Revision: 885
+
+Modified:
+   trunk/server/object.c
+   trunk/server/proto.c
+Log:
+- silence debuging a little bit
+- remove displaylist in obj_update_tex()
+- shared memory textures should work now ;)
+
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2007-11-25 21:53:09 UTC (rev 884)
++++ trunk/server/object.c	2007-11-25 22:09:38 UTC (rev 885)
+@@ -857,6 +857,13 @@
+ 		return(-1);
+ 	tex = &amp;obj-&gt;p_tex[tid];
+ 
++	if (obj-&gt;dplist) {
++		s3dprintf(VLOW, &quot;freeing display list %d to get new data&quot;, obj-&gt;dplist);
++		glDeleteLists(obj-&gt;dplist, 1);
++		obj-&gt;dplist = 0;
++	}
++
++
+ 	if ((tex-&gt;gl_texnum) != -1) {
+ 		t = tex-&gt;gl_texnum;
+ 		/* s3dprintf(MED,&quot;updating texture %d at [%d %d] with a [%d %d] pixbuf&quot;,t,x,y,w,h); */
+@@ -883,12 +890,6 @@
+ 		if (tex &lt; obj-&gt;n_tex) {
+ 			t = &amp;obj-&gt;p_tex[tex];
+ 			if (t-&gt;buf != NULL) {
+-				if (obj-&gt;dplist) {
+-					s3dprintf(VLOW, &quot;freeing display list %d to get new data&quot;, obj-&gt;dplist);
+-					glDeleteLists(obj-&gt;dplist, 1);
+-					obj-&gt;dplist = 0;
+-				}
+-
+ 				m = t-&gt;w * t-&gt;th + t-&gt;tw;     /*  maximum: position of the last pixel in the buffer */
+ 				if ((x + w) &gt; t-&gt;tw)
+ 					mw = (t-&gt;tw - x);
+@@ -1574,7 +1575,7 @@
+ 			glGenTextures(1, &amp;t);
+ 			glBindTexture(GL_TEXTURE_2D, t);
+ 			tex-&gt;gl_texnum = t;
+-			s3dprintf(HIGH, &quot;generated texture %d [%dx%d, in memory %dx%d]&quot;, t, tex-&gt;tw, tex-&gt;th, tex-&gt;w, tex-&gt;h);
++			s3dprintf(LOW, &quot;generated texture %d [%dx%d, in memory %dx%d]&quot;, t, tex-&gt;tw, tex-&gt;th, tex-&gt;w, tex-&gt;h);
+ 			/*    for (j=0;j&lt;tex-&gt;th;j++)
+ 			    for (i=0;i&lt;tex-&gt;tw;i++)
+ 			    {
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2007-11-25 21:53:09 UTC (rev 884)
++++ trunk/server/proto.c	2007-11-25 22:09:38 UTC (rev 885)
+@@ -315,7 +315,7 @@
+ 			cptr += 2;
+ 			h = ntohs(*((uint16_t *)cptr));
+ 			cptr += 2;
+-			s3dprintf(MED, &quot;UPDATE_TEX[%d]: oid %d, texture %d, [%d x %d] data at [%d x %d] &quot;, length, oid, toid, w, h, x, y);
++			s3dprintf(VLOW, &quot;UPDATE_TEX[%d]: oid %d, texture %d, [%d x %d] data at [%d x %d] &quot;, length, oid, toid, w, h, x, y);
+ 			obj_update_tex(p, oid, toid, x, y, w, h, NULL);
+ 		}
+ 		break;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000877.html">[S3d-svn] r884 - trunk/libs3d
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#878">[ date ]</a>
+              <a href="thread.html#878">[ thread ]</a>
+              <a href="subject.html#878">[ subject ]</a>
+              <a href="author.html#878">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

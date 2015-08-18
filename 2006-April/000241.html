@@ -1,0 +1,327 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r248 - in trunk: . client
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-April/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r248%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200604100853.k3A8rbZ3015908%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000240.html">
+   <LINK REL="Next"  HREF="000242.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r248 - in trunk: . client</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r248%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200604100853.k3A8rbZ3015908%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r248 - in trunk: . client">dotslash at berlios.de
+       </A><BR>
+    <I>Mon Apr 10 10:53:37 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000240.html">[S3d-svn] r247 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000242.html">[S3d-svn] r249 - trunk/apps/s3dgps
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#241">[ date ]</a>
+              <a href="thread.html#241">[ thread ]</a>
+              <a href="subject.html#241">[ subject ]</a>
+              <a href="author.html#241">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-04-10 10:53:33 +0200 (Mon, 10 Apr 2006)
+New Revision: 248
+
+Modified:
+   trunk/
+   trunk/client/3dsread.c
+   trunk/client/freetype.c
+   trunk/client/proto_out.c
+   trunk/client/s3d.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r377 at balthasar</A>:  dotslash | 2006-04-10 10:53:27 +0200
+ - htonl() -&gt; clientlib (don't bother user/coder with this stuff)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:375
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:377
+
+Modified: trunk/client/3dsread.c
+===================================================================
+--- trunk/client/3dsread.c	2006-04-09 19:06:17 UTC (rev 247)
++++ trunk/client/3dsread.c	2006-04-10 08:53:33 UTC (rev 248)
+@@ -26,7 +26,6 @@
+ #include &quot;s3dlib.h&quot;
+ #include &lt;stdlib.h&gt; 	 /*  exit(), malloc() */
+ #include &lt;math.h&gt;		 /*  sqrt() */
+-#include &lt;netinet/in.h&gt;  /*  htonl() */
+ #include &lt;string.h&gt; 	 /*  strncpy() */
+ #include &lt;errno.h&gt; 		 /*  errno */
+ #define MAXSTRN		20
+@@ -140,7 +139,7 @@
+ 	{
+ 		for (j=0;j&lt;3;j++)
+ 		{
+-			k=ntohl(pbuf[i*4+j])-voff;
++			k=pbuf[i*4+j]-voff;
+ 			if (v_t_buf[k].g!=g)  /*  not added in this group yet */
+ 			{
+ 				for (n=0;n&lt;3;n++)
+@@ -159,7 +158,7 @@
+ 	{
+ 		for (j=0;j&lt;3;j++)
+ 		{
+-			k=ntohl(pbuf[i*4+j])-voff;
++			k=pbuf[i*4+j]-voff;
+ 			if (v_t_buf[k].num&gt;1)  /*  if more than 1, normalize. */
+ 			{
+ 				len=sqrt(v_t_buf[k].n[0]*v_t_buf[k].n[0]+v_t_buf[k].n[1]*v_t_buf[k].n[1]+v_t_buf[k].n[2]*v_t_buf[k].n[2]);
+@@ -217,7 +216,7 @@
+ 		}
+ 		for (j=0;j&lt;3;j++)
+ 		{
+-			v[j]=ntohl(poly_buf[i*4+j])-voff;
++			v[j]=poly_buf[i*4+j]-voff;
+ 			if (v[j]&gt;=vertexnum)  /*  bad input */
+ 			{
+ 				errds(VHIGH,&quot;calc_normals()&quot;,&quot;bad input, polygon vertex index out of range&quot;);
+@@ -356,10 +355,10 @@
+ 			if (poly_buf==NULL) break;
+ 		    for (j=0; j&lt;polynum; j++)
+ 			{
+-				poly_buf[j*4+0]=htonl(vertex_offset+gints(ptr+0)); 
+-				poly_buf[j*4+1]=htonl(vertex_offset+gints(ptr+2));
+-				poly_buf[j*4+2]=htonl(vertex_offset+gints(ptr+4));
+-				poly_buf[j*4+3]=htonl(col_obj);  /*  we should have a default material .... */
++				poly_buf[j*4+0]=vertex_offset+gints(ptr+0); 
++				poly_buf[j*4+1]=vertex_offset+gints(ptr+2);
++				poly_buf[j*4+2]=vertex_offset+gints(ptr+4);
++				poly_buf[j*4+3]=col_obj;  /*  we should have a default material .... */
+ 				ptr+=sizeof(unsigned short)*4;
+ 		    }
+ 			break;
+@@ -382,7 +381,7 @@
+ 			{
+ 				j=gints(ptr+2*i);
+ 				if (j&gt;=0 &amp;&amp; j&lt;polynum)
+-					poly_buf[gints(ptr+2*i)*4+3]=htonl(col_obj); 
++					poly_buf[gints(ptr+2*i)*4+3]=col_obj; 
+ 				else {
+ 					errds(MED,&quot;s3d_import_3ds()&quot;,&quot;polygon %d out of range!&quot;,j);
+ 				}
+
+Modified: trunk/client/freetype.c
+===================================================================
+--- trunk/client/freetype.c	2006-04-09 19:06:17 UTC (rev 247)
++++ trunk/client/freetype.c	2006-04-10 08:53:33 UTC (rev 248)
+@@ -27,7 +27,6 @@
+ #include &quot;s3dlib.h&quot;
+ #include &quot;sei_interface.h&quot;	/* sei_triangulate_polygon() */
+ #include &lt;stdlib.h&gt;    		/*  malloc(), free() */
+-#include &lt;netinet/in.h&gt;  	/*  htonl(), htons() */
+ #include &lt;math.h&gt;			/*  atan2() */
+ #include &quot;ft2build.h&quot;
+ #include FT_FREETYPE_H
+@@ -298,11 +297,6 @@
+ 						pbuf[i*4+1],
+ 						pbuf[i*4+2],
+ 						pbuf[i*4+3],*voff);*/
+-		pbuf[i*4]=htonl(pbuf[i*4]);
+-		pbuf[i*4+1]=htonl(pbuf[i*4+1]);
+-		pbuf[i*4+2]=htonl(pbuf[i*4+2]);
+-		pbuf[i*4+3]=htonl(pbuf[i*4+3]);
+-
+ 	}
+ 	dprintf(VLOW,&quot;commiting %d vertices, %d polygons&quot;,tess_buf[a].vn,tess_buf[a].pn);
+ 	s3d_push_vertices(oid,vbuf,tess_buf[a].vn);
+
+Modified: trunk/client/proto_out.c
+===================================================================
+--- trunk/client/proto_out.c	2006-04-09 19:06:17 UTC (rev 247)
++++ trunk/client/proto_out.c	2006-04-10 08:53:33 UTC (rev 248)
+@@ -245,45 +245,53 @@
+ /*  assumes to have a list of polys which consists of v1,v2,v3,material */
+ int s3d_push_polygons(int object, unsigned long *pbuf, unsigned short n)
+ {
+-	char				buf[MF_LEN+4],*ptr;
+-	int					f,i,len=n*4*4;
++	unsigned long		buf[(MF_LEN+4)/4];
++	unsigned long		*s,*d;
++	int					f,i,j,len=n*4*4;
+ 	int					flen,stepl;
+ 	if (n&lt;1)
+ 		return(-1);
+ 	stepl=((int)((MF_LEN-4)/(4*4)))*(4*4);
+ 	f=len/(MF_LEN-4)+1;  /*  how many fragments? */
++
++	buf[0]=htonl(object);
++	d=buf+1;
+ 	for (i=0;i&lt;f;i++)
+ 	{
+-		ptr=buf;
+-		*((uint32_t *)ptr)=htonl(object);			ptr+=sizeof(uint32_t);		  /*  object id */
+-		if (len-i*stepl&gt;stepl)
+-			flen=stepl;
+-		else
+-			flen=(len-i*stepl);
+-		memcpy(ptr,(char *)pbuf+i*stepl,flen);
+-		net_send(S3D_P_C_PUSH_POLY,buf,flen+4);
++		if (len-i*stepl&gt;stepl)			flen=stepl;
++		else							flen=(len-i*stepl);
++
++		s=pbuf+i*stepl/4;
++		for (j=0;j&lt;flen/4;j++)
++			d[j]=htonl(s[j]);
++		net_send(S3D_P_C_PUSH_POLY,(char *)buf,flen+4);
+ 	}
+ 	return(0);
+ }
+ int s3d_push_lines(int object, unsigned long *lbuf, unsigned short n)
+ {
+-	char				buf[MF_LEN+4],*ptr;
+-	int					f,i,len=n*4*3;
++	unsigned long		buf[(MF_LEN+4)/4];
++	unsigned long		*s,*d;
++	int					f,i,j,len=n*4*3;
+ 	int					flen,stepl;
+ 	if (n&lt;1)
+ 		return(-1);
+ 	stepl=((int)((MF_LEN-4)/(4*3)))*(4*3);
+ 	f=len/(MF_LEN-4)+1;  /*  how many fragments? */
++
++	buf[0]=htonl(object);
++	d=buf+1;
++
+ 	for (i=0;i&lt;f;i++)
+ 	{
+-		ptr=buf;
+-		*((uint32_t *)ptr)=htonl(object);			ptr+=sizeof(uint32_t);		  /*  object id */
+-		if (len-i*stepl&gt;stepl)
+-			flen=stepl;
+-		else
+-			flen=(len-i*stepl);
+-		memcpy(ptr,(char *)lbuf+i*stepl,flen);
+-		net_send(S3D_P_C_PUSH_LINE,buf,flen+4);
++		if (len-i*stepl&gt;stepl)			flen=stepl;
++		else							flen=(len-i*stepl);
++
++		s=lbuf+i*stepl/4;
++		for (j=0;j&lt;flen/4;j++)
++			d[j]=htonl(s[j]);
++
++		net_send(S3D_P_C_PUSH_LINE,(char *)buf,flen+4);
+ 	}
+ 	return(0);
+ }
+@@ -299,25 +307,30 @@
+ 	net_send(S3D_P_C_PUSH_TEX,buf,len);
+ 	return(0);
+ }
+-int s3d_push_textures(int object, unsigned long *pbuf, unsigned short n)
++int s3d_push_textures(int object, unsigned short *tbuf, unsigned short n)
+ {
+-	char				buf[MF_LEN+4],*ptr;
+-	int					f,i,len=n*2*2;
++	unsigned short		buf[(MF_LEN+4)/2];
++	unsigned short		*s,*d;
++
++	int					f,i,j,len=n*2*2;
+ 	int					flen,stepl;
+ 	if (n&lt;1)
+ 		return(-1);
+ 	stepl=((int)((MF_LEN-4)/(2*2)))*(2*2);
+ 	f=len/(MF_LEN-4)+1;  /*  how many fragments? */
++
++	*((unsigned long *)buf)=htonl(object);
++	d=buf+2;
++
+ 	for (i=0;i&lt;f;i++)
+ 	{
+-		ptr=buf;
+-		*((uint32_t *)ptr)=htonl(object);			ptr+=sizeof(uint32_t);		  /*  object id */
+-		if (len-i*stepl&gt;stepl)
+-			flen=stepl;
+-		else
+-			flen=(len-i*stepl);
+-		memcpy(ptr,(char *)pbuf+i*stepl,flen);
+-		net_send(S3D_P_C_PUSH_POLY,buf,flen+4);
++		if (len-i*stepl&gt;stepl)			flen=stepl;
++		else							flen=(len-i*stepl);
++
++		s=tbuf+i*stepl/2;
++		for (j=0;j&lt;flen/2;j++)
++			d[j]=htons(s[j]);
++		net_send(S3D_P_C_PUSH_POLY,(char *)buf,flen+4);
+ 	}
+ 	return(0);
+ }
+@@ -495,14 +508,16 @@
+ /*  replaces the last n lines. */
+ int s3d_pep_lines(int object, unsigned long *lbuf,unsigned short n)
+ {
+-	unsigned char buf[MF_LEN+4];
++	unsigned long 	buf[MF_LEN+4];
++	int				i;
+ 	if ((n*3*4+4)&gt;MF_LEN) 
+ 	{
+-		errds(MED,&quot;s3d_pep_vertices()&quot;,&quot;too much data&quot;);
++		errds(MED,&quot;s3d_pep_lines()&quot;,&quot;too much data&quot;);
+ 		return(-1);  /*  impossible */
+ 	}
+-	*((uint32_t *)buf)=htonl(object);
+-	memcpy(buf+4,lbuf,3*4*n);
++	buf[0]=htonl(object);
++	for (i=0;i&lt;3*n;i++)
++		buf[i+1]=htonl(lbuf[0]);
+ 	net_send(S3D_P_C_PEP_LINE, (char *)buf,n*3*4+4);
+ 	return(0);
+ 	
+
+Modified: trunk/client/s3d.h
+===================================================================
+--- trunk/client/s3d.h	2006-04-09 19:06:17 UTC (rev 247)
++++ trunk/client/s3d.h	2006-04-10 08:53:33 UTC (rev 248)
+@@ -104,6 +104,7 @@
+ int s3d_push_line(int object, unsigned long v1, unsigned long v2, unsigned long material);
+ int s3d_push_lines(int object, unsigned long *lbuf, unsigned short n);
+ int s3d_push_texture(int object, unsigned short w, unsigned short h);
++int s3d_push_textures(int object, unsigned short *tbuf, unsigned short n);
+ int s3d_pop_vertex(int object, unsigned long n);
+ int s3d_pop_polygon(int object, unsigned long n);
+ int s3d_pop_material(int object, unsigned long n);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000240.html">[S3d-svn] r247 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000242.html">[S3d-svn] r249 - trunk/apps/s3dgps
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#241">[ date ]</a>
+              <a href="thread.html#241">[ thread ]</a>
+              <a href="subject.html#241">[ subject ]</a>
+              <a href="author.html#241">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

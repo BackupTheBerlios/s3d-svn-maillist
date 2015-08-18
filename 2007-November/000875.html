@@ -1,0 +1,206 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r882 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r882%20-%20trunk/server&In-Reply-To=%3C200711252116.lAPLG3Ji000849%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000874.html">
+   <LINK REL="Next"  HREF="000876.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r882 - trunk/server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r882%20-%20trunk/server&In-Reply-To=%3C200711252116.lAPLG3Ji000849%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r882 - trunk/server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 25 22:16:03 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000874.html">[S3d-svn] r881 - trunk/server
+</A></li>
+        <LI>Next message: <A HREF="000876.html">[S3d-svn] r883 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#875">[ date ]</a>
+              <a href="thread.html#875">[ thread ]</a>
+              <a href="subject.html#875">[ subject ]</a>
+              <a href="author.html#875">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-25 22:16:02 +0100 (Sun, 25 Nov 2007)
+New Revision: 882
+
+Modified:
+   trunk/server/global.h
+   trunk/server/object.c
+   trunk/server/proto.c
+   trunk/server/proto.h
+Log:
+- add UPDATE call and let obj_update_tex() handle it
+
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2007-11-25 20:43:20 UTC (rev 881)
++++ trunk/server/global.h	2007-11-25 21:16:02 UTC (rev 882)
+@@ -341,6 +341,7 @@
+ int obj_load_poly_texc(struct t_process *p, int32_t oid, float *x, int32_t start, int32_t n);
+ int obj_load_mat(struct t_process *p, int32_t oid, float *x, int32_t start, int32_t n);
+ int obj_load_tex(struct t_process *p, int32_t oid, int32_t tex, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *pixbuf);
++int obj_update_tex(struct t_process *p, int32_t oid, int32_t tid, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *pixbuf);
+ int obj_del_vertex(struct t_process *p, int32_t oid, int32_t n);
+ int obj_del_mat(struct t_process *p, int32_t oid, int32_t n);
+ int obj_del_poly(struct t_process *p, int32_t oid, int32_t n);
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2007-11-25 20:43:20 UTC (rev 881)
++++ trunk/server/object.c	2007-11-25 21:16:02 UTC (rev 882)
+@@ -41,7 +41,6 @@
+ #define MAXLOOP 10
+ /*  if oid is always unsigned, we don't have to check oid&gt;=0 */
+ 
+-static void obj_update_tex(struct t_tex *tex, u_int16_t x, u_int16_t y, u_int16_t w, u_int16_t h, u_int8_t *pixbuf);
+ void obj_sys_update(struct t_process *p, int32_t oid);
+ 
+ int texture_shm_register(struct t_tex *tex, int bufsize);
+@@ -840,10 +839,24 @@
+ 		return(-1);
+ 	return(0);
+ }
+-/* the interal texture updating function ... this is for opengl*/
+-static void obj_update_tex(struct t_tex *tex, u_int16_t S3DUNUSED(x), u_int16_t S3DUNUSED(y), u_int16_t S3DUNUSED(w), u_int16_t S3DUNUSED(h), u_int8_t *S3DUNUSED(pixbuf))
++/* notify graphic system that the texture is updated */
++int obj_update_tex(struct t_process *p, int32_t oid, int32_t tid,uint16_t S3DUNUSED(x), uint16_t S3DUNUSED(y), uint16_t S3DUNUSED(w), uint16_t S3DUNUSED(h), uint8_t *S3DUNUSED(pixbuf))
+ {
+ 	GLuint t;
++	struct t_obj *obj;
++	struct t_tex *tex;
++
++	if (OBJ_VALID(p, oid, obj)) {
++		if (obj-&gt;oflags&amp;OF_NODATA) {
++			errds(MED, &quot;obj_load_tex()&quot;, &quot;error: no data on object allowed!&quot;);
++			return(-1);
++		}
++		if ((tid &lt; 0) || (tid &gt;= obj-&gt;n_tex)) 
++			return(-1);
++	} else
++		return(-1);
++	tex = &amp;obj-&gt;p_tex[tid];
++
+ 	if ((tex-&gt;gl_texnum) != -1) {
+ 		t = tex-&gt;gl_texnum;
+ 		/* s3dprintf(MED,&quot;updating texture %d at [%d %d] with a [%d %d] pixbuf&quot;,t,x,y,w,h); */
+@@ -852,6 +865,7 @@
+ 		glDeleteTextures(1, &amp;t);
+ 		tex-&gt;gl_texnum = -1;
+ 	}
++	return(0);
+ }
+ /*  loads some data into the pixbuf */
+ int obj_load_tex(struct t_process *p, int32_t oid, int32_t tex, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *pixbuf)
+@@ -901,7 +915,7 @@
+ 					       4*p2);
+ 				}
+ 				s3dprintf(MED, &quot;updating texture %d\n&quot;, t-&gt;gl_texnum);
+-				obj_update_tex(t, x, y, w, h, pixbuf);
++				obj_update_tex(p, oid, tex, x, y, w, h, pixbuf);
+ 				return(0);
+ 			} else {
+ 				errds(HIGH, &quot;obj_load_tex()&quot;, &quot;no buffer to draw to in oid %d, texture %d&quot;, oid, tex);
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2007-11-25 20:43:20 UTC (rev 881)
++++ trunk/server/proto.c	2007-11-25 21:16:02 UTC (rev 882)
+@@ -282,7 +282,7 @@
+ 		}
+ 		break;
+ 	case S3D_P_C_LOAD_TEX:
+-		if (length &gt; 8) {
++		if (length &gt; 16) {
+ 			oid = ntohl(*((uint32_t *)cptr));
+ 			cptr += 4;
+ 			toid = ntohl(*((uint32_t *)cptr));
+@@ -296,11 +296,30 @@
+ 			h = ntohs(*((uint16_t *)cptr));
+ 			cptr += 2;
+ 			num = length - 16;
+-			s3dprintf(MED, &quot;LOAD_TEX[%d]: oid %d, texture %d, [%d x %d] data at [%d x %d] (%d = %d)&quot;, length, oid, toid, w, h, x, y, num, w*h*4, num);
++			s3dprintf(MED, &quot;LOAD_TEX[%d]: oid %d, texture %d, [%d x %d] data at [%d x %d] (%d = %d)&quot;, length, oid, toid, w, h, x, y, num, w*h*4);
+ 			if ((w*h*4) == num)  /*  check correct size */
+ 				obj_load_tex(p, oid, toid, x, y, w, h, cptr);
+ 		}
+ 		break;
++	case S3D_P_C_UPDATE_TEX:
++		if (length == 16) {
++			oid = ntohl(*((uint32_t *)cptr));
++			cptr += 4;
++			toid = ntohl(*((uint32_t *)cptr));
++			cptr += 4;
++			x = ntohs(*((uint16_t *)cptr));
++			cptr += 2;
++			y = ntohs(*((uint16_t *)cptr));
++			cptr += 2;
++			w = ntohs(*((uint16_t *)cptr));
++			cptr += 2;
++			h = ntohs(*((uint16_t *)cptr));
++			cptr += 2;
++			s3dprintf(MED, &quot;UPDATE_TEX[%d]: oid %d, texture %d, [%d x %d] data at [%d x %d] &quot;, length, oid, toid, w, h, x, y);
++			obj_update_tex(p, oid, toid, x, y, w, h, NULL);
++		}
++		break;
++
+ 	case S3D_P_C_DEL_VERTEX:
+ 		if (length == 8) {
+ 			oid = ntohl(*((uint32_t *)cptr));
+
+Modified: trunk/server/proto.h
+===================================================================
+--- trunk/server/proto.h	2007-11-25 20:43:20 UTC (rev 881)
++++ trunk/server/proto.h	2007-11-25 21:16:02 UTC (rev 882)
+@@ -116,6 +116,10 @@
+ /*  4b:  object id */
+ /*  4b:  position */
+ /*  3*4f: material elements [amb,spec,diff with r,g,b,a] */
++#define S3D_P_C_UPDATE_TEX  29
++/*  4b:    object id */
++/*  4b:    texture id */
++/*  4*2b: xpos,ypos,width,height */
+ #define S3D_P_C_LOAD_TEX  28
+ /*  4b:  object id */
+ /*  4b:  texture number */
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000874.html">[S3d-svn] r881 - trunk/server
+</A></li>
+	<LI>Next message: <A HREF="000876.html">[S3d-svn] r883 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#875">[ date ]</a>
+              <a href="thread.html#875">[ thread ]</a>
+              <a href="subject.html#875">[ subject ]</a>
+              <a href="author.html#875">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

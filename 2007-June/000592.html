@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r602 - in branches/s3d-cmake: . cmake/modules
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r602%20-%20in%20branches/s3d-cmake%3A%20.%20cmake/modules&In-Reply-To=%3C200706252155.l5PLtv3L022929%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000599.html">
+   <LINK REL="Next"  HREF="000593.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r602 - in branches/s3d-cmake: . cmake/modules</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r602%20-%20in%20branches/s3d-cmake%3A%20.%20cmake/modules&In-Reply-To=%3C200706252155.l5PLtv3L022929%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r602 - in branches/s3d-cmake: . cmake/modules">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Jun 25 23:55:57 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000599.html">[S3d-svn] r601 - in branches/s3d-cmake: . apps/dot_mcp apps/kism3d	apps/meshs3d apps/olsrs3d apps/s3d_x11gate apps/s3dfm	apps/s3dosm apps/s3dvt libs3d libs3dw objs server
+</A></li>
+        <LI>Next message: <A HREF="000593.html">[S3d-svn] r603 - in branches/s3d-cmake: . cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#592">[ date ]</a>
+              <a href="thread.html#592">[ thread ]</a>
+              <a href="subject.html#592">[ subject ]</a>
+              <a href="author.html#592">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-06-25 23:55:56 +0200 (Mon, 25 Jun 2007)
+New Revision: 602
+
+Added:
+   branches/s3d-cmake/cmake/modules/SetDebugLevel.cmake
+Modified:
+   branches/s3d-cmake/CMakeLists.txt
+   branches/s3d-cmake/ConfigureChecks.cmake
+   branches/s3d-cmake/config.h.cmake
+Log:
+- Added cmake option &quot;DEBUG&quot; to set debug level (vlow, low, med, high, vhigh)
+
+
+Modified: branches/s3d-cmake/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/CMakeLists.txt	2007-06-25 21:55:55 UTC (rev 601)
++++ branches/s3d-cmake/CMakeLists.txt	2007-06-25 21:55:56 UTC (rev 602)
+@@ -1,14 +1,23 @@
+ project(s3d)
+ 
++# we require cmake 2.4.4 or higher
++cmake_minimum_required(VERSION 2.4.4)
++
++# Add directory with library checks to search path
++set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
++
+ # set path to objects
+ set(OBJECTPATH &quot;${CMAKE_INSTALL_PREFIX}/share/s3d/objs:${CMAKE_CURRENT_SOURCE_DIR}/objs&quot;)
+ 
+-# Run configure stuff
+-include(ConfigureChecks.cmake)
++# set debug level with -DDEBUG=level
++include(SetDebugLevel)
+ 
+ # Set some compiler flags
+ include(SetCCWarnFlags)
+ 
++# Run configure stuff
++include(ConfigureChecks.cmake)
++
+ add_subdirectory(apps)
+ add_subdirectory(cmake)
+ add_subdirectory(Documentation)
+
+Modified: branches/s3d-cmake/ConfigureChecks.cmake
+===================================================================
+--- branches/s3d-cmake/ConfigureChecks.cmake	2007-06-25 21:55:55 UTC (rev 601)
++++ branches/s3d-cmake/ConfigureChecks.cmake	2007-06-25 21:55:56 UTC (rev 602)
+@@ -1,7 +1,3 @@
+-# Add directory with library checks to search path
+-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
+-
+-
+ # find required lib and add include dir for FREETYPE
+ find_package(FREETYPE REQUIRED)
+ include_directories(${FREETYPE_INCLUDE_DIR})
+
+Added: branches/s3d-cmake/cmake/modules/SetDebugLevel.cmake
+===================================================================
+--- branches/s3d-cmake/cmake/modules/SetDebugLevel.cmake	2007-06-25 21:55:55 UTC (rev 601)
++++ branches/s3d-cmake/cmake/modules/SetDebugLevel.cmake	2007-06-25 21:55:56 UTC (rev 602)
+@@ -0,0 +1,27 @@
++# if user set debug level
++string(TOUPPER &quot;${DEBUG}&quot; DEBUG_UPPER)
++set(DEBUG ${DEBUG}
++	CACHE STRING &quot;Set Debug Level&quot;
++)
++
++# test debug and convert it so numeric debug_level
++set(DEBUG_LEVEL CACHE INTERNAL &quot;Numeric representation of DEBUG&quot;)
++if (DEBUG_UPPER STREQUAL VLOW)
++	set(DEBUG_LEVEL &quot;1&quot;)
++elseif (DEBUG_UPPER STREQUAL LOW)
++	set(DEBUG_LEVEL &quot;2&quot;)
++elseif (DEBUG_UPPER STREQUAL MED)
++	set(DEBUG_LEVEL &quot;3&quot;)
++elseif (DEBUG_UPPER STREQUAL HIGH)
++	set(DEBUG_LEVEL &quot;4&quot;)
++elseif (DEBUG_UPPER STREQUAL VHIGH)
++	set(DEBUG_LEVEL &quot;5&quot;)
++elseif (DEBUG_UPPER STREQUAL &quot;&quot;)
++	set(DEBUG)
++else (DEBUG_UPPER STREQUAL VLOW)
++	message(FATAL_ERROR &quot;No valid debug-level [VLOW|LOW|MED|HIGH|VHIGH] found.&quot;)
++endif (DEBUG_UPPER STREQUAL VLOW)
++
++if (DEBUG)
++	message(STATUS &quot;Set debug level to: ${DEBUG}&quot;)
++endif (DEBUG)
+\ No newline at end of file
+
+Modified: branches/s3d-cmake/config.h.cmake
+===================================================================
+--- branches/s3d-cmake/config.h.cmake	2007-06-25 21:55:55 UTC (rev 601)
++++ branches/s3d-cmake/config.h.cmake	2007-06-25 21:55:56 UTC (rev 602)
+@@ -13,4 +13,7 @@
+ /* path where to find objects */
+ #cmakedefine OBJECTPATH &quot;${OBJECTPATH}&quot;
+ 
+-#endif /* _CONFIG_H_ */
+\ No newline at end of file
++/* set debug level (can be changed by -DDEBUG=vlow|low|med|high|vhigh )*/
++#cmakedefine DEBUG ${DEBUG_LEVEL}
++
++#endif /* _CONFIG_H_ */
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000599.html">[S3d-svn] r601 - in branches/s3d-cmake: . apps/dot_mcp apps/kism3d	apps/meshs3d apps/olsrs3d apps/s3d_x11gate apps/s3dfm	apps/s3dosm apps/s3dvt libs3d libs3dw objs server
+</A></li>
+	<LI>Next message: <A HREF="000593.html">[S3d-svn] r603 - in branches/s3d-cmake: . cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#592">[ date ]</a>
+              <a href="thread.html#592">[ thread ]</a>
+              <a href="subject.html#592">[ subject ]</a>
+              <a href="author.html#592">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

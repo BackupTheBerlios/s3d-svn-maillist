@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r827 - in trunk: . cmake/modules
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r827%20-%20in%20trunk%3A%20.%20cmake/modules&In-Reply-To=%3C200710261507.l9QF7Nbj024487%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000818.html">
+   <LINK REL="Next"  HREF="000820.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r827 - in trunk: . cmake/modules</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r827%20-%20in%20trunk%3A%20.%20cmake/modules&In-Reply-To=%3C200710261507.l9QF7Nbj024487%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r827 - in trunk: . cmake/modules">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 26 17:07:23 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000818.html">[S3d-svn] r826 - trunk/svnonly
+</A></li>
+        <LI>Next message: <A HREF="000820.html">[S3d-svn] r828 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#819">[ date ]</a>
+              <a href="thread.html#819">[ thread ]</a>
+              <a href="subject.html#819">[ subject ]</a>
+              <a href="author.html#819">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-26 17:07:22 +0200 (Fri, 26 Oct 2007)
+New Revision: 827
+
+Added:
+   trunk/cmake/modules/FindCWiid.cmake
+Modified:
+   trunk/ConfigureChecks.cmake
+Log:
+Added cmake test for CWiid
+
+
+Modified: trunk/ConfigureChecks.cmake
+===================================================================
+--- trunk/ConfigureChecks.cmake	2007-10-26 13:24:23 UTC (rev 826)
++++ trunk/ConfigureChecks.cmake	2007-10-26 15:07:22 UTC (rev 827)
+@@ -49,6 +49,13 @@
+ endif (OPENGL_FOUND)
+ 
+ 
++# find lib and add include dir for CWiid
++find_package(CWiid)
++if (CWIID_FOUND)
++	include_directories(${CWIID_INCLUDE_DIR})
++endif (CWIID_FOUND)
++
++
+ # try to find lib and add include dir for GLUT
+ find_package(GLUT)
+ if (GLUT_FOUND)
+
+Added: trunk/cmake/modules/FindCWiid.cmake
+===================================================================
+--- trunk/cmake/modules/FindCWiid.cmake	2007-10-26 13:24:23 UTC (rev 826)
++++ trunk/cmake/modules/FindCWiid.cmake	2007-10-26 15:07:22 UTC (rev 827)
+@@ -0,0 +1,36 @@
++# Try to find CWiid
++#  CWIID_FOUND - If false, do not try to use CWiid.
++#  CWIID_INCLUDE_DIR - where to find cwiid.h
++#  CWIID_LIBRARIES - the libraries to link against
++
++
++if (CWIID_LIBRARIES AND CWIID_INCLUDE_DIR)
++	# path set by user or was found in the past
++	set(CWIID_FOUND TRUE)
++else (CWIID_LIBRARIES AND CWIID_INCLUDE_DIR)
++	find_path(CWIID_INCLUDE_DIR
++		NAMES cwiid.h
++	)
++
++	find_library(CWIID_LIBRARIES
++		NAMES cwiid
++	)
++
++	if (CWIID_INCLUDE_DIR AND CWIID_LIBRARIES)
++		set(CWIID_FOUND TRUE)
++	endif (CWIID_INCLUDE_DIR AND CWIID_LIBRARIES)
++
++	if (CWIID_FOUND)
++		if (NOT CWIID_FIND_QUIETLY)
++			message(STATUS &quot;Found CWiid: ${CWIID_LIBRARIES}&quot;)
++		endif (NOT CWIID_FIND_QUIETLY)
++	else (CWIID_FOUND)
++		if (CWIID_FIND_REQUIRED)
++			message(FATAL_ERROR &quot;Could not find CWiid&quot;)
++		endif (CWIID_FIND_REQUIRED)
++	endif (CWIID_FOUND)
++
++	# set visibility in cache
++ 	mark_as_advanced(CWIID_INCLUDE_DIR CWIID_LIBRARIES)
++
++endif (CWIID_LIBRARIES AND CWIID_INCLUDE_DIR)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000818.html">[S3d-svn] r826 - trunk/svnonly
+</A></li>
+	<LI>Next message: <A HREF="000820.html">[S3d-svn] r828 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#819">[ date ]</a>
+              <a href="thread.html#819">[ thread ]</a>
+              <a href="subject.html#819">[ subject ]</a>
+              <a href="author.html#819">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

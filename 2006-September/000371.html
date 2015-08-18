@@ -1,0 +1,773 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r378 - in trunk: . apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r378%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200609031657.k83GvaAR021252%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000370.html">
+   <LINK REL="Next"  HREF="000372.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r378 - in trunk: . apps/s3dfm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r378%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200609031657.k83GvaAR021252%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r378 - in trunk: . apps/s3dfm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Sep  3 18:57:36 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000370.html">[S3d-svn] r377 - in trunk: . libs3d
+</A></li>
+        <LI>Next message: <A HREF="000372.html">[S3d-svn] r379 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#371">[ date ]</a>
+              <a href="thread.html#371">[ thread ]</a>
+              <a href="subject.html#371">[ subject ]</a>
+              <a href="author.html#371">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-03 18:57:33 +0200 (Sun, 03 Sep 2006)
+New Revision: 378
+
+Added:
+   trunk/apps/s3dfm/icon.c
+Modified:
+   trunk/
+   trunk/apps/s3dfm/Makefile.am
+   trunk/apps/s3dfm/animation.c
+   trunk/apps/s3dfm/box.c
+   trunk/apps/s3dfm/dialog.c
+   trunk/apps/s3dfm/main.c
+   trunk/apps/s3dfm/parse.c
+   trunk/apps/s3dfm/s3dfm.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r896 at balthasar</A>:  dotslash | 2006-09-03 18:57:09 +0200
+ - some code cleanup, dir-&gt;disp now storing how node is displayed
+ - still bugs in refresh-code ... :(
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:893
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:896
+
+Modified: trunk/apps/s3dfm/Makefile.am
+===================================================================
+--- trunk/apps/s3dfm/Makefile.am	2006-09-03 13:59:25 UTC (rev 377)
++++ trunk/apps/s3dfm/Makefile.am	2006-09-03 16:57:33 UTC (rev 378)
+@@ -6,7 +6,7 @@
+ 	s3dfm.h
+ s3dfm_SOURCES =  \
+ 	main.c box.c animation.c \
+-	fs.c dialog.c parse.c
++	fs.c dialog.c parse.c icon.c
+ 
+ s3dfm_CPPFLAGS=		-I${top_srcdir}/libs3d -I${top_srcdir}/libs3dw
+ s3dfm_LDADD=		${top_builddir}/libs3d/libs3d.la ${top_builddir}/libs3dw/libs3dw.la
+
+Modified: trunk/apps/s3dfm/animation.c
+===================================================================
+--- trunk/apps/s3dfm/animation.c	2006-09-03 13:59:25 UTC (rev 377)
++++ trunk/apps/s3dfm/animation.c	2006-09-03 16:57:33 UTC (rev 378)
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include &quot;s3dfm.h&quot;
++#include &lt;s3dw.h&gt;
+ #include &lt;stdio.h&gt; 	 /*  printf(),NULL */
+ #include &lt;math.h&gt;	 /*  fabs() */
+ #define SCALE 	1
+
+Modified: trunk/apps/s3dfm/box.c
+===================================================================
+--- trunk/apps/s3dfm/box.c	2006-09-03 13:59:25 UTC (rev 377)
++++ trunk/apps/s3dfm/box.c	2006-09-03 16:57:33 UTC (rev 378)
+@@ -26,34 +26,7 @@
+ #include &lt;math.h&gt;	 /*  sin(),cos() */
+ #include &lt;string.h&gt;  /*  strlen() */
+ 
+-/* clear the dirs attributes */
+-int box_init(t_item *dir)
+-{
+-	dir-&gt;parent=NULL;
+-	dir-&gt;list=NULL;
+-	dir-&gt;n_item=-1;
+ 
+-	dir-&gt;block=-1;
+-	dir-&gt;str=-1;
+-	dir-&gt;close=-1;
+-	dir-&gt;select=-1;
+-	dir-&gt;title=-1;
+-	dir-&gt;titlestr=-1;
+-
+-	dir-&gt;len=0;
+-	dir-&gt;disp=0;
+-	dir-&gt;parsed=0;
+-
+-	dir-&gt;px=root.pz=0.0;
+-	dir-&gt;dirs_opened=0;
+-	dir-&gt;type=T_DUNO;
+-	dir-&gt;px=dir-&gt;py=dir-&gt;pz=0.0;
+-	dir-&gt;dpx=dir-&gt;dpy=dir-&gt;dpz=0.0;
+-	dir-&gt;scale=dir-&gt;dscale=1.0;
+-	dir-&gt;detached=0;
+-
+-	return(0);
+-}
+ /* remove old items on the box */
+ void box_dissolve(t_item *dir)
+ {
+@@ -64,71 +37,7 @@
+ 	if (dir-&gt;block!=-1)			s3d_del_object(dir-&gt;block);
+ 
+ }
+-/* draws icon i in the block of dir */
+-int box_icon(t_item *dir,int i)
+-{
+-	float vertices[]={	-1,-0.5,0,
+-						-1, 0.5,0,
+-						 1, 0.5,0,
+-						 1,-0.5,0,
+-						-1,-0.5,-1,
+-						-1, 0.5,-1,
+-						 1, 0.5,-1,
+-						 1,-0.5,-1};
+-	unsigned long polys[]={
+-				1,3,0,0,				2,3,1,0,
+-				5,6,2,0,				1,5,2,0,
+-				2,6,7,0,				2,7,3,0,
+-				0,3,7,0,				0,7,4,0,
+-				5,1,0,0,				5,0,4,0	
+-				};
+-	float len;
+-	float d;
+-	int dps;
+-	dps=ceil(sqrt(dir-&gt;n_item)); /* directories per line */
+-	/* find position for the new block in our directory box */
+-	dir-&gt;list[i].dpx = dir-&gt;list[i].px=-1 +2*  ((float)((int)i%dps)+0.5)/((float)dps);
+-	dir-&gt;list[i].dpy = dir-&gt;list[i].py=0.5+((float)((int)i/dps)+0.5)/((float)dps)-0.5;
+-	dir-&gt;list[i].dpz = dir-&gt;list[i].pz=1.0;
+-	dir-&gt;list[i].scale = dir-&gt;list[i].dscale = (float)1.0/((float)dps);
+-	/* create the block */
+-	box_dissolve(&amp;(dir-&gt;list[i]));
+-	dir-&gt;list[i].block=s3d_new_object();
+-	s3d_push_vertices(dir-&gt;list[i].block,vertices,8);
+-	d=((int)(((i+(dps+1)%2*(i/dps)))%2))*0.2;
+-	switch (dir-&gt;list[i].type)
+-	{
+-		case T_FOLDER:
+-			s3d_push_material(dir-&gt;list[i].block,
+-									0.4-d,0.4-d,0,
+-									0.4-d,0.4-d,0,
+-									0.4-d,0.4-d,0);
+-			break;
+-		default:
+-			s3d_push_material(dir-&gt;list[i].block,
+-									0,0,0.5-d,
+-									0,0,0.5-d,
+-									0,0,0.5-d);
+-	};
+-	s3d_push_polygons(dir-&gt;list[i].block,polys,10);
+-	s3d_link(dir-&gt;list[i].block,dir-&gt;block);
+ 
+-	/* draw and position the string */
+-	if (dir-&gt;list[i].str==-1)
+-	{
+-		dir-&gt;list[i].str=s3d_draw_string(dir-&gt;list[i].name,&amp;len);
+-		if (len&lt;2) len=2;
+-		dir-&gt;list[i].len=len;
+-	}
+-	else 
+-		len=dir-&gt;list[i].len;
+-	s3d_scale(dir-&gt;list[i].str,(float)1.8/len);
+-	s3d_translate(dir-&gt;list[i].str,-0.9,-0.3,0.1);
+-	s3d_rotate(dir-&gt;list[i].str,0,0,0);
+-	s3d_link(dir-&gt;list[i].str,dir-&gt;list[i].block);
+-	ani_finish(&amp;dir-&gt;list[i],-1); /* apply transformation */
+-	return(0);
+-}
+ 
+ 
+ /* places the string at the left side of the cube */
+@@ -294,10 +203,19 @@
+ 		s3d_scale(dir-&gt;titlestr,0.2);
+ 	s3d_translate(dir-&gt;titlestr,-1.0,1.05,1.01);
+ 	s3d_link(dir-&gt;titlestr,dir-&gt;block);
++	dir-&gt;disp=D_DIR;
+ /*	printf(&quot;FULLNAME is [%s]\n&quot;,fullname);*/
+ 	return(0);
+ }
+-
++int undisplay(t_item *dir)
++{
++	switch (dir-&gt;disp)
++	{
++		case D_DIR: return(box_undisplay(dir));break;
++		case D_ICON:return(icon_undisplay(dir));break;
++		default:	return(-1);
++	}
++}
+ /* display a directoy on the top of another, draw it's icons etc ... */
+ int box_expand(t_item *dir)
+ {
+@@ -305,28 +223,27 @@
+ 	float  px,pz;
+ 	int dirn;
+ 	px=pz=0.0;
+-	if (dir-&gt;disp)
+-		return(-1); /* already displayed ... */ 
+-	s3d_del_object(dir-&gt;block);
++	printf(&quot;box_expand( %s )\n&quot;,dir-&gt;name);
++	if (dir-&gt;disp)		undisplay(dir);
+ 	box_buildblock(dir);
+ 	if (dir-&gt;parent!=NULL)
+ 		dir-&gt;parent-&gt;dirs_opened++;
+-	dir-&gt;dirs_opened=0;
+  /* count directories */
+ 	dirn=0;
+ 	for (i=0;i&lt;dir-&gt;n_item;i++)
+ 	{
+-		if (dir-&gt;list[i].type==T_FOLDER)
+-			dirn++;
++		if (dir-&gt;list[i].type==T_FOLDER) dirn++;
+ 	}
++
++	/* draw icons, if necceasry */
+ 	for (i=0;i&lt;dir-&gt;n_item;i++)
+ 	{
+-		if (!dir-&gt;list[i].disp)
+-			box_icon(dir,i);
+-		else 
++		if (!dir-&gt;list[i].disp)	icon_draw(dir,i);
++		else {
++			printf(&quot;link %d to the block %d of %s\n&quot;,dir-&gt;list[i].block,dir-&gt;block,dir-&gt;name);
+ 			s3d_link(dir-&gt;list[i].block,dir-&gt;block); /* if it's already displayed, make sure it linked properly ... */
++		}
+ 	}
+-	dir-&gt;disp=1;
+ 	if (dir-&gt;parent!=NULL)
+ 	{
+ 		s3d_link(dir-&gt;block,dir-&gt;parent-&gt;block);
+@@ -348,29 +265,19 @@
+     s3d_flags_on(dir-&gt;title,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+     s3d_flags_on(dir-&gt;select,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+     s3d_flags_on(dir-&gt;titlestr,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++	dir-&gt;disp=D_DIR;
+ 	return(0);
+ }
+-void box_undisplay(t_item *dir)
++int box_undisplay(t_item *dir)
+ {
+ 	int i;
+ 	t_item *par;
++	printf(&quot;box_undisplay( %s )\n&quot;,dir-&gt;name);
+ 	for (i=0;i&lt;dir-&gt;n_item;i++)
+ 	{
+-		if (!dir-&gt;list[i].disp)
+-		{
+-			if (dir-&gt;list[i].block!=-1)
+-			{
+-				s3d_del_object(dir-&gt;list[i].block);
+-				dir-&gt;list[i].block=-1;
+-			}
+-			if (dir-&gt;list[i].str!=-1)
+-			{
+-				s3d_del_object(dir-&gt;list[i].str);
+-				dir-&gt;list[i].str=-1;
+-			}
+-		} else {
+-			printf(&quot;not undisplaying: %s\n&quot;,dir-&gt;list[i].name);
+-		}
++		if (dir-&gt;list[i].disp==D_ICON)	icon_undisplay(&amp;(dir-&gt;list[i]));
++		else if (dir-&gt;list[i].disp!=0)	
++				printf(&quot;not undisplaying: %s (disp = %d)\n&quot;,dir-&gt;list[i].name, dir-&gt;list[i].disp);
+ 	}
+ 	if ((par=dir-&gt;parent)!=NULL) /* we can't do this on root.... */
+ 	{
+@@ -379,7 +286,7 @@
+ 				break;
+ 		if (i!=par-&gt;n_item) /* if it actually was in the parents item list */
+ 		{
+-			box_icon(par,i);
++			icon_draw(par,i);
+ 			s3d_flags_on(dir-&gt;block,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 			s3d_flags_on(dir-&gt;str,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 		}
+@@ -387,19 +294,18 @@
+ 	} else {
+ 		/* we're root ... */
+ 		box_dissolve(dir);
+-
+ 	}
+ 	printf(&quot;[U]ndisplayed %s\n&quot;,dir-&gt;name);
+-	dir-&gt;dirs_opened=0;
+-	dir-&gt;disp=0;
++/*	dir-&gt;dirs_opened=0;*/
+ 	dir-&gt;detached=0;
+-	
++	return(0);
+ }
+ /* undisplay a directory, thus recursively removing the kids.*/
+ int box_collapse(t_item *dir,int force)
+ {
+ 	int i;
+ 	int ret;
++	printf(&quot;box_collapse( %s )\n&quot;,dir-&gt;name);
+ 	if (&amp;root==dir)
+ 	{
+ 		printf(&quot;won't undisplay root window ... \n&quot;);
+@@ -407,18 +313,19 @@
+ 	}
+ 	if (dir-&gt;detached &amp;&amp; !force)
+ 		return(1);
+-	if (dir-&gt;disp==0)
++	if (dir-&gt;disp!=D_DIR)
+ 	{
+ 		printf(&quot;[A]lready undisplayed %s, nothing to do ...\n&quot;,dir-&gt;name);
+ 		return(-1);
+ 	}
++	/* undisplaying kids. ret will be != 0 if any of the kids did not close correctly */
+ 	ret=0;
+ 	for (i=0;i&lt;dir-&gt;n_item;i++)
+-		if (dir-&gt;list[i].disp)
++		if (dir-&gt;list[i].disp==D_DIR)
+ 			ret|=box_collapse(&amp;dir-&gt;list[i],force);
+ 
+ 	if (ret &amp;&amp; !force) return(ret); /* if anything got wrong, return here ... */
+-	box_undisplay(dir);
++	undisplay(dir);
+ 	if (dir-&gt;parent!=NULL)
+ 	{
+ 		box_position_kids(dir-&gt;parent);
+@@ -431,10 +338,11 @@
+ 	int i,j;
+ 	t_item *kid;
+ 	for (i=0;i&lt;dir-&gt;n_item;i++)
+-		if (dir-&gt;list[i].disp)
++		if (dir-&gt;list[i].disp==D_DIR)
+ 		{
+ 			kid=&amp;dir-&gt;list[i];
+ 			for (j=0;j&lt;kid-&gt;n_item;j++)
++			if (kid-&gt;list[j].disp==D_DIR)
+ 				box_collapse(&amp;kid-&gt;list[j],0);
+ 		}
+ 	return(0);
+@@ -444,14 +352,14 @@
+ void box_position_kids(t_item *dir)
+ {
+ 	int i,j;
+-/*	printf(&quot;placeontop dir %s, %d\n&quot;,dir-&gt;name,dir-&gt;dirs_opened);*/
++	printf(&quot;box_position_kids( %s ): %d dirs opened\n&quot;,dir-&gt;name,dir-&gt;dirs_opened);
+ 	switch (dir-&gt;dirs_opened)
+ 	{
+ 		case 0: return;
+ 		case 1:
+ 			for (i=0;i&lt;dir-&gt;n_item;i++)
+ 			{
+-				if (dir-&gt;list[i].disp)
++				if (dir-&gt;list[i].disp==D_DIR)
+ 				{
+ 					dir-&gt;list[i].px=0.0;
+ 					dir-&gt;list[i].py=BOXHEIGHT+dir-&gt;list[i].detached*DETHEIGHT;
+@@ -465,7 +373,7 @@
+ 			j=0;
+ 			for (i=0;i&lt;dir-&gt;n_item;i++)
+ 			{
+-				if (dir-&gt;list[i].disp)
++				if (dir-&gt;list[i].disp==D_DIR)
+ 				{
+ 					dir-&gt;list[i].px=0.8 * sin(((float)j*2*M_PI)/((float)dir-&gt;dirs_opened));
+ 					dir-&gt;list[i].py=BOXHEIGHT+dir-&gt;list[i].detached*DETHEIGHT;
+
+Modified: trunk/apps/s3dfm/dialog.c
+===================================================================
+--- trunk/apps/s3dfm/dialog.c	2006-09-03 13:59:25 UTC (rev 377)
++++ trunk/apps/s3dfm/dialog.c	2006-09-03 16:57:33 UTC (rev 378)
+@@ -76,13 +76,17 @@
+ 		}
+ 		if (f-&gt;type==T_FOLDER)
+ 		{
+-			printf(&quot;[F]ound, expanding %s\n&quot;,f-&gt;name);
+-			if (!f-&gt;disp)		parse_dir(f);
+-			box_expand(f);
++			if (f-&gt;disp == D_DIR)
++			{
++				printf(&quot;[F]ound, Already displayed - ani_focus( %s )\n&quot;,f-&gt;name);
++			} else {
++				if (!f-&gt;parsed)	parse_dir(f);
++				box_expand(f);
++			}
+ 			focus=f;
+ 			ani_focus(f);
+ 		} else
+-			printf(&quot;[F]ound, but is %s no folder\n&quot;,f-&gt;name);
++			printf(&quot;[F]ound, but %s is no folder\n&quot;,f-&gt;name);
+ 	} else {
+ /*		printf(&quot;[C]ould not find :/\n&quot;);*/
+ 	}
+@@ -91,6 +95,7 @@
+ {
+ 	s3dw_delete(button-&gt;parent); /* parent =surface. this means close containing window */
+ }
++/* add some dots to an integer value for better readability */
+ void dotted_int(char *s,unsigned int i)
+ {
+ 	char st[M_DIR];
+@@ -113,7 +118,7 @@
+ 		s[i]=st[p-i];
+ 	s[p+1]=0;
+ }
+-
++/* a small window which counts directories/files and displays the result */
+ void info_window(char *path)
+ {
+ 	s3dw_surface *infwin;
+
+Added: trunk/apps/s3dfm/icon.c
+===================================================================
+--- trunk/apps/s3dfm/icon.c	2006-09-03 13:59:25 UTC (rev 377)
++++ trunk/apps/s3dfm/icon.c	2006-09-03 16:57:33 UTC (rev 378)
+@@ -0,0 +1,110 @@
++/*
++ * icon.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3dfm, a s3d file manager.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3dfm is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3dfm is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3dfm; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#include &quot;s3dfm.h&quot;
++#include &lt;stdio.h&gt; 	 /*  printf() */
++#include &lt;math.h&gt;	 /*  sin(),cos() */
++#include &lt;string.h&gt;  /*  strlen() */
++/* draws icon i in the block of dir */
++int icon_draw(t_item *dir,int i)
++{
++	float vertices[]={	-1,-0.5,0,
++						-1, 0.5,0,
++						 1, 0.5,0,
++						 1,-0.5,0,
++						-1,-0.5,-1,
++						-1, 0.5,-1,
++						 1, 0.5,-1,
++						 1,-0.5,-1};
++	unsigned long polys[]={
++				1,3,0,0,				2,3,1,0,
++				5,6,2,0,				1,5,2,0,
++				2,6,7,0,				2,7,3,0,
++				0,3,7,0,				0,7,4,0,
++				5,1,0,0,				5,0,4,0	
++				};
++	float len;
++	float d;
++	int dps;
++	printf(&quot;icon_draw( %s )\n&quot;,dir-&gt;list[i].name);
++	dps=ceil(sqrt(dir-&gt;n_item)); /* directories per line */
++	/* find position for the new block in our directory box */
++	dir-&gt;list[i].dpx = dir-&gt;list[i].px=-1 +2*  ((float)((int)i%dps)+0.5)/((float)dps);
++	dir-&gt;list[i].dpy = dir-&gt;list[i].py=0.5+((float)((int)i/dps)+0.5)/((float)dps)-0.5;
++	dir-&gt;list[i].dpz = dir-&gt;list[i].pz=1.0;
++	dir-&gt;list[i].scale = dir-&gt;list[i].dscale = (float)1.0/((float)dps);
++	/* create the block */
++	box_dissolve(&amp;(dir-&gt;list[i]));
++	dir-&gt;list[i].block=s3d_new_object();
++	s3d_push_vertices(dir-&gt;list[i].block,vertices,8);
++	d=((int)(((i+(dps+1)%2*(i/dps)))%2))*0.2;
++	switch (dir-&gt;list[i].type)
++	{
++		case T_FOLDER:
++			s3d_push_material(dir-&gt;list[i].block,
++									0.4-d,0.4-d,0,
++									0.4-d,0.4-d,0,
++									0.4-d,0.4-d,0);
++			break;
++		default:
++			s3d_push_material(dir-&gt;list[i].block,
++									0,0,0.5-d,
++									0,0,0.5-d,
++									0,0,0.5-d);
++	};
++	s3d_push_polygons(dir-&gt;list[i].block,polys,10);
++	s3d_link(dir-&gt;list[i].block,dir-&gt;block);
++
++	/* draw and position the string */
++	if (dir-&gt;list[i].str==-1)
++	{
++		dir-&gt;list[i].str=s3d_draw_string(dir-&gt;list[i].name,&amp;len);
++		if (len&lt;2) len=2;
++		dir-&gt;list[i].len=len;
++	}
++	else 
++		len=dir-&gt;list[i].len;
++	s3d_scale(dir-&gt;list[i].str,(float)1.8/len);
++	s3d_translate(dir-&gt;list[i].str,-0.9,-0.3,0.1);
++	s3d_rotate(dir-&gt;list[i].str,0,0,0);
++	s3d_link(dir-&gt;list[i].str,dir-&gt;list[i].block);
++	ani_finish(&amp;dir-&gt;list[i],-1); /* apply transformation */
++	dir-&gt;list[i].disp=D_ICON;
++	return(0);
++}
++int icon_undisplay(t_item *dir)
++{
++	printf(&quot;icon_undisplay( %s )\n&quot;,dir-&gt;name);
++	if (dir-&gt;block!=-1)
++	{
++		s3d_del_object(dir-&gt;block);
++		dir-&gt;block=-1;
++	}
++	if (dir-&gt;str!=-1)
++	{
++		s3d_del_object(dir-&gt;str);
++		dir-&gt;str=-1;
++	}
++	dir-&gt;disp=0;
++	return(0);
++}
+
+Modified: trunk/apps/s3dfm/main.c
+===================================================================
+--- trunk/apps/s3dfm/main.c	2006-09-03 13:59:25 UTC (rev 377)
++++ trunk/apps/s3dfm/main.c	2006-09-03 16:57:33 UTC (rev 378)
+@@ -116,7 +116,7 @@
+ 
+ 		
+ 		/* set up file system representation */
+-		box_init(&amp;root);
++		node_init(&amp;root);
+ 		strncpy(root.name,&quot;/&quot;,M_NAME);
+ 		focus=&root;
+ 		root.dscale=0.1;
+@@ -128,7 +128,7 @@
+ 		ani_doit(&amp;root);
+ 		ani_focus(&amp;root);
+ 		
+-		box_init(&amp;cam); /* a virtual object, just to push the cam throu our animation stack */
++		node_init(&amp;cam); /* a virtual object, just to push the cam throu our animation stack */
+ 		cam.block=0;
+ 		
+ 		
+
+Modified: trunk/apps/s3dfm/parse.c
+===================================================================
+--- trunk/apps/s3dfm/parse.c	2006-09-03 13:59:25 UTC (rev 377)
++++ trunk/apps/s3dfm/parse.c	2006-09-03 16:57:33 UTC (rev 378)
+@@ -29,6 +29,36 @@
+ #include &lt;stdlib.h&gt;	 /*  malloc() */
+ #include &lt;string.h&gt;  /*  strlen(), strncmp(), strrchr() */
+ #include &lt;time.h&gt;	/* nanosleep() */
++
++
++/* clear the dirs attributes */
++int node_init(t_item *dir)
++{
++	dir-&gt;parent=NULL;
++	dir-&gt;list=NULL;
++	dir-&gt;n_item=-1;
++
++	dir-&gt;block=-1;
++	dir-&gt;str=-1;
++	dir-&gt;close=-1;
++	dir-&gt;select=-1;
++	dir-&gt;title=-1;
++	dir-&gt;titlestr=-1;
++
++	dir-&gt;len=0;
++	dir-&gt;disp=0;
++	dir-&gt;parsed=0;
++
++	dir-&gt;px=root.pz=0.0;
++	dir-&gt;dirs_opened=0;
++	dir-&gt;type=T_DUNO;
++	dir-&gt;px=dir-&gt;py=dir-&gt;pz=0.0;
++	dir-&gt;dpx=dir-&gt;dpy=dir-&gt;dpz=0.0;
++	dir-&gt;scale=dir-&gt;dscale=1.0;
++	dir-&gt;detached=0;
++
++	return(0);
++}
+ int parse_dir(t_item *dir)
+ {
+ 	t_item *list;
+@@ -37,8 +67,9 @@
+ 	char *ext,*nstr;
+ 	char path[M_DIR];
+ 	char ndir[M_DIR]; 
+-
+-	if (dir-&gt;parsed) return(-1);
++	
++	printf(&quot;parse_dir( %s )&quot;,dir-&gt;name);
++/*	if (dir-&gt;parsed) return(-1);*/
+ 	get_path(dir,path);
+ /*	printf(&quot;scanning %s\n&quot;,path);*/
+     n = i = scandir(path, &amp;namelist, 0, alphasort);
+@@ -53,7 +84,7 @@
+ 		dir-&gt;n_item=n;
+         while(n--) {
+ 			/* setup kids in the list */
+-			box_init(&amp;list[n]);
++			node_init(&amp;list[n]);
+ 			nstr=namelist[n]-&gt;d_name;
+ 			strncpy(list[n].name,nstr,M_NAME);
+  		    if ((0==strncmp(nstr,&quot;.&quot;,1)) &amp;&amp; (strlen(nstr)==1))
+@@ -94,7 +125,12 @@
+ 	oldlist=dir-&gt;list;
+ 	oldn   =dir-&gt;n_item;
+ 	redisp=0;
+-	if (dir-&gt;disp)	{ box_undisplay(dir); redisp=1; }
++	printf(&quot;parse_again( %s )\n&quot;,dir-&gt;name);
++	if (dir-&gt;disp==D_DIR)	/* undisplay it later */
++	{ 
++		box_undisplay(dir); 
++		redisp=1; 
++	}
+ 	parse_dir(dir);
+ 
+ 	printf(&quot;oldn = %d\n&quot;,oldn);
+@@ -105,8 +141,9 @@
+ 		
+ 		for (i=0;i&lt;oldn;i++)
+ 		{
+-			if (oldlist[i].disp)
++			if (oldlist[i].disp == D_DIR)	/* old things expanded as directory */
+ 			{
++				/* see if it's also in the new list */
+ 				for (j=0;j&lt;dir-&gt;n_item;j++)
+ 				{
+ 					if (0==strcmp(oldlist[i].name,dir-&gt;list[j].name))
+@@ -116,26 +153,35 @@
+ 						break; /* found */
+ 					}
+ 				}
+-				if (j==dir-&gt;n_item) /* not found, collapse it */
+-					freeitem(&amp;oldlist[i]);
++				if (j == dir-&gt;n_item) /* not found, collapse it */
++					node_free(&amp;oldlist[i]);
+ 				else {}/* don't collapse it!! keep as it is */
+-			} else freeitem(&amp;oldlist[i]);
++			} else node_free(&amp;oldlist[i]);
+ 		}
+ 		free(oldlist);
++
++		printf(&quot;finished copying old content, redisplay if neccesary\n&quot;);
+ 		if (redisp)
+ 		{
++			printf(&quot;redisplay ... (opened: %d) &quot;, dir-&gt;dirs_opened);
+ 			/* if it was displayed, redisplay it ... */
+ 			box_expand(dir);
++			printf(&quot;done (opened: %d)\n&quot;, dir-&gt;dirs_opened);
+ 		}
+ 	}	
+ }
+-void freeitem(t_item *t)
++void node_free(t_item *t)
+ {
+ 	int i;
+-	box_collapse(t,1); /* collapse this and its kids */
++	printf(&quot;node_free( %s )\n&quot;,t-&gt;name);
++	switch (t-&gt;disp)
++	{
++			case D_DIR:  box_collapse(t,1); /* collapse this and its kids */
++			case D_ICON: icon_undisplay(t);
++	}
+ 	if (t-&gt;n_item&gt;0) {
+ 		for (i=0;i&lt;t-&gt;n_item;i++)
+-			freeitem(&amp;(t-&gt;list[i]));
++			node_free(&amp;(t-&gt;list[i]));
+ 		free(t-&gt;list);
+ 	}
+ 	t-&gt;n_item=0;
+
+Modified: trunk/apps/s3dfm/s3dfm.h
+===================================================================
+--- trunk/apps/s3dfm/s3dfm.h	2006-09-03 13:59:25 UTC (rev 377)
++++ trunk/apps/s3dfm/s3dfm.h	2006-09-03 16:57:33 UTC (rev 378)
+@@ -59,6 +59,8 @@
+ 	int n_item;								/* number of items in list ( = -1 for normal or not-expanded files) */
+ 	int type;								/* type, determined by extension or file type like dir, pipe, link etc */
+ 	int disp,parsed;						/* Flags for displayed/parsed items ... */
++#define D_ICON	1
++#define D_DIR	2
+ };
+ struct _filelist {
+ 	char **p;
+@@ -74,8 +76,9 @@
+ t_item *finditem(t_item *t, int oid);
+ void mainloop();
+ /* parse.c */
++int node_init(t_item *dir);
++void node_free(t_item *t);
+ int parse_dir(t_item *dir);
+-void freeitem(t_item *t);
+ void parse_again(t_item *t);
+ /* animation.c */
+ float ani_get_scale(t_item *f);
+@@ -93,13 +96,14 @@
+ int box_collapse_grandkids(t_item *dir);
+ int box_expand(t_item *dir);
+ int box_buildblock(t_item *dir);
+-int box_icon(t_item *dir,int i);
+-int box_init(t_item *dir);
+ void box_dissolve(t_item *dir);
+-void box_undisplay(t_item *dir);
++int  box_undisplay(t_item *dir);
+ void box_sidelabel(t_item *dir);
+ void box_position_kids(t_item *dir);
+ void box_select(t_item *dir);
++/* icon.c */
++int icon_draw(t_item *dir,int i);
++int icon_undisplay(t_item *dir);
+ /* fs.c */
+ filelist *fl_new(char *path);
+ void fl_del(filelist *fl);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000370.html">[S3d-svn] r377 - in trunk: . libs3d
+</A></li>
+	<LI>Next message: <A HREF="000372.html">[S3d-svn] r379 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#371">[ date ]</a>
+              <a href="thread.html#371">[ thread ]</a>
+              <a href="subject.html#371">[ subject ]</a>
+              <a href="author.html#371">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

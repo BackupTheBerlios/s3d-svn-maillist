@@ -1,0 +1,855 @@
+From lazhur at mail.berlios.de  Fri Apr 22 18:17:24 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Fri, 22 Apr 2011 18:17:24 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-7-2-gf97dd28
+Message-ID: <20110422161724.D6ADB480AAE@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  f97dd28fc1fa626524e8c914027f3b88ad10c20a (commit)
+      from  454e5706c3ed760f6cd609b357def5851ac2250d (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit f97dd28fc1fa626524e8c914027f3b88ad10c20a
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Fri Apr 22 18:14:58 2011 +0200
+
+    Upgraded to policy 3.9.2, no changes required
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    6 ++++++
+ debian/control   |    2 +-
+ 2 files changed, 7 insertions(+), 1 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Apr 23 11:14:07 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 23 Apr 2011 11:14:07 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-95-ge13329e
+Message-ID: <20110423091408.005BE4801B1@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  e13329eb5bbcd5ed01291b08c8548747213fa609 (commit)
+      from  ad765fac327b601781c512485f2eac441aa2cf2c (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit e13329eb5bbcd5ed01291b08c8548747213fa609
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Apr 23 11:08:40 2011 +0200
+
+    Fx obj install path
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ cmake/modules/S3DInternals.cmake |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Apr 23 11:42:07 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 23 Apr 2011 11:42:07 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-96-gf25a438
+Message-ID: <20110423094207.8C59D481490@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  f25a438629868d1ec8026c8d067502cc5881aed2 (commit)
+      from  e13329eb5bbcd5ed01291b08c8548747213fa609 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit f25a438629868d1ec8026c8d067502cc5881aed2
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Apr 23 11:30:52 2011 +0200
+
+    Use configured (sub)paths in pkg-config
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ libs3d/libs3d.pc.cmake   |    6 +++---
+ libs3dw/libs3dw.pc.cmake |    6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Apr 23 11:42:41 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 23 Apr 2011 11:42:41 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian-multiarch,
+	created. debian/0.2.1.1-7-3-gf01bebb
+Message-ID: <20110423094241.EDA474814C0@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian-multiarch has been created
+        at  f01bebbbc72e85c9b167be08dd1c50251ad1a684 (commit)
+
+- Log -----------------------------------------------------------------
+commit f01bebbbc72e85c9b167be08dd1c50251ad1a684
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Apr 23 00:55:48 2011 +0200
+
+    Add multiarch support
+
+-----------------------------------------------------------------------
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Apr 23 12:56:36 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 23 Apr 2011 12:56:36 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian-multiarch,
+	updated. debian/0.2.1.1-7-3-g41bcf09
+Message-ID: <20110423105637.200D04814C9@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian-multiarch has been updated
+  discards  f01bebbbc72e85c9b167be08dd1c50251ad1a684 (commit)
+       via  41bcf09e3e63758b42da8bb317703e53062ce9e5 (commit)
+
+This update added new revisions after undoing existing revisions.  That is
+to say, the old revision is not a strict subset of the new revision.  This
+situation occurs when you --force push a change and generate a repository
+containing something like this:
+
+ * -- * -- B -- O -- O -- O (f01bebbbc72e85c9b167be08dd1c50251ad1a684)
+            \
+             N -- N -- N (41bcf09e3e63758b42da8bb317703e53062ce9e5)
+
+When this happens we assume that you've already had alert emails for all
+of the O revisions, and so we here report only the revisions in the N
+branch from the common base, B.
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 41bcf09e3e63758b42da8bb317703e53062ce9e5
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Apr 23 00:55:48 2011 +0200
+
+    Add multiarch support
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/rules |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Apr 23 20:39:07 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 23 Apr 2011 20:39:07 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-98-g027ac8f
+Message-ID: <20110423183907.CE41D4814C9@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  027ac8f936d0e8e8f7bc87f6091ff916c30041bd (commit)
+       via  e410488d0453eb44a24619a830617d8f55dfbce3 (commit)
+      from  f25a438629868d1ec8026c8d067502cc5881aed2 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 027ac8f936d0e8e8f7bc87f6091ff916c30041bd
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Apr 23 17:15:45 2011 +0200
+
+    meshs3d: Ignore batman-adv subgraph blocks
+
+commit e410488d0453eb44a24619a830617d8f55dfbce3
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Sep 9 14:09:20 2009 +0200
+
+    meshs3d: Add support for generic strings as identifier
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ apps/meshs3d/batman-adv.data |    2 +-
+ apps/meshs3d/meshs3d.h       |    4 ++-
+ apps/meshs3d/mixed.data      |   12 +++++++
+ apps/meshs3d/process.c       |   75 +++++++++++++++++++++++++++++++++++++-----
+ apps/meshs3d/subgraph.data   |   24 +++++++++++++
+ 5 files changed, 106 insertions(+), 11 deletions(-)
+ create mode 100644 apps/meshs3d/mixed.data
+ create mode 100644 apps/meshs3d/subgraph.data
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Apr 23 20:42:58 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 23 Apr 2011 20:42:58 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-98-g8ce6bd3
+Message-ID: <20110423184258.B61E94814C0@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+  discards  027ac8f936d0e8e8f7bc87f6091ff916c30041bd (commit)
+       via  8ce6bd3eed10728d6e247a28dfe652b5b3b16b38 (commit)
+
+This update added new revisions after undoing existing revisions.  That is
+to say, the old revision is not a strict subset of the new revision.  This
+situation occurs when you --force push a change and generate a repository
+containing something like this:
+
+ * -- * -- B -- O -- O -- O (027ac8f936d0e8e8f7bc87f6091ff916c30041bd)
+            \
+             N -- N -- N (8ce6bd3eed10728d6e247a28dfe652b5b3b16b38)
+
+When this happens we assume that you've already had alert emails for all
+of the O revisions, and so we here report only the revisions in the N
+branch from the common base, B.
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 8ce6bd3eed10728d6e247a28dfe652b5b3b16b38
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Apr 23 17:15:45 2011 +0200
+
+    meshs3d: Ignore batman-adv subgraph blocks
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ apps/meshs3d/process.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Apr 23 21:03:09 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 23 Apr 2011 21:03:09 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-102-ge2a378d
+Message-ID: <20110423190309.C78894814D0@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  e2a378d94c6ece5022b96716c4b9bf69da5ed7c6 (commit)
+       via  ffc189302b28200b4ee2b2148813e571ce28422d (commit)
+       via  e7d2540ff7c631cac5e880038f6d7712b41f67aa (commit)
+       via  397a8bf664cfd1c2725b248db7c945b1d46b9f6b (commit)
+      from  8ce6bd3eed10728d6e247a28dfe652b5b3b16b38 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit e2a378d94c6ece5022b96716c4b9bf69da5ed7c6
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Apr 23 21:02:19 2011 +0200
+
+    Ignore temporary files generated during manpages generation
+
+commit ffc189302b28200b4ee2b2148813e571ce28422d
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Apr 23 21:00:25 2011 +0200
+
+    Regenerate documentation with updated toolchain
+
+commit e7d2540ff7c631cac5e880038f6d7712b41f67aa
+Merge: 8ce6bd3 397a8bf
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Apr 23 20:52:09 2011 +0200
+
+    Merge branch 'maint'
+    
+    Conflicts:
+    	apps/s3dosm/osm.c
+    	libs3d/s3d.h
+    	server/object.c
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ .gitignore                                         |    2 ++
+ Documentation/libs3dw/structs.docbook              |    4 ++--
+ Documentation/manpages/man1/dot_mcp.1              |   11 ++++++++++-
+ Documentation/manpages/man1/kism3d.1               |   11 ++++++++++-
+ Documentation/manpages/man1/meshs3d.1              |   11 ++++++++++-
+ Documentation/manpages/man1/s3d.1                  |   13 +++++++++++--
+ Documentation/manpages/man1/s3d_x11gate.1          |   11 ++++++++++-
+ Documentation/manpages/man1/s3dfm.1                |   11 ++++++++++-
+ Documentation/manpages/man1/s3dosm.1               |   11 ++++++++++-
+ Documentation/manpages/man1/s3dvt.1                |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_angle_to_cam.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_clear_callback.3   |    9 +++++++++
+ Documentation/manpages/man3/s3d_clone.3            |    9 +++++++++
+ Documentation/manpages/man3/s3d_clone_target.3     |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_del_object.3       |    9 +++++++++
+ Documentation/manpages/man3/s3d_delete_event.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_draw_string.3      |    9 +++++++++
+ Documentation/manpages/man3/s3d_find_event.3       |    9 +++++++++
+ Documentation/manpages/man3/s3d_flags_off.3        |    9 +++++++++
+ Documentation/manpages/man3/s3d_flags_on.3         |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_get_callback.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_ignore_callback.3  |   11 ++++++++++-
+ .../manpages/man3/s3d_import_model_file.3          |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_init.3             |    9 +++++++++
+ Documentation/manpages/man3/s3d_link.3             |   11 ++++++++++-
+ .../manpages/man3/s3d_load_line_normals.3          |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_load_materials_a.3 |    9 +++++++++
+ .../manpages/man3/s3d_load_polygon_normals.3       |   11 ++++++++++-
+ .../manpages/man3/s3d_load_polygon_tex_coords.3    |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_load_texture.3     |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_mainloop.3         |    9 +++++++++
+ Documentation/manpages/man3/s3d_mcp_focus.3        |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_net_check.3        |    9 +++++++++
+ Documentation/manpages/man3/s3d_new_object.3       |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_open_file.3        |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_pep_line.3         |    9 +++++++++
+ Documentation/manpages/man3/s3d_pep_line_normals.3 |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_pep_lines.3        |    9 +++++++++
+ Documentation/manpages/man3/s3d_pep_material.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_pep_material_a.3   |    9 +++++++++
+ .../manpages/man3/s3d_pep_material_texture.3       |    9 +++++++++
+ Documentation/manpages/man3/s3d_pep_materials_a.3  |    9 +++++++++
+ .../manpages/man3/s3d_pep_polygon_normals.3        |   11 ++++++++++-
+ .../manpages/man3/s3d_pep_polygon_tex_coord.3      |    9 +++++++++
+ .../manpages/man3/s3d_pep_polygon_tex_coords.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_pep_vertex.3       |    9 +++++++++
+ Documentation/manpages/man3/s3d_pep_vertices.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_pop_event.3        |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_pop_line.3         |    9 +++++++++
+ Documentation/manpages/man3/s3d_pop_material.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_pop_polygon.3      |    9 +++++++++
+ Documentation/manpages/man3/s3d_pop_texture.3      |    9 +++++++++
+ Documentation/manpages/man3/s3d_pop_vertex.3       |    9 +++++++++
+ Documentation/manpages/man3/s3d_process_stack.3    |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_event.3       |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_push_line.3        |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_lines.3       |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_material.3    |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_material_a.3  |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_materials_a.3 |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_polygon.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_polygons.3    |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_texture.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_textures.3    |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_vertex.3      |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_push_vertices.3    |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_quit.3             |    9 +++++++++
+ Documentation/manpages/man3/s3d_rotate.3           |    9 +++++++++
+ Documentation/manpages/man3/s3d_scale.3            |    9 +++++++++
+ Documentation/manpages/man3/s3d_select_font.3      |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_set_callback.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_strlen.3           |    9 +++++++++
+ Documentation/manpages/man3/s3d_translate.3        |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_unlink.3           |    9 +++++++++
+ Documentation/manpages/man3/s3d_usage.3            |    9 +++++++++
+ Documentation/manpages/man3/s3d_vector_angle.3     |    9 +++++++++
+ .../manpages/man3/s3d_vector_cross_product.3       |    9 +++++++++
+ .../manpages/man3/s3d_vector_dot_product.3         |    9 +++++++++
+ Documentation/manpages/man3/s3d_vector_length.3    |    9 +++++++++
+ Documentation/manpages/man3/s3d_vector_subtract.3  |    9 +++++++++
+ Documentation/manpages/man3/s3dw_ani_mate.3        |   11 ++++++++++-
+ Documentation/manpages/man3/s3dw_button_new.3      |    9 +++++++++
+ Documentation/manpages/man3/s3dw_delete.3          |    9 +++++++++
+ Documentation/manpages/man3/s3dw_focus.3           |    9 +++++++++
+ Documentation/manpages/man3/s3dw_getroot.3         |   11 ++++++++++-
+ Documentation/manpages/man3/s3dw_handle_click.3    |    9 +++++++++
+ Documentation/manpages/man3/s3dw_handle_key.3      |    9 +++++++++
+ .../manpages/man3/s3dw_input_change_text.3         |    9 +++++++++
+ Documentation/manpages/man3/s3dw_input_gettext.3   |    9 +++++++++
+ Documentation/manpages/man3/s3dw_input_new.3       |    9 +++++++++
+ .../manpages/man3/s3dw_label_change_text.3         |    9 +++++++++
+ Documentation/manpages/man3/s3dw_label_new.3       |    9 +++++++++
+ Documentation/manpages/man3/s3dw_moveit.3          |   11 ++++++++++-
+ Documentation/manpages/man3/s3dw_object_info.3     |    9 +++++++++
+ Documentation/manpages/man3/s3dw_show.3            |    9 +++++++++
+ Documentation/manpages/man3/s3dw_surface_new.3     |    9 +++++++++
+ .../manpages/man3/s3dw_textbox_change_text.3       |    9 +++++++++
+ Documentation/manpages/man3/s3dw_textbox_new.3     |    9 +++++++++
+ .../manpages/man3/s3dw_textbox_scrolldown.3        |    9 +++++++++
+ .../manpages/man3/s3dw_textbox_scrollleft.3        |    9 +++++++++
+ .../manpages/man3/s3dw_textbox_scrollright.3       |    9 +++++++++
+ .../manpages/man3/s3dw_textbox_scrollto.3          |    9 +++++++++
+ .../manpages/man3/s3dw_textbox_scrollup.3          |    9 +++++++++
+ Documentation/manpages/man9/mcp_object.9           |   11 ++++++++++-
+ Documentation/manpages/man9/s3d_but_info.9         |    9 +++++++++
+ Documentation/manpages/man9/s3d_evt.9              |    9 +++++++++
+ Documentation/manpages/man9/s3d_key_event.9        |    9 +++++++++
+ Documentation/manpages/man9/s3d_obj_info.9         |    9 +++++++++
+ Documentation/manpages/man9/s3dw_button.9          |    9 +++++++++
+ Documentation/manpages/man9/s3dw_input.9           |    9 +++++++++
+ Documentation/manpages/man9/s3dw_label.9           |    9 +++++++++
+ Documentation/manpages/man9/s3dw_scrollbar.9       |    9 +++++++++
+ Documentation/manpages/man9/s3dw_style.9           |   13 +++++++++++--
+ Documentation/manpages/man9/s3dw_surface.9         |    9 +++++++++
+ Documentation/manpages/man9/s3dw_textbox.9         |    9 +++++++++
+ Documentation/manpages/man9/s3dw_widget.9          |   11 ++++++++++-
+ README                                             |    2 +-
+ apps/s3dosm/osm.c                                  |    2 +-
+ cmake/modules/EnableProfiling.cmake                |    2 +-
+ cmake/modules/FilterPIE.cmake                      |    2 +-
+ cmake/modules/FindDocbook.cmake                    |    2 +-
+ cmake/modules/FindMath.cmake                       |    2 +-
+ cmake/modules/FindPThreads.cmake                   |    2 +-
+ cmake/modules/LateErrors.cmake                     |    2 +-
+ cmake/modules/LateStatus.cmake                     |    2 +-
+ cmake/modules/LateStatusPartial.cmake              |    2 +-
+ cmake/modules/S3DInternals.cmake                   |    2 +-
+ cmake/modules/SetC9X.cmake                         |    2 +-
+ cmake/modules/SetCCWarnFlags.cmake                 |    2 +-
+ cmake/modules/SetDebugLevel.cmake                  |    2 +-
+ cmake/modules/TestForSHM.cmake                     |    2 +-
+ cmake/modules/TestForSIGS.cmake                    |    2 +-
+ cmake/modules/TestForTCP.cmake                     |    2 +-
+ cmake/modules/TestGCCExternally.cmake              |    2 +-
+ cmake/modules/TestGCCSections.cmake                |    2 +-
+ cmake/modules/TestGCCVisibility.cmake              |    2 +-
+ cmake/modules/TestUnusedParam.cmake                |    2 +-
+ libs3d/s3d.h                                       |    2 +-
+ server/object.c                                    |    2 +-
+ 139 files changed, 1089 insertions(+), 61 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Apr 23 23:32:23 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 23 Apr 2011 23:32:23 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	updated. v0.2.1.1-26-g200dd7f
+Message-ID: <20110423213224.23CD14814C9@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been updated
+       via  200dd7f82778c484485fbdd4233426ac65f66172 (commit)
+       via  d315ccc78c873ca5ce7db8792b22ac1e482bb12b (commit)
+      from  397a8bf664cfd1c2725b248db7c945b1d46b9f6b (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 200dd7f82778c484485fbdd4233426ac65f66172
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Apr 23 23:31:34 2011 +0200
+
+    s3dvt: Warn when pty pair creation wasn't successful
+
+commit d315ccc78c873ca5ce7db8792b22ac1e482bb12b
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Apr 23 22:51:19 2011 +0200
+
+    libs3d: Generate errors on read failures
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ apps/s3dvt/main.c |    5 ++++-
+ libs3d/io.c       |   22 +++++++++++-----------
+ 2 files changed, 15 insertions(+), 12 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sun Apr 24 00:08:34 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun, 24 Apr 2011 00:08:34 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-104-gbbca1e7
+Message-ID: <20110423220835.0D5184814C9@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  bbca1e70308efff49967d571078b6301fffae6c0 (commit)
+       via  314353e89dc7f222c15071646283bda15ba08eec (commit)
+      from  e2a378d94c6ece5022b96716c4b9bf69da5ed7c6 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit bbca1e70308efff49967d571078b6301fffae6c0
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sun Apr 24 00:06:49 2011 +0200
+
+    libs3d: Remove deactivated code
+
+commit 314353e89dc7f222c15071646283bda15ba08eec
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sun Apr 24 00:04:40 2011 +0200
+
+    Don't use return like a function call
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/libs3d/functions.docbook       |    2 +-
+ Documentation/manpages/man3/s3d_init.3       |    2 +-
+ apps/dot_mcp/main.c                          |   34 ++--
+ apps/dot_mcp/menu.c                          |    2 +-
+ apps/kism3d/gui.c                            |   12 +-
+ apps/kism3d/kism3d.c                         |    2 +-
+ apps/meshs3d/hash.c                          |   34 ++--
+ apps/meshs3d/main.c                          |   12 +-
+ apps/meshs3d/net.c                           |   18 +-
+ apps/meshs3d/process.c                       |   12 +-
+ apps/s3d_x11gate/s3d_x11gate.c               |    8 +-
+ apps/s3dfm/animation.c                       |    8 +-
+ apps/s3dfm/box.c                             |   26 ++--
+ apps/s3dfm/dialog.c                          |    4 +-
+ apps/s3dfm/event.c                           |   12 +-
+ apps/s3dfm/fly.c                             |    4 +-
+ apps/s3dfm/focus.c                           |    8 +-
+ apps/s3dfm/fs.c                              |   32 ++--
+ apps/s3dfm/icon.c                            |    4 +-
+ apps/s3dfm/main.c                            |    2 +-
+ apps/s3dfm/node.c                            |   34 ++--
+ apps/s3dfm/parse.c                           |    4 +-
+ apps/s3dfm/string.c                          |    6 +-
+ apps/s3dosm/db.c                             |   36 ++--
+ apps/s3dosm/draw.c                           |    8 +-
+ apps/s3dosm/gps.c                            |   14 +-
+ apps/s3dosm/http_fetcher.c                   |    4 +-
+ apps/s3dosm/io.c                             |   14 +-
+ apps/s3dosm/kismet.c                         |    8 +-
+ apps/s3dosm/main.c                           |   14 +-
+ apps/s3dosm/nav.c                            |    4 +-
+ apps/s3dosm/object.c                         |   10 +-
+ apps/s3dosm/osm.c                            |   12 +-
+ apps/s3dosm/tag.c                            |    4 +-
+ apps/s3dosm/ui.c                             |   22 +-
+ apps/s3dvt/main.c                            |   16 +-
+ apps/s3dvt/terminal.c                        |    2 +-
+ example/filebrowser.c                        |   14 +-
+ example/hudtest.c                            |    2 +-
+ example/katze.c                              |    2 +-
+ example/linetest.c                           |    2 +-
+ example/modelloader.c                        |    6 +-
+ example/nichtsnutz.c                         |    6 +-
+ example/ptrtest.c                            |    8 +-
+ example/radius_test.c                        |    2 +-
+ example/s3dclock.c                           |    2 +-
+ example/snowman.c                            |    2 +-
+ example/strtest.c                            |    2 +-
+ example/texturetest.c                        |    2 +-
+ example/widgets.c                            |    6 +-
+ example/wiresphere.c                         |    4 +-
+ experimental/comptest/comptest.c             |   12 +-
+ experimental/comptest/window.c               |   16 +-
+ experimental/comptest/x11.c                  |   34 ++--
+ experimental/olsrs3d/main.c                  |   16 +-
+ experimental/olsrs3d/net.c                   |   18 +-
+ experimental/olsrs3d/process.c               |   12 +-
+ experimental/wiitest/wiitest.c               |    4 +-
+ extras/mplayer/mplayer.1.0pre7try2.s3d.patch |    6 +-
+ libs3d/callback.c                            |    4 +-
+ libs3d/event.c                               |    6 +-
+ libs3d/fontselect.c                          |    6 +-
+ libs3d/freetype.c                            |   50 ++---
+ libs3d/hash.c                                |   34 ++--
+ libs3d/io.c                                  |   36 ++--
+ libs3d/modelread.c                           |   14 +-
+ libs3d/network.c                             |   12 +-
+ libs3d/object_queue.c                        |   18 +-
+ libs3d/proto_in.c                            |    2 +-
+ libs3d/proto_out.c                           |  122 ++++++------
+ libs3d/sei_construct.c                       |   10 +-
+ libs3d/sei_misc.c                            |    2 +-
+ libs3d/sei_monotone.c                        |   27 +---
+ libs3d/sei_tri.c                             |   32 +---
+ libs3d/shm.c                                 |   40 ++--
+ libs3d/shm_ringbuf.c                         |    8 +-
+ libs3d/tcp.c                                 |   22 +-
+ libs3d/texture.c                             |   22 +-
+ libs3d/vector.c                              |    6 +-
+ libs3dw/animate.c                            |    8 +-
+ libs3dw/button.c                             |    8 +-
+ libs3dw/event.c                              |    6 +-
+ libs3dw/input.c                              |   18 +-
+ libs3dw/label.c                              |    8 +-
+ libs3dw/root.c                               |   22 +-
+ libs3dw/scrollbar.c                          |   10 +-
+ libs3dw/surface.c                            |   10 +-
+ libs3dw/textbox.c                            |    8 +-
+ libs3dw/widget.c                             |   14 +-
+ server/event.c                               |   18 +-
+ server/graphics.c                            |   10 +-
+ server/graphics_sdl.c                        |    4 +-
+ server/main.c                                |   12 +-
+ server/matrix.c                              |    4 +-
+ server/mcp.c                                 |   10 +-
+ server/network.c                             |   22 +-
+ server/object.c                              |  252 +++++++++++++-------------
+ server/process.c                             |   30 ++--
+ server/proto.c                               |    6 +-
+ server/shm.c                                 |   42 ++--
+ server/shm_ringbuf.c                         |    9 +-
+ server/tcp.c                                 |   20 +-
+ server/user.c                                |    8 +-
+ server/user_sdl.c                            |    6 +-
+ 104 files changed, 801 insertions(+), 865 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sun Apr 24 01:07:18 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun, 24 Apr 2011 01:07:18 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-106-ge9e5237
+Message-ID: <20110423230718.93D7F481370@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  e9e523763f43058e58da99ae0f532ddbac74ae0b (commit)
+       via  7dad7e52867b8e2d6a19d043b21f5138c8ffdf49 (commit)
+      from  bbca1e70308efff49967d571078b6301fffae6c0 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit e9e523763f43058e58da99ae0f532ddbac74ae0b
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sun Apr 24 01:04:23 2011 +0200
+
+    server: Reformat source files
+
+commit 7dad7e52867b8e2d6a19d043b21f5138c8ffdf49
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sun Apr 24 00:50:51 2011 +0200
+
+    server: Remove "dead" code
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ server/allocate.c     |   15 +-
+ server/config.h       |    3 +-
+ server/cull.c         |   20 +-
+ server/endian.c       |   18 +-
+ server/error.c        |   17 +-
+ server/event.c        |   50 ++--
+ server/global.h       |  161 ++++++-----
+ server/graphics.c     |   94 +++----
+ server/graphics_sdl.c |   13 +-
+ server/main.c         |   51 ++--
+ server/matrix.c       |   82 +++---
+ server/mcp.c          |   30 +--
+ server/navigation.c   |   44 +--
+ server/network.c      |   41 ++--
+ server/object.c       |  788 +++++++++++++++++++++++++------------------------
+ server/process.c      |  100 ++++---
+ server/proto.c        |  192 ++++++-------
+ server/proto.h        |    9 +-
+ server/shm.c          |  140 +++++-----
+ server/shm_ringbuf.c  |   55 ++---
+ server/tcp.c          |   95 ++++---
+ server/user.c         |   15 +-
+ server/user_sdl.c     |   10 +-
+ 23 files changed, 1009 insertions(+), 1034 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Thu Apr 28 19:20:12 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 28 Apr 2011 19:20:12 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-110-g0987537
+Message-ID: <20110428172012.75655480CB5@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  098753765ee1bf7e8dc5229c18ae9526fb77e8a8 (commit)
+       via  0e8f0a1e39bde43f17a5125cb24a9800c68acb56 (commit)
+       via  200dd7f82778c484485fbdd4233426ac65f66172 (commit)
+       via  d315ccc78c873ca5ce7db8792b22ac1e482bb12b (commit)
+      from  e9e523763f43058e58da99ae0f532ddbac74ae0b (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 098753765ee1bf7e8dc5229c18ae9526fb77e8a8
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Thu Apr 28 19:19:01 2011 +0200
+
+    Update draft release notes for 0.2.2
+
+commit 0e8f0a1e39bde43f17a5125cb24a9800c68acb56
+Merge: e9e5237 200dd7f
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Thu Apr 28 18:22:30 2011 +0200
+
+    Merge branch 'maint'
+    
+    Conflicts:
+    	libs3d/io.c
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/RelNotes-0.2.1.2.txt |   22 ----------------------
+ Documentation/RelNotes-0.2.2.txt   |   19 ++++++++++++++++++-
+ apps/s3dvt/main.c                  |    5 ++++-
+ libs3d/io.c                        |   24 ++++++++++++------------
+ 4 files changed, 34 insertions(+), 36 deletions(-)
+ delete mode 100644 Documentation/RelNotes-0.2.1.2.txt
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Apr 30 22:19:23 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 30 Apr 2011 22:19:23 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-111-g1e39f74
+Message-ID: <20110430201923.734D5480EFE@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  1e39f74b8a87468bf8f3c2ba0c41121c81549181 (commit)
+      from  098753765ee1bf7e8dc5229c18ae9526fb77e8a8 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 1e39f74b8a87468bf8f3c2ba0c41121c81549181
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Apr 30 21:38:43 2011 +0200
+
+    Documentation: Remove ohloh from release todo
+    
+    ohloh stopped the download service [1] in 2010. This makes it
+    unnecessary to have an upload to this service as part of the release
+    todo.
+    
+    [1] https://www.ohloh.net/announcements/long-overdue-update
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/Maintain.txt |    2 --
+ 1 files changed, 0 insertions(+), 2 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

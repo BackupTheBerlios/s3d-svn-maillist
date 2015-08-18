@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r756 - trunk/apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r756%20-%20trunk/apps/s3dfm&In-Reply-To=%3C200710182357.l9INv1Cn029983%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000747.html">
+   <LINK REL="Next"  HREF="000749.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r756 - trunk/apps/s3dfm</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r756%20-%20trunk/apps/s3dfm&In-Reply-To=%3C200710182357.l9INv1Cn029983%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r756 - trunk/apps/s3dfm">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 01:57:01 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000747.html">[S3d-svn] r755 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000749.html">[S3d-svn] r757 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#748">[ date ]</a>
+              <a href="thread.html#748">[ thread ]</a>
+              <a href="subject.html#748">[ subject ]</a>
+              <a href="author.html#748">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 01:57:01 +0200 (Fri, 19 Oct 2007)
+New Revision: 756
+
+Modified:
+   trunk/apps/s3dfm/fs.c
+   trunk/apps/s3dfm/parse.c
+Log:
+s3dfm: Use NULL for pointers instead of plain 0
+
+
+Modified: trunk/apps/s3dfm/fs.c
+===================================================================
+--- trunk/apps/s3dfm/fs.c	2007-10-18 23:56:48 UTC (rev 755)
++++ trunk/apps/s3dfm/fs.c	2007-10-18 23:57:01 UTC (rev 756)
+@@ -53,7 +53,7 @@
+ 	fl = malloc(sizeof(filelist));
+ 	fl-&gt;p = NULL;
+ 	fl-&gt;n = 0;
+-	n = scandir(path, &amp;namelist, 0, alphasort);
++	n = scandir(path, &amp;namelist, NULL, alphasort);
+ 	if (n &lt;= 2) { /* . and .. is always included. */
+ 		if (n &lt; 0)
+ 			fs_error(&quot;fl_new():scandir()&quot;, path);
+
+Modified: trunk/apps/s3dfm/parse.c
+===================================================================
+--- trunk/apps/s3dfm/parse.c	2007-10-18 23:56:48 UTC (rev 755)
++++ trunk/apps/s3dfm/parse.c	2007-10-18 23:57:01 UTC (rev 756)
+@@ -44,7 +44,7 @@
+ 	for (i = 0;i &lt; dir-&gt;n_sub;i++) {
+ 		dir-&gt;sub[i]-&gt;check = 1;
+ 	}
+-	n = i = scandir(path, &amp;namelist, 0, alphasort);
++	n = i = scandir(path, &amp;namelist, NULL, alphasort);
+ 	if (n &lt; 0) {
+ 		window_fs_errno(path);
+ 		return(-1);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000747.html">[S3d-svn] r755 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000749.html">[S3d-svn] r757 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#748">[ date ]</a>
+              <a href="thread.html#748">[ thread ]</a>
+              <a href="subject.html#748">[ subject ]</a>
+              <a href="author.html#748">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

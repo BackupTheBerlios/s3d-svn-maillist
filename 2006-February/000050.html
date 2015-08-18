@@ -1,0 +1,229 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r54 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r54%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602111252.k1BCqs61013425%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000049.html">
+   <LINK REL="Next"  HREF="000051.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r54 - trunk/apps/olsrs3d</H1>
+    <B>marec at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r54%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602111252.k1BCqs61013425%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r54 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Sat Feb 11 13:52:54 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000049.html">[S3d-svn] r53 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000051.html">[S3d-svn] r55 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#50">[ date ]</a>
+              <a href="thread.html#50">[ thread ]</a>
+              <a href="subject.html#50">[ subject ]</a>
+              <a href="author.html#50">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-02-11 13:52:30 +0100 (Sat, 11 Feb 2006)
+New Revision: 54
+
+Modified:
+   trunk/apps/olsrs3d/process.c
+Log:
+olsr connection list
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-02-11 12:24:29 UTC (rev 53)
++++ trunk/apps/olsrs3d/process.c	2006-02-11 12:52:30 UTC (rev 54)
+@@ -13,14 +13,35 @@
+  *
+  * create new or alter connection between 2 nodes
+  *
+- *   olsr_con =&gt;   pointer to current olsr connection
++ *   con_from =&gt;   current node
+  *   con_to   =&gt;   node to connect to
+- *   l        =&gt;   length ? ETX ?
++ *   etx      =&gt;   ETX
+  *
+  ***/
+ 
+-int add_olsr_con( struct olsr_con **olsr_con, struct olsr_node *con_to, float l ) {
++int add_olsr_con( struct olsr_node *con_from, struct olsr_node *con_to, float etx ) {
+ 
++	struct olsr_con **olsr_con = &amp;Con_begin;
++
++	while ( (*olsr_con) != NULL ) {
++
++		/* connection already exists */
++		if ( ( strncmp( (*olsr_con)-&gt;left_olsr_node-&gt;ip, con_from-&gt;ip, NAMEMAX ) == 0 ) &amp;&amp; ( strncmp( (*olsr_con)-&gt;right_olsr_node-&gt;ip, con_to-&gt;ip, NAMEMAX ) == 0 ) ) {
++
++			(*olsr_con)-&gt;left_etx = etx;
++			break;
++
++		} else if ( ( strncmp( (*olsr_con)-&gt;right_olsr_node-&gt;ip, con_from-&gt;ip, NAMEMAX ) == 0 ) &amp;&amp; ( strncmp( (*olsr_con)-&gt;left_olsr_node-&gt;ip, con_to-&gt;ip, NAMEMAX ) == 0 ) ) {
++
++			(*olsr_con)-&gt;right_etx = etx;
++			break;
++
++		}
++
++		olsr_con = &amp;(*olsr_con)-&gt;next_olsr_con;
++
++	}
++
+ 	/* new connection */
+ 	if ( (*olsr_con) == NULL ) {
+ 
+@@ -39,24 +60,14 @@
+ 		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 0,4,5,0 );
+ 		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 3,1,2,0 );
+ 
++		(*olsr_con)-&gt;left_olsr_node = con_from;
++		(*olsr_con)-&gt;right_olsr_node = con_to;
++		(*olsr_con)-&gt;left_etx = etx;
++
+ 		(*olsr_con)-&gt;next_olsr_con = NULL;
+-		(*olsr_con)-&gt;olsr_node = con_to;
+-		(*olsr_con)-&gt;etx = l;
+ 
+-		return ( 0 );
+-
+ 	}
+ 
+-	/* existing connection */
+-	if ( strncmp( (*olsr_con)-&gt;olsr_node-&gt;ip, con_to-&gt;ip, NAMEMAX ) == 0 ) {
+-
+-		(*olsr_con)-&gt;etx = l;
+-		return ( 0 );
+-
+-	}
+-
+-	add_olsr_con( &amp;(*olsr_con)-&gt;next_olsr_con, con_to, l );
+-
+ }
+ 
+ 
+@@ -151,6 +162,22 @@
+ 	int i;   /* inc var */
+ 	int result;   /* result of strcmp */
+ 
++	while ( (*olsr_node) != NULL ) {
++
++		result = strncmp( (*olsr_node)-&gt;ip, ip, NAMEMAX );
++
++		/* we found the node */
++		if ( result == 0 ) return (*olsr_node);
++
++		/* the searched node must be in the subtree */
++		if ( result &lt; 0 ) {
++			olsr_node = &amp;(*olsr_node)-&gt;right;
++		} else {
++			olsr_node = &amp;(*olsr_node)-&gt;left;
++		}
++
++	}
++
+ 	/* if node is NULL we reached the end of the tree and must create a new olsr_node */
+ 	if ( (*olsr_node) == NULL ) {
+ 
+@@ -162,8 +189,9 @@
+ 		strncpy((*olsr_node)-&gt;ip,ip,NAMEMAX);
+ 		(*olsr_node)-&gt;inet_gw = 0;
+ 		(*olsr_node)-&gt;inet_gw_modified = 1;
+-		printf( &quot;add: %s\n&quot;, (*olsr_node)-&gt;ip );
+ 
++		if ( Debug ) printf( &quot;new olsr node: %s\n&quot;, (*olsr_node)-&gt;ip );
++
+ 		for ( i=0; i&lt;3; i++ ) {
+ 			(*olsr_node)-&gt;pos_vec[i] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
+ 			(*olsr_node)-&gt;mov_vec[i] = 0.0;
+@@ -177,18 +205,6 @@
+ 
+ 	}
+ 
+-	result = strncmp( (*olsr_node)-&gt;ip, ip, NAMEMAX );
+-
+-	/* we found the node */
+-	if ( result == 0 ) return (*olsr_node);
+-
+-	/* the searched node must be in the subtree */
+-	if ( result &lt; 0 ) {
+-		get_olsr_node( &amp;(*olsr_node)-&gt;right, ip );
+-	} else {
+-		get_olsr_node( &amp;(*olsr_node)-&gt;left, ip );
+-	}
+-
+ }
+ 
+ 
+@@ -342,13 +358,13 @@
+ 			// connection to internet
+ 			if ( strcmp( data[1], &quot;0.0.0.0/0.0.0.0&quot; ) == 0 ) {
+ 
+-				olsr_node1 = get_olsr_node( &amp;Root, data[0] );
++				olsr_node1 = get_olsr_node( &amp;Olsr_root, data[0] );
+ 
+ 				if ( olsr_node1-&gt;inet_gw == 0 ) {
+ 
+ 					olsr_node1-&gt;inet_gw = 1;
+ 					olsr_node1-&gt;inet_gw_modified = 1;
+-					printf( &quot;new internet: %s\n&quot;, olsr_node1-&gt;ip );
++					if ( Debug ) printf( &quot;new internet: %s\n&quot;, olsr_node1-&gt;ip );
+ 
+ 				}
+ 
+@@ -360,13 +376,13 @@
+ 		} else {
+ // 			n1=get_node_num(data[0]);
+ // 			n2=get_node_num(data[1]);
+-			olsr_node1 = get_olsr_node( &amp;Root, data[0] );
+-			olsr_node2 = get_olsr_node( &amp;Root, data[1] );
++			olsr_node1 = get_olsr_node( &amp;Olsr_root, data[0] );
++			olsr_node2 = get_olsr_node( &amp;Olsr_root, data[1] );
+ 			f=10.0+strtod(data[2],NULL)/10.0;
+ /*		printf(&quot;######link from %d to %d, %f, %d\n&quot;,n1,n2,f, f&gt;=10);*/
+ 			if (f&gt;=5) /* just to prevent ascii to float converting inconsistency ... */
+ // 				add_adj(n1,n2,f);
+-				add_olsr_con( &amp;(olsr_node1)-&gt;olsr_con, olsr_node2, f );
++				add_olsr_con( olsr_node1, olsr_node2, f );
+ 		}
+ 	}
+ 	return(0);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000049.html">[S3d-svn] r53 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000051.html">[S3d-svn] r55 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#50">[ date ]</a>
+              <a href="thread.html#50">[ thread ]</a>
+              <a href="subject.html#50">[ subject ]</a>
+              <a href="author.html#50">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

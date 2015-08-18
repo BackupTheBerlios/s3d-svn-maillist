@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1040 - in trunk: cmake/modules libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1040%20-%20in%20trunk%3A%20cmake/modules%20libs3d%20libs3dw&In-Reply-To=%3C200811262032.mAQKWdQT029282%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001019.html">
+   <LINK REL="Next"  HREF="001021.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1040 - in trunk: cmake/modules libs3d libs3dw</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1040%20-%20in%20trunk%3A%20cmake/modules%20libs3d%20libs3dw&In-Reply-To=%3C200811262032.mAQKWdQT029282%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1040 - in trunk: cmake/modules libs3d libs3dw">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Wed Nov 26 21:32:39 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001019.html">[S3d-svn] r1039 - trunk/apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="001021.html">[S3d-svn] r1041 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1020">[ date ]</a>
+              <a href="thread.html#1020">[ thread ]</a>
+              <a href="subject.html#1020">[ subject ]</a>
+              <a href="author.html#1020">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-11-26 21:32:38 +0100 (Wed, 26 Nov 2008)
+New Revision: 1040
+
+Modified:
+   trunk/cmake/modules/S3DInternals.cmake
+   trunk/libs3d/CMakeLists.txt
+   trunk/libs3dw/CMakeLists.txt
+Log:
+Fix installation of cygs3d(w).dll under windows
+
+Modified: trunk/cmake/modules/S3DInternals.cmake
+===================================================================
+--- trunk/cmake/modules/S3DInternals.cmake	2008-11-26 20:32:32 UTC (rev 1039)
++++ trunk/cmake/modules/S3DInternals.cmake	2008-11-26 20:32:38 UTC (rev 1040)
+@@ -39,13 +39,12 @@
+ 
+ if (WIN32)
+ 	set(CFG_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/etc&quot; CACHE PATH &quot;The s3d cfg install dir (default prefix/etc/)&quot;)
+-	set(LIB_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/bin&quot; CACHE PATH &quot;The s3d lib install dir (default prefix/bin/)&quot;)
+ else (WIN32)
+ 	set(CFG_INSTALL_DIR &quot;/etc&quot; CACHE PATH &quot;The s3d cfg install dir (default /etc/)&quot;)
+-	set(LIB_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/lib&quot; CACHE PATH &quot;The s3d lib install dir (default prefix/lib/)&quot;)
+ endif (WIN32)
+ 
+ set(BIN_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/bin&quot; CACHE PATH &quot;The s3d man install dir (default prefix/bin/)&quot;)
++set(LIB_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/lib&quot; CACHE PATH &quot;The s3d lib install dir (default prefix/lib/)&quot;)
+ set(INCLUDE_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/include&quot; CACHE PATH &quot;The s3d header install dir (default prefix/include/)&quot;)
+ set(DATA_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/share/objs&quot; CACHE PATH &quot;The s3d objs install dir (default prefix/share/objs/)&quot;)
+ set(HTML_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/share/doc/s3d&quot; CACHE PATH &quot;The s3d html documentation install dir (default prefix/share/doc/s3d/)&quot;)
+
+Modified: trunk/libs3d/CMakeLists.txt
+===================================================================
+--- trunk/libs3d/CMakeLists.txt	2008-11-26 20:32:32 UTC (rev 1039)
++++ trunk/libs3d/CMakeLists.txt	2008-11-26 20:32:38 UTC (rev 1040)
+@@ -12,6 +12,7 @@
+ 
+ # install
+ install(TARGETS s3d
++	RUNTIME DESTINATION &quot;${BIN_INSTALL_DIR}&quot;
+ 	LIBRARY DESTINATION &quot;${LIB_INSTALL_DIR}&quot;
+ 	ARCHIVE DESTINATION &quot;${LIB_INSTALL_DIR}&quot;
+ )
+
+Modified: trunk/libs3dw/CMakeLists.txt
+===================================================================
+--- trunk/libs3dw/CMakeLists.txt	2008-11-26 20:32:32 UTC (rev 1039)
++++ trunk/libs3dw/CMakeLists.txt	2008-11-26 20:32:38 UTC (rev 1040)
+@@ -10,6 +10,7 @@
+ 
+ # install
+ install(TARGETS s3dw
++	RUNTIME DESTINATION &quot;${BIN_INSTALL_DIR}&quot;
+ 	LIBRARY DESTINATION &quot;${LIB_INSTALL_DIR}&quot;
+ 	ARCHIVE DESTINATION &quot;${LIB_INSTALL_DIR}&quot;
+ )
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001019.html">[S3d-svn] r1039 - trunk/apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="001021.html">[S3d-svn] r1041 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1020">[ date ]</a>
+              <a href="thread.html#1020">[ thread ]</a>
+              <a href="subject.html#1020">[ subject ]</a>
+              <a href="author.html#1020">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r611 - branches/s3d-cmake/apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r611%20-%20branches/s3d-cmake/apps/s3dosm&In-Reply-To=%3C200706252156.l5PLu5ds023137%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000601.html">
+   <LINK REL="Next"  HREF="000603.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r611 - branches/s3d-cmake/apps/s3dosm</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r611%20-%20branches/s3d-cmake/apps/s3dosm&In-Reply-To=%3C200706252156.l5PLu5ds023137%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r611 - branches/s3d-cmake/apps/s3dosm">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Jun 25 23:56:05 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000601.html">[S3d-svn] r609 - in branches/s3d-cmake: . cmake/modules
+</A></li>
+        <LI>Next message: <A HREF="000603.html">[S3d-svn] r610 - branches/s3d-cmake/example
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#600">[ date ]</a>
+              <a href="thread.html#600">[ thread ]</a>
+              <a href="subject.html#600">[ subject ]</a>
+              <a href="author.html#600">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-06-25 23:56:05 +0200 (Mon, 25 Jun 2007)
+New Revision: 611
+
+Modified:
+   branches/s3d-cmake/apps/s3dosm/CMakeLists.txt
+Log:
+- Remove gps as required dependency from s3dosm
+
+
+Modified: branches/s3d-cmake/apps/s3dosm/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/apps/s3dosm/CMakeLists.txt	2007-06-25 21:56:04 UTC (rev 610)
++++ branches/s3d-cmake/apps/s3dosm/CMakeLists.txt	2007-06-25 21:56:05 UTC (rev 611)
+@@ -1,13 +1,17 @@
+-# depends on xml2, sqlite, gps
+-if (LIBXML2_FOUND AND SQLITE_FOUND AND GPS_FOUND)
++# depends on xml2, sqlite
++if (LIBXML2_FOUND AND SQLITE_FOUND)
+ 	include_directories(${CMAKE_SOURCE_DIR}/libs3d ${CMAKE_SOURCE_DIR}/libs3dw)
+ 
+ 	add_executable(s3dosm db.c draw.c gps.c http_error_codes.c http_fetcher.c#
+ 		io.c kismet.c main.c nav.c net.c object.c olsrs3d.c osm.c
+ 		process.c search.c tag.c ui.c)
+ 
+-	target_link_libraries(s3dosm s3d s3dw ${LIBXML2_LIBRARIES} ${SQLITE_LIBRARIES} ${GPS_LIBRARIES})
++	target_link_libraries(s3dosm s3d s3dw ${LIBXML2_LIBRARIES} ${SQLITE_LIBRARIES})
+ 
++	if (GPS_FOUND)
++		target_link_libraries(s3dosm ${GPS_LIBRARIES})
++	endif (GPS_FOUND)
++
+ 	# install 
+ 	install(TARGETS s3dosm RUNTIME DESTINATION bin)
+-endif (LIBXML2_FOUND AND SQLITE_FOUND AND GPS_FOUND)
++endif (LIBXML2_FOUND AND SQLITE_FOUND)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000601.html">[S3d-svn] r609 - in branches/s3d-cmake: . cmake/modules
+</A></li>
+	<LI>Next message: <A HREF="000603.html">[S3d-svn] r610 - branches/s3d-cmake/example
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#600">[ date ]</a>
+              <a href="thread.html#600">[ thread ]</a>
+              <a href="subject.html#600">[ subject ]</a>
+              <a href="author.html#600">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

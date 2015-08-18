@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r872 - trunk/svnonly/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r872%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711211529.lALFTe9V011278%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000864.html">
+   <LINK REL="Next"  HREF="000866.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r872 - trunk/svnonly/comptest</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r872%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711211529.lALFTe9V011278%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r872 - trunk/svnonly/comptest">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Wed Nov 21 16:29:40 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000864.html">[S3d-svn] r871 - trunk/svnonly/comptest
+</A></li>
+        <LI>Next message: <A HREF="000866.html">[S3d-svn] r873 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#865">[ date ]</a>
+              <a href="thread.html#865">[ thread ]</a>
+              <a href="subject.html#865">[ subject ]</a>
+              <a href="author.html#865">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-11-21 16:29:34 +0100 (Wed, 21 Nov 2007)
+New Revision: 872
+
+Modified:
+   trunk/svnonly/comptest/comptest.c
+   trunk/svnonly/comptest/x11.c
+Log:
+comptest: Convert non-ANSI to ANSI function declaration
+
+
+Modified: trunk/svnonly/comptest/comptest.c
+===================================================================
+--- trunk/svnonly/comptest/comptest.c	2007-11-21 12:33:47 UTC (rev 871)
++++ trunk/svnonly/comptest/comptest.c	2007-11-21 15:29:34 UTC (rev 872)
+@@ -164,7 +164,7 @@
+ int screen_height = 0;
+ int screen_oid = -1;
+ 
+-void set_screenpos() {
++static void set_screenpos(void) {
+ 	XWindowAttributes    attr;
+ 	XGetWindowAttributes(dpy, RootWindow(dpy, 0), &amp;attr);
+ 	screen_width = attr.width;
+
+Modified: trunk/svnonly/comptest/x11.c
+===================================================================
+--- trunk/svnonly/comptest/x11.c	2007-11-21 12:33:47 UTC (rev 871)
++++ trunk/svnonly/comptest/x11.c	2007-11-21 15:29:34 UTC (rev 872)
+@@ -166,7 +166,7 @@
+ }
+ 
+ /* find biggest bounding rect of the two given rects, write it into dest */
+-void merge_rect( XRectangle *dest, XRectangle *src) {
++static void merge_rect( XRectangle *dest, XRectangle *src) {
+ 	int max;
+ 	if (dest-&gt;width == 0 || dest-&gt;height == 0) {
+ 		memcpy(dest, src, sizeof(*dest));
+@@ -263,7 +263,7 @@
+ 
+ }
+ 
+-void x11_addwindows() 
++void x11_addwindows(void)
+ {
+ 	Window        root_return, parent_return;
+ 	unsigned int     nchildren;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000864.html">[S3d-svn] r871 - trunk/svnonly/comptest
+</A></li>
+	<LI>Next message: <A HREF="000866.html">[S3d-svn] r873 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#865">[ date ]</a>
+              <a href="thread.html#865">[ thread ]</a>
+              <a href="subject.html#865">[ subject ]</a>
+              <a href="author.html#865">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

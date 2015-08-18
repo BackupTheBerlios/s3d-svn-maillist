@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r826 - trunk/svnonly
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r826%20-%20trunk/svnonly&In-Reply-To=%3C200710261324.l9QDON0s015585%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000817.html">
+   <LINK REL="Next"  HREF="000819.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r826 - trunk/svnonly</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r826%20-%20trunk/svnonly&In-Reply-To=%3C200710261324.l9QDON0s015585%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r826 - trunk/svnonly">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 26 15:24:23 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000817.html">[S3d-svn] r825 - trunk/svnonly
+</A></li>
+        <LI>Next message: <A HREF="000819.html">[S3d-svn] r827 - in trunk: . cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#818">[ date ]</a>
+              <a href="thread.html#818">[ thread ]</a>
+              <a href="subject.html#818">[ subject ]</a>
+              <a href="author.html#818">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-10-26 15:24:23 +0200 (Fri, 26 Oct 2007)
+New Revision: 826
+
+Modified:
+   trunk/svnonly/ROADMAP
+Log:
+- answer question, update
+
+
+Modified: trunk/svnonly/ROADMAP
+===================================================================
+--- trunk/svnonly/ROADMAP	2007-10-26 13:07:58 UTC (rev 825)
++++ trunk/svnonly/ROADMAP	2007-10-26 13:24:23 UTC (rev 826)
+@@ -57,7 +57,17 @@
+    dieser dann seine Textur erneuert.
+ 
+ Frage Andreas:
+-soll es denn &#252;berhaupt weiterhin m&#246;glich sein, von einem anderen rechner zu connecten ?
++soll es denn &#252;berhaupt weiterhin m&#246;glich sein, von einem anderen rechner zu 
++connecten ?
++
++Ja, auf jeden Fall! Man koennte ja eine Funktion 
++&quot;s3d_get_texture_buffer(void **)&quot;, die lokal einen Pointer auf den 
++shared-memory Bereich zurueckgibt, und remote einfach einen ganz normalen 
++Speicherbereich. Wenn jetzt &quot;update&quot; aufgeruften wird, uebertraegt die Funktion
++auf dem remote-Rechner wie gehabt diesen Speicherbereich zum Server, auf einem
++SHM-Rechner macht sie aber das oben beschriebene (also nur dem Server Bescheid 
++sagen).
++Damit haetten wir gewissermassen Abwaertskompatibilitaet.
+    
+ 3. Aufbau eines Composite-Managers als MCP
+    -----------------------------------------
+@@ -108,3 +118,9 @@
+   man 2 leicht voneinander verschobene Bilder fuer beide Augen haben moechte.
+ 
+ <A HREF="http://en.wikipedia.org/wiki/Cave_Automatic_Virtual_Environment">http://en.wikipedia.org/wiki/Cave_Automatic_Virtual_Environment</A>
++
++GLUT
++------
++
++Kann eigentlich raus, SDL tut alles was wir wollen und mehr, und ist auch 
++Defacto-Standard und auf vielen Platformen verfuegbar.
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000817.html">[S3d-svn] r825 - trunk/svnonly
+</A></li>
+	<LI>Next message: <A HREF="000819.html">[S3d-svn] r827 - in trunk: . cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#818">[ date ]</a>
+              <a href="thread.html#818">[ thread ]</a>
+              <a href="subject.html#818">[ subject ]</a>
+              <a href="author.html#818">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

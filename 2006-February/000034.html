@@ -1,0 +1,220 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r38 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r38%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602102007.k1AK7Mjn008637%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000033.html">
+   <LINK REL="Next"  HREF="000035.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r38 - trunk/apps/olsrs3d</H1>
+    <B>marec at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r38%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602102007.k1AK7Mjn008637%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r38 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Fri Feb 10 21:07:22 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000033.html">[S3d-svn] r37 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000035.html">[S3d-svn] r39 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#34">[ date ]</a>
+              <a href="thread.html#34">[ thread ]</a>
+              <a href="subject.html#34">[ subject ]</a>
+              <a href="author.html#34">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-02-10 21:07:04 +0100 (Fri, 10 Feb 2006)
+New Revision: 38
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/olsrs3d.h
+   trunk/apps/olsrs3d/process.c
+Log:
+adj-list
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-02-09 17:28:33 UTC (rev 37)
++++ trunk/apps/olsrs3d/main.c	2006-02-10 20:07:04 UTC (rev 38)
+@@ -11,7 +11,9 @@
+ 
+ char Olsr_host[256];   // ip or hostname of olsr node with running dot_draw plugin
+ 
++struct olsr_node *Root = NULL;   // top of olsr node tree
+ 
++
+ int node_count=-1;
+ int alpha=0;
+ int Olsr_node_obj,Olsr_node_inet_obj,mesh;
+@@ -144,22 +146,22 @@
+ 	float tmp_mov_vec[3];
+ 	struct olsr_con **olsr_con;
+ 
+-	// no more node left
++	/* no more nodes left */
+ 	if ( olsr_node == NULL ) return;
+-printf( &quot;durchlauf: %s\n&quot;, olsr_node );
+-	// olsr node shape has been modified
++
++	/* olsr node shape has been modified */
+ 	if ( olsr_node-&gt;inet_gw_modified ) {
+ 
+ 		/* delete old shape */
+-		if ( olsr_node-&gt;obj_id != NULL ) s3d_del_object( olsr_node-&gt;obj_id );
+-		if ( olsr_node-&gt;desc_id != NULL ) s3d_del_object( olsr_node-&gt;desc_id );
++		if ( olsr_node-&gt;obj_id != -1 ) s3d_del_object( olsr_node-&gt;obj_id );
++		if ( olsr_node-&gt;desc_id != -1 ) s3d_del_object( olsr_node-&gt;desc_id );
+ 
+ 		/* create new shape */
+ 		if ( olsr_node-&gt;inet_gw ) {
+-			// olsr node offers internet access
++			/* olsr node offers internet access */
+ 			olsr_node-&gt;obj_id = s3d_clone( Olsr_node_inet_obj );
+ 		} else {
+-			// normal olsr node
++			/* normal olsr node */
+ 			olsr_node-&gt;obj_id = s3d_clone( Olsr_node_obj );
+ 		}
+ 
+@@ -179,17 +181,18 @@
+ 	olsr_node-&gt;mov_vec[0] = olsr_node-&gt;mov_vec[1] = olsr_node-&gt;mov_vec[2] = 0.0;
+ 
+ 	/* calculate new movement vector */
+-// 	olsr_con = &amp;olsr_node-&gt;olsr_con;
+-//
++	(*olsr_con) = &amp;olsr_node-&gt;olsr_con;
++
+ // 	while ( (*olsr_con) != NULL ) {
+-//
++
++// 		printf( &quot;distance: %i\n&quot;, olsr_con-&gt;olsr_node );
+ // 		distance = dirt( olsr_node-&gt;pos_vec, (*olsr_con)-&gt;olsr_node-&gt;pos_vec, tmp_mov_vec );
+-// 		f = ( (*olsr_con)-&gt;etx ) / distance;
++// 		f = (*olsr_con)-&gt;etx / distance;
+ // 		if ( f &lt; 0.3 ) f = 0.3;
+ // 		mov_add( olsr_node-&gt;mov_vec, tmp_mov_vec, 1/f-1);
+-//
+-// 		olsr_con = &amp;(*olsr_con)-&gt;next_olsr_con;
+-//
++
++// 		(*olsr_con) = &amp;olsr_con-&gt;next_olsr_con;
++
+ // 	}
+ 
+ 	handle_olsr_node( olsr_node-&gt;left );
+@@ -329,14 +332,14 @@
+ 
+ 	if ( Debug ) printf( &quot;debug mode enabled ...\n&quot; );
+ 
+-	// delete olsrs3d options
+-	while ( ( optind &lt; argc ) &amp;&amp; ( argv[optind][0] != '-' ) ) optind++;   // optind may point to ip addr of '-H'
++	/* delete olsrs3d options */
++	while ( ( optind &lt; argc ) &amp;&amp; ( argv[optind][0] != '-' ) ) optind++;   /* optind may point to ip addr of '-H' */
+ 	optind--;
+-	argv[optind] = argv[0];   // save program path
+-	argc -= optind;   // jump over olsrs3d options
++	argv[optind] = argv[0];   /* save program path */
++	argc -= optind;   /* jump over olsrs3d options */
+ 	argv += optind;
+ 
+-	// set extern int optind = 0 for parse_args in io.c
++	/* set extern int optind = 0 for parse_args in io.c */
+ 	optind = 0;
+ 
+ 	process_init(Olsr_host);
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-02-09 17:28:33 UTC (rev 37)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-02-10 20:07:04 UTC (rev 38)
+@@ -35,9 +35,7 @@
+ 
+ 
+ 
+-static struct olsr_node *Root = NULL;   // top of olsr node tree
+-
+-
++extern struct olsr_node *Root;   // top of olsr node tree
+ extern int 	max, new_max;
+ extern float 	*adj;
+ extern int	*adj_obj;
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-02-09 17:28:33 UTC (rev 37)
++++ trunk/apps/olsrs3d/process.c	2006-02-10 20:07:04 UTC (rev 38)
+@@ -39,18 +39,22 @@
+ 		(*olsr_con)-&gt;next_olsr_con = NULL;
+ 		(*olsr_con)-&gt;etx = l;
+ 
++		printf( &quot;new connection to %s: %f\n&quot;, con_to-&gt;ip, l );
++
+ 		return( 0 );
+ 
+ 	}
+ 
+ 	// existing connection
+-	if ( (*olsr_con)-&gt;olsr_node == con_to ) {
++	printf( &quot;connected to: %f\n&quot;, (*olsr_con)-&gt;olsr_node );
++	if ( strncmp( (*olsr_con)-&gt;olsr_node-&gt;ip, con_to-&gt;ip, NAMEMAX ) == 0 ) {
+ 
++		printf( &quot;modified connection to %s: %f\n&quot;, con_to-&gt;ip, l );
+ 		(*olsr_con)-&gt;etx = l;
+ 		return( 0 );
+ 
+ 	}
+-
++	printf( &quot;connection not found %s: %f\n&quot;, con_to-&gt;ip, l );
+ 	add_olsr_con( &amp;(*olsr_con)-&gt;next_olsr_con, con_to, l );
+ 
+ }
+@@ -165,8 +169,8 @@
+ 			(*olsr_node)-&gt;mov_vec[i] = 0.0;
+ 		}
+ 
+-		(*olsr_node)-&gt;obj_id = NULL;
+-		(*olsr_node)-&gt;desc_id = NULL;
++		(*olsr_node)-&gt;obj_id = -1;
++		(*olsr_node)-&gt;desc_id = -1;
+ 		(*olsr_node)-&gt;olsr_con = NULL;
+ 
+ 		return (*olsr_node);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000033.html">[S3d-svn] r37 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000035.html">[S3d-svn] r39 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#34">[ date ]</a>
+              <a href="thread.html#34">[ thread ]</a>
+              <a href="subject.html#34">[ subject ]</a>
+              <a href="author.html#34">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

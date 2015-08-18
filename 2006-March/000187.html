@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r191 - in trunk: . client server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r191%20-%20in%20trunk%3A%20.%20client%20server&In-Reply-To=%3C200603152114.k2FLEJkX026398%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000186.html">
+   <LINK REL="Next"  HREF="000188.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r191 - in trunk: . client server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r191%20-%20in%20trunk%3A%20.%20client%20server&In-Reply-To=%3C200603152114.k2FLEJkX026398%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r191 - in trunk: . client server">dotslash at berlios.de
+       </A><BR>
+    <I>Wed Mar 15 22:14:19 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000186.html">[S3d-svn] r190 - in trunk: . Documentation example server
+</A></li>
+        <LI>Next message: <A HREF="000188.html">[S3d-svn] r192 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#187">[ date ]</a>
+              <a href="thread.html#187">[ thread ]</a>
+              <a href="subject.html#187">[ subject ]</a>
+              <a href="author.html#187">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-03-15 22:14:18 +0100 (Wed, 15 Mar 2006)
+New Revision: 191
+
+Modified:
+   trunk/
+   trunk/TODO
+   trunk/client/TODO
+   trunk/server/TODO
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r283 at balthasar</A>:  dotslash | 2006-03-15 22:14:09 +0100
+ - TODO update
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:280
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:283
+
+Modified: trunk/TODO
+===================================================================
+--- trunk/TODO	2006-03-15 20:58:13 UTC (rev 190)
++++ trunk/TODO	2006-03-15 21:14:18 UTC (rev 191)
+@@ -1,17 +1,11 @@
+ dot_mcp:
+ 	* sane paths for applications
+-	* logout button for use with rc-file
+-client(portability?!):
+-	shmat() return (char *) -1 or NULL?! data_ctos/data_stoc should
+-	really not be 0x0
+-	3ds reader won't work on linux ppc, probably lots of memory leaks
+-server:
+-	* implement mouse movement
+-	* endless loop in proccess_args() (getopts) on linux ppc
+-
+ autotools:
+-	* Apple todo: won't find -lX11 (for s3d_x11gate) while compiling
+ 	* OBJECTPATH for finding the object?
++
++	* Apple todo: won't find -lX11 (for s3d_x11gate) while compiling
++	* &quot;-Wall -pedantic&quot; default in CFLAGS? (if possible)
++	* --enable-debug not honored when CFLAGS is set?
+ 	* We should perhaps check for the correct versions of
+ 	  autotools to avoid some confusion about some warnings.
+ 	  At the time of writing, supported are:
+
+Modified: trunk/client/TODO
+===================================================================
+--- trunk/client/TODO	2006-03-15 20:58:13 UTC (rev 190)
++++ trunk/client/TODO	2006-03-15 21:14:18 UTC (rev 191)
+@@ -1,2 +1,5 @@
+ TODO:
+- - .max, .x, .obj files
++- shmat() return (char *) -1 or NULL?! data_ctos/data_stoc should
++  really not be 0x0
++- 3ds reader won't work on linux ppc, probably lots of memory leaks
++- .max, .x, .obj files
+
+Modified: trunk/server/TODO
+===================================================================
+--- trunk/server/TODO	2006-03-15 20:58:13 UTC (rev 190)
++++ trunk/server/TODO	2006-03-15 21:14:18 UTC (rev 191)
+@@ -1,9 +1,11 @@
+ HIGH:
++ - OnMouseOver-events - with a pointer-object?!
+ MED:
++ - culling for selection-mode - do it with line-culling, not plane-culling!
+  - stop networking grepping after some deadline to prevent DoS ...?
+  - delete polygon normals when vertex got changed?!
++ - endless loop in proccess_args() (getopts) on linux ppc
+ LOW:
+- - culling for selection-mode - do it with line-culling, not plane-culling!
+  - checking for biggest object is not cool implemented
+  - checking on clone sources is not very nice too ...
+ 
+@@ -12,7 +14,6 @@
+ 
+  
+ IDEAS:
+- - OnMouseOver-events - with a pointer-object?!
+  - how to define special keys? e.g. the GLUT way, the SDL way, the ANSI way ...
+  - ipv6, unix socket support. 
+  - put whole processes in display lists?!
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000186.html">[S3d-svn] r190 - in trunk: . Documentation example server
+</A></li>
+	<LI>Next message: <A HREF="000188.html">[S3d-svn] r192 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#187">[ date ]</a>
+              <a href="thread.html#187">[ thread ]</a>
+              <a href="subject.html#187">[ subject ]</a>
+              <a href="author.html#187">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

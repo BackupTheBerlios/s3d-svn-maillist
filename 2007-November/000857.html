@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r864 - trunk/svnonly/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r864%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711202146.lAKLkF0B021947%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000856.html">
+   <LINK REL="Next"  HREF="000858.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r864 - trunk/svnonly/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r864%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711202146.lAKLkF0B021947%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r864 - trunk/svnonly/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Tue Nov 20 22:46:15 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000856.html">[S3d-svn] r863 - trunk/svnonly/comptest
+</A></li>
+        <LI>Next message: <A HREF="000858.html">[S3d-svn] r865 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#857">[ date ]</a>
+              <a href="thread.html#857">[ thread ]</a>
+              <a href="subject.html#857">[ subject ]</a>
+              <a href="author.html#857">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-20 22:46:15 +0100 (Tue, 20 Nov 2007)
+New Revision: 864
+
+Modified:
+   trunk/svnonly/comptest/comptest.c
+Log:
+- fix distance to screen
+
+
+Modified: trunk/svnonly/comptest/comptest.c
+===================================================================
+--- trunk/svnonly/comptest/comptest.c	2007-11-20 21:10:18 UTC (rev 863)
++++ trunk/svnonly/comptest/comptest.c	2007-11-20 21:46:15 UTC (rev 864)
+@@ -144,7 +144,7 @@
+ 	if (key-&gt;keysym == S3DK_RETURN) {
+ 		printf(&quot;camera into position ...\n&quot;);
+ 
+-		s3d_translate(0, 0,0, SCREEN_SCALE);
++		s3d_translate(0, 0,0, SCREEN_SCALE * ( 1 - 1/100.0));
+ 		s3d_rotate(0,0,0,0);
+ 
+ 		
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000856.html">[S3d-svn] r863 - trunk/svnonly/comptest
+</A></li>
+	<LI>Next message: <A HREF="000858.html">[S3d-svn] r865 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#857">[ date ]</a>
+              <a href="thread.html#857">[ thread ]</a>
+              <a href="subject.html#857">[ subject ]</a>
+              <a href="author.html#857">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

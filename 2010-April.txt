@@ -1,0 +1,38 @@
+From lazhur at mail.berlios.de  Thu Apr 15 15:37:36 2010
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 15 Apr 2010 15:37:36 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	updated. v0.2.1.1-15-ge015df2
+Message-ID: <201004151337.o3FDbaHu003063@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been updated
+       via  e015df26323a73f6228b1281e8ff30559759a6a8 (commit)
+      from  3a398686a496dfb8c5262ff5e9bb30c30f7d3006 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit e015df26323a73f6228b1281e8ff30559759a6a8
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Apr 15 15:12:13 2010 +0200
+
+    s3dfm: Fix potential buffer overflow when parsing directory
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ apps/s3dfm/parse.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

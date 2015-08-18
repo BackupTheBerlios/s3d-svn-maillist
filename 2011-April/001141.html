@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-104-gbbca1e7
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2011-April/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20branch%2C%20master%2C%0A%09updated.%20v0.2.1.1-104-gbbca1e7&In-Reply-To=%3C20110423220835.0D5184814C9%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001140.html">
+   <LINK REL="Next"  HREF="001142.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-104-gbbca1e7</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20branch%2C%20master%2C%0A%09updated.%20v0.2.1.1-104-gbbca1e7&In-Reply-To=%3C20110423220835.0D5184814C9%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-104-gbbca1e7">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Apr 24 00:08:34 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001140.html">[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-26-g200dd7f
+</A></li>
+        <LI>Next message: <A HREF="001142.html">[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-106-ge9e5237
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1141">[ date ]</a>
+              <a href="thread.html#1141">[ thread ]</a>
+              <a href="subject.html#1141">[ subject ]</a>
+              <a href="author.html#1141">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project &quot;Project s3d at BerliOS&quot;.
+
+The branch, master has been updated
+       via  bbca1e70308efff49967d571078b6301fffae6c0 (commit)
+       via  314353e89dc7f222c15071646283bda15ba08eec (commit)
+      from  e2a378d94c6ece5022b96716c4b9bf69da5ed7c6 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit bbca1e70308efff49967d571078b6301fffae6c0
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven at narfation.org</A>&gt;
+Date:   Sun Apr 24 00:06:49 2011 +0200
+
+    libs3d: Remove deactivated code
+
+commit 314353e89dc7f222c15071646283bda15ba08eec
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven at narfation.org</A>&gt;
+Date:   Sun Apr 24 00:04:40 2011 +0200
+
+    Don't use return like a function call
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/libs3d/functions.docbook       |    2 +-
+ Documentation/manpages/man3/s3d_init.3       |    2 +-
+ apps/dot_mcp/main.c                          |   34 ++--
+ apps/dot_mcp/menu.c                          |    2 +-
+ apps/kism3d/gui.c                            |   12 +-
+ apps/kism3d/kism3d.c                         |    2 +-
+ apps/meshs3d/hash.c                          |   34 ++--
+ apps/meshs3d/main.c                          |   12 +-
+ apps/meshs3d/net.c                           |   18 +-
+ apps/meshs3d/process.c                       |   12 +-
+ apps/s3d_x11gate/s3d_x11gate.c               |    8 +-
+ apps/s3dfm/animation.c                       |    8 +-
+ apps/s3dfm/box.c                             |   26 ++--
+ apps/s3dfm/dialog.c                          |    4 +-
+ apps/s3dfm/event.c                           |   12 +-
+ apps/s3dfm/fly.c                             |    4 +-
+ apps/s3dfm/focus.c                           |    8 +-
+ apps/s3dfm/fs.c                              |   32 ++--
+ apps/s3dfm/icon.c                            |    4 +-
+ apps/s3dfm/main.c                            |    2 +-
+ apps/s3dfm/node.c                            |   34 ++--
+ apps/s3dfm/parse.c                           |    4 +-
+ apps/s3dfm/string.c                          |    6 +-
+ apps/s3dosm/db.c                             |   36 ++--
+ apps/s3dosm/draw.c                           |    8 +-
+ apps/s3dosm/gps.c                            |   14 +-
+ apps/s3dosm/http_fetcher.c                   |    4 +-
+ apps/s3dosm/io.c                             |   14 +-
+ apps/s3dosm/kismet.c                         |    8 +-
+ apps/s3dosm/main.c                           |   14 +-
+ apps/s3dosm/nav.c                            |    4 +-
+ apps/s3dosm/object.c                         |   10 +-
+ apps/s3dosm/osm.c                            |   12 +-
+ apps/s3dosm/tag.c                            |    4 +-
+ apps/s3dosm/ui.c                             |   22 +-
+ apps/s3dvt/main.c                            |   16 +-
+ apps/s3dvt/terminal.c                        |    2 +-
+ example/filebrowser.c                        |   14 +-
+ example/hudtest.c                            |    2 +-
+ example/katze.c                              |    2 +-
+ example/linetest.c                           |    2 +-
+ example/modelloader.c                        |    6 +-
+ example/nichtsnutz.c                         |    6 +-
+ example/ptrtest.c                            |    8 +-
+ example/radius_test.c                        |    2 +-
+ example/s3dclock.c                           |    2 +-
+ example/snowman.c                            |    2 +-
+ example/strtest.c                            |    2 +-
+ example/texturetest.c                        |    2 +-
+ example/widgets.c                            |    6 +-
+ example/wiresphere.c                         |    4 +-
+ experimental/comptest/comptest.c             |   12 +-
+ experimental/comptest/window.c               |   16 +-
+ experimental/comptest/x11.c                  |   34 ++--
+ experimental/olsrs3d/main.c                  |   16 +-
+ experimental/olsrs3d/net.c                   |   18 +-
+ experimental/olsrs3d/process.c               |   12 +-
+ experimental/wiitest/wiitest.c               |    4 +-
+ extras/mplayer/mplayer.1.0pre7try2.s3d.patch |    6 +-
+ libs3d/callback.c                            |    4 +-
+ libs3d/event.c                               |    6 +-
+ libs3d/fontselect.c                          |    6 +-
+ libs3d/freetype.c                            |   50 ++---
+ libs3d/hash.c                                |   34 ++--
+ libs3d/io.c                                  |   36 ++--
+ libs3d/modelread.c                           |   14 +-
+ libs3d/network.c                             |   12 +-
+ libs3d/object_queue.c                        |   18 +-
+ libs3d/proto_in.c                            |    2 +-
+ libs3d/proto_out.c                           |  122 ++++++------
+ libs3d/sei_construct.c                       |   10 +-
+ libs3d/sei_misc.c                            |    2 +-
+ libs3d/sei_monotone.c                        |   27 +---
+ libs3d/sei_tri.c                             |   32 +---
+ libs3d/shm.c                                 |   40 ++--
+ libs3d/shm_ringbuf.c                         |    8 +-
+ libs3d/tcp.c                                 |   22 +-
+ libs3d/texture.c                             |   22 +-
+ libs3d/vector.c                              |    6 +-
+ libs3dw/animate.c                            |    8 +-
+ libs3dw/button.c                             |    8 +-
+ libs3dw/event.c                              |    6 +-
+ libs3dw/input.c                              |   18 +-
+ libs3dw/label.c                              |    8 +-
+ libs3dw/root.c                               |   22 +-
+ libs3dw/scrollbar.c                          |   10 +-
+ libs3dw/surface.c                            |   10 +-
+ libs3dw/textbox.c                            |    8 +-
+ libs3dw/widget.c                             |   14 +-
+ server/event.c                               |   18 +-
+ server/graphics.c                            |   10 +-
+ server/graphics_sdl.c                        |    4 +-
+ server/main.c                                |   12 +-
+ server/matrix.c                              |    4 +-
+ server/mcp.c                                 |   10 +-
+ server/network.c                             |   22 +-
+ server/object.c                              |  252 +++++++++++++-------------
+ server/process.c                             |   30 ++--
+ server/proto.c                               |    6 +-
+ server/shm.c                                 |   42 ++--
+ server/shm_ringbuf.c                         |    9 +-
+ server/tcp.c                                 |   20 +-
+ server/user.c                                |    8 +-
+ server/user_sdl.c                            |    6 +-
+ 104 files changed, 801 insertions(+), 865 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001140.html">[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-26-g200dd7f
+</A></li>
+	<LI>Next message: <A HREF="001142.html">[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-106-ge9e5237
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1141">[ date ]</a>
+              <a href="thread.html#1141">[ thread ]</a>
+              <a href="subject.html#1141">[ subject ]</a>
+              <a href="author.html#1141">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

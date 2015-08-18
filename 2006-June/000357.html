@@ -1,0 +1,223 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r364 - trunk/libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r364%20-%20trunk/libs3d&In-Reply-To=%3C200606271654.k5RGswrZ025579%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000356.html">
+   <LINK REL="Next"  HREF="000358.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r364 - trunk/libs3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r364%20-%20trunk/libs3d&In-Reply-To=%3C200606271654.k5RGswrZ025579%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r364 - trunk/libs3d">dotslash at berlios.de
+       </A><BR>
+    <I>Tue Jun 27 18:54:58 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000356.html">[S3d-svn] r363 - trunk/example
+</A></li>
+        <LI>Next message: <A HREF="000358.html">[S3d-svn] r365 - in trunk: example libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#357">[ date ]</a>
+              <a href="thread.html#357">[ thread ]</a>
+              <a href="subject.html#357">[ subject ]</a>
+              <a href="author.html#357">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-27 18:54:56 +0200 (Tue, 27 Jun 2006)
+New Revision: 364
+
+Modified:
+   trunk/libs3d/event.c
+   trunk/libs3d/io.c
+   trunk/libs3d/network.c
+   trunk/libs3d/object_queue.c
+   trunk/libs3d/proto_in.c
+   trunk/libs3d/s3dlib.h
+Log:
+- locking before we got an &quot;init&quot; signal from the server - no insane recursions ;)
+- some cleanup
+
+Modified: trunk/libs3d/event.c
+===================================================================
+--- trunk/libs3d/event.c	2006-06-27 08:24:42 UTC (rev 363)
++++ trunk/libs3d/event.c	2006-06-27 16:54:56 UTC (rev 364)
+@@ -28,7 +28,7 @@
+ #include &lt;stdlib.h&gt;		 /*  malloc(), free() */
+ 
+ struct s3d_evt *s3d_stack;
+-static int cb_lock=0;	 /*  callback lock */
++int cb_lock=0;	 /*  callback lock */
+ void s3d_push_event(struct s3d_evt *newevt)
+ {
+ 	struct s3d_evt *p;
+
+Modified: trunk/libs3d/io.c
+===================================================================
+--- trunk/libs3d/io.c	2006-06-27 08:24:42 UTC (rev 363)
++++ trunk/libs3d/io.c	2006-06-27 16:54:56 UTC (rev 364)
+@@ -44,6 +44,7 @@
+ 
+ static char				*url=NULL;
+ extern int 				con_type;
++extern int 				cb_lock;
+ /*  this file is the client-lib-implementation which holds the function to connect and control the server. */
+ #ifdef SIGS
+ int _s3d_sigio=0;
+@@ -149,8 +150,8 @@
+ 	}
+ 	strncpy(buf,name,256);  /*  copy the name ... */
+ 	net_send(S3D_P_C_INIT,buf,strlen(buf));
++	cb_lock=2;
+ 
+-	 /*  TODO: we should wait for the INIT-event here before proceeding. */
+ 	_queue_init();
+ #ifdef SIGS
+     if (signal(SIGINT, (sig_t)sigint_handler) == SIG_ERR)
+
+Modified: trunk/libs3d/network.c
+===================================================================
+--- trunk/libs3d/network.c	2006-06-27 08:24:42 UTC (rev 363)
++++ trunk/libs3d/network.c	2006-06-27 16:54:56 UTC (rev 364)
+@@ -41,11 +41,12 @@
+ {
+ 	char *ptr;
+ /* 	char *buff; */
+-	char buff[65536];  /*  unsigned short really shouldn't be bigger ;) */
++	char buff[65539];  /*  unsigned short really shouldn't be bigger ;) */
+ 	*(buff)=opcode; 
+ 	ptr=buff+1;
+ 	*((unsigned short *) ptr)=htons(length);
+-	memcpy(buff+3,buf,length);
++	if (length!=0)
++		memcpy(buff+3,buf,length);
+ 	switch (con_type)
+ 	{
+ #ifdef SHM
+
+Modified: trunk/libs3d/object_queue.c
+===================================================================
+--- trunk/libs3d/object_queue.c	2006-06-27 08:24:42 UTC (rev 363)
++++ trunk/libs3d/object_queue.c	2006-06-27 16:54:56 UTC (rev 364)
+@@ -88,28 +88,29 @@
+ unsigned int _queue_want_object()
+ {
+ 	unsigned int ret;
+-	int i;
++	int i,j;
++	j=0;
+ 	do {
+-	for (i=0;i&lt;queue_size;i++)
+-		if (queue[i]!=Q_UNUSED)
++		for (i=0;i&lt;queue_size;i++)
++			if (queue[i]!=Q_UNUSED)
++			{
++				ret=queue[i];
++				queue[i]=Q_UNUSED;
++				net_send(S3D_P_C_NEW_OBJ,NULL,0);  /*  we already can request a new one. */
++				return(ret);
++			}
++		 /*  if we reach this point, our queue is empty. */
++		 /*  as other request should have sent S3D_P_C_NEW_OBJ-requests,  */
++		 /*  we request one more object than needed to satisfy more load in future. */
++		if (queue_size==0) return(-1);  /*  already quit. */
++		if (requested&lt;MAX_REQ)
+ 		{
+-			ret=queue[i];
+-			queue[i]=Q_UNUSED;
+-			net_send(S3D_P_C_NEW_OBJ,NULL,0);  /*  we already can request a new one. */
+-			return(ret);
++			net_send(S3D_P_C_NEW_OBJ,NULL,0);
++			requested++;
+ 		}
+-	 /*  if we reach this point, our queue is empty. */
+-	 /*  as other request should have sent S3D_P_C_NEW_OBJ-requests,  */
+-	 /*  we request one more object than needed to satisfy more load in future. */
+-	if (queue_size==0) return(-1);  /*  already quit. */
+-	if (requested&lt;MAX_REQ)
+-	{
+-		net_send(S3D_P_C_NEW_OBJ,NULL,0);
+-		requested++;
+-	}
+-	s3d_net_check();
+-	nanosleep(&amp;t,NULL); 
+-	} while(i++&lt;TIMEOUT);
++		s3d_net_check();
++		nanosleep(&amp;t,NULL); 
++	} while(j++&lt;TIMEOUT);
+ 
+ 	errds(LOW,&quot;_queue_want_object()&quot;,&quot;timeout is reached. server is extremly slow/laggy or dead&quot;);	
+ 	return(-1);
+
+Modified: trunk/libs3d/proto_in.c
+===================================================================
+--- trunk/libs3d/proto_in.c	2006-06-27 08:24:42 UTC (rev 363)
++++ trunk/libs3d/proto_in.c	2006-06-27 16:54:56 UTC (rev 364)
+@@ -28,7 +28,7 @@
+ #include &lt;netinet/in.h&gt;  /*  htons(),htonl() */
+ #include &lt;errno.h&gt;		 /*  errno */
+ #include &lt;stdlib.h&gt;		 /*  malloc(), free() */
+-
++extern int cb_lock;
+ /*  this proccesses the commands and pushes s3d-events, or does other things ;) */
+ int net_prot_in(uint8_t opcode, uint16_t length, char *buf)
+ {
+@@ -40,6 +40,7 @@
+ 	{
+ 		case S3D_P_S_INIT:
+ 			s3dprintf(MED,&quot;S3D_P_S_INIT: init!!&quot;);
++			cb_lock=0;
+ 			break;
+ 		case S3D_P_S_QUIT:
+ 			s3dprintf(MED,&quot;S3D_P_S_QUIT: server wants us to go. well ...&quot;);
+
+Modified: trunk/libs3d/s3dlib.h
+===================================================================
+--- trunk/libs3d/s3dlib.h	2006-06-27 08:24:42 UTC (rev 363)
++++ trunk/libs3d/s3dlib.h	2006-06-27 16:54:56 UTC (rev 364)
+@@ -35,7 +35,7 @@
+ #define OF_TURN_ON 		1		 /*  logical or */
+ #define OF_TURN_OFF 	2		 /*  logical ?! */
+ #define OF_TURN_SWAP 	3		 /*  logical ?! */
+-#define TIMEOUT			1000
++#define TIMEOUT			100000
+ #define MAX_CB			256		 /*  as much as there are callbacks */
+ #ifndef NULL
+ 	#define NULL	0
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000356.html">[S3d-svn] r363 - trunk/example
+</A></li>
+	<LI>Next message: <A HREF="000358.html">[S3d-svn] r365 - in trunk: example libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#357">[ date ]</a>
+              <a href="thread.html#357">[ thread ]</a>
+              <a href="subject.html#357">[ subject ]</a>
+              <a href="author.html#357">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

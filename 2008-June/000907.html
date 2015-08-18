@@ -1,0 +1,636 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r914 - in trunk/extras/distro/gentoo: media-gfx/s3d	media-gfx/s3d-svn media-libs/libg3d media-libs/libg3d/files
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r914%20-%20in%20trunk/extras/distro/gentoo%3A%20media-gfx/s3d%0A%09media-gfx/s3d-svn%20media-libs/libg3d%20media-libs/libg3d/files&In-Reply-To=%3C200806161122.m5GBM2Su029665%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000908.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r914 - in trunk/extras/distro/gentoo: media-gfx/s3d	media-gfx/s3d-svn media-libs/libg3d media-libs/libg3d/files</H1>
+    <B>lazhur at mail.berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r914%20-%20in%20trunk/extras/distro/gentoo%3A%20media-gfx/s3d%0A%09media-gfx/s3d-svn%20media-libs/libg3d%20media-libs/libg3d/files&In-Reply-To=%3C200806161122.m5GBM2Su029665%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r914 - in trunk/extras/distro/gentoo: media-gfx/s3d	media-gfx/s3d-svn media-libs/libg3d media-libs/libg3d/files">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Jun 16 13:22:02 CEST 2008</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000908.html">[S3d-svn] r915 - trunk/extras
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#907">[ date ]</a>
+              <a href="thread.html#907">[ thread ]</a>
+              <a href="subject.html#907">[ subject ]</a>
+              <a href="author.html#907">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-06-16 13:21:43 +0200 (Mon, 16 Jun 2008)
+New Revision: 914
+
+Removed:
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/ChangeLog
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/metadata.xml
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild
+   trunk/extras/distro/gentoo/media-gfx/s3d/ChangeLog
+   trunk/extras/distro/gentoo/media-gfx/s3d/Manifest
+   trunk/extras/distro/gentoo/media-gfx/s3d/metadata.xml
+   trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.1.1.ebuild
+   trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.2.ebuild
+   trunk/extras/distro/gentoo/media-libs/libg3d/ChangeLog
+   trunk/extras/distro/gentoo/media-libs/libg3d/Manifest
+   trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.3-link_math.patch
+   trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.6-link_math.patch
+   trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.3.ebuild
+   trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.5.ebuild
+   trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.6.ebuild
+   trunk/extras/distro/gentoo/media-libs/libg3d/metadata.xml
+Log:
+Move gentoo ebuilds to <A HREF="http://gitorious.org/projects/s3d-gentoo">http://gitorious.org/projects/s3d-gentoo</A>
+
+
+Deleted: trunk/extras/distro/gentoo/media-gfx/s3d/ChangeLog
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d/ChangeLog	2008-05-04 20:17:15 UTC (rev 913)
++++ trunk/extras/distro/gentoo/media-gfx/s3d/ChangeLog	2008-06-16 11:21:43 UTC (rev 914)
+@@ -1,15 +0,0 @@
+-# ChangeLog for media-gfx/s3d
+-
+- 22 Apr 2008; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; s3d-0.2.ebuild, s3d-0.1.1.ebuild
+- Use berlios mirror list feature in portage
+-
+-*s3d-0.2 (25 Oct 2007)
+-
+- 25 Oct 2006; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; +s3d-0.2.ebuild
+- Updated to latest version
+-
+-*s3d-0.1.1 (25 Oct 2006)
+-
+-  25 Oct 2006; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; s3d-0.1.1.ebuild:
+-  Initial import.
+-
+
+Deleted: trunk/extras/distro/gentoo/media-gfx/s3d/Manifest
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d/Manifest	2008-05-04 20:17:15 UTC (rev 913)
++++ trunk/extras/distro/gentoo/media-gfx/s3d/Manifest	2008-06-16 11:21:43 UTC (rev 914)
+@@ -1,6 +0,0 @@
+-DIST s3d-0.1.1.tar.bz2 1737935 SHA1 3765171848d519784a436468ac613c9bfe85c3ae SHA256 1e2be7c806deaaf07e7f00d018f6f08723a1b26332419a80e732c8b7a1a515e4
+-DIST s3d-0.2.tar.bz2 1715297 SHA1 c288902d4b93180628a805ef00fd295eaabe2c88 SHA256 0f7db68fbd760b765e63f912391c99e674b8bf9c7425de4b6eb24d53f3a32e89
+-EBUILD s3d-0.1.1.ebuild 921 SHA1 0699f19d359e6775489d48c2c5d83a9637a9dc19 SHA256 28def199f04440833d7718fc5bde8dbfb7dbf3fc53628321d214b699cffba814
+-EBUILD s3d-0.2.ebuild 1041 SHA1 62014e8cc206cd315e16aa004c946938cf32dbf0 SHA256 df3e767d2f3c1bd5482dd70c1a91bc09a6c47b75286b731dd390a98ddd1ffc94
+-MISC ChangeLog 400 SHA1 2c6beb98f91cf1f287ce581d0c30d48358a5d501 SHA256 e0f35dc101f032df0bfd4c73e93b5c469558deb1ae655770ce4eca9a8dc1f0d4
+-MISC metadata.xml 239 SHA1 76f167e3abff81e9535c16a637fd1e7f91d4fda3 SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f
+
+Deleted: trunk/extras/distro/gentoo/media-gfx/s3d/metadata.xml
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d/metadata.xml	2008-05-04 20:17:15 UTC (rev 913)
++++ trunk/extras/distro/gentoo/media-gfx/s3d/metadata.xml	2008-06-16 11:21:43 UTC (rev 914)
+@@ -1,8 +0,0 @@
+-&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+-&lt;!DOCTYPE pkgmetadata SYSTEM &quot;<A HREF="http://www.gentoo.org/dtd/metadata.dtd">http://www.gentoo.org/dtd/metadata.dtd</A>&quot;&gt;
+-&lt;pkgmetadata&gt;
+-  &lt;herd&gt;d0tslash&lt;/herd&gt;
+-    &lt;maintainer&gt;
+-    &lt;email&gt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&lt;/email&gt;
+-  &lt;/maintainer&gt;
+-&lt;/pkgmetadata&gt;
+
+Deleted: trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.1.1.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.1.1.ebuild	2008-05-04 20:17:15 UTC (rev 913)
++++ trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.1.1.ebuild	2008-06-16 11:21:43 UTC (rev 914)
+@@ -1,51 +0,0 @@
+-# Copyright 2004-2008 S3D Team
+-# Distributed under the terms of the GNU General Public License v2
+-
+-DESCRIPTION=&quot;a 3d network display server&quot;
+-HOMEPAGE=&quot;<A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>&quot;
+-SRC_URI=&quot;<A HREF="mirror://berlios/${PN">mirror://berlios/${PN</A>}/${P}.tar.bz2&quot;
+-
+-LICENSE=&quot;GPL-2 LGPL-2.1&quot;
+-SLOT=&quot;0&quot;
+-KEYWORDS=&quot;x86&quot;
+-IUSE=&quot;&quot;
+-
+-DEPEND=&quot;${RDEPEND}
+-	&gt;=sys-devel/autoconf-2.59
+-	&gt;=sys-devel/automake-1.9
+-	sys-devel/flex
+-	&gt;=sys-devel/libtool-1.5
+-	&quot;
+-RDEPEND=&quot;!media-gfx/s3d-svn
+-	!media-libs/libg3d
+-	&gt;=media-libs/libsdl-1.2.7
+-	&gt;=media-libs/freetype-2
+-	&gt;=dev-libs/glib-2
+-	media-fonts/ttf-bitstream-vera
+-	media-libs/fontconfig
+-	media-libs/mesa
+-
+-	|| ( 	(
+-			sys-libs/zlib
+-			x11-libs/libX11
+-			x11-libs/libXext
+-			x11-libs/libXi
+-			x11-libs/libXmu
+-			x11-libs/libXt
+-			x11-libs/libXtst )
+-		virtual/x11 )
+-
+-	virtual/glut
+-	&quot;
+-
+-src_compile() {
+-	econf \
+-		--prefix=/usr/ \
+-		|| die &quot;econf failed&quot;
+-
+-	emake || die &quot;emake failed&quot;
+-}
+-
+-src_install() {
+-	emake DESTDIR=&quot;${D}&quot; install || die
+-}
+
+Deleted: trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.2.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.2.ebuild	2008-05-04 20:17:15 UTC (rev 913)
++++ trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.2.ebuild	2008-06-16 11:21:43 UTC (rev 914)
+@@ -1,51 +0,0 @@
+-# Copyright 2004-2008 S3D Team
+-# Distributed under the terms of the GNU General Public License v2
+-
+-DESCRIPTION=&quot;a 3d network display server&quot;
+-HOMEPAGE=&quot;<A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>&quot;
+-SRC_URI=&quot;<A HREF="mirror://berlios/${PN">mirror://berlios/${PN</A>}/${P}.tar.bz2&quot;
+-
+-LICENSE=&quot;GPL-2 LGPL-2.1&quot;
+-SLOT=&quot;0&quot;
+-KEYWORDS=&quot;x86 amd64&quot;
+-IUSE=&quot;gps doc&quot;
+-
+-DEPEND=&quot;${RDEPEND}
+-	sys-devel/flex
+-	&gt;=dev-db/sqlite-3
+-	&gt;=dev-util/cmake-2.4.4
+-	&quot;
+-RDEPEND=&quot;!media-gfx/s3d-svn
+-	&gt;=media-libs/libsdl-1.2.7
+-	&gt;=media-libs/freetype-2
+-	&gt;=dev-libs/glib-2
+-	dev-libs/libxml2
+-	media-fonts/ttf-bitstream-vera
+-	media-libs/fontconfig
+-	&gt;=media-libs/libg3d-0.0.6
+-	media-libs/mesa
+-
+-	|| ( 	(
+-			sys-libs/zlib
+-			x11-libs/libX11
+-			x11-libs/libXext
+-			x11-libs/libXi
+-			x11-libs/libXmu
+-			x11-libs/libXt
+-			x11-libs/libXtst )
+-		virtual/x11 )
+-
+-	doc? ( app-text/docbook-sgml-utils )
+-	gps? ( sci-geosciences/gpsd )
+-	virtual/glut
+-	&quot;
+-
+-src_compile() {
+-	cmake -DCMAKE_INSTALL_PREFIX=/usr/ ${cmake_opts} || die &quot;cmake failed&quot;
+-	emake || die &quot;emake failed&quot;
+-}
+-
+-src_install() {
+-	emake DESTDIR=&quot;${D}&quot; install || die
+-	dodoc ChangeLog README TODO
+-}
+
+Deleted: trunk/extras/distro/gentoo/media-gfx/s3d-svn/ChangeLog
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/ChangeLog	2008-05-04 20:17:15 UTC (rev 913)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/ChangeLog	2008-06-16 11:21:43 UTC (rev 914)
+@@ -1,25 +0,0 @@
+-# ChangeLog for media-gfx/s3d-svn
+-
+-*s3d-svn-9999 (22 Oct 2007)
+-
+-  22 Oct 2007; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; s3d-svn-9999.ebuild:
+-  Added useflag xcomposite to build comptest.
+-
+-  22 Oct 2007; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; s3d-svn-9999.ebuild:
+-  Added useflag to build documentation.
+-
+-*s3d-svn-9999 (5 Jul 2007)
+-
+-  5 Jul 2007; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; s3d-svn-9999.ebuild:
+-  Changed ebuild to use cmake instead of autotools.
+-
+-*s3d-svn-9999 (26 Nov 2006)
+-
+-  26 Nov 2006; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; s3d-svn-9999.ebuild:
+-  Added sqlite-3 as dependency.
+-
+-*s3d-svn-9999 (25 Oct 2006)
+-
+-  25 Oct 2006; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; s3d-svn-9999.ebuild:
+-  Initial import.
+-
+
+Deleted: trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest	2008-05-04 20:17:15 UTC (rev 913)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest	2008-06-16 11:21:43 UTC (rev 914)
+@@ -1,3 +0,0 @@
+-EBUILD s3d-svn-9999.ebuild 1161 SHA1 45b2cf8fb152f56b017adfe0463975b17ac8a56b SHA256 3c8621c9a7e595b155d06cf3833a283c363897f776de3d957447b3f09e821afb
+-MISC ChangeLog 717 SHA1 e3f6ae8c96e94d078c05f06a26c4671126bf2ae0 SHA256 50813962433038ee35016fdbd5a738f99f8ef5da1dbb6db01c35b258ca180587
+-MISC metadata.xml 239 SHA1 76f167e3abff81e9535c16a637fd1e7f91d4fda3 SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f
+
+Deleted: trunk/extras/distro/gentoo/media-gfx/s3d-svn/metadata.xml
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/metadata.xml	2008-05-04 20:17:15 UTC (rev 913)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/metadata.xml	2008-06-16 11:21:43 UTC (rev 914)
+@@ -1,8 +0,0 @@
+-&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+-&lt;!DOCTYPE pkgmetadata SYSTEM &quot;<A HREF="http://www.gentoo.org/dtd/metadata.dtd">http://www.gentoo.org/dtd/metadata.dtd</A>&quot;&gt;
+-&lt;pkgmetadata&gt;
+-  &lt;herd&gt;d0tslash&lt;/herd&gt;
+-    &lt;maintainer&gt;
+-    &lt;email&gt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&lt;/email&gt;
+-  &lt;/maintainer&gt;
+-&lt;/pkgmetadata&gt;
+
+Deleted: trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild	2008-05-04 20:17:15 UTC (rev 913)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild	2008-06-16 11:21:43 UTC (rev 914)
+@@ -1,57 +0,0 @@
+-# Copyright 2004-2008 S3D Team
+-# Distributed under the terms of the GNU General Public License v2
+-
+-inherit subversion
+-
+-DESCRIPTION=&quot;a 3d network display server&quot;
+-HOMEPAGE=&quot;<A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>&quot;
+-ESVN_REPO_URI=&quot;<A HREF="http://svn.berlios.de/svnroot/repos/s3d/trunk">http://svn.berlios.de/svnroot/repos/s3d/trunk</A>&quot;
+-
+-LICENSE=&quot;GPL-2 LGPL-2.1&quot;
+-SLOT=&quot;0&quot;
+-KEYWORDS=&quot;~x86 ~amd64&quot;
+-IUSE=&quot;gps doc xcomposite&quot;
+-
+-DEPEND=&quot;${RDEPEND}
+-	sys-devel/flex
+-	&gt;=dev-db/sqlite-3
+-	&gt;=dev-util/cmake-2.4.4
+-	&quot;
+-RDEPEND=&quot;!media-gfx/s3d
+-	&gt;=media-libs/libsdl-1.2.7
+-	&gt;=media-libs/freetype-2
+-	dev-libs/libxml2
+-	media-fonts/ttf-bitstream-vera
+-	media-libs/fontconfig
+-	&gt;=media-libs/libg3d-0.0.6
+-	media-libs/mesa
+-
+-	|| ( 	(
+-			sys-libs/zlib
+-			x11-libs/libX11
+-			x11-libs/libXext
+-			x11-libs/libXi
+-			x11-libs/libXmu
+-			x11-libs/libXt
+-			x11-libs/libXtst )
+-		virtual/x11 )
+-
+-	doc? ( app-text/docbook-sgml-utils )
+-	gps? ( sci-geosciences/gpsd )
+-	xcomposite? (
+-		x11-libs/libXcomposite
+-		x11-libs/libXdamage
+-		x11-libs/libXfixes
+-		x11-libs/libXrender
+-	)
+-	&quot;
+-
+-src_compile() {
+-	cmake -DCMAKE_INSTALL_PREFIX=/usr/ ${cmake_opts} || die &quot;cmake failed&quot;
+-	emake || die &quot;emake failed&quot;
+-}
+-
+-src_install() {
+-	emake DESTDIR=&quot;${D}&quot; install || die
+-	dodoc ChangeLog README TODO
+-}
+
+Deleted: trunk/extras/distro/gentoo/media-libs/libg3d/ChangeLog
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/ChangeLog	2008-05-04 20:17:15 UTC (rev 913)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/ChangeLog	2008-06-16 11:21:43 UTC (rev 914)
+@@ -1,34 +0,0 @@
+-# ChangeLog for media-gfx/libg3d
+-
+-  23 Dec 2006; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; libg3d-0.0.3.ebuild,
+-  libg3d-0.0.5.ebuild, libg3d-0.0.6.ebuild, +libg3d-0.0.3-link_math.patch,
+-  +libg3d-0.0.6-link_math.patch:
+-  Force direct linking against math library to protect against errors
+-  in conjunktion with ld's &quot;--as-needed&quot;.
+-
+-  23 Dec 2006; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; libg3d-0.0.6.ebuild:
+-  Mark amd64 as stable.
+-
+-*libg3d-0.0.6 (23 Dec 2006)
+-
+-  23 Dec 2006; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; +libg3d-0.0.6.ebuild,
+-  -files/libg3d-0.0.6.20061222-missingflexheaders.patch.bz2,
+-  -libg3d-0.0.6.20061222.ebuild:
+-  Version bump. Remove old snapshot.
+-
+-*libg3d-0.0.6.20061222 (22 Dec 2006)
+-
+-  22 Dec 2006; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; +libg3d-0.0.6.20061222.ebuild,
+-  +files/libg3d-0.0.6.20061222-missingflexheaders.patch.bz2:
+-  Add snapshot to build s3d-svn.
+-
+-*libg3d-0.0.3 (22 Dec 2006)
+-
+-  22 Dec 2006; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; +libg3d-0.0.3.ebuild:
+-  Version bump.
+-
+-*libg3d-0.0.3 (22 Dec 2006)
+-
+-  22 Dec 2006; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; +libg3d-0.0.3.ebuild:
+-  Initial import.
+-
+
+Deleted: trunk/extras/distro/gentoo/media-libs/libg3d/Manifest
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/Manifest	2008-05-04 20:17:15 UTC (rev 913)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/Manifest	2008-06-16 11:21:43 UTC (rev 914)
+@@ -1,10 +0,0 @@
+-AUX libg3d-0.0.3-link_math.patch 690 SHA1 6f877c85df8e44f69ad1de96188457ecc83f8b3a SHA256 937b958723aac82489a9363db90474e131fa0aca0be7a8c1c46446c33fb2fc9d
+-AUX libg3d-0.0.6-link_math.patch 683 SHA1 b512f5603ef9c01b1cefb63b12ad7676b4c375e0 SHA256 46315c654f634ff68e149657257f49a0e40bac1b1e244ad15c7f02fb7ce397c1
+-DIST libg3d-0.0.3.tar.gz 438414 SHA1 768608dfc78d88f53ffb4d520bd434fe8c362c44 SHA256 d8c08448586b4d6f70c5933c89877f81e8f31d7eea8f3497b0d12357134a71e0
+-DIST libg3d-0.0.5.tar.gz 475879 SHA1 3c1453fe41d60fb4d8ffa69fbb41aa6df2faa50a SHA256 4d19ea782ef71d862fae99291b6355b1331a309f68674ae301a9e1fd68c8c32a
+-DIST libg3d-0.0.6.tar.gz 490091 SHA1 7fba70067fe32e4eacda0ada1d7fee073422e76e SHA256 d3ea0037e56cee9d38ed55d81416d22ec960e65a85b9166f2b25bab8e7d22884
+-EBUILD libg3d-0.0.3.ebuild 773 SHA1 e93f85795c0bb809d0a43e365a8b9a88de5c6793 SHA256 91097dc950c84801b7596c33c74d4dd42a962e7ddf55b69b3431a6f5be1d2060
+-EBUILD libg3d-0.0.5.ebuild 835 SHA1 a0c272a5c5390221cf8d3ba1132c7562903ef394 SHA256 fea18cb3409c1c3bf060bde5f423239e8cb3dacdc9c405054f7019b4141828c9
+-EBUILD libg3d-0.0.6.ebuild 841 SHA1 153ab83b97e3c4f8b4abed87755ac62c0f4db8f0 SHA256 6243d8874925ca98426dd0c64444985687c11eb4f15cee53af720a450147989d
+-MISC ChangeLog 1131 SHA1 2b0c4db8b2d5bd1a4a2719b1599daf7298fac130 SHA256 df3951de540cb85bc4c366c118bf8d5f9deebcc0179de450bd0f49d873d7cbe7
+-MISC metadata.xml 239 SHA1 76f167e3abff81e9535c16a637fd1e7f91d4fda3 SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f
+
+Deleted: trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.3-link_math.patch
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.3-link_math.patch	2008-05-04 20:17:15 UTC (rev 913)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.3-link_math.patch	2008-06-16 11:21:43 UTC (rev 914)
+@@ -1,23 +0,0 @@
+-diff -ruN libg3d-0.0.3.orig/src/Makefile.am libg3d-0.0.3/src/Makefile.am
+---- libg3d-0.0.3.orig/src/Makefile.am	2008-01-11 21:21:55.000000000 +0000
+-+++ libg3d-0.0.3/src/Makefile.am	2008-01-11 21:22:23.000000000 +0000
+-@@ -26,4 +26,5 @@
+- 	-version-number &quot;$(subst .,:<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">, at VERSION</A>@)&quot;
+- 
+- libg3d_la_LIBADD = \
+--	@GLIB_LIBS@
+-+	@GLIB_LIBS@ \
+-+	-lm
+-diff -ruN libg3d-0.0.3.orig/src/Makefile.in libg3d-0.0.3/src/Makefile.in
+---- libg3d-0.0.3.orig/src/Makefile.in	2008-01-11 21:21:55.000000000 +0000
+-+++ libg3d-0.0.3/src/Makefile.in	2008-01-11 21:22:14.000000000 +0000
+-@@ -183,7 +183,8 @@
+- 
+- 
+- libg3d_la_LIBADD = \
+--	@GLIB_LIBS@
+-+	@GLIB_LIBS@ \
+-+	-lm
+- 
+- subdir = src
+- ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
+
+Deleted: trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.6-link_math.patch
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.6-link_math.patch	2008-05-04 20:17:15 UTC (rev 913)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/files/libg3d-0.0.6-link_math.patch	2008-06-16 11:21:43 UTC (rev 914)
+@@ -1,24 +0,0 @@
+-diff -ruN libg3d-0.0.6.orig/src/Makefile.am libg3d-0.0.6/src/Makefile.am
+---- libg3d-0.0.6.orig/src/Makefile.am	2008-01-11 20:56:28.000000000 +0000
+-+++ libg3d-0.0.6/src/Makefile.am	2008-01-11 20:58:57.000000000 +0000
+-@@ -28,5 +28,6 @@
+- 
+- libg3d_la_LIBADD = \
+- 	@GLIB_LIBS@ \
+--	@MAGIC_LIBS@
+-+	@MAGIC_LIBS@ \
+-+	-lm
+- 
+-diff -ruN libg3d-0.0.6.orig/src/Makefile.in libg3d-0.0.6/src/Makefile.in
+---- libg3d-0.0.6.orig/src/Makefile.in	2008-01-11 20:56:28.000000000 +0000
+-+++ libg3d-0.0.6/src/Makefile.in	2008-01-11 20:58:57.000000000 +0000
+-@@ -200,7 +200,8 @@
+- 
+- libg3d_la_LIBADD = \
+- 	@GLIB_LIBS@ \
+--	@MAGIC_LIBS@
+-+	@MAGIC_LIBS@ \
+-+	-lm
+- 
+- subdir = src
+- ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
+
+Deleted: trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.3.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.3.ebuild	2008-05-04 20:17:15 UTC (rev 913)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.3.ebuild	2008-06-16 11:21:43 UTC (rev 914)
+@@ -1,40 +0,0 @@
+-# Copyright 2004-2008 S3D Team
+-# Distributed under the terms of the GNU General Public License v2
+-
+-inherit eutils
+-
+-DESCRIPTION=&quot;library for loading 3D models of many file types&quot;
+-HOMEPAGE=&quot;<A HREF="https://gna.org/projects/libg3d/">https://gna.org/projects/libg3d/</A>&quot;
+-SRC_URI=&quot;<A HREF="http://download.gna.org/${PN">http://download.gna.org/${PN</A>}/${P}.tar.gz&quot;
+-
+-LICENSE=&quot;GPL-2 LGPL-2.1&quot;
+-SLOT=&quot;0&quot;
+-KEYWORDS=&quot;x86&quot;
+-IUSE=&quot;gtk&quot;
+-
+-DEPEND=&quot;${RDEPEND}
+-	&gt;=sys-devel/autoconf-2.59
+-	&gt;=sys-devel/automake-1.9
+-	sys-devel/flex
+-	&gt;=sys-devel/libtool-1.5
+-	&quot;
+-RDEPEND=&quot;!&lt;=media-gfx/s3d-0.1.1
+-	&gt;=dev-libs/glib-2
+-
+-	gtk? ( &gt;=x11-libs/gtk+-2 )
+-	&quot;
+-
+-src_compile() {
+-	epatch &quot;${FILESDIR}&quot;/${PN}-0.0.3-link_math.patch
+-
+-	econf \
+-		$(use_enable gtk gtktest) \
+-		--prefix=/usr/ \
+-		|| die &quot;econf failed&quot;
+-
+-	emake || die &quot;emake failed&quot;
+-}
+-
+-src_install() {
+-	emake DESTDIR=&quot;${D}&quot; install || die
+-}
+
+Deleted: trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.5.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.5.ebuild	2008-05-04 20:17:15 UTC (rev 913)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.5.ebuild	2008-06-16 11:21:43 UTC (rev 914)
+@@ -1,43 +0,0 @@
+-# Copyright 2004-2008 S3D Team
+-# Distributed under the terms of the GNU General Public License v2
+-
+-inherit eutils
+-
+-DESCRIPTION=&quot;library for loading 3D models of many file types&quot;
+-HOMEPAGE=&quot;<A HREF="https://gna.org/projects/libg3d/">https://gna.org/projects/libg3d/</A>&quot;
+-SRC_URI=&quot;<A HREF="http://download.gna.org/${PN">http://download.gna.org/${PN</A>}/${P}.tar.gz&quot;
+-
+-LICENSE=&quot;GPL-2 LGPL-2.1&quot;
+-SLOT=&quot;0&quot;
+-KEYWORDS=&quot;x86&quot;
+-IUSE=&quot;gtk xml&quot;
+-
+-DEPEND=&quot;${RDEPEND}
+-	&gt;=sys-devel/autoconf-2.59
+-	&gt;=sys-devel/automake-1.9
+-	sys-devel/flex
+-	&gt;=sys-devel/libtool-1.5
+-	&quot;
+-RDEPEND=&quot;!&lt;=media-gfx/s3d-0.1.1
+-	&gt;=dev-libs/glib-2
+-
+-	gtk? ( &gt;=x11-libs/gtk+-2 )
+-	xml? ( dev-libs/libxml2 )
+-	&quot;
+-
+-src_compile() {
+-	epatch &quot;${FILESDIR}&quot;/${PN}-0.0.3-link_math.patch
+-
+-	econf \
+-		$(use_enable gtk gtktest) \
+-		$(use_enable xml xmltest) \
+-		--prefix=/usr/ \
+-		|| die &quot;econf failed&quot;
+-
+-	emake || die &quot;emake failed&quot;
+-}
+-
+-src_install() {
+-	emake DESTDIR=&quot;${D}&quot; install || die
+-}
+-
+
+Deleted: trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.6.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.6.ebuild	2008-05-04 20:17:15 UTC (rev 913)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/libg3d-0.0.6.ebuild	2008-06-16 11:21:43 UTC (rev 914)
+@@ -1,43 +0,0 @@
+-# Copyright 2004-2008 S3D Team
+-# Distributed under the terms of the GNU General Public License v2
+-
+-inherit eutils
+-
+-DESCRIPTION=&quot;library for loading 3D models of many file types&quot;
+-HOMEPAGE=&quot;<A HREF="https://gna.org/projects/libg3d/">https://gna.org/projects/libg3d/</A>&quot;
+-SRC_URI=&quot;<A HREF="http://download.gna.org/${PN">http://download.gna.org/${PN</A>}/${P}.tar.gz&quot;
+-
+-LICENSE=&quot;GPL-2 LGPL-2.1&quot;
+-SLOT=&quot;0&quot;
+-KEYWORDS=&quot;x86 amd64&quot;
+-IUSE=&quot;gtk xml&quot;
+-
+-DEPEND=&quot;${RDEPEND}
+-	&gt;=sys-devel/autoconf-2.59
+-	&gt;=sys-devel/automake-1.9
+-	sys-devel/flex
+-	&gt;=sys-devel/libtool-1.5
+-	&quot;
+-RDEPEND=&quot;!&lt;=media-gfx/s3d-0.1.1
+-	&gt;=dev-libs/glib-2
+-
+-	gtk? ( &gt;=x11-libs/gtk+-2 )
+-	xml? ( dev-libs/libxml2 )
+-	&quot;
+-
+-src_compile() {
+-	epatch &quot;${FILESDIR}&quot;/${PN}-0.0.6-link_math.patch
+-
+-	econf \
+-		$(use_enable gtk gtktest) \
+-		$(use_enable xml xmltest) \
+-		--prefix=/usr/ \
+-		|| die &quot;econf failed&quot;
+-
+-	emake || die &quot;emake failed&quot;
+-}
+-
+-src_install() {
+-	emake DESTDIR=&quot;${D}&quot; install || die
+-}
+-
+
+Deleted: trunk/extras/distro/gentoo/media-libs/libg3d/metadata.xml
+===================================================================
+--- trunk/extras/distro/gentoo/media-libs/libg3d/metadata.xml	2008-05-04 20:17:15 UTC (rev 913)
++++ trunk/extras/distro/gentoo/media-libs/libg3d/metadata.xml	2008-06-16 11:21:43 UTC (rev 914)
+@@ -1,8 +0,0 @@
+-&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+-&lt;!DOCTYPE pkgmetadata SYSTEM &quot;<A HREF="http://www.gentoo.org/dtd/metadata.dtd">http://www.gentoo.org/dtd/metadata.dtd</A>&quot;&gt;
+-&lt;pkgmetadata&gt;
+-  &lt;herd&gt;d0tslash&lt;/herd&gt;
+-    &lt;maintainer&gt;
+-    &lt;email&gt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&lt;/email&gt;
+-  &lt;/maintainer&gt;
+-&lt;/pkgmetadata&gt;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000908.html">[S3d-svn] r915 - trunk/extras
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#907">[ date ]</a>
+              <a href="thread.html#907">[ thread ]</a>
+              <a href="subject.html#907">[ subject ]</a>
+              <a href="author.html#907">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

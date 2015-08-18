@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r453 - in trunk: example libs3d swig
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r453%20-%20in%20trunk%3A%20example%20libs3d%20swig&In-Reply-To=%3C200610231417.k9NEHnlf031177%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000445.html">
+   <LINK REL="Next"  HREF="000447.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r453 - in trunk: example libs3d swig</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r453%20-%20in%20trunk%3A%20example%20libs3d%20swig&In-Reply-To=%3C200610231417.k9NEHnlf031177%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r453 - in trunk: example libs3d swig">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Oct 23 16:17:49 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000445.html">[S3d-svn] r452 - in trunk: . swig
+</A></li>
+        <LI>Next message: <A HREF="000447.html">[S3d-svn] r454 - in trunk: . swig
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#446">[ date ]</a>
+              <a href="thread.html#446">[ thread ]</a>
+              <a href="subject.html#446">[ subject ]</a>
+              <a href="author.html#446">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-10-23 16:17:48 +0200 (Mon, 23 Oct 2006)
+New Revision: 453
+
+Modified:
+   trunk/example/modelloader.c
+   trunk/libs3d/modelread.c
+   trunk/swig/Makefile
+   trunk/swig/s3d.i
+Log:
+- more binding stuff for swig and minor things
+
+Modified: trunk/example/modelloader.c
+===================================================================
+--- trunk/example/modelloader.c	2006-10-19 18:31:38 UTC (rev 452)
++++ trunk/example/modelloader.c	2006-10-23 14:17:48 UTC (rev 453)
+@@ -32,7 +32,7 @@
+ void mainloop()
+ {
+ 	s3d_rotate(oid,0,i,0);
+-	i++;
++	i=(i+1)%360;
+ 	nanosleep(&amp;t,NULL); 
+ }
+ int object_click(struct s3d_evt *evt)
+@@ -51,6 +51,7 @@
+ 	if (!s3d_init(&amp;argc,&amp;argv,&quot;modelloader&quot;))	
+ 	{
+ 		s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
++		i=0;
+ 	    if (-1!=(oid=s3d_import_model_file(argv[1])))
+ 		{
+ 		    s3d_flags_on(oid,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+
+Modified: trunk/libs3d/modelread.c
+===================================================================
+--- trunk/libs3d/modelread.c	2006-10-19 18:31:38 UTC (rev 452)
++++ trunk/libs3d/modelread.c	2006-10-23 14:17:48 UTC (rev 453)
+@@ -126,7 +126,7 @@
+ 	G3DFace 				*face;
+ 	GSList 					*oitem, *oface;
+ 	struct material2texture *mat2tex;
+-	int						 i, j, k, material_count, texture_count, voff,obj_id;
++	int						 j, k, material_count, texture_count, voff,obj_id;
+ #define 					PMAX	100
+ 	uint32_t 			 polybuf[PMAX * 4],npoly,oldflags;
+ 	float					 normalbuf[PMAX * 9],texcoordbuf[PMAX * 6];
+
+Modified: trunk/swig/Makefile
+===================================================================
+--- trunk/swig/Makefile	2006-10-19 18:31:38 UTC (rev 452)
++++ trunk/swig/Makefile	2006-10-23 14:17:48 UTC (rev 453)
+@@ -4,6 +4,8 @@
+ 
+ default:	all
+ all:		$(MODS)
++python:		$(PYTHON_MOD)
++perl:		$(PERL_MOD)
+ $(PYTHON_MOD):	s3d.i
+ 	 swig -python s3d.i
+ 	 gcc -fPIC -c s3d_wrap.c -I/usr/include/python2.3/
+
+Modified: trunk/swig/s3d.i
+===================================================================
+--- trunk/swig/s3d.i	2006-10-19 18:31:38 UTC (rev 452)
++++ trunk/swig/s3d.i	2006-10-23 14:17:48 UTC (rev 453)
+@@ -1,6 +1,7 @@
+ %module s3d
+ typedef unsigned int uint32_t;
+ %inline %{
++#include &lt;stdint.h&gt;
+ int s3dpy_init(char *name)
+ {
+ 	return s3d_init(NULL,NULL,name);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000445.html">[S3d-svn] r452 - in trunk: . swig
+</A></li>
+	<LI>Next message: <A HREF="000447.html">[S3d-svn] r454 - in trunk: . swig
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#446">[ date ]</a>
+              <a href="thread.html#446">[ thread ]</a>
+              <a href="subject.html#446">[ subject ]</a>
+              <a href="author.html#446">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

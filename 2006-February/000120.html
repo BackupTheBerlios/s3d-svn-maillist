@@ -1,0 +1,2367 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r124 - in trunk: . apps/dot_mcp apps/s3d_x11gate apps/s3dgps apps/s3dvt client example server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r124%20-%20in%20trunk%3A%20.%20apps/dot_mcp%20apps/s3d_x11gate%20apps/s3dgps%20apps/s3dvt%20client%20example%20server&In-Reply-To=%3C200602272115.k1RLFHkR001894%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000119.html">
+   <LINK REL="Next"  HREF="000121.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r124 - in trunk: . apps/dot_mcp apps/s3d_x11gate apps/s3dgps apps/s3dvt client example server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r124%20-%20in%20trunk%3A%20.%20apps/dot_mcp%20apps/s3d_x11gate%20apps/s3dgps%20apps/s3dvt%20client%20example%20server&In-Reply-To=%3C200602272115.k1RLFHkR001894%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r124 - in trunk: . apps/dot_mcp apps/s3d_x11gate apps/s3dgps apps/s3dvt client example server">dotslash at berlios.de
+       </A><BR>
+    <I>Mon Feb 27 22:15:17 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000119.html">[S3d-svn] r123 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000121.html">[S3d-svn] r125 - in trunk: . client
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#120">[ date ]</a>
+              <a href="thread.html#120">[ thread ]</a>
+              <a href="subject.html#120">[ subject ]</a>
+              <a href="author.html#120">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-02-27 22:14:47 +0100 (Mon, 27 Feb 2006)
+New Revision: 124
+
+Modified:
+   trunk/
+   trunk/CREDITS
+   trunk/ChangeLog
+   trunk/README
+   trunk/apps/dot_mcp/dot_mcp.h
+   trunk/apps/dot_mcp/main.c
+   trunk/apps/dot_mcp/menu.c
+   trunk/apps/s3d_x11gate/s3d_x11gate.c
+   trunk/apps/s3dgps/s3dgps.c
+   trunk/apps/s3dvt/main.c
+   trunk/apps/s3dvt/s3dvt.h
+   trunk/apps/s3dvt/terminal.c
+   trunk/client/3dsread.c
+   trunk/client/callback.c
+   trunk/client/config.h
+   trunk/client/error.c
+   trunk/client/event.c
+   trunk/client/fontselect.c
+   trunk/client/freetype.c
+   trunk/client/io.c
+   trunk/client/network.c
+   trunk/client/object_queue.c
+   trunk/client/proto_in.c
+   trunk/client/proto_out.c
+   trunk/client/s3d.h
+   trunk/client/s3dlib.h
+   trunk/client/sei_construct.c
+   trunk/client/sei_interface.h
+   trunk/client/sei_misc.c
+   trunk/client/sei_monotone.c
+   trunk/client/sei_tri.c
+   trunk/client/sei_triangulate.h
+   trunk/client/shm.c
+   trunk/client/shm_ringbuf.c
+   trunk/client/tcp.c
+   trunk/example/3dsloader.c
+   trunk/example/filebrowser.c
+   trunk/example/hudtest.c
+   trunk/example/katze.c
+   trunk/example/radius_test.c
+   trunk/example/s3dclock.c
+   trunk/example/snowman.c
+   trunk/example/strtest.c
+   trunk/example/texturetest.c
+   trunk/server/config.h
+   trunk/server/cull.c
+   trunk/server/error.c
+   trunk/server/event.c
+   trunk/server/global.h
+   trunk/server/graphics.c
+   trunk/server/graphics_glut.c
+   trunk/server/graphics_sdl.c
+   trunk/server/main.c
+   trunk/server/matrix.c
+   trunk/server/mcp.c
+   trunk/server/navigation.c
+   trunk/server/network.c
+   trunk/server/object.c
+   trunk/server/process.c
+   trunk/server/proto.c
+   trunk/server/proto.h
+   trunk/server/shm.c
+   trunk/server/shm_ringbuf.c
+   trunk/server/tcp.c
+   trunk/server/user.c
+   trunk/server/user_glut.c
+   trunk/server/user_sdl.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r162 at balthasar</A>:  dotslash | 2006-02-27 22:14:40 +0100
+ - added GPL/LGPL copyright notes (phew -.-)
+ 
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:160
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:162
+
+Modified: trunk/CREDITS
+===================================================================
+--- trunk/CREDITS	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/CREDITS	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,7 +1,5 @@
+ server/cull.c
+ 	- culling code adapted from Ruud van Gaal
+-client/freetype.c
+-	- tesselation things come from the OpenGL redbook
+ client/sei_*.c
+ 	Implementation of the fast polygon triangulation algorithm
+ 	by R.Seidel (1991),  implementation by Narkhede A. and 
+
+Modified: trunk/ChangeLog
+===================================================================
+--- trunk/ChangeLog	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/ChangeLog	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,4 +1,5 @@
+ 2006-02-27  Simon Wunderlich - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++	- added GPL/LGPL copyright notes (phew -.-)
+ 	- implemented object search path as : delimited list
+ 	- INFINITY define into #ifndef
+ 	- splitting README and INSTALL
+
+Modified: trunk/README
+===================================================================
+--- trunk/README	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/README	2006-02-27 21:14:47 UTC (rev 124)
+@@ -35,6 +35,7 @@
+ The Library is licensed under the GNU Lesser GPL (LGPL), so you can 
+ also write close-sourced thing which links to the library (if you 
+ really have to ...).
++gpl.txt for the GPL and client/lgpl.txt for the LGPL are included too.
+ if I'm mistaken in any ownership-concerns, please tell me and don't be 
+ too mad at me, as I have had no idea of licensing at all.
+ 
+
+Modified: trunk/apps/dot_mcp/dot_mcp.h
+===================================================================
+--- trunk/apps/dot_mcp/dot_mcp.h	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/apps/dot_mcp/dot_mcp.h	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,2 +1,26 @@
++/*
++ * dot_mcp.h
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ int menu_init();
+ void menu_click(int oid);
+
+Modified: trunk/apps/dot_mcp/main.c
+===================================================================
+--- trunk/apps/dot_mcp/main.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/apps/dot_mcp/main.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * main.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;s3d.h&quot;
+ #include &quot;dot_mcp.h&quot;
+ #include &lt;unistd.h&gt;  /*  sleep() */
+
+Modified: trunk/apps/dot_mcp/menu.c
+===================================================================
+--- trunk/apps/dot_mcp/menu.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/apps/dot_mcp/menu.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * menu.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;s3d.h&quot;
+ #include &quot;dot_mcp.h&quot;
+ #include &lt;unistd.h&gt; /* fork(), execl() */
+
+Modified: trunk/apps/s3d_x11gate/s3d_x11gate.c
+===================================================================
+--- trunk/apps/s3d_x11gate/s3d_x11gate.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/apps/s3d_x11gate/s3d_x11gate.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * s3d_x11gate.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &lt;s3d.h&gt;		 /*  s3d_*() */
+ #include &lt;stdlib.h&gt; 	 /*  getenv() */
+ #include &lt;stdio.h&gt;		 /*  printf() */
+
+Modified: trunk/apps/s3dgps/s3dgps.c
+===================================================================
+--- trunk/apps/s3dgps/s3dgps.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/apps/s3dgps/s3dgps.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * s3dgps.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &lt;s3d.h&gt;
+ #include &lt;gps.h&gt; 	/* gps_*() */
+ #include &lt;stdio.h&gt; 	/* printf() */
+
+Modified: trunk/apps/s3dvt/main.c
+===================================================================
+--- trunk/apps/s3dvt/main.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/apps/s3dvt/main.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,28 @@
++/*
++ * main.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2002 Alexander Graf &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">helly at gmx.net</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;s3dvt.h&quot;
+ #include &lt;stdio.h&gt; 		 /*  FILE,NULL */
+ #include &lt;unistd.h&gt; 	 /*  read(),write(), sleep(),close() ... */
+
+Modified: trunk/apps/s3dvt/s3dvt.h
+===================================================================
+--- trunk/apps/s3dvt/s3dvt.h	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/apps/s3dvt/s3dvt.h	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,28 @@
++/*
++ * s3dvt.h
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2002 Alexander Graf &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">helly at gmx.net</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #define MAX_LINES	50
+ #define MAX_CHARS	80
+ #define DEFAULT_FGCOLOR 2
+
+Modified: trunk/apps/s3dvt/terminal.c
+===================================================================
+--- trunk/apps/s3dvt/terminal.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/apps/s3dvt/terminal.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,28 @@
++/*
++ * terminal.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2002 Alexander Graf &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">helly at gmx.net</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;s3dvt.h&quot;
+ #include &lt;stdio.h&gt; 		 /*  NULL,perror() */
+ #include &lt;string.h&gt;		 /*  memcpy() */
+
+Modified: trunk/client/3dsread.c
+===================================================================
+--- trunk/client/3dsread.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/3dsread.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * 3dsread.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
+ #include &lt;stdlib.h&gt; 	 /*  exit(), malloc() */
+
+Modified: trunk/client/callback.c
+===================================================================
+--- trunk/client/callback.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/callback.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * callback.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
+ /*  the s3d callback list */
+
+Modified: trunk/client/config.h
+===================================================================
+--- trunk/client/config.h	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/config.h	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * config.h
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ /*  this is definitly the better way to pick fonts. */
+ #define WITH_FONTCONFIG
+ /* #define WITH_SIGNALS */
+@@ -2,3 +26,3 @@
+ /*  our level of debug messages */
+-#define DEBUG			HIGH /*  standard debug level */
++#define DEBUG			LOW /*  standard debug level */
+ #define SHM_MAX_IDLE	200	/* maximum wait for server timeout */
+
+Modified: trunk/client/error.c
+===================================================================
+--- trunk/client/error.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/error.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * error.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
+ #include &lt;stdarg.h&gt;		 /*  va_list */
+
+Modified: trunk/client/event.c
+===================================================================
+--- trunk/client/event.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/event.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * event.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
+ #include &quot;proto.h&quot;
+
+Modified: trunk/client/fontselect.c
+===================================================================
+--- trunk/client/fontselect.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/fontselect.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * fontselect.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ /*  here we select our truetype font. I'd recommend the fontconfig way,  */
+ /*  as it always gives the best matching font. a xft version and a win32 */
+ /*  version would be nice too, to be implemented :) */
+
+Modified: trunk/client/freetype.c
+===================================================================
+--- trunk/client/freetype.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/freetype.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * freetype.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ /*  this file should render truetype fonts as objects */
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
+
+Modified: trunk/client/io.c
+===================================================================
+--- trunk/client/io.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/io.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * io.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
+ #include &quot;proto.h&quot;
+
+Modified: trunk/client/network.c
+===================================================================
+--- trunk/client/network.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/network.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * network.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
+ #include &lt;string.h&gt; 	 /*  memcpy() */
+
+Modified: trunk/client/object_queue.c
+===================================================================
+--- trunk/client/object_queue.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/object_queue.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * object_queue.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
+ #include &quot;proto.h&quot;	 
+
+Modified: trunk/client/proto_in.c
+===================================================================
+--- trunk/client/proto_in.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/proto_in.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * proto_in.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
+ #include &lt;proto.h&gt;
+
+Modified: trunk/client/proto_out.c
+===================================================================
+--- trunk/client/proto_out.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/proto_out.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * proto_out.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
+ #include &lt;proto.h&gt;
+
+Modified: trunk/client/s3d.h
+===================================================================
+--- trunk/client/s3d.h	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/s3d.h	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * s3d.h
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ struct s3d_evt {
+ 	unsigned char event;
+ 	int length;
+
+Modified: trunk/client/s3dlib.h
+===================================================================
+--- trunk/client/s3dlib.h	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/s3dlib.h	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * s3dlib.h
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &lt;stdint.h&gt;
+ #define VLOW	1
+ #define	LOW		2
+
+Modified: trunk/client/sei_construct.c
+===================================================================
+--- trunk/client/sei_construct.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/sei_construct.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,42 @@
++/*
++ * sei_construct.c
++ * 
++ * Copyright (C) 2006 Simon Wunderlich
++ * Copyright (C) 1994 A. Narkhede and D .Manocha, who released their code
++ * for public domain: 
++ * &lt;snip&gt;
++ *
++ * This code is in the public domain. Specifically, we give to the public
++ * domain all rights for future licensing of the source code, all resale
++ * rights, and all publishing rights.
++ *
++ * UNC-CH GIVES NO WARRANTY, EXPRESSED OR IMPLIED, FOR THE SOFTWARE
++ * AND/OR DOCUMENTATION PROVIDED, INCLUDING, WITHOUT LIMITATION, WARRANTY
++ * OF MERCHANTABILITY AND WARRANTY OF FITNESS FOR A PARTICULAR PURPOSE.
++ *
++ *
++ *                                 - Atul Narkhede (<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">narkhede at cs.unc.edu</A>)
++ * &lt;/snip&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &lt;sei_triangulate.h&gt;
+ #include &lt;math.h&gt;
+ 
+
+Modified: trunk/client/sei_interface.h
+===================================================================
+--- trunk/client/sei_interface.h	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/sei_interface.h	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,42 @@
++/*
++ * sei_interface.h
++ * 
++ * Copyright (C) 2006 Simon Wunderlich
++ * Copyright (C) 1994 A. Narkhede and D .Manocha, who released their code
++ * for public domain: 
++ * &lt;snip&gt;
++ *
++ * This code is in the public domain. Specifically, we give to the public
++ * domain all rights for future licensing of the source code, all resale
++ * rights, and all publishing rights.
++ *
++ * UNC-CH GIVES NO WARRANTY, EXPRESSED OR IMPLIED, FOR THE SOFTWARE
++ * AND/OR DOCUMENTATION PROVIDED, INCLUDING, WITHOUT LIMITATION, WARRANTY
++ * OF MERCHANTABILITY AND WARRANTY OF FITNESS FOR A PARTICULAR PURPOSE.
++ *
++ *
++ *                                 - Atul Narkhede (<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">narkhede at cs.unc.edu</A>)
++ * &lt;/snip&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #ifndef __interface_h
+ #define __interface_h
+ 
+
+Modified: trunk/client/sei_misc.c
+===================================================================
+--- trunk/client/sei_misc.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/sei_misc.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,42 @@
++/*
++ * sei_misc.c
++ * 
++ * Copyright (C) 2006 Simon Wunderlich
++ * Copyright (C) 1994 A. Narkhede and D .Manocha, who released their code
++ * for public domain: 
++ * &lt;snip&gt;
++ *
++ * This code is in the public domain. Specifically, we give to the public
++ * domain all rights for future licensing of the source code, all resale
++ * rights, and all publishing rights.
++ *
++ * UNC-CH GIVES NO WARRANTY, EXPRESSED OR IMPLIED, FOR THE SOFTWARE
++ * AND/OR DOCUMENTATION PROVIDED, INCLUDING, WITHOUT LIMITATION, WARRANTY
++ * OF MERCHANTABILITY AND WARRANTY OF FITNESS FOR A PARTICULAR PURPOSE.
++ *
++ *
++ *                                 - Atul Narkhede (<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">narkhede at cs.unc.edu</A>)
++ * &lt;/snip&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &lt;sei_triangulate.h&gt;
+ #include &lt;sys/time.h&gt;
+ #include &lt;math.h&gt;
+
+Modified: trunk/client/sei_monotone.c
+===================================================================
+--- trunk/client/sei_monotone.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/sei_monotone.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,42 @@
++/*
++ * sei_monotone.c
++ * 
++ * Copyright (C) 2006 Simon Wunderlich
++ * Copyright (C) 1994 A. Narkhede and D .Manocha, who released their code
++ * for public domain: 
++ * &lt;snip&gt;
++ *
++ * This code is in the public domain. Specifically, we give to the public
++ * domain all rights for future licensing of the source code, all resale
++ * rights, and all publishing rights.
++ *
++ * UNC-CH GIVES NO WARRANTY, EXPRESSED OR IMPLIED, FOR THE SOFTWARE
++ * AND/OR DOCUMENTATION PROVIDED, INCLUDING, WITHOUT LIMITATION, WARRANTY
++ * OF MERCHANTABILITY AND WARRANTY OF FITNESS FOR A PARTICULAR PURPOSE.
++ *
++ *
++ *                                 - Atul Narkhede (<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">narkhede at cs.unc.edu</A>)
++ * &lt;/snip&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &lt;sei_triangulate.h&gt;
+ #include &lt;math.h&gt;
+ 
+
+Modified: trunk/client/sei_tri.c
+===================================================================
+--- trunk/client/sei_tri.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/sei_tri.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,42 @@
++/*
++ * sei_tri.c
++ *
++ * Copyright (C) 2006 Simon Wunderlich
++ * Copyright (C) 1994 A. Narkhede and D .Manocha, who released their code
++ * for public domain: 
++ * &lt;snip&gt;
++ *
++ * This code is in the public domain. Specifically, we give to the public
++ * domain all rights for future licensing of the source code, all resale
++ * rights, and all publishing rights.
++ *
++ * UNC-CH GIVES NO WARRANTY, EXPRESSED OR IMPLIED, FOR THE SOFTWARE
++ * AND/OR DOCUMENTATION PROVIDED, INCLUDING, WITHOUT LIMITATION, WARRANTY
++ * OF MERCHANTABILITY AND WARRANTY OF FITNESS FOR A PARTICULAR PURPOSE.
++ *
++ *
++ *                                 - Atul Narkhede (<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">narkhede at cs.unc.edu</A>)
++ * &lt;/snip&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &lt;sei_triangulate.h&gt;
+ #include &lt;sys/time.h&gt;
+ 
+
+Modified: trunk/client/sei_triangulate.h
+===================================================================
+--- trunk/client/sei_triangulate.h	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/sei_triangulate.h	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,42 @@
++/*
++ * sei_triangulate.h
++ * 
++ * Copyright (C) 2006 Simon Wunderlich
++ * Copyright (C) 1994 A. Narkhede and D .Manocha, who released their code
++ * for public domain: 
++ * &lt;snip&gt;
++ *
++ * This code is in the public domain. Specifically, we give to the public
++ * domain all rights for future licensing of the source code, all resale
++ * rights, and all publishing rights.
++ *
++ * UNC-CH GIVES NO WARRANTY, EXPRESSED OR IMPLIED, FOR THE SOFTWARE
++ * AND/OR DOCUMENTATION PROVIDED, INCLUDING, WITHOUT LIMITATION, WARRANTY
++ * OF MERCHANTABILITY AND WARRANTY OF FITNESS FOR A PARTICULAR PURPOSE.
++ *
++ *
++ *                                 - Atul Narkhede (<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">narkhede at cs.unc.edu</A>)
++ * &lt;/snip&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #ifndef _triangulate_h
+ #define _triangulate_h
+ 
+
+Modified: trunk/client/shm.c
+===================================================================
+--- trunk/client/shm.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/shm.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,26 @@
++/*
++ * shm.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
+ #include &lt;stdlib.h&gt; /* malloc() */
+
+Modified: trunk/client/shm_ringbuf.c
+===================================================================
+--- trunk/client/shm_ringbuf.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/shm_ringbuf.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,26 @@
++/*
++ * shm_ringbuf.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
+ #include &lt;stdint.h&gt; /* uint32_t */
+
+Modified: trunk/client/tcp.c
+===================================================================
+--- trunk/client/tcp.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/client/tcp.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,26 @@
++/*
++ * tcp.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d API, the API of s3d (the 3d network display server).
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * the s3d API is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d API is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d API; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
+ #include &lt;sys/types.h&gt;
+
+Modified: trunk/example/3dsloader.c
+===================================================================
+--- trunk/example/3dsloader.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/example/3dsloader.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,29 @@
++/*
++ * 3dsloader.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
++
++
+ #include &lt;s3d.h&gt;
+ #include &lt;stdio.h&gt;  /*  NULL */
+ #include &lt;unistd.h&gt;  /* usleep() */
+
+Modified: trunk/example/filebrowser.c
+===================================================================
+--- trunk/example/filebrowser.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/example/filebrowser.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,29 @@
++/*
++ * filebrowser.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
++
++
+ #include &lt;s3d.h&gt;
+ #include &lt;stdio.h&gt; 	 /*  printf() */
+ #include &lt;unistd.h&gt;  /*  usleep() */
+
+Modified: trunk/example/hudtest.c
+===================================================================
+--- trunk/example/hudtest.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/example/hudtest.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,28 @@
++/*
++ * hudtest.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
++
+ #include &lt;s3d.h&gt;
+ #include &lt;unistd.h&gt;  /*  sleep() */
+ #include &lt;stdio.h&gt;  /*  printf() */
+
+Modified: trunk/example/katze.c
+===================================================================
+--- trunk/example/katze.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/example/katze.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,29 @@
++/*
++ * katze.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
++
++
+ #include &lt;s3d.h&gt;
+ #include &lt;unistd.h&gt; /* usleep()*/
+ #include &lt;math.h&gt;	/* sin() */
+
+Modified: trunk/example/radius_test.c
+===================================================================
+--- trunk/example/radius_test.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/example/radius_test.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,26 @@
++/*
++ * radius_test.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
+ #include &lt;s3d.h&gt;
+ #include &lt;stdio.h&gt;  /*  NULL */
+ #include &lt;unistd.h&gt;  /* usleep() */
+
+Modified: trunk/example/s3dclock.c
+===================================================================
+--- trunk/example/s3dclock.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/example/s3dclock.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * s3dclock.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &lt;s3d.h&gt;
+ #include &lt;stdio.h&gt;  /*  NULL, sprintf() */
+ #include &lt;unistd.h&gt;  /* usleep() */
+
+Modified: trunk/example/snowman.c
+===================================================================
+--- trunk/example/snowman.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/example/snowman.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,26 @@
++/*
++ * snowman.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
+ #include &lt;s3d.h&gt;
+ #include &lt;unistd.h&gt; /* usleep()*/
+ #include &lt;math.h&gt;	/* sin() */
+
+Modified: trunk/example/strtest.c
+===================================================================
+--- trunk/example/strtest.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/example/strtest.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,28 @@
++/*
++ * strtest.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
++
+ #include &lt;s3d.h&gt;
+ #include &lt;stdio.h&gt;  /*  NULL*/
+ #include &lt;unistd.h&gt; /* sleep() */
+
+Modified: trunk/example/texturetest.c
+===================================================================
+--- trunk/example/texturetest.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/example/texturetest.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * texturetest.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &lt;s3d.h&gt;
+ #include &lt;stdio.h&gt;  /*  NULL */
+ #include &lt;unistd.h&gt;  /* usleep() */
+
+Modified: trunk/server/config.h
+===================================================================
+--- trunk/server/config.h	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/config.h	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * config.h
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ /*  to be filled with configure options ...  */
+ /*   */
+ /*  on which port do we listen? */
+
+Modified: trunk/server/cull.c
+===================================================================
+--- trunk/server/cull.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/cull.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,8 +1,32 @@
++/*
++ * cull.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * code originated from  <A HREF="http://www.racer.nl/reference/vfc.htm">http://www.racer.nl/reference/vfc.htm</A> 
++ * which is (C) Ruud van Gaal
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;global.h&quot;
+ #include &lt;math.h&gt;	/* sqrt() */
+ #include &lt;GL/gl.h&gt;	/* glGetFloatv() */
+-/* code originated from  <A HREF="http://www.racer.nl/reference/vfc.htm">http://www.racer.nl/reference/vfc.htm</A> 
+- * which is (c) Ruud van Gaal */
+ struct t_plane {
+ 	struct t_vertex n;
+ 	float d;
+
+Modified: trunk/server/error.c
+===================================================================
+--- trunk/server/error.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/error.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * error.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;global.h&quot;	 
+ #include &lt;stdio.h&gt;	 /*  for printf() */
+ #include &lt;stdarg.h&gt;	 /*  va_start, va_end */
+
+Modified: trunk/server/event.c
+===================================================================
+--- trunk/server/event.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/event.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * event.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;global.h&quot;
+ #include &quot;proto.h&quot;
+ #ifdef WIN32 
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/global.h	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * global.h
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;config.h&quot;
+ #include &lt;stdint.h&gt;		 /*  integer types */
+ #ifdef SHM
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/graphics.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,26 @@
++/*
++ * graphics.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
+ #include &quot;global.h&quot;
+ #include &lt;stdlib.h&gt;		 /*  malloc() */
+ #include &lt;string.h&gt;		 /*  memcpy() */
+
+Modified: trunk/server/graphics_glut.c
+===================================================================
+--- trunk/server/graphics_glut.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/graphics_glut.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * graphics_glut.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ /*  this is the file for operation with glut ... */
+ /*  maybe we are able to choose if we want to use glut or sdl or any other lib later ... */
+ 
+
+Modified: trunk/server/graphics_sdl.c
+===================================================================
+--- trunk/server/graphics_sdl.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/graphics_sdl.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,26 @@
++/*
++ * graphics_sdl.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
+ #include &quot;global.h&quot;
+ 
+ #include &lt;SDL_opengl.h&gt;
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/main.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * main.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;global.h&quot; 		 /*  contains the prototypes of all modules */
+ #include &lt;unistd.h&gt; 	 /*  usleep() */
+ #include &lt;stdlib.h&gt;		 /*  exit() */
+
+Modified: trunk/server/matrix.c
+===================================================================
+--- trunk/server/matrix.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/matrix.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * matrix.c 
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++i
++
+ /*  this file gives some simple matrix functionality for things I was unable */
+ /*  to do with OpenGL */
+ #include &quot;global.h&quot;
+
+Modified: trunk/server/mcp.c
+===================================================================
+--- trunk/server/mcp.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/mcp.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * mcp.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;global.h&quot;
+ #include &quot;proto.h&quot; 			 /*  for S3D_P_OBJECT, to be integrated in proto.c */
+ #ifdef WIN32
+
+Modified: trunk/server/navigation.c
+===================================================================
+--- trunk/server/navigation.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/navigation.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * navigation.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;global.h&quot;
+ #include &lt;math.h&gt;
+ int alphax,alphay;
+
+Modified: trunk/server/network.c
+===================================================================
+--- trunk/server/network.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/network.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * network.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;global.h&quot;
+ #include &lt;stdio.h&gt;
+ #include &lt;stdlib.h&gt;		 /*  free() */
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/object.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * object.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;global.h&quot;
+ #include &lt;stdlib.h&gt;		 /*  malloc(),realloc(),free() */
+ #include &lt;string.h&gt;		 /*  memcpy() */
+
+Modified: trunk/server/process.c
+===================================================================
+--- trunk/server/process.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/process.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * process.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;global.h&quot;
+ #include &lt;stdlib.h&gt;  /*  for malloc, free */
+ #include &lt;string.h&gt;	 /*  strncmp(), strncpy() */
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/proto.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * proto.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;global.h&quot;
+ #include &quot;proto.h&quot;
+ /* #include &lt;string.h&gt;  / *  memcpy() * / */
+
+Modified: trunk/server/proto.h
+===================================================================
+--- trunk/server/proto.h	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/proto.h	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * proto.h
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ /*  this defines the protocol */
+ 
+ /*  simply put, a command can be issued from either the client or  */
+
+Modified: trunk/server/shm.c
+===================================================================
+--- trunk/server/shm.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/shm.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * shm.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;global.h&quot;
+ #ifdef SHM
+ #include &lt;stdio.h&gt;  /* printf(),fopen(),fclose() */
+
+Modified: trunk/server/shm_ringbuf.c
+===================================================================
+--- trunk/server/shm_ringbuf.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/shm_ringbuf.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * shm_ringbuf.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;global.h&quot;
+ #include &lt;stdio.h&gt;	/* printf(), getchar() */
+ #include &lt;stdint.h&gt; /* uint32_t */
+
+Modified: trunk/server/tcp.c
+===================================================================
+--- trunk/server/tcp.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/tcp.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * tcp.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;global.h&quot;
+ #ifdef TCP
+ #include &lt;errno.h&gt;		 /*  errno */
+
+Modified: trunk/server/user.c
+===================================================================
+--- trunk/server/user.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/user.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * user.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;global.h&quot;
+ /*  this file reads user input */
+ /*  this is done right now by SDL-polling */
+
+Modified: trunk/server/user_glut.c
+===================================================================
+--- trunk/server/user_glut.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/user_glut.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * user_glut.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;global.h&quot;
+ #include &lt;GL/glut.h&gt; 	 /*  all the glut functions */
+ /*  local prototypes */
+
+Modified: trunk/server/user_sdl.c
+===================================================================
+--- trunk/server/user_sdl.c	2006-02-27 20:29:16 UTC (rev 123)
++++ trunk/server/user_sdl.c	2006-02-27 21:14:47 UTC (rev 124)
+@@ -1,3 +1,27 @@
++/*
++ * user_sdl.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+ #include &quot;global.h&quot;
+ #include &lt;SDL.h&gt;
+ /*  this file reads user input */
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000119.html">[S3d-svn] r123 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000121.html">[S3d-svn] r125 - in trunk: . client
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#120">[ date ]</a>
+              <a href="thread.html#120">[ thread ]</a>
+              <a href="subject.html#120">[ subject ]</a>
+              <a href="author.html#120">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

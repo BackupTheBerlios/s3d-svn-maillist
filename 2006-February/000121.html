@@ -1,0 +1,562 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r125 - in trunk: . client
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r125%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200602272204.k1RM44Ed031631%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000120.html">
+   <LINK REL="Next"  HREF="000122.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r125 - in trunk: . client</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r125%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200602272204.k1RM44Ed031631%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r125 - in trunk: . client">dotslash at berlios.de
+       </A><BR>
+    <I>Mon Feb 27 23:04:04 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000120.html">[S3d-svn] r124 - in trunk: . apps/dot_mcp apps/s3d_x11gate apps/s3dgps apps/s3dvt client example server
+</A></li>
+        <LI>Next message: <A HREF="000122.html">[S3d-svn] r126 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#121">[ date ]</a>
+              <a href="thread.html#121">[ thread ]</a>
+              <a href="subject.html#121">[ subject ]</a>
+              <a href="author.html#121">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-02-27 23:04:03 +0100 (Mon, 27 Feb 2006)
+New Revision: 125
+
+Modified:
+   trunk/
+   trunk/client/3dsread.c
+   trunk/client/callback.c
+   trunk/client/config.h
+   trunk/client/error.c
+   trunk/client/event.c
+   trunk/client/fontselect.c
+   trunk/client/freetype.c
+   trunk/client/io.c
+   trunk/client/network.c
+   trunk/client/object_queue.c
+   trunk/client/proto_in.c
+   trunk/client/proto_out.c
+   trunk/client/s3d.h
+   trunk/client/s3dlib.h
+   trunk/client/sei_construct.c
+   trunk/client/sei_interface.h
+   trunk/client/sei_misc.c
+   trunk/client/sei_monotone.c
+   trunk/client/sei_tri.c
+   trunk/client/sei_triangulate.h
+   trunk/client/shm.c
+   trunk/client/shm_ringbuf.c
+   trunk/client/tcp.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r171 at balthasar</A>:  dotslash | 2006-02-27 23:03:56 +0100
+ the -&gt; The :)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:162
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:171
+
+Modified: trunk/client/3dsread.c
+===================================================================
+--- trunk/client/3dsread.c	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/3dsread.c	2006-02-27 22:04:03 UTC (rev 125)
+@@ -6,12 +6,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/callback.c
+===================================================================
+--- trunk/client/callback.c	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/callback.c	2006-02-27 22:04:03 UTC (rev 125)
+@@ -6,12 +6,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/config.h
+===================================================================
+--- trunk/client/config.h	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/config.h	2006-02-27 22:04:03 UTC (rev 125)
+@@ -6,12 +6,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/error.c
+===================================================================
+--- trunk/client/error.c	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/error.c	2006-02-27 22:04:03 UTC (rev 125)
+@@ -6,12 +6,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/event.c
+===================================================================
+--- trunk/client/event.c	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/event.c	2006-02-27 22:04:03 UTC (rev 125)
+@@ -6,12 +6,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/fontselect.c
+===================================================================
+--- trunk/client/fontselect.c	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/fontselect.c	2006-02-27 22:04:03 UTC (rev 125)
+@@ -6,12 +6,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/freetype.c
+===================================================================
+--- trunk/client/freetype.c	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/freetype.c	2006-02-27 22:04:03 UTC (rev 125)
+@@ -6,12 +6,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/io.c
+===================================================================
+--- trunk/client/io.c	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/io.c	2006-02-27 22:04:03 UTC (rev 125)
+@@ -6,12 +6,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/network.c
+===================================================================
+--- trunk/client/network.c	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/network.c	2006-02-27 22:04:03 UTC (rev 125)
+@@ -6,12 +6,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/object_queue.c
+===================================================================
+--- trunk/client/object_queue.c	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/object_queue.c	2006-02-27 22:04:03 UTC (rev 125)
+@@ -6,12 +6,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/proto_in.c
+===================================================================
+--- trunk/client/proto_in.c	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/proto_in.c	2006-02-27 22:04:03 UTC (rev 125)
+@@ -6,12 +6,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/proto_out.c
+===================================================================
+--- trunk/client/proto_out.c	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/proto_out.c	2006-02-27 22:04:03 UTC (rev 125)
+@@ -6,12 +6,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/s3d.h
+===================================================================
+--- trunk/client/s3d.h	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/s3d.h	2006-02-27 22:04:03 UTC (rev 125)
+@@ -6,12 +6,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/s3dlib.h
+===================================================================
+--- trunk/client/s3dlib.h	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/s3dlib.h	2006-02-27 22:04:03 UTC (rev 125)
+@@ -6,12 +6,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/sei_construct.c
+===================================================================
+--- trunk/client/sei_construct.c	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/sei_construct.c	2006-02-27 22:04:03 UTC (rev 125)
+@@ -21,12 +21,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/sei_interface.h
+===================================================================
+--- trunk/client/sei_interface.h	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/sei_interface.h	2006-02-27 22:04:03 UTC (rev 125)
+@@ -21,12 +21,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/sei_misc.c
+===================================================================
+--- trunk/client/sei_misc.c	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/sei_misc.c	2006-02-27 22:04:03 UTC (rev 125)
+@@ -21,12 +21,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/sei_monotone.c
+===================================================================
+--- trunk/client/sei_monotone.c	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/sei_monotone.c	2006-02-27 22:04:03 UTC (rev 125)
+@@ -21,12 +21,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/sei_tri.c
+===================================================================
+--- trunk/client/sei_tri.c	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/sei_tri.c	2006-02-27 22:04:03 UTC (rev 125)
+@@ -21,12 +21,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/sei_triangulate.h
+===================================================================
+--- trunk/client/sei_triangulate.h	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/sei_triangulate.h	2006-02-27 22:04:03 UTC (rev 125)
+@@ -21,12 +21,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/shm.c
+===================================================================
+--- trunk/client/shm.c	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/shm.c	2006-02-27 22:04:03 UTC (rev 125)
+@@ -6,12 +6,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/shm_ringbuf.c
+===================================================================
+--- trunk/client/shm_ringbuf.c	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/shm_ringbuf.c	2006-02-27 22:04:03 UTC (rev 125)
+@@ -6,12 +6,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+Modified: trunk/client/tcp.c
+===================================================================
+--- trunk/client/tcp.c	2006-02-27 21:14:47 UTC (rev 124)
++++ trunk/client/tcp.c	2006-02-27 22:04:03 UTC (rev 125)
+@@ -6,12 +6,12 @@
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * the s3d API is free software; you can redistribute it and/or modify
++ * The s3d API is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d API is distributed in the hope that it will be useful,
++ * The s3d API is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU Lesser General Public License for more details.
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000120.html">[S3d-svn] r124 - in trunk: . apps/dot_mcp apps/s3d_x11gate apps/s3dgps apps/s3dvt client example server
+</A></li>
+	<LI>Next message: <A HREF="000122.html">[S3d-svn] r126 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#121">[ date ]</a>
+              <a href="thread.html#121">[ thread ]</a>
+              <a href="subject.html#121">[ subject ]</a>
+              <a href="author.html#121">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

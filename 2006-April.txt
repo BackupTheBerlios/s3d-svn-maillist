@@ -1,0 +1,3120 @@
+From dotslash at berlios.de  Sat Apr  8 19:28:03 2006
+From: dotslash at berlios.de (dotslash at BerliOS)
+Date: Sat, 8 Apr 2006 19:28:03 +0200
+Subject: [S3d-svn] r245 - in trunk: . apps/s3dfm
+Message-ID: <200604081728.k38HS3oH022464@sheep.berlios.de>
+
+Author: dotslash
+Date: 2006-04-08 19:28:01 +0200 (Sat, 08 Apr 2006)
+New Revision: 245
+
+Modified:
+   trunk/
+   trunk/apps/s3dfm/main.c
+Log:
+ r373 at balthasar:  dotslash | 2006-04-08 19:27:48 +0200
+ - incomplete, but maybe you want to have a look ...
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:368
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:373
+
+Modified: trunk/apps/s3dfm/main.c
+===================================================================
+--- trunk/apps/s3dfm/main.c	2006-03-30 16:40:39 UTC (rev 244)
++++ trunk/apps/s3dfm/main.c	2006-04-08 17:28:01 UTC (rev 245)
+@@ -43,14 +43,14 @@
+ 
+ #define M_DIR		512
+ #define M_NAME		256
+-int folder,geometry,mp3,duno,dot,dotdot,dirstep;
++int folder,geometry,mp3,duno,dot,dotdot;
+ struct t_item {
+ 	int icon, str;							/* object ids ...*/
+ 	int block;								/* oid of the block */
++	int dirs_opened;						/* how many directories are on the block */
+ 	char name[M_NAME];						/* name (e.g. file name) */
+ 	struct t_item *parent;					/* parent item */
+ 	struct t_item *list;					/* list of items  (if it's a subdir)*/
+-	float scale;
+ 	float px,pz;
+ 	int n_item;								/* number of items in list ( = -1 for normal or not-expanded files) */
+ 	int type;								/* type, determined by extension or file type like dir, pipe, link etc */
+@@ -77,9 +77,14 @@
+ 						1,1,1,
+ 						1,1,1,
+ 						1,1,1);
+-	s3d_push_polygon(dir->block,4,5,6,0);
+-	s3d_push_polygon(dir->block,4,6,7,0);
++	s3d_push_material(dir->block,
++						0.5,1,0.5,
++						0.5,1,0.5,
++						0.5,1,0.5);
+ 
++	s3d_push_polygon(dir->block,4,5,6,1);
++	s3d_push_polygon(dir->block,4,6,7,1);
++
+ 	s3d_push_polygon(dir->block,0,4,5,0);
+ 	s3d_push_polygon(dir->block,0,5,1,0);
+ 	
+@@ -88,15 +93,53 @@
+ 
+ 	s3d_push_polygon(dir->block,2,6,7,0);
+ 	s3d_push_polygon(dir->block,2,7,3,0);
++	return(0);
+ 
+ }
++/* orders the directory objects on top of its parent objects 
++ * to be called after adding or removing things ...*/
++int placeontop(struct t_item *dir)
++{
++	int i,j;
++	printf("placeontop dir %s, %d\n",dir->name,dir->dirs_opened);
++	switch (dir->dirs_opened)
++	{
++		case 0: return(0);
++		case 1:
++			for (i=0;i<dir->n_item;i++)
++			{
++				if (dir->list[i].disp)
++				{
++					printf("raising %d\n", i);
++					dir->list[i].px=0.0;
++					dir->list[i].pz=0.0;
++					s3d_translate(dir->list[i].block,0,1,0);
++					s3d_scale(dir->list[i].block,0.2);
++				}
++			}
++			break;
++		default:
++			j=0;
++			for (i=0;i<dir->n_item;i++)
++			{
++				if (dir->list[i].disp)
++				{
++					printf("raising %d\n", i);
++					dir->list[i].px=0.8 * sin(((float)j*2*M_PI)/((float)dir->dirs_opened));
++					dir->list[i].pz=0.8 * cos(((float)j*2*M_PI)/((float)dir->dirs_opened));
++					s3d_translate(dir->list[i].block,dir->list[i].px,1,dir->list[i].pz);
++					s3d_scale(dir->list[i].block,0.2);
++					j++;
++				}
++
++			}
++	}
++}
+ int display_dir(struct t_item *dir)
+ {
+ 	int i;
+ 	float  px,pz;
+-	float dss; /* dirstep size */
+-	int dirn, dirc,dps;
+-	int icon;
++	int dirn, dps;
+ 	float vertices[]={	-1,-0.5,0,
+ 						-1, 0.5,0,
+ 						 1, 0.5,0,
+@@ -105,7 +148,11 @@
+ 	px=pz=0.0;
+ 	if (dir->disp)
+ 		return(-1); /* already displayed ... */ 
+-
++	s3d_del_object(dir->block);
++	new_block(dir);
++	if (dir->parent!=NULL)
++		dir->parent->dirs_opened++;
++	dir->dirs_opened=0;
+  /* count directories */
+ 	dirn=0;
+ 	for (i=0;i<dir->n_item;i++)
+@@ -115,7 +162,6 @@
+ 	}
+ 	dps=ceil(sqrt(dir->n_item)); /* directories per line */
+ 	printf("directories per line: %d\n",dps);
+-	root.icon=s3d_new_object();
+ 	for (i=0;i<dir->n_item;i++)
+ 	{
+ 		dir->list[i].px=((float)((int)i%dps)+0.5)/((float)dps)-0.5;
+@@ -141,12 +187,17 @@
+ 		s3d_push_polygon(dir->list[i].block,0,1,2,0);
+ 		s3d_push_polygon(dir->list[i].block,0,2,3,0);
+ 		s3d_scale(dir->list[i].block,(float)1.0/((float)dps));
+-		printf("scaling factor is %f\n",(float)1.0/((float)dps));
+-		printf("moving to %3.3f %3.3f 1.0\n",dir->list[i].px,dir->list[i].pz);
+ 		s3d_translate(dir->list[i].block,dir->list[i].px*2,dir->list[i].pz+0.5,1.0);
+-		s3d_flags_on(dir->list[i].block,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 	}
+ 	dir->disp=1;
++	if (dir->parent!=NULL)
++	{
++		s3d_link(dir->block,dir->parent->block);
++		placeontop(dir->parent);
++	}
++	for (i=0;i<dir->n_item;i++)
++		s3d_flags_on(dir->list[i].block,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++    s3d_flags_on(dir->block,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 	return(0);
+ }
+ void get_path(struct t_item *dir, char *path)
+@@ -212,7 +263,6 @@
+ 			list[n].n_item=-1;
+ 			list[n].parent=dir;
+ 			list[n].disp=0;
+-			list[n].scale=1.0f;
+ 			list[n].icon=-1;
+         	free(namelist[n]);
+ 		}
+@@ -225,7 +275,7 @@
+ {
+ 	int i;
+ 	struct t_item *f;
+-	if (t->icon==oid)
++	if (t->block==oid)
+ 		return(t);
+ 	if (t->type==T_FOLDER)
+ 		for (i=0;i<t->n_item;i++)
+@@ -235,21 +285,24 @@
+ }
+ float px, py, pz;
+ /* gets the scale by multiplying scales */
++
+ float get_scale(struct t_item *f)
+ {
+-	float scale;
+-	scale=1/f->scale;
++	float scale,s;
++	s=0.2;
++	scale=1.0/s;
+ 	if (f->parent!=NULL)
+-		scale=1/f->scale*get_scale(f->parent);
+-	px+=f->px;
+-	pz+=f->pz;
+-	py+=SH;
+-	printf("scale factor of %s: %f\n",f->name,1/f->scale);
+-	px*=1/f->scale;
+-	py*=1/f->scale;
+-	pz*=1/f->scale;
++		scale=1/s*get_scale(f->parent);
++	else
++		return(1.0);
++	px-=f->px;
++	pz-=f->pz;
++	py-=1;
++	printf("[S]cale factor of %s: %f\n",f->name,1/s);
++	px*=1/s;
++	py*=1/s;
++	pz*=1/s;
+ 	
+-	
+ 	return(scale);
+ }
+ #define SCALE 	1
+@@ -259,14 +312,15 @@
+ 	px=0.0;
+ 	py=0.0;
+ 	pz=0.0;
++	printf("[Z]ooming to %s\n",f->name);
+ 	if (f->parent!=NULL)
+ 	{
+ 		scale=get_scale(f);
+ 	}
+-	s3d_scale(root.icon,scale*SCALE);
+-	printf("rescaling to %f\n",scale);
++	printf("[R]escaling to %f\n",scale);
+ 	printf("px: %f py:%f pz: %f\n",px,py,pz);
+-	s3d_translate(root.icon,px*SCALE,-3.0-SCALE*py,pz*SCALE);
++	s3d_translate(root.block,px*SCALE,-3.0+SCALE*py,pz*SCALE);
++	s3d_scale(root.block,scale*SCALE);
+ }
+ 
+ void object_click(struct s3d_evt *evt)
+@@ -279,11 +333,14 @@
+ 	{
+ 		if (f->type==T_FOLDER)
+ 		{
+-			printf("found, expanding %s\n",f->name);
++			printf("[F]ound, expanding %s\n",f->name);
+ 			parse_dir(f);
+ 			display_dir(f);
+ 			rescale(f);
+-		}
++		} else
++			printf("[F]ound, but is no folder\n");
++	} else {
++		printf("[C]ould not find :/\n");
+ 	}
+ }
+ void mainloop()
+@@ -297,7 +354,6 @@
+ 	{
+ 		i=0;
+ 		 /*  load the object files */
+-		dirstep=s3d_import_3ds_file("objs/dirstep.3ds");
+ 		folder=s3d_import_3ds_file("objs/folder.3ds");
+ 		geometry=s3d_import_3ds_file("objs/geometry.3ds");
+ 		mp3=s3d_import_3ds_file("objs/notes.3ds");
+@@ -311,14 +367,10 @@
+ 		strncpy(root.name,"/",M_NAME);
+ 		root.parent=NULL;
+ 		root.type=T_FOLDER;
+-		root.icon=s3d_clone(dirstep);
+ 		root.px=root.pz=0.0;
+-		root.scale=1.0;
+-		new_block(&root);
++		root.dirs_opened=0;
++		parse_dir(&root);
+ 		rescale(&root);
+-	    s3d_flags_on(root.icon,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-	    s3d_flags_on(root.block,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-		parse_dir(&root);
+ 		display_dir(&root);
+ 		s3d_mainloop(mainloop);
+ 		s3d_quit();
+
+
+
+From dotslash at berlios.de  Sun Apr  9 01:28:35 2006
+From: dotslash at berlios.de (dotslash at BerliOS)
+Date: Sun, 9 Apr 2006 01:28:35 +0200
+Subject: [S3d-svn] r246 - in trunk: . apps/s3dfm
+Message-ID: <200604082328.k38NSZ1M023460@sheep.berlios.de>
+
+Author: dotslash
+Date: 2006-04-09 01:28:10 +0200 (Sun, 09 Apr 2006)
+New Revision: 246
+
+Modified:
+   trunk/
+   trunk/apps/s3dfm/main.c
+Log:
+ r375 at balthasar:  dotslash | 2006-04-09 01:28:03 +0200
+ - funny zoom :D
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:373
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:375
+
+Modified: trunk/apps/s3dfm/main.c
+===================================================================
+--- trunk/apps/s3dfm/main.c	2006-04-08 17:28:01 UTC (rev 245)
++++ trunk/apps/s3dfm/main.c	2006-04-08 23:28:10 UTC (rev 246)
+@@ -29,7 +29,7 @@
+ #include <string.h>  /*  strlen(), strncmp(), strrchr() */
+ #include <math.h>	 /*  sin(),cos() */
+ #include <time.h>	/* nanosleep() */
+-static struct timespec t={0,100*1000*1000}; /* 100 mili seconds */
++static struct timespec t={0,10*1000*1000}; /* 10 mili seconds */
+ 
+ 
+ #define SH			0.4 /* height of the step */
+@@ -44,6 +44,8 @@
+ #define M_DIR		512
+ #define M_NAME		256
+ int folder,geometry,mp3,duno,dot,dotdot;
++float dpx,dpy,dpz,dscale;
++float px, py, pz, scale;
+ struct t_item {
+ 	int icon, str;							/* object ids ...*/
+ 	int block;								/* oid of the block */
+@@ -98,13 +100,13 @@
+ }
+ /* orders the directory objects on top of its parent objects 
+  * to be called after adding or removing things ...*/
+-int placeontop(struct t_item *dir)
++void placeontop(struct t_item *dir)
+ {
+ 	int i,j;
+ 	printf("placeontop dir %s, %d\n",dir->name,dir->dirs_opened);
+ 	switch (dir->dirs_opened)
+ 	{
+-		case 0: return(0);
++		case 0: return;
+ 		case 1:
+ 			for (i=0;i<dir->n_item;i++)
+ 			{
+@@ -283,7 +285,6 @@
+ 				return(f);
+ 	return(NULL);
+ }
+-float px, py, pz;
+ /* gets the scale by multiplying scales */
+ 
+ float get_scale(struct t_item *f)
+@@ -308,19 +309,13 @@
+ #define SCALE 	1
+ void rescale(struct t_item *f)
+ {
+-	float scale=1.0;
+ 	px=0.0;
+ 	py=0.0;
+ 	pz=0.0;
+ 	printf("[Z]ooming to %s\n",f->name);
+-	if (f->parent!=NULL)
+-	{
+-		scale=get_scale(f);
+-	}
++	scale=get_scale(f);
+ 	printf("[R]escaling to %f\n",scale);
+ 	printf("px: %f py:%f pz: %f\n",px,py,pz);
+-	s3d_translate(root.block,px*SCALE,-3.0+SCALE*py,pz*SCALE);
+-	s3d_scale(root.block,scale*SCALE);
+ }
+ 
+ void object_click(struct s3d_evt *evt)
+@@ -328,7 +323,6 @@
+ 	int oid;
+ 	struct t_item *f;
+ 	oid=(int)*((unsigned long *)evt->buf);
+-	printf("! clicked object %d\n",oid);
+ 	if (NULL!=(f=finditem(&root,oid)))
+ 	{
+ 		if (f->type==T_FOLDER)
+@@ -343,13 +337,24 @@
+ 		printf("[C]ould not find :/\n");
+ 	}
+ }
++#define ZOOMS 	5
+ void mainloop()
+ {
++	dpx=(px+dpx*ZOOMS)/(ZOOMS+1);
++	dpy=(py+dpy*ZOOMS)/(ZOOMS+1);
++	dpz=(pz+dpz*ZOOMS)/(ZOOMS+1);
++	dscale=(scale+dscale*ZOOMS)/(ZOOMS+1);
++	s3d_translate(root.block,dpx*SCALE,-3.0+SCALE*dpy,dpz*SCALE);
++	s3d_scale(root.block,dscale*SCALE);
++
+ 	nanosleep(&t,NULL); 
+ }
+ int main (int argc, char **argv)
+ {
+ 	int i;
++	px=py=pz=0.0;
++	dpx=dpy=dpz=0.0;
++	dscale=scale=1.0;
+ 	if (!s3d_init(&argc,&argv,"filebrowser"))	
+ 	{
+ 		i=0;
+
+
+
+From nichtsnutz at berlios.de  Sun Apr  9 21:06:55 2006
+From: nichtsnutz at berlios.de (nichtsnutz at BerliOS)
+Date: Sun, 9 Apr 2006 21:06:55 +0200
+Subject: [S3d-svn] r247 - trunk/apps/olsrs3d
+Message-ID: <200604091906.k39J6tvm005539@sheep.berlios.de>
+
+Author: nichtsnutz
+Date: 2006-04-09 21:06:17 +0200 (Sun, 09 Apr 2006)
+New Revision: 247
+
+Modified:
+   trunk/apps/olsrs3d/process.c
+Log:
+fix olsr parsing
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-04-08 23:28:10 UTC (rev 246)
++++ trunk/apps/olsrs3d/process.c	2006-04-09 19:06:17 UTC (rev 247)
+@@ -392,6 +392,8 @@
+ 	con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
+ 	dn = 0;
+ 
++	/*printf("---lbuf-start---\n%s\n---lbuf-end---\n",lbuf);*/
++
+ 	while ( (*lbuf_ptr) != '\0' ) {
+ 
+ 		/* printf( "%c",(*lbuf_ptr) ); */
+@@ -454,15 +456,16 @@
+ 
+ 					/* normal HNA */
+ 					} else {
+-
++						/* printf("before: %s\n",con_to); */
+ 						if( (tmpChar = strchr((char*)con_to, (int)'/')))
+ 						{
+ 							tmpChar++;
+ 							address = (int)-inet_network(tmpChar);
+ 							sprintf(hna_name,"%d",(int)(32 - ceil(log(address)/log(2))));
+-							strncpy(tmpChar,hna_name,NAMEMAX);
++							strcpy(tmpChar,hna_name);
+ 						}
+-
++						/* printf("after: %s\n",con_to); */
++						/* fflush(NULL); */
+ 						olsr_node1 = get_olsr_node( &Olsr_root, con_from );
+ 						olsr_node2 = get_olsr_node( &Olsr_root, con_to );
+ 
+@@ -488,11 +491,11 @@
+ 						f = 999.0;
+ 					add_olsr_con( olsr_node1, olsr_node2, f );
+ 				}
+-
++/*
+ 				con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
+ 				dn = 0;
+ 				last_cr_ptr = lbuf_ptr;
+-
++*/
+ 			}
+ 
+ 		} else if ( ( (*lbuf_ptr) == '}' ) && ( (*(lbuf_ptr + 1)) == '\n' ) ) {
+@@ -506,7 +509,7 @@
+ 	}
+ 
+ 	if ( last_cr_ptr != NULL ) memmove( lbuf, last_cr_ptr + 1, strlen( last_cr_ptr ) );
+-
++	/*printf("---memmove-lbuf-start---\n%s\n---memmove-lbuf-end---\n",lbuf);*/
+ 	return(0);
+ 
+ }
+
+
+
+From dotslash at berlios.de  Mon Apr 10 10:53:37 2006
+From: dotslash at berlios.de (dotslash at BerliOS)
+Date: Mon, 10 Apr 2006 10:53:37 +0200
+Subject: [S3d-svn] r248 - in trunk: . client
+Message-ID: <200604100853.k3A8rbZ3015908@sheep.berlios.de>
+
+Author: dotslash
+Date: 2006-04-10 10:53:33 +0200 (Mon, 10 Apr 2006)
+New Revision: 248
+
+Modified:
+   trunk/
+   trunk/client/3dsread.c
+   trunk/client/freetype.c
+   trunk/client/proto_out.c
+   trunk/client/s3d.h
+Log:
+ r377 at balthasar:  dotslash | 2006-04-10 10:53:27 +0200
+ - htonl() -> clientlib (don't bother user/coder with this stuff)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:375
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:377
+
+Modified: trunk/client/3dsread.c
+===================================================================
+--- trunk/client/3dsread.c	2006-04-09 19:06:17 UTC (rev 247)
++++ trunk/client/3dsread.c	2006-04-10 08:53:33 UTC (rev 248)
+@@ -26,7 +26,6 @@
+ #include "s3dlib.h"
+ #include <stdlib.h> 	 /*  exit(), malloc() */
+ #include <math.h>		 /*  sqrt() */
+-#include <netinet/in.h>  /*  htonl() */
+ #include <string.h> 	 /*  strncpy() */
+ #include <errno.h> 		 /*  errno */
+ #define MAXSTRN		20
+@@ -140,7 +139,7 @@
+ 	{
+ 		for (j=0;j<3;j++)
+ 		{
+-			k=ntohl(pbuf[i*4+j])-voff;
++			k=pbuf[i*4+j]-voff;
+ 			if (v_t_buf[k].g!=g)  /*  not added in this group yet */
+ 			{
+ 				for (n=0;n<3;n++)
+@@ -159,7 +158,7 @@
+ 	{
+ 		for (j=0;j<3;j++)
+ 		{
+-			k=ntohl(pbuf[i*4+j])-voff;
++			k=pbuf[i*4+j]-voff;
+ 			if (v_t_buf[k].num>1)  /*  if more than 1, normalize. */
+ 			{
+ 				len=sqrt(v_t_buf[k].n[0]*v_t_buf[k].n[0]+v_t_buf[k].n[1]*v_t_buf[k].n[1]+v_t_buf[k].n[2]*v_t_buf[k].n[2]);
+@@ -217,7 +216,7 @@
+ 		}
+ 		for (j=0;j<3;j++)
+ 		{
+-			v[j]=ntohl(poly_buf[i*4+j])-voff;
++			v[j]=poly_buf[i*4+j]-voff;
+ 			if (v[j]>=vertexnum)  /*  bad input */
+ 			{
+ 				errds(VHIGH,"calc_normals()","bad input, polygon vertex index out of range");
+@@ -356,10 +355,10 @@
+ 			if (poly_buf==NULL) break;
+ 		    for (j=0; j<polynum; j++)
+ 			{
+-				poly_buf[j*4+0]=htonl(vertex_offset+gints(ptr+0)); 
+-				poly_buf[j*4+1]=htonl(vertex_offset+gints(ptr+2));
+-				poly_buf[j*4+2]=htonl(vertex_offset+gints(ptr+4));
+-				poly_buf[j*4+3]=htonl(col_obj);  /*  we should have a default material .... */
++				poly_buf[j*4+0]=vertex_offset+gints(ptr+0); 
++				poly_buf[j*4+1]=vertex_offset+gints(ptr+2);
++				poly_buf[j*4+2]=vertex_offset+gints(ptr+4);
++				poly_buf[j*4+3]=col_obj;  /*  we should have a default material .... */
+ 				ptr+=sizeof(unsigned short)*4;
+ 		    }
+ 			break;
+@@ -382,7 +381,7 @@
+ 			{
+ 				j=gints(ptr+2*i);
+ 				if (j>=0 && j<polynum)
+-					poly_buf[gints(ptr+2*i)*4+3]=htonl(col_obj); 
++					poly_buf[gints(ptr+2*i)*4+3]=col_obj; 
+ 				else {
+ 					errds(MED,"s3d_import_3ds()","polygon %d out of range!",j);
+ 				}
+
+Modified: trunk/client/freetype.c
+===================================================================
+--- trunk/client/freetype.c	2006-04-09 19:06:17 UTC (rev 247)
++++ trunk/client/freetype.c	2006-04-10 08:53:33 UTC (rev 248)
+@@ -27,7 +27,6 @@
+ #include "s3dlib.h"
+ #include "sei_interface.h"	/* sei_triangulate_polygon() */
+ #include <stdlib.h>    		/*  malloc(), free() */
+-#include <netinet/in.h>  	/*  htonl(), htons() */
+ #include <math.h>			/*  atan2() */
+ #include "ft2build.h"
+ #include FT_FREETYPE_H
+@@ -298,11 +297,6 @@
+ 						pbuf[i*4+1],
+ 						pbuf[i*4+2],
+ 						pbuf[i*4+3],*voff);*/
+-		pbuf[i*4]=htonl(pbuf[i*4]);
+-		pbuf[i*4+1]=htonl(pbuf[i*4+1]);
+-		pbuf[i*4+2]=htonl(pbuf[i*4+2]);
+-		pbuf[i*4+3]=htonl(pbuf[i*4+3]);
+-
+ 	}
+ 	dprintf(VLOW,"commiting %d vertices, %d polygons",tess_buf[a].vn,tess_buf[a].pn);
+ 	s3d_push_vertices(oid,vbuf,tess_buf[a].vn);
+
+Modified: trunk/client/proto_out.c
+===================================================================
+--- trunk/client/proto_out.c	2006-04-09 19:06:17 UTC (rev 247)
++++ trunk/client/proto_out.c	2006-04-10 08:53:33 UTC (rev 248)
+@@ -245,45 +245,53 @@
+ /*  assumes to have a list of polys which consists of v1,v2,v3,material */
+ int s3d_push_polygons(int object, unsigned long *pbuf, unsigned short n)
+ {
+-	char				buf[MF_LEN+4],*ptr;
+-	int					f,i,len=n*4*4;
++	unsigned long		buf[(MF_LEN+4)/4];
++	unsigned long		*s,*d;
++	int					f,i,j,len=n*4*4;
+ 	int					flen,stepl;
+ 	if (n<1)
+ 		return(-1);
+ 	stepl=((int)((MF_LEN-4)/(4*4)))*(4*4);
+ 	f=len/(MF_LEN-4)+1;  /*  how many fragments? */
++
++	buf[0]=htonl(object);
++	d=buf+1;
+ 	for (i=0;i<f;i++)
+ 	{
+-		ptr=buf;
+-		*((uint32_t *)ptr)=htonl(object);			ptr+=sizeof(uint32_t);		  /*  object id */
+-		if (len-i*stepl>stepl)
+-			flen=stepl;
+-		else
+-			flen=(len-i*stepl);
+-		memcpy(ptr,(char *)pbuf+i*stepl,flen);
+-		net_send(S3D_P_C_PUSH_POLY,buf,flen+4);
++		if (len-i*stepl>stepl)			flen=stepl;
++		else							flen=(len-i*stepl);
++
++		s=pbuf+i*stepl/4;
++		for (j=0;j<flen/4;j++)
++			d[j]=htonl(s[j]);
++		net_send(S3D_P_C_PUSH_POLY,(char *)buf,flen+4);
+ 	}
+ 	return(0);
+ }
+ int s3d_push_lines(int object, unsigned long *lbuf, unsigned short n)
+ {
+-	char				buf[MF_LEN+4],*ptr;
+-	int					f,i,len=n*4*3;
++	unsigned long		buf[(MF_LEN+4)/4];
++	unsigned long		*s,*d;
++	int					f,i,j,len=n*4*3;
+ 	int					flen,stepl;
+ 	if (n<1)
+ 		return(-1);
+ 	stepl=((int)((MF_LEN-4)/(4*3)))*(4*3);
+ 	f=len/(MF_LEN-4)+1;  /*  how many fragments? */
++
++	buf[0]=htonl(object);
++	d=buf+1;
++
+ 	for (i=0;i<f;i++)
+ 	{
+-		ptr=buf;
+-		*((uint32_t *)ptr)=htonl(object);			ptr+=sizeof(uint32_t);		  /*  object id */
+-		if (len-i*stepl>stepl)
+-			flen=stepl;
+-		else
+-			flen=(len-i*stepl);
+-		memcpy(ptr,(char *)lbuf+i*stepl,flen);
+-		net_send(S3D_P_C_PUSH_LINE,buf,flen+4);
++		if (len-i*stepl>stepl)			flen=stepl;
++		else							flen=(len-i*stepl);
++
++		s=lbuf+i*stepl/4;
++		for (j=0;j<flen/4;j++)
++			d[j]=htonl(s[j]);
++
++		net_send(S3D_P_C_PUSH_LINE,(char *)buf,flen+4);
+ 	}
+ 	return(0);
+ }
+@@ -299,25 +307,30 @@
+ 	net_send(S3D_P_C_PUSH_TEX,buf,len);
+ 	return(0);
+ }
+-int s3d_push_textures(int object, unsigned long *pbuf, unsigned short n)
++int s3d_push_textures(int object, unsigned short *tbuf, unsigned short n)
+ {
+-	char				buf[MF_LEN+4],*ptr;
+-	int					f,i,len=n*2*2;
++	unsigned short		buf[(MF_LEN+4)/2];
++	unsigned short		*s,*d;
++
++	int					f,i,j,len=n*2*2;
+ 	int					flen,stepl;
+ 	if (n<1)
+ 		return(-1);
+ 	stepl=((int)((MF_LEN-4)/(2*2)))*(2*2);
+ 	f=len/(MF_LEN-4)+1;  /*  how many fragments? */
++
++	*((unsigned long *)buf)=htonl(object);
++	d=buf+2;
++
+ 	for (i=0;i<f;i++)
+ 	{
+-		ptr=buf;
+-		*((uint32_t *)ptr)=htonl(object);			ptr+=sizeof(uint32_t);		  /*  object id */
+-		if (len-i*stepl>stepl)
+-			flen=stepl;
+-		else
+-			flen=(len-i*stepl);
+-		memcpy(ptr,(char *)pbuf+i*stepl,flen);
+-		net_send(S3D_P_C_PUSH_POLY,buf,flen+4);
++		if (len-i*stepl>stepl)			flen=stepl;
++		else							flen=(len-i*stepl);
++
++		s=tbuf+i*stepl/2;
++		for (j=0;j<flen/2;j++)
++			d[j]=htons(s[j]);
++		net_send(S3D_P_C_PUSH_POLY,(char *)buf,flen+4);
+ 	}
+ 	return(0);
+ }
+@@ -495,14 +508,16 @@
+ /*  replaces the last n lines. */
+ int s3d_pep_lines(int object, unsigned long *lbuf,unsigned short n)
+ {
+-	unsigned char buf[MF_LEN+4];
++	unsigned long 	buf[MF_LEN+4];
++	int				i;
+ 	if ((n*3*4+4)>MF_LEN) 
+ 	{
+-		errds(MED,"s3d_pep_vertices()","too much data");
++		errds(MED,"s3d_pep_lines()","too much data");
+ 		return(-1);  /*  impossible */
+ 	}
+-	*((uint32_t *)buf)=htonl(object);
+-	memcpy(buf+4,lbuf,3*4*n);
++	buf[0]=htonl(object);
++	for (i=0;i<3*n;i++)
++		buf[i+1]=htonl(lbuf[0]);
+ 	net_send(S3D_P_C_PEP_LINE, (char *)buf,n*3*4+4);
+ 	return(0);
+ 	
+
+Modified: trunk/client/s3d.h
+===================================================================
+--- trunk/client/s3d.h	2006-04-09 19:06:17 UTC (rev 247)
++++ trunk/client/s3d.h	2006-04-10 08:53:33 UTC (rev 248)
+@@ -104,6 +104,7 @@
+ int s3d_push_line(int object, unsigned long v1, unsigned long v2, unsigned long material);
+ int s3d_push_lines(int object, unsigned long *lbuf, unsigned short n);
+ int s3d_push_texture(int object, unsigned short w, unsigned short h);
++int s3d_push_textures(int object, unsigned short *tbuf, unsigned short n);
+ int s3d_pop_vertex(int object, unsigned long n);
+ int s3d_pop_polygon(int object, unsigned long n);
+ int s3d_pop_material(int object, unsigned long n);
+
+
+
+From dotslash at berlios.de  Thu Apr 13 10:10:54 2006
+From: dotslash at berlios.de (dotslash at BerliOS)
+Date: Thu, 13 Apr 2006 10:10:54 +0200
+Subject: [S3d-svn] r249 - trunk/apps/s3dgps
+Message-ID: <200604130810.k3D8Asap023563@sheep.berlios.de>
+
+Author: dotslash
+Date: 2006-04-13 10:10:01 +0200 (Thu, 13 Apr 2006)
+New Revision: 249
+
+Modified:
+   trunk/apps/s3dgps/s3dgps.c
+Log:
+- new gps.h compatibility
+
+Modified: trunk/apps/s3dgps/s3dgps.c
+===================================================================
+--- trunk/apps/s3dgps/s3dgps.c	2006-04-10 08:53:33 UTC (rev 248)
++++ trunk/apps/s3dgps/s3dgps.c	2006-04-13 08:10:01 UTC (rev 249)
+@@ -24,6 +24,9 @@
+ 
+ #include <s3d.h>
+ #include <gps.h> 	/* gps_*() */
++#ifdef NMEA_CHANNELS
++#define GPS_NEW
++#endif
+ #include <stdio.h> 	/* printf() */
+ #include <errno.h>  /* errno */
+ #include <stdlib.h>	/* malloc(), free() */
+@@ -210,7 +213,7 @@
+ }
+ void show_gpsdata(struct gps_data_t *dgps)
+ {
+-	if (!dgps->online) 
++/*	if (!dgps->online) 
+ 		printf("WARNING: no connection to gps device\n");
+ 	printf("[%d] lat/long: [%f|%f], altitude %f\n",frame,dgps->latitude,dgps->longitude,dgps->altitude);
+ 	printf("speed [kph]: %f",dgps->speed/KNOTS_TO_KPH);
+@@ -227,15 +230,26 @@
+ 		case MODE_NO_FIX:	printf("mode: no fix\n");break;
+ 		case MODE_2D:		printf("mode: 2d fix\n");break;
+ 		case MODE_3D:		printf("mode: 3d fix\n");break;
+-	}
++	}*/
+ }
+ int lastfix=0;
+ void show_position(struct gps_data_t *dgps)
+ {
+ 	int fix=1;
+ 	float x,y,z,p;
++#ifdef GPS_NEW
+ 	if (!dgps->online) 
+ 		fix=0;
++	switch (dgps->fix.mode)
++	{
++		case MODE_NOT_SEEN:	fix=0;break;
++		case MODE_NO_FIX:	fix=0;break;
++	}
++	if (fix) {
++		calc_position(dgps->fix.longitude,dgps->fix.latitude,&x,&y,&z);
++#else
++	if (!dgps->online) 
++		fix=0;
+ 	switch (dgps->mode)
+ 	{
+ 		case MODE_NOT_SEEN:	fix=0;break;
+@@ -243,6 +257,7 @@
+ 	}
+ 	if (fix) {
+ 		calc_position(dgps->longitude,dgps->latitude,&x,&y,&z);
++#endif
+ /*		calc_position(dgps->latitude,dgps->longitude,&x,&y,&z);*/
+ 		p=sin(M_PI*((2*frame)%180)/180.0);
+ /*		if (p<0.0) p*=-1.0;*/
+
+
+
+From dotslash at berlios.de  Thu Apr 13 18:22:39 2006
+From: dotslash at berlios.de (dotslash at BerliOS)
+Date: Thu, 13 Apr 2006 18:22:39 +0200
+Subject: [S3d-svn] r250 - in trunk: . apps/dot_mcp
+Message-ID: <200604131622.k3DGMdBB028490@sheep.berlios.de>
+
+Author: dotslash
+Date: 2006-04-13 18:22:39 +0200 (Thu, 13 Apr 2006)
+New Revision: 250
+
+Modified:
+   trunk/
+   trunk/apps/dot_mcp/main.c
+Log:
+ r382 at balthasar:  dotslash | 2006-04-13 18:22:22 +0200
+ - egomode enhanced :D
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:377
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:382
+
+Modified: trunk/apps/dot_mcp/main.c
+===================================================================
+--- trunk/apps/dot_mcp/main.c	2006-04-13 08:10:01 UTC (rev 249)
++++ trunk/apps/dot_mcp/main.c	2006-04-13 16:22:39 UTC (rev 250)
+@@ -386,10 +386,10 @@
+ 		case S3DK_F1:  ego_mode=(ego_mode+1)%2;
+ 				 printf("ego mode %d\n",ego_mode);
+ 				 break;
+-		case 'w':ydif=-1;break;
+-		case 'a':xdif=-1;break;
+-		case 's':ydif= 1;break;
+-		case 'd':xdif= 1;break;
++		case 'w':ydif=-2;break;
++		case 'a':xdif=-2;break;
++		case 's':ydif= 2;break;
++		case 'd':xdif= 2;break;
+ 		default:
+ 			printf("unknown/not handled key %d\n", key);
+ 	}
+@@ -399,7 +399,8 @@
+ 		campos.z+=ydif*cos((camrot.y*M_PI)/180);
+ 		campos.x+=xdif*cos((-camrot.y*M_PI)/180);
+ 		campos.z+=xdif*sin((-camrot.y*M_PI)/180);
+-		s3d_translate(	0,campos.x,0,campos.z);
++		campos.y+=ydif*sin((-camrot.x*M_PI)/180);
++		s3d_translate(	0,campos.x,campos.y,campos.z);
+ 	}
+ }
+ 
+
+
+
+From dotslash at berlios.de  Thu Apr 13 21:04:49 2006
+From: dotslash at berlios.de (dotslash at BerliOS)
+Date: Thu, 13 Apr 2006 21:04:49 +0200
+Subject: [S3d-svn] r251 - in trunk: . apps/s3dfm server
+Message-ID: <200604131904.k3DJ4nna000818@sheep.berlios.de>
+
+Author: dotslash
+Date: 2006-04-13 21:04:20 +0200 (Thu, 13 Apr 2006)
+New Revision: 251
+
+Modified:
+   trunk/
+   trunk/apps/s3dfm/main.c
+   trunk/server/cull.c
+   trunk/server/object.c
+   trunk/server/proto.c
+Log:
+ r384 at balthasar:  dotslash | 2006-04-13 21:04:06 +0200
+ - culling disabled for now, it's buggy
+ - some s3dfm advances (filenames, colors etc)
+ - system objects may not be deleted
+ 
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:382
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:384
+
+Modified: trunk/apps/s3dfm/main.c
+===================================================================
+--- trunk/apps/s3dfm/main.c	2006-04-13 16:22:39 UTC (rev 250)
++++ trunk/apps/s3dfm/main.c	2006-04-13 19:04:20 UTC (rev 251)
+@@ -51,6 +51,7 @@
+ 	int block;								/* oid of the block */
+ 	int dirs_opened;						/* how many directories are on the block */
+ 	char name[M_NAME];						/* name (e.g. file name) */
++	float len;
+ 	struct t_item *parent;					/* parent item */
+ 	struct t_item *list;					/* list of items  (if it's a subdir)*/
+ 	float px,pz;
+@@ -62,27 +63,42 @@
+ /* draw a block */
+ int new_block(struct t_item *dir)
+ {
++#define S 1.001
+ 	float vertices[]=
+-			{-1,0,-1,
+-			 -1,0, 1,
+-			  1,0, 1,
+-			  1,0,-1,
+-			 -1,1,-1,
+-			 -1,1, 1,
+-			  1,1, 1,
+-			  1,1,-1};
+-
+-			 
++			{-S,0,-S,
++			 -S,0, S,
++			  S,0, S,
++			  S,0,-S,
++			 -S,S,-S,
++			 -S,S, S,
++			  S,S, S,
++			  S,S,-S,
++			 -1,0, 0.8,
++			 -1,1, 0.8,
++			  1,1, 0.8,
++			  1,0, 0.8,
++			 };
++#undef S
++	struct t_item *d;
++	float f;	 
+ 	dir->block=s3d_new_object();
+-	s3d_push_vertices(dir->block,vertices,8);
++	s3d_push_vertices(dir->block,vertices,12);
+ 	s3d_push_material(dir->block,
+-						1,1,1,
+-						1,1,1,
+-						1,1,1);
++						0.5,0.5,0.5,
++						0.5,0.5,0.5,
++						0.5,0.5,0.5
++					);
++	d=dir;
++	f=0;
++	while (d->parent!=NULL)
++	{
++		f=(f+1)/4;
++		d=d->parent;
++	}
+ 	s3d_push_material(dir->block,
+-						0.5,1,0.5,
+-						0.5,1,0.5,
+-						0.5,1,0.5);
++						0.5+f/2,0.5+f,0.6,
++						0.5+f/2,0.5+f,0.6,
++						0.5+f/2,0.5+f,0.6);
+ 
+ 	s3d_push_polygon(dir->block,4,5,6,1);
+ 	s3d_push_polygon(dir->block,4,6,7,1);
+@@ -95,6 +111,10 @@
+ 
+ 	s3d_push_polygon(dir->block,2,6,7,0);
+ 	s3d_push_polygon(dir->block,2,7,3,0);
++	
++	s3d_push_polygon(dir->block,8,9,10,0);
++	s3d_push_polygon(dir->block,8,10,11,0);
++
+ 	return(0);
+ 
+ }
+@@ -137,21 +157,45 @@
+ 			}
+ 	}
+ }
++/* places the string at the left side of the cube */
++int place_str(struct t_item *dir)
++{
++
++	s3d_rotate(dir->str,0,90,0);
++	s3d_translate(dir->str,1.1,0.3,1);
++	s3d_scale(dir->str,(float)1.8/(dir->len));
++	s3d_scale(dir->str,(float)1.8/(dir->len));
++	s3d_link(dir->str,dir->block);
++	s3d_flags_on(dir->str,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++}
+ int display_dir(struct t_item *dir)
+ {
+ 	int i;
+ 	float  px,pz;
+ 	int dirn, dps;
++	float len;
+ 	float vertices[]={	-1,-0.5,0,
+ 						-1, 0.5,0,
+ 						 1, 0.5,0,
+-						 1,-0.5,0};
++						 1,-0.5,0,
++						-1,-0.5,-1,
++						-1, 0.5,-1,
++						 1, 0.5,-1,
++						 1,-0.5,-1};
++	unsigned long polys[]={
++				1,3,0,0,				2,3,1,0,
++				5,6,2,0,				1,5,2,0,
++				2,6,7,0,				2,7,3,0,
++				0,3,7,0,				0,7,4,0,
++				5,1,0,0,				5,0,4,0	
++				};
+ 	float d;
+ 	px=pz=0.0;
+ 	if (dir->disp)
+ 		return(-1); /* already displayed ... */ 
+ 	s3d_del_object(dir->block);
+ 	new_block(dir);
++	place_str(dir);
+ 	if (dir->parent!=NULL)
+ 		dir->parent->dirs_opened++;
+ 	dir->dirs_opened=0;
+@@ -169,36 +213,49 @@
+ 		dir->list[i].px=((float)((int)i%dps)+0.5)/((float)dps)-0.5;
+ 		dir->list[i].pz=((float)((int)i/dps)+0.5)/((float)dps)-0.5;
+ 		dir->list[i].block=s3d_new_object();
+-		s3d_link(dir->list[i].block,dir->block);
+-		s3d_push_vertices(dir->list[i].block,vertices,4);
+-		d=((int)i%2)*0.2;
++		printf("[L]inking %d against %d\n",dir->list[i].block,dir->block);
++		s3d_push_vertices(dir->list[i].block,vertices,8);
++		d=((int)(((i+(dps+1)%2*(i/dps)))%2))*0.2;
+ 		switch (dir->list[i].type)
+ 		{
+ 			case T_FOLDER:
+ 				s3d_push_material(dir->list[i].block,
+-										1-d,1-d,0,
+-										1-d,1-d,0,
+-										1-d,1-d,0);
++										0.4-d,0.4-d,0,
++										0.4-d,0.4-d,0,
++										0.4-d,0.4-d,0);
+ 				break;
+ 			default:
+ 				s3d_push_material(dir->list[i].block,
+-										0,0,1-d,
+-										0,0,1-d,
+-										0,0,1-d);
++										0,0,0.5-d,
++										0,0,0.5-d,
++										0,0,0.5-d);
+ 		};
+-		s3d_push_polygon(dir->list[i].block,0,1,2,0);
+-		s3d_push_polygon(dir->list[i].block,0,2,3,0);
++		s3d_push_polygons(dir->list[i].block,polys,10);
++/*		s3d_push_polygon(dir->list[i].block,0,1,2,0);
++		s3d_push_polygon(dir->list[i].block,0,2,3,0);*/
+ 		s3d_scale(dir->list[i].block,(float)1.0/((float)dps));
++		dir->list[i].str=s3d_draw_string(dir->list[i].name,&len);
++		if (len<2) len=2;
++		dir->list[i].len=len;
++		s3d_scale(dir->list[i].str,(float)1.8/(((float)dps)*len));
++
+ 		s3d_translate(dir->list[i].block,dir->list[i].px*2,dir->list[i].pz+0.5,1.0);
++		s3d_translate(dir->list[i].str,dir->list[i].px*2-0.9/(float)dps,dir->list[i].pz-0.4/(float)dps+0.5,1.01);
++		s3d_link(dir->list[i].block,dir->block);
++		s3d_link(dir->list[i].str,dir->block);
+ 	}
+ 	dir->disp=1;
+ 	if (dir->parent!=NULL)
+ 	{
+ 		s3d_link(dir->block,dir->parent->block);
++		printf("[L] parent: linking against %d\n",dir->parent->block);
+ 		placeontop(dir->parent);
+ 	}
+ 	for (i=0;i<dir->n_item;i++)
++	{
+ 		s3d_flags_on(dir->list[i].block,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++		s3d_flags_on(dir->list[i].str,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++	}
+     s3d_flags_on(dir->block,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 	return(0);
+ }
+@@ -277,8 +334,8 @@
+ {
+ 	int i;
+ 	struct t_item *f;
+-	if (t->block==oid)
+-		return(t);
++	if (t->block==oid)		return(t);
++	if (t->str==oid)		return(t);
+ 	if (t->type==T_FOLDER)
+ 		for (i=0;i<t->n_item;i++)
+ 			if ((f=finditem(&(t->list[i]),oid))!=NULL)
+@@ -337,14 +394,14 @@
+ 		printf("[C]ould not find :/\n");
+ 	}
+ }
+-#define ZOOMS 	5
++#define ZOOMS 	10
+ void mainloop()
+ {
+ 	dpx=(px+dpx*ZOOMS)/(ZOOMS+1);
+ 	dpy=(py+dpy*ZOOMS)/(ZOOMS+1);
+ 	dpz=(pz+dpz*ZOOMS)/(ZOOMS+1);
+ 	dscale=(scale+dscale*ZOOMS)/(ZOOMS+1);
+-	s3d_translate(root.block,dpx*SCALE,-3.0+SCALE*dpy,dpz*SCALE);
++	s3d_translate(root.block,dpx*SCALE,-1.2+SCALE*dpy,dpz*SCALE);
+ 	s3d_scale(root.block,dscale*SCALE);
+ 
+ 	nanosleep(&t,NULL); 
+@@ -371,9 +428,12 @@
+ 		/* set up file system representation */
+ 		strncpy(root.name,"/",M_NAME);
+ 		root.parent=NULL;
++		root.block=-1;
+ 		root.type=T_FOLDER;
+ 		root.px=root.pz=0.0;
+ 		root.dirs_opened=0;
++		root.str=s3d_draw_string(root.name,&root.len);
++		if (root.len<2) root.len=2;
+ 		parse_dir(&root);
+ 		rescale(&root);
+ 		display_dir(&root);
+
+Modified: trunk/server/cull.c
+===================================================================
+--- trunk/server/cull.c	2006-04-13 16:22:39 UTC (rev 250)
++++ trunk/server/cull.c	2006-04-13 19:04:20 UTC (rev 251)
+@@ -109,7 +109,7 @@
+ {
+ 	int i;
+ 	struct t_plane *p;
+-	
++	return(1);
+ 	for(i=0;i<6;i++)
+ 	{
+ 		p=&frustumPlane[i];
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2006-04-13 16:22:39 UTC (rev 250)
++++ trunk/server/object.c	2006-04-13 19:04:20 UTC (rev 251)
+@@ -1853,66 +1853,70 @@
+ 	uint32_t i;
+ 	uint32_t mcp_oid=-1;
+ 	mcp_p=get_proc_by_pid(MCP);
+-	if ((p->id==MCP) && (obj_valid(p,oid,o)))
++	if (obj_valid(p,oid,o))
+ 	{
+-		if (o->oflags&OF_VIRTUAL)  /*  only delete if virtual */
++		if (p->id==MCP) 
+ 		{
+-			dprintf(HIGH,"the mcp wants %d to be closed",o->n_mat);
+-			event_quit(get_proc_by_pid(o->n_mat));
+-			return(0);
+-		}
++			if (o->oflags&OF_VIRTUAL)  /*  only delete if virtual */
++			{
++				dprintf(HIGH,"the mcp wants %d to be closed",o->n_mat);
++				event_quit(get_proc_by_pid(o->n_mat));
++				return(0);
++			}
++		} else 
++			mcp_oid=p->mcp_oid;
+ 		if (o->oflags&OF_SYSTEM)
+ 		{
+ 			dprintf(HIGH,"can't delete system object!");
+ 			return(0);
+ 		}
+-	} else 
+-		mcp_oid=p->mcp_oid;
+-	if (obj_valid(p,oid,o))
+-	{
+-		obj_free(p,oid);
+-		if ((p->id!=MCP) && (p->biggest_obj==oid))
+-		{  /*  if object was the biggest object, find a new one. */
+-			mr=-1;
+-			p->biggest_obj=-1;
+-			for (i=0;i<p->n_obj;i++)
+-				if (p->object[i]!=NULL)
+-				{
+-					r=p->object[i]->r+p->object[i]->or;
+-					if (r>mr)
++
++		if (obj_valid(p,oid,o))
++		{
++			obj_free(p,oid);
++			if ((p->id!=MCP) && (p->biggest_obj==oid))
++			{  /*  if object was the biggest object, find a new one. */
++				mr=-1;
++				p->biggest_obj=-1;
++				for (i=0;i<p->n_obj;i++)
++					if (p->object[i]!=NULL)
+ 					{
+-						if (!(p->object[i]->oflags&OF_SYSTEM)) 
++						r=p->object[i]->r+p->object[i]->or;
++						if (r>mr)
+ 						{
+-							p->biggest_obj=i;
+-							mr=r;
++							if (!(p->object[i]->oflags&OF_SYSTEM)) 
++							{
++								p->biggest_obj=i;
++								mr=r;
++							}
+ 						}
+ 					}
+-				}
+-			mcp_p->object[mcp_oid]->r=mr;
+-			dprintf(MED,"new biggest object is :%d (size: %f)",p->biggest_obj,mr);
++				mcp_p->object[mcp_oid]->r=mr;
++				dprintf(MED,"new biggest object is :%d (size: %f)",p->biggest_obj,mr);
++			}
++			/*  check if someone depended on this object as clone.... */
++			if (o->oflags&OF_CLONE_SRC)
++				for (i=0;i<p->n_obj;i++)
++					if (p->object[i]!=NULL)
++						if ((p->object[i]->oflags&OF_CLONE) && (p->object[i]->n_vertex==oid))  /*  it's linking to our object! */
++						{
++							p->object[i]->oflags&=~OF_CLONE;  	 /*  disable clone flag */
++							p->object[i]->n_vertex=0; 			 /*  and "clone reference" to 0 */
++							p->object[i]->r=0.0F;				 /*  empty object, so radius is zero! */
++							if (p->id!=MCP) obj_check_biggest_object(p,i);
++						}
++			/* check if we were a link source for anyone ... */
++			if (o->oflags&OF_LINK_SRC)
++				for (i=0;i<p->n_obj;i++)
++					if (p->object[i]!=NULL)
++						if ((p->object[i]->oflags&OF_LINK) && (p->object[i]->linkid==oid))
++						{
++								p->object[i]->linkid=-1;			 /*  lost our link target! */
++							if (mcp_oid>-1)
++								obj_pos_update(p,i);
++						}
++			return(0);
+ 		}
+-		/*  check if someone depended on this object as clone.... */
+-		if (o->oflags&OF_CLONE_SRC)
+-			for (i=0;i<p->n_obj;i++)
+-				if (p->object[i]!=NULL)
+-					if ((p->object[i]->oflags&OF_CLONE) && (p->object[i]->n_vertex==oid))  /*  it's linking to our object! */
+-					{
+-						p->object[i]->oflags&=~OF_CLONE;  	 /*  disable clone flag */
+-						p->object[i]->n_vertex=0; 			 /*  and "clone reference" to 0 */
+-						p->object[i]->r=0.0F;				 /*  empty object, so radius is zero! */
+-						if (p->id!=MCP) obj_check_biggest_object(p,i);
+-					}
+-		/* check if we were a link source for anyone ... */
+-		if (o->oflags&OF_LINK_SRC)
+-			for (i=0;i<p->n_obj;i++)
+-				if (p->object[i]!=NULL)
+-					if ((p->object[i]->oflags&OF_LINK) && (p->object[i]->linkid==oid))
+-					{
+-						p->object[i]->linkid=-1;			 /*  lost our link target! */
+-						if (mcp_oid>-1)
+-							obj_pos_update(p,i);
+-					}
+-		return(0);
+ 	}
+ 	return(-1);
+ }
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2006-04-13 16:22:39 UTC (rev 250)
++++ trunk/server/proto.c	2006-04-13 19:04:20 UTC (rev 251)
+@@ -78,7 +78,7 @@
+ 				break;
+ 			case S3D_P_C_NEW_OBJ:
+ 				oid=htonl(obj_new(p));
+-/* 				dprintf(LOW,"pid %d registering new object %d",pid,oid); */
++/* 				dprintf(LOW,"pid %d registering new object %d",p->id,ntohl(oid)); */
+ 				prot_com_out(p,S3D_P_S_NEWOBJ,(uint8_t *)&oid, 4);
+ 				break;
+ 			case S3D_P_C_DEL_OBJ:
+
+
+
+From dotslash at berlios.de  Thu Apr 13 22:58:46 2006
+From: dotslash at berlios.de (dotslash at BerliOS)
+Date: Thu, 13 Apr 2006 22:58:46 +0200
+Subject: [S3d-svn] r252 - in trunk: . apps/s3dfm
+Message-ID: <200604132058.k3DKwkKb022119@sheep.berlios.de>
+
+Author: dotslash
+Date: 2006-04-13 22:58:45 +0200 (Thu, 13 Apr 2006)
+New Revision: 252
+
+Modified:
+   trunk/
+   trunk/apps/s3dfm/main.c
+Log:
+ r386 at balthasar:  dotslash | 2006-04-13 22:58:36 +0200
+ - only translate/scale when it's needed -> "big" directories work now :)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:384
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:386
+
+Modified: trunk/apps/s3dfm/main.c
+===================================================================
+--- trunk/apps/s3dfm/main.c	2006-04-13 19:04:20 UTC (rev 251)
++++ trunk/apps/s3dfm/main.c	2006-04-13 20:58:45 UTC (rev 252)
+@@ -29,7 +29,7 @@
+ #include <string.h>  /*  strlen(), strncmp(), strrchr() */
+ #include <math.h>	 /*  sin(),cos() */
+ #include <time.h>	/* nanosleep() */
+-static struct timespec t={0,10*1000*1000}; /* 10 mili seconds */
++static struct timespec t={0,33*1000*1000}; /* 30 fps */
+ 
+ 
+ #define SH			0.4 /* height of the step */
+@@ -158,7 +158,7 @@
+ 	}
+ }
+ /* places the string at the left side of the cube */
+-int place_str(struct t_item *dir)
++void place_str(struct t_item *dir)
+ {
+ 
+ 	s3d_rotate(dir->str,0,90,0);
+@@ -401,9 +401,11 @@
+ 	dpy=(py+dpy*ZOOMS)/(ZOOMS+1);
+ 	dpz=(pz+dpz*ZOOMS)/(ZOOMS+1);
+ 	dscale=(scale+dscale*ZOOMS)/(ZOOMS+1);
+-	s3d_translate(root.block,dpx*SCALE,-1.2+SCALE*dpy,dpz*SCALE);
+-	s3d_scale(root.block,dscale*SCALE);
+-
++	if ((fabs(dscale-scale)/scale)>0.01)
++	{
++		s3d_translate(root.block,dpx*SCALE,-1.2+SCALE*dpy,dpz*SCALE);
++		s3d_scale(root.block,dscale*SCALE);
++	}
+ 	nanosleep(&t,NULL); 
+ }
+ int main (int argc, char **argv)
+@@ -435,8 +437,8 @@
+ 		root.str=s3d_draw_string(root.name,&root.len);
+ 		if (root.len<2) root.len=2;
+ 		parse_dir(&root);
++		display_dir(&root);
+ 		rescale(&root);
+-		display_dir(&root);
+ 		s3d_mainloop(mainloop);
+ 		s3d_quit();
+ 	}
+
+
+
+From dotslash at berlios.de  Thu Apr 13 23:21:02 2006
+From: dotslash at berlios.de (dotslash at BerliOS)
+Date: Thu, 13 Apr 2006 23:21:02 +0200
+Subject: [S3d-svn] r253 - in trunk: . apps/olsrs3d
+Message-ID: <200604132121.k3DLL2at024208@sheep.berlios.de>
+
+Author: dotslash
+Date: 2006-04-13 23:21:02 +0200 (Thu, 13 Apr 2006)
+New Revision: 253
+
+Modified:
+   trunk/
+   trunk/apps/olsrs3d/main.c
+Log:
+ r388 at balthasar:  dotslash | 2006-04-13 23:20:53 +0200
+ - surprise surprise :D (try clicking on a node)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:386
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:388
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-04-13 20:58:45 UTC (rev 252)
++++ trunk/apps/olsrs3d/main.c	2006-04-13 21:21:02 UTC (rev 253)
+@@ -75,6 +75,8 @@
+ struct olsr_node *Olsr_node_pEtx;
+ int Btn_close_id = -1;
+ int Btn_close_obj;
++int cam_go=0;
++
+ /***
+  *
+  * print usage info
+@@ -683,7 +685,15 @@
+ 	CamPosition2[0][1]=  CamPosition[0][1];
+ 	CamPosition2[0][2]=  CamPosition[0][0]*sin(Zp_rotate*M_PI/180.0) + CamPosition[0][2] * cos (Zp_rotate*M_PI/180.0);
+ 
+-
++	if (cam_go)
++	{ /* move a little bit closer ... */
++		CamPosition[0][0]=(CamPosition[0][0]*9+Olsr_node_pEtx->pos_vec[0])/10;
++		CamPosition[0][1]=(CamPosition[0][1]*9+Olsr_node_pEtx->pos_vec[1])/10;
++		CamPosition[0][2]=(CamPosition[0][2]*9+Olsr_node_pEtx->pos_vec[2])/10;
++		s3d_translate(0,CamPosition[0][0],CamPosition[0][1],CamPosition[0][2]);
++		if (dist(CamPosition[0],Olsr_node_pEtx->pos_vec)<5) /* close enough? stop! */
++				cam_go=0;
++	}
+ 	nanosleep( &sleep_time, NULL );
+ 
+ 	return;
+@@ -813,6 +823,7 @@
+ 	mov_add(ZeroPosition,tmp_vector,1.0);
+ 	s3d_translate(ZeroPoint,ZeroPosition[0] * -1,ZeroPosition[1] * -1,ZeroPosition[2] * -1);
+ 	*/
++	cam_go=1;
+ 
+ 	/* print clicked object ip and connections */
+ 	if ( Olsr_ip_label_obj != -1 ) s3d_del_object( Olsr_ip_label_obj );
+
+
+
+From nichtsnutz at berlios.de  Sat Apr 15 18:17:14 2006
+From: nichtsnutz at berlios.de (nichtsnutz at BerliOS)
+Date: Sat, 15 Apr 2006 18:17:14 +0200
+Subject: [S3d-svn] r254 - trunk/apps/olsrs3d
+Message-ID: <200604151617.k3FGHEtC002713@sheep.berlios.de>
+
+Author: nichtsnutz
+Date: 2006-04-15 18:17:14 +0200 (Sat, 15 Apr 2006)
+New Revision: 254
+
+Modified:
+   trunk/apps/olsrs3d/process.c
+Log:
+fix parsing of olsr output, remove zerobyte in lbuf after processing ,what set by us
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-04-13 21:21:02 UTC (rev 253)
++++ trunk/apps/olsrs3d/process.c	2006-04-15 16:17:14 UTC (rev 254)
+@@ -385,6 +385,7 @@
+ 	struct olsr_node *olsr_node2;
+ 	int address;
+ 	char hna_name[NAMEMAX];
++	char hna_node[NAMEMAX];
+ 
+ 	lbuf_ptr = lbuf;
+ 	last_cr_ptr = NULL;
+@@ -456,18 +457,17 @@
+ 
+ 					/* normal HNA */
+ 					} else {
+-						/* printf("before: %s\n",con_to); */
+-						if( (tmpChar = strchr((char*)con_to, (int)'/')))
++						memmove(hna_node,con_to,NAMEMAX);
++						if( (tmpChar = strchr(hna_node, (int)'/')))
+ 						{
+ 							tmpChar++;
+ 							address = (int)-inet_network(tmpChar);
+ 							sprintf(hna_name,"%d",(int)(32 - ceil(log(address)/log(2))));
+ 							strcpy(tmpChar,hna_name);
+ 						}
+-						/* printf("after: %s\n",con_to); */
+-						/* fflush(NULL); */
++
+ 						olsr_node1 = get_olsr_node( &Olsr_root, con_from );
+-						olsr_node2 = get_olsr_node( &Olsr_root, con_to );
++						olsr_node2 = get_olsr_node( &Olsr_root, hna_node );
+ 
+ 						if ( olsr_node2->node_type != 2 ) {
+ 
+@@ -491,11 +491,13 @@
+ 						f = 999.0;
+ 					add_olsr_con( olsr_node1, olsr_node2, f );
+ 				}
+-/*
++				/* remove zerobyte */
++				(*con_from_end) = (*con_to_end) = (*etx_end) = '"';
++
+ 				con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
+ 				dn = 0;
+ 				last_cr_ptr = lbuf_ptr;
+-*/
++
+ 			}
+ 
+ 		} else if ( ( (*lbuf_ptr) == '}' ) && ( (*(lbuf_ptr + 1)) == '\n' ) ) {
+
+
+
+From nichtsnutz at berlios.de  Wed Apr 19 20:09:51 2006
+From: nichtsnutz at berlios.de (nichtsnutz at BerliOS)
+Date: Wed, 19 Apr 2006 20:09:51 +0200
+Subject: [S3d-svn] r255 - trunk/apps/olsrs3d
+Message-ID: <200604191809.k3JI9p9p016777@sheep.berlios.de>
+
+Author: nichtsnutz
+Date: 2006-04-19 20:09:49 +0200 (Wed, 19 Apr 2006)
+New Revision: 255
+
+Added:
+   trunk/apps/olsrs3d/terminal.c
+   trunk/apps/olsrs3d/terminal.h
+Modified:
+   trunk/apps/olsrs3d/Makefile.am
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/olsrs3d.h
+Log:
+add small terminal for user input, to search a node by ip,
+use "t" for move to the terminal, press ESC to remove the focus from terminal
+
+Modified: trunk/apps/olsrs3d/Makefile.am
+===================================================================
+--- trunk/apps/olsrs3d/Makefile.am	2006-04-15 16:17:14 UTC (rev 254)
++++ trunk/apps/olsrs3d/Makefile.am	2006-04-19 18:09:49 UTC (rev 255)
+@@ -2,12 +2,14 @@
+ 
+ olsrs3dincludedir = $(pkgincludedir)/olsrs3d
+ olsrs3dinclude_HEADERS =  \
+-	olsrs3d.h
++	olsrs3d.h \
++	terminal.h
+ 
+ olsrs3d_SOURCES =  \
+ 	process.c \
+ 	main.c \
+-	net.c
++	net.c \
++	terminal.c
+ 
+ olsrs3d_CPPFLAGS=	-I$(top_srcdir)/client
+ olsrs3d_LDADD=		$(top_builddir)/client/libs3d.la
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-04-15 16:17:14 UTC (rev 254)
++++ trunk/apps/olsrs3d/main.c	2006-04-19 18:09:49 UTC (rev 255)
+@@ -34,6 +34,8 @@
+ #include <getopt.h>	/* getopt() */
+ #include <stdlib.h>	/* exit() */
+ #include "olsrs3d.h"
++#include "terminal.h"
++
+ #define SPEED		10.0
+ 
+ static struct timespec sleep_time = { 0, 100 * 1000 * 1000 };   /* 100 mili seconds */
+@@ -52,6 +54,7 @@
+ int Output_border[4];
+ int *Olsr_neighbour_label_obj = NULL;
+ int Size;
++int Move_prepared = 0;
+ 
+ int Net_read_count;
+ int Output_block_counter = 0;
+@@ -75,8 +78,19 @@
+ struct olsr_node *Olsr_node_pEtx;
+ int Btn_close_id = -1;
+ int Btn_close_obj;
++
++float Title_len;
+ int cam_go=0;
+ 
++/* object vars */
++int obj_term;
++int obj_cursor;
++extern int obj_cursor_mp;
++struct s3d_object **obj;
++
++int move_cam_to = -1;
++int oid_focus = -1;
++
+ /***
+  *
+  * print usage info
+@@ -631,7 +645,8 @@
+ 	int net_result;   /* result of function net_main */
+ 	char nc_str[20];
+ 	float strLen;
+-
++	float target,current;
++	int i;
+ 	/* calculate new movement vector */
+ 	calc_olsr_node_mov();
+ 
+@@ -651,7 +666,6 @@
+ 		s3d_flags_on( Olsr_node_count_obj, S3D_OF_VISIBLE );
+ 		s3d_scale( Olsr_node_count_obj, 0.2 );
+ 		s3d_translate( Olsr_node_count_obj, -Left*3.0-(strLen * 0.2), -Bottom*3.0-0.5, -3.0 );
+-
+ 		Last_olsr_node_count = Olsr_node_count;
+ 
+ 	}
+@@ -672,6 +686,36 @@
+ 		}
+ 	}
+ 
++	/* move to terminal */
++	if(move_cam_to != -1 && move_cam_to == obj[obj_term]->oid)
++	{
++		oid_focus = obj[obj_term]->oid;
++		for( i=0; i<3; i++)
++		{
++			CamPosition[0][i]=(CamPosition[0][i]*4+obj[obj_term]->poi[i])/5;
++
++			target = obj[obj_term]->rot[i];
++			current = CamPosition[1][i];
++
++			if( obj[obj_term]->rot[i] - CamPosition[1][i] > 180 )
++				target = obj[obj_term]->rot[i] - 360;
++			if( obj[obj_term]->rot[i] - CamPosition[1][i] < -180 )
++				current = CamPosition[1][i] - 360;
++			CamPosition[1][i]=(CamPosition[1][i]*4+target)/5;
++		}
++		s3d_translate(0,CamPosition[0][0],CamPosition[0][1],CamPosition[0][2]);
++		s3d_rotate(0,CamPosition[1][0],CamPosition[1][1],CamPosition[1][2]);
++
++		if (dist(CamPosition[0],obj[obj_term]->poi)<0.2)
++		{
++			s3d_translate(0,obj[obj_term]->poi[0],obj[obj_term]->poi[1],obj[obj_term]->poi[2]);
++			s3d_rotate(0,obj[obj_term]->rot[0],(obj[obj_term]->rot[1]),obj[obj_term]->rot[2]);
++			move_cam_to = -1;
++		}
++	}
++
++	rotate_cursor();
++
+ 	if( Olsr_ip_label_obj != -1 )
+ 	{
+ 		print_etx();
+@@ -685,7 +729,7 @@
+ 	CamPosition2[0][1]=  CamPosition[0][1];
+ 	CamPosition2[0][2]=  CamPosition[0][0]*sin(Zp_rotate*M_PI/180.0) + CamPosition[0][2] * cos (Zp_rotate*M_PI/180.0);
+ 
+-	if (cam_go)
++	if (cam_go && move_cam_to == -1)
+ 	{ /* move a little bit closer ... */
+ 		CamPosition[0][0]=(CamPosition[0][0]*9+Olsr_node_pEtx->pos_vec[0])/10;
+ 		CamPosition[0][1]=(CamPosition[0][1]*9+Olsr_node_pEtx->pos_vec[1])/10;
+@@ -694,14 +738,13 @@
+ 		if (dist(CamPosition[0],Olsr_node_pEtx->pos_vec)<5) /* close enough? stop! */
+ 				cam_go=0;
+ 	}
++
+ 	nanosleep( &sleep_time, NULL );
+ 
+ 	return;
+ 
+ }
+ 
+-
+-
+ void stop() {
+ 
+ 	s3d_quit();
+@@ -709,8 +752,6 @@
+ 
+ }
+ 
+-
+-
+ /***
+  *
+  * eventhandler when key pressed
+@@ -718,60 +759,66 @@
+  ***/
+ 
+ void keypress(struct s3d_evt *event) {
+-
+ 	int key;
+ 	key=*((unsigned short *)event->buf);
+-	switch(key) {
+-		case S3DK_ESCAPE: /* esc -> close olsr */
+-			stop();
+-			break;
+-		case 'c': /* c -> color on/off */
+-			if(ColorSwitch) ColorSwitch = 0;
+-			else ColorSwitch = 1;
+-			break;
+-		case 'r': /* r -> rotate start/stop*/
+-			if(RotateSwitch) RotateSwitch = 0;
+-			else RotateSwitch = 1;
+-			break;
+-		case '+': /* + -> rotate speed increase*/
+-			if(RotateSwitch && RotateSpeed < 10)
+-				RotateSpeed++;
+-			break;
+-		case '-': /* - -> rotate speed decrease*/
+-			if(RotateSwitch && RotateSpeed > 1)
+-				RotateSpeed--;
+-			break;
+-		case 16: /* strg + p -> reset nodes ( zeroPoint to 0,0,0 ) */
+-			s3d_translate(ZeroPoint,0.0,0.0,0.0);
+-			ZeroPosition[0] = ZeroPosition[1] = ZeroPosition[2] = 0.0;
+-			break;
+-		case S3DK_UP: /* arrow up -> move nodes up */
+-			ZeroPosition[1]++;
+-			s3d_translate(ZeroPoint,ZeroPosition[0],ZeroPosition[1],ZeroPosition[2]);
+-			break;
+-		case S3DK_DOWN: /* arrow down -> move nodes down */
+-			ZeroPosition[1]--;
+-			s3d_translate(ZeroPoint,ZeroPosition[0],ZeroPosition[1],ZeroPosition[2]);
+-			break;
+-		case S3DK_PAGEUP: /* page up -> change factor in calc_olsr_node_mov */
+-			if(Factor < 0.9)
+-				Factor += 0.1;
+-			break;
+-		case S3DK_PAGEDOWN: /* page down -> change factor in calc_olsr_node_mov */
+-			if(Factor > 0.3)
+-				Factor -= 0.1;
+-			break;
++
++	if(oid_focus != obj[obj_term]->oid)
++	{
++		switch(key) {
++			case S3DK_ESCAPE: /* esc -> close olsr */
++				stop();
++				break;
++			case 'c': /* c -> color on/off */
++				if(ColorSwitch) ColorSwitch = 0;
++				else ColorSwitch = 1;
++				break;
++			case 'r': /* r -> rotate start/stop*/
++				if(RotateSwitch) RotateSwitch = 0;
++				else RotateSwitch = 1;
++				break;
++			case 't': /* t -> move to terminal*/
++				move_cam_to = obj[obj_term]->oid;
++				break;
++			case '+': /* + -> rotate speed increase*/
++				if(RotateSwitch && RotateSpeed < 10)
++					RotateSpeed++;
++				break;
++			case '-': /* - -> rotate speed decrease*/
++				if(RotateSwitch && RotateSpeed > 1)
++					RotateSpeed--;
++				break;
++			case 16: /* strg + p -> reset nodes ( zeroPoint to 0,0,0 ) */
++				s3d_translate(ZeroPoint,0.0,0.0,0.0);
++				ZeroPosition[0] = ZeroPosition[1] = ZeroPosition[2] = 0.0;
++				break;
++			case S3DK_UP: /* arrow up -> move nodes up */
++				ZeroPosition[1]++;
++				s3d_translate(ZeroPoint,ZeroPosition[0],ZeroPosition[1],ZeroPosition[2]);
++				break;
++			case S3DK_DOWN: /* arrow down -> move nodes down */
++				ZeroPosition[1]--;
++				s3d_translate(ZeroPoint,ZeroPosition[0],ZeroPosition[1],ZeroPosition[2]);
++				break;
++			case S3DK_PAGEUP: /* page up -> change factor in calc_olsr_node_mov */
++				if(Factor < 0.9)
++					Factor += 0.1;
++				break;
++			case S3DK_PAGEDOWN: /* page down -> change factor in calc_olsr_node_mov */
++				if(Factor > 0.3)
++					Factor -= 0.1;
++				break;
++		}
++	} else {
++		if( (key >= 48 && key <= 57) || key == 46 || key == 13 || key == 8 )
++			write_terminal(key);
++		if ( key == S3DK_ESCAPE )
++		{
++			oid_focus = -1;
++			move_cam_to = -1;
++		}
+ 	}
+ }
+ 
+-/*
+-void mbutton_click(struct s3d_but_info *event)
+-{
+-	printf("%s",event->state);
+-}
+-*/
+-
+-
+ /***
+  *
+  * eventhandler when object clicked
+@@ -783,7 +830,6 @@
+ 	int oid;
+ 	/* float distance,tmp_vector[3]; */
+ 	char ip_str[50];
+-	float ln;
+ 
+ 	oid=(int)*((unsigned long *)evt->buf);
+ 
+@@ -808,32 +854,31 @@
+ 
+ 	Olsr_node_pEtx = *lst_search(oid);
+ 
+-	if( Btn_close_id == -1)
++	if( Btn_close_id == -1 && Olsr_node_pEtx != NULL )
+ 	{
+ 		Btn_close_id = s3d_clone( Btn_close_obj );
+ 		s3d_link(Btn_close_id,0);
+ 		s3d_flags_on(Btn_close_id,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 		s3d_scale( Btn_close_id, 0.05 );
+ 		s3d_translate( Btn_close_id,-Left*3.0-0.125, -Bottom*3.0-0.7, -3.0 );
+-
++		if ( Olsr_ip_label_obj != -1 ) s3d_del_object( Olsr_ip_label_obj );
++		snprintf( ip_str, 35, "ip: %s", Olsr_node_pEtx->ip );
++		Olsr_ip_label_obj = s3d_draw_string( ip_str, &Title_len );
++		s3d_link( Olsr_ip_label_obj, 0 );
++		s3d_flags_on( Olsr_ip_label_obj, S3D_OF_VISIBLE );
++		s3d_scale( Olsr_ip_label_obj, 0.2 );
++		s3d_translate( Olsr_ip_label_obj,-Left*3.0-(Title_len * 0.2)-0.15, -Bottom*3.0-1.0, -3.0 );
++		cam_go=1;
++		if ( Olsr_ip_label_obj != -1 ) s3d_del_object( Olsr_ip_label_obj );
++		snprintf( ip_str, 35, "ip: %s", Olsr_node_pEtx->ip );
++		Olsr_ip_label_obj = s3d_draw_string( ip_str, &Title_len );
++		s3d_link( Olsr_ip_label_obj, 0 );
++		s3d_flags_on( Olsr_ip_label_obj, S3D_OF_VISIBLE );
++		s3d_scale( Olsr_ip_label_obj, 0.2 );
++		s3d_translate( Olsr_ip_label_obj,-Left*3.0-(Title_len * 0.2)-0.15, -Bottom*3.0-1.0, -3.0 );
++	} else {
++		/* object_handler(oid); */
+ 	}
+-
+-	/*
+-	distance = dirt(CamPosition[0],olsr_node->pos_vec,tmp_vector);
+-	mov_add(ZeroPosition,tmp_vector,1.0);
+-	s3d_translate(ZeroPoint,ZeroPosition[0] * -1,ZeroPosition[1] * -1,ZeroPosition[2] * -1);
+-	*/
+-	cam_go=1;
+-
+-	/* print clicked object ip and connections */
+-	if ( Olsr_ip_label_obj != -1 ) s3d_del_object( Olsr_ip_label_obj );
+-	snprintf( ip_str, 35, "ip: %s", Olsr_node_pEtx->ip );
+-	Olsr_ip_label_obj = s3d_draw_string( ip_str, &ln );
+-	s3d_link( Olsr_ip_label_obj, 0 );
+-	s3d_flags_on( Olsr_ip_label_obj, S3D_OF_VISIBLE );
+-	s3d_scale( Olsr_ip_label_obj, 0.2 );
+-	s3d_translate( Olsr_ip_label_obj,-Left*3.0-(ln * 0.2)-0.15, -Bottom*3.0-1.0, -3.0 );
+-
+ }
+ 
+ void print_etx()
+@@ -870,7 +915,7 @@
+ 		float mEtx = ( tmpNeighbour->olsr_con->left_etx + tmpNeighbour->olsr_con->right_etx ) / 2;
+ 
+ 		if( mEtx != -1000 )
+-			snprintf(nIpStr, 60, "%15s --> %4.2f",(strcmp(Olsr_node_pEtx->ip,tmpNeighbour->olsr_con->right_olsr_node->ip)?tmpNeighbour->olsr_con->right_olsr_node->ip:tmpNeighbour->olsr_con->left_olsr_node->ip),mEtx);
++			snprintf(nIpStr, 60, "%15s --> %.2f",(strcmp(Olsr_node_pEtx->ip,tmpNeighbour->olsr_con->right_olsr_node->ip)?tmpNeighbour->olsr_con->right_olsr_node->ip:tmpNeighbour->olsr_con->left_olsr_node->ip),mEtx);
+ 		else
+ 			snprintf(nIpStr, 60, "%15s --> HNA",(strcmp(Olsr_node_pEtx->ip,tmpNeighbour->olsr_con->right_olsr_node->ip)?tmpNeighbour->olsr_con->right_olsr_node->ip:tmpNeighbour->olsr_con->left_olsr_node->ip));
+ 
+@@ -881,7 +926,9 @@
+ 		s3d_translate(Olsr_neighbour_label_obj[i], -Left*3.0-(len * 0.2)-0.15, -Bottom*3.0-p, -3.0 );
+ 		tmpNeighbour = tmpNeighbour->next_olsr_neigh_list;
+ 		p += 0.2;
+-		max_len = (len > max_len)?len+0.15:max_len;
++		max_len = (len > max_len - 0.2)?len+0.2:max_len;
++		max_len = (Title_len > max_len - 0.2)?len+0.2:max_len;
++		/* printf("title: %f len: %f maxlen: %f %s\n",Title_len,len,max_len-0.2,nIpStr);*/
+ 	}
+ 
+ 	if( Btn_close_id != -1)
+@@ -978,6 +1025,20 @@
+ 	/* printf("%f %f %f\n",inf->trans_x,inf->trans_y,inf->trans_z); */
+ }
+ 
++void mbutton_press(struct s3d_evt *hrmz)
++{
++	struct s3d_but_info *inf;
++	inf=(struct s3d_but_info *)hrmz->buf;
++	printf("button %d, state %d\n", inf->button,inf->state);
++	return;
++}
++
++void initialize_objects()
++{
++	create_terminal();
++	create_cursor();
++}
++
+ int main( int argc, char *argv[] ) {
+ 
+ 	int optchar;
+@@ -1026,7 +1087,9 @@
+ 		if (!s3d_init(&argc,&argv,"olsrs3d"))
+ 		{
+ 			s3d_set_callback(S3D_EVENT_OBJ_INFO,object_info);
++			/* s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click); */
+ 			s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
++			s3d_set_callback(S3D_EVENT_MBUTTON,mbutton_press);
+ 			s3d_set_callback(S3D_EVENT_KEY,keypress);
+ 			s3d_set_callback(S3D_EVENT_QUIT,stop);
+ 			/* s3d_set_callback(S3D_EVENT_MBUTTON,mbutton_click); */
+@@ -1038,6 +1101,10 @@
+ 			Btn_close_obj = s3d_import_3ds_file("objs/btn_close.3ds");
+ 			ZeroPoint = s3d_new_object();
+ 			Output_border[0] = Output_border[1] = Output_border[2] = Output_border[3] = -1;
++
++			/* create system objects */
++			initialize_objects();
++
+ 			s3d_mainloop(mainloop);
+ 			s3d_quit();
+ 			net_quit();
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-04-15 16:17:14 UTC (rev 254)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-04-19 18:09:49 UTC (rev 255)
+@@ -29,6 +29,8 @@
+ #define MAXLINESIZE 1000 /* lines in a digraph just shouldn't get that longer ... */
+ #define MAXDATASIZE 100 /* max number of bytes we can get at once  */
+ 
++#define max(x,y)((x)>(y)?(x):(y))
++#define min(x,y)((x)<(y)?(x):(y))
+ 
+ 
+ /* linked list for the all connections */
+@@ -98,20 +100,18 @@
+ extern int	Olsr_node_hna_net;
+ extern int	Btn_close_obj;
+ extern int	Btn_close_id;
+-
+ extern int Olsr_node_count_obj;
+ extern int Olsr_node_count;
+ extern int Last_olsr_node_count;
+-
+ extern int Net_read_count;
+ extern int Output_block_counter;
+ extern int Output_block_completed;
+-
+ extern int ZeroPoint;
+-
++extern float CamPosition[2][3];
+ extern float Bottom, Left;
++extern char lbuf[MAXLINESIZE];
++extern int Move_cam_target;
+ 
+-extern char lbuf[MAXLINESIZE];
+ /* process */
+ void lst_initialize();
+ void lst_add(int id,struct olsr_node **olsr_node);
+@@ -128,3 +128,4 @@
+ void out_of_mem( void );
+ struct olsr_node **lst_search(int id);
+ void print_etx( void );
++float dist(float p1[], float p2[]);
+
+Added: trunk/apps/olsrs3d/terminal.c
+===================================================================
+--- trunk/apps/olsrs3d/terminal.c	2006-04-15 16:17:14 UTC (rev 254)
++++ trunk/apps/olsrs3d/terminal.c	2006-04-19 18:09:49 UTC (rev 255)
+@@ -0,0 +1,146 @@
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <s3d.h>
++#include "terminal.h"
++#include "olsrs3d.h"
++
++#define BLOCK_SIZE 10
++
++/* index of s3d_object array for objects */
++int obj_term = 0;
++int obj_cursor = 0;
++
++/* object_id of middlepoint cursor */
++int obj_cursor_mp = 0;
++
++int obj_cnt=0;
++int obj_max = 0;
++
++struct s3d_object **obj = NULL;
++
++int create_rectangle(struct rectangle *rect,float mat[]);
++
++int create_rectangle(struct rectangle *rect,float mat[])
++{
++	int oid=s3d_new_object();
++	float vertices[24];
++	unsigned long pbuf[] = { 1,2,0,0,
++											1,3,2,0,
++											5,3,1,0,
++											5,4,3,0,
++											6,5,4,0,
++											6,4,7,0,
++											0,6,7,0,
++											0,7,2,0,
++											3,2,7,0,
++											3,7,4,0,
++											5,6,0,0,
++											5,0,1,0};
++
++	vertices[0]  = (*rect).front.x; vertices[1] = (*rect).front.y; vertices[2] = (*rect).front.z;
++	vertices[3]  = (*rect).rear.x;vertices[4] = (*rect).front.y; vertices[5] = (*rect).front.z;
++	vertices[6]  = (*rect).front.x; vertices[7] = (*rect).rear.y; vertices[8] = (*rect).front.z;
++	vertices[9]  = (*rect).rear.x; vertices[10] = (*rect).rear.y; vertices[11] = (*rect).front.z;
++	vertices[12] = (*rect).rear.x; vertices[13] = (*rect).rear.y; vertices[14] = (*rect).rear.z;
++	vertices[15] = (*rect).rear.x; vertices[16] = (*rect).front.y; vertices[17] = (*rect).rear.z;
++	vertices[18] = (*rect).front.x; vertices[19] = (*rect).front.y; vertices[20] = (*rect).rear.z;
++	vertices[21] = (*rect).front.x; vertices[22] = (*rect).rear.y; vertices[23] = (*rect).rear.z;
++
++	s3d_push_vertices(oid,vertices,8);
++	s3d_push_material(oid,mat[0],mat[1],mat[2],mat[3],mat[4],mat[5],mat[6],mat[7],mat[8]);
++	s3d_push_polygons(oid,pbuf,12);
++	return(oid);
++}
++
++int create_object(char name[],float sp[], float ep[],float pos[],float poi[],float mat[])
++{
++	int oid;
++
++	struct rectangle rect;
++	rect.front.x = sp[0]; rect.front.y = sp[1]; rect.front.z = sp[2];
++	rect.rear.x = ep[0]; rect.rear.y = ep[1]; rect.rear.z = ep[2];
++	oid = create_rectangle(&rect,mat);
++
++	if( obj_cnt >= obj_max )
++	{
++		obj_max += BLOCK_SIZE;
++		obj = (struct s3d_object **) realloc(obj, obj_max*sizeof(struct s3d_object *));
++		if(obj == NULL)
++			out_of_mem();
++	}
++	if( (obj[obj_cnt] = (struct s3d_object *) malloc( sizeof(struct s3d_object ) )) == NULL)
++		out_of_mem();
++
++	obj[obj_cnt]->oid = oid;
++	obj[obj_cnt]->pos[0] = pos[0]; obj[obj_cnt]->pos[1] = pos[1]; obj[obj_cnt]->pos[2] = pos[2];
++	obj[obj_cnt]->rot[0] = 0; obj[obj_cnt]->rot[1] = 180; obj[obj_cnt]->rot[2] = 0;
++
++	s3d_translate(oid,pos[0],pos[1],pos[2]);
++
++	strncpy(obj[obj_cnt]->name,name,20);
++	obj[obj_cnt]->poi[0] = poi[0]; obj[obj_cnt]->poi[1] = poi[1]; obj[obj_cnt]->poi[2] = poi[2];
++	obj_cnt++;
++	return(	obj_cnt-1);
++}
++
++void create_cursor()
++{
++	float sp[] = {-0.15,-0.15,-0.05};
++	float ep[] = {0.15,0.15,0.05};
++	float pos[] = {9.15, 4.25, 299.95};
++	float poi[] = {9.0,-17.5,295.0};
++	float mat[] = {1.0,1.0,0.7,1.0,1.0,0.7,1.0,1.0,0.7};
++	obj_cursor = create_object("cursor",sp,ep,pos,poi,mat);
++	s3d_flags_on(obj[obj_cursor]->oid, S3D_OF_VISIBLE);
++	return;
++}
++
++void create_terminal()
++{
++	float sp[] = {0.0,0.0,0.0};
++	float ep[] = {10.0,5.0,2.0};
++	float pos[] = {0.0, 0.0, 300.0};
++	float poi[] = {5,2.5,295.0};
++	float mat[] = {0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6};
++	obj_term = create_object("terminal",sp,ep,pos,poi,mat);
++	s3d_flags_on(obj[obj_term]->oid, S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++	return;
++}
++
++void rotate_cursor()
++{
++	static int y = 0;
++	y = (y+20)%360;
++	s3d_rotate(obj[obj_cursor]->oid,0,y,0);
++	return;
++}
++
++void write_terminal(int key)
++{
++	static char s[20];
++	int ln = strlen(s);
++	float draw_length;
++	float tmp;
++	static int str_id = -1;
++
++	if(key == 8)
++	{
++		if(ln > 0)
++			s[ln-1] = '\0';
++	} else {
++		if(ln < 20)
++			s[ln] = key;
++	}
++	if(str_id != -1)
++		s3d_del_object(str_id);
++	str_id = s3d_draw_string( s, &draw_length );
++	s3d_flags_on( str_id, S3D_OF_VISIBLE );
++	s3d_pep_material(str_id,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0);
++	s3d_scale( str_id, 0.4 );
++	s3d_translate( str_id,9,4,-0.45);
++	s3d_rotate(str_id,0,180,0);
++	s3d_link( str_id, obj[obj_term]->oid );
++	tmp = obj[obj_cursor]->pos[0] - (draw_length*0.43);
++	s3d_translate( obj[obj_cursor]->oid , tmp, obj[obj_cursor]->pos[1], obj[obj_cursor]->pos[2]);
++}
+
+Added: trunk/apps/olsrs3d/terminal.h
+===================================================================
+--- trunk/apps/olsrs3d/terminal.h	2006-04-15 16:17:14 UTC (rev 254)
++++ trunk/apps/olsrs3d/terminal.h	2006-04-19 18:09:49 UTC (rev 255)
+@@ -0,0 +1,29 @@
++struct coordinates {
++	float x;
++	float y;
++	float z;
++};
++
++struct rectangle {
++	struct coordinates front;
++	struct coordinates rear;
++};
++
++struct s3d_object {
++	int oid;
++	char name[20];
++	float pos[3];
++	float rot[3];
++	float poi[3];
++	int focus;
++};
++
++extern int obj_term;
++extern int obj_cursor;
++extern int obj_cursor_mp;
++extern struct s3d_object **obj;
++
++void create_cursor();
++void create_terminal();
++void rotate_cursor();
++void write_terminal(int key);
+
+
+
+From nichtsnutz at berlios.de  Sat Apr 22 14:01:12 2006
+From: nichtsnutz at berlios.de (nichtsnutz at BerliOS)
+Date: Sat, 22 Apr 2006 14:01:12 +0200
+Subject: [S3d-svn] r256 - trunk/apps/olsrs3d
+Message-ID: <200604221201.k3MC1CEm027057@sheep.berlios.de>
+
+Author: nichtsnutz
+Date: 2006-04-22 14:01:08 +0200 (Sat, 22 Apr 2006)
+New Revision: 256
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+Log:
+add move back to starting point when ESC was pressed
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-04-19 18:09:49 UTC (rev 255)
++++ trunk/apps/olsrs3d/main.c	2006-04-22 12:01:08 UTC (rev 256)
+@@ -90,6 +90,7 @@
+ 
+ int move_cam_to = -1;
+ int oid_focus = -1;
++float returnPoint[2][3];
+ 
+ /***
+  *
+@@ -713,7 +714,35 @@
+ 			move_cam_to = -1;
+ 		}
+ 	}
++	
++	/* move back to returnPoint */
++	if(move_cam_to == -2)
++	{
++		oid_focus = -1;
++		for( i=0; i<3; i++)
++		{
++			CamPosition[0][i]=(CamPosition[0][i]*4+returnPoint[0][i])/5;
+ 
++			target = returnPoint[1][i];
++			current = CamPosition[1][i];
++
++			if( returnPoint[1][i] - CamPosition[1][i] > 180 )
++				target = returnPoint[1][i] - 360;
++			if( returnPoint[1][i] - CamPosition[1][i] < -180 )
++				current = CamPosition[1][i] - 360;
++			CamPosition[1][i]=(CamPosition[1][i]*4+target)/5;
++		}
++		s3d_translate(0,CamPosition[0][0],CamPosition[0][1],CamPosition[0][2]);
++		s3d_rotate(0,CamPosition[1][0],CamPosition[1][1],CamPosition[1][2]);
++
++		if (dist(CamPosition[0],returnPoint[0])<0.2)
++		{
++			s3d_translate(0,returnPoint[0][0],returnPoint[0][1],returnPoint[0][2]);
++			s3d_rotate(0,returnPoint[1][0],returnPoint[1][1],returnPoint[1][2]);
++			move_cam_to = -1;
++		}
++	}
++
+ 	rotate_cursor();
+ 
+ 	if( Olsr_ip_label_obj != -1 )
+@@ -759,7 +788,7 @@
+  ***/
+ 
+ void keypress(struct s3d_evt *event) {
+-	int key;
++	int key,i;
+ 	key=*((unsigned short *)event->buf);
+ 
+ 	if(oid_focus != obj[obj_term]->oid)
+@@ -777,6 +806,11 @@
+ 				else RotateSwitch = 1;
+ 				break;
+ 			case 't': /* t -> move to terminal*/
++				for(i=0;i<3;i++)
++				{
++					returnPoint[0][i] = CamPosition[0][i];
++					returnPoint[1][i] = CamPosition[1][i];
++				}
+ 				move_cam_to = obj[obj_term]->oid;
+ 				break;
+ 			case '+': /* + -> rotate speed increase*/
+@@ -814,7 +848,7 @@
+ 		if ( key == S3DK_ESCAPE )
+ 		{
+ 			oid_focus = -1;
+-			move_cam_to = -1;
++			move_cam_to = -2;
+ 		}
+ 	}
+ }
+
+
+
+From dotslash at berlios.de  Sat Apr 22 22:52:18 2006
+From: dotslash at berlios.de (dotslash at BerliOS)
+Date: Sat, 22 Apr 2006 22:52:18 +0200
+Subject: [S3d-svn] r257 - in trunk: . server
+Message-ID: <200604222052.k3MKqI8O014797@sheep.berlios.de>
+
+Author: dotslash
+Date: 2006-04-22 22:52:17 +0200 (Sat, 22 Apr 2006)
+New Revision: 257
+
+Modified:
+   trunk/
+   trunk/server/global.h
+   trunk/server/mcp.c
+   trunk/server/object.c
+   trunk/server/process.c
+   trunk/server/proto.c
+Log:
+ r415 at balthasar:  dotslash | 2006-04-22 22:51:58 +0200
+ - less debug
+ - link_* for more efficient position updating
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:388
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:415
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2006-04-22 12:01:08 UTC (rev 256)
++++ trunk/server/global.h	2006-04-22 20:52:17 UTC (rev 257)
+@@ -136,6 +136,7 @@
+ 					 /*  I know this is dirty, but it would a waste of data if I don't do so ... */
+ 		uint32_t dplist;	 /*  opengl display list number */
+ 		uint32_t linkid;	 /*  linking target, -1 if there is none */
++		uint32_t lsub,lnext,lprev;
+ 		 /*  pointer to our objects; */
+ 		struct t_vertex *p_vertex;
+ 		struct t_mat	*p_mat;
+@@ -340,9 +341,11 @@
+ void into_position		(struct t_process *p, struct t_obj *obj, int depth);
+ void obj_recalc_tmat	(struct t_process *p, uint32_t oid);
+ void obj_size_update	(struct t_process *p, uint32_t oid);
+-void obj_pos_update		(struct t_process *p, uint32_t oid);
++void obj_pos_update(struct t_process *p, uint32_t oid, uint32_t first_oid);
+ void obj_check_biggest_object(struct t_process *p, uint32_t oid);
+ uint32_t get_pointer(struct t_process *p);
++void link_delete(struct t_process *p, uint32_t oid);
++void link_insert(struct t_process *p, uint32_t oid, uint32_t target);
+ /*  mcp.c */
+ int mcp_rep_object(uint32_t mcp_oid);
+ int mcp_del_object(uint32_t mcp_oid);
+
+Modified: trunk/server/mcp.c
+===================================================================
+--- trunk/server/mcp.c	2006-04-22 12:01:08 UTC (rev 256)
++++ trunk/server/mcp.c	2006-04-22 20:52:17 UTC (rev 257)
+@@ -108,7 +108,7 @@
+ 		if (o->oflags&OF_VIRTUAL)
+ 		{
+ 			focus_oid=oid;
+-			obj_pos_update(p,0);
++			obj_pos_update(p,0,0);
+ 		}
+ 	return(0);
+ }
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2006-04-22 12:01:08 UTC (rev 256)
++++ trunk/server/object.c	2006-04-22 20:52:17 UTC (rev 257)
+@@ -464,7 +464,7 @@
+ 			glDeleteLists(obj->dplist,1);
+ 			obj->dplist=0;
+ 		}
+-		dprintf(MED,"pepping mats %d to %d",(m-n),m);
++		dprintf(VLOW,"pepping mats %d to %d",(m-n),m);
+ 		for (i=(m-n);i<m;i++)
+ 		{
+ 			obj->p_mat[i].amb_r=*(px++);
+@@ -552,7 +552,7 @@
+ 			glDeleteLists(obj->dplist,1);
+ 			obj->dplist=0;
+ 		}
+-		dprintf(MED,"pepping vertices %d to %d",(m-n),m-1);
++		dprintf(VLOW,"pepping vertices %d to %d",(m-n),m-1);
+ 		for (i=(m-n);i<m;i++)
+ 		{
+ 			obj->p_vertex[i].x=*(px++);
+@@ -1083,7 +1083,7 @@
+ 			obj->translate.x=*transv;
+ 			obj->translate.y=*(transv+1);
+ 			obj->translate.z=*(transv+2);
+-			obj_pos_update(p,oid);
++			obj_pos_update(p,oid,oid);
+ 		}
+ 
+ 	}
+@@ -1121,7 +1121,7 @@
+ 			if (f<0.0)		f+=(float)((int)-f/360)*360;
+ 			if (f>360.0)	f+=(float)((int)f/360)*-360;
+ 			obj->rotate.z=f;
+-			obj_pos_update(p,oid);
++			obj_pos_update(p,oid,oid);
+ 		}
+ 	}
+ 	return(0);
+@@ -1141,7 +1141,7 @@
+ 			obj->scale.y=*(scav+1);
+ 			obj->scale.z=*(scav+2);*/
+ 			obj_size_update(p,oid);
+-			obj_pos_update(p,oid);
++			obj_pos_update(p,oid,oid);
+ 		}
+ 	}
+ 	return(0);
+@@ -1346,18 +1346,16 @@
+ 	p->object[oid]->scale=ss/sa;
+ 
+ /*	obj_debug(p,oid);*/
+-	obj_pos_update(p,oid); /* now also update the matrix and the objects linking to our sys-object ... */
++	obj_pos_update(p,oid,oid); /* now also update the matrix and the objects linking to our sys-object ... */
+ }
+ /*  recalculate the position of an object. this assumes that oid is valid. */
+-void obj_pos_update(struct t_process *p, uint32_t oid)
++void obj_pos_update(struct t_process *p, uint32_t oid, uint32_t first_oid)
+ {
+ 	float v[3];
+-	uint32_t i;
+-	int is_lnksrc;
+ 	struct t_obj 		*ao,*o;
+ 	struct t_process	*ap;
+ 	o=p->object[oid];
+-	dprintf(VLOW,"[obj_pos_upd|pid %d] %d",p->id, oid);
++	dprintf(VLOW,"[obj_pos_upd|pid %d] %d",p->id, oid,first_oid);
+ 	o->m_uptodate=0;
+ 	obj_recalc_tmat(p,oid);
+ 	if (p->id!=MCP) 
+@@ -1384,11 +1382,11 @@
+ 							ao->translate.x=o->translate.x;
+ 							ao->translate.y=o->translate.y;
+ 							ao->translate.z=o->translate.z; /* just copy */
+-							obj_pos_update(ap,get_pointer(ap));
++							obj_pos_update(ap,get_pointer(ap),get_pointer(ap));
+ 						}
+-						
+-					} else 
++					} else {
+ 						obj_sys_update(ap,oid);	
++					}
+ 				}
+ 			switch (o->oflags&0xF0000000)
+ 			{
+@@ -1404,23 +1402,10 @@
+ 			}
+ 
+ 		}
+-	if (o->oflags&OF_LINK_SRC)
+-	{
+-		is_lnksrc=0;
+-		for (i=0;i<p->n_obj;i++)  /*  update objects which reference on us. (recursive) */
+-			if (p->object[i]!=NULL)
+-				if ((p->object[i]->oflags&OF_LINK) && (p->object[i]->linkid==oid))
+-				{
+-					is_lnksrc=1;
+-					dprintf(VLOW,"[obj_pos_upd|pid %d] % is pointing on %d -> update",p->id,i, oid);
+-					obj_pos_update(p,i);
+-				}
+-		if (!is_lnksrc)	/* it's not! switch out the flag */
+-		{
+-			o->oflags&=~OF_LINK_SRC;
+-			dprintf(VLOW,"obj_pos_update(): %d in process %d is no longer a link-source",oid,p->id);
+-		}
+-	}
++	/* if it's the root (oid==first_oid), only go down */
++	
++	if (o->lsub!=-1)						obj_pos_update(p,o->lsub,first_oid);
++	if ((o->lnext!=-1) && (oid!=first_oid))	obj_pos_update(p,o->lnext,first_oid); 
+ 	if (p->id!=MCP)
+ 		obj_check_biggest_object(p,oid);
+ }
+@@ -1676,6 +1661,51 @@
+ 	glPopMatrix();
+ 	return(0);
+ }
++
++/* remove the oid out of the link chain */
++void link_delete(struct t_process *p, uint32_t oid)
++{
++	struct t_obj *o,*o2;
++	if (obj_valid(p,oid,o))
++	{
++		dprintf(LOW,"link_delete(): [%d] unlinking %d from %d",p->id, oid, o->linkid);
++		if (o->linkid!=-1) 
++		{
++			if (obj_valid(p,o->linkid,o2))
++				if (o2->lsub==oid)
++				{/* parent is having oid as it's first link in chain */
++					o2->lsub=o->lnext; 
++				}
++			if (o->lprev!=-1)
++				if (obj_valid(p,o->lprev,o2))
++				{ /* we have a previous pointer linking to us */
++					o2->lnext=o->lnext; /* might also be -1 */
++				}
++		}
++		o->lnext=-1;
++		o->lprev=-1;
++		o->linkid=-1;
++		o->oflags&=~OF_LINK;
++	}
++}
++/* add an element into the link chain */
++void link_insert(struct t_process *p, uint32_t oid, uint32_t target)
++{
++	struct t_obj *o,*ot,*o2;
++	if (obj_valid(p,oid,o) && obj_valid(p,target,ot))
++	{
++		dprintf(LOW,"link_insert(): [%d] linking %d to %d",p->id, oid, target);
++		o->oflags|=OF_LINK;
++		o->linkid=target;
++		o->lnext=ot->lsub; /* we have a new "first" element */
++		if (o->lnext!=-1) if (obj_valid(p,o->lnext,o2))  /* if we already had an element
++														  in the chain, create the backlink */
++		{
++			o2->lprev=oid;
++		}
++		ot->lsub=oid;
++	}
++}
+ /*  creates a link from object from an object to another  */
+ /*  to have a translation or anything move with other things */
+ int obj_link(struct t_process *p, uint32_t oid_from, uint32_t oid_to)
+@@ -1708,11 +1738,15 @@
+ 			errds(VHIGH,"obj_link()","can't link system-objects in non-mcp-apps!");
+ 			return(-1);
+ 		}
+- 		dprintf(LOW,"[link|pid %d] %d -> %d",p->id, oid_from,oid_to); 
+-		o->oflags|=OF_LINK;
+-		o->linkid=oid_to;
+-		p->object[oid_to]->oflags|=OF_LINK_SRC;
+-		obj_pos_update(p,oid_from);
++ 		dprintf(VLOW,"[link|pid %d] %d -> %d",p->id, oid_from,oid_to); 
++		if (oid_to!=o->linkid) /* only if something changed ... */
++		{
++			if (o->linkid!=-1)
++				link_delete(p,oid_from);
++			link_insert(p,oid_from,oid_to);
++			p->object[oid_to]->oflags|=OF_LINK_SRC;
++			obj_pos_update(p,oid_from,oid_from);
++		}
+ 		return(0);
+ 	}
+ 	return(-1);
+@@ -1728,9 +1762,10 @@
+ 			errds(VHIGH,"obj_link()","may not change the link of a pointer");
+ 			return(-1);
+ 		}
+-		o->oflags&=~OF_LINK;
++		link_delete(p,oid);
+ 		dprintf(VLOW,"removing link of object %d from pid %d",oid,p->id);
+-		obj_pos_update(p,oid);
++
++		obj_pos_update(p,oid,oid);
+ 		return(0);
+ 	}
+ 	return(-1);
+@@ -1743,6 +1778,9 @@
+ 	obj=malloc(sizeof(struct t_obj));  /*  get an object and define it with our data */
+ 	memset(obj,0,sizeof(struct t_obj));
+ 	obj->linkid=-1;
++	obj->lsub=-1;
++	obj->lnext=-1;
++	obj->lprev=-1;
+ 	obj->rotate.x=obj->rotate.y=obj->rotate.z=0.0F;
+ 	obj->translate.x=obj->translate.y=obj->translate.z=0.0F;
+ 	obj->scale=1.0F;
+@@ -1855,6 +1893,13 @@
+ 	mcp_p=get_proc_by_pid(MCP);
+ 	if (obj_valid(p,oid,o))
+ 	{
++		if (o->oflags&OF_SYSTEM)
++		{
++			dprintf(HIGH,"can't delete system object!");
++			return(0);
++		}
++
++
+ 		if (p->id==MCP) 
+ 		{
+ 			if (o->oflags&OF_VIRTUAL)  /*  only delete if virtual */
+@@ -1865,11 +1910,6 @@
+ 			}
+ 		} else 
+ 			mcp_oid=p->mcp_oid;
+-		if (o->oflags&OF_SYSTEM)
+-		{
+-			dprintf(HIGH,"can't delete system object!");
+-			return(0);
+-		}
+ 
+ 		if (obj_valid(p,oid,o))
+ 		{
+@@ -1905,16 +1945,6 @@
+ 							p->object[i]->r=0.0F;				 /*  empty object, so radius is zero! */
+ 							if (p->id!=MCP) obj_check_biggest_object(p,i);
+ 						}
+-			/* check if we were a link source for anyone ... */
+-			if (o->oflags&OF_LINK_SRC)
+-				for (i=0;i<p->n_obj;i++)
+-					if (p->object[i]!=NULL)
+-						if ((p->object[i]->oflags&OF_LINK) && (p->object[i]->linkid==oid))
+-						{
+-								p->object[i]->linkid=-1;			 /*  lost our link target! */
+-							if (mcp_oid>-1)
+-								obj_pos_update(p,i);
+-						}
+ 			return(0);
+ 		}
+ 	}
+@@ -1927,42 +1957,57 @@
+ 	uint32_t i;
+ 	GLuint t;
+ 	struct t_obj *o=p->object[oid];
+-		dprintf(HIGH,"deleting object %d of process %d",oid,p->id);
+-		if (!(o->oflags&OF_NODATA))
++	dprintf(HIGH,"deleting object %d of process %d",oid,p->id);
++
++	/* clearing links */
++	if (o->linkid!=-1)		link_delete(p,oid);
++	while (o->lsub!=-1)		
++	{
++		i=o->lsub;
++		link_delete(p,o->lsub);
++		if (i==o->lsub) 
+ 		{
+-			if (o->n_vertex>0) free(o->p_vertex);
+-			if (o->n_poly>0) free(o->p_poly);
+-			if (o->n_mat>0) free(o->p_mat);
+-			for (i=0;i<o->n_tex;i++)
+-			{
+-				if (o->p_tex[i].buf!=NULL)
+-					free(o->p_tex[i].buf);
+-				if (o->p_tex[i].gl_texnum)
+-				{
+-					t=o->p_tex[i].gl_texnum;
+-					glDeleteTextures(1,&t);
+-				}
+-			}
+-			if (o->n_tex>0) free(o->p_tex);
++			dprintf(HIGH,"something is wrong!!");
++			o=NULL; /* segfault */
++			o->lsub=-1;
++		}
++	}
+ 
+-		}
+-		if (o->dplist)
++	if (!(o->oflags&OF_NODATA))
++	{
++		if (o->n_vertex>0) free(o->p_vertex);
++		if (o->n_poly>0) free(o->p_poly);
++		if (o->n_mat>0) free(o->p_mat);
++		for (i=0;i<o->n_tex;i++)
+ 		{
+-			if (!(o->oflags&(OF_CLONE|OF_SYSTEM))) 
++			if (o->p_tex[i].buf!=NULL)
++				free(o->p_tex[i].buf);
++			if (o->p_tex[i].gl_texnum)
+ 			{
+-				dprintf(VLOW,"freeing display list %d",o->dplist);
+-				glDeleteLists(o->dplist,1);
++				t=o->p_tex[i].gl_texnum;
++				glDeleteTextures(1,&t);
+ 			}
+ 		}
+-		free(o);
+-		p->object[oid]=NULL;
+-		if (oid==(p->n_obj-1))
++		if (o->n_tex>0) free(o->p_tex);
++
++	}
++	if (o->dplist)
++	{
++		if (!(o->oflags&(OF_CLONE|OF_SYSTEM))) 
+ 		{
+-			i=oid;
+-			while ((i!=-1) && (p->object[i]==NULL)) i--;
+-			p->n_obj=i+1;
+-			p->object=realloc(p->object,sizeof(struct t_obj *)*(p->n_obj));
++			dprintf(VLOW,"freeing display list %d",o->dplist);
++			glDeleteLists(o->dplist,1);
+ 		}
++	}
++	free(o);
++	p->object[oid]=NULL;
++	if (oid==(p->n_obj-1))
++	{
++		i=oid;
++		while ((i!=-1) && (p->object[i]==NULL)) i--;
++		p->n_obj=i+1;
++		p->object=realloc(p->object,sizeof(struct t_obj *)*(p->n_obj));
++	}
+ 	return(0);
+ }
+ /* get the object of the pointer (that's 1, usually */
+
+Modified: trunk/server/process.c
+===================================================================
+--- trunk/server/process.c	2006-04-22 12:01:08 UTC (rev 256)
++++ trunk/server/process.c	2006-04-22 20:52:17 UTC (rev 257)
+@@ -105,8 +105,8 @@
+ 		p->object[cam]->translate.z=5;
+ 		p->object[cam]->oflags=OF_CAM;
+ 		p->object[ptr]->translate.z=-1;
+-		p->object[ptr]->oflags=OF_POINTER|OF_LINK;
+-		p->object[ptr]->linkid=cam;
++		p->object[ptr]->oflags=OF_POINTER;
++		link_insert(p,ptr,cam);
+ 	} else {
+ 		/* TODO: ... get the cam and ptr position of the mcp, somehow */
+ 		p->object[cam]->oflags=OF_CAM;
+@@ -120,13 +120,13 @@
+ 			p->object[ptr]->translate.y=o->translate.y;
+ 			p->object[ptr]->translate.z=o->translate.z;
+ 		}
+-		p->object[ptr]->oflags=OF_POINTER|OF_LINK;
+-		p->object[ptr]->linkid=cam;
++		p->object[ptr]->oflags=OF_POINTER;
++		link_insert(p,ptr,cam);
+ 	}
+ 	dprintf(MED,"process_sys_init(): added object cam0 %d",cam);
+ 	dprintf(MED,"process_sys_init(): added object ptr0 %d",ptr);
+-	obj_pos_update(get_proc_by_pid(MCP),cam);
+-	obj_pos_update(get_proc_by_pid(MCP),ptr);
++	obj_pos_update(get_proc_by_pid(MCP),cam,cam);
++	obj_pos_update(get_proc_by_pid(MCP),ptr,ptr);
+ /*	obj_recalc_tmat(p,0);*/
+ 	event_obj_info(p,0); /* tell the new program about the thing */
+ 
+@@ -211,8 +211,6 @@
+ 						mcp_p->object[j]->n_vertex=0; 			 /*  and "clone reference" to 0 */
+ 						mcp_p->object[j]->r=0.0F;				 /*  empty object, so radius is zero! */
+ 					}
+-					if ((mcp_p->object[j]->linkid==p->mcp_oid))
+-						mcp_p->object[j]->linkid=-1;			 /*  lost our link target! */
+ 				}
+ 			obj_free(mcp_p,p->mcp_oid); 	 /*  free the mcp-app-object. */
+ 			mcp_del_object(p->mcp_oid); 	 /*  tell MCP that it's object is beeing deleted. */
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2006-04-22 12:01:08 UTC (rev 256)
++++ trunk/server/proto.c	2006-04-22 20:52:17 UTC (rev 257)
+@@ -202,7 +202,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(4*3);
+- 					dprintf(LOW,"pepping %d new vertices for object oid...%d", num, oid); 
++ 					dprintf(VLOW,"pepping %d new vertices for object oid...%d", num, oid); 
+ 					obj_pep_vertex(p,oid, (float  *)cptr, num);
+ 				}
+ 				break;
+
+
+
+From dotslash at berlios.de  Sun Apr 23 01:34:13 2006
+From: dotslash at berlios.de (dotslash at BerliOS)
+Date: Sun, 23 Apr 2006 01:34:13 +0200
+Subject: [S3d-svn] r258 - in trunk: . server
+Message-ID: <200604222334.k3MNYD6U022317@sheep.berlios.de>
+
+Author: dotslash
+Date: 2006-04-23 01:33:57 +0200 (Sun, 23 Apr 2006)
+New Revision: 258
+
+Modified:
+   trunk/
+   trunk/server/object.c
+   trunk/server/proto.c
+Log:
+ r417 at balthasar:  dotslash | 2006-04-23 01:33:40 +0200
+ - forgot to set next's prev-link (which confused the list a bit :/)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:415
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:417
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2006-04-22 20:52:17 UTC (rev 257)
++++ trunk/server/object.c	2006-04-22 23:33:57 UTC (rev 258)
+@@ -1668,18 +1668,25 @@
+ 	struct t_obj *o,*o2;
+ 	if (obj_valid(p,oid,o))
+ 	{
+-		dprintf(LOW,"link_delete(): [%d] unlinking %d from %d",p->id, oid, o->linkid);
++		dprintf(VLOW,"link_delete(): [%d] unlinking %d from %d",p->id, oid, o->linkid);
+ 		if (o->linkid!=-1) 
+ 		{
++			if (o->lprev!=-1)
++				if (obj_valid(p,o->lprev,o2))
++				{ /* we have a previous pointer linking to us */
++					o2->lnext=o->lnext; /* might also be -1 */
++				}
+ 			if (obj_valid(p,o->linkid,o2))
++			{
+ 				if (o2->lsub==oid)
+ 				{/* parent is having oid as it's first link in chain */
+ 					o2->lsub=o->lnext; 
+ 				}
+-			if (o->lprev!=-1)
+-				if (obj_valid(p,o->lprev,o2))
+-				{ /* we have a previous pointer linking to us */
+-					o2->lnext=o->lnext; /* might also be -1 */
++			}
++			if (o->lnext!=-1)
++				if (obj_valid(p,o->lnext,o2))
++				{ /* fixing next's previous pointer */
++					o2->lprev=o->lprev;
+ 				}
+ 		}
+ 		o->lnext=-1;
+@@ -1694,7 +1701,7 @@
+ 	struct t_obj *o,*ot,*o2;
+ 	if (obj_valid(p,oid,o) && obj_valid(p,target,ot))
+ 	{
+-		dprintf(LOW,"link_insert(): [%d] linking %d to %d",p->id, oid, target);
++		dprintf(VLOW,"link_insert(): [%d] linking %d to %d",p->id, oid, target);
+ 		o->oflags|=OF_LINK;
+ 		o->linkid=target;
+ 		o->lnext=ot->lsub; /* we have a new "first" element */
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2006-04-22 20:52:17 UTC (rev 257)
++++ trunk/server/proto.c	2006-04-22 23:33:57 UTC (rev 258)
+@@ -193,7 +193,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(4*12);
+-					dprintf(LOW,"PEP_MAT[%d]: %d materials for object oid...%d", length, num, oid);
++					dprintf(VLOW,"PEP_MAT[%d]: %d materials for object oid...%d", length, num, oid);
+ 					obj_pep_mat(p,oid, (float *)cptr, num);
+ 				}
+ 				break;
+
+
+
+From nichtsnutz at berlios.de  Sun Apr 23 04:13:00 2006
+From: nichtsnutz at berlios.de (nichtsnutz at BerliOS)
+Date: Sun, 23 Apr 2006 04:13:00 +0200
+Subject: [S3d-svn] r259 - trunk/apps/olsrs3d
+Message-ID: <200604230213.k3N2D0Yg029735@sheep.berlios.de>
+
+Author: nichtsnutz
+Date: 2006-04-23 04:12:50 +0200 (Sun, 23 Apr 2006)
+New Revision: 259
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/olsrs3d.h
+   trunk/apps/olsrs3d/terminal.c
+   trunk/apps/olsrs3d/terminal.h
+Log:
+- add search node
+- 't' move to terminal
+- 'esc' move back from terminal to start point
+- 'enter' search and move to node
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-04-22 23:33:57 UTC (rev 258)
++++ trunk/apps/olsrs3d/main.c	2006-04-23 02:12:50 UTC (rev 259)
+@@ -82,12 +82,12 @@
+ float Title_len;
+ int cam_go=0;
+ 
+-/* object vars */
++/* object vars
+ int obj_term;
+ int obj_cursor;
+-extern int obj_cursor_mp;
++int obj_cursor_mp;
+ struct s3d_object **obj;
+-
++*/
+ int move_cam_to = -1;
+ int oid_focus = -1;
+ float returnPoint[2][3];
+@@ -713,6 +713,34 @@
+ 			s3d_rotate(0,obj[obj_term]->rot[0],(obj[obj_term]->rot[1]),obj[obj_term]->rot[2]);
+ 			move_cam_to = -1;
+ 		}
++	} else if ( move_cam_to != -2 && move_cam_to != -1 ) {
++		oid_focus = -1;
++		for( i=0; i<3; i++)
++		{
++			if( i==2 )
++				CamPosition[0][i]=(CamPosition[0][i]*4+(search_node->pos_vec[i]+10))/5;
++			else if ( i == 1 )
++				CamPosition[0][i]=(CamPosition[0][i]*4+(search_node->pos_vec[i])+2)/5;
++			else
++				CamPosition[0][i]=(CamPosition[0][i]*4+search_node->pos_vec[i])/5;
++			target = 0.0;
++			current = CamPosition[1][i];
++
++			if( 0 - CamPosition[1][i] > 180 )
++				target = 0 - 360;
++			if( 0 - CamPosition[1][i] < -180 )
++				current = CamPosition[1][i] - 360;
++			CamPosition[1][i]=(CamPosition[1][i]*4+target)/5;
++		}
++		s3d_translate(0,CamPosition[0][0],CamPosition[0][1],CamPosition[0][2]);
++		s3d_rotate(0,CamPosition[1][0],CamPosition[1][1],CamPosition[1][2]);
++
++/*		if (dist(CamPosition[0],search_node->pos_vec) < 6)
++		{
++			s3d_translate(0,search_node->pos_vec[0],search_node->pos_vec[1],(search_node->pos_vec[2]+5));
++			s3d_rotate(0,0,0,0);
++			move_cam_to = -1;
++		}*/
+ 	}
+ 	
+ 	/* move back to returnPoint */
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-04-22 23:33:57 UTC (rev 258)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-04-23 02:12:50 UTC (rev 259)
+@@ -111,6 +111,7 @@
+ extern float Bottom, Left;
+ extern char lbuf[MAXLINESIZE];
+ extern int Move_cam_target;
++extern int move_cam_to;
+ 
+ /* process */
+ void lst_initialize();
+
+Modified: trunk/apps/olsrs3d/terminal.c
+===================================================================
+--- trunk/apps/olsrs3d/terminal.c	2006-04-22 23:33:57 UTC (rev 258)
++++ trunk/apps/olsrs3d/terminal.c	2006-04-23 02:12:50 UTC (rev 259)
+@@ -18,8 +18,10 @@
+ int obj_max = 0;
+ 
+ struct s3d_object **obj = NULL;
++struct olsr_node *search_node;
+ 
+ int create_rectangle(struct rectangle *rect,float mat[]);
++int find_olsr_node( char *ip );
+ 
+ int create_rectangle(struct rectangle *rect,float mat[])
+ {
+@@ -124,23 +126,61 @@
+ 	float tmp;
+ 	static int str_id = -1;
+ 
+-	if(key == 8)
++	if(key != 13)
+ 	{
+-		if(ln > 0)
+-			s[ln-1] = '\0';
++		if(key == 8)
++		{
++			if(ln > 0)
++				s[ln-1] = '\0';
++		} else {
++			if(ln < 20)
++				s[ln] = key;
++		}
++		if(str_id != -1)
++			s3d_del_object(str_id);
++		str_id = s3d_draw_string( s, &draw_length );
++		s3d_flags_on( str_id, S3D_OF_VISIBLE );
++		s3d_pep_material(str_id,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0);
++		s3d_scale( str_id, 0.4 );
++		s3d_translate( str_id,9,4,-0.45);
++		s3d_rotate(str_id,0,180,0);
++		s3d_link( str_id, obj[obj_term]->oid );
++		tmp = obj[obj_cursor]->pos[0] - (draw_length*0.43);
++		s3d_translate( obj[obj_cursor]->oid , tmp, obj[obj_cursor]->pos[1], obj[obj_cursor]->pos[2]);
+ 	} else {
+-		if(ln < 20)
+-			s[ln] = key;
++		if(!find_olsr_node(s))
++		{
++			printf("no node found\n");
++		} else {
++			move_cam_to = search_node->obj_id;	
++		}
+ 	}
+-	if(str_id != -1)
+-		s3d_del_object(str_id);
+-	str_id = s3d_draw_string( s, &draw_length );
+-	s3d_flags_on( str_id, S3D_OF_VISIBLE );
+-	s3d_pep_material(str_id,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0);
+-	s3d_scale( str_id, 0.4 );
+-	s3d_translate( str_id,9,4,-0.45);
+-	s3d_rotate(str_id,0,180,0);
+-	s3d_link( str_id, obj[obj_term]->oid );
+-	tmp = obj[obj_cursor]->pos[0] - (draw_length*0.43);
+-	s3d_translate( obj[obj_cursor]->oid , tmp, obj[obj_cursor]->pos[1], obj[obj_cursor]->pos[2]);
+ }
++
++int find_olsr_node( char *ip )
++{
++	int result;
++	search_node = Olsr_root;
++	
++	while ( search_node != NULL )
++	{
++
++		result = strncmp( search_node->ip, ip, NAMEMAX );
++
++		/* we found the node */
++		if ( result == 0 ) 
++			break;
++
++		/* the searched node must be in the subtree */
++		if ( result < 0 )
++			search_node = search_node->right;
++		else
++			search_node = search_node->left;
++	}
++	
++	if( search_node != NULL )
++	{
++		return(1);
++	}
++	return(0);
++}
+
+Modified: trunk/apps/olsrs3d/terminal.h
+===================================================================
+--- trunk/apps/olsrs3d/terminal.h	2006-04-22 23:33:57 UTC (rev 258)
++++ trunk/apps/olsrs3d/terminal.h	2006-04-23 02:12:50 UTC (rev 259)
+@@ -22,6 +22,7 @@
+ extern int obj_cursor;
+ extern int obj_cursor_mp;
+ extern struct s3d_object **obj;
++extern struct olsr_node *search_node;
+ 
+ void create_cursor();
+ void create_terminal();
+
+
+
+From dotslash at berlios.de  Tue Apr 25 19:46:28 2006
+From: dotslash at berlios.de (dotslash at BerliOS)
+Date: Tue, 25 Apr 2006 19:46:28 +0200
+Subject: [S3d-svn] r260 - in trunk: . server
+Message-ID: <200604251746.k3PHkSn3029710@sheep.berlios.de>
+
+Author: dotslash
+Date: 2006-04-25 19:46:25 +0200 (Tue, 25 Apr 2006)
+New Revision: 260
+
+Modified:
+   trunk/
+   trunk/server/config.h
+   trunk/server/cull.c
+   trunk/server/graphics.c
+Log:
+ r460 at balthasar:  dotslash | 2006-04-25 19:46:08 +0200
+ - culling fixed and reenabled
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:417
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:460
+
+Modified: trunk/server/config.h
+===================================================================
+--- trunk/server/config.h	2006-04-23 02:12:50 UTC (rev 259)
++++ trunk/server/config.h	2006-04-25 17:46:25 UTC (rev 260)
+@@ -40,7 +40,7 @@
+ #define HIGH	4
+ #define	VHIGH	5
+ /*  which is the minimum level of debugmessage we want to see? */
+-#define DEBUG	VHIGH
++#define DEBUG	LOW
+ #ifndef DEBUG
+ #define errds(...) /* nothing */
+ #define dprintf(...) /* nothing */
+
+Modified: trunk/server/cull.c
+===================================================================
+--- trunk/server/cull.c	2006-04-23 02:12:50 UTC (rev 259)
++++ trunk/server/cull.c	2006-04-25 17:46:25 UTC (rev 260)
+@@ -109,7 +109,6 @@
+ {
+ 	int i;
+ 	struct t_plane *p;
+-	return(1);
+ 	for(i=0;i<6;i++)
+ 	{
+ 		p=&frustumPlane[i];
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2006-04-23 02:12:50 UTC (rev 259)
++++ trunk/server/graphics.c	2006-04-25 17:46:25 UTC (rev 260)
+@@ -107,7 +107,7 @@
+ void render_virtual_object(struct t_obj *o)
+ {
+ 	struct t_process *ap;
+-	struct t_vertex x;
++	struct t_vertex x,y;
+ 	uint32_t j,k;
+ 	t_mtrx m;
+ 
+@@ -130,7 +130,13 @@
+ 					x.x=x.y=x.z=0.0f;
+ 					mySetMatrix(ap->object[j]->m); /* get into position ... */
+ 					myTransformV(&x);
+-					k=cull_sphere_in_frustum(&x,ap->object[j]->r);
++					y.x=1.0;y.y=y.z=0.0f;
++					myTransformV(&y);
++					y.x-=x.x;
++					y.y-=x.y;
++					y.z-=x.z;
++
++					k=cull_sphere_in_frustum(&x,ap->object[j]->r * sqrt(y.x*y.x + y.y*y.y + y.z*y.z));
+ 					if (k)
+ 					{
+ /*						dprintf(HIGH,"object %d is in %s frustum",j,k?"":"not");*/
+@@ -153,7 +159,7 @@
+ 	struct t_process *p=get_proc_by_pid(MCP);
+ 	uint32_t i;
+ 	struct t_obj *o;
+-	struct t_vertex x;
++	struct t_vertex x,y;
+ 	int k;
+ 	for (i=0;i<p->n_obj;i++)
+ 	{
+@@ -170,7 +176,13 @@
+ 						mySetMatrix(o->m);
+ 						x.x=x.y=x.z=0.0f;
+ 						myTransformV(&x);
+-						k=cull_sphere_in_frustum(&x,o->r);
++						y.x=1.0;y.y=y.z=0.0f;
++						myTransformV(&y);
++						y.x-=x.x;
++						y.y-=x.y;
++						y.z-=x.z;
++
++						k=cull_sphere_in_frustum(&x,o->r * sqrt(y.x*y.x + y.y*y.y + y.z*y.z));
+ 						dprintf(VLOW,"mcp-object %d is in %s frustum",i,k?"":"not");
+ 						if (k)
+ 							{
+
+
+

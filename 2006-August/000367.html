@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r374 - trunk/libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r374%20-%20trunk/libs3d&In-Reply-To=%3C200608031918.k73JIn8f013026%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000368.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r374 - trunk/libs3d</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r374%20-%20trunk/libs3d&In-Reply-To=%3C200608031918.k73JIn8f013026%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r374 - trunk/libs3d">nichtsnutz at mail.berlios.de
+       </A><BR>
+    <I>Thu Aug  3 21:18:49 CEST 2006</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000368.html">[S3d-svn] r375 - in trunk: . libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#367">[ date ]</a>
+              <a href="thread.html#367">[ thread ]</a>
+              <a href="subject.html#367">[ subject ]</a>
+              <a href="author.html#367">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-08-03 21:18:41 +0200 (Thu, 03 Aug 2006)
+New Revision: 374
+
+Modified:
+   trunk/libs3d/3dsread.c
+Log:
+ugly fix for crash on arch linux
+
+Modified: trunk/libs3d/3dsread.c
+===================================================================
+--- trunk/libs3d/3dsread.c	2006-07-04 07:25:33 UTC (rev 373)
++++ trunk/libs3d/3dsread.c	2006-08-03 19:18:41 UTC (rev 374)
+@@ -533,7 +533,8 @@
+ 			}
+ 			if (smooth_list!=NULL)
+ 			{
+-				free(smooth_list);smooth_list=NULL;
++				/*FIXME: free(smooth_list);*/
++				smooth_list=NULL;
+ 			}
+ 			if (nbuf!=NULL)
+ 			{
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000368.html">[S3d-svn] r375 - in trunk: . libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#367">[ date ]</a>
+              <a href="thread.html#367">[ thread ]</a>
+              <a href="subject.html#367">[ subject ]</a>
+              <a href="author.html#367">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

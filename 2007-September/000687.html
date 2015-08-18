@@ -1,0 +1,251 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r695 - in trunk: . example server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r695%20-%20in%20trunk%3A%20.%20example%20server&In-Reply-To=%3C200709232226.l8NMQS2i016953%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000686.html">
+   <LINK REL="Next"  HREF="000688.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r695 - in trunk: . example server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r695%20-%20in%20trunk%3A%20.%20example%20server&In-Reply-To=%3C200709232226.l8NMQS2i016953%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r695 - in trunk: . example server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 24 00:26:28 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000686.html">[S3d-svn] r694 - in trunk: . libs3d
+</A></li>
+        <LI>Next message: <A HREF="000688.html">[S3d-svn] r696 - in trunk: . apps apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#687">[ date ]</a>
+              <a href="thread.html#687">[ thread ]</a>
+              <a href="subject.html#687">[ subject ]</a>
+              <a href="author.html#687">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-09-24 00:26:27 +0200 (Mon, 24 Sep 2007)
+New Revision: 695
+
+Modified:
+   trunk/
+   trunk/example/texturetest.c
+   trunk/server/global.h
+   trunk/server/graphics.c
+   trunk/server/object.c
+   trunk/server/proto.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r2451 at kero</A>:  dotslash | 2007-09-24 00:23:38 +0200
+ - linear filtering beautifies our textures 
+ - add (non-functional) mipmapping support
+ - decrease texturetest texture size for mipmap testing/debugging
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2424
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2451
+
+Modified: trunk/example/texturetest.c
+===================================================================
+--- trunk/example/texturetest.c	2007-09-23 22:26:12 UTC (rev 694)
++++ trunk/example/texturetest.c	2007-09-23 22:26:27 UTC (rev 695)
+@@ -37,8 +37,8 @@
+ 	s3d_rotate(oid, 0, i, 0);
+ 	nanosleep(&amp;t, NULL);
+ }
+-#define MAXX 300
+-#define MAXY 300
++#define MAXX 32
++#define MAXY 32
+ int main(int argc, char **argv)
+ {
+ 	unsigned int x, y;
+@@ -63,7 +63,7 @@
+ 		s3d_pep_polygon_tex_coord(oid, 0.0, 0.0,
+ 		                          1.0, 1.0,
+ 		                          0.0, 1.0);
+-		s3d_translate(oid, 0, 0, 5);
++		s3d_translate(oid, 0, 0, -5);
+ 		for (y = 0;y &lt; MAXY;y++)
+ 			for (x = 0;x &lt; MAXX;x++) {
+ 				data[(y*MAXX+x)*4+0] = (char)((x * 255) / MAXX);
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2007-09-23 22:26:12 UTC (rev 694)
++++ trunk/server/global.h	2007-09-23 22:26:27 UTC (rev 695)
+@@ -47,8 +47,8 @@
+ #endif
+ #define NAME_MAX 256   /*  limit for names [e.g. process names] */
+ #define MCP   0   /*  the mcp's pid  */
+-#define TEXTURE_MAX_W 2048
+-#define TEXTURE_MAX_H 2048
++#define TEXTURE_MAX_W 4096
++#define TEXTURE_MAX_H 4096
+ /*  server version */
+ #define S3D_SERVER_MAJOR 0
+ #define S3D_SERVER_MINOR 1
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2007-09-23 22:26:12 UTC (rev 694)
++++ trunk/server/graphics.c	2007-09-23 22:26:27 UTC (rev 695)
+@@ -73,6 +73,7 @@
+ 	/*     glDepthFunc( GL_LEQUAL ); */
+ 
+ 	/* textures */
++	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+ 	glEnable(GL_TEXTURE_2D);
+ 	glShadeModel(GL_SMOOTH);
+ 	glDisable(GL_DITHER);
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2007-09-23 22:26:12 UTC (rev 694)
++++ trunk/server/object.c	2007-09-23 22:26:27 UTC (rev 695)
+@@ -1445,8 +1445,45 @@
+ 
+ }
+ 
++void tex_build_mipmaps(struct t_tex *tex) 
++{
++	int 			 i, w, h, x, y, c;
++	unsigned char 	*buf, *src;
++	w = tex-&gt;w;
++	h = tex-&gt;h;
++	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
++	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
++	             tex-&gt;w, tex-&gt;h, 0,  /*  no border. */
++	             GL_RGBA, GL_UNSIGNED_BYTE, tex-&gt;buf);
++	/* this is fairly hacky, but we only use one buffer and decrease the image left-top to right-bottom,
++	 * so we only read from elements AFTER the updated (written) elements. */
++	buf = malloc( (w / 2) * (h /2 ) * 4);
++	src = tex-&gt;buf;
++	for (i = 1 ; i &lt; 4 ; i++) {
++		w /= 2;
++		h /= 2;
++
++		if ((w == 0) || (h == 0)) break;
++		/* TODO: handle texture borders which have not even width or height */
++		for (y = 0; y &lt; h; y++)
++			for (x = 0; x &lt; w; x++) 
++				for (c = 0; c &lt; 4; c++) {
++					buf[(y * w + x)*4 + c] = ((uint16_t) 
++											  src[( 2 * y      * w + 2 * x    )*4 + c] + 
++											  src[((2 * y + 1) * w + 2 * x    )*4 + c] + 
++											  src[( 2 * y      * w + 2 * x + 1)*4 + c] + 
++											  src[((2 * y + 1) * w + 2 * x + 1)*4 + c]) / 4;
++/*					s3dprintf(MED,&quot;texture: %d, x = %d, y = %d, c = %d, buf = %02x\n&quot;, i, x, y, c, buf[(y * w + x)*4 + c]);*/
++
++				}
++		glTexImage2D(GL_TEXTURE_2D, i, GL_RGBA, w, h, 0,   GL_RGBA, GL_UNSIGNED_BYTE, buf);
++		src = buf;
++	}
++	free(buf);
++}
++
+ /* activate/bind texture for object */
+-static struct t_tex *get_texture(struct t_obj *obj, struct t_mat *m) {
++struct t_tex *get_texture(struct t_obj *obj, struct t_mat *m) {
+ 	GLuint t;
+ 	struct t_tex *tex = NULL;
+ 	GLfloat matgl[4];
+@@ -1454,9 +1491,9 @@
+ 	if (m-&gt;tex &lt; obj-&gt;n_tex) {
+ 		tex = &amp;obj-&gt;p_tex[m-&gt;tex];
+ 		if (tex-&gt;buf != NULL) { /*  texture seems to be okay, select it. */
+-			matgl[0] = 0.5f;
+-			matgl[1] = 0.5f;
+-			matgl[2] = 0.5f;
++			matgl[0] = 0.9f;
++			matgl[1] = 0.9f;
++			matgl[2] = 0.9f;
+ 			matgl[3] = 1.0f;
+ 			glMaterialfv(GL_FRONT, GL_AMBIENT, matgl);
+ 			glMaterialfv(GL_FRONT, GL_DIFFUSE, matgl);
+@@ -1477,17 +1514,27 @@
+ 				         tex-&gt;buf[(j*tex-&gt;w+i)*4+2],
+ 				         tex-&gt;buf[(j*tex-&gt;w+i)*4+3]);
+ 				    }*/
++				/*  texture has to be generated yet ... */
++/*				tex_build_mipmaps(tex);*/
+ 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+ 				             tex-&gt;w, tex-&gt;h, 0,  /*  no border. */
+-				             GL_RGBA, GL_UNSIGNED_BYTE, tex-&gt;buf);
+-				/*  texture has to be generated yet ... */
++			    	         GL_RGBA, GL_UNSIGNED_BYTE, tex-&gt;buf);
++
+ 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+ 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
++
+ 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+-				                GL_NEAREST);
++				                GL_LINEAR);
+ 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+-				                GL_NEAREST);
++				                GL_LINEAR);
++/*				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
++				                GL_LINEAR_MIPMAP_LINEAR);
++				TODO: does not work?! Textures are still blank. */
+ 
++
++
++
++
+ 			}
+ 		} else { /* . can't use a texture  */
+ 			tex = NULL;
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2007-09-23 22:26:12 UTC (rev 694)
++++ trunk/server/proto.c	2007-09-23 22:26:27 UTC (rev 695)
+@@ -294,7 +294,7 @@
+ 			h = ntohs(*((uint16_t *)cptr));
+ 			cptr += 2;
+ 			num = length - 16;
+-			/*     s3dprintf(MED,&quot;LOAD_TEX[%d]: oid %d, texture %d, [%d x %d] data at [%d x %d] (%d = %d)&quot;,length, oid,toid,w,h,x,y,num,w*h*4,num); */
++			s3dprintf(MED,&quot;LOAD_TEX[%d]: oid %d, texture %d, [%d x %d] data at [%d x %d] (%d = %d)&quot;,length, oid,toid,w,h,x,y,num,w*h*4,num); 
+ 			if ((w*h*4) == num)  /*  check correct size */
+ 				obj_load_tex(p, oid, toid, x, y, w, h, cptr);
+ 		}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000686.html">[S3d-svn] r694 - in trunk: . libs3d
+</A></li>
+	<LI>Next message: <A HREF="000688.html">[S3d-svn] r696 - in trunk: . apps apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#687">[ date ]</a>
+              <a href="thread.html#687">[ thread ]</a>
+              <a href="subject.html#687">[ subject ]</a>
+              <a href="author.html#687">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

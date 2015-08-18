@@ -1,0 +1,239 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r308 - in trunk: . example libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r308%20-%20in%20trunk%3A%20.%20example%20libs3dw&In-Reply-To=%3C200605301927.k4UJRpU1001584%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000300.html">
+   <LINK REL="Next"  HREF="000302.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r308 - in trunk: . example libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r308%20-%20in%20trunk%3A%20.%20example%20libs3dw&In-Reply-To=%3C200605301927.k4UJRpU1001584%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r308 - in trunk: . example libs3dw">dotslash at berlios.de
+       </A><BR>
+    <I>Tue May 30 21:27:51 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000300.html">[S3d-svn] r307 - trunk/libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000302.html">[S3d-svn] r309 - in trunk: . config example libs3d libs3d/libg3d libs3d/libg3d/include/g3d libs3d/libg3d/plugins/image libs3d/libg3d/plugins/import libs3d/libg3d/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#301">[ date ]</a>
+              <a href="thread.html#301">[ thread ]</a>
+              <a href="subject.html#301">[ subject ]</a>
+              <a href="author.html#301">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-30 21:27:48 +0200 (Tue, 30 May 2006)
+New Revision: 308
+
+Modified:
+   trunk/
+   trunk/example/widgets.c
+   trunk/libs3dw/Makefile.am
+   trunk/libs3dw/object.c
+   trunk/libs3dw/s3dw.h
+   trunk/libs3dw/s3dw_int.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r656 at balthasar</A>:  dotslash | 2006-05-30 21:27:26 +0200
+ - labels, input to come
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:628
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:656
+
+Modified: trunk/example/widgets.c
+===================================================================
+--- trunk/example/widgets.c	2006-05-28 20:01:44 UTC (rev 307)
++++ trunk/example/widgets.c	2006-05-30 19:27:48 UTC (rev 308)
+@@ -50,7 +50,7 @@
+ 	struct s3dw_button *button;
+ 	s3dw_surface_delete(surface);
+ 	surface=s3dw_surface_new(&quot;Let's go&quot;,10,7);
+-	s3dw_button_new(surface,&quot;Fast Forward!!&quot;,1,1);
++	s3dw_label_new(surface,&quot;Fast Forward!!&quot;,1,2);
+ 	button=s3dw_button_new(surface,&quot;Okay&quot;,4,4);
+ 	button-&gt;onclick=okay_button;
+ 
+@@ -60,7 +60,7 @@
+ 	struct s3dw_button *button;
+ 	s3dw_surface_delete(surface);
+ 	surface=s3dw_surface_new(&quot;Up Up'n Away!&quot;,10,7);
+-	s3dw_button_new(surface,&quot;Fly away ...&quot;,1,1);
++	s3dw_label_new(surface,&quot;Fly away ...&quot;,1,2);
+ 	button=s3dw_button_new(surface,&quot;Okay&quot;,4,4);
+ 	button-&gt;onclick=okay_button;
+ 
+@@ -74,7 +74,7 @@
+ 		s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
+ 
+ 		surface=s3dw_surface_new(&quot;Hello World&quot;,20,10);
+-		s3dw_button_new(surface,&quot;Where do you want to fly today?&quot;,1,1);
++		s3dw_label_new(surface,&quot;Where do you want to fly today?&quot;,1,2);
+ 		button=s3dw_button_new(surface,&quot;Forward&quot;,1,7);
+ 		button-&gt;onclick=forward_button;
+ 		button=s3dw_button_new(surface,&quot;Into the Sky&quot;,10,7);
+
+Modified: trunk/libs3dw/Makefile.am
+===================================================================
+--- trunk/libs3dw/Makefile.am	2006-05-28 20:01:44 UTC (rev 307)
++++ trunk/libs3dw/Makefile.am	2006-05-30 19:27:48 UTC (rev 308)
+@@ -1,6 +1,6 @@
+ lib_LTLIBRARIES=	libs3dw.la
+ 
+-libs3dw_la_SOURCES=	button.c surface.c object.c style.c event.c animate.c
++libs3dw_la_SOURCES=	button.c surface.c object.c style.c event.c animate.c label.c input.c
+ 			
+ include_HEADERS= 	s3dw.h
+ noinst_HEADERS=		s3dw_int.h
+
+Modified: trunk/libs3dw/object.c
+===================================================================
+--- trunk/libs3dw/object.c	2006-05-28 20:01:44 UTC (rev 307)
++++ trunk/libs3dw/object.c	2006-05-30 19:27:48 UTC (rev 308)
+@@ -64,6 +64,13 @@
+ 			case S3DW_TBUTTON:
+ 					s3dw_button_event_click(object-&gt;data.button,oid);
+ 					break;
++			case S3DW_TLABEL:
++					s3dw_label_event_click(object-&gt;data.label,oid);
++					break;
++			case S3DW_TINPUT:
++					s3dw_input_event_click(object-&gt;data.input,oid);
++					break;
++
+ 		}
+ 
+ }
+
+Modified: trunk/libs3dw/s3dw.h
+===================================================================
+--- trunk/libs3dw/s3dw.h	2006-05-28 20:01:44 UTC (rev 307)
++++ trunk/libs3dw/s3dw.h	2006-05-30 19:27:48 UTC (rev 308)
+@@ -29,6 +29,7 @@
+ enum {
+ 	S3DW_TSURFACE,
+ 	S3DW_TBUTTON,
++	S3DW_TLABEL,
+ 	S3DW_TINPUT
+ };
+ 
+@@ -41,10 +42,23 @@
+ 	unsigned long   _oid_box;
+ 	
+ };
++struct s3dw_label {
++	char *_text;
++	struct s3dw_object *_object;
++	int   _flags;
++	void (*onclick)(struct s3dw_label *);
++	unsigned long   _oid_text;
++	
++};
+ struct s3dw_input {
+ 	char *_text;
++	struct s3dw_object *_object;
+ 	int   _flags;
+-	struct s3dw_object *_object;
++	void (*onclick)(struct s3dw_input *);
++	void (*onedit)(struct s3dw_input *);
++	unsigned long   _oid_text;
++	unsigned long   _oid_box;
++	
+ };
+ 
+ struct s3dw_object {
+@@ -55,6 +69,7 @@
+ 	unsigned long *o;
+ 	struct s3dw_surface *_surface;
+ 	union {
++		struct s3dw_label 	*label;
+ 		struct s3dw_button  *button;
+ 		struct s3dw_input   *input;
+ 		struct s3dw_surface *surface;
+@@ -84,6 +99,12 @@
+ };
+ /* button.c */
+ struct s3dw_button *s3dw_button_new(struct s3dw_surface *surface, char *text, float posx, float posy);
++/* label.c */
++struct s3dw_label *s3dw_label_new(struct s3dw_surface *surface, char *text, float posx, float posy);
++/* input.c */
++struct s3dw_input *s3dw_input_new(struct s3dw_surface *surface, char *text, float posx, float posy);
++
++
+ /* surface.c */
+ struct s3dw_surface *s3dw_surface_new(char *title, float width, float height);
+ void s3dw_surface_delete(struct s3dw_surface *surface);
+
+Modified: trunk/libs3dw/s3dw_int.h
+===================================================================
+--- trunk/libs3dw/s3dw_int.h	2006-05-28 20:01:44 UTC (rev 307)
++++ trunk/libs3dw/s3dw_int.h	2006-05-30 19:27:48 UTC (rev 308)
+@@ -27,9 +27,6 @@
+ extern	struct s3dw_object  **psurf;
+ extern	int					  nsurf;
+ 
+-/* button.c */
+-void s3dw_button_destroy(struct s3dw_button *button);
+-void s3dw_button_event_click(struct s3dw_button *button, unsigned long oid);
+ /* object.c */
+ struct s3dw_object *s3dw_object_new();
+ void s3dw_object_destroy(struct s3dw_object *object);
+@@ -38,6 +35,16 @@
+ void s3dw_surface_event_click(struct s3dw_surface *surface, unsigned long oid);
+ void s3dw_surface_append_obj(struct s3dw_surface *surface, struct s3dw_object *object);
+ void s3dw_surface_event_click(struct s3dw_surface *surface, unsigned long oid);
++/* button.c */
++void s3dw_button_destroy(struct s3dw_button *button);
++void s3dw_button_event_click(struct s3dw_button *button, unsigned long oid);
++/* label.c */
++void s3dw_label_destroy(struct s3dw_label *label);
++void s3dw_label_event_click(struct s3dw_label *label, unsigned long oid);
++/* input.c */
++void s3dw_input_destroy(struct s3dw_input *input);
++void s3dw_input_event_click(struct s3dw_input *input, unsigned long oid);
++
+ /* style.c */
+ extern struct s3dw_style def_style;
+ /* animate.c */
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000300.html">[S3d-svn] r307 - trunk/libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000302.html">[S3d-svn] r309 - in trunk: . config example libs3d libs3d/libg3d libs3d/libg3d/include/g3d libs3d/libg3d/plugins/image libs3d/libg3d/plugins/import libs3d/libg3d/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#301">[ date ]</a>
+              <a href="thread.html#301">[ thread ]</a>
+              <a href="subject.html#301">[ subject ]</a>
+              <a href="author.html#301">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

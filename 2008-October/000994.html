@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1014 - trunk/libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1014%20-%20trunk/libs3d&In-Reply-To=%3C200810232328.m9NNSdHf000092%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000993.html">
+   <LINK REL="Next"  HREF="000995.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1014 - trunk/libs3d</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1014%20-%20trunk/libs3d&In-Reply-To=%3C200810232328.m9NNSdHf000092%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1014 - trunk/libs3d">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 24 01:28:39 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000993.html">[S3d-svn] r1013 - in trunk: libs3d libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000995.html">[S3d-svn] r1015 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#994">[ date ]</a>
+              <a href="thread.html#994">[ thread ]</a>
+              <a href="subject.html#994">[ subject ]</a>
+              <a href="author.html#994">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-10-24 01:28:39 +0200 (Fri, 24 Oct 2008)
+New Revision: 1014
+
+Modified:
+   trunk/libs3d/s3d.h
+Log:
+Mark functions without side effect and local storage as const
+
+Functions which doesn't read from global memory and which will not write to
+global memory can be declared as const. The function must not read anything but
+the function parameters to create the return value.
+This makes it safe for the optimizer in some cases to create less calls then
+specified by the source code.
+
+Modified: trunk/libs3d/s3d.h
+===================================================================
+--- trunk/libs3d/s3d.h	2008-10-23 23:28:29 UTC (rev 1013)
++++ trunk/libs3d/s3d.h	2008-10-23 23:28:39 UTC (rev 1014)
+@@ -34,8 +34,10 @@
+ 
+ #ifdef __GNUC_MINOR__
+ #define S3D_WARN_UNUSED_RESULT  __attribute__ ((warn_unused_result))
++#define S3D_CONST  __attribute__ ((const))
+ #else
+ #define S3D_WARN_UNUSED_RESULT
++#define S3D_CONST
+ #endif
+ 
+ #include &lt;stdint.h&gt;  /* [u]intXX_t type definitions*/
+@@ -210,12 +212,12 @@
+ 
+ 	/* some vector calculation helpers */
+ 
+-	S3DEXPORT float s3d_vector_length(const float vector[]);
+-	S3DEXPORT float s3d_vector_dot_product(const float vector1[], const float vector2[]);
+-	S3DEXPORT void s3d_vector_subtract(const float vector1[], const float vector2[], float result_vector[]);
+-	S3DEXPORT float s3d_vector_angle(const float vector1[], const float vector2[]);
+-	S3DEXPORT float s3d_angle_to_cam(const float obj_pos[], const float cam_pos[], float *angle_rad);
+-	S3DEXPORT void s3d_vector_cross_product(const float vector1[], const float vector2[], float result_vector[]);
++	S3DEXPORT float s3d_vector_length(const float vector[]) S3D_CONST;
++	S3DEXPORT float s3d_vector_dot_product(const float vector1[], const float vector2[]) S3D_CONST;
++	S3DEXPORT void s3d_vector_subtract(const float vector1[], const float vector2[], float result_vector[]) S3D_CONST;
++	S3DEXPORT float s3d_vector_angle(const float vector1[], const float vector2[]) S3D_CONST;
++	S3DEXPORT float s3d_angle_to_cam(const float obj_pos[], const float cam_pos[], float *angle_rad) S3D_CONST;
++	S3DEXPORT void s3d_vector_cross_product(const float vector1[], const float vector2[], float result_vector[]) S3D_CONST;
+ 
+ 	/* event handlers */
+ 	S3DEXPORT void s3d_push_event(struct s3d_evt *newevt);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000993.html">[S3d-svn] r1013 - in trunk: libs3d libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000995.html">[S3d-svn] r1015 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#994">[ date ]</a>
+              <a href="thread.html#994">[ thread ]</a>
+              <a href="subject.html#994">[ subject ]</a>
+              <a href="author.html#994">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

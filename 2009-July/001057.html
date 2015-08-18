@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] Project s3d at BerliOS annotated tag, v0.2.1.1,	created. v0.2.1.1
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2009-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20annotated%20tag%2C%20v0.2.1.1%2C%0A%09created.%20v0.2.1.1&In-Reply-To=%3C200907111506.n6BF63Fc029476%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001056.html">
+   <LINK REL="Next"  HREF="001058.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] Project s3d at BerliOS annotated tag, v0.2.1.1,	created. v0.2.1.1</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20annotated%20tag%2C%20v0.2.1.1%2C%0A%09created.%20v0.2.1.1&In-Reply-To=%3C200907111506.n6BF63Fc029476%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] Project s3d at BerliOS annotated tag, v0.2.1.1,	created. v0.2.1.1">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sat Jul 11 17:06:03 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001056.html">[S3d-svn] Project s3d at BerliOS branch, pristine-tar,	updated. ac2c5c8af71129993e527b5e79fbce0a3e8b70e0
+</A></li>
+        <LI>Next message: <A HREF="001058.html">[S3d-svn] Project s3d at BerliOS annotated tag, debian/0.2.1.1-1,	created. debian/0.2.1.1-1
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1057">[ date ]</a>
+              <a href="thread.html#1057">[ thread ]</a>
+              <a href="subject.html#1057">[ subject ]</a>
+              <a href="author.html#1057">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project &quot;Project s3d at BerliOS&quot;.
+
+The annotated tag, v0.2.1.1 has been created
+        at  f34c113fb78068e8b3e537267e5f352a7556c196 (tag)
+   tagging  00e71be5b6791455d792b470289d4ad9b4166a33 (commit)
+  replaces  v0.2.1
+ tagged by  Sven Eckelmann
+        on  Sat Jul 11 15:33:12 2009 +0200
+
+- Log -----------------------------------------------------------------
+s3d 0.2.1.1
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iQIcBAABCgAGBQJKWJSYAAoJEF2HCgfBJntGT2IQAIW8aTMn0Yqq5f8yQtlep45Z
+rJnE5Kea/zdOQNxGaR6OtVRRR4E7zcGXhRdGCRxAuI4mEz2eoMYnohAM+2JPiL26
+QcKGvEFYL45kyN0soaA6EEZWObwEcLOYovlQiX3S5it4soY9mwMWVZHY2yCyvFD+
+WtjoJXeXBjEFU5uJHOzrtTy5nOckRS3RnlQEm6B3PsNjlKKmC2l9BfqmbV+F/Gon
+Lc7IeVKIHKChhP5DU97LS8QJ5YNZ6kR6GczMBmic60jN6iQtQf/IgzFYwGoomZUp
+GE4ZlJCvkTMB5Tk9KtOq3VaPqm1sBL0y8+Q84x49s0Ei06ldkw3f7HIYPnQwKWmR
+5mhQ6Qar9399DMuAudugSeVq+gvv3GkMjelJgmzZxBjtEGu4J55dGfXfV/UPqWbx
+d1ccJWwhBkuZv400PzaYQ3euaddJQEaMgJuMUNhzWMAL40F2ZP0JbGEdE/pt/q/7
+GKswdS8xCbn4AAp15f9ubi/Al6a3h/x1tEomubX88DMAbAcs8NfZR4xao4SuUaSm
+ofyWJCRITL2u5nraryQFJcVBXV9EmaavZMyP6no/pQ/nk+KEn6lCdIOEm4EHjmTs
+zVnOwZPBvF/GeS13LS2KoiYhLA1DsS8QbB51r1OFEKEFNto+/PqgijvrXBCJTmi0
+fuGcJbH/ZwMmWgM341bI
+=wBWG
+-----END PGP SIGNATURE-----
+
+Simon Wunderlich (1):
+      update README
+
+Sven Eckelmann (47):
+      Read incoming data from aligned address
+      Send S3D_P_C_LOAD_* instead of S3D_PC_PEP_* in s3d_load_* proto functions
+      Use floats in network endian byte order
+      Remove dead stores
+      Fix possible null pointer dereferences
+      Fix obvious format string errors
+      Specify which version of GPL is meant for objs
+      Reduce number of indirectly linked libraries
+      Link libs3dw against libm
+      Don't clutter up the CMakeCache with library dependencies
+      Don't require already linked libraries in pkg-config
+      Define _s3d_ready status variable even if no signals are available
+      Use stdint uint*_t instead of u_int*_t
+      meshs3d: Unify parameters of debugFree declaration and definition
+      Build examples/filebrowser.c even if data structure is different in cygwin
+      s3dvt: Disable TIOCSCTTY if not supported
+      s3dfm: Disable usage of d_type until it was rewritten to use stat
+      Fix installation of cygs3d(w).dll under windows
+      server: Link only against GL and not against glu
+      server: Disable kill of childs in quit() when no signals available
+      server: Process tcp data even if shm is deactivated
+      Rewrote directory detection with posix stat
+      s3dfm: Use correct path names for parsing directory items
+      server: Include glext.h for post-1.2 OpenGL constants
+      Open files explicit as binary file
+      Don't convert to int when we compare two float after rintf
+      Make declarations available for hton*b function definitions
+      Remove binary files without free copyright status
+      Transform g3d model orientation to s3d orientation
+      Fix FTBFS with cmake 2.6.3
+      Correct check for new style gpsd structs in s3dosm
+      s3dosm: Require argument in short option of --osm
+      Only strip out libs3d options from argv
+      s3dosm: Move to upcoming osm api 0.6
+      Prevent buffer overrun when using strncat
+      s3dfm: Close source when target cannot be opened in fs_copy
+      s3dosm: Fix compilation with DB_STACK
+      Add notes about the current git layout and releases
+      Move changelogs to Documentation RelNotes
+      Add initial release notes for 0.2.1.1
+      Add smaller cleanups and clarifications to Maintainer notes
+      Add informations how to submit patches
+      Correct smaller spelling errors in maintainer guide
+      Rebuild manpages with docbook-to-man
+      Change docbook compiler to xmlto
+      Update RelNotes-0.2.1.1
+      Add informations about packaging new release for debian
+
+-----------------------------------------------------------------------
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001056.html">[S3d-svn] Project s3d at BerliOS branch, pristine-tar,	updated. ac2c5c8af71129993e527b5e79fbce0a3e8b70e0
+</A></li>
+	<LI>Next message: <A HREF="001058.html">[S3d-svn] Project s3d at BerliOS annotated tag, debian/0.2.1.1-1,	created. debian/0.2.1.1-1
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1057">[ date ]</a>
+              <a href="thread.html#1057">[ thread ]</a>
+              <a href="subject.html#1057">[ subject ]</a>
+              <a href="author.html#1057">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

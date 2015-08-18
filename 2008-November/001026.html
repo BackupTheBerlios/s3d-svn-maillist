@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1046 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1046%20-%20trunk/server&In-Reply-To=%3C200811282032.mASKWdoR001657%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001025.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1046 - trunk/server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1046%20-%20trunk/server&In-Reply-To=%3C200811282032.mASKWdoR001657%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1046 - trunk/server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Nov 28 21:32:39 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001025.html">[S3d-svn] r1045 - trunk/apps/s3dfm
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1026">[ date ]</a>
+              <a href="thread.html#1026">[ thread ]</a>
+              <a href="subject.html#1026">[ subject ]</a>
+              <a href="author.html#1026">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-11-28 21:32:38 +0100 (Fri, 28 Nov 2008)
+New Revision: 1046
+
+Modified:
+   trunk/server/graphics.c
+   trunk/server/object.c
+Log:
+server: Include glext.h for post-1.2 OpenGL constants
+
+To compile s3d on cygwin with windows we need a different name mangling
+than the one used by mesa's opengl headers. We should include the one
+provided by w32api but the GL/gl.h doesn't provide constants for
+extension introduced later then OpenGL 1.2. The best way to get it
+working with mesa and w32api is to include GL/glext.h even if we don't
+need it on systems using mesa.
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2008-11-26 23:48:47 UTC (rev 1045)
++++ trunk/server/graphics.c	2008-11-28 20:32:38 UTC (rev 1046)
+@@ -25,6 +25,7 @@
+ #include &lt;string.h&gt;   /*  memcpy() */
+ 
+ #include &lt;GL/gl.h&gt;   /*  GLint */
++#include &lt;GL/glext.h&gt;   /*  GL_RESCALE_NORMAL */
+ #ifdef G_SDL
+ #include &lt;SDL.h&gt;  /*  SDL_GL_SwapBuffers */
+ #endif
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2008-11-26 23:48:47 UTC (rev 1045)
++++ trunk/server/object.c	2008-11-28 20:32:38 UTC (rev 1046)
+@@ -27,6 +27,7 @@
+ #include &lt;stdlib.h&gt;   /*  malloc(),realloc(),free() */
+ #include &lt;string.h&gt;   /*  memcpy() */
+ #include &lt;GL/gl.h&gt;   /*  gl*, GL* */
++#include &lt;GL/glext.h&gt;   /* GL_GENERATE_MIPMAP */
+ #ifndef _ISOC99_SOURCE /* we want isnan() */
+ #define _ISOC99_SOURCE
+ #endif
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001025.html">[S3d-svn] r1045 - trunk/apps/s3dfm
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1026">[ date ]</a>
+              <a href="thread.html#1026">[ thread ]</a>
+              <a href="subject.html#1026">[ subject ]</a>
+              <a href="author.html#1026">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

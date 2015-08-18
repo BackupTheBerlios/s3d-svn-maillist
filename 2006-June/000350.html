@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r357 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r357%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200606111547.k5BFlZOD000380%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000349.html">
+   <LINK REL="Next"  HREF="000351.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r357 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r357%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200606111547.k5BFlZOD000380%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r357 - in trunk: . server">dotslash at berlios.de
+       </A><BR>
+    <I>Sun Jun 11 17:47:35 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000349.html">[S3d-svn] r356 - in trunk: . extras libs3d
+</A></li>
+        <LI>Next message: <A HREF="000351.html">[S3d-svn] r358 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#350">[ date ]</a>
+              <a href="thread.html#350">[ thread ]</a>
+              <a href="subject.html#350">[ subject ]</a>
+              <a href="author.html#350">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-11 17:47:35 +0200 (Sun, 11 Jun 2006)
+New Revision: 357
+
+Modified:
+   trunk/
+   trunk/server/main.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r763 at balthasar</A>:  dotslash | 2006-06-11 17:47:30 +0200
+ - cosmetic changes
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:761
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:763
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2006-06-11 15:46:48 UTC (rev 356)
++++ trunk/server/main.c	2006-06-11 15:47:35 UTC (rev 357)
+@@ -164,9 +164,9 @@
+ 	running=1;
+ #ifdef SIGS
+     if (signal(SIGINT, sigint_handler) == SIG_ERR) 
+-	        errn(&quot;network_init():signal()&quot;,errno);
++	        errn(&quot;init():signal()&quot;,errno);
+     if (signal(SIGTERM, sigint_handler) == SIG_ERR) 
+-	        errn(&quot;network_init():signal()&quot;,errno);
++	        errn(&quot;init():signal()&quot;,errno);
+ #endif
+ 	return(0);
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000349.html">[S3d-svn] r356 - in trunk: . extras libs3d
+</A></li>
+	<LI>Next message: <A HREF="000351.html">[S3d-svn] r358 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#350">[ date ]</a>
+              <a href="thread.html#350">[ thread ]</a>
+              <a href="subject.html#350">[ subject ]</a>
+              <a href="author.html#350">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

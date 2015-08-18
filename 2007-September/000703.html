@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r711 - trunk/apps/dot_mcp
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r711%20-%20trunk/apps/dot_mcp&In-Reply-To=%3C200709241937.l8OJbadE025937%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000702.html">
+   <LINK REL="Next"  HREF="000704.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r711 - trunk/apps/dot_mcp</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r711%20-%20trunk/apps/dot_mcp&In-Reply-To=%3C200709241937.l8OJbadE025937%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r711 - trunk/apps/dot_mcp">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 24 21:37:36 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000702.html">[S3d-svn] r710 - in trunk: . apps/comptest
+</A></li>
+        <LI>Next message: <A HREF="000704.html">[S3d-svn] r712 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#703">[ date ]</a>
+              <a href="thread.html#703">[ thread ]</a>
+              <a href="subject.html#703">[ subject ]</a>
+              <a href="author.html#703">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-09-24 21:37:35 +0200 (Mon, 24 Sep 2007)
+New Revision: 711
+
+Modified:
+   trunk/apps/dot_mcp/menu.c
+Log:
+dot_mcp: translate menu in correct direction
+
+
+Modified: trunk/apps/dot_mcp/menu.c
+===================================================================
+--- trunk/apps/dot_mcp/menu.c	2007-09-24 19:12:05 UTC (rev 710)
++++ trunk/apps/dot_mcp/menu.c	2007-09-24 19:37:35 UTC (rev 711)
+@@ -83,13 +83,13 @@
+ 	go = s3d_import_model_file(&quot;objs/s3dstart.3ds&quot;);
+ 	s3d_flags_on(go, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+ 	s3d_link(go, menu_o);
+-	for (i = 0;i &lt; (sizeof(menu) / sizeof(struct menu_entry));i++) {
++	for (i = 0; i &lt; (sizeof(menu) / sizeof(struct menu_entry)); i++) {
+ 		if (-1 == (menu[i].icon_oid = s3d_import_model_file(menu[i].icon)))
+ 			menu[i].icon_oid = s3d_new_object();
+ 		menu[i].str_oid = s3d_draw_string(menu[i].name, NULL);
+ 		s3d_link(menu[i].str_oid, menu[i].icon_oid);
+ 		s3d_link(menu[i].icon_oid, menu_o);
+-		s3d_translate(menu[i].icon_oid, 0, -3 + (-3*i), 0);
++		s3d_translate(menu[i].icon_oid, 0, -3 + (-3 * (signed)i), 0);
+ 		s3d_translate(menu[i].str_oid, 2, 0, 0);
+ 		/*  s3d_flags_on(menu[i].icon_oid,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 		  s3d_flags_on(menu[i].str_oid,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);*/
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000702.html">[S3d-svn] r710 - in trunk: . apps/comptest
+</A></li>
+	<LI>Next message: <A HREF="000704.html">[S3d-svn] r712 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#703">[ date ]</a>
+              <a href="thread.html#703">[ thread ]</a>
+              <a href="subject.html#703">[ subject ]</a>
+              <a href="author.html#703">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

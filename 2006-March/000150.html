@@ -1,0 +1,278 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r154 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r154%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603131738.k2DHchbn028941%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000149.html">
+   <LINK REL="Next"  HREF="000151.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r154 - trunk/apps/olsrs3d</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r154%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603131738.k2DHchbn028941%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r154 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Mon Mar 13 18:38:43 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000149.html">[S3d-svn] r153 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000151.html">[S3d-svn] r155 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#150">[ date ]</a>
+              <a href="thread.html#150">[ thread ]</a>
+              <a href="subject.html#150">[ subject ]</a>
+              <a href="author.html#150">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-03-13 18:38:41 +0100 (Mon, 13 Mar 2006)
+New Revision: 154
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+Log:
+- replace push &amp; pop with pep
+- remove old code
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-03-13 16:54:00 UTC (rev 153)
++++ trunk/apps/olsrs3d/main.c	2006-03-13 17:38:41 UTC (rev 154)
+@@ -386,8 +386,12 @@
+ 
+ 			distance = dirt( olsr_con-&gt;left_olsr_node-&gt;pos_vec, olsr_con-&gt;right_olsr_node-&gt;pos_vec, tmp_mov_vec );
+ 			f = (( olsr_con-&gt;left_etx + olsr_con-&gt;right_etx ) / 4.0) / distance;
++
++			/***
++			 * drift factor - 0.0 &lt; factor &lt; 1.0 ( best results: 0.3 &lt; factor &lt; 0.9
++			 * small factor: fast and strong drift to neighbours
++			 ***/
+ 			if ( f &lt; factor ) f = factor;
+-// 			if ( f &lt; 0.9 ) f = 0.9;
+ 
+ 			mov_add( olsr_con-&gt;left_olsr_node-&gt;mov_vec, tmp_mov_vec, 1 / f - 1 );
+ 			mov_add( olsr_con-&gt;right_olsr_node-&gt;mov_vec, tmp_mov_vec, - ( 1 / f - 1 ) );
+@@ -412,7 +416,7 @@
+ 
+ 	float null_vec[3] = {0,0,0};
+ 	float tmp_mov_vec[3];
+-	float distance, factor, etx, rgb, rgb2;
++	float distance, etx, rgb, rgb2;
+ 	struct olsr_con *olsr_con = Con_begin;
+ 
+ 	while ( olsr_con != NULL ) {
+@@ -420,35 +424,18 @@
+ 		/* move left olsr node if it has not been moved yet */
+ 		if ( !( ( olsr_con-&gt;left_olsr_node-&gt;mov_vec[0] == 0 ) &amp;&amp; ( olsr_con-&gt;left_olsr_node-&gt;mov_vec[1] == 0 ) &amp;&amp; ( olsr_con-&gt;left_olsr_node-&gt;mov_vec[2] == 0 ) ) &amp;&amp; olsr_con-&gt;left_olsr_node-&gt;visible ) {
+ 
+-// 			if ( ( dist( olsr_con-&gt;left_olsr_node-&gt;mov_vec, olsr_con-&gt;left_olsr_node-&gt;pos_vec ) &gt; 10.0 ) || ( dist( olsr_con-&gt;left_olsr_node-&gt;pos_vec, null_vec ) &lt; 15.0 ) ) {
++			distance = dirt( olsr_con-&gt;left_olsr_node-&gt;pos_vec, null_vec, tmp_mov_vec );
++			mov_add( olsr_con-&gt;left_olsr_node-&gt;mov_vec, tmp_mov_vec, distance / 100 ); /* move a little bit to point zero */
++			mov_add( olsr_con-&gt;left_olsr_node-&gt;mov_vec, tmp_mov_vec, 1 ); /* move a little bit to point zero */
+ 
+-				distance = dirt( olsr_con-&gt;left_olsr_node-&gt;pos_vec, null_vec, tmp_mov_vec );
+-				mov_add( olsr_con-&gt;left_olsr_node-&gt;mov_vec, tmp_mov_vec, distance / 100 ); /* move a little bit to point zero */
+-				mov_add( olsr_con-&gt;left_olsr_node-&gt;mov_vec, tmp_mov_vec, 1 ); /* move a little bit to point zero */
++			if ( ( distance = dist( olsr_con-&gt;left_olsr_node-&gt;mov_vec, null_vec ) ) &gt; 10.0 ) {
++				mov_add( olsr_con-&gt;left_olsr_node-&gt;pos_vec, olsr_con-&gt;left_olsr_node-&gt;mov_vec, 1.0 / ( (float ) distance ) );
++			} else {
++				mov_add( olsr_con-&gt;left_olsr_node-&gt;pos_vec, olsr_con-&gt;left_olsr_node-&gt;mov_vec, 0.1 );
++			}
+ 
+-				if ( ( distance = dist( olsr_con-&gt;left_olsr_node-&gt;mov_vec, null_vec ) ) &gt; 10.0 ) {
+-					factor = 1.0 / ( (float ) distance );
+-				} else {
+-					factor = 0.1;
+-				}
++			s3d_translate( olsr_con-&gt;left_olsr_node-&gt;obj_id, olsr_con-&gt;left_olsr_node-&gt;pos_vec[0], olsr_con-&gt;left_olsr_node-&gt;pos_vec[1], olsr_con-&gt;left_olsr_node-&gt;pos_vec[2] );
+ 
+-				olsr_con-&gt;left_olsr_node-&gt;mov_vec[0] *= factor;
+-				olsr_con-&gt;left_olsr_node-&gt;mov_vec[1] *= factor;
+-				olsr_con-&gt;left_olsr_node-&gt;mov_vec[2] *= factor;
+-
+-				tmp_mov_vec[0] = olsr_con-&gt;left_olsr_node-&gt;pos_vec[0];
+-				tmp_mov_vec[1] = olsr_con-&gt;left_olsr_node-&gt;pos_vec[1];
+-				tmp_mov_vec[2] = olsr_con-&gt;left_olsr_node-&gt;pos_vec[2];
+-
+-				mov_add( tmp_mov_vec, olsr_con-&gt;left_olsr_node-&gt;mov_vec, 1.0 );
+-
+-				/*if ( ( dist( tmp_mov_vec, olsr_con-&gt;left_olsr_node-&gt;pos_vec ) &gt; 0.75 ) || ( dist( tmp_mov_vec, null_vec ) &lt; 2.0 ) ) {*/
+-
+-				mov_add( olsr_con-&gt;left_olsr_node-&gt;pos_vec, olsr_con-&gt;left_olsr_node-&gt;mov_vec, 1.0 );
+-				s3d_translate( olsr_con-&gt;left_olsr_node-&gt;obj_id, olsr_con-&gt;left_olsr_node-&gt;pos_vec[0], olsr_con-&gt;left_olsr_node-&gt;pos_vec[1], olsr_con-&gt;left_olsr_node-&gt;pos_vec[2] );
+-
+-			/*}*/
+-
+ 			/* reset movement vector */
+ 			olsr_con-&gt;left_olsr_node-&gt;mov_vec[0] = olsr_con-&gt;left_olsr_node-&gt;mov_vec[1] = olsr_con-&gt;left_olsr_node-&gt;mov_vec[2] = 0.0;
+ 
+@@ -457,35 +444,18 @@
+ 		/* move right olsr node if it has not been moved yet */
+ 		if ( !( ( olsr_con-&gt;right_olsr_node-&gt;mov_vec[0] == 0 ) &amp;&amp; ( olsr_con-&gt;right_olsr_node-&gt;mov_vec[1] == 0 ) &amp;&amp; ( olsr_con-&gt;right_olsr_node-&gt;mov_vec[2] == 0 ) ) &amp;&amp; olsr_con-&gt;right_olsr_node-&gt;visible ) {
+ 
+-// 			if ( ( dist( olsr_con-&gt;right_olsr_node-&gt;mov_vec, olsr_con-&gt;right_olsr_node-&gt;pos_vec )&gt; 10.0 ) || ( dist( olsr_con-&gt;right_olsr_node-&gt;pos_vec, null_vec ) &lt; 15.0 ) ) {
++			distance = dirt( olsr_con-&gt;right_olsr_node-&gt;pos_vec, null_vec, tmp_mov_vec );
++			mov_add( olsr_con-&gt;right_olsr_node-&gt;mov_vec, tmp_mov_vec, distance / 100 ); /* move a little bit to point zero */
++			mov_add( olsr_con-&gt;right_olsr_node-&gt;mov_vec, tmp_mov_vec, 1 ); /* move a little bit to point zero */
+ 
+-				distance = dirt( olsr_con-&gt;right_olsr_node-&gt;pos_vec, null_vec, tmp_mov_vec );
+-				mov_add( olsr_con-&gt;right_olsr_node-&gt;mov_vec, tmp_mov_vec, distance / 100 ); /* move a little bit to point zero */
+-				mov_add( olsr_con-&gt;right_olsr_node-&gt;mov_vec, tmp_mov_vec, 1 ); /* move a little bit to point zero */
++			if ( ( distance = dist( olsr_con-&gt;right_olsr_node-&gt;mov_vec, null_vec ) ) &gt; 10.0 ) {
++				mov_add( olsr_con-&gt;right_olsr_node-&gt;pos_vec, olsr_con-&gt;right_olsr_node-&gt;mov_vec, 1.0 / ( (float ) distance ) );
++			} else {
++				mov_add( olsr_con-&gt;right_olsr_node-&gt;pos_vec, olsr_con-&gt;right_olsr_node-&gt;mov_vec, 0.1 );
++			}
+ 
+-				if ( ( distance = dist( olsr_con-&gt;right_olsr_node-&gt;mov_vec, null_vec ) ) &gt; 10.0 ) {
+-					factor = 1.0 / ( (float ) distance );
+-				} else {
+-					factor = 0.1;
+-				}
++			s3d_translate( olsr_con-&gt;right_olsr_node-&gt;obj_id, olsr_con-&gt;right_olsr_node-&gt;pos_vec[0], olsr_con-&gt;right_olsr_node-&gt;pos_vec[1], olsr_con-&gt;right_olsr_node-&gt;pos_vec[2] );
+ 
+-				olsr_con-&gt;right_olsr_node-&gt;mov_vec[0] *= factor;
+-				olsr_con-&gt;right_olsr_node-&gt;mov_vec[1] *= factor;
+-				olsr_con-&gt;right_olsr_node-&gt;mov_vec[2] *= factor;
+-
+-				tmp_mov_vec[0] = olsr_con-&gt;right_olsr_node-&gt;pos_vec[0];
+-				tmp_mov_vec[1] = olsr_con-&gt;right_olsr_node-&gt;pos_vec[1];
+-				tmp_mov_vec[2] = olsr_con-&gt;right_olsr_node-&gt;pos_vec[2];
+-
+-				mov_add( tmp_mov_vec, olsr_con-&gt;right_olsr_node-&gt;mov_vec, 1.0 );
+-
+-				/*if ( ( dist( tmp_mov_vec, olsr_con-&gt;right_olsr_node-&gt;pos_vec )&gt; 0.75 ) || ( dist( tmp_mov_vec, null_vec ) &lt; 2.0 ) ) {*/
+-
+-					mov_add( olsr_con-&gt;right_olsr_node-&gt;pos_vec, olsr_con-&gt;right_olsr_node-&gt;mov_vec, 1.0 );
+-					s3d_translate( olsr_con-&gt;right_olsr_node-&gt;obj_id, olsr_con-&gt;right_olsr_node-&gt;pos_vec[0], olsr_con-&gt;right_olsr_node-&gt;pos_vec[1], olsr_con-&gt;right_olsr_node-&gt;pos_vec[2] );
+-
+-				/*}*/
+-
+ 			/* reset movement vector */
+ 			olsr_con-&gt;right_olsr_node-&gt;mov_vec[0] = olsr_con-&gt;right_olsr_node-&gt;mov_vec[1] = olsr_con-&gt;right_olsr_node-&gt;mov_vec[2] = 0.0;
+ 
+@@ -495,7 +465,6 @@
+ 		/* move connection between left and right olsr node */
+ 		s3d_pop_vertex( olsr_con-&gt;obj_id, 6 );
+ 		s3d_pop_polygon( olsr_con-&gt;obj_id, 2 );
+-		s3d_pop_material( olsr_con-&gt;obj_id, 1 );
+ 
+ 		s3d_push_vertex( olsr_con-&gt;obj_id, olsr_con-&gt;left_olsr_node-&gt;pos_vec[0] , olsr_con-&gt;left_olsr_node-&gt;pos_vec[1] , olsr_con-&gt;left_olsr_node-&gt;pos_vec[2] );
+ 		s3d_push_vertex( olsr_con-&gt;obj_id, olsr_con-&gt;left_olsr_node-&gt;pos_vec[0] + 0.2 , olsr_con-&gt;left_olsr_node-&gt;pos_vec[1] , olsr_con-&gt;left_olsr_node-&gt;pos_vec[2] );
+@@ -510,7 +479,7 @@
+ 			/* HNA */
+ 			if ( olsr_con-&gt;left_etx == -1000.00 ) {
+ 
+-				s3d_push_material( olsr_con-&gt;obj_id,
++				s3d_pep_material( olsr_con-&gt;obj_id,
+ 							   0.0,0.0,1.0,
+ 							   0.0,0.0,1.0,
+ 							   0.0,0.0,1.0);
+@@ -522,7 +491,7 @@
+ 				/* very good link - bright blue */
+ 				if ( ( etx &gt;= 1.0 ) &amp;&amp; ( etx &lt; 1.5 ) ) {
+ 
+-					s3d_push_material( olsr_con-&gt;obj_id,
++					s3d_pep_material( olsr_con-&gt;obj_id,
+ 							0.5,1.0,1.0,
+ 							0.5,1.0,1.0,
+ 							0.5,1.0,1.0);
+@@ -531,7 +500,7 @@
+ 				} else if ( ( etx &gt;= 1.5 ) &amp;&amp; ( etx &lt; 2.0 ) ) {
+ 
+ 					rgb = 2.0 - etx;
+-					s3d_push_material( olsr_con-&gt;obj_id,
++					s3d_pep_material( olsr_con-&gt;obj_id,
+ 							1.0,1.0,rgb,
+ 							1.0,1.0,rgb,
+ 							1.0,1.0,rgb);
+@@ -540,7 +509,7 @@
+ 				} else if ( ( etx &gt;= 2.0 ) &amp;&amp; ( etx &lt; 3.0 ) ) {
+ 
+ 					rgb = 1.5 - ( etx / 2.0 );
+-					s3d_push_material( olsr_con-&gt;obj_id,
++					s3d_pep_material( olsr_con-&gt;obj_id,
+ 							1.0,rgb,0.0,
+ 							1.0,rgb,0.0,
+ 							1.0,rgb,0.0);
+@@ -550,7 +519,7 @@
+ 
+ 					rgb = 1.75 - ( etx / 4.0 );
+ 					rgb2 = 1.25 - ( etx / 4.0 );
+-					s3d_push_material( olsr_con-&gt;obj_id,
++					s3d_pep_material( olsr_con-&gt;obj_id,
+ 							rgb,rgb2,0.0,
+ 							rgb,rgb2,0.0,
+ 							rgb,rgb2,0.0);
+@@ -560,7 +529,7 @@
+ 
+ 					rgb = 1000.0 / ( 1500.0 + etx );
+ 
+-					s3d_push_material( olsr_con-&gt;obj_id,
++					s3d_pep_material( olsr_con-&gt;obj_id,
+ 							rgb,rgb,rgb,
+ 							rgb,rgb,rgb,
+ 							rgb,rgb,rgb);
+@@ -568,7 +537,7 @@
+ 				/* wtf - dark grey */
+ 				} else {
+ 
+-					s3d_push_material( olsr_con-&gt;obj_id,
++					s3d_pep_material( olsr_con-&gt;obj_id,
+ 							0.3,0.3,0.3,
+ 							0.3,0.3,0.3,
+ 							0.3,0.3,0.3);
+@@ -579,7 +548,7 @@
+ 
+ 		} else {
+ 
+-			s3d_push_material( olsr_con-&gt;obj_id,
++			s3d_pep_material( olsr_con-&gt;obj_id,
+ 						1.0,1.0,1.0,
+ 						1.0,1.0,1.0,
+ 						1.0,1.0,1.0);
+@@ -721,7 +690,7 @@
+ void object_click(struct s3d_evt *evt)
+ {
+ 	int oid;
+-	float distance,tmp_vector[3];
++	/* float distance,tmp_vector[3]; */
+ 	char ip_str[50];
+ 	oid=(int)*((unsigned long *)evt-&gt;buf);
+ 	struct olsr_node *olsr_node;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000149.html">[S3d-svn] r153 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000151.html">[S3d-svn] r155 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#150">[ date ]</a>
+              <a href="thread.html#150">[ thread ]</a>
+              <a href="subject.html#150">[ subject ]</a>
+              <a href="author.html#150">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

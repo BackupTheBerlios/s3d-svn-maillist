@@ -1,0 +1,196 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r329 - in trunk: . libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r329%20-%20in%20trunk%3A%20.%20libs3dw&In-Reply-To=%3C200606041855.k54IttTc002512%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000321.html">
+   <LINK REL="Next"  HREF="000323.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r329 - in trunk: . libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r329%20-%20in%20trunk%3A%20.%20libs3dw&In-Reply-To=%3C200606041855.k54IttTc002512%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r329 - in trunk: . libs3dw">dotslash at berlios.de
+       </A><BR>
+    <I>Sun Jun  4 20:55:55 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000321.html">[S3d-svn] r328 - in trunk: . apps/s3dvt example libs3d libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000323.html">[S3d-svn] r330 - in trunk: . libs3d libs3dw server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#322">[ date ]</a>
+              <a href="thread.html#322">[ thread ]</a>
+              <a href="subject.html#322">[ subject ]</a>
+              <a href="author.html#322">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-04 20:55:53 +0200 (Sun, 04 Jun 2006)
+New Revision: 329
+
+Added:
+   trunk/libs3dw/arrange.c
+Modified:
+   trunk/
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r699 at balthasar</A>:  dotslash | 2006-06-04 20:54:59 +0200
+ - forgot to version arrange.c
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:697
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:699
+
+Added: trunk/libs3dw/arrange.c
+===================================================================
+--- trunk/libs3dw/arrange.c	2006-06-04 17:57:33 UTC (rev 328)
++++ trunk/libs3dw/arrange.c	2006-06-04 18:55:53 UTC (rev 329)
+@@ -0,0 +1,109 @@
++/*
++ * arrange.c
++ *
++ * Copyright (C) 2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of the s3d Widgets, a Widget Library for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d Widgets is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d Widgets is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d Widgets; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#include &lt;s3d.h&gt;
++#include &lt;s3dw.h&gt;
++#include &lt;s3dw_int.h&gt;
++#include &lt;stdlib.h&gt; /* rand(), RAND_MAX */
++
++void s3dw_arr_widgetcenter(s3dw_widget *widget, float *center)
++{
++	center[0]=widget-&gt;width/2;
++	center[1]=-widget-&gt;height/2+0.5;
++	center[2]=0.5;
++	
++}
++void s3dw_arr_normdir(float *dir)
++{
++	float dirlen=s3d_vector_length(dir);
++	while ((dirlen=s3d_vector_length(dir))==0)
++	{
++		/* make up some random direction if they're exactly the same position */
++		dir[0]=((float)rand() - RAND_MAX/2.0)/RAND_MAX;
++		dir[1]=((float)rand() - RAND_MAX/2.0)/RAND_MAX;
++		dir[2]=((float)rand() - RAND_MAX/2.0)/RAND_MAX;
++	}
++	dir[0]/=dirlen;
++	dir[1]/=dirlen;
++	dir[2]/=dirlen;
++}
++void s3dw_arrange()
++{
++	s3dw_widget *w1,*w2,*root=s3dw_getroot();
++	int i,j,arranged;
++	float len1,len2, dirlen;
++	float tomove, move1, move2;
++	float f1[3],f2[3],dir[3];
++
++	/* test if there is anything to arrange ... */
++	arranged=1;
++	for (i=0;i&lt;root-&gt;nobj;i++)
++		if (!(root-&gt;pobj[i]-&gt;flags&amp;S3DW_ARRANGED)) arranged=0;
++	if (arranged) return; /* no arrangement necceasary .... */
++
++	if (root-&gt;nobj==1)
++	{
++		w1=root-&gt;pobj[0];
++		w1-&gt;flags|=S3DW_ARRANGED; /* done */
++	}
++	for (i=0;i&lt;root-&gt;nobj;i++)
++	{
++		w1=root-&gt;pobj[i];
++		arranged=1;
++		for (j=0;j&lt;root-&gt;nobj;j++)
++			if (i!=j)
++			{
++				w2=root-&gt;pobj[j];
++				s3dw_arr_widgetcenter(w1,f1);
++				s3dw_arr_widgetcenter(w2,f2);
++				len1=s3d_vector_length(f1);
++				len2=s3d_vector_length(f2);
++				dir[0]=(w1-&gt;x+f1[0]) - (w2-&gt;x+f2[0]);
++				dir[1]=(w1-&gt;y+f1[1]) - (w2-&gt;y+f2[1]);
++				dir[2]=(w1-&gt;z+f1[2]) - (w2-&gt;z+f2[2]);
++				dirlen=s3d_vector_length(dir);
++				if (dirlen&lt;(len1+len2))
++				{
++					arranged=0;
++					w1-&gt;flags&amp;=~S3DW_ARRANGED;
++					w2-&gt;flags&amp;=~S3DW_ARRANGED;
++					/* it's not arranged, turn the flags off! */
++					s3dw_arr_normdir(dir);
++					tomove=((len1+len2+1)-dirlen);
++					move1=len1/(len1+len2);
++					move2=len2/(len1+len2);
++					w1-&gt;x += tomove * move1 *  dir[0];
++					w1-&gt;y += tomove * move1 *  dir[1];
++					w1-&gt;z += tomove * move1 *  dir[2];
++					w2-&gt;x += tomove * move2 * -dir[0];
++					w2-&gt;y += tomove * move2 * -dir[1];
++					w2-&gt;z += tomove * move2 * -dir[2];
++
++					s3dw_ani_add(w1);
++					s3dw_ani_add(w2);
++				}
++			}
++		if (arranged)
++			w1-&gt;flags|=S3DW_ARRANGED;
++	}
++}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000321.html">[S3d-svn] r328 - in trunk: . apps/s3dvt example libs3d libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000323.html">[S3d-svn] r330 - in trunk: . libs3d libs3dw server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#322">[ date ]</a>
+              <a href="thread.html#322">[ thread ]</a>
+              <a href="subject.html#322">[ subject ]</a>
+              <a href="author.html#322">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

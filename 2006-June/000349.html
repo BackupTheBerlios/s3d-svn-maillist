@@ -1,0 +1,284 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r356 - in trunk: . extras libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r356%20-%20in%20trunk%3A%20.%20extras%20libs3d&In-Reply-To=%3C200606111546.k5BFknIj000211%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000348.html">
+   <LINK REL="Next"  HREF="000350.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r356 - in trunk: . extras libs3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r356%20-%20in%20trunk%3A%20.%20extras%20libs3d&In-Reply-To=%3C200606111546.k5BFknIj000211%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r356 - in trunk: . extras libs3d">dotslash at berlios.de
+       </A><BR>
+    <I>Sun Jun 11 17:46:49 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000348.html">[S3d-svn] r355 - in trunk: . libs3d
+</A></li>
+        <LI>Next message: <A HREF="000350.html">[S3d-svn] r357 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#349">[ date ]</a>
+              <a href="thread.html#349">[ thread ]</a>
+              <a href="subject.html#349">[ subject ]</a>
+              <a href="author.html#349">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-11 17:46:48 +0200 (Sun, 11 Jun 2006)
+New Revision: 356
+
+Modified:
+   trunk/
+   trunk/extras/mplayer.1.0pre7try2.s3d.patch
+   trunk/libs3d/callback.c
+   trunk/libs3d/s3d.h
+   trunk/libs3d/s3dlib.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r761 at balthasar</A>:  dotslash | 2006-06-11 17:46:43 +0200
+ - fix mplayer patch (no crashing)
+ - keyboard support in mplayer
+ - s3d_net_check() in the &quot;official&quot; s3d.h (mplayer patch needs that)
+ - some more ignores in the static callback list
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:759
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:761
+
+Modified: trunk/extras/mplayer.1.0pre7try2.s3d.patch
+===================================================================
+--- trunk/extras/mplayer.1.0pre7try2.s3d.patch	2006-06-11 14:31:27 UTC (rev 355)
++++ trunk/extras/mplayer.1.0pre7try2.s3d.patch	2006-06-11 15:46:48 UTC (rev 356)
+@@ -93,17 +93,20 @@
+  #endif
+ diff -Naur MPlayer-1.0pre7try2/libvo/vo_s3d.c MPlayer-1.0pre7try2.s3d/libvo/vo_s3d.c
+ --- MPlayer-1.0pre7try2/libvo/vo_s3d.c	1970-01-01 01:00:00.000000000 +0100
+-+++ MPlayer-1.0pre7try2.s3d/libvo/vo_s3d.c	2006-06-10 19:48:51.000000000 +0200
+-@@ -0,0 +1,169 @@
+++++ MPlayer-1.0pre7try2.s3d/libvo/vo_s3d.c	2006-06-11 17:44:27.000000000 +0200
++@@ -0,0 +1,262 @@
+ +#include &lt;stdio.h&gt;
+ +#include &lt;stdlib.h&gt;
+ +#include &lt;string.h&gt;
+ +#include &lt;errno.h&gt;
+ +#include &lt;s3d.h&gt;
+++#include &lt;s3d_keysym.h&gt;
+ +#include &quot;config.h&quot;
+ +#include &quot;video_out.h&quot;
+ +#include &quot;video_out_internal.h&quot;
+ +#include &quot;mp_msg.h&quot;
+++#include &quot;input/mouse.h&quot;
+++#include &quot;input/input.h&quot;
+ +
+ +static vo_info_t info = 
+ +{
+@@ -138,6 +141,7 @@
+ +	}
+ +	s3d_load_texture(oid,0,x,y,w,h,data2);
+ +	return(0);*/
+++	return(0);
+ +}
+ +
+ +static void draw_osd(void)
+@@ -205,17 +209,106 @@
+ +	s3d_quit();
+ +}
+ +
+++#include &quot;osdep/keycodes.h&quot;
+++extern void mplayer_put_key(int code);
+ +
+ +static void check_events(void)
+ +{
+++	s3d_net_check();
+ +}
+++#define shift_key (ki-&gt;modifier==(S3D_KMOD_LSHIFT||S3D_KMOD_RSHIFT)) 
+++void s3dmp_key(struct s3d_evt *evt)
+++{
+++	struct s3d_key_event *ki=(struct s3d_key_event *)evt-&gt;buf;
+++	switch (ki-&gt;keysym)
+++	{
+++		case S3DK_RETURN: mplayer_put_key(KEY_ENTER);break;
+++        case S3DK_ESCAPE: mplayer_put_key(KEY_ESC);break;
+++		case S3DK_q: mplayer_put_key('q');break;
+++ 		case S3DK_F1: mplayer_put_key(KEY_F+1);break;
+++ 		case S3DK_F2: mplayer_put_key(KEY_F+2);break;
+++ 		case S3DK_F3: mplayer_put_key(KEY_F+3);break;
+++ 		case S3DK_F4: mplayer_put_key(KEY_F+4);break;
+++ 		case S3DK_F5: mplayer_put_key(KEY_F+5);break;
+++ 		case S3DK_F6: mplayer_put_key(KEY_F+6);break;
+++ 		case S3DK_F7: mplayer_put_key(KEY_F+7);break;
+++ 		case S3DK_F8: mplayer_put_key(KEY_F+8);break;
+++ 		case S3DK_F9: mplayer_put_key(KEY_F+9);break;
+++ 		case S3DK_F10: mplayer_put_key(KEY_F+10);break;
+++ 		case S3DK_F11: mplayer_put_key(KEY_F+11);break;
+++ 		case S3DK_F12: mplayer_put_key(KEY_F+12);break;
+++                                /*case S3DK_o: mplayer_put_key('o');break;
+++                                case S3DK_SPACE: mplayer_put_key(' ');break;
+++                                case S3DK_p: mplayer_put_key('p');break;*/
+++		case S3DK_7: mplayer_put_key(shift_key?'/':'7');
+++        case S3DK_PLUS: mplayer_put_key(shift_key?'*':'+');
+++        case S3DK_KP_PLUS: mplayer_put_key('+');break;
+++        case S3DK_MINUS:
+++        case S3DK_KP_MINUS: mplayer_put_key('-');break;
+++		case S3DK_TAB: mplayer_put_key('\t');break;
+++		case S3DK_PAGEUP: mplayer_put_key(KEY_PAGE_UP);break;
+++		case S3DK_PAGEDOWN: mplayer_put_key(KEY_PAGE_DOWN);break;  
+++		case S3DK_UP: mplayer_put_key(KEY_UP);break;
+++        case S3DK_DOWN: mplayer_put_key(KEY_DOWN);break;
+++        case S3DK_LEFT: mplayer_put_key(KEY_LEFT);break;
+++        case S3DK_RIGHT: mplayer_put_key(KEY_RIGHT);break;
+++        case S3DK_LESS: mplayer_put_key(shift_key?'&gt;':'&lt;'); break;
+++        case S3DK_GREATER: mplayer_put_key('&gt;'); break;
+++        case S3DK_ASTERISK:
+++		case S3DK_KP_MULTIPLY: mplayer_put_key('*'); break;
+++		case S3DK_SLASH:
+++		case S3DK_KP_DIVIDE: mplayer_put_key('/'); break;
+++		case S3DK_KP0: mplayer_put_key(KEY_KP0); break;
+++		case S3DK_KP1: mplayer_put_key(KEY_KP1); break;
+++		case S3DK_KP2: mplayer_put_key(KEY_KP2); break;
+++		case S3DK_KP3: mplayer_put_key(KEY_KP3); break;
+++		case S3DK_KP4: mplayer_put_key(KEY_KP4); break;
+++		case S3DK_KP5: mplayer_put_key(KEY_KP5); break;
+++		case S3DK_KP6: mplayer_put_key(KEY_KP6); break;
+++		case S3DK_KP7: mplayer_put_key(KEY_KP7); break;
+++		case S3DK_KP8: mplayer_put_key(KEY_KP8); break;
+++		case S3DK_KP9: mplayer_put_key(KEY_KP9); break;
+++		case S3DK_KP_PERIOD: mplayer_put_key(KEY_KPDEC); break;
+++		case S3DK_KP_ENTER: mplayer_put_key(KEY_KPENTER); break;
+++		default:
+++			mplayer_put_key(ki-&gt;keysym);
+++			break;
+ +
+++	}
+++	
+++}
+++int mbutton;
+++void s3dmp_mbutton(struct s3d_evt *evt)
+++{
+++	struct s3d_but_info *bi=(struct s3d_but_info *)evt-&gt;buf;
+++	mbutton=-1;
+++	if ((bi-&gt;state==0) &amp;&amp; (!vo_nomouse_input))
+++		mbutton=bi-&gt;button;
+++}
+++void s3dmp_obj_click(struct s3d_evt *evt)
+++{
+++	uint32_t coid=*((uint32_t *)evt-&gt;buf);
+++	if (coid==oid)
+++	{
+++		mplayer_put_key(MOUSE_BASE+mbutton-1);
+++	}
+++	mbutton=-1;
+++}
+++
+++
+++
+++
+ +static uint32_t preinit(const char *arg)
+ +{
+ +	int argc=0;
+ +	char *arg1=NULL;
+ +	char **argv=&amp;arg1;
+ +    mp_msg (MSGT_VO, MSGL_INFO, &quot;[s3d] hello, i'm initing - darn it!\n&quot;);
+++	mbutton=-1;
+++    s3d_set_callback(S3D_EVENT_MBUTTON,s3dmp_mbutton);
+++    s3d_set_callback(S3D_EVENT_OBJ_CLICK,s3dmp_obj_click);
+++    s3d_set_callback(S3D_EVENT_KEY,s3dmp_key);
+++
+ +	if (s3d_init(&amp;argc,&amp;argv,&quot;mplayer&quot;))
+ +	{
+ +    	mp_msg (MSGT_VO, MSGL_WARN, &quot;[s3d] sorry, can't reach server.\n&quot;);
+
+Modified: trunk/libs3d/callback.c
+===================================================================
+--- trunk/libs3d/callback.c	2006-06-11 14:31:27 UTC (rev 355)
++++ trunk/libs3d/callback.c	2006-06-11 15:46:48 UTC (rev 356)
+@@ -26,11 +26,13 @@
+ #include &quot;s3dlib.h&quot;
+ static void _s3d_ignore(struct s3d_evt *evt);
+ /*  the s3d callback list */
++/* i know it's ugly, but it's better to have ugly code somewhere than provoke
++ * race conditions in the applications code */
+ s3d_cb s3d_cb_list[MAX_CB]={
+-			NULL,_s3d_ignore,_s3d_ignore,_s3d_ignore, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
++			NULL,_s3d_ignore,_s3d_ignore,_s3d_ignore, _s3d_ignore,_s3d_ignore,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
+ 			_s3d_ignore,_s3d_ignore,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
++			_s3d_ignore,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
+ 			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
+-			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
+ 
+ 			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
+ 			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
+
+Modified: trunk/libs3d/s3d.h
+===================================================================
+--- trunk/libs3d/s3d.h	2006-06-11 14:31:27 UTC (rev 355)
++++ trunk/libs3d/s3d.h	2006-06-11 15:46:48 UTC (rev 356)
+@@ -70,7 +70,8 @@
+ };
+ struct s3d_but_info
+ {
+-	unsigned char button, state;
++	unsigned char button; /* 0 = left, 1 = middle, 2 = right */
++	unsigned char state;  /* 0 = down, 1 = up, 2 = moving */
+ };
+ struct s3d_key_event
+ {
+@@ -178,3 +179,5 @@
+ /* mcp special */
+ int s3d_mcp_focus(int object);
+ 
++/* for apps which don't employ s3d_mainloop() */
++int s3d_net_check();
+
+Modified: trunk/libs3d/s3dlib.h
+===================================================================
+--- trunk/libs3d/s3dlib.h	2006-06-11 14:31:27 UTC (rev 355)
++++ trunk/libs3d/s3dlib.h	2006-06-11 15:46:48 UTC (rev 356)
+@@ -65,7 +65,6 @@
+ unsigned int _queue_want_object();
+ int _queue_quit();
+ /*  network.c */
+-int s3d_net_check();
+ int net_send(unsigned char opcode, char *buf, unsigned short length);
+ int s3d_net_init(char *urlc);
+ #ifdef TCP
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000348.html">[S3d-svn] r355 - in trunk: . libs3d
+</A></li>
+	<LI>Next message: <A HREF="000350.html">[S3d-svn] r357 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#349">[ date ]</a>
+              <a href="thread.html#349">[ thread ]</a>
+              <a href="subject.html#349">[ subject ]</a>
+              <a href="author.html#349">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,516 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r135 - in trunk: . apps apps/s3dfm client example
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r135%20-%20in%20trunk%3A%20.%20apps%20apps/s3dfm%20client%20example&In-Reply-To=%3C200603031904.k23J4dAk002718%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000130.html">
+   <LINK REL="Next"  HREF="000132.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r135 - in trunk: . apps apps/s3dfm client example</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r135%20-%20in%20trunk%3A%20.%20apps%20apps/s3dfm%20client%20example&In-Reply-To=%3C200603031904.k23J4dAk002718%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r135 - in trunk: . apps apps/s3dfm client example">dotslash at berlios.de
+       </A><BR>
+    <I>Fri Mar  3 20:04:39 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000130.html">[S3d-svn] r134 - in trunk: . apps client
+</A></li>
+        <LI>Next message: <A HREF="000132.html">[S3d-svn] r136 - in trunk: . apps/olsrs3d apps/s3dfm apps/s3dgps client server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#131">[ date ]</a>
+              <a href="thread.html#131">[ thread ]</a>
+              <a href="subject.html#131">[ subject ]</a>
+              <a href="author.html#131">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-03-03 20:04:36 +0100 (Fri, 03 Mar 2006)
+New Revision: 135
+
+Added:
+   trunk/apps/s3dfm/
+   trunk/apps/s3dfm/Makefile.am
+   trunk/apps/s3dfm/main.c
+Modified:
+   trunk/
+   trunk/client/sei_interface.h
+   trunk/client/sei_misc.c
+   trunk/client/sei_monotone.c
+   trunk/configure.ac
+   trunk/example/strtest.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r188 at balthasar</A>:  dotslash | 2006-03-03 20:04:31 +0100
+ - committing new file manager (NOT working yet!)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:183
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:188
+
+Added: trunk/apps/s3dfm/Makefile.am
+===================================================================
+--- trunk/apps/s3dfm/Makefile.am	2006-03-03 18:20:54 UTC (rev 134)
++++ trunk/apps/s3dfm/Makefile.am	2006-03-03 19:04:36 UTC (rev 135)
+@@ -0,0 +1,11 @@
++bin_PROGRAMS=	s3dfm
++
++s3dfmincludedir = ${pkgincludedir}/s3dfm
++
++s3dfm_SOURCES =  \
++	main.c 
++
++s3dfm_CPPFLAGS=	-I${top_srcdir}/client
++s3dfm_LDADD=		${top_builddir}/client/libs3d.la
++
++
+
+Added: trunk/apps/s3dfm/main.c
+===================================================================
+--- trunk/apps/s3dfm/main.c	2006-03-03 18:20:54 UTC (rev 134)
++++ trunk/apps/s3dfm/main.c	2006-03-03 19:04:36 UTC (rev 135)
+@@ -0,0 +1,301 @@
++/*
++ * main.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3dfm, a s3d file manager.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3dfm is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3dfm is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3dfm; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
++#include &lt;s3d.h&gt;
++#include &lt;stdio.h&gt; 	 /*  printf() */
++#include &lt;unistd.h&gt;  /*  usleep() */
++#include &lt;dirent.h&gt;  /*  dirent */
++#include &lt;stdlib.h&gt;	 /*  malloc() */
++#include &lt;string.h&gt;  /*  strlen(), strncmp(), strrchr() */
++#include &lt;math.h&gt;	 /*  sin(),cos() */
++
++#define SH			0.4 /* height of the step */
++
++#define T_DUNO		0
++#define T_LOCALDIR	1
++#define T_BACKDIR	2
++#define T_FOLDER	3
++#define T_GEOMETRY	4
++#define T_MUSIC		5
++
++#define M_DIR		512
++#define M_NAME		256
++int folder,geometry,mp3,duno,dot,dotdot,dirstep;
++struct t_item {
++	int icon, str;							/* object ids ...*/
++	char name[M_NAME];						/* name (e.g. file name) */
++	struct t_item *parent;					/* parent item */
++	struct t_item *list;					/* list of items  (if it's a subdir)*/
++	float scale;
++	float px,pz;
++	int n_item;								/* number of items in list ( = -1 for normal or not-expanded files) */
++	int type;								/* type, determined by extension or file type like dir, pipe, link etc */
++	int disp;
++};
++struct t_item root;
++
++int display_dir(struct t_item *dir)
++{
++	int n,i;
++	float  px,py,pz;
++	char *ext;
++	char *nstr;
++	float dss; /* dirstep size */
++	int dirn, dirc,dps;
++	int icon;
++	if (dir-&gt;disp)
++		return(-1); /* already displayed ... */ 
++
++ /* count directories */
++	dirn=0;
++	for (i=0;i&lt;dir-&gt;n_item;i++)
++	{
++		if (dir-&gt;list[i].type==T_FOLDER)
++			dirn++;
++	}
++	dps=(dirn+3)/4; /* directories per side */
++	dirc=0;			/* no directories counted yet */
++	dss=1.0/(2.0*dps+1.0);
++	dir-&gt;scale=dss;
++	printf(&quot;having %d directories, %d per side. one is scaled down to %3.3f \n&quot;,dirn,dps,dss);
++	for (i=0;i&lt;dir-&gt;n_item;i++)
++	{
++		if (dir-&gt;list[i].type==T_FOLDER)
++		{
++			icon=dir-&gt;list[i].icon=s3d_clone(dirstep);
++			printf(&quot;processing %d [%s] icon %d\n&quot;,dirc,dir-&gt;list[i].name,icon);
++			s3d_scale(icon,dss);
++		    s3d_flags_on(icon,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++			s3d_link(icon,dir-&gt;icon);
++			/* castle style:
++			 * direcotires are clockwise oredered, starting from the lower left corner on the 
++			 * underlying dirstep */
++			switch (dirc/dps)
++			{
++				case 0:
++					px=-1.0+dss;
++					pz=-1.0+(dirc*2+0.5)*2*dss;
++					break;
++				case 1:
++					px=-1.0+((dirc-dps)*2+0.5)*2*dss;
++					pz=1.0-dss;
++					break;
++				case 2:
++					px=1.0-dss;
++					pz=1.0-((dirc-2*dps)*2+0.5)*2*dss;
++					break;
++				case 3:
++					px=1.0-((dirc-dps*3)*2+0.5)*2*dss;
++					pz=-1.0+dss;
++					break;
++			}
++			s3d_translate(icon, px,SH,pz);
++			dir-&gt;list[i].px=px;
++			dir-&gt;list[i].pz=pz;
++			dir-&gt;list[i].str=s3d_draw_string(dir-&gt;list[i].name,NULL);
++			s3d_translate(	dir-&gt;list[i].str, px,1.0+SH,pz);
++			s3d_link(		dir-&gt;list[i].str,icon);
++			s3d_flags_on(	dir-&gt;list[i].str,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++			dirc++;
++			
++        }
++	}
++	dir-&gt;disp=1;
++}
++void get_path(struct t_item *dir, char *path)
++{
++	if (dir-&gt;parent!=NULL)
++	{
++		get_path(dir-&gt;parent,path);
++		strncat(path,dir-&gt;name,M_DIR);
++		strncat(path,&quot;/&quot;,M_DIR);
++	} else
++		strncpy(path,dir-&gt;name,M_DIR);
++}
++int parse_dir(struct t_item *dir)
++{
++	struct t_item *list;
++	struct dirent **namelist;
++	int n,i;
++	char *ext,*nstr;
++	float alpha,al,radius,f;
++	char path[M_DIR];
++	char ndir[M_DIR];  
++	if (dir-&gt;n_item&gt;0) /* refusing */
++		return(-1);
++	get_path(dir,path);
++	printf(&quot;scanning %s\n&quot;,path);
++    n = i = scandir(path, &amp;namelist, 0, alphasort);
++    if (n &lt; 0)
++	{
++        perror(&quot;scandir&quot;);
++		return(-1);
++	} else {
++		if (dir-&gt;n_item&gt;0)
++			free(dir-&gt;list); /* this is a refresh, free old items */
++		list=malloc(sizeof(struct t_item)*i);
++		dir-&gt;list=list;
++		dir-&gt;n_item=n;
++		printf(&quot;found %d items, processing ...\n&quot;,n);
++        while(n--) {
++			list[n].type=T_DUNO;
++			nstr=namelist[n]-&gt;d_name;
++			strncpy(list[n].name,nstr,M_NAME);
++ 		    if ((0==strncmp(nstr,&quot;.&quot;,1)) &amp;&amp; (strlen(nstr)==1))
++				list[n].type=T_LOCALDIR;
++			else if (0==strncmp(nstr,&quot;..&quot;,strlen(nstr)&lt;2?strlen(nstr):2))
++			   list[n].type=T_BACKDIR;
++			else {
++				ext=strrchr(nstr,'.');
++				strncpy(ndir,path,M_DIR);
++		    	strncat(ndir,namelist[n]-&gt;d_name,M_DIR);
++			    if ((namelist[n]-&gt;d_type==DT_DIR) ||
++					((namelist[n]-&gt;d_type==DT_UNKNOWN) &amp;&amp; (opendir(ndir)!=NULL)))
++						list[n].type=T_FOLDER;
++				else 
++				{
++				   if (ext!=NULL)
++				   {
++					   if (0==strncmp(ext,&quot;.3ds&quot;,strlen(ext)&lt;4?strlen(ext):4))
++							   list[n].type=T_GEOMETRY;
++					   else if (0==strncmp(ext,&quot;.mp3&quot;,strlen(ext)&lt;4?strlen(ext):4))
++							   list[n].type=T_MUSIC;
++				   }
++				}
++			}
++			list[n].n_item=-1;
++			list[n].parent=dir;
++			list[n].disp=0;
++			list[n].scale=1.0f;
++			list[n].icon=-1;
++        	free(namelist[n]);
++		}
++		free(namelist);
++   	}
++	return(0);
++}
++/* finds an item in the tree by oid */
++struct t_item *finditem(struct t_item *t, int oid)
++{
++	int i;
++	struct t_item *f;
++	if (t-&gt;icon==oid)
++		return(t);
++	if (t-&gt;type=T_FOLDER)
++		for (i=0;i&lt;t-&gt;n_item;i++)
++			if ((f=finditem(&amp;(t-&gt;list[i]),oid))!=NULL)
++				return(f);
++	return(NULL);
++}
++float px, py, pz;
++/* gets the scale by multiplying scales */
++float get_scale(struct t_item *f)
++{
++	float scale;
++	scale=1/f-&gt;scale;
++	if (f-&gt;parent!=NULL)
++		scale=1/f-&gt;scale*get_scale(f-&gt;parent);
++	px+=f-&gt;px;
++	pz+=f-&gt;pz;
++	py+=SH;
++	printf(&quot;scale factor of %s: %f\n&quot;,f-&gt;name,1/f-&gt;scale);
++	px*=1/f-&gt;scale;
++	py*=1/f-&gt;scale;
++	pz*=1/f-&gt;scale;
++	
++	
++	return(scale);
++}
++#define SCALE 	1
++void rescale(struct t_item *f)
++{
++	float scale=1.0;
++	px=0.0;
++	py=0.0;
++	pz=0.0;
++	if (f-&gt;parent!=NULL)
++	{
++		scale=get_scale(f);
++	}
++	s3d_scale(root.icon,scale*SCALE);
++	printf(&quot;rescaling to %f\n&quot;,scale);
++	printf(&quot;px: %f py:%f pz: %f\n&quot;,px,py,pz);
++	s3d_translate(root.icon,px*SCALE,-3.0-SCALE*py,pz*SCALE);
++}
++
++void object_click(struct s3d_evt *evt)
++{
++	int i,oid;
++	struct t_item *f;
++	oid=(int)*((unsigned long *)evt-&gt;buf);
++	printf(&quot;! clicked object %d\n&quot;,oid);
++	if (NULL!=(f=finditem(&amp;root,oid)))
++	{
++		if (f-&gt;type==T_FOLDER)
++		{
++			printf(&quot;found, expanding %s\n&quot;,f-&gt;name);
++			parse_dir(f);
++			display_dir(f);
++			rescale(f);
++		}
++	}
++}
++void mainloop()
++{
++	usleep(10000);
++}
++int main (int argc, char **argv)
++{
++	int i;
++	struct t_item dummy;
++	if (!s3d_init(&amp;argc,&amp;argv,&quot;filebrowser&quot;))	
++	{
++		i=0;
++		 /*  load the object files */
++		dirstep=s3d_import_3ds_file(&quot;objs/dirstep.3ds&quot;);
++		folder=s3d_import_3ds_file(&quot;objs/folder.3ds&quot;);
++		geometry=s3d_import_3ds_file(&quot;objs/geometry.3ds&quot;);
++		mp3=s3d_import_3ds_file(&quot;objs/notes.3ds&quot;);
++		duno=s3d_import_3ds_file(&quot;objs/duno.3ds&quot;);
++		dot=s3d_import_3ds_file(&quot;objs/dot.3ds&quot;);
++		dotdot=s3d_import_3ds_file(&quot;objs/dotdot.3ds&quot;);
++		s3d_select_font(&quot;vera&quot;);
++		s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
++		
++		/* set up file system representation */
++		strncpy(root.name,&quot;/&quot;,M_NAME);
++		root.parent=NULL;
++		root.type=T_FOLDER;
++		root.icon=s3d_clone(dirstep);
++		root.px=root.pz=0.0;
++		root.scale=1.0;
++		rescale(&amp;root);
++	    s3d_flags_on(root.icon,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++		parse_dir(&amp;root);
++		display_dir(&amp;root);
++		s3d_mainloop(mainloop);
++		s3d_quit();
++	}
++	return(0);
++}
+
+Modified: trunk/client/sei_interface.h
+===================================================================
+--- trunk/client/sei_interface.h	2006-03-03 18:20:54 UTC (rev 134)
++++ trunk/client/sei_interface.h	2006-03-03 19:04:36 UTC (rev 135)
+@@ -43,7 +43,7 @@
+ #define TRUE 1
+ #define FALSE 0
+ 
+-extern int triangulate_polygon(int, int *, double (*)[2], int (*)[3]);
++extern int sei_triangulate_polygon(int, int *, double (*)[2], int (*)[3]);
+ extern int is_point_inside_polygon(double *);
+ 
+ #endif /* __interface_h */
+
+Modified: trunk/client/sei_misc.c
+===================================================================
+--- trunk/client/sei_misc.c	2006-03-03 18:20:54 UTC (rev 134)
++++ trunk/client/sei_misc.c	2006-03-03 19:04:36 UTC (rev 135)
+@@ -53,12 +53,11 @@
+      int n;
+ {
+   struct timeval tval;
+-  struct timezone tzone;
+   register int i;
+   int m, st[SEGSIZE], *p;
+   
+   choose_idx = 1;
+-  gettimeofday(&amp;tval, &amp;tzone);
++  gettimeofday(&amp;tval, NULL);
+   srand48(tval.tv_sec);
+ 
+   for (i = 0; i &lt;= n; i++)
+
+Modified: trunk/client/sei_monotone.c
+===================================================================
+--- trunk/client/sei_monotone.c	2006-03-03 18:20:54 UTC (rev 134)
++++ trunk/client/sei_monotone.c	2006-03-03 19:04:36 UTC (rev 135)
+@@ -39,6 +39,7 @@
+ 
+ #include &lt;sei_triangulate.h&gt;
+ #include &lt;math.h&gt;
++#include &lt;string.h&gt; /* memset() */
+ 
+ #define CROSS_SINE(v0, v1) ((v0).x * (v1).y - (v1).x * (v0).y)
+ #define LENGTH(v0) (sqrt((v0).x * (v0).x + (v0).y * (v0).y))
+@@ -130,6 +131,8 @@
+   double angle, temp;
+   int tp, tq;
+ 
++  tp = tq = 0;
++  
+   vp0 = &amp;vert[v0];
+   vp1 = &amp;vert[v1];
+   
+@@ -319,9 +322,9 @@
+      int dir;
+ {
+   trap_t *t = &amp;tr[trnum];
+-  int howsplit, mnew;
+-  int v0, v1, v0next, v1next;
+-  int retval, tmp;
++  int mnew;
++  int v0, v1;
++  int retval = -1;
+   int do_switch = FALSE;
+ 
+   if ((trnum &lt;= 0) || visited[trnum])
+
+Modified: trunk/configure.ac
+===================================================================
+--- trunk/configure.ac	2006-03-03 18:20:54 UTC (rev 134)
++++ trunk/configure.ac	2006-03-03 19:04:36 UTC (rev 135)
+@@ -161,6 +161,7 @@
+ 	apps/s3d_x11gate/Makefile
+ 	apps/s3dgps/Makefile
+ 	apps/s3dvt/Makefile
++	apps/s3dfm/Makefile
+ 	apps/dot_mcp/Makefile
+ 	example/Makefile
+ 	objs/Makefile])
+
+Modified: trunk/example/strtest.c
+===================================================================
+--- trunk/example/strtest.c	2006-03-03 18:20:54 UTC (rev 134)
++++ trunk/example/strtest.c	2006-03-03 19:04:36 UTC (rev 135)
+@@ -40,10 +40,16 @@
+ }
+ int main (int argc, char **argv)
+ {
++	char c[256];
++	int i;
+ 	if (!s3d_init(&amp;argc,&amp;argv,&quot;strtest&quot;))	
+ 	{
+ 		s3d_select_font(&quot;vera&quot;);
+-		o=s3d_draw_string(&quot;The lazy fox is bored enough to jump over everything it sees. weird, isn't it?!&quot;,NULL);  
++/*		o=s3d_draw_string(&quot;The lazy fox is bored enough to jump over everything it sees. weird, isn't it?!&quot;,NULL);  */
++		for (i=0;i&lt;256;i++)
++			c[255-i]=i;
++		o=s3d_draw_string(c,NULL);
++/*		o=s3d_draw_string(&quot;A&quot;,NULL);*/
+ 		s3d_flags_on(o,S3D_OF_VISIBLE);
+ 
+ 		s3d_set_callback(S3D_EVENT_OBJ_CLICK,	(s3d_cb)stop);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000130.html">[S3d-svn] r134 - in trunk: . apps client
+</A></li>
+	<LI>Next message: <A HREF="000132.html">[S3d-svn] r136 - in trunk: . apps/olsrs3d apps/s3dfm apps/s3dgps client server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#131">[ date ]</a>
+              <a href="thread.html#131">[ thread ]</a>
+              <a href="subject.html#131">[ subject ]</a>
+              <a href="author.html#131">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

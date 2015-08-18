@@ -1,0 +1,241 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r955 - in trunk/Documentation: libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r955%20-%20in%20trunk/Documentation%3A%20libs3d%20libs3dw&In-Reply-To=%3C200808182149.m7ILn9uZ008447%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000938.html">
+   <LINK REL="Next"  HREF="000940.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r955 - in trunk/Documentation: libs3d libs3dw</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r955%20-%20in%20trunk/Documentation%3A%20libs3d%20libs3dw&In-Reply-To=%3C200808182149.m7ILn9uZ008447%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r955 - in trunk/Documentation: libs3d libs3dw">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Aug 18 23:49:09 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000938.html">[S3d-svn] r954 - in trunk/Documentation: libs3d libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000940.html">[S3d-svn] r956 - trunk/Documentation/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#939">[ date ]</a>
+              <a href="thread.html#939">[ thread ]</a>
+              <a href="subject.html#939">[ subject ]</a>
+              <a href="author.html#939">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-08-18 23:49:08 +0200 (Mon, 18 Aug 2008)
+New Revision: 955
+
+Modified:
+   trunk/Documentation/libs3d/libs3d.docbook
+   trunk/Documentation/libs3dw/libs3dw.docbook
+Log:
+Update data definitions in Documentation
+
+Modified: trunk/Documentation/libs3d/libs3d.docbook
+===================================================================
+--- trunk/Documentation/libs3d/libs3d.docbook	2008-08-18 21:49:02 UTC (rev 954)
++++ trunk/Documentation/libs3d/libs3d.docbook	2008-08-18 21:49:08 UTC (rev 955)
+@@ -1524,15 +1524,14 @@
+ &lt;sect2 id=&quot;s3d_obj_info&quot;&gt;
+ &lt;title&gt;struct s3d_but_info&lt;/title&gt;
+ &lt;programlisting&gt;
+-struct s3d_obj_info 
+-{
+-	unsigned long object;
+-	unsigned long flags;
+-	float trans_x,trans_y,trans_z;
+-	float rot_x,rot_y,rot_z;
++struct s3d_obj_info {
++	uint32_t object;
++	uint32_t flags;
++	float trans_x, trans_y, trans_z;
++	float rot_x, rot_y, rot_z;
+ 	float scale;
+ 	float r;
+-	char name[256]; 
++	char name[256];
+ };
+ &lt;/programlisting&gt;
+ &lt;para&gt;
+@@ -1551,10 +1550,10 @@
+ &lt;sect2 id=&quot;s3d_but_info&quot;&gt;
+ &lt;title&gt;struct s3d_but_info&lt;/title&gt;
+ &lt;programlisting&gt;
+-struct s3d_but_info     
+-{                       
+-    unsigned char button, state;
+-};                      
++struct s3d_but_info {
++	uint8_t button;
++	uint8_t state;
++};
+ &lt;/programlisting&gt;
+ &lt;para&gt;
+ Can be used on the buffer of an &lt;link linkend=&quot;s3d_evt&quot;&gt;event&lt;/link&gt; of type &lt;link linkend=&quot;S3D_EVENT_MBUTTON&quot;&gt;S3D_EVENT_MBUTTON&lt;/link&gt;.
+@@ -1565,12 +1564,11 @@
+ &lt;sect2 id=&quot;mcp_object&quot;&gt;
+ &lt;title&gt;struct mcp_object&lt;/title&gt;
+ &lt;programlisting&gt;
+-struct mcp_object 
+-{
+-	unsigned long object;
+-	float trans_x,trans_y,trans_z;
++struct mcp_object {
++	uint32_t object;
++	float trans_x, trans_y, trans_z;
+ 	float r;
+-	char name[256]; 
++	char name[256];
+ };
+ 
+ &lt;/programlisting&gt;
+@@ -1583,7 +1581,7 @@
+ &lt;title&gt;struct s3d_evt&lt;/title&gt;
+ &lt;programlisting&gt;
+ struct s3d_evt {
+-	unsigned char event;
++	uint8_t event;
+ 	int length;
+ 	char *buf;
+ 	struct s3d_evt *next;
+
+Modified: trunk/Documentation/libs3dw/libs3dw.docbook
+===================================================================
+--- trunk/Documentation/libs3dw/libs3dw.docbook	2008-08-18 21:49:02 UTC (rev 954)
++++ trunk/Documentation/libs3dw/libs3dw.docbook	2008-08-18 21:49:08 UTC (rev 955)
+@@ -522,37 +522,40 @@
+ &lt;sect2 id=&quot;s3dw_widget&quot;&gt;
+ &lt;title&gt;s3dw_widget&lt;/title&gt;
+ &lt;programlisting&gt;
+-struct _s3dw_widget {   
+-		/* private .. */
+-		int          type;
+-		&lt;emphasis&gt;s3dw_widget&lt;/emphasis&gt; *parent;        
+-		&lt;link linkend=&quot;s3dw_style&quot;&gt;s3dw_style&lt;/link&gt;  *style;
+-		int                   nobj; /* number of children objects */
+-		&lt;emphasis&gt;s3dw_widget&lt;/emphasis&gt;         **pobj; /* pointer to list of children objects */
+-		int          focus;         /* index of the widget focused in pobj */
+-		int          flags;         /* flags like visibility */
+-		float        ax,ay,az;      /* current position for animation */
+-		float        as;            /* current scale factor */
+-		float        arx,ary,arz;   /* current rotation */
+-		float        width,height;  /* width and height of the widget, outer size */
+-		unsigned long oid;          /* the main object which is used for transformations etc ...*/
+-		/* public */
+-		void  *ptr;   				/* a pointer to a user structure, to use in callbacks etc */
+-		float        x,y,z;         /* position, relative to the surface usually */
+-		float        s;             /* scale factor */
+-		float        rx,ry,rz;      /* rotation around the axis */
++struct _s3dw_widget {
++	/* private .. */
++	int         type;
++	s3dw_widget *parent;
++	s3dw_style  *style;
++	int         nobj;          /* number of children objects */
++	s3dw_widget **pobj;        /* pointer to list of children objects */
++	int         focus;         /* index of the widget focused in pobj */
++	int         flags;         /* flags like visibility */
++	float       ax, ay, az;    /* current position for animation */
++	float       as;            /* current scale factor */
++	float       arx, ary, arz; /* current rotation */
++	float       width, height; /* width and height of the widget, outer size */
++	uint32_t    oid;           /* the main object which is used for transformations etc ...*/
++	/* public */
++	void        *ptr;          /* a pointer to a user structure, to use in callbacks etc */
++	float       x, y, z;       /* position, relative to the surface usually */
++	float       s;             /* scale factor */
++	float       rx, ry, rz;    /* rotation around the axis */
+ };
+ typedef struct _s3dw_widget     s3dw_widget;
+ 
+ /* type may be one of the following ... */		
+ 
+ enum {
+-    S3DW_TROOT,
+-    S3DW_TSURFACE,
+-    S3DW_TBUTTON,
+-    S3DW_TLABEL,
+-    S3DW_TINPUT,
+-    S3DW_NTYPES
++	S3DW_TROOT,
++	S3DW_TCAM,
++	S3DW_TSURFACE,
++	S3DW_TBUTTON,
++	S3DW_TLABEL,
++	S3DW_TINPUT,
++	S3DW_TTEXTBOX,
++	S3DW_TSCROLLBAR,
++	S3DW_NTYPES
+ };
+ &lt;anchor id=&quot;S3DWIDGET&quot;/&gt;
+ #define     S3DWIDGET(x)    ((s3dw_widget *)x)
+@@ -578,7 +581,7 @@
+     /* private */
+ 	&lt;link linkend=&quot;s3dw_widget&quot;&gt;s3dw_widget&lt;/link&gt;      widget;
+ 	char            *text;
+-	unsigned long    oid_text;
++	uint32_t    oid_text;
+ 	/* public */
+ 	&lt;link linkend=&quot;s3dw_callback&quot;&gt;s3dw_callback&lt;/link&gt;    onclick;
+ };
+@@ -597,7 +600,7 @@
+     /* private */
+ 	&lt;link linkend=&quot;s3dw_widget&quot;&gt;s3dw_widget&lt;/link&gt;      widget;
+ 	char            *text;
+-	unsigned long    oid_text;
++	uint32_t    oid_text;
+ 	/* public */
+ 	&lt;link linkend=&quot;s3dw_callback&quot;&gt;s3dw_callback&lt;/link&gt;    onclick;
+ 	&lt;link linkend=&quot;s3dw_callback&quot;&gt;s3dw_callback&lt;/link&gt;    onedit;
+@@ -678,9 +681,9 @@
+ struct _s3dw_surface {
+     /* private */
+ 	&lt;link linkend=&quot;s3dw_widget&quot;&gt;s3dw_widget&lt;/link&gt;      widget;
+-	unsigned long         oid_title;
+-	unsigned long         oid_tbar;
+-	char            *text;
++	uint32_t         oid_title;
++	uint32_t         oid_tbar;
++	char            *title;
+ };
+ &lt;/programlisting&gt;
+ &lt;para&gt;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000938.html">[S3d-svn] r954 - in trunk/Documentation: libs3d libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000940.html">[S3d-svn] r956 - trunk/Documentation/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#939">[ date ]</a>
+              <a href="thread.html#939">[ thread ]</a>
+              <a href="subject.html#939">[ subject ]</a>
+              <a href="author.html#939">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

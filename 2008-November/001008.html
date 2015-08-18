@@ -1,0 +1,326 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1028 - in trunk: apps/dot_mcp apps/kism3d apps/meshs3d	apps/s3d_x11gate apps/s3dfm apps/s3dosm apps/s3dvt example	experimental/comptest experimental/olsrs3d	experimental/wiitest libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1028%20-%20in%20trunk%3A%20apps/dot_mcp%20apps/kism3d%20apps/meshs3d%0A%09apps/s3d_x11gate%20apps/s3dfm%20apps/s3dosm%20apps/s3dvt%20example%0A%09experimental/comptest%20experimental/olsrs3d%0A%09experimental/wiitest%20libs3d%20libs3dw&In-Reply-To=%3C200811180037.mAI0bTmb001706%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001007.html">
+   <LINK REL="Next"  HREF="001009.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1028 - in trunk: apps/dot_mcp apps/kism3d apps/meshs3d	apps/s3d_x11gate apps/s3dfm apps/s3dosm apps/s3dvt example	experimental/comptest experimental/olsrs3d	experimental/wiitest libs3d libs3dw</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1028%20-%20in%20trunk%3A%20apps/dot_mcp%20apps/kism3d%20apps/meshs3d%0A%09apps/s3d_x11gate%20apps/s3dfm%20apps/s3dosm%20apps/s3dvt%20example%0A%09experimental/comptest%20experimental/olsrs3d%0A%09experimental/wiitest%20libs3d%20libs3dw&In-Reply-To=%3C200811180037.mAI0bTmb001706%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1028 - in trunk: apps/dot_mcp apps/kism3d apps/meshs3d	apps/s3d_x11gate apps/s3dfm apps/s3dosm apps/s3dvt example	experimental/comptest experimental/olsrs3d	experimental/wiitest libs3d libs3dw">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Nov 18 01:37:29 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001007.html">[S3d-svn] r1027 - trunk/libs3dw
+</A></li>
+        <LI>Next message: <A HREF="001009.html">[S3d-svn] r1029 - in trunk: . Documentation Documentation/manpages	apps/dot_mcp apps/kism3d apps/meshs3d apps/s3d_x11gate	apps/s3dfm apps/s3dosm apps/s3dvt cmake/modules	experimental/comptest experimental/olsrs3d	experimental/testvis experimental/wiitest libs3d libs3dw objs server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1008">[ date ]</a>
+              <a href="thread.html#1008">[ thread ]</a>
+              <a href="subject.html#1008">[ subject ]</a>
+              <a href="author.html#1008">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-11-18 01:37:28 +0100 (Tue, 18 Nov 2008)
+New Revision: 1028
+
+Modified:
+   trunk/apps/dot_mcp/CMakeLists.txt
+   trunk/apps/kism3d/CMakeLists.txt
+   trunk/apps/meshs3d/CMakeLists.txt
+   trunk/apps/s3d_x11gate/CMakeLists.txt
+   trunk/apps/s3dfm/CMakeLists.txt
+   trunk/apps/s3dosm/CMakeLists.txt
+   trunk/apps/s3dvt/CMakeLists.txt
+   trunk/example/CMakeLists.txt
+   trunk/experimental/comptest/CMakeLists.txt
+   trunk/experimental/olsrs3d/CMakeLists.txt
+   trunk/experimental/wiitest/CMakeLists.txt
+   trunk/libs3d/CMakeLists.txt
+   trunk/libs3dw/CMakeLists.txt
+Log:
+Don't clutter up the CMakeCache with library dependencies
+
+binutils-gold has fixed it's library NEEDED tracking in upstream and don't need
+information about already linked shared objects anymore. The names of target
+can now be used for linking again instead of library name and it's
+dependencies.
+
+Modified: trunk/apps/dot_mcp/CMakeLists.txt
+===================================================================
+--- trunk/apps/dot_mcp/CMakeLists.txt	2008-11-18 00:07:08 UTC (rev 1027)
++++ trunk/apps/dot_mcp/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
+@@ -3,7 +3,7 @@
+ include_directories(${s3d_SOURCE_DIR}/libs3d)
+ 
+ add_executable(dot_mcp main.c menu.c)
+-target_link_libraries(dot_mcp ${S3D_LIBRARIES} ${MATH_LIBRARIES})
++target_link_libraries(dot_mcp s3d ${MATH_LIBRARIES})
+ 
+ # install
+ install(TARGETS dot_mcp RUNTIME DESTINATION bin)
+
+Modified: trunk/apps/kism3d/CMakeLists.txt
+===================================================================
+--- trunk/apps/kism3d/CMakeLists.txt	2008-11-18 00:07:08 UTC (rev 1027)
++++ trunk/apps/kism3d/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
+@@ -4,8 +4,8 @@
+ 	include_directories(${s3d_SOURCE_DIR}/libs3d ${s3d_SOURCE_DIR}/libs3dw)
+ 
+ 	add_executable(kism3d client.c gui.c kism3d.c network.c)
+-	target_link_libraries(kism3d ${S3D_LIBRARIES} ${S3DW_LIBRARIES}
+-		${PTHREADS_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(kism3d s3d s3dw ${PTHREADS_LIBRARIES}
++	                      ${MATH_LIBRARIES})
+ 
+ 	# install
+ 	install(TARGETS kism3d RUNTIME DESTINATION bin)
+
+Modified: trunk/apps/meshs3d/CMakeLists.txt
+===================================================================
+--- trunk/apps/meshs3d/CMakeLists.txt	2008-11-18 00:07:08 UTC (rev 1027)
++++ trunk/apps/meshs3d/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
+@@ -3,8 +3,7 @@
+ include_directories(${s3d_SOURCE_DIR}/libs3d ${s3d_SOURCE_DIR}/libs3dw)
+ 
+ add_executable(meshs3d hash.c main.c net.c process.c)
+-target_link_libraries(meshs3d ${S3D_LIBRARIES} ${S3DW_LIBRARIES}
+-		${MATH_LIBRARIES})
++target_link_libraries(meshs3d s3d s3dw ${MATH_LIBRARIES})
+ 
+ # install
+ install(TARGETS meshs3d RUNTIME DESTINATION bin)
+
+Modified: trunk/apps/s3d_x11gate/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3d_x11gate/CMakeLists.txt	2008-11-18 00:07:08 UTC (rev 1027)
++++ trunk/apps/s3d_x11gate/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
+@@ -4,8 +4,8 @@
+ 	include_directories(${s3d_SOURCE_DIR}/libs3d ${s3d_SOURCE_DIR}/libs3dw)
+ 
+ 	add_executable(s3d_x11gate s3d_x11gate.c)
+-	target_link_libraries(s3d_x11gate ${S3D_LIBRARIES} ${S3DW_LIBRARIES}
+-		${X11_LIBRARIES} ${XTST_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(s3d_x11gate s3d s3dw ${X11_LIBRARIES}
++	                      ${XTST_LIBRARIES} ${MATH_LIBRARIES})
+ 
+ 	# install
+ 	install(TARGETS s3d_x11gate RUNTIME DESTINATION bin)
+
+Modified: trunk/apps/s3dfm/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3dfm/CMakeLists.txt	2008-11-18 00:07:08 UTC (rev 1027)
++++ trunk/apps/s3dfm/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
+@@ -5,8 +5,7 @@
+ 
+ 	add_executable(s3dfm animation.c box.c dialog.c event.c fly.c focus.c fs.c
+ 		icon.c main.c node.c parse.c string.c)
+-	target_link_libraries(s3dfm ${S3D_LIBRARIES} ${S3DW_LIBRARIES}
+-		${PTHREADS_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(s3dfm s3d s3dw ${PTHREADS_LIBRARIES} ${MATH_LIBRARIES})
+ 
+ 	# install
+ 	install(TARGETS s3dfm RUNTIME DESTINATION bin)
+
+Modified: trunk/apps/s3dosm/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3dosm/CMakeLists.txt	2008-11-18 00:07:08 UTC (rev 1027)
++++ trunk/apps/s3dosm/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
+@@ -8,8 +8,8 @@
+ 		io.c kismet.c main.c nav.c object.c osm.c
+ 		tag.c ui.c)
+ 
+-	target_link_libraries(s3dosm ${S3D_LIBRARIES} ${S3DW_LIBRARIES}
+-		${LIBXML2_LIBRARIES} ${SQLITE3_LIBRARIES})
++	target_link_libraries(s3dosm s3d s3dw ${MATH_LIBRARIES} ${LIBXML2_LIBRARIES}
++	                      ${SQLITE3_LIBRARIES})
+ 
+ 	if (GPS_FOUND)
+ 		target_link_libraries(s3dosm ${GPS_LIBRARIES})
+
+Modified: trunk/apps/s3dvt/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3dvt/CMakeLists.txt	2008-11-18 00:07:08 UTC (rev 1027)
++++ trunk/apps/s3dvt/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
+@@ -4,7 +4,7 @@
+ 	include_directories(${s3d_SOURCE_DIR}/libs3d)
+ 
+ 	add_executable(s3dvt main.c terminal.c)
+-	target_link_libraries(s3dvt ${S3D_LIBRARIES} ${PTHREADS_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(s3dvt s3d ${PTHREADS_LIBRARIES} ${MATH_LIBRARIES})
+ 
+ 	# install
+ 	install(TARGETS s3dvt RUNTIME DESTINATION bin)
+
+Modified: trunk/example/CMakeLists.txt
+===================================================================
+--- trunk/example/CMakeLists.txt	2008-11-18 00:07:08 UTC (rev 1027)
++++ trunk/example/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
+@@ -5,44 +5,44 @@
+ 	include_directories(${s3d_SOURCE_DIR}/libs3d ${s3d_SOURCE_DIR}/libs3dw)
+ 
+ 	add_executable(filebrowser filebrowser.c)
+-	target_link_libraries(filebrowser ${S3D_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(filebrowser s3d ${MATH_LIBRARIES})
+ 
+ 	add_executable(hudtest hudtest.c)
+-	target_link_libraries(hudtest ${S3D_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(hudtest s3d ${MATH_LIBRARIES})
+ 
+ 	add_executable(katze katze.c)
+-	target_link_libraries(katze ${S3D_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(katze s3d ${MATH_LIBRARIES})
+ 
+ 	add_executable(linetest linetest.c)
+-	target_link_libraries(linetest ${S3D_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(linetest s3d ${MATH_LIBRARIES})
+ 
+ 	add_executable(modelloader modelloader.c)
+-	target_link_libraries(modelloader ${S3D_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(modelloader s3d ${MATH_LIBRARIES})
+ 
+ 	add_executable(nichtsnutz nichtsnutz.c)
+-	target_link_libraries(nichtsnutz ${S3D_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(nichtsnutz s3d ${MATH_LIBRARIES})
+ 
+ 	add_executable(ptrtest ptrtest.c)
+-	target_link_libraries(ptrtest ${S3D_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(ptrtest s3d ${MATH_LIBRARIES})
+ 
+ 	add_executable(radius_test radius_test.c)
+-	target_link_libraries(radius_test ${S3D_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(radius_test s3d ${MATH_LIBRARIES})
+ 
+ 	add_executable(s3dclock s3dclock.c)
+-	target_link_libraries(s3dclock ${S3D_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(s3dclock s3d ${MATH_LIBRARIES})
+ 
+ 	add_executable(snowman snowman.c)
+-	target_link_libraries(snowman ${S3D_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(snowman s3d ${MATH_LIBRARIES})
+ 
+ 	add_executable(strtest strtest.c)
+-	target_link_libraries(strtest ${S3D_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(strtest s3d ${MATH_LIBRARIES})
+ 
+ 	add_executable(texturetest texturetest.c)
+-	target_link_libraries(texturetest ${S3D_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(texturetest s3d ${MATH_LIBRARIES})
+ 
+ 	add_executable(widgets widgets.c)
+-	target_link_libraries(widgets ${S3D_LIBRARIES} ${S3DW_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(widgets s3d s3dw ${MATH_LIBRARIES})
+ 
+ 	add_executable(wiresphere wiresphere.c)
+-	target_link_libraries(wiresphere ${S3D_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(wiresphere s3d ${MATH_LIBRARIES})
+ endif (EXAMPLES)
+
+Modified: trunk/experimental/comptest/CMakeLists.txt
+===================================================================
+--- trunk/experimental/comptest/CMakeLists.txt	2008-11-18 00:07:08 UTC (rev 1027)
++++ trunk/experimental/comptest/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
+@@ -4,7 +4,7 @@
+ 	include_directories(${s3d_SOURCE_DIR}/libs3d)
+ 
+ 	add_executable(comptest comptest.c window.c x11.c)
+-	target_link_libraries(comptest ${S3D_LIBRARIES} ${X11_LIBRARIES}
++	target_link_libraries(comptest s3d ${X11_LIBRARIES}
+ 		${XCOMPOSITE_LIBRARIES} ${XFIXES_LIBRARIES} ${XDAMAGE_LIBRARIES}
+ 		${XRENDER_LIBRARIES} ${MATH_LIBRARIES})
+ 
+
+Modified: trunk/experimental/olsrs3d/CMakeLists.txt
+===================================================================
+--- trunk/experimental/olsrs3d/CMakeLists.txt	2008-11-18 00:07:08 UTC (rev 1027)
++++ trunk/experimental/olsrs3d/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
+@@ -3,8 +3,7 @@
+ include_directories(${s3d_SOURCE_DIR}/libs3d ${s3d_SOURCE_DIR}/libs3dw)
+ 
+ add_executable(olsrs3d main.c net.c process.c search.c)
+-target_link_libraries(olsrs3d ${S3D_LIBRARIES} ${S3DW_LIBRARIES}
+-		${MATH_LIBRARIES})
++target_link_libraries(olsrs3d s3d s3dw ${MATH_LIBRARIES})
+ 
+ # install
+ install(TARGETS olsrs3d RUNTIME DESTINATION bin)
+
+Modified: trunk/experimental/wiitest/CMakeLists.txt
+===================================================================
+--- trunk/experimental/wiitest/CMakeLists.txt	2008-11-18 00:07:08 UTC (rev 1027)
++++ trunk/experimental/wiitest/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
+@@ -4,7 +4,7 @@
+ 	include_directories(${s3d_SOURCE_DIR}/libs3d ${CWIID_INCLUDE_DIR})
+ 
+ 	add_executable(wiitest wiitest.c)
+-	target_link_libraries(wiitest ${S3D_LIBRARIES} ${CWIID_LIBRARIES} ${MATH_LIBRARIES})
++	target_link_libraries(wiitest s3d ${CWIID_LIBRARIES} ${MATH_LIBRARIES})
+ 
+ 	# install
+ 	install(TARGETS wiitest RUNTIME DESTINATION bin)
+
+Modified: trunk/libs3d/CMakeLists.txt
+===================================================================
+--- trunk/libs3d/CMakeLists.txt	2008-11-18 00:07:08 UTC (rev 1027)
++++ trunk/libs3d/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
+@@ -9,7 +9,6 @@
+ target_link_libraries(s3d ${S3D_LIBRARY_DEPENDENCIES})
+ set_target_properties(s3d PROPERTIES VERSION ${VERSION} SOVERSION 2
+                       LINK_INTERFACE_LIBRARIES &quot;&quot;)
+-set(S3D_LIBRARIES ${S3D_LIBRARY_DEPENDENCIES} s3d CACHE PATHS &quot;Path to libraries&quot;)
+ 
+ # install
+ install(TARGETS s3d
+
+Modified: trunk/libs3dw/CMakeLists.txt
+===================================================================
+--- trunk/libs3dw/CMakeLists.txt	2008-11-18 00:07:08 UTC (rev 1027)
++++ trunk/libs3dw/CMakeLists.txt	2008-11-18 00:37:28 UTC (rev 1028)
+@@ -7,7 +7,6 @@
+ target_link_libraries(s3dw ${S3DW_LIBRARY_DEPENDENCIES})
+ set_target_properties(s3dw PROPERTIES VERSION ${VERSION} SOVERSION 2
+                       LINK_INTERFACE_LIBRARIES &quot;&quot;)
+-set(S3DW_LIBRARIES s3dw CACHE PATHS &quot;Path to libraries&quot;)
+ 
+ # install
+ install(TARGETS s3dw
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001007.html">[S3d-svn] r1027 - trunk/libs3dw
+</A></li>
+	<LI>Next message: <A HREF="001009.html">[S3d-svn] r1029 - in trunk: . Documentation Documentation/manpages	apps/dot_mcp apps/kism3d apps/meshs3d apps/s3d_x11gate	apps/s3dfm apps/s3dosm apps/s3dvt cmake/modules	experimental/comptest experimental/olsrs3d	experimental/testvis experimental/wiitest libs3d libs3dw objs server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1008">[ date ]</a>
+              <a href="thread.html#1008">[ thread ]</a>
+              <a href="subject.html#1008">[ subject ]</a>
+              <a href="author.html#1008">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

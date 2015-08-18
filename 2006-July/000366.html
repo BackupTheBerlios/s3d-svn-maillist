@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r373 - in trunk/apps: dot_mcp s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r373%20-%20in%20trunk/apps%3A%20dot_mcp%20s3dfm&In-Reply-To=%3C200607040725.k647Pckb022795%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000365.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r373 - in trunk/apps: dot_mcp s3dfm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r373%20-%20in%20trunk/apps%3A%20dot_mcp%20s3dfm&In-Reply-To=%3C200607040725.k647Pckb022795%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r373 - in trunk/apps: dot_mcp s3dfm">dotslash at berlios.de
+       </A><BR>
+    <I>Tue Jul  4 09:25:38 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000365.html">[S3d-svn] r372 - in trunk: . apps/s3dfm
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#366">[ date ]</a>
+              <a href="thread.html#366">[ thread ]</a>
+              <a href="subject.html#366">[ subject ]</a>
+              <a href="author.html#366">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-07-04 09:25:33 +0200 (Tue, 04 Jul 2006)
+New Revision: 373
+
+Modified:
+   trunk/apps/dot_mcp/main.c
+   trunk/apps/s3dfm/dialog.c
+Log:
+- resetting in egomode
+- use i for dir information, not f1
+
+Modified: trunk/apps/dot_mcp/main.c
+===================================================================
+--- trunk/apps/dot_mcp/main.c	2006-06-30 22:22:53 UTC (rev 372)
++++ trunk/apps/dot_mcp/main.c	2006-07-04 07:25:33 UTC (rev 373)
+@@ -468,6 +468,8 @@
+ 	switch (keys-&gt;keysym)
+ 	{
+ 		case S3DK_F1:  ego_mode=(ego_mode+1)%2;
++				 xdif=0;
++			     ydif=0;
+ 				 printf(&quot;ego mode %d\n&quot;,ego_mode);
+ 				 break;
+ 		case 'w':ydif+=-1.0;break;
+
+Modified: trunk/apps/s3dfm/dialog.c
+===================================================================
+--- trunk/apps/s3dfm/dialog.c	2006-06-30 22:22:53 UTC (rev 372)
++++ trunk/apps/s3dfm/dialog.c	2006-07-04 07:25:33 UTC (rev 373)
+@@ -33,12 +33,14 @@
+ 	struct s3d_key_event *keys=(struct s3d_key_event *)evt-&gt;buf;
+ 	switch (keys-&gt;keysym)
+ 	{
+-		case S3DK_F1:
++		case 'i':
++		case 'I':
+ 				{
+ 				char path[M_DIR];
+ 				get_path(focus,path);
+ 				info_window(path);
+ 				}
++				break;
+ 	}
+ 	s3dw_handle_key(evt);
+ }
+@@ -75,7 +77,7 @@
+ 		} else
+ 			printf(&quot;[F]ound, but is %s no folder\n&quot;,f-&gt;name);
+ 	} else {
+-		printf(&quot;[C]ould not find :/\n&quot;);
++/*		printf(&quot;[C]ould not find :/\n&quot;);*/
+ 	}
+ }
+ void close_win(s3dw_widget *button)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000365.html">[S3d-svn] r372 - in trunk: . apps/s3dfm
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#366">[ date ]</a>
+              <a href="thread.html#366">[ thread ]</a>
+              <a href="subject.html#366">[ subject ]</a>
+              <a href="author.html#366">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

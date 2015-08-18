@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r948 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r948%20-%20trunk/server&In-Reply-To=%3C200808162212.m7GMCDMh001785%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000932.html">
+   <LINK REL="Next"  HREF="000933.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r948 - trunk/server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r948%20-%20trunk/server&In-Reply-To=%3C200808162212.m7GMCDMh001785%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r948 - trunk/server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Aug 17 00:12:13 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000932.html">[S3d-svn] r947 - trunk/server
+</A></li>
+        <LI>Next message: <A HREF="000933.html">[S3d-svn] r949 - trunk/experimental/testvis
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#928">[ date ]</a>
+              <a href="thread.html#928">[ thread ]</a>
+              <a href="subject.html#928">[ subject ]</a>
+              <a href="author.html#928">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2008-08-17 00:12:12 +0200 (Sun, 17 Aug 2008)
+New Revision: 948
+
+Modified:
+   trunk/server/object.c
+Log:
+remove segfault, try to free rest of object even if tree is broken
+
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2008-08-16 22:03:37 UTC (rev 947)
++++ trunk/server/object.c	2008-08-16 22:12:12 UTC (rev 948)
+@@ -2040,7 +2040,7 @@
+ 		link_delete(p, o-&gt;lsub);
+ 		if (i == o-&gt;lsub) {
+ 			s3dprintf(HIGH, &quot;something is wrong!!&quot;);
+-			o = NULL; /* segfault */
++			o-&gt;lsub = -1;
+ 		}
+ 	}
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000932.html">[S3d-svn] r947 - trunk/server
+</A></li>
+	<LI>Next message: <A HREF="000933.html">[S3d-svn] r949 - trunk/experimental/testvis
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#928">[ date ]</a>
+              <a href="thread.html#928">[ thread ]</a>
+              <a href="subject.html#928">[ subject ]</a>
+              <a href="author.html#928">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

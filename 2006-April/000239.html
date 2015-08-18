@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r246 - in trunk: . apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-April/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r246%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200604082328.k38NSZ1M023460%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000238.html">
+   <LINK REL="Next"  HREF="000240.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r246 - in trunk: . apps/s3dfm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r246%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200604082328.k38NSZ1M023460%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r246 - in trunk: . apps/s3dfm">dotslash at berlios.de
+       </A><BR>
+    <I>Sun Apr  9 01:28:35 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000238.html">[S3d-svn] r245 - in trunk: . apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000240.html">[S3d-svn] r247 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#239">[ date ]</a>
+              <a href="thread.html#239">[ thread ]</a>
+              <a href="subject.html#239">[ subject ]</a>
+              <a href="author.html#239">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-04-09 01:28:10 +0200 (Sun, 09 Apr 2006)
+New Revision: 246
+
+Modified:
+   trunk/
+   trunk/apps/s3dfm/main.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r375 at balthasar</A>:  dotslash | 2006-04-09 01:28:03 +0200
+ - funny zoom :D
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:373
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:375
+
+Modified: trunk/apps/s3dfm/main.c
+===================================================================
+--- trunk/apps/s3dfm/main.c	2006-04-08 17:28:01 UTC (rev 245)
++++ trunk/apps/s3dfm/main.c	2006-04-08 23:28:10 UTC (rev 246)
+@@ -29,7 +29,7 @@
+ #include &lt;string.h&gt;  /*  strlen(), strncmp(), strrchr() */
+ #include &lt;math.h&gt;	 /*  sin(),cos() */
+ #include &lt;time.h&gt;	/* nanosleep() */
+-static struct timespec t={0,100*1000*1000}; /* 100 mili seconds */
++static struct timespec t={0,10*1000*1000}; /* 10 mili seconds */
+ 
+ 
+ #define SH			0.4 /* height of the step */
+@@ -44,6 +44,8 @@
+ #define M_DIR		512
+ #define M_NAME		256
+ int folder,geometry,mp3,duno,dot,dotdot;
++float dpx,dpy,dpz,dscale;
++float px, py, pz, scale;
+ struct t_item {
+ 	int icon, str;							/* object ids ...*/
+ 	int block;								/* oid of the block */
+@@ -98,13 +100,13 @@
+ }
+ /* orders the directory objects on top of its parent objects 
+  * to be called after adding or removing things ...*/
+-int placeontop(struct t_item *dir)
++void placeontop(struct t_item *dir)
+ {
+ 	int i,j;
+ 	printf(&quot;placeontop dir %s, %d\n&quot;,dir-&gt;name,dir-&gt;dirs_opened);
+ 	switch (dir-&gt;dirs_opened)
+ 	{
+-		case 0: return(0);
++		case 0: return;
+ 		case 1:
+ 			for (i=0;i&lt;dir-&gt;n_item;i++)
+ 			{
+@@ -283,7 +285,6 @@
+ 				return(f);
+ 	return(NULL);
+ }
+-float px, py, pz;
+ /* gets the scale by multiplying scales */
+ 
+ float get_scale(struct t_item *f)
+@@ -308,19 +309,13 @@
+ #define SCALE 	1
+ void rescale(struct t_item *f)
+ {
+-	float scale=1.0;
+ 	px=0.0;
+ 	py=0.0;
+ 	pz=0.0;
+ 	printf(&quot;[Z]ooming to %s\n&quot;,f-&gt;name);
+-	if (f-&gt;parent!=NULL)
+-	{
+-		scale=get_scale(f);
+-	}
++	scale=get_scale(f);
+ 	printf(&quot;[R]escaling to %f\n&quot;,scale);
+ 	printf(&quot;px: %f py:%f pz: %f\n&quot;,px,py,pz);
+-	s3d_translate(root.block,px*SCALE,-3.0+SCALE*py,pz*SCALE);
+-	s3d_scale(root.block,scale*SCALE);
+ }
+ 
+ void object_click(struct s3d_evt *evt)
+@@ -328,7 +323,6 @@
+ 	int oid;
+ 	struct t_item *f;
+ 	oid=(int)*((unsigned long *)evt-&gt;buf);
+-	printf(&quot;! clicked object %d\n&quot;,oid);
+ 	if (NULL!=(f=finditem(&amp;root,oid)))
+ 	{
+ 		if (f-&gt;type==T_FOLDER)
+@@ -343,13 +337,24 @@
+ 		printf(&quot;[C]ould not find :/\n&quot;);
+ 	}
+ }
++#define ZOOMS 	5
+ void mainloop()
+ {
++	dpx=(px+dpx*ZOOMS)/(ZOOMS+1);
++	dpy=(py+dpy*ZOOMS)/(ZOOMS+1);
++	dpz=(pz+dpz*ZOOMS)/(ZOOMS+1);
++	dscale=(scale+dscale*ZOOMS)/(ZOOMS+1);
++	s3d_translate(root.block,dpx*SCALE,-3.0+SCALE*dpy,dpz*SCALE);
++	s3d_scale(root.block,dscale*SCALE);
++
+ 	nanosleep(&amp;t,NULL); 
+ }
+ int main (int argc, char **argv)
+ {
+ 	int i;
++	px=py=pz=0.0;
++	dpx=dpy=dpz=0.0;
++	dscale=scale=1.0;
+ 	if (!s3d_init(&amp;argc,&amp;argv,&quot;filebrowser&quot;))	
+ 	{
+ 		i=0;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000238.html">[S3d-svn] r245 - in trunk: . apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000240.html">[S3d-svn] r247 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#239">[ date ]</a>
+              <a href="thread.html#239">[ thread ]</a>
+              <a href="subject.html#239">[ subject ]</a>
+              <a href="author.html#239">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

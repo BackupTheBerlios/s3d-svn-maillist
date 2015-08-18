@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r334 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r334%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200606042249.k54MnoDb009206%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000326.html">
+   <LINK REL="Next"  HREF="000328.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r334 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r334%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200606042249.k54MnoDb009206%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r334 - in trunk: . server">dotslash at berlios.de
+       </A><BR>
+    <I>Mon Jun  5 00:49:50 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000326.html">[S3d-svn] r333 - in trunk: . apps/s3d_x11gate apps/s3dvt
+</A></li>
+        <LI>Next message: <A HREF="000328.html">[S3d-svn] r335 - in trunk: . apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#327">[ date ]</a>
+              <a href="thread.html#327">[ thread ]</a>
+              <a href="subject.html#327">[ subject ]</a>
+              <a href="author.html#327">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-05 00:49:49 +0200 (Mon, 05 Jun 2006)
+New Revision: 334
+
+Modified:
+   trunk/
+   trunk/server/graphics.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r710 at balthasar</A>:  dotslash | 2006-06-05 00:49:42 +0200
+ - move the light a bit
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:708
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:710
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2006-06-04 22:42:54 UTC (rev 333)
++++ trunk/server/graphics.c	2006-06-04 22:49:49 UTC (rev 334)
+@@ -80,7 +80,8 @@
+ 	
+ 	/* polygon smoothing */
+ 	glDisable(GL_POLYGON_SMOOTH);
+-/*    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST); */
++/*    glEnable(GL_POLYGON_SMOOTH); 
++    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST); */
+ 
+ 	/* normalizing */
+ 	glDisable(GL_AUTO_NORMAL);
+@@ -349,7 +350,7 @@
+ 	struct t_process *p=get_proc_by_pid(MCP);
+ 	t_mtrx m;
+ /*	GLfloat pos[]={100.0,20.0,100.0,1.0};*/
+-	GLfloat pos[]={0,20,0,1.0};
++	GLfloat pos[]={0,20,1.0,1.0};
+ 	GLfloat light0_spec[]={0.7,0.7,0.7,0.0};
+ 	GLfloat light0_shininess[] ={50.0};
+ 	GLfloat light0_diff[]={0.5,0.5,0.5,1.0};
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000326.html">[S3d-svn] r333 - in trunk: . apps/s3d_x11gate apps/s3dvt
+</A></li>
+	<LI>Next message: <A HREF="000328.html">[S3d-svn] r335 - in trunk: . apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#327">[ date ]</a>
+              <a href="thread.html#327">[ thread ]</a>
+              <a href="subject.html#327">[ subject ]</a>
+              <a href="author.html#327">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

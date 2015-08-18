@@ -1,0 +1,263 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r226 - in trunk: Documentation apps/olsrs3d server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r226%20-%20in%20trunk%3A%20Documentation%20apps/olsrs3d%20server&In-Reply-To=%3C200603242012.k2OKCeeP028576%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000218.html">
+   <LINK REL="Next"  HREF="000220.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r226 - in trunk: Documentation apps/olsrs3d server</H1>
+    <B>marec at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r226%20-%20in%20trunk%3A%20Documentation%20apps/olsrs3d%20server&In-Reply-To=%3C200603242012.k2OKCeeP028576%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r226 - in trunk: Documentation apps/olsrs3d server">marec at berlios.de
+       </A><BR>
+    <I>Fri Mar 24 21:12:40 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000218.html">[S3d-svn] r222 - in trunk: . Documentation
+</A></li>
+        <LI>Next message: <A HREF="000220.html">[S3d-svn] r227 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#219">[ date ]</a>
+              <a href="thread.html#219">[ thread ]</a>
+              <a href="subject.html#219">[ subject ]</a>
+              <a href="author.html#219">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-03-24 21:11:42 +0100 (Fri, 24 Mar 2006)
+New Revision: 226
+
+Modified:
+   trunk/Documentation/Makefile.am
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/olsrs3d.h
+   trunk/apps/olsrs3d/process.c
+   trunk/server/config.h
+Log:
+sqrt for distance of olsr nodes
+
+
+Modified: trunk/Documentation/Makefile.am
+===================================================================
+--- trunk/Documentation/Makefile.am	2006-03-21 00:12:44 UTC (rev 225)
++++ trunk/Documentation/Makefile.am	2006-03-24 20:11:42 UTC (rev 226)
+@@ -1,4 +1,4 @@
+-SUBDIRS		= s3dapi
++#SUBDIRS		= s3dapi
+ 
+ EXTRA_DIST	= s3drc.txt for_icon_designer.txt OPEN_PROBLEMS.txt \
+ 		  s3dapi/README s3dapi/bookinfo.docbook s3dapi.docbook
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-03-21 00:12:44 UTC (rev 225)
++++ trunk/apps/olsrs3d/main.c	2006-03-24 20:11:42 UTC (rev 226)
+@@ -409,22 +409,18 @@
+ 
+ 	while ( olsr_con != NULL ) {
+ 
+-		if ( ( olsr_con-&gt;left_etx != 0.0 ) &amp;&amp; ( olsr_con-&gt;right_etx != 0.0  ) ) {
++		distance = dirt( olsr_con-&gt;left_olsr_node-&gt;pos_vec, olsr_con-&gt;right_olsr_node-&gt;pos_vec, tmp_mov_vec );
++		f = ( ( olsr_con-&gt;left_etx_sqrt + olsr_con-&gt;left_etx_sqrt ) / 4.0 ) / distance;
+ 
+-			distance = dirt( olsr_con-&gt;left_olsr_node-&gt;pos_vec, olsr_con-&gt;right_olsr_node-&gt;pos_vec, tmp_mov_vec );
+-			f = ( ( olsr_con-&gt;left_etx + olsr_con-&gt;right_etx ) / 4.0 ) / distance;
++		/***
++		 * drift factor - 0.0 &lt; factor &lt; 1.0 ( best results: 0.3 &lt; factor &lt; 0.9
++		 * small factor: fast and strong drift to neighbours
++		 ***/
++		if ( f &lt; Factor ) f = Factor;
+ 
+-			/***
+-			 * drift factor - 0.0 &lt; factor &lt; 1.0 ( best results: 0.3 &lt; factor &lt; 0.9
+-			 * small factor: fast and strong drift to neighbours
+-			 ***/
+-			if ( f &lt; Factor ) f = Factor;
++		mov_add( olsr_con-&gt;left_olsr_node-&gt;mov_vec, tmp_mov_vec, 1 / f - 1 );
++		mov_add( olsr_con-&gt;right_olsr_node-&gt;mov_vec, tmp_mov_vec, - ( 1 / f - 1 ) );
+ 
+-			mov_add( olsr_con-&gt;left_olsr_node-&gt;mov_vec, tmp_mov_vec, 1 / f - 1 );
+-			mov_add( olsr_con-&gt;right_olsr_node-&gt;mov_vec, tmp_mov_vec, - ( 1 / f - 1 ) );
+-
+-		}
+-
+ 		olsr_con = olsr_con-&gt;next_olsr_con;
+ 
+ 	}
+@@ -756,16 +752,16 @@
+ 	struct olsr_neigh_list *tmpNeighbour;
+ 	float p = 1.0;
+ 	int i;
+-	
++
+ 	oid=(int)*((unsigned long *)evt-&gt;buf);
+ 	olsr_node = *lst_search(oid);
+-	
++
+ 	/*
+ 	distance = dirt(CamPosition[0],olsr_node-&gt;pos_vec,tmp_vector);
+ 	mov_add(ZeroPosition,tmp_vector,1.0);
+ 	s3d_translate(ZeroPoint,ZeroPosition[0] * -1,ZeroPosition[1] * -1,ZeroPosition[2] * -1);
+ 	*/
+-	
++
+ 	/* print clicked object ip and connections */
+ 	if ( Olsr_ip_label_obj != -1 ) s3d_del_object( Olsr_ip_label_obj );
+ 	snprintf( ip_str, 35, &quot;ip: %s&quot;, olsr_node-&gt;ip );
+@@ -774,7 +770,7 @@
+ 	s3d_flags_on( Olsr_ip_label_obj, S3D_OF_VISIBLE );
+ 	s3d_scale( Olsr_ip_label_obj, 0.2 );
+ 	s3d_translate( Olsr_ip_label_obj,-Left*3.0-(ln * 0.2), -Bottom*3.0-0.8, -3.0 );
+-	
++
+ 	if( Olsr_neighbour_label_obj != NULL )
+ 	{
+ 		/* int n = sizeof(Olsr_neighbour_label_obj) / sizeof(int);*/
+@@ -786,21 +782,21 @@
+ 		free(Olsr_neighbour_label_obj);
+ 		Olsr_neighbour_label_obj = NULL;
+ 	}
+-	
++
+ 	tmpNeighbour = olsr_node-&gt;olsr_neigh_list;
+-	
++
+ 	Size = 0;
+ 	while(tmpNeighbour != NULL)
+ 	{
+ 		Size++;
+ 		tmpNeighbour = tmpNeighbour-&gt;next_olsr_neigh_list;
+ 	}
+-	
++
+ 	Olsr_neighbour_label_obj = malloc(Size*sizeof(int));
+ 	tmpNeighbour = olsr_node-&gt;olsr_neigh_list;
+-	
++
+ 	for(i = 0; i &lt; Size ;i++)
+-	{	
++	{
+ 		char nIpStr[60];
+ 		float len;
+ 		snprintf(nIpStr, 60, &quot;%10.2f %s %10.2f&quot;, (strcmp(olsr_node-&gt;ip,tmpNeighbour-&gt;olsr_con-&gt;right_olsr_node-&gt;ip)?tmpNeighbour-&gt;olsr_con-&gt;left_etx:tmpNeighbour-&gt;olsr_con-&gt;right_etx),
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-03-21 00:12:44 UTC (rev 225)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-03-24 20:11:42 UTC (rev 226)
+@@ -40,6 +40,8 @@
+ 	struct olsr_node *right_olsr_node;   /* pointer to right end point of the connection */
+ 	float left_etx;   /* etx of left olsr node */
+ 	float right_etx;   /* etx of right olsr node */
++	float left_etx_sqrt;   /* sqrt of etx of left olsr node */
++	float right_etx_sqrt;   /* sqrt etx of right olsr node */
+ 	int obj_id;   /* id of connection object in s3d */
+ 	int color;
+ 	float rgb;
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-03-21 00:12:44 UTC (rev 225)
++++ trunk/apps/olsrs3d/process.c	2006-03-24 20:11:42 UTC (rev 226)
+@@ -29,6 +29,7 @@
+ #include &lt;string.h&gt; 	/* strlen(), memmove() */
+ #include &lt;stdlib.h&gt; 	/* rand(), malloc(), realloc(), free() */
+ #include &lt;s3d.h&gt;
++#include &lt;math.h&gt;       /* sqrt() */
+ #include &quot;olsrs3d.h&quot;
+ 
+ char lbuf[MAXLINESIZE];
+@@ -56,11 +57,13 @@
+ 		/* connection already exists */
+ 		if ( ( strncmp( (*olsr_con)-&gt;left_olsr_node-&gt;ip, con_from-&gt;ip, NAMEMAX ) == 0 ) &amp;&amp; ( strncmp( (*olsr_con)-&gt;right_olsr_node-&gt;ip, con_to-&gt;ip, NAMEMAX ) == 0 ) ) {
+ 			(*olsr_con)-&gt;left_etx = etx;
++			(*olsr_con)-&gt;left_etx_sqrt = sqrt( etx );
+ 			break;
+ 
+ 		} else if ( ( strncmp( (*olsr_con)-&gt;right_olsr_node-&gt;ip, con_from-&gt;ip, NAMEMAX ) == 0 ) &amp;&amp; ( strncmp( (*olsr_con)-&gt;left_olsr_node-&gt;ip, con_to-&gt;ip, NAMEMAX ) == 0 ) ) {
+ 
+ 			(*olsr_con)-&gt;right_etx = etx;
++			(*olsr_con)-&gt;right_etx_sqrt = sqrt( etx );
+ 			break;
+ 
+ 		}
+@@ -106,12 +109,16 @@
+ 		if ( etx == -1000.00 ) {
+ 
+ 			(*olsr_con)-&gt;left_etx = etx;
++			(*olsr_con)-&gt;left_etx_sqrt = 10.0;
+ 			(*olsr_con)-&gt;right_etx = etx;
++			(*olsr_con)-&gt;right_etx_sqrt = 10.0;
+ 
+ 		} else {
+ 
+ 			(*olsr_con)-&gt;left_etx = etx;
+-			(*olsr_con)-&gt;right_etx = 0.0;
++			(*olsr_con)-&gt;left_etx_sqrt = sqrt( etx );
++			(*olsr_con)-&gt;right_etx = 999.0;
++			(*olsr_con)-&gt;right_etx_sqrt = sqrt( 999.0 );
+ 
+ 		}
+ 
+@@ -463,8 +470,8 @@
+ 					olsr_node1 = get_olsr_node( &amp;Olsr_root, con_from );
+ 					olsr_node2 = get_olsr_node( &amp;Olsr_root, con_to );
+ 					f = strtod(etx,NULL);
+-					if ( f &lt; 1 )
+-						f = 999;
++					if ( f &lt; 1.0 )
++						f = 999.0;
+ 					add_olsr_con( olsr_node1, olsr_node2, f );
+ 				}
+ 
+
+Modified: trunk/server/config.h
+===================================================================
+--- trunk/server/config.h	2006-03-21 00:12:44 UTC (rev 225)
++++ trunk/server/config.h	2006-03-24 20:11:42 UTC (rev 226)
+@@ -40,7 +40,7 @@
+ #define HIGH	4
+ #define	VHIGH	5
+ /*  which is the minimum level of debugmessage we want to see? */
+-#define DEBUG	LOW
++#define DEBUG	VHIGH
+ #ifndef DEBUG
+ #define errds(...) /* nothing */
+ #define dprintf(...) /* nothing */
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000218.html">[S3d-svn] r222 - in trunk: . Documentation
+</A></li>
+	<LI>Next message: <A HREF="000220.html">[S3d-svn] r227 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#219">[ date ]</a>
+              <a href="thread.html#219">[ thread ]</a>
+              <a href="subject.html#219">[ subject ]</a>
+              <a href="author.html#219">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

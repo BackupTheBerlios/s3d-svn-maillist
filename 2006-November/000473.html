@@ -1,0 +1,561 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r480 - trunk/apps/kism3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r480%20-%20trunk/apps/kism3d&In-Reply-To=%3C200611191408.kAJE8fjp024546%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000472.html">
+   <LINK REL="Next"  HREF="000474.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r480 - trunk/apps/kism3d</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r480%20-%20trunk/apps/kism3d&In-Reply-To=%3C200611191408.kAJE8fjp024546%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r480 - trunk/apps/kism3d">marec at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 19 15:08:41 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000472.html">[S3d-svn] r479 - trunk/objs
+</A></li>
+        <LI>Next message: <A HREF="000474.html">[S3d-svn] r481 - in trunk: . example libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#473">[ date ]</a>
+              <a href="thread.html#473">[ thread ]</a>
+              <a href="subject.html#473">[ subject ]</a>
+              <a href="author.html#473">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-11-19 15:08:40 +0100 (Sun, 19 Nov 2006)
+New Revision: 480
+
+Added:
+   trunk/apps/kism3d/client.c
+   trunk/apps/kism3d/gui.c
+   trunk/apps/kism3d/network.c
+Modified:
+   trunk/apps/kism3d/Makefile.am
+   trunk/apps/kism3d/kism3d.c
+   trunk/apps/kism3d/kism3d.h
+   trunk/apps/kism3d/list.h
+Log:
+kism3d update
+
+Modified: trunk/apps/kism3d/Makefile.am
+===================================================================
+--- trunk/apps/kism3d/Makefile.am	2006-11-16 16:45:32 UTC (rev 479)
++++ trunk/apps/kism3d/Makefile.am	2006-11-19 14:08:40 UTC (rev 480)
+@@ -5,7 +5,7 @@
+ kism3dinclude_HEADERS =  \
+ 	kism3d.h list.h
+ kism3d_SOURCES =  \
+-	kism3d.c
++	kism3d.c network.c client.c gui.c
+ 
+ kism3d_CPPFLAGS=		-I${top_srcdir}/libs3d -I${top_srcdir}/libs3dw
+ kism3d_LDADD=		${top_builddir}/libs3d/libs3d.la ${top_builddir}/libs3dw/libs3dw.la
+
+Added: trunk/apps/kism3d/client.c
+===================================================================
+--- trunk/apps/kism3d/client.c	2006-11-16 16:45:32 UTC (rev 479)
++++ trunk/apps/kism3d/client.c	2006-11-19 14:08:40 UTC (rev 480)
+@@ -0,0 +1,73 @@
++/*
++ * client.c
++ *
++ * Copyright (C) 2006  Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
++ *
++ * This file is part of kism3d, an 802.11 visualizer for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * kism3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * kism3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with olsrs3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
++
++#include &quot;kism3d.h&quot;
++#include &lt;string.h&gt;   /* strncmp(), strncpy() */
++#include &lt;stdlib.h&gt;   /* rand() */
++
++
++
++struct wlan_client *get_wlan_client( char *mac ) {
++
++	struct list_head *client_pos;
++	struct wlan_client *wlan_client;
++
++
++	list_for_each(client_pos, &amp;Client_list) {
++
++		wlan_client = list_entry(client_pos, struct wlan_client, list);
++
++		if ( strncmp( wlan_client-&gt;mac, mac, 18 ) == 0 )
++			return wlan_client;
++
++	}
++
++
++	/* we reached the end of the list and must create a new wlan_network */
++	wlan_client = alloc_memory( sizeof( struct wlan_client ) );
++
++	INIT_LIST_HEAD(&amp;wlan_client-&gt;list);
++
++	strncpy( wlan_client-&gt;mac, mac, 18 );
++	wlan_client-&gt;wlan_network = NULL;
++
++	wlan_client-&gt;visible = 1;
++
++	wlan_client-&gt;pos_vec[0] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
++	wlan_client-&gt;pos_vec[1] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
++	wlan_client-&gt;pos_vec[2] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
++	wlan_client-&gt;mov_vec[0] = wlan_client-&gt;mov_vec[1] = wlan_client-&gt;mov_vec[2] = 0.0;
++
++	wlan_client-&gt;obj_id = -1;
++	wlan_client-&gt;desc_id = -1;
++
++	list_add_tail(&amp;wlan_client-&gt;list, &amp;Client_list);
++
++	return wlan_client;
++
++}
++
++
++
+
+Added: trunk/apps/kism3d/gui.c
+===================================================================
+--- trunk/apps/kism3d/gui.c	2006-11-16 16:45:32 UTC (rev 479)
++++ trunk/apps/kism3d/gui.c	2006-11-19 14:08:40 UTC (rev 480)
+@@ -0,0 +1,24 @@
++/*
++ * gui.c
++ *
++ * Copyright (C) 2006  Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
++ *
++ * This file is part of kism3d, an 802.11 visualizer for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * kism3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * kism3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with olsrs3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
+
+Modified: trunk/apps/kism3d/kism3d.c
+===================================================================
+--- trunk/apps/kism3d/kism3d.c	2006-11-16 16:45:32 UTC (rev 479)
++++ trunk/apps/kism3d/kism3d.c	2006-11-19 14:08:40 UTC (rev 480)
+@@ -11,7 +11,7 @@
+  * the Free Software Foundation; either version 2 of the License, or
+  * (at your option) any later version.
+  *
+- * olsrs3d is distributed in the hope that it will be useful,
++ * kism3d is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+@@ -26,7 +26,7 @@
+ #include &quot;kism3d.h&quot;
+ #include &lt;stdlib.h&gt;   /* malloc() */
+ #include &lt;stdio.h&gt;    /* printf() */
+-#include &lt;string.h&gt;   /* memset() */
++#include &lt;string.h&gt;   /* memset(), strncmp(), strncpy() */
+ #include &lt;errno.h&gt;    /* errno */
+ #include &lt;unistd.h&gt;   /* write() */
+ 
+@@ -36,9 +36,9 @@
+ 
+ 
+ 
+-int num_kismet_sources = 0;
+-
+ DEFINE_LIST_HEAD(kismet_src_list);
++DEFINE_LIST_HEAD(Network_list);
++DEFINE_LIST_HEAD(Client_list);
+ 
+ 
+ 
+@@ -59,8 +59,27 @@
+ 
+ 
+ 
++void *realloc_memory( void *ptr, int len ) {
++
++	void *res = realloc( ptr, len );
++
++	if (res == NULL) {
++		printf( &quot;Error - can't trallocate memory: %s\n&quot;, strerror(errno) );
++		exit(1);
++	}
++
++	memset( res, 0, len );
++
++	return res;
++
++}
++
++
++
+ void parse_buffer( struct kismet_src *kismet_src ) {
+ 
++	struct wlan_network *wlan_network;
++	struct wlan_client *wlan_client;
+ 	char enable_network[] = &quot;!0 ENABLE NETWORK bssid,type,channel,ssid\n&quot;, enable_client[] = &quot;!0 ENABLE CLIENT bssid,mac,ip\n&quot;, enable_alert[] = &quot;!0 ENABLE ALERT *\n&quot;;
+ 	char *read_ptr, *line_ptr, *last_cr_ptr = NULL, *parse_begin_ptr, *parse_end_ptr;
+ 	char *bssid, *channel, *type, *ssid, *mac, *ip;
+@@ -164,8 +183,27 @@
+ 
+ 				}
+ 
+-				printf( &quot;network found - bssid %s, type %s, channel %s, ssid %s\n&quot;, bssid, type, channel, ssid );
++				wlan_network = get_wlan_network( bssid );
+ 
++				if ( ( wlan_network-&gt;type != -1 ) &amp;&amp; ( wlan_network-&gt;channel != -1 ) &amp;&amp; ( wlan_network-&gt;ssid != NULL ) ) {
++
++					/* network properties have changed - alert user */
++
++				}
++
++				wlan_network-&gt;type = atoi( type );
++				wlan_network-&gt;channel = atoi( channel );
++
++				if ( wlan_network-&gt;ssid == NULL )
++					wlan_network-&gt;ssid = alloc_memory( strlen( ssid ) );
++				else
++					wlan_network-&gt;ssid = realloc_memory( wlan_network-&gt;ssid, strlen( ssid ) );
++
++				strncpy( wlan_network-&gt;ssid, ssid, strlen( ssid ) );
++
++
++				/* printf( &quot;network found - bssid %s, type %s, channel %s, ssid %s\n&quot;, bssid, type, channel, ssid ); */
++
+ 			} else if ( strncmp( line_ptr, &quot;*CLIENT: &quot;, strlen( &quot;*CLIENT: &quot; ) ) == 0 ) {
+ 
+ 				parse_begin_ptr = parse_end_ptr = line_ptr + strlen( &quot;*CLIENT: &quot; );
+@@ -205,11 +243,23 @@
+ 
+ 				}
+ 
+-				printf( &quot;client found - bssid %s, mac %s, ip %s\n&quot;, bssid, mac, ip );
++				wlan_client = get_wlan_client( mac );
+ 
++				/*if ( ( wlan_client-&gt;type != -1 ) &amp;&amp; ( wlan_client-&gt;channel != -1 ) &amp;&amp; ( wlan_client-&gt;ssid != NULL ) ) {
++
++					 client properties have changed - alert user
++
++				}*/
++
++				strncpy( wlan_client-&gt;bssid, bssid, 18 );
++				strncpy( wlan_client-&gt;ip, ip, 16 );
++				wlan_client-&gt;wlan_network = find_wlan_network( wlan_client-&gt;bssid );
++
++				/* printf( &quot;client found - bssid %s, mac %s, ip %s\n&quot;, bssid, mac, ip ); */
++
+ 			} else if ( strncmp( line_ptr, &quot;*ALERT: &quot;, strlen( &quot;*ALERT: &quot; ) ) == 0 ) {
+ 
+-				printf( &quot;alert: %s\n&quot;, line_ptr + strlen( &quot;*ALERT: &quot; ) );
++				/* printf( &quot;alert: %s\n&quot;, line_ptr + strlen( &quot;*ALERT: &quot; ) ); */
+ 
+ 			}
+ 
+@@ -234,8 +284,10 @@
+ 	struct in_addr tmp_ip_holder;
+ 	struct kismet_src *kismet_src;
+ 	struct list_head *kismet_pos, *kismet_pos_tmp;
++	struct wlan_network *wlan_network;
++	struct wlan_client *wlan_client;
+ 	struct timeval tv;
+-	int found_args = 1, max_sock = -1, res, status;
++	int num_kismet_sources = 0, found_args = 1, max_sock = -1, res, status;
+ 	char *colon_ptr, buff[1000];
+ 	fd_set wait_sockets, tmp_wait_sockets;
+ 
+@@ -436,6 +488,28 @@
+ 
+ 		}
+ 
++		printf( &quot;\nCurrent network list:\n&quot; );
++
++		list_for_each_safe(kismet_pos, kismet_pos_tmp, &amp;Network_list) {
++
++			wlan_network = list_entry(kismet_pos, struct wlan_network, list);
++
++			printf( &quot;   =&gt; %s\n&quot;, wlan_network-&gt;bssid );
++
++		}
++
++		printf( &quot;\nCurrent client list:\n&quot; );
++
++		list_for_each_safe(kismet_pos, kismet_pos_tmp, &amp;Client_list) {
++
++			wlan_client = list_entry(kismet_pos, struct wlan_client, list);
++
++			printf( &quot;   =&gt; %s belonging to %s\n&quot;, wlan_client-&gt;mac, ( wlan_client-&gt;wlan_network == NULL ? &quot;unknown&quot; : wlan_client-&gt;wlan_network-&gt;bssid ) );
++
++		}
++
+ 	}
+ 
++	return (0);
++
+ }
+
+Modified: trunk/apps/kism3d/kism3d.h
+===================================================================
+--- trunk/apps/kism3d/kism3d.h	2006-11-16 16:45:32 UTC (rev 479)
++++ trunk/apps/kism3d/kism3d.h	2006-11-19 14:08:40 UTC (rev 480)
+@@ -11,7 +11,7 @@
+  * the Free Software Foundation; either version 2 of the License, or
+  * (at your option) any later version.
+  *
+- * olsrs3d is distributed in the hope that it will be useful,
++ * kism3d is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+@@ -28,10 +28,6 @@
+ 
+ 
+ 
+-extern int num_kismet_sources;
+-
+-
+-
+ struct kismet_src {
+ 
+ 	struct list_head list;
+@@ -44,3 +40,47 @@
+ 	int enable_level;
+ 
+ };
++
++
++struct wlan_network {
++
++	struct list_head list;
++	char bssid[18];
++	char *ssid;
++	int type;
++	int channel;
++	int visible;
++	float pos_vec[3];
++	float mov_vec[3];
++	int obj_id;
++	int desc_id;
++
++};
++
++
++struct wlan_client {
++
++	struct list_head list;
++	char bssid[18];
++	char mac[18];
++	int ip[16];
++	struct wlan_network *wlan_network;
++	int visible;
++	float pos_vec[3];
++	float mov_vec[3];
++	int obj_id;
++	int desc_id;
++
++};
++
++
++
++void *alloc_memory( int len );
++struct wlan_network *get_wlan_network( char *bssid );
++struct wlan_network *find_wlan_network( char *bssid );
++struct wlan_client *get_wlan_client( char *mac );
++
++
++
++extern struct list_head Network_list;
++extern struct list_head Client_list;
+
+Modified: trunk/apps/kism3d/list.h
+===================================================================
+--- trunk/apps/kism3d/list.h	2006-11-16 16:45:32 UTC (rev 479)
++++ trunk/apps/kism3d/list.h	2006-11-19 14:08:40 UTC (rev 480)
+@@ -11,7 +11,7 @@
+  * the Free Software Foundation; either version 2 of the License, or
+  * (at your option) any later version.
+  *
+- * olsrs3d is distributed in the hope that it will be useful,
++ * kism3d is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+@@ -38,6 +38,16 @@
+ 
+ 
+ /**
++ * list_for_each	-	iterate over a list
++ * @pos:	the &amp;struct list_head to use as a loop counter.
++ * @head:	the head for your list.
++ */
++#define list_for_each(pos, head) \
++	for (pos = (head)-&gt;next; pos != (head); \
++        	pos = pos-&gt;next)
++
++
++/**
+  * list_for_each_safe - iterate over a list safe against removal of list entry
+  * @pos:	the &amp;struct list_head to use as a loop counter.
+  * @n:		another &amp;struct list_head to use as temporary storage
+
+Added: trunk/apps/kism3d/network.c
+===================================================================
+--- trunk/apps/kism3d/network.c	2006-11-16 16:45:32 UTC (rev 479)
++++ trunk/apps/kism3d/network.c	2006-11-19 14:08:40 UTC (rev 480)
+@@ -0,0 +1,92 @@
++/*
++ * network.c
++ *
++ * Copyright (C) 2006  Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
++ *
++ * This file is part of kism3d, an 802.11 visualizer for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * kism3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * kism3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with olsrs3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
++
++#include &quot;kism3d.h&quot;
++#include &lt;string.h&gt;   /* strncmp(), strncpy() */
++#include &lt;stdlib.h&gt;   /* rand() */
++
++
++
++struct wlan_network *get_wlan_network( char *bssid ) {
++
++	struct wlan_network *wlan_network;
++
++
++	wlan_network = find_wlan_network( bssid );
++
++	if ( wlan_network != NULL )
++		return wlan_network;
++
++
++	/* we reached the end of the list and must create a new wlan_network */
++	wlan_network = alloc_memory( sizeof( struct wlan_network ) );
++
++	INIT_LIST_HEAD(&amp;wlan_network-&gt;list);
++
++	strncpy( wlan_network-&gt;bssid, bssid, 18 );
++
++	wlan_network-&gt;type = -1;
++	wlan_network-&gt;channel = -1;
++
++	wlan_network-&gt;ssid = NULL;
++
++	wlan_network-&gt;visible = 1;
++
++	wlan_network-&gt;pos_vec[0] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
++	wlan_network-&gt;pos_vec[1] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
++	wlan_network-&gt;pos_vec[2] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
++	wlan_network-&gt;mov_vec[0] = wlan_network-&gt;mov_vec[1] = wlan_network-&gt;mov_vec[2] = 0.0;
++
++	wlan_network-&gt;obj_id = -1;
++	wlan_network-&gt;desc_id = -1;
++
++	list_add_tail(&amp;wlan_network-&gt;list, &amp;Network_list);
++
++	return wlan_network;
++
++}
++
++
++
++struct wlan_network *find_wlan_network( char *bssid ) {
++
++	struct list_head *network_pos;
++	struct wlan_network *wlan_network;
++
++
++	list_for_each(network_pos, &amp;Network_list) {
++
++		wlan_network = list_entry(network_pos, struct wlan_network, list);
++
++		if ( strncmp( wlan_network-&gt;bssid, bssid, 18 ) == 0 )
++			return wlan_network;
++
++	}
++
++
++	return NULL;
++
++}
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000472.html">[S3d-svn] r479 - trunk/objs
+</A></li>
+	<LI>Next message: <A HREF="000474.html">[S3d-svn] r481 - in trunk: . example libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#473">[ date ]</a>
+              <a href="thread.html#473">[ thread ]</a>
+              <a href="subject.html#473">[ subject ]</a>
+              <a href="author.html#473">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r499 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r499%20-%20trunk&In-Reply-To=%3C200612021331.kB2DVofB014465%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000493.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r499 - trunk</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r499%20-%20trunk&In-Reply-To=%3C200612021331.kB2DVofB014465%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r499 - trunk">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sat Dec  2 14:31:50 CET 2006</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000493.html">[S3d-svn] r500 - in trunk: . libs3d/libg3d/include/g3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#492">[ date ]</a>
+              <a href="thread.html#492">[ thread ]</a>
+              <a href="subject.html#492">[ subject ]</a>
+              <a href="author.html#492">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-12-02 14:31:50 +0100 (Sat, 02 Dec 2006)
+New Revision: 499
+
+Modified:
+   trunk/
+   trunk/config.h.in
+   trunk/configure.ac
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1190 at kero</A>:  dotslash | 2006-12-02 14:31:46 +0100
+ - proper gps checking with autohell
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1188
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1190
+
+Modified: trunk/config.h.in
+===================================================================
+--- trunk/config.h.in	2006-11-30 22:47:08 UTC (rev 498)
++++ trunk/config.h.in	2006-12-02 13:31:50 UTC (rev 499)
+@@ -6,6 +6,8 @@
+ /* Use SDL */
+ #undef G_SDL
+ 
++#undef HAVE_GPS
++
+ /* Define to 1 if you have the &lt;dirent.h&gt; header file, and it defines `DIR'.
+    */
+ #undef HAVE_DIRENT_H
+
+Modified: trunk/configure.ac
+===================================================================
+--- trunk/configure.ac	2006-11-30 22:47:08 UTC (rev 498)
++++ trunk/configure.ac	2006-12-02 13:31:50 UTC (rev 499)
+@@ -121,7 +121,8 @@
+  ### Sorry, you lack the libxml2 library to compile the s3dosm application.&quot;
+ 
+ fi
+-		
++
++	
+ if test x&quot;${HAVE_SQLITE3}&quot; = xyes ; then
+ 	LIBSQLITE3_CFLAGS=&quot;&quot;
+ 	LIBSQLITE3_LIBS=&quot;-lsqlite3&quot;
+@@ -136,7 +137,6 @@
+ 
+ 
+ 
+-
+ AM_CONDITIONAL([BUILD_S3DOSM], [test x&quot;${HAVE_XML}&quot; = xyes &amp;&amp; test x&quot;${HAVE_SQLITE3}&quot; = xyes])
+ 
+ SIM_AC_HAVE_SIMAGE_IFELSE([
+@@ -148,8 +148,13 @@
+ 	WARNS=&quot;$WARNS
+  ### Sorry, you lack the simage library to compile the s3dgps application.&quot;
+ ])
++AC_CHECK_HEADER(gps.h, [HAVE_GPS=yes])
+ AM_CONDITIONAL([BUILD_S3DGPS], [test x$HAVE_GPS = xyes &amp;&amp; test x$sim_ac_simage_avail = xtrue])
+ 
++if test &quot;x${HAVE_GPS}&quot; = &quot;xyes&quot;; then
++	AC_DEFINE([HAVE_GPS], 1, [Have gps support])
++fi
++
+ AC_CHECK_LIB(Xtst, main, [HAVE_Xtst=yes], [HAVE_Xtst=no], [$X_PRE_LIBS $X_LIBS $X_EXTRA_LIBS])
+ if test x$HAVE_Xtst = xyes; then
+ 	XTST_CFLAGS=
+@@ -167,7 +172,6 @@
+ AC_ARG_WITH([examples], AS_HELP_STRING([--with-examples], [build examples]), [with_examples=$withval], [with_examples=yes])
+ AM_CONDITIONAL([BUILD_EXAMPLES], [test x$with_examples = xyes])
+ ########################################### LIBG3D ################
+-AC_CONFIG_HEADERS(libs3d/libg3d/include/g3d/config.h)
+ AM_PROG_LEX
+ 
+ ## gtk-doc
+@@ -216,7 +220,7 @@
+ 	AC_DEFINE([SIGS], 1, [Define if signal code should be compiled])
+ fi
+ 
+-AC_CONFIG_HEADER(config.h)
++AC_CONFIG_HEADERS(libs3d/libg3d/include/g3d/config.h config.h)
+ AC_CONFIG_FILES([
+ 	Makefile
+ 	server/Makefile
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000493.html">[S3d-svn] r500 - in trunk: . libs3d/libg3d/include/g3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#492">[ date ]</a>
+              <a href="thread.html#492">[ thread ]</a>
+              <a href="subject.html#492">[ subject ]</a>
+              <a href="author.html#492">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

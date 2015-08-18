@@ -1,0 +1,1009 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r349 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r349%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200606072304.k57N4HQr021048%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000341.html">
+   <LINK REL="Next"  HREF="000343.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r349 - trunk/apps/olsrs3d</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r349%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200606072304.k57N4HQr021048%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r349 - trunk/apps/olsrs3d">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Thu Jun  8 01:04:17 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000341.html">[S3d-svn] r348 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000343.html">[S3d-svn] r350 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#342">[ date ]</a>
+              <a href="thread.html#342">[ thread ]</a>
+              <a href="subject.html#342">[ subject ]</a>
+              <a href="author.html#342">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-06-08 01:04:15 +0200 (Thu, 08 Jun 2006)
+New Revision: 349
+
+Added:
+   trunk/apps/olsrs3d/search.c
+   trunk/apps/olsrs3d/search.h
+   trunk/apps/olsrs3d/structs.h
+Removed:
+   trunk/apps/olsrs3d/mod_search.c
+   trunk/apps/olsrs3d/mod_search.h
+Modified:
+   trunk/apps/olsrs3d/Makefile.am
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/olsrs3d.h
+Log:
+- add widget IIII
+- push the structs for olsr in structs.h
+- rename files ( search )
+
+Modified: trunk/apps/olsrs3d/Makefile.am
+===================================================================
+--- trunk/apps/olsrs3d/Makefile.am	2006-06-07 22:58:02 UTC (rev 348)
++++ trunk/apps/olsrs3d/Makefile.am	2006-06-07 23:04:15 UTC (rev 349)
+@@ -2,14 +2,15 @@
+ 
+ olsrs3dincludedir = $(pkgincludedir)/olsrs3d
+ olsrs3dinclude_HEADERS =  \
++	structs.h \
+ 	olsrs3d.h \
+-	mod_search.h
++	search.h
+ 
+ olsrs3d_SOURCES =  \
+ 	process.c \
+ 	main.c \
+ 	net.c \
+-	mod_search.c
++	search.c
+ 
+ olsrs3d_CPPFLAGS=	-I$(top_srcdir)/libs3d -I$(top_srcdir)/libs3dw
+ olsrs3d_LDADD=		$(top_builddir)/libs3d/libs3d.la $(top_builddir)/libs3dw/libs3dw.la
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-06-07 22:58:02 UTC (rev 348)
++++ trunk/apps/olsrs3d/main.c	2006-06-07 23:04:15 UTC (rev 349)
+@@ -35,7 +35,7 @@
+ #include &lt;getopt.h&gt;	/* getopt() */
+ #include &lt;stdlib.h&gt;	/* exit() */
+ #include &quot;olsrs3d.h&quot;
+-#include &quot;mod_search.h&quot;
++#include &quot;search.h&quot;
+ 
+ #define SPEED		10.0
+ 
+@@ -805,35 +805,36 @@
+  ***/
+ 
+ void keypress(struct s3d_evt *event) {
+-	int key;
+-	key=*((unsigned short *)event-&gt;buf);
+ 
++	struct s3d_key_event *key=(struct s3d_key_event *)event-&gt;buf;
++	printf(&quot;%d\n&quot;,key-&gt;unicode);	
+ 	if( get_search_status() != WIDGET )
+ 	{
+-		switch(key) {
+-			case S3DK_ESCAPE: /* esc abort action */
++		switch(key-&gt;unicode)
++		{
++			case S3DK_ESCAPE: /* abort action */
+ 			
+ 				set_search_status( get_search_status() == WIDGET ? ABORT : NOTHING );
+ 				break;
+ 				
+-			case 's': /* move to search widget, give widget focus */
++			case S3DK_s: /* move to search widget, give widget focus */
+ 
+-				set_search_status(WIDGET);
+-				set_return_point(CamPosition[0],CamPosition[1]);
++				set_search_status(WIDGET);							/* set status for mainloop */
++				set_return_point(CamPosition[0],CamPosition[1]);	/* save the return position */
++				set_node_root( Olsr_root );
+ 				break;
+ 			
+-			case 'c': /* c -&gt; color on/off */
++			case S3DK_c: /* color on/off */
+ 				
+ 				ColorSwitch =  ColorSwitch ? 0 : 1;
+ 				break;
+ 				
+-			case 'r': /* r -&gt; rotate start/stop*/
++			case S3DK_r: /* rotate start/stop*/
+ 				
+ 				RotateSwitch = RotateSwitch ? 0 : 1;
+ 				break;
+ 				
+-			case S3DK_KP_PLUS:
+-			case '+': /* + -&gt; rotate speed increase*/
++			case S3DK_PLUS: /* rotate speed increase */
+ 				
+ 				if(RotateSwitch &amp;&amp; RotateSpeed &lt; 5)
+ 				{
+@@ -845,8 +846,7 @@
+ 				}
+ 				break;
+ 				
+-			case S3DK_KP_MINUS:
+-			case '-': /* - -&gt; rotate speed decrease*/
++			case S3DK_MINUS: /* - -&gt; rotate speed decrease */
+ 				
+ 				if(RotateSwitch)
+ 				{
+@@ -866,13 +866,13 @@
+ 				Zp_rotate = 0.0;
+ 				break;
+ 				
+-			case S3DK_PAGEUP: /* page up -&gt; change factor in calc_olsr_node_mov */
++			case S3DK_PAGEUP: /* change factor in calc_olsr_node_mov */
+ 				
+ 				if(Factor &lt; 0.9)
+ 					Factor += 0.1;
+ 				break;
+ 				
+-			case S3DK_PAGEDOWN: /* page down -&gt; change factor in calc_olsr_node_mov */
++			case S3DK_PAGEDOWN: /* change factor in calc_olsr_node_mov */
+ 				
+ 				if(Factor &gt; 0.3)
+ 					Factor -= 0.1;
+@@ -880,8 +880,8 @@
+ 				
+ 		}
+ 	} else {
+-		if( (key &gt;= 48 &amp;&amp; key &lt;= 57) || key == 46 || key == 13 || key == 8 || (key &gt;= 256 &amp;&amp; key &lt;= 265) || key == 266 || key == 271 )
+-			search_widget_write( key );
++		if( (key-&gt;unicode &gt;= S3DK_PERIOD &amp;&amp; key-&gt;unicode &lt;= S3DK_9) || key-&gt;unicode == S3DK_COMMA || key-&gt;unicode == S3DK_RETURN || key-&gt;unicode == S3DK_BACKSPACE )
++			search_widget_write( key-&gt;unicode );
+ 	}
+ }
+ 
+
+Deleted: trunk/apps/olsrs3d/mod_search.c
+===================================================================
+--- trunk/apps/olsrs3d/mod_search.c	2006-06-07 22:58:02 UTC (rev 348)
++++ trunk/apps/olsrs3d/mod_search.c	2006-06-07 23:04:15 UTC (rev 349)
+@@ -1,270 +0,0 @@
+-/*
+- * mod_search.c
+- * 
+- * Copyright (C) 2006 Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
+- *
+- * This file is part of the olsrs3d, an olsr topology visualizer for s3d.
+- * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+- * 
+- * s3d is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- * 
+- * s3d is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- * 
+- * You should have received a copy of the GNU General Public License
+- * along with s3d; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- */
+-
+-#include &lt;s3d.h&gt;
+-#include &lt;s3dw.h&gt;
+-#include &lt;s3d_keysym.h&gt;
+-#include &lt;math.h&gt;
+-#include &lt;stdio.h&gt;	/* TODO can remove then no more printf needed */
+-#include &lt;string.h&gt;
+-#include &quot;structs.h&quot;
+-#include &quot;mod_search.h&quot;
+-
+-s3dw_surface	*_search_surface;
+-s3dw_input		*_search_input;
+-s3dw_widget		*_search_widget;
+-
+-struct olsr_node *_node_root = NULL;
+-
+-float	_return_point[2][3];				/* cam position before move to the widget */
+-int		_search_status = NOTHING;			/* status of search */
+-											
+-void _search_node(s3dw_widget *dummy);
+-void _abort_search(s3dw_widget *dummy);
+-
+-/* public */
+-void create_search_widget(float x, float y, float z)
+-{
+-	s3dw_button *search_button, *abort_button;
+-	
+-	_search_surface	= s3dw_surface_new( &quot;Node Search&quot;, 17, 10 );
+-	_search_input	= s3dw_input_new( _search_surface, 15, 1, 4 );
+-	
+-	s3dw_label_new( _search_surface, &quot;Enter the IP of the node.&quot;, 1, 2);
+-	s3dw_focus( S3DWIDGET( _search_input ) );
+-	
+-	search_button = s3dw_button_new( _search_surface, &quot;Search&quot;, 11.5, 7 );
+-	abort_button  = s3dw_button_new( _search_surface, &quot;Abort&quot;, 1, 7 );
+-	search_button-&gt;onclick = _search_node;
+-	abort_button-&gt;onclick = _abort_search;
+-
+-	/* TODO calc position for ok button */
+-	
+-	s3dw_focus	( S3DWIDGET( _search_input ) );	
+-	s3dw_focus	( S3DWIDGET( _search_surface ) );
+-	s3dw_show	( S3DWIDGET( _search_surface ) );
+-	
+-	_search_widget	= s3dw_getroot();
+-	move_search_widget( x, y, z );
+-
+-	_search_widget-&gt;ary = 180;
+-	s3d_rotate( _search_widget-&gt;oid, _search_widget-&gt;arx, _search_widget-&gt;ary, _search_widget-&gt;arz );
+-}
+-
+-/* public */
+-void move_search_widget(float x, float y, float z)
+-{
+-	_search_widget-&gt;x = x; _search_widget-&gt;y = y; _search_widget-&gt;z = z;
+-	s3dw_moveit( _search_widget );
+-}
+-
+-/* public */
+-void move_to_search_widget(float cam_position_t[], float cam_position_r[])
+-{
+-	float target, current;
+-	
+-	set_search_status(WIDGET);
+-	cam_position_t[0] = ( cam_position_t[0] * 4 + _search_widget-&gt;x ) / 5;
+-	cam_position_t[1] = ( cam_position_t[1] * 4 + _search_widget-&gt;y ) / 5;
+-	cam_position_t[2] = ( cam_position_t[2] * 4 + ( _search_widget-&gt;z - 10 ) ) / 5;
+-
+-	target = _search_widget-&gt;arx;
+-	current = cam_position_r[0];
+-
+-	if( _search_widget-&gt;arx - cam_position_r[0] &gt; 180 )
+-		target -= 360;
+-	if( _search_widget-&gt;arx - cam_position_r[0] &lt; -180 )
+-		current -= 360;
+-	cam_position_r[0] = ( cam_position_r[0] * 4 + target ) / 5;
+-
+-	target = _search_widget-&gt;ary;
+-	current = cam_position_r[1];
+-
+-	if( _search_widget-&gt;ary - cam_position_r[1] &gt; 180 )
+-		target -= 360;
+-	if( _search_widget-&gt;ary - cam_position_r[1] &lt; -180 )
+-		current -= 360;
+-	cam_position_r[1] = ( cam_position_r[1] * 4 + target ) / 5;
+-
+-	target = _search_widget-&gt;arz;
+-	current = cam_position_r[2];
+-
+-	if( _search_widget-&gt;arz - cam_position_r[2] &gt; 180 )
+-		target -= 360;
+-	if( _search_widget-&gt;arz - cam_position_r[2] &lt; -180 )
+-		current -= 360;
+-	cam_position_r[2] = ( cam_position_r[2] * 4 + target ) / 5;
+-	
+-	s3d_translate(0,cam_position_t[0],cam_position_t[1],cam_position_t[2]);
+-	s3d_rotate(0,cam_position_r[0],cam_position_r[1],cam_position_r[2]);
+-	
+-	if ( sqrt(  (( cam_position_t[0] - _search_widget-&gt;x)*( cam_position_t[0] - _search_widget-&gt;x)) + 
+-				(( cam_position_t[1] - _search_widget-&gt;y)*( cam_position_t[1] - _search_widget-&gt;y)) + 
+-				(( cam_position_t[2] - _search_widget-&gt;z)*( cam_position_t[2] - _search_widget-&gt;z)) ) &lt; 0.2 )
+-	{
+-		s3d_translate( 0, _search_widget-&gt;x, _search_widget-&gt;y, ( _search_widget-&gt;z - 10 ) );
+-		s3d_rotate( 0, _search_widget-&gt;arx, _search_widget-&gt;ary, _search_widget-&gt;arz );
+-	}
+-}
+-
+-/* public */
+-void move_to_return_point(float cam_position_t[], float cam_position_r[])
+-{
+-	float target, current;
+-
+-	cam_position_t[0] = ( cam_position_t[0] * 4 + _return_point[0][0] ) / 5;
+-	cam_position_t[1] = ( cam_position_t[1] * 4 + _return_point[0][1] ) / 5;
+-	cam_position_t[2] = ( cam_position_t[2] * 4 + _return_point[0][2] ) / 5;
+-
+-	target = _return_point[1][0];
+-	current = cam_position_r[0];
+-
+-	if( _return_point[1][0] - cam_position_r[0] &gt; 180 )
+-		target -= 360;
+-	if( _return_point[1][0] - cam_position_r[0] &lt; -180 )
+-		current -= 360;
+-	cam_position_r[0] = ( cam_position_r[0] * 4 + target ) / 5;
+-
+-	target = _return_point[1][1];
+-	current = cam_position_r[1];
+-
+-	if( _return_point[1][1] - cam_position_r[1] &gt; 180 )
+-		target -= 360;
+-	if( _return_point[1][1] - cam_position_r[1] &lt; -180 )
+-		current -= 360;
+-	cam_position_r[1] = ( cam_position_r[1] * 4 + target ) / 5;
+-
+-	target = _return_point[1][2];
+-	current = cam_position_r[2];
+-
+-	if( _return_point[1][2] - cam_position_r[2] &gt; 180 )
+-		target -= 360;
+-	if( _return_point[1][2] - cam_position_r[2] &lt; -180 )
+-		current -= 360;
+-	cam_position_r[2] = ( cam_position_r[2] * 4 + target ) / 5;
+-	
+-	s3d_translate(0,cam_position_t[0],cam_position_t[1],cam_position_t[2]);
+-	s3d_rotate(0,cam_position_r[0],cam_position_r[1],cam_position_r[2]);
+-	
+-	if ( sqrt(  (( cam_position_t[0] - _return_point[0][0])*( cam_position_t[0] - _return_point[0][0])) + 
+-				(( cam_position_t[1] - _return_point[0][1])*( cam_position_t[1] - _return_point[0][1])) + 
+-				(( cam_position_t[2] - _return_point[0][2])*( cam_position_t[2] - _return_point[0][2])) ) &lt; 0.2 )
+-	{
+-		s3d_translate( 0, _return_point[0][0], _return_point[0][1], _return_point[0][2] );
+-		s3d_rotate( 0, _return_point[1][0], _return_point[1][1], _return_point[1][2] );
+-		set_search_status(NOTHING);
+-	}
+-}
+-
+-/* public */
+-void search_widget_write(int key)
+-{
+-	static char s[20];
+-	int ln = strlen(s);
+-	
+-	if( key == S3DK_COMMA ) key = S3DK_PERIOD;
+-	
+-	if( key != S3DK_RETURN )
+-	{
+-		if( key == S3DK_BACKSPACE )
+-		{
+-			if( ln &gt; 0 )
+-				s[ln-1] = '\0';
+-		} else {
+-			if( ln &lt; 20 )
+-				s[ln] = key;
+-		}
+-		s3dw_input_change_text( _search_input, s );
+-	} else {
+-		_search_node( _search_widget );	
+-	}
+-}
+-
+-/* public */
+-void set_return_point(float cam_position_t[], float cam_position_r[])
+-{
+-	int i;
+-	for( i = 0; i &lt; 3; i++ )
+-		_return_point[0][i] = cam_position_t[i];
+-	for( i = 0; i &lt; 3; i++ )
+-		_return_point[1][i] = cam_position_r[i];
+-}
+-
+-/* public */
+-int get_search_status(void)
+-{
+-	return _search_status;
+-}
+-
+-/* public */
+-void set_search_status(int stat)
+-{
+-	/* TODO check if stat between 0-3 else debug printf */
+-	_search_status = stat;
+-}
+-
+-/* public */
+-void set_node_root(struct olsr_node *root)
+-{
+-	_node_root = root;
+-}
+-/* private */
+-void _search_node(s3dw_widget *dummy)
+-{
+-	char *ip;
+-	int result;
+-	ip = s3dw_input_gettext( _search_input );
+-	
+-	printf(&quot;%s\n&quot;,ip);
+-	/*	
+-	search_node = Olsr_root;
+-	
+-	while ( search_node != NULL )
+-	{
+-
+-		result = strncmp( search_node-&gt;ip, ip, NAMEMAX );
+-
+-		if ( result == 0 ) 
+-			break;
+-
+-
+-		if ( result &lt; 0 )
+-			search_node = search_node-&gt;right;
+-		else
+-			search_node = search_node-&gt;left;
+-	}
+-	
+-	if( search_node != NULL )
+-	{
+-		return(1);
+-	}
+-	return(0);*/
+-}
+-
+-/* private */
+-void _abort_search(s3dw_widget *dummy)
+-{
+-	set_search_status(ABORT);
+-}
+-
+-	
+
+Deleted: trunk/apps/olsrs3d/mod_search.h
+===================================================================
+--- trunk/apps/olsrs3d/mod_search.h	2006-06-07 22:58:02 UTC (rev 348)
++++ trunk/apps/olsrs3d/mod_search.h	2006-06-07 23:04:15 UTC (rev 349)
+@@ -1,38 +0,0 @@
+-/*
+- * mod_search.h
+- *
+- * Copyright (C) 2006 Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
+- *
+- * This file is part of the olsrs3d, an olsr topology visualizer for s3d.
+- * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+- * 
+- * s3d Widgets is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU Lesser General Public License as published by
+- * the Free Software Foundation; either version 2.1 of the License, or
+- * (at your option) any later version.
+- * 
+- * s3d Widgets is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU Lesser General Public License for more details.
+- * 
+- * You should have received a copy of the GNU Lesser General Public License
+- * along with the s3d Widgets; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- */
+-
+-#define NOTHING 0		/* nothing ;) */
+-#define ABORT 1			/* widget has no focus */
+-#define WIDGET 2		/* focus on widget */
+-#define FOLLOW 3		/* follow search result */
+-
+-void create_search_widget(float x, float y, float z);
+-void move_search_widget(float x, float y, float z);
+-void move_to_search_widget(float cam_position_t[], float cam_position_r[]);
+-void move_to_return_point(float cam_position_t[], float cam_position_r[]);
+-void set_return_point(float cam_position_t[], float cam_position_r[]);
+-int get_search_status(void);
+-void set_search_status(int stat);
+-void search_widget_write(int key);
+-void set_node_root(struct olsr_node *root);
+-
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-06-07 22:58:02 UTC (rev 348)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-06-07 23:04:15 UTC (rev 349)
+@@ -23,72 +23,14 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#include &quot;structs.h&quot;
+ 
+ 
+-#define NAMEMAX		128
+-#define MAXLINESIZE 1000 /* lines in a digraph just shouldn't get that longer ... */
+-#define MAXDATASIZE 100 /* max number of bytes we can get at once  */
+-
+ #define max(x,y)((x)&gt;(y)?(x):(y))
+ #define min(x,y)((x)&lt;(y)?(x):(y))
+ 
+ 
+-/* linked list for the all connections */
+-struct olsr_con {
+ 
+-	struct olsr_con *next_olsr_con;   /* pointer to next connection */
+-	struct olsr_con *prev_olsr_con;   /* pointer to previous connection */
+-	struct olsr_node *left_olsr_node;   /* pointer to left end point of the connection */
+-	struct olsr_node *right_olsr_node;   /* pointer to right end point of the connection */
+-	float left_etx;   /* etx of left olsr node */
+-	float right_etx;   /* etx of right olsr node */
+-	float left_etx_sqrt;   /* sqrt of etx of left olsr node */
+-	float right_etx_sqrt;   /* sqrt etx of right olsr node */
+-	int obj_id;   /* id of connection object in s3d */
+-	int color;
+-	float rgb;
+-
+-};
+-
+-
+-/* linked list for the neighbours of each olsr node */
+-struct olsr_neigh_list {
+-
+-	struct olsr_neigh_list *next_olsr_neigh_list;   /* pointer to next neighbour */
+-	struct olsr_con *olsr_con;   /* pointer to the connection */
+-
+-};
+-
+-
+-/* we contruct a binary tree to handle the nodes */
+-struct olsr_node {
+-
+-	struct olsr_node *left;
+-	struct olsr_node *right;
+-	char ip[NAMEMAX];   /* host ip */
+-	int node_type;   /* normal = 0, internet gateway = 1, via hna announced network = 2 */
+-	int node_type_modified;   /* node_type modified flag */
+-	int last_seen;   /* last seen counter */
+-	int visible;   /* is this node visible or vanished */
+-	float pos_vec[3];   /* position vector in 3d &quot;space&quot; */
+-	float mov_vec[3];   /* move vector */
+-	int obj_id;   /* id of node object in s3d */
+-	int desc_id;   /* id of node description object in s3d */
+-	float desc_length;   /* length of node description object in s3d */
+-	struct olsr_neigh_list *olsr_neigh_list;   /* pointer to first neighbour */
+-
+-};
+-
+-
+-struct Obj_to_ip {
+-	int id;
+-	struct olsr_node *olsr_node;
+-	struct Obj_to_ip *next;
+-	struct Obj_to_ip *prev;
+-};
+-
+-
+-
+ extern int Debug;
+ 
+ extern struct olsr_con *Con_begin;   /* begin of connection list */
+
+Copied: trunk/apps/olsrs3d/search.c (from rev 348, trunk/apps/olsrs3d/mod_search.c)
+===================================================================
+--- trunk/apps/olsrs3d/mod_search.c	2006-06-07 22:58:02 UTC (rev 348)
++++ trunk/apps/olsrs3d/search.c	2006-06-07 23:04:15 UTC (rev 349)
+@@ -0,0 +1,270 @@
++/*
++ * search.c
++ * 
++ * Copyright (C) 2006 Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
++ *
++ * This file is part of the olsrs3d, an olsr topology visualizer for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#include &lt;s3d.h&gt;
++#include &lt;s3dw.h&gt;
++#include &lt;s3d_keysym.h&gt;
++#include &lt;math.h&gt;
++#include &lt;stdio.h&gt;	/* TODO can remove then no more printf needed */
++#include &lt;string.h&gt;
++#include &quot;structs.h&quot;
++#include &quot;search.h&quot;
++
++s3dw_surface	*_search_surface;
++s3dw_input		*_search_input;
++s3dw_widget		*_search_widget;
++
++struct olsr_node *_node_root = NULL;
++
++float	_return_point[2][3];				/* cam position before move to the widget */
++int		_search_status = NOTHING;			/* status of search */
++											
++void _search_node(s3dw_widget *dummy);
++void _abort_search(s3dw_widget *dummy);
++
++/* public */
++void create_search_widget(float x, float y, float z)
++{
++	s3dw_button *search_button, *abort_button;
++	
++	_search_surface	= s3dw_surface_new( &quot;Node Search&quot;, 17, 10 );
++	_search_input	= s3dw_input_new( _search_surface, 15, 1, 4 );
++	
++	s3dw_label_new( _search_surface, &quot;Enter the IP of the node.&quot;, 1, 2);
++	s3dw_focus( S3DWIDGET( _search_input ) );
++	
++	search_button = s3dw_button_new( _search_surface, &quot;Search&quot;, 11.5, 7 );
++	abort_button  = s3dw_button_new( _search_surface, &quot;Abort&quot;, 1, 7 );
++	search_button-&gt;onclick = _search_node;
++	abort_button-&gt;onclick = _abort_search;
++
++	/* TODO calc position for ok button */
++	
++	s3dw_focus	( S3DWIDGET( _search_input ) );	
++	s3dw_focus	( S3DWIDGET( _search_surface ) );
++	s3dw_show	( S3DWIDGET( _search_surface ) );
++	
++	_search_widget	= s3dw_getroot();
++	move_search_widget( x, y, z );
++
++	_search_widget-&gt;ary = 180;
++	s3d_rotate( _search_widget-&gt;oid, _search_widget-&gt;arx, _search_widget-&gt;ary, _search_widget-&gt;arz );
++}
++
++/* public */
++void move_search_widget(float x, float y, float z)
++{
++	_search_widget-&gt;x = x; _search_widget-&gt;y = y; _search_widget-&gt;z = z;
++	s3dw_moveit( _search_widget );
++}
++
++/* public */
++void move_to_search_widget(float cam_position_t[], float cam_position_r[])
++{
++	float target, current;
++	
++	set_search_status(WIDGET);
++	cam_position_t[0] = ( cam_position_t[0] * 4 + _search_widget-&gt;x ) / 5;
++	cam_position_t[1] = ( cam_position_t[1] * 4 + _search_widget-&gt;y ) / 5;
++	cam_position_t[2] = ( cam_position_t[2] * 4 + ( _search_widget-&gt;z - 10 ) ) / 5;
++
++	target = _search_widget-&gt;arx;
++	current = cam_position_r[0];
++
++	if( _search_widget-&gt;arx - cam_position_r[0] &gt; 180 )
++		target -= 360;
++	if( _search_widget-&gt;arx - cam_position_r[0] &lt; -180 )
++		current -= 360;
++	cam_position_r[0] = ( cam_position_r[0] * 4 + target ) / 5;
++
++	target = _search_widget-&gt;ary;
++	current = cam_position_r[1];
++
++	if( _search_widget-&gt;ary - cam_position_r[1] &gt; 180 )
++		target -= 360;
++	if( _search_widget-&gt;ary - cam_position_r[1] &lt; -180 )
++		current -= 360;
++	cam_position_r[1] = ( cam_position_r[1] * 4 + target ) / 5;
++
++	target = _search_widget-&gt;arz;
++	current = cam_position_r[2];
++
++	if( _search_widget-&gt;arz - cam_position_r[2] &gt; 180 )
++		target -= 360;
++	if( _search_widget-&gt;arz - cam_position_r[2] &lt; -180 )
++		current -= 360;
++	cam_position_r[2] = ( cam_position_r[2] * 4 + target ) / 5;
++	
++	s3d_translate(0,cam_position_t[0],cam_position_t[1],cam_position_t[2]);
++	s3d_rotate(0,cam_position_r[0],cam_position_r[1],cam_position_r[2]);
++	
++	if ( sqrt(  (( cam_position_t[0] - _search_widget-&gt;x)*( cam_position_t[0] - _search_widget-&gt;x)) + 
++				(( cam_position_t[1] - _search_widget-&gt;y)*( cam_position_t[1] - _search_widget-&gt;y)) + 
++				(( cam_position_t[2] - _search_widget-&gt;z)*( cam_position_t[2] - _search_widget-&gt;z)) ) &lt; 0.2 )
++	{
++		s3d_translate( 0, _search_widget-&gt;x, _search_widget-&gt;y, ( _search_widget-&gt;z - 10 ) );
++		s3d_rotate( 0, _search_widget-&gt;arx, _search_widget-&gt;ary, _search_widget-&gt;arz );
++	}
++}
++
++/* public */
++void move_to_return_point(float cam_position_t[], float cam_position_r[])
++{
++	float target, current;
++
++	cam_position_t[0] = ( cam_position_t[0] * 4 + _return_point[0][0] ) / 5;
++	cam_position_t[1] = ( cam_position_t[1] * 4 + _return_point[0][1] ) / 5;
++	cam_position_t[2] = ( cam_position_t[2] * 4 + _return_point[0][2] ) / 5;
++
++	target = _return_point[1][0];
++	current = cam_position_r[0];
++
++	if( _return_point[1][0] - cam_position_r[0] &gt; 180 )
++		target -= 360;
++	if( _return_point[1][0] - cam_position_r[0] &lt; -180 )
++		current -= 360;
++	cam_position_r[0] = ( cam_position_r[0] * 4 + target ) / 5;
++
++	target = _return_point[1][1];
++	current = cam_position_r[1];
++
++	if( _return_point[1][1] - cam_position_r[1] &gt; 180 )
++		target -= 360;
++	if( _return_point[1][1] - cam_position_r[1] &lt; -180 )
++		current -= 360;
++	cam_position_r[1] = ( cam_position_r[1] * 4 + target ) / 5;
++
++	target = _return_point[1][2];
++	current = cam_position_r[2];
++
++	if( _return_point[1][2] - cam_position_r[2] &gt; 180 )
++		target -= 360;
++	if( _return_point[1][2] - cam_position_r[2] &lt; -180 )
++		current -= 360;
++	cam_position_r[2] = ( cam_position_r[2] * 4 + target ) / 5;
++	
++	s3d_translate(0,cam_position_t[0],cam_position_t[1],cam_position_t[2]);
++	s3d_rotate(0,cam_position_r[0],cam_position_r[1],cam_position_r[2]);
++	
++	if ( sqrt(  (( cam_position_t[0] - _return_point[0][0])*( cam_position_t[0] - _return_point[0][0])) + 
++				(( cam_position_t[1] - _return_point[0][1])*( cam_position_t[1] - _return_point[0][1])) + 
++				(( cam_position_t[2] - _return_point[0][2])*( cam_position_t[2] - _return_point[0][2])) ) &lt; 0.2 )
++	{
++		s3d_translate( 0, _return_point[0][0], _return_point[0][1], _return_point[0][2] );
++		s3d_rotate( 0, _return_point[1][0], _return_point[1][1], _return_point[1][2] );
++		set_search_status(NOTHING);
++	}
++}
++
++/* public */
++void search_widget_write(int key)
++{
++	static char s[20];
++	int ln = strlen(s);
++	
++	if( key == S3DK_COMMA ) key = S3DK_PERIOD;
++	
++	if( key != S3DK_RETURN )
++	{
++		if( key == S3DK_BACKSPACE )
++		{
++			if( ln &gt; 0 )
++				s[ln-1] = '\0';
++		} else {
++			if( ln &lt; 20 )
++				s[ln] = key;
++		}
++		s3dw_input_change_text( _search_input, s );
++	} else {
++		_search_node( _search_widget );	
++	}
++}
++
++/* public */
++void set_return_point(float cam_position_t[], float cam_position_r[])
++{
++	int i;
++	for( i = 0; i &lt; 3; i++ )
++		_return_point[0][i] = cam_position_t[i];
++	for( i = 0; i &lt; 3; i++ )
++		_return_point[1][i] = cam_position_r[i];
++}
++
++/* public */
++int get_search_status(void)
++{
++	return _search_status;
++}
++
++/* public */
++void set_search_status(int stat)
++{
++	/* TODO check if stat between 0-3 else debug printf */
++	_search_status = stat;
++}
++
++/* public */
++void set_node_root(struct olsr_node *root)
++{
++	_node_root = root;
++}
++/* private */
++void _search_node(s3dw_widget *dummy)
++{
++	char *ip;
++	int result;
++	ip = s3dw_input_gettext( _search_input );
++	
++	printf(&quot;%s\n&quot;,ip);
++	/*	
++	search_node = Olsr_root;
++	
++	while ( search_node != NULL )
++	{
++
++		result = strncmp( search_node-&gt;ip, ip, NAMEMAX );
++
++		if ( result == 0 ) 
++			break;
++
++
++		if ( result &lt; 0 )
++			search_node = search_node-&gt;right;
++		else
++			search_node = search_node-&gt;left;
++	}
++	
++	if( search_node != NULL )
++	{
++		return(1);
++	}
++	return(0);*/
++}
++
++/* private */
++void _abort_search(s3dw_widget *dummy)
++{
++	set_search_status(ABORT);
++}
++
++	
+
+Copied: trunk/apps/olsrs3d/search.h (from rev 348, trunk/apps/olsrs3d/mod_search.h)
+===================================================================
+--- trunk/apps/olsrs3d/mod_search.h	2006-06-07 22:58:02 UTC (rev 348)
++++ trunk/apps/olsrs3d/search.h	2006-06-07 23:04:15 UTC (rev 349)
+@@ -0,0 +1,38 @@
++/*
++ * search.h
++ *
++ * Copyright (C) 2006 Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
++ *
++ * This file is part of the olsrs3d, an olsr topology visualizer for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d Widgets is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published by
++ * the Free Software Foundation; either version 2.1 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d Widgets is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ * 
++ * You should have received a copy of the GNU Lesser General Public License
++ * along with the s3d Widgets; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#define NOTHING 0		/* nothing ;) */
++#define ABORT 1			/* widget has no focus */
++#define WIDGET 2		/* focus on widget */
++#define FOLLOW 3		/* follow search result */
++
++void create_search_widget(float x, float y, float z);
++void move_search_widget(float x, float y, float z);
++void move_to_search_widget(float cam_position_t[], float cam_position_r[]);
++void move_to_return_point(float cam_position_t[], float cam_position_r[]);
++void set_return_point(float cam_position_t[], float cam_position_r[]);
++int get_search_status(void);
++void set_search_status(int stat);
++void search_widget_write(int key);
++void set_node_root(struct olsr_node *root);
++
+
+Added: trunk/apps/olsrs3d/structs.h
+===================================================================
+--- trunk/apps/olsrs3d/structs.h	2006-06-07 22:58:02 UTC (rev 348)
++++ trunk/apps/olsrs3d/structs.h	2006-06-07 23:04:15 UTC (rev 349)
+@@ -0,0 +1,81 @@
++/*
++ * structs.h
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *                         Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
++ *                         Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
++ *
++ * This file is part of olsrs3d, an olsr topology visualizer for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * olsrs3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * olsrs3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#define NAMEMAX		128
++#define MAXLINESIZE 1000		/* lines in a digraph just shouldn't get that longer ... */
++#define MAXDATASIZE 100			/* max number of bytes we can get at once  */
++
++/* linked list for the all connections */
++struct olsr_con 
++{
++	struct olsr_con *next_olsr_con;			/* pointer to next connection */
++	struct olsr_con *prev_olsr_con;			/* pointer to previous connection */
++	struct olsr_node *left_olsr_node;		/* pointer to left end point of the connection */
++	struct olsr_node *right_olsr_node;		/* pointer to right end point of the connection */
++	float left_etx;							/* etx of left olsr node */
++	float right_etx;						/* etx of right olsr node */
++	float left_etx_sqrt;					/* sqrt of etx of left olsr node */
++	float right_etx_sqrt;					/* sqrt etx of right olsr node */
++	int obj_id;								/* id of connection object in s3d */
++	int color;
++	float rgb;
++};
++
++
++/* linked list for the neighbours of each olsr node */
++struct olsr_neigh_list
++{
++	struct olsr_neigh_list *next_olsr_neigh_list;		/* pointer to next neighbour */
++	struct olsr_con *olsr_con;							/* pointer to the connection */
++};
++
++
++/* we contruct a binary tree to handle the nodes */
++struct olsr_node 
++{
++	struct olsr_node *left;
++	struct olsr_node *right;
++	char ip[NAMEMAX];				/* host ip */
++	int node_type;					/* normal = 0, internet gateway = 1, via hna announced network = 2 */
++	int node_type_modified;			/* node_type modified flag */
++	int last_seen;					/* last seen counter */
++	int visible;					/* is this node visible or vanished */
++	float pos_vec[3];				/* position vector in 3d &quot;space&quot; */
++	float mov_vec[3];				/* move vector */
++	int obj_id;						/* id of node object in s3d */
++	int desc_id;					/* id of node description object in s3d */
++	float desc_length;				/* length of node description object in s3d */
++	struct olsr_neigh_list *olsr_neigh_list;	/* pointer to first neighbour */
++};
++
++
++struct Obj_to_ip
++{
++	int id;
++	struct olsr_node *olsr_node;
++	struct Obj_to_ip *next;
++	struct Obj_to_ip *prev;
++};
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000341.html">[S3d-svn] r348 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000343.html">[S3d-svn] r350 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#342">[ date ]</a>
+              <a href="thread.html#342">[ thread ]</a>
+              <a href="subject.html#342">[ subject ]</a>
+              <a href="author.html#342">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

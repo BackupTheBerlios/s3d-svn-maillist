@@ -1,0 +1,449 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r762 - in trunk: apps/dot_mcp apps/meshs3d apps/olsrs3d	apps/s3dfm apps/s3dosm apps/s3dvt libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r762%20-%20in%20trunk%3A%20apps/dot_mcp%20apps/meshs3d%20apps/olsrs3d%0A%09apps/s3dfm%20apps/s3dosm%20apps/s3dvt%20libs3d%20libs3dw&In-Reply-To=%3C200710182358.l9INwA87030293%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000753.html">
+   <LINK REL="Next"  HREF="000755.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r762 - in trunk: apps/dot_mcp apps/meshs3d apps/olsrs3d	apps/s3dfm apps/s3dosm apps/s3dvt libs3d libs3dw</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r762%20-%20in%20trunk%3A%20apps/dot_mcp%20apps/meshs3d%20apps/olsrs3d%0A%09apps/s3dfm%20apps/s3dosm%20apps/s3dvt%20libs3d%20libs3dw&In-Reply-To=%3C200710182358.l9INwA87030293%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r762 - in trunk: apps/dot_mcp apps/meshs3d apps/olsrs3d	apps/s3dfm apps/s3dosm apps/s3dvt libs3d libs3dw">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 01:58:10 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000753.html">[S3d-svn] r761 - trunk/server
+</A></li>
+        <LI>Next message: <A HREF="000755.html">[S3d-svn] r763 - trunk/libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#754">[ date ]</a>
+              <a href="thread.html#754">[ thread ]</a>
+              <a href="subject.html#754">[ subject ]</a>
+              <a href="author.html#754">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 01:58:08 +0200 (Fri, 19 Oct 2007)
+New Revision: 762
+
+Modified:
+   trunk/apps/dot_mcp/dot_mcp.h
+   trunk/apps/meshs3d/meshs3d.h
+   trunk/apps/olsrs3d/olsrs3d.h
+   trunk/apps/olsrs3d/search.h
+   trunk/apps/s3dfm/s3dfm.h
+   trunk/apps/s3dosm/http_fetcher.h
+   trunk/apps/s3dosm/olsrs3d.h
+   trunk/apps/s3dosm/s3dosm.h
+   trunk/apps/s3dvt/s3dvt.h
+   trunk/libs3d/s3d.h
+   trunk/libs3dw/s3dw.h
+   trunk/libs3dw/s3dw_int.h
+Log:
+Convert headers to ANSI function declarations
+
+
+Modified: trunk/apps/dot_mcp/dot_mcp.h
+===================================================================
+--- trunk/apps/dot_mcp/dot_mcp.h	2007-10-18 23:58:00 UTC (rev 761)
++++ trunk/apps/dot_mcp/dot_mcp.h	2007-10-18 23:58:08 UTC (rev 762)
+@@ -33,5 +33,5 @@
+ #endif
+ #endif
+ 
+-int menu_init();
++int menu_init(void);
+ void menu_click(int oid);
+
+Modified: trunk/apps/meshs3d/meshs3d.h
+===================================================================
+--- trunk/apps/meshs3d/meshs3d.h	2007-10-18 23:58:00 UTC (rev 761)
++++ trunk/apps/meshs3d/meshs3d.h	2007-10-18 23:58:08 UTC (rev 762)
+@@ -97,20 +97,20 @@
+ 
+ /* process.c */
+ /*
+-void lst_initialize();
++void lst_initialize(void);
+ void lst_add(int id,struct olsr_node **olsr_node);
+ void lst_del(int id);
+ struct olsr_node *lst_search(int id);
+-void lst_out();
++void lst_out(void);
+ struct olsr_node *move_lst_ptr(int *id);
+ */
+-int process_main();
+-void process_init();
++int process_main(void);
++void process_init(void);
+ 
+ /* net.c */
+ int net_init(char *host);
+-int net_main();
+-int net_quit();
++int net_main(void);
++int net_quit(void);
+ 
+ /* main */
+ /*
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2007-10-18 23:58:00 UTC (rev 761)
++++ trunk/apps/olsrs3d/olsrs3d.h	2007-10-18 23:58:08 UTC (rev 762)
+@@ -65,17 +65,17 @@
+ extern int move_cam_to;
+ 
+ /* process */
+-void lst_initialize();
++void lst_initialize(void);
+ void lst_add(int id, struct olsr_node **olsr_node);
+ void lst_del(int id);
+ struct olsr_node *lst_search(int id);
+-void lst_out();
++void lst_out(void);
+ struct olsr_node *move_lst_ptr(int *id);
+-int process_main();
++int process_main(void);
+ /* net */
+ int net_init(char *host);
+-int net_main();
+-int net_quit();
++int net_main(void);
++int net_quit(void);
+ /* main */
+ void out_of_mem(void);
+ void print_etx(void);
+
+Modified: trunk/apps/olsrs3d/search.h
+===================================================================
+--- trunk/apps/olsrs3d/search.h	2007-10-18 23:58:00 UTC (rev 761)
++++ trunk/apps/olsrs3d/search.h	2007-10-18 23:58:08 UTC (rev 762)
+@@ -38,4 +38,4 @@
+ void follow_node(float cam_position_t[], float cam_position_r[], float rotate);
+ void follow_node_by_click(struct olsr_node *olsr_node);
+ 
+-void show_search_window();
++void show_search_window(void);
+
+Modified: trunk/apps/s3dfm/s3dfm.h
+===================================================================
+--- trunk/apps/s3dfm/s3dfm.h	2007-10-18 23:58:00 UTC (rev 761)
++++ trunk/apps/s3dfm/s3dfm.h	2007-10-18 23:58:08 UTC (rev 762)
+@@ -135,7 +135,7 @@
+ void    ani_finish(t_node *f, int i);
+ void    ani_iterate(t_node *f);
+ int    ani_check(t_node *f);
+-void    ani_mate();
++void    ani_mate(void);
+ /* box.c */
+ void    box_draw(t_node *dir);
+ void     box_draw_icons(t_node *dir);
+@@ -150,10 +150,10 @@
+ void    box_focus_color(t_node *dir, int on);
+ /* dialog.c */
+ void   close_win(s3dw_widget *button);
+-void   window_help();
++void   window_help(void);
+ void    window_fs(s3dw_widget *button);
+-void   window_fs_another();
+-void   window_fs_nothing();
++void   window_fs_another(void);
++void   window_fs_nothing(void);
+ void   window_fs_errno(char *errmsg);
+ void   window_fs_abort(s3dw_widget *button);
+ void   window_copy(char *path);
+@@ -161,8 +161,8 @@
+ void   window_mkdir(char *path);
+ void   window_move(char *path);
+ void   window_info(char *path);
+-void   window_fsani();
+-void    window_unlink();
++void   window_fsani(void);
++void    window_unlink(void);
+ /* event.c */
+ int    event_click(struct s3d_evt *evt);
+ int    event_key(struct s3d_evt *evt);
+
+Modified: trunk/apps/s3dosm/http_fetcher.h
+===================================================================
+--- trunk/apps/s3dosm/http_fetcher.h	2007-10-18 23:58:00 UTC (rev 761)
++++ trunk/apps/s3dosm/http_fetcher.h	2007-10-18 23:58:08 UTC (rev 762)
+@@ -124,7 +124,7 @@
+  * so if you need to hold on to the message for a while you should make
+  * a copy of it.
+  */
+-const char *http_strerror();
++const char *http_strerror(void);
+ 
+ 
+ 
+
+Modified: trunk/apps/s3dosm/olsrs3d.h
+===================================================================
+--- trunk/apps/s3dosm/olsrs3d.h	2007-10-18 23:58:00 UTC (rev 761)
++++ trunk/apps/s3dosm/olsrs3d.h	2007-10-18 23:58:08 UTC (rev 762)
+@@ -57,17 +57,17 @@
+ extern int move_cam_to;
+ 
+ /* process */
+-void lst_initialize();
++void lst_initialize(void);
+ void lst_add(int id, struct olsr_node **olsr_node);
+ void lst_del(int id);
+ struct olsr_node *lst_search(int id);
+-void lst_out();
++void lst_out(void);
+ struct olsr_node *move_lst_ptr(int *id);
+-int process_main();
++int process_main(void);
+ /* net */
+ int net_init(char *host);
+-int net_main();
+-int net_quit();
++int net_main(void);
++int net_quit(void);
+ /* main */
+ void out_of_mem(void);
+ void print_etx(void);
+
+Modified: trunk/apps/s3dosm/s3dosm.h
+===================================================================
+--- trunk/apps/s3dosm/s3dosm.h	2007-10-18 23:58:00 UTC (rev 761)
++++ trunk/apps/s3dosm/s3dosm.h	2007-10-18 23:58:08 UTC (rev 762)
+@@ -128,16 +128,16 @@
+ void    segment_init(segment_t *nsegment);
+ void    way_init(way_t *nway);
+ object_t  *object_new(int key);
+-node_t   *node_new();
+-segment_t  *segment_new();
+-layer_t  *layer_new();
+-way_t   *way_new();
++node_t   *node_new(void);
++segment_t  *segment_new(void);
++layer_t  *layer_new(void);
++way_t   *way_new(void);
+ void    node_free(node_t *node);
+ void    segment_free(segment_t *segment);
+ void    way_free(way_t *way);
+ void    layerset_add(layer_t *layer);
+ /* main.c */
+-void mainloop();
++void mainloop(void);
+ /* osm.c */
+ void debug_obj(object_t *obj, void *dummy);
+ layer_t *parse_osm(char *buf, int length);
+@@ -147,15 +147,15 @@
+ layer_t *parse_kismet(char *buf, int length);
+ layer_t *load_kismet_file(char *filename);
+ /* draw.c */
+-void draw_all_layers();
++void draw_all_layers(void);
+ int draw_layer(layer_t *layer);
+ void calc_earth_to_eukl(float lat, float lon, float alt, float *x);
+ void draw_translate_icon(int user_icon, float la, float lo);
+ /* nav.c */
+-void nav_main();
+-void nav_init();
++void nav_main(void);
++void nav_init(void);
+ void nav_center(float la, float lo);
+-void nav_autocenter();
++void nav_autocenter(void);
+ void nav_campos(float campos[3], float earthpos[3]);
+ float get_heading(float la1, float lo1, float la2, float lo2);
+ extern int oidy;
+@@ -180,19 +180,19 @@
+ int db_insert_way_seg(way_t *way, int seg_n);
+ int db_insert_object(object_t *obj);
+ int db_init(char *dbFile);
+-int db_quit();
+-int db_create();
++int db_quit(void);
++int db_create(void);
+ int db_insert_layer(char *layer_name);
+-void db_flush();
++void db_flush(void);
+ int callback(void *NotUsed, int argc, char **argv, char **azColName);
+ /* gps.c */
+ int gps_init(char *gpshost);
+-int gps_main();
+-int gps_quit();
++int gps_main(void);
++int gps_quit(void);
+ /* ui.c */
+-int ui_init();
++int ui_init(void);
+ int load_window(char *text);
+-int load_window_remove();
++int load_window_remove(void);
+ int load_update_status(float percent);
+ /* olsrs3d.c */
+ #define NODEHEIGHT 10
+@@ -200,7 +200,7 @@
+ int olsr_object_info(struct s3d_evt *hrmz);
+ int olsr_parse_args(int argc, char **argv);
+ int olsr_keypress(struct s3d_evt *event);
+-void olsr_main();
+-int olsr_init();
+-int olsr_quit();
++void olsr_main(void);
++int olsr_init(void);
++int olsr_quit(void);
+ int olsr_parse_args(int argc, char **argv);
+
+Modified: trunk/apps/s3dvt/s3dvt.h
+===================================================================
+--- trunk/apps/s3dvt/s3dvt.h	2007-10-18 23:58:00 UTC (rev 761)
++++ trunk/apps/s3dvt/s3dvt.h	2007-10-18 23:58:08 UTC (rev 762)
+@@ -59,7 +59,7 @@
+ 
+ extern t_line line[MAX_LINES+1];
+ /* main.c */
+-void paintit();
++void paintit(void);
+ void term_addchar(char toprint);
+ /* terminal.c */
+ void AddChar(char *_toadd);
+
+Modified: trunk/libs3d/s3d.h
+===================================================================
+--- trunk/libs3d/s3d.h	2007-10-18 23:58:00 UTC (rev 761)
++++ trunk/libs3d/s3d.h	2007-10-18 23:58:08 UTC (rev 762)
+@@ -84,10 +84,10 @@
+ #ifdef HAVE_GCCVISIBILITY
+ #pragma GCC visibility push(default) /* Only export following functions */
+ #endif
+-void s3d_usage();
++void s3d_usage(void);
+ int s3d_init(int *argc, char ***argv, char *name);
+-int s3d_quit();
+-int s3d_mainloop(void (*f)());
++int s3d_quit(void);
++int s3d_mainloop(void (*f)(void));
+ 
+ /* object manipulations */
+ int s3d_push_vertex(int object, float x, float y, float z);
+@@ -138,7 +138,7 @@
+ int s3d_load_polygon_tex_coords(int object, float *tbuf, uint32_t start, uint16_t n);
+ int s3d_load_texture(int object, uint32_t tex, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h, uint8_t *data);
+ 
+-int s3d_new_object();
++int s3d_new_object(void);
+ int s3d_del_object(int oid);
+ 
+ int s3d_clone(int oid);
+@@ -171,7 +171,7 @@
+ 
+ /* event handlers */
+ void s3d_push_event(struct s3d_evt *newevt);
+-struct s3d_evt *s3d_pop_event();
++struct s3d_evt *s3d_pop_event(void);
+ struct s3d_evt *s3d_find_event(uint8_t event);
+ int s3d_delete_event(struct s3d_evt *devt);
+ 
+@@ -179,13 +179,13 @@
+ void s3d_clear_callback(uint8_t event);
+ void s3d_ignore_callback(uint8_t event);
+ s3d_cb s3d_get_callback(uint8_t event);
+-void s3d_process_stack();
++void s3d_process_stack(void);
+ 
+ /* mcp special */
+ int s3d_mcp_focus(int object);
+ 
+ /* for apps which don't employ s3d_mainloop() */
+-int s3d_net_check();
++int s3d_net_check(void);
+ #ifdef HAVE_GCCVISIBILITY
+ #pragma GCC visibility pop
+ #endif
+
+Modified: trunk/libs3dw/s3dw.h
+===================================================================
+--- trunk/libs3dw/s3dw.h	2007-10-18 23:58:00 UTC (rev 761)
++++ trunk/libs3dw/s3dw.h	2007-10-18 23:58:08 UTC (rev 762)
+@@ -172,7 +172,7 @@
+ void      s3dw_label_change_text(s3dw_label *label, char *text);
+ s3dw_surface   *s3dw_surface_new(char *title, float width, float height);
+ 
+-s3dw_widget   *s3dw_getroot();
++s3dw_widget   *s3dw_getroot(void);
+ void     s3dw_moveit(s3dw_widget *widget);
+ void      s3dw_delete(s3dw_widget *widget);
+ void      s3dw_show(s3dw_widget *widget);
+@@ -189,7 +189,7 @@
+ int      s3dw_handle_key(struct s3d_evt *evt);
+ int      s3dw_object_info(struct s3d_evt *evt);
+ 
+-void      s3dw_ani_mate();
++void      s3dw_ani_mate(void);
+ #ifdef HAVE_GCCVISIBILITY
+ #pragma GCC visibility pop
+ #endif
+
+Modified: trunk/libs3dw/s3dw_int.h
+===================================================================
+--- trunk/libs3dw/s3dw_int.h	2007-10-18 23:58:00 UTC (rev 761)
++++ trunk/libs3dw/s3dw_int.h	2007-10-18 23:58:08 UTC (rev 762)
+@@ -34,7 +34,7 @@
+ extern s3dw_key_callback s3dwcb_key[S3DW_NTYPES];
+ 
+ /* root.c */
+-s3dw_widget *s3dw_getroot();
++s3dw_widget *s3dw_getroot(void);
+ void s3dw_nothing(s3dw_widget *widget);
+ int s3dw_click_nothing(s3dw_widget *widget, uint32_t dummy);
+ int s3dw_key_nothing(s3dw_widget *widget, struct s3d_key_event *dummy);
+@@ -112,10 +112,10 @@
+ void s3dw_ani_doit(s3dw_widget *f);
+ void s3dw_ani_finish(s3dw_widget *f, int i);
+ void s3dw_ani_iterate(s3dw_widget *f);
+-void s3dw_ani_needarr();
++void s3dw_ani_needarr(void);
+ int  s3dw_ani_check(s3dw_widget *f);
+ /* arrange.c */
+-void s3dw_arrange();
++void s3dw_arrange(void);
+ void s3dw_arr_widgetcenter(s3dw_widget *widget, float *center);
+ void s3dw_arr_normdir(float *dir);
+-void s3dw_turn();
++void s3dw_turn(void);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000753.html">[S3d-svn] r761 - trunk/server
+</A></li>
+	<LI>Next message: <A HREF="000755.html">[S3d-svn] r763 - trunk/libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#754">[ date ]</a>
+              <a href="thread.html#754">[ thread ]</a>
+              <a href="subject.html#754">[ subject ]</a>
+              <a href="author.html#754">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

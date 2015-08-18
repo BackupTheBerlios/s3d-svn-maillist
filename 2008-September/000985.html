@@ -1,0 +1,372 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1005 - in trunk: experimental/testvis libs3d server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1005%20-%20in%20trunk%3A%20experimental/testvis%20libs3d%20server&In-Reply-To=%3C200809252222.m8PMMFDd006853%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000984.html">
+   <LINK REL="Next"  HREF="000986.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1005 - in trunk: experimental/testvis libs3d server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1005%20-%20in%20trunk%3A%20experimental/testvis%20libs3d%20server&In-Reply-To=%3C200809252222.m8PMMFDd006853%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1005 - in trunk: experimental/testvis libs3d server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 26 00:22:15 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000984.html">[S3d-svn] r1004 - in trunk: libs3d server
+</A></li>
+        <LI>Next message: <A HREF="000986.html">[S3d-svn] r1006 - in trunk: apps/kism3d libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#985">[ date ]</a>
+              <a href="thread.html#985">[ thread ]</a>
+              <a href="subject.html#985">[ subject ]</a>
+              <a href="author.html#985">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-26 00:22:14 +0200 (Fri, 26 Sep 2008)
+New Revision: 1005
+
+Modified:
+   trunk/experimental/testvis/testvis.c
+   trunk/libs3d/modelread.c
+   trunk/libs3d/proto_out.c
+   trunk/server/proto.c
+Log:
+Remove dead stores
+
+Modified: trunk/experimental/testvis/testvis.c
+===================================================================
+--- trunk/experimental/testvis/testvis.c	2008-09-25 22:21:51 UTC (rev 1004)
++++ trunk/experimental/testvis/testvis.c	2008-09-25 22:22:14 UTC (rev 1005)
+@@ -218,7 +218,7 @@
+ 			t-&gt;active = 1;
+ 			t-&gt;next = head-&gt;next;
+ 			head-&gt;next = t;
+-		} else if ((tmp_buffer = strstr(buffer, &quot;list&quot;)) != NULL) {
++		} else if (strstr(buffer, &quot;list&quot;) != NULL) {
+ 
+ 			list_data(head, z);
+ 
+@@ -240,7 +240,7 @@
+ 			tmp_buffer += 4;
+ 			act_data(atoi(tmp_buffer), head, z);
+ 
+-		} else if ((tmp_buffer = strstr(buffer, &quot;quit&quot;)) != NULL) {
++		} else if (strstr(buffer, &quot;quit&quot;) != NULL) {
+ 
+ 			break;
+ 
+
+Modified: trunk/libs3d/modelread.c
+===================================================================
+--- trunk/libs3d/modelread.c	2008-09-25 22:21:51 UTC (rev 1004)
++++ trunk/libs3d/modelread.c	2008-09-25 22:22:14 UTC (rev 1005)
+@@ -257,7 +257,6 @@
+ 				s3d_push_polygons(obj_id, polybuf, npoly);
+ 				if (oldflags &amp; G3D_FLAG_FAC_NORMALS)  s3d_pep_polygon_normals(obj_id, normalbuf,   npoly);
+ 				if (oldflags &amp; G3D_FLAG_FAC_TEXMAP)   s3d_pep_polygon_tex_coords(obj_id, texcoordbuf, npoly);
+-				npoly = 0;
+ 			}
+ 
+ 			voff += object-&gt;vertex_count; /* increase vertex offset */
+
+Modified: trunk/libs3d/proto_out.c
+===================================================================
+--- trunk/libs3d/proto_out.c	2008-09-25 22:21:51 UTC (rev 1004)
++++ trunk/libs3d/proto_out.c	2008-09-25 22:22:14 UTC (rev 1005)
+@@ -144,7 +144,6 @@
+ 	*((float *)ptr) = y;
+ 	ptr += sizeof(float);
+ 	*((float *)ptr) = z;
+-	ptr += sizeof(float);
+ 
+ 	htonfb((float*)(buf + sizeof(uint32_t)), 3);
+ 	net_send(S3D_P_C_PUSH_VERTEX, buf, len);
+@@ -235,7 +234,6 @@
+ 	*((float *)ptr) = diff_b;
+ 	ptr += sizeof(float);
+ 	*((float *)ptr) = 1.0;
+-	ptr += sizeof(float);
+ 
+ 	htonfb((float*)(buf + sizeof(uint32_t)), 12);
+ 	net_send(S3D_P_C_PUSH_MAT, buf, len);
+@@ -283,7 +281,6 @@
+ 	*((float *)ptr) = diff_b;
+ 	ptr += sizeof(float);
+ 	*((float *)ptr) = diff_a;
+-	ptr += sizeof(float);
+ 
+ 	htonfb((float*)(buf + sizeof(uint32_t)), 12);
+ 	net_send(S3D_P_C_PUSH_MAT, buf, len);
+@@ -370,7 +367,6 @@
+ 	*((uint32_t *)ptr) = htonl(v3);
+ 	ptr += sizeof(uint32_t);
+ 	*((uint32_t *)ptr) = htonl(material);
+-	ptr += sizeof(uint32_t);
+ 
+ 	net_send(S3D_P_C_PUSH_POLY, buf, len);
+ 	return(0);
+@@ -394,7 +390,6 @@
+ 	*((uint32_t *)ptr) = htonl(v2);
+ 	ptr += sizeof(uint32_t);
+ 	*((uint32_t *)ptr) = htonl(material);
+-	ptr += sizeof(uint32_t);
+ 
+ 	net_send(S3D_P_C_PUSH_LINE, buf, len);
+ 	return(0);
+@@ -643,7 +638,6 @@
+ 	*((float *)ptr) = diff_b;
+ 	ptr += sizeof(float);
+ 	*((float *)ptr) = 1.0;
+-	ptr += sizeof(float);
+ 
+ 	htonfb((float*)(buf + sizeof(uint32_t)), 12);
+ 	net_send(S3D_P_C_PEP_MAT, buf, len);
+@@ -692,7 +686,6 @@
+ 	*((float *)ptr) = diff_b;
+ 	ptr += sizeof(float);
+ 	*((float *)ptr) = diff_a;
+-	ptr += sizeof(float);
+ 
+ 	htonfb((float*)(buf + sizeof(uint32_t)), 12);
+ 	net_send(S3D_P_C_PEP_MAT, buf, len);
+@@ -788,7 +781,6 @@
+ 	*((float *)ptr) = y;
+ 	ptr += sizeof(float);
+ 	*((float *)ptr) = z;
+-	ptr += sizeof(float);
+ 
+ 	htonfb((float*)(buf + sizeof(uint32_t)), 3);
+ 	net_send(S3D_P_C_PEP_VERTEX, buf, len);
+@@ -811,7 +803,6 @@
+ 	*((uint32_t *)ptr) = htonl(v2);
+ 	ptr += sizeof(uint32_t);
+ 	*((uint32_t *)ptr) = htonl(material);
+-	ptr += sizeof(uint32_t);
+ 
+ 	net_send(S3D_P_C_PEP_LINE, buf, len);
+ 	return(0);
+@@ -874,19 +865,18 @@
+ 	char *ptr, buf[4*6+4];
+ 	ptr = buf;
+ 	*((uint32_t *)buf) = htonl(object);
+-	ptr += 4;
++	ptr += sizeof(uint32_t);
+ 	*((float *)ptr) = x1;
+-	ptr += 4;
++	ptr += sizeof(float);
+ 	*((float *)ptr) = y1;
+-	ptr += 4;
++	ptr += sizeof(float);
+ 	*((float *)ptr) = x2;
+-	ptr += 4;
++	ptr += sizeof(float);
+ 	*((float *)ptr) = y2;
+-	ptr += 4;
++	ptr += sizeof(float);
+ 	*((float *)ptr) = x3;
+-	ptr += 4;
++	ptr += sizeof(float);
+ 	*((float *)ptr) = y3;
+-	ptr += 4;
+ 
+ 	htonfb((float*)(buf + sizeof(uint32_t)), 6);
+ 	net_send(S3D_P_C_PEP_POLY_TEXC, (char *)buf, 6*4 + 4);
+@@ -1061,7 +1051,7 @@
+ 	*((uint32_t *)ptr) = htonl(object);
+ 	ptr += sizeof(uint32_t);  /*  object id */
+ 	*((uint32_t *)ptr) = htonl(tex);
+-	ptr += sizeof(uint32_t);   /*  texture index numer */
++
+ 	net_send(S3D_P_C_PEP_MAT_TEX, buf, 8);
+ 	return(0);
+ }
+@@ -1080,7 +1070,7 @@
+ 	*((uint16_t *)ptr) = htons(w);
+ 	ptr += sizeof(uint16_t);  /*  width */
+ 	*((uint16_t *)ptr) = htons(h);
+-	ptr += sizeof(uint16_t);  /*  height */
++
+ 	net_send(S3D_P_C_UPDATE_TEX, buf, 16);
+ 	return(0);
+ 
+@@ -1144,11 +1134,11 @@
+ 	ptr = buf;
+ 	/*  s3dprintf(VLOW, &quot;toggling flags on .. %010x&quot;, flags); */
+ 	*((uint32_t *)ptr) = htonl(object);
+-	ptr += 4;
++	ptr += sizeof(uint32_t);
+ 	*ptr = OF_TURN_ON;
+-	ptr += 1;
++	ptr += sizeof(unsigned char);
+ 	*((uint32_t *)ptr) = htonl(flags);
+-	ptr += 4;
++
+ 	net_send(S3D_P_C_TOGGLE_FLAGS, buf, len);
+ 	return(0);
+ }
+@@ -1164,11 +1154,11 @@
+ 	ptr = buf;
+ 	/*  s3dprintf(VLOW, &quot;toggling flags off .. %010x&quot;, flags); */
+ 	*((uint32_t *)ptr) = htonl(object);
+-	ptr += 4;
++	ptr += sizeof(uint32_t);
+ 	*ptr = OF_TURN_OFF;
+-	ptr += 1;
++	ptr += sizeof(unsigned char);
+ 	*((uint32_t *)ptr) = htonl(flags);
+-	ptr += 4;
++
+ 	net_send(S3D_P_C_TOGGLE_FLAGS, buf, len);
+ 	return(0);
+ }
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2008-09-25 22:21:51 UTC (rev 1004)
++++ trunk/server/proto.c	2008-09-25 22:22:14 UTC (rev 1005)
+@@ -304,17 +304,17 @@
+ 	case S3D_P_C_UPDATE_TEX:
+ 		if (length == 16) {
+ 			oid = ntohl(*((uint32_t *)cptr));
+-			cptr += 4;
++			cptr += sizeof(uint32_t);
+ 			toid = ntohl(*((uint32_t *)cptr));
+-			cptr += 4;
++			cptr += sizeof(uint32_t);
+ 			x = ntohs(*((uint16_t *)cptr));
+-			cptr += 2;
++			cptr += sizeof(uint16_t);
+ 			y = ntohs(*((uint16_t *)cptr));
+-			cptr += 2;
++			cptr += sizeof(uint16_t);
+ 			w = ntohs(*((uint16_t *)cptr));
+-			cptr += 2;
++			cptr += sizeof(uint16_t);
+ 			h = ntohs(*((uint16_t *)cptr));
+-			cptr += 2;
++
+ 			s3dprintf(VLOW, &quot;UPDATE_TEX[%d]: oid %d, texture %d, [%d x %d] data at [%d x %d] &quot;, length, oid, toid, w, h, x, y);
+ 			obj_update_tex(p, oid, toid, x, y, w, h, NULL);
+ 		}
+@@ -323,9 +323,9 @@
+ 	case S3D_P_C_DEL_VERTEX:
+ 		if (length == 8) {
+ 			oid = ntohl(*((uint32_t *)cptr));
+-			cptr += 4;
++			cptr += sizeof(uint32_t);
+ 			num = ntohl(*((uint32_t *)cptr));
+-			cptr += 4;
++
+ 			/*      s3dprintf(LOW,&quot;deleting %d vertices for object oid...%d&quot;, num, oid); */
+ 			obj_del_vertex(p, oid, num);
+ 		}
+@@ -333,9 +333,9 @@
+ 	case S3D_P_C_DEL_POLY:
+ 		if (length == 8) {
+ 			oid = ntohl(*((uint32_t *)cptr));
+-			cptr += 4;
++			cptr += sizeof(uint32_t);
+ 			num = ntohl(*((uint32_t *)cptr));
+-			cptr += 4;
++
+ 			/*      s3dprintf(LOW,&quot;deleting %d vertices for object oid...%d&quot;, num, oid); */
+ 			obj_del_poly(p, oid, num);
+ 		}
+@@ -343,9 +343,9 @@
+ 	case S3D_P_C_DEL_LINE:
+ 		if (length == 8) {
+ 			oid = ntohl(*((uint32_t *)cptr));
+-			cptr += 4;
++			cptr += sizeof(uint32_t);
+ 			num = ntohl(*((uint32_t *)cptr));
+-			cptr += 4;
++
+ 			s3dprintf(VLOW, &quot;deleting %d lines for object oid...%d&quot;, num, oid);
+ 			obj_del_line(p, oid, num);
+ 		}
+@@ -354,9 +354,9 @@
+ 	case S3D_P_C_DEL_MAT:
+ 		if (length == 8) {
+ 			oid = ntohl(*((uint32_t *)cptr));
+-			cptr += 4;
++			cptr += sizeof(uint32_t);
+ 			num = ntohl(*((uint32_t *)cptr));
+-			cptr += 4;
++
+ 			/*      s3dprintf(LOW,&quot;deleting %d materials for object oid...%d&quot;, num, oid); */
+ 			obj_del_mat(p, oid, num);
+ 		}
+@@ -364,9 +364,9 @@
+ 	case S3D_P_C_DEL_TEX:
+ 		if (length == 8) {
+ 			oid = ntohl(*((uint32_t *)cptr));
+-			cptr += 4;
++			cptr += sizeof(uint32_t);
+ 			num = ntohl(*((uint32_t *)cptr));
+-			cptr += 4;
++
+ 			/*      s3dprintf(LOW,&quot;deleting %d textures for object oid...%d&quot;, num, oid); */
+ 			obj_del_tex(p, oid, num);
+ 		}
+@@ -374,18 +374,18 @@
+ 	case S3D_P_C_TOGGLE_FLAGS:
+ 		if (length == 9) {
+ 			oid = ntohl(*((uint32_t *)cptr));
+-			cptr += 4;
++			cptr += sizeof(uint32_t);;
+ 			type = *cptr;
+-			cptr += 1;
++			cptr += sizeof(unsigned char);
+ 			flags = ntohl(*((uint32_t *)cptr));
+-			cptr += 4;
++
+ 			obj_toggle_flags(p, oid, type, flags);
+ 		}
+ 		break;
+ 	case S3D_P_C_TRANSLATE:
+ 		if (length &gt;= 16) {
+ 			oid = ntohl(*((uint32_t *)cptr));
+-			cptr += 4;
++			cptr += sizeof(uint32_t);
+ 			ntohfb((float *)cptr, 3);
+ 			obj_translate(p, oid, (float *)cptr);
+ 		}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000984.html">[S3d-svn] r1004 - in trunk: libs3d server
+</A></li>
+	<LI>Next message: <A HREF="000986.html">[S3d-svn] r1006 - in trunk: apps/kism3d libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#985">[ date ]</a>
+              <a href="thread.html#985">[ thread ]</a>
+              <a href="subject.html#985">[ subject ]</a>
+              <a href="author.html#985">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

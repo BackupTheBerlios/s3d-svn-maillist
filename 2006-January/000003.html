@@ -1,0 +1,256 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r6 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-January/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r6%20-%20trunk&In-Reply-To=%3C200601301721.k0UHLFEA010780%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000002.html">
+   <LINK REL="Next"  HREF="000004.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r6 - trunk</H1>
+    <B>ankon at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r6%20-%20trunk&In-Reply-To=%3C200601301721.k0UHLFEA010780%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r6 - trunk">ankon at berlios.de
+       </A><BR>
+    <I>Mon Jan 30 18:21:15 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000002.html">[S3d-svn] r4 - trunk/client
+</A></li>
+        <LI>Next message: <A HREF="000004.html">[S3d-svn] r8 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#3">[ date ]</a>
+              <a href="thread.html#3">[ thread ]</a>
+              <a href="subject.html#3">[ subject ]</a>
+              <a href="author.html#3">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: ankon
+Date: 2006-01-30 18:21:12 +0100 (Mon, 30 Jan 2006)
+New Revision: 6
+
+Added:
+   trunk/autogen.sh
+Log:
+Script to regenerate configure and the different Makefiles.
+You need automake 1.9, autoconf 2.59 and (soon) libtool 1.5
+
+To use it, run
+# ./autogen.sh
+and then make/make install as usual.
+
+# ./autogen.sh --enable-devel 
+activates debugging and profiling support.
+
+
+
+Added: trunk/autogen.sh
+===================================================================
+--- trunk/autogen.sh	2006-01-30 17:18:52 UTC (rev 5)
++++ trunk/autogen.sh	2006-01-30 17:21:12 UTC (rev 6)
+@@ -0,0 +1,164 @@
++#!/bin/sh
++
++# $zfxce: autogen.sh,v 1.9 2005/10/28 11:58:33 andreaskohn Exp $
++
++# Regenerate configuration files.
++#
++# If the user has set environment variables for
++# AUTOMAKE, AUTOCONF, etc, try to use these
++#
++# Run configure aftwerwards
++#
++
++# (c) Andreas Kohn, 2004-2006.
++#
++# NO WARRANTY. THIS PROGRAM IS FREE SOFTWARE, AND YOU MAY USE AND/OR MODIFY
++# IT AS LONG AS YOU KEEP THE ABOVE COPYRIGHT NOTICE AND THIS DISCLAIMER IN
++# PLACE.
++
++#
++# Globals
++#
++SRCDIR=`pwd`
++WSDIR=$SRCDIR
++run_configure=1
++quiet=0
++configure_args=&quot;&quot;
++
++#
++# Functions
++#
++error() {
++	echo &quot;ERROR: $*&quot;
++	exit 1
++}
++note() {
++	[ $quiet -ne 0 ] || echo $1
++}
++
++require_tool() {
++	# Checks if $1 is in PATH, or overridden
++	# using a environment variable with $1 in uppercase letters
++	# Sets ${$1-uppercase} to the full path of the tool
++	# and fails with an error message if no such tool was found.
++	
++	tool=$1
++	varname=`echo $tool | tr &quot;[:lower:]&quot; &quot;[:upper:]&quot;`
++	eval varvalue=\$$varname
++	[ $quiet -ne 0 ] || printf &quot;checking for $tool...&quot;
++	if [ -z &quot;$varvalue&quot; ]; then
++		varvalue=`which $tool`
++	fi
++	if [ -z &quot;$varvalue&quot; ]; then
++		error &quot;$tool not found. Check your \$PATH or set \$$varname to the full location of $tool.&quot;
++	fi
++	if [ -x &quot;$varvalue&quot; ]; then
++		eval $varname=$varvalue
++	else
++		error &quot;$tool not executable (tried '$varvalue'). Check your \$PATH or set \$$varname to the full location of $tool.&quot;
++	fi
++	note &quot;$varvalue&quot;
++	return 0
++}	
++
++require_success() {
++	# Run $1, and require that test $2 succeeds afterwards, else exit printing $3
++	# default for $2 is '$? -eq 0', default for $3 is '$1 failed'
++	run=$1
++	if [ -z &quot;$2&quot; ]; then
++		check='$? -eq 0'
++	else
++		check=$2
++	fi
++	if [ -z &quot;$3&quot; ]; then
++		message=&quot;'$1' failed.&quot;
++	else
++		message=$3
++	fi
++	note &quot;running $run...&quot;
++	eval $run
++	if [ $? -ne 0 ]; then
++		error $message
++	fi
++	eval test $check
++	if [ $? -ne 0 ]; then
++		error $message
++	fi
++	return 0
++}
++
++check_env() {
++	[ $quiet -ne 0 ] || echo &quot;checking and preparing environment...&quot;
++
++	require_tool aclocal
++	require_tool autoheader
++	require_tool autoconf
++	#require_tool automake
++	#require_tool libtoolize
++
++	return 0
++}
++
++usage() {
++	echo &quot;Usage: `basename $0` [-h|--help] [-q|--quiet] [--configure|--no-configure] ... &quot;
++	if [ &quot;$1&quot; = &quot;-v&quot; ]; then
++		cat &lt;&lt;EOF
++Generate a suitable build infrastructure for s3d using
++GNU autotools.
++
++Option summary
++--configure
++	Run the generated configure script, using non-recognized remaining arguments
++	(this is the default setting)
++--no-configure
++	Do not run configure afterwards
++-h
++--help
++	Show this help
++-q
++--quiet
++	Be quiet
++		
++EOF
++	fi
++}
++
++#
++# Execution starts here
++#
++while [ $# -gt 0 ]; do
++	case &quot;$1&quot; in 
++		--no-configure)
++			run_configure=0
++			;;
++		--configure)
++			# For compat with older versions
++			run_configure=1
++			;;
++		--help|-h)
++			usage -v
++			return 0
++			;;
++		--quiet|-q)
++			quiet=1
++			;;
++		*)
++			configure_args=&quot;$configure_args $1&quot;
++			;;
++	esac
++	shift
++done
++
++check_env
++
++note &quot;generating build scripts...&quot;
++	
++#require_success &quot;test -f $WSDIR/config/ltmain.sh || ${LIBTOOLIZE} --force --copy&quot; &quot;\$? -eq 0 -a -f $WSDIR/config/ltmain.sh&quot; &quot;${LIBTOOLIZE} failed.&quot;
++require_success &quot;${ACLOCAL} -I $WSDIR/config ${ACLOCAL_FLAGS}&quot;
++require_success &quot;${AUTOHEADER}&quot;
++#require_success &quot;${AUTOMAKE} --foreign --include-deps --add-missing --copy&quot;
++require_success &quot;${AUTOCONF}&quot;
++if [ $run_configure -eq 1 ]; then
++        require_success &quot;./configure $configure_args&quot;
++fi
++
+
+
+Property changes on: trunk/autogen.sh
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000002.html">[S3d-svn] r4 - trunk/client
+</A></li>
+	<LI>Next message: <A HREF="000004.html">[S3d-svn] r8 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#3">[ date ]</a>
+              <a href="thread.html#3">[ thread ]</a>
+              <a href="subject.html#3">[ subject ]</a>
+              <a href="author.html#3">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

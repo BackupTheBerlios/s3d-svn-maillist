@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r500 - in trunk: . libs3d/libg3d/include/g3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r500%20-%20in%20trunk%3A%20.%20libs3d/libg3d/include/g3d&In-Reply-To=%3C200612021438.kB2EcjpK020545%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000492.html">
+   <LINK REL="Next"  HREF="000494.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r500 - in trunk: . libs3d/libg3d/include/g3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r500%20-%20in%20trunk%3A%20.%20libs3d/libg3d/include/g3d&In-Reply-To=%3C200612021438.kB2EcjpK020545%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r500 - in trunk: . libs3d/libg3d/include/g3d">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sat Dec  2 15:38:45 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000492.html">[S3d-svn] r499 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000494.html">[S3d-svn] r501 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#493">[ date ]</a>
+              <a href="thread.html#493">[ thread ]</a>
+              <a href="subject.html#493">[ subject ]</a>
+              <a href="author.html#493">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-12-02 15:38:45 +0100 (Sat, 02 Dec 2006)
+New Revision: 500
+
+Modified:
+   trunk/
+   trunk/configure.ac
+   trunk/libs3d/libg3d/include/g3d/config.h.in
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1192 at kero</A>:  dotslash | 2006-12-02 15:38:41 +0100
+ - sqlite3 now REALLY optional :)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1190
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1192
+
+Modified: trunk/configure.ac
+===================================================================
+--- trunk/configure.ac	2006-12-02 13:31:50 UTC (rev 499)
++++ trunk/configure.ac	2006-12-02 14:38:45 UTC (rev 500)
+@@ -106,7 +106,7 @@
+ PKG_CHECK_MODULES(FONTCONFIG, fontconfig &gt;= 2.1.0, [:], [AC_MSG_ERROR([Please install fontconfig (version 2.1.0 or higher)])])
+ PKG_CHECK_MODULES(FREETYPE, freetype2 &gt;= 9.5.0, [:], [AC_MSG_ERROR([Please install freetype2 (version 9.5.0 or higher)])])
+ 
+-PKG_CHECK_MODULES(SQLITE3, sqlite3 &gt;= 3.0, [HAVE_SQLITE3=&quot;yes&quot;], [])
++PKG_CHECK_MODULES(SQLITE3, sqlite3 &gt;= 3.0, [HAVE_SQLITE3=&quot;yes&quot;], [HAVE_SQLITE3=&quot;no&quot;])
+ # libxml2
+ AM_PATH_XML2(2.0.0, [HAVE_XML=&quot;yes&quot;], [])
+ 
+
+Modified: trunk/libs3d/libg3d/include/g3d/config.h.in
+===================================================================
+--- trunk/libs3d/libg3d/include/g3d/config.h.in	2006-12-02 13:31:50 UTC (rev 499)
++++ trunk/libs3d/libg3d/include/g3d/config.h.in	2006-12-02 14:38:45 UTC (rev 500)
+@@ -16,6 +16,9 @@
+ /* Define to 1 if you have the &lt;fcntl.h&gt; header file. */
+ #undef HAVE_FCNTL_H
+ 
++/* Have gps support */
++#undef HAVE_GPS
++
+ /* Define to 1 if you have the &lt;inttypes.h&gt; header file. */
+ #undef HAVE_INTTYPES_H
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000492.html">[S3d-svn] r499 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000494.html">[S3d-svn] r501 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#493">[ date ]</a>
+              <a href="thread.html#493">[ thread ]</a>
+              <a href="subject.html#493">[ subject ]</a>
+              <a href="author.html#493">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,41 @@
+From dotslash at mail.berlios.de  Sat Feb 10 14:08:25 2007
+From: dotslash at mail.berlios.de (dotslash at BerliOS)
+Date: Sat, 10 Feb 2007 14:08:25 +0100
+Subject: [S3d-svn] r577 - trunk
+Message-ID: <200702101308.l1AD8Pr1011389@sheep.berlios.de>
+
+Author: dotslash
+Date: 2007-02-10 14:08:24 +0100 (Sat, 10 Feb 2007)
+New Revision: 577
+
+Modified:
+   trunk/
+   trunk/INSTALL
+Log:
+ r1410 at kero:  dotslash | 2007-02-10 14:08:16 +0100
+ - don't reference 3dsloader, it was renamed to modelloader
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1381
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1410
+
+Modified: trunk/INSTALL
+===================================================================
+--- trunk/INSTALL	2007-01-22 16:12:35 UTC (rev 576)
++++ trunk/INSTALL	2007-02-10 13:08:24 UTC (rev 577)
+@@ -90,7 +90,7 @@
+ Now it's time to test some things. on another terminal:
+ 
+ $ cd examples
+-$ ./3dsloader miu3ds/miu.3ds
++$ ./modelloader ../objs/miu.3ds
+ 
+ now there should appear a rotating cat. you can move with with the middle 
+ mouse-button pushed.
+
+
+

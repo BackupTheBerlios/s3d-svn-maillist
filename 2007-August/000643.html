@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r649 - trunk/cmake/modules
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r649%20-%20trunk/cmake/modules&In-Reply-To=%3C200708281550.l7SFoAH6007053%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000640.html">
+   <LINK REL="Next"  HREF="000645.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r649 - trunk/cmake/modules</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r649%20-%20trunk/cmake/modules&In-Reply-To=%3C200708281550.l7SFoAH6007053%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r649 - trunk/cmake/modules">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Aug 28 17:50:11 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000640.html">[S3d-svn] r648 - trunk/libs3d
+</A></li>
+        <LI>Next message: <A HREF="000645.html">[S3d-svn] r650 - in trunk: . cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#643">[ date ]</a>
+              <a href="thread.html#643">[ thread ]</a>
+              <a href="subject.html#643">[ subject ]</a>
+              <a href="author.html#643">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-08-28 17:50:10 +0200 (Tue, 28 Aug 2007)
+New Revision: 649
+
+Modified:
+   trunk/cmake/modules/TestForSIGS.cmake
+Log:
+Test for sig_t to enable compilation under cygwin
+
+
+Modified: trunk/cmake/modules/TestForSIGS.cmake
+===================================================================
+--- trunk/cmake/modules/TestForSIGS.cmake	2007-08-28 15:50:09 UTC (rev 648)
++++ trunk/cmake/modules/TestForSIGS.cmake	2007-08-28 15:50:10 UTC (rev 649)
+@@ -1,2 +1,13 @@
+ include(CheckFunctionExists)
+-check_function_exists(signal HAVE_SIGS)
++check_function_exists(signal HAVE_SIGS_FUNC)
++
++include(CheckCSourceCompiles)
++check_c_source_compiles(&quot;#include&lt;signal.h&gt;
++	int main() {
++	sig_t test;
++	return 0;
++}&quot; SIG_T_DEFINED)
++
++if (HAVE_SIGS_FUNC AND SIG_T_DEFINED)
++	set(HAVE_SIGS TRUE)
++endif (HAVE_SIGS_FUNC AND SIG_T_DEFINED)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000640.html">[S3d-svn] r648 - trunk/libs3d
+</A></li>
+	<LI>Next message: <A HREF="000645.html">[S3d-svn] r650 - in trunk: . cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#643">[ date ]</a>
+              <a href="thread.html#643">[ thread ]</a>
+              <a href="subject.html#643">[ subject ]</a>
+              <a href="author.html#643">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

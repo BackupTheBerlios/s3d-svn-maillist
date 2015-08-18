@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r633 - in trunk: apps/s3dfm cmake/modules
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r633%20-%20in%20trunk%3A%20apps/s3dfm%20cmake/modules&In-Reply-To=%3C200707050000.l6500Lxj004364%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000623.html">
+   <LINK REL="Next"  HREF="000626.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r633 - in trunk: apps/s3dfm cmake/modules</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r633%20-%20in%20trunk%3A%20apps/s3dfm%20cmake/modules&In-Reply-To=%3C200707050000.l6500Lxj004364%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r633 - in trunk: apps/s3dfm cmake/modules">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Thu Jul  5 02:00:22 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000623.html">[S3d-svn] r631 - in trunk: . apps/kism3d apps/s3dfm apps/s3dvt	cmake/modules
+</A></li>
+        <LI>Next message: <A HREF="000626.html">[S3d-svn] r634 - trunk/cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#625">[ date ]</a>
+              <a href="thread.html#625">[ thread ]</a>
+              <a href="subject.html#625">[ subject ]</a>
+              <a href="author.html#625">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-07-05 02:00:15 +0200 (Thu, 05 Jul 2007)
+New Revision: 633
+
+Modified:
+   trunk/apps/s3dfm/CMakeLists.txt
+   trunk/cmake/modules/FindPThreads.cmake
+Log:
+- Test first for *pthread.* and then for *pthreads.*
+
+
+Modified: trunk/apps/s3dfm/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3dfm/CMakeLists.txt	2007-07-05 00:00:14 UTC (rev 632)
++++ trunk/apps/s3dfm/CMakeLists.txt	2007-07-05 00:00:15 UTC (rev 633)
+@@ -3,7 +3,7 @@
+ 
+ 	add_executable(s3dfm animation.c box.c dialog.c event.c fly.c focus.c fs.c
+ 		icon.c main.c node.c parse.c string.c)
+-	target_link_libraries(s3dfm s3d s3dw $&#194;{PTHREADS_LIBRARIES})
++	target_link_libraries(s3dfm s3d s3dw ${PTHREADS_LIBRARIES})
+ 
+ 	# install 
+ 	install(TARGETS s3dfm RUNTIME DESTINATION bin)
+
+Modified: trunk/cmake/modules/FindPThreads.cmake
+===================================================================
+--- trunk/cmake/modules/FindPThreads.cmake	2007-07-05 00:00:14 UTC (rev 632)
++++ trunk/cmake/modules/FindPThreads.cmake	2007-07-05 00:00:15 UTC (rev 633)
+@@ -9,13 +9,19 @@
+ 	set(PTHREADS_FOUND TRUE)
+ else (PTHREADS_LIBRARIES AND PTHREADS_INCLUDE_DIR)
+ 	find_path(PTHREADS_INCLUDE_DIR
+-		NAMES pthreads.h
++		NAMES pthread.h
+ 	)
+ 
+ 	find_library(PTHREADS_LIBRARIES
+-		NAMES pthreads
++		NAMES pthread
+ 	)
+ 
++	if (NOT PTHREADS_LIBRARIES)
++		find_library(PTHREADS_LIBRARIES
++			NAMES pthreads
++		)
++	endif (NOT PTHREADS_LIBRARIES)
++
+ 	if (PTHREADS_INCLUDE_DIR AND PTHREADS_LIBRARIES)
+ 		set(PTHREADS_FOUND TRUE)
+ 	endif (PTHREADS_INCLUDE_DIR AND PTHREADS_LIBRARIES)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000623.html">[S3d-svn] r631 - in trunk: . apps/kism3d apps/s3dfm apps/s3dvt	cmake/modules
+</A></li>
+	<LI>Next message: <A HREF="000626.html">[S3d-svn] r634 - trunk/cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#625">[ date ]</a>
+              <a href="thread.html#625">[ thread ]</a>
+              <a href="subject.html#625">[ subject ]</a>
+              <a href="author.html#625">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

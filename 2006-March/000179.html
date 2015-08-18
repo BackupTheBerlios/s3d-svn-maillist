@@ -1,0 +1,326 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r183 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r183%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603151919.k2FJJWh1019666%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000178.html">
+   <LINK REL="Next"  HREF="000180.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r183 - trunk/apps/olsrs3d</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r183%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603151919.k2FJJWh1019666%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r183 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Wed Mar 15 20:19:32 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000178.html">[S3d-svn] r182 - in trunk: . Documentation
+</A></li>
+        <LI>Next message: <A HREF="000180.html">[S3d-svn] r184 - trunk/config
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#179">[ date ]</a>
+              <a href="thread.html#179">[ thread ]</a>
+              <a href="subject.html#179">[ subject ]</a>
+              <a href="author.html#179">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-03-15 20:19:26 +0100 (Wed, 15 Mar 2006)
+New Revision: 183
+
+Added:
+   trunk/apps/olsrs3d/vector.c
+Modified:
+   trunk/apps/olsrs3d/Makefile.am
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/olsrs3d.h
+   trunk/apps/olsrs3d/process.c
+Log:
+- rotate node text with cam
+- adding vector.c for vector operations
+
+Modified: trunk/apps/olsrs3d/Makefile.am
+===================================================================
+--- trunk/apps/olsrs3d/Makefile.am	2006-03-15 11:53:04 UTC (rev 182)
++++ trunk/apps/olsrs3d/Makefile.am	2006-03-15 19:19:26 UTC (rev 183)
+@@ -5,6 +5,7 @@
+ 	olsrs3d.h
+ 
+ olsrs3d_SOURCES =  \
++	vector.c \
+ 	process.c \
+ 	main.c \
+ 	net.c
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-03-15 11:53:04 UTC (rev 182)
++++ trunk/apps/olsrs3d/main.c	2006-03-15 19:19:26 UTC (rev 183)
+@@ -184,8 +184,8 @@
+ 
+ void handle_olsr_node( struct olsr_node *olsr_node ) {
+ 
+-	float f, distance;
+-	float tmp_mov_vec[3];
++	float distance, angle;
++	float tmp_mov_vec[3], desc_norm_vec[3] = {0,-1,0};
+ 	struct olsr_node *other_node;
+ 	struct Obj_to_ip *Obj_to_ip_curr;
+ 	struct olsr_neigh_list *olsr_neigh_list, *prev_olsr_neigh_list, *other_node_neigh_list, *tmp_olsr_neigh_list;
+@@ -314,15 +314,21 @@
+ 			lst_add(olsr_node-&gt;obj_id,&amp;olsr_node);
+ 
+ 			/* create olsr node text and attach (link) it to the node */
+-			olsr_node-&gt;desc_id = s3d_draw_string( olsr_node-&gt;ip, &amp;f );
++			olsr_node-&gt;desc_id = s3d_draw_string( olsr_node-&gt;ip, &amp;olsr_node-&gt;desc_length );
+ 			s3d_link( olsr_node-&gt;desc_id, olsr_node-&gt;obj_id );
+-			s3d_translate( olsr_node-&gt;desc_id, -f/2,-2,0 );
++			s3d_translate( olsr_node-&gt;desc_id, - olsr_node-&gt;desc_length / 2, -2, 0 );
+ 			s3d_flags_on( olsr_node-&gt;desc_id, S3D_OF_VISIBLE );
+ 
+ 			olsr_node-&gt;node_type_modified = 0;
+ 
+ 		}
+ 
++		vector_substract( olsr_node-&gt;pos_vec, CamPosition[0], tmp_mov_vec );
++		angle = vector_angle( desc_norm_vec, tmp_mov_vec );
++		s3d_rotate( olsr_node-&gt;desc_id, 0, angle * 180 / M_PI, 0 );
++		s3d_translate( olsr_node-&gt;desc_id, 0 ,-2, cos(angle*M_PI/180)*olsr_node-&gt;desc_length/2 );
++// 		printf( &quot;olsr node (%s) angle: %f\n&quot;, olsr_node-&gt;ip, angle * 180 / M_PI );
++
+ 		/* drift away from unrelated nodes */
+ 		Obj_to_ip_curr = Obj_to_ip_head-&gt;next;
+ 		while ( Obj_to_ip_curr != Obj_to_ip_end ) {
+@@ -387,7 +393,7 @@
+ 		if ( ( olsr_con-&gt;left_etx != 0.0 ) &amp;&amp; ( olsr_con-&gt;right_etx != 0.0  ) ) {
+ 
+ 			distance = dirt( olsr_con-&gt;left_olsr_node-&gt;pos_vec, olsr_con-&gt;right_olsr_node-&gt;pos_vec, tmp_mov_vec );
+-			f = (( olsr_con-&gt;left_etx + olsr_con-&gt;right_etx ) / 4.0) / distance;
++			f = ( ( olsr_con-&gt;left_etx + olsr_con-&gt;right_etx ) / 4.0 ) / distance;
+ 
+ 			/***
+ 			 * drift factor - 0.0 &lt; factor &lt; 1.0 ( best results: 0.3 &lt; factor &lt; 0.9
+@@ -469,13 +475,12 @@
+ 		s3d_pop_line( olsr_con-&gt;obj_id, 2 );
+ 
+ 		s3d_push_vertex( olsr_con-&gt;obj_id, olsr_con-&gt;left_olsr_node-&gt;pos_vec[0] , olsr_con-&gt;left_olsr_node-&gt;pos_vec[1] , olsr_con-&gt;left_olsr_node-&gt;pos_vec[2] );
+-		s3d_push_vertex( olsr_con-&gt;obj_id, olsr_con-&gt;left_olsr_node-&gt;pos_vec[0] + 0.2 , olsr_con-&gt;left_olsr_node-&gt;pos_vec[1] , olsr_con-&gt;left_olsr_node-&gt;pos_vec[2] );
+-		s3d_push_vertex( olsr_con-&gt;obj_id, olsr_con-&gt;left_olsr_node-&gt;pos_vec[0] - 0.2 , olsr_con-&gt;left_olsr_node-&gt;pos_vec[1] , olsr_con-&gt;left_olsr_node-&gt;pos_vec[2] );
++		s3d_push_vertex( olsr_con-&gt;obj_id, olsr_con-&gt;left_olsr_node-&gt;pos_vec[0] , olsr_con-&gt;left_olsr_node-&gt;pos_vec[1] + 0.2 , olsr_con-&gt;left_olsr_node-&gt;pos_vec[2] );
+ 
+ 		s3d_push_vertex( olsr_con-&gt;obj_id, olsr_con-&gt;right_olsr_node-&gt;pos_vec[0] , olsr_con-&gt;right_olsr_node-&gt;pos_vec[1] , olsr_con-&gt;right_olsr_node-&gt;pos_vec[2] );
+-		s3d_push_vertex( olsr_con-&gt;obj_id, olsr_con-&gt;right_olsr_node-&gt;pos_vec[0] , olsr_con-&gt;right_olsr_node-&gt;pos_vec[1]+ 0.2 , olsr_con-&gt;right_olsr_node-&gt;pos_vec[2] );
+-		s3d_push_vertex( olsr_con-&gt;obj_id, olsr_con-&gt;right_olsr_node-&gt;pos_vec[0] , olsr_con-&gt;right_olsr_node-&gt;pos_vec[1]- 0.2 , olsr_con-&gt;right_olsr_node-&gt;pos_vec[2] );
++		s3d_push_vertex( olsr_con-&gt;obj_id, olsr_con-&gt;left_olsr_node-&gt;pos_vec[0] , olsr_con-&gt;left_olsr_node-&gt;pos_vec[1] - 0.2 , olsr_con-&gt;left_olsr_node-&gt;pos_vec[2] );
+ 
++
+ 		if ( ColorSwitch ) {
+ 
+ 			/* HNA */
+@@ -823,6 +828,7 @@
+ 	/* set extern int optind = 0 for parse_args in io.c */
+ 	optind = 0;
+ 
++
+ 	if (!net_init(Olsr_host))
+ 	{
+ 		if (!s3d_init(&amp;argc,&amp;argv,&quot;olsrs3d&quot;))
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-03-15 11:53:04 UTC (rev 182)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-03-15 19:19:26 UTC (rev 183)
+@@ -43,7 +43,7 @@
+ 	int obj_id;   /* id of connection object in s3d */
+ 	int color;
+ 	float rgb;
+-	
++
+ };
+ 
+ 
+@@ -70,6 +70,7 @@
+ 	float mov_vec[3];   /* move vector */
+ 	int obj_id;   /* id of node object in s3d */
+ 	int desc_id;   /* id of node description object in s3d */
++	float desc_length;   /* length of node description object in s3d */
+ 	struct olsr_neigh_list *olsr_neigh_list;   /* pointer to first neighbour */
+ 
+ };
+@@ -120,3 +121,10 @@
+ /* main */
+ void out_of_mem( void );
+ struct olsr_node **lst_search(int id);
++
++/* vector */
++float vector_length( float vector[] );
++void vector_substract( float vector1[], float vector2[], float result_vector[] );
++float vector_dot_product( float vector1[], float vector2[] );
++float vector_angle( float vector1[], float vector2[] );
++
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-03-15 11:53:04 UTC (rev 182)
++++ trunk/apps/olsrs3d/process.c	2006-03-15 19:19:26 UTC (rev 183)
+@@ -88,8 +88,8 @@
+ 
+ 		s3d_flags_on( (*olsr_con)-&gt;obj_id, S3D_OF_VISIBLE );
+ 
+-		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 0,4,5,0 );
+-		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 3,1,2,0 );
++// 		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 0,4,5,0 );
++// 		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 3,1,2,0 );
+ 		s3d_link( (*olsr_con)-&gt;obj_id,  ZeroPoint );
+ 
+ 		/* add olsr node to new olsr connection in order to access the nodes from the connection list */
+
+Added: trunk/apps/olsrs3d/vector.c
+===================================================================
+--- trunk/apps/olsrs3d/vector.c	2006-03-15 11:53:04 UTC (rev 182)
++++ trunk/apps/olsrs3d/vector.c	2006-03-15 19:19:26 UTC (rev 183)
+@@ -0,0 +1,108 @@
++/*
++ * net.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *                         Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
++ *                         Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
++ *
++ * This file is part of olsrs3d, an olsr topology visualizer for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * olsrs3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * olsrs3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
++
++#include &lt;stdio.h&gt;
++#include &lt;math.h&gt;		/* sqrt() */
++
++
++
++
++
++/***
++ *
++ * calculate length of a vector =&gt; <A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Length_of_a_vector">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Length_of_a_vector</A>
++ *
++ *   vector   =&gt;   given vector
++ *
++ *   return length
++ *
++ ***/
++
++float vector_length( float vector[] ) {
++// printf( &quot;length = %f\n&quot;, sqrt( vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2] ) );
++	return ( sqrt( vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2] ) );
++
++}
++
++
++
++/***
++ *
++ * substract vector1 from vector2 =&gt; <A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Vector_addition_and_subtraction">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Vector_addition_and_subtraction</A>
++ *
++ *   vector1         =&gt;   given vector1
++ *   vector2         =&gt;   given vector2
++ *   result_vector   =&gt;   save resulting vector here
++ *
++ ***/
++
++void vector_substract( float vector1[], float vector2[], float result_vector[] ) {
++
++	result_vector[0] = vector2[0] - vector1[0];
++	result_vector[1] = vector2[1] - vector1[1];
++	result_vector[2] = vector2[2] - vector1[2];
++// 	printf( &quot;vektor2 (%f,%f,%f) - vektor1 (%f,%f,%f) = result_vektor (%f,%f,%f)\n&quot;, vector2[0], vector2[1], vector2[2], vector1[0], vector1[1], vector1[2], result_vector[0], result_vector[1], result_vector[2] );
++}
++
++
++
++/***
++ *
++ * calculate dot product of 2 vectors =&gt; <A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Dot_product">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Dot_product</A>
++ *
++ *   vector1   =&gt;   given vector1
++ *   vector2   =&gt;   given vector2
++ *
++ *   return dot product
++ *
++ ***/
++
++float vector_dot_product( float vector1[], float vector2[] ) {
++// 	printf( &quot;dot product = %f\n&quot;, vector1[0] * vector2[0] + vector1[1] * vector2[1] + vector1[2] * vector2[2] );
++	return ( vector1[0] * vector2[0] + vector1[1] * vector2[1] + vector1[2] * vector2[2] );
++
++}
++
++
++
++/***
++ *
++ * calculate angle between 2 vectors =&gt; <A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Cross_product">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Cross_product</A>
++ *
++ *   vector1   =&gt;   given vector1
++ *   vector2   =&gt;   given vector2
++ *
++ *   return angle
++ *
++ ***/
++
++float vector_angle( float vector1[], float vector2[] ) {
++// 	printf( &quot;angle = %f\n&quot;, ( vector_dot_product( vector1, vector2 ) / ( vector_length( vector1 ) * vector_length( vector2 ) ) ) );
++	return ( acos( vector_dot_product( vector1, vector2 ) / ( vector_length( vector1 ) * vector_length( vector2 ) ) ) );
++
++}
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000178.html">[S3d-svn] r182 - in trunk: . Documentation
+</A></li>
+	<LI>Next message: <A HREF="000180.html">[S3d-svn] r184 - trunk/config
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#179">[ date ]</a>
+              <a href="thread.html#179">[ thread ]</a>
+              <a href="subject.html#179">[ subject ]</a>
+              <a href="author.html#179">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

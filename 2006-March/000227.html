@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r234 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r234%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603251808.k2PI8aLc030460%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000226.html">
+   <LINK REL="Next"  HREF="000228.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r234 - trunk/apps/olsrs3d</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r234%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603251808.k2PI8aLc030460%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r234 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Sat Mar 25 19:08:36 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000226.html">[S3d-svn] r233 - trunk/objs
+</A></li>
+        <LI>Next message: <A HREF="000228.html">[S3d-svn] r235 - trunk/objs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#227">[ date ]</a>
+              <a href="thread.html#227">[ thread ]</a>
+              <a href="subject.html#227">[ subject ]</a>
+              <a href="author.html#227">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-03-25 19:07:57 +0100 (Sat, 25 Mar 2006)
+New Revision: 234
+
+Modified:
+   trunk/apps/olsrs3d/process.c
+Log:
+fix subnet mask
+
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-03-25 17:44:57 UTC (rev 233)
++++ trunk/apps/olsrs3d/process.c	2006-03-25 18:07:57 UTC (rev 234)
+@@ -384,7 +384,8 @@
+ 	struct olsr_node *olsr_node1;   /* pointer to olsr nodes */
+ 	struct olsr_node *olsr_node2;
+ 	in_addr_t address;
+-	
++	char hna_name[NAMEMAX];
++
+ 	lbuf_ptr = lbuf;
+ 	last_cr_ptr = NULL;
+ 
+@@ -453,18 +454,16 @@
+ 
+ 					/* normal HNA */
+ 					} else {
+-						
++
+ 						if( (tmpChar = strchr((char*)con_to, (int)'/')))
+ 						{
+-							char *test;
+ 							tmpChar++;
+ 							address = inet_addr(tmpChar);
+-							printf(&quot;%d\n&quot;, (int)(rintf(log(address)/log(2))));
+-							*tmpChar = '\0';
+-							*test = sprintf(&quot;%d&quot;,(int)address);
+-							strncat(con_to,test,NAMEMAX);
++							sprintf(hna_name,&quot;%d&quot;,(int)(rintf(log(address)/log(2))));
++							strncpy(tmpChar,hna_name,NAMEMAX);
++							printf(&quot;hna_name: %s &lt;&gt; con_to: %s\n&quot;, hna_name,con_to );
+ 						}
+-						
++
+ 						olsr_node1 = get_olsr_node( &amp;Olsr_root, con_from );
+ 						olsr_node2 = get_olsr_node( &amp;Olsr_root, con_to );
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000226.html">[S3d-svn] r233 - trunk/objs
+</A></li>
+	<LI>Next message: <A HREF="000228.html">[S3d-svn] r235 - trunk/objs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#227">[ date ]</a>
+              <a href="thread.html#227">[ thread ]</a>
+              <a href="subject.html#227">[ subject ]</a>
+              <a href="author.html#227">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

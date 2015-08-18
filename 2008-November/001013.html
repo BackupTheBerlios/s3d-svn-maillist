@@ -1,0 +1,1039 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1033 - in trunk: . apps/dot_mcp apps/kism3d apps/meshs3d	apps/s3d_x11gate apps/s3dfm apps/s3dosm apps/s3dvt	cmake/modules example experimental/comptest	experimental/olsrs3d experimental/testvis	experimental/wiitest libs3d libs3dw server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1033%20-%20in%20trunk%3A%20.%20apps/dot_mcp%20apps/kism3d%20apps/meshs3d%0A%09apps/s3d_x11gate%20apps/s3dfm%20apps/s3dosm%20apps/s3dvt%0A%09cmake/modules%20example%20experimental/comptest%0A%09experimental/olsrs3d%20experimental/testvis%0A%09experimental/wiitest%20libs3d%20libs3dw%20server&In-Reply-To=%3C200811221819.mAMIJXSj001249%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001012.html">
+   <LINK REL="Next"  HREF="001014.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1033 - in trunk: . apps/dot_mcp apps/kism3d apps/meshs3d	apps/s3d_x11gate apps/s3dfm apps/s3dosm apps/s3dvt	cmake/modules example experimental/comptest	experimental/olsrs3d experimental/testvis	experimental/wiitest libs3d libs3dw server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1033%20-%20in%20trunk%3A%20.%20apps/dot_mcp%20apps/kism3d%20apps/meshs3d%0A%09apps/s3d_x11gate%20apps/s3dfm%20apps/s3dosm%20apps/s3dvt%0A%09cmake/modules%20example%20experimental/comptest%0A%09experimental/olsrs3d%20experimental/testvis%0A%09experimental/wiitest%20libs3d%20libs3dw%20server&In-Reply-To=%3C200811221819.mAMIJXSj001249%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1033 - in trunk: . apps/dot_mcp apps/kism3d apps/meshs3d	apps/s3d_x11gate apps/s3dfm apps/s3dosm apps/s3dvt	cmake/modules example experimental/comptest	experimental/olsrs3d experimental/testvis	experimental/wiitest libs3d libs3dw server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sat Nov 22 19:19:33 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001012.html">[S3d-svn] r1032 - in trunk: . server
+</A></li>
+        <LI>Next message: <A HREF="001014.html">[S3d-svn] r1034 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1013">[ date ]</a>
+              <a href="thread.html#1013">[ thread ]</a>
+              <a href="subject.html#1013">[ subject ]</a>
+              <a href="author.html#1013">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-11-22 19:19:29 +0100 (Sat, 22 Nov 2008)
+New Revision: 1033
+
+Added:
+   trunk/cmake/modules/S3DInternals.cmake
+Removed:
+   trunk/cmake/modules/InstallPaths.cmake
+Modified:
+   trunk/CMakeLists.txt
+   trunk/INSTALL
+   trunk/apps/dot_mcp/CMakeLists.txt
+   trunk/apps/dot_mcp/menu.c
+   trunk/apps/kism3d/CMakeLists.txt
+   trunk/apps/kism3d/kism3d.h
+   trunk/apps/kism3d/list.h
+   trunk/apps/meshs3d/CMakeLists.txt
+   trunk/apps/meshs3d/hash.h
+   trunk/apps/meshs3d/meshs3d.h
+   trunk/apps/s3d_x11gate/CMakeLists.txt
+   trunk/apps/s3dfm/CMakeLists.txt
+   trunk/apps/s3dfm/s3dfm.h
+   trunk/apps/s3dosm/CMakeLists.txt
+   trunk/apps/s3dosm/olsrs3d.h
+   trunk/apps/s3dosm/s3dosm.h
+   trunk/apps/s3dosm/search.h
+   trunk/apps/s3dosm/structs.h
+   trunk/apps/s3dvt/CMakeLists.txt
+   trunk/apps/s3dvt/s3dvt.h
+   trunk/example/CMakeLists.txt
+   trunk/experimental/comptest/CMakeLists.txt
+   trunk/experimental/comptest/comptest.h
+   trunk/experimental/olsrs3d/CMakeLists.txt
+   trunk/experimental/olsrs3d/olsrs3d.h
+   trunk/experimental/olsrs3d/search.h
+   trunk/experimental/olsrs3d/structs.h
+   trunk/experimental/testvis/CMakeLists.txt
+   trunk/experimental/wiitest/CMakeLists.txt
+   trunk/libs3d/CMakeLists.txt
+   trunk/libs3d/object_queue.c
+   trunk/libs3d/s3d_keysym.h
+   trunk/libs3d/s3dlib.h
+   trunk/libs3dw/CMakeLists.txt
+   trunk/libs3dw/s3dw_int.h
+   trunk/server/CMakeLists.txt
+   trunk/server/global.h
+   trunk/server/main.c
+Log:
+Allow pseudo global optimisations
+
+A new cmake cache variable ENABLE_FINAL is introduced to enable pseudo global
+optimisations by generating a c file which includes all other files of a target
+and compiles that in single compiler call.
+
+Modified: trunk/CMakeLists.txt
+===================================================================
+--- trunk/CMakeLists.txt	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/CMakeLists.txt	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -12,8 +12,7 @@
+ # Add directory with library checks to search path
+ list(APPEND CMAKE_MODULE_PATH &quot;${s3d_SOURCE_DIR}/cmake/modules&quot;)
+ 
+-# Set default installation paths
+-include(InstallPaths)
++include(S3DInternals)
+ 
+ # set path to objects
+ set(OBJECTPATH &quot;${S3D_DATA_INSTALL_DIR}&quot;)
+
+Modified: trunk/INSTALL
+===================================================================
+--- trunk/INSTALL	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/INSTALL	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -29,7 +29,8 @@
+ $ mkdir build
+ $ cd build
+ $ cmake .. [-DPROFILING=ON|OFF] [-DDEBUG=VLOW|LOW|MED|HIGH|VHIGH] \
+-           [-DCMAKE_INSTALL_PREFIX=...] [-DEXAMPLES=ON|OFF]
++           [-DENABLE_FINAL=ON|OFF] [-DEXAMPLES=ON|OFF] \
++	   [-DCMAKE_INSTALL_PREFIX=...]
+ 
+ This will configure s3d. Use the -DCMAKE_INSTALL_PREFIX command line argument to
+ select a different prefix to install s3d into. The default is /usr/local, so
+@@ -37,6 +38,9 @@
+ and documentation into /usr/local/share/doc/s3d-version. If you are intending to
+ work on s3d, you can use the -DDEBUG argument to enable building a debug
+ version. Likewise, -DPROFILING=ON will enable a version compiled for profiling.
++Pseudo global optimisation can be enabled by setting -DENABLE_FINAL=ON. This
++will create a single file for each target which includes all other files and
++the compiler will only compile that specific file.
+ 
+ You can use ccmake to ccmake to set additional cmake cache variables.
+ 
+
+Modified: trunk/apps/dot_mcp/CMakeLists.txt
+===================================================================
+--- trunk/apps/dot_mcp/CMakeLists.txt	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/apps/dot_mcp/CMakeLists.txt	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -2,7 +2,7 @@
+ 
+ include_directories(${s3d_SOURCE_DIR}/libs3d)
+ 
+-add_executable(dot_mcp main.c menu.c)
++s3d_add_executable(dot_mcp main.c menu.c)
+ target_link_libraries(dot_mcp s3d ${MATH_LIBRARIES})
+ 
+ # install
+
+Modified: trunk/apps/dot_mcp/menu.c
+===================================================================
+--- trunk/apps/dot_mcp/menu.c	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/apps/dot_mcp/menu.c	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -36,7 +36,7 @@
+ 
+ static int go = -1;
+ static int act;
+-static struct menu_entry menu[] = {
++static struct menu_entry menu_items[] = {
+ 	{&quot;objs/comp.3ds&quot;, &quot;terminal&quot;, &quot;s3dvt&quot;,    0, 0},
+ 	{&quot;objs/comp.3ds&quot;, &quot;meshs3d&quot;, &quot;meshs3d&quot;,    0, 0},
+ 	{&quot;objs/comp.3ds&quot;, &quot;s3d_x11gate&quot;, &quot;s3d_x11gate&quot;,  0, 0},
+@@ -51,26 +51,26 @@
+ 	printf(&quot;%d got clicked\n&quot;, oid);
+ 	if (oid == go) {
+ 		act = !act;
+-		for (i = 0;i &lt; (sizeof(menu) / sizeof(struct menu_entry));i++) {
++		for (i = 0;i &lt; (sizeof(menu_items) / sizeof(struct menu_entry));i++) {
+ 			if (act) {
+-				s3d_flags_on(menu[i].icon_oid, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+-				s3d_flags_on(menu[i].str_oid, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
++				s3d_flags_on(menu_items[i].icon_oid, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
++				s3d_flags_on(menu_items[i].str_oid, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+ 			} else {
+-				s3d_flags_off(menu[i].icon_oid, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+-				s3d_flags_off(menu[i].str_oid, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
++				s3d_flags_off(menu_items[i].icon_oid, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
++				s3d_flags_off(menu_items[i].str_oid, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+ 			}
+ 
+ 		}
+ 		return;
+ 	}
+ 	if (act) {
+-		for (i = 0;i &lt; (sizeof(menu) / sizeof(struct menu_entry));i++) {
+-			if ((oid == menu[i].icon_oid) || (oid == menu[i].str_oid)) {
+-				if (0 == strncmp(menu[i].path, &quot;LOGOUT&quot;, 6)) {
++		for (i = 0;i &lt; (sizeof(menu_items) / sizeof(struct menu_entry));i++) {
++			if ((oid == menu_items[i].icon_oid) || (oid == menu_items[i].str_oid)) {
++				if (0 == strncmp(menu_items[i].path, &quot;LOGOUT&quot;, 6)) {
+ 					s3d_quit();
+ 					return;
+ 				}
+-				strncpy(exec, menu[i].path, 256);
++				strncpy(exec, menu_items[i].path, 256);
+ 				strncat(exec, &quot;&gt; /dev/null 2&gt;&amp;1 &amp;&quot;, 256); /* ignoring output, starting in background */
+ 				printf(&quot;executing [%s]\n&quot;, exec);
+ 				system(exec);
+@@ -89,17 +89,17 @@
+ 	go = s3d_import_model_file(&quot;objs/s3dstart.3ds&quot;);
+ 	s3d_flags_on(go, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+ 	s3d_link(go, menu_o);
+-	for (i = 0; i &lt; (sizeof(menu) / sizeof(struct menu_entry)); i++) {
+-		if (-1 == (menu[i].icon_oid = s3d_import_model_file(menu[i].icon)))
+-			menu[i].icon_oid = s3d_new_object();
+-		menu[i].str_oid = s3d_draw_string(menu[i].name, NULL);
+-		s3d_link(menu[i].str_oid, menu[i].icon_oid);
+-		s3d_link(menu[i].icon_oid, menu_o);
+-		s3d_translate(menu[i].icon_oid, 0, -3 + (-3 * (signed)i), 0);
+-		s3d_translate(menu[i].str_oid, 2, 0, 0);
+-		/*  s3d_flags_on(menu[i].icon_oid,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-		  s3d_flags_on(menu[i].str_oid,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);*/
+-		printf(&quot;menu item menu[%d], icon_oid=%d, icon_str=%d\n&quot;, i, menu[i].icon_oid, menu[i].str_oid);
++	for (i = 0; i &lt; (sizeof(menu_items) / sizeof(struct menu_entry)); i++) {
++		if (-1 == (menu_items[i].icon_oid = s3d_import_model_file(menu_items[i].icon)))
++			menu_items[i].icon_oid = s3d_new_object();
++		menu_items[i].str_oid = s3d_draw_string(menu_items[i].name, NULL);
++		s3d_link(menu_items[i].str_oid, menu_items[i].icon_oid);
++		s3d_link(menu_items[i].icon_oid, menu_o);
++		s3d_translate(menu_items[i].icon_oid, 0, -3 + (-3 * (signed)i), 0);
++		s3d_translate(menu_items[i].str_oid, 2, 0, 0);
++		/*  s3d_flags_on(menu_items[i].icon_oid,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++		  s3d_flags_on(menu_items[i].str_oid,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);*/
++		printf(&quot;menu item menu[%d], icon_oid=%d, icon_str=%d\n&quot;, i, menu_items[i].icon_oid, menu_items[i].str_oid);
+ 	}
+ 	return(menu_o);
+ }
+
+Modified: trunk/apps/kism3d/CMakeLists.txt
+===================================================================
+--- trunk/apps/kism3d/CMakeLists.txt	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/apps/kism3d/CMakeLists.txt	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -3,7 +3,7 @@
+ if (PTHREADS_FOUND)
+ 	include_directories(${s3d_SOURCE_DIR}/libs3d ${s3d_SOURCE_DIR}/libs3dw)
+ 
+-	add_executable(kism3d client.c gui.c kism3d.c network.c)
++	s3d_add_executable(kism3d client.c gui.c kism3d.c network.c)
+ 	target_link_libraries(kism3d s3d s3dw ${PTHREADS_LIBRARIES}
+ 	                      ${MATH_LIBRARIES})
+ 
+
+Modified: trunk/apps/kism3d/kism3d.h
+===================================================================
+--- trunk/apps/kism3d/kism3d.h	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/apps/kism3d/kism3d.h	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -21,8 +21,9 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef _KISM3D_H_
++#define _KISM3D_H_
+ 
+-
+ #include &quot;list.h&quot;
+ #include &lt;pthread.h&gt;
+ #include &lt;netinet/in.h&gt;   /* sockaddr_in */
+@@ -118,3 +119,5 @@
+ extern pthread_mutex_t Client_list_mutex;
+ extern int Kism3d_aborted;
+ extern int Num_networks;
++
++#endif /* _KISM3D_H_ */
+
+Modified: trunk/apps/kism3d/list.h
+===================================================================
+--- trunk/apps/kism3d/list.h	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/apps/kism3d/list.h	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -21,6 +21,9 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef _LIST_H_
++#define _LIST_H_
++
+ #include &lt;stdlib.h&gt;
+ 
+ struct list_head {
+@@ -129,3 +132,4 @@
+ 	entry-&gt;prev = NULL;
+ }
+ 
++#endif /* _LIST_H_ */
+
+Modified: trunk/apps/meshs3d/CMakeLists.txt
+===================================================================
+--- trunk/apps/meshs3d/CMakeLists.txt	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/apps/meshs3d/CMakeLists.txt	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -2,7 +2,7 @@
+ 
+ include_directories(${s3d_SOURCE_DIR}/libs3d ${s3d_SOURCE_DIR}/libs3dw)
+ 
+-add_executable(meshs3d hash.c main.c net.c process.c)
++s3d_add_executable(meshs3d hash.c main.c net.c process.c)
+ target_link_libraries(meshs3d s3d s3dw ${MATH_LIBRARIES})
+ 
+ # install
+
+Modified: trunk/apps/meshs3d/hash.h
+===================================================================
+--- trunk/apps/meshs3d/hash.h	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/apps/meshs3d/hash.h	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -22,6 +22,8 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef _HASH_H_
++#define _HASH_H_
+ 
+ typedef int (*hashdata_compare_cb)(const void *, const void *);
+ typedef int (*hashdata_choose_cb)(const void *, int);
+@@ -92,3 +94,4 @@
+  * use the returned iterator to access the elements until hash_it_t returns NULL. */
+ struct hash_it_t *hash_iterate(struct hashtable_t *hash, struct hash_it_t *iter_in);
+ 
++#endif /* _HASH_H_ */
+
+Modified: trunk/apps/meshs3d/meshs3d.h
+===================================================================
+--- trunk/apps/meshs3d/meshs3d.h	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/apps/meshs3d/meshs3d.h	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -23,6 +23,9 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef _MESHS3D_H_
++#define _MESHS3D_H_
++
+ #define max(x,y) ((x)&gt;(y)?(x):(y))
+ #define min(x,y) ((x)&lt;(y)?(x):(y))
+ #define NAMEMAX  128
+@@ -120,3 +123,5 @@
+ float dist(float p1[], float p2[]);
+ void window_error(char *msg);
+ */
++
++#endif /* _MESHS3D_H_ */
+
+Modified: trunk/apps/s3d_x11gate/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3d_x11gate/CMakeLists.txt	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/apps/s3d_x11gate/CMakeLists.txt	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -3,7 +3,7 @@
+ if (XTST_FOUND AND XTST_FOUND)
+ 	include_directories(${s3d_SOURCE_DIR}/libs3d ${s3d_SOURCE_DIR}/libs3dw)
+ 
+-	add_executable(s3d_x11gate s3d_x11gate.c)
++	s3d_add_executable(s3d_x11gate s3d_x11gate.c)
+ 	target_link_libraries(s3d_x11gate s3d s3dw ${X11_LIBRARIES}
+ 	                      ${XTST_LIBRARIES} ${MATH_LIBRARIES})
+ 
+
+Modified: trunk/apps/s3dfm/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3dfm/CMakeLists.txt	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/apps/s3dfm/CMakeLists.txt	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -3,7 +3,7 @@
+ if (PTHREADS_FOUND)
+ 	include_directories(${s3d_SOURCE_DIR}/libs3d ${s3d_SOURCE_DIR}/libs3dw)
+ 
+-	add_executable(s3dfm animation.c box.c dialog.c event.c fly.c focus.c fs.c
++	s3d_add_executable(s3dfm animation.c box.c dialog.c event.c fly.c focus.c fs.c
+ 		icon.c main.c node.c parse.c string.c)
+ 	target_link_libraries(s3dfm s3d s3dw ${PTHREADS_LIBRARIES} ${MATH_LIBRARIES})
+ 
+
+Modified: trunk/apps/s3dfm/s3dfm.h
+===================================================================
+--- trunk/apps/s3dfm/s3dfm.h	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/apps/s3dfm/s3dfm.h	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -21,6 +21,8 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef _S3DFM_H_
++#define _S3DFM_H_
+ 
+ #include &lt;s3d.h&gt;
+ #include &lt;s3dw.h&gt;
+@@ -208,3 +210,5 @@
+ /* fly.c */
+ int    fly_set_absolute_position(t_node *node);
+ t_node   *fly_create_anode(t_node *node);
++
++#endif /* _S3DFM_H_ */
+
+Modified: trunk/apps/s3dosm/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3dosm/CMakeLists.txt	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/apps/s3dosm/CMakeLists.txt	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -4,7 +4,7 @@
+ if (LIBXML2_FOUND AND SQLITE3_FOUND)
+ 	include_directories(${s3d_SOURCE_DIR}/libs3d ${s3d_SOURCE_DIR}/libs3dw)
+ 
+-	add_executable(s3dosm db.c draw.c gps.c http_error_codes.c http_fetcher.c#
++	s3d_add_executable(s3dosm db.c draw.c gps.c http_error_codes.c http_fetcher.c#
+ 		io.c kismet.c main.c nav.c object.c osm.c
+ 		tag.c ui.c)
+ 
+
+Modified: trunk/apps/s3dosm/olsrs3d.h
+===================================================================
+--- trunk/apps/s3dosm/olsrs3d.h	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/apps/s3dosm/olsrs3d.h	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -23,6 +23,9 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef _OLSRS3D_H_
++#define _OLSRS3D_H_
++
+ #include &quot;structs.h&quot;
+ 
+ 
+@@ -73,3 +76,5 @@
+ void print_etx(void);
+ float dist(float p1[], float p2[]);
+ void window_error(char *msg);
++
++#endif /* _OLSRS3D_H_ */
+
+Modified: trunk/apps/s3dosm/s3dosm.h
+===================================================================
+--- trunk/apps/s3dosm/s3dosm.h	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/apps/s3dosm/s3dosm.h	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -21,6 +21,9 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef _S3DOSM_H_
++#define _S3DOSM_H_
++
+ #include &lt;sqlite3.h&gt;
+ #include &lt;s3d.h&gt; /* s3devt structure */
+ #include &lt;config-s3d.h&gt;
+@@ -228,3 +231,5 @@
+ int olsr_init(void);
+ int olsr_quit(void);
+ int olsr_parse_args(int argc, char **argv);
++
++#endif /* _S3DOSM_H_ */
+
+Modified: trunk/apps/s3dosm/search.h
+===================================================================
+--- trunk/apps/s3dosm/search.h	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/apps/s3dosm/search.h	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -21,6 +21,9 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef _SEARCH_H_
++#define _SEARCH_H_
++
+ #define NOTHING 0  /* nothing ;) */
+ #define ABORT 1   /* widget has no focus */
+ #define WIDGET 2  /* focus on widget */
+@@ -39,3 +42,5 @@
+ void follow_node_by_click(struct olsr_node *olsr_node);
+ 
+ void show_search_window();
++
++#endif /* _SEARCH_H_ */
+
+Modified: trunk/apps/s3dosm/structs.h
+===================================================================
+--- trunk/apps/s3dosm/structs.h	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/apps/s3dosm/structs.h	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -23,6 +23,9 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef _STRUCTS_H_
++#define _STRUCTS_H_
++
+ #define NAMEMAX  128
+ #define MAXLINESIZE 1000  /* lines in a digraph just shouldn't get that longer ... */
+ #define MAXDATASIZE 100   /* max number of bytes we can get at once  */
+@@ -76,3 +79,4 @@
+ 	struct Obj_to_ip *prev;
+ };
+ 
++#endif /* _STRUCTS_H_ */
+
+Modified: trunk/apps/s3dvt/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3dvt/CMakeLists.txt	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/apps/s3dvt/CMakeLists.txt	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -3,7 +3,7 @@
+ if (PTHREADS_FOUND)
+ 	include_directories(${s3d_SOURCE_DIR}/libs3d)
+ 
+-	add_executable(s3dvt main.c terminal.c)
++	s3d_add_executable(s3dvt main.c terminal.c)
+ 	target_link_libraries(s3dvt s3d ${PTHREADS_LIBRARIES} ${MATH_LIBRARIES})
+ 
+ 	# install
+
+Modified: trunk/apps/s3dvt/s3dvt.h
+===================================================================
+--- trunk/apps/s3dvt/s3dvt.h	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/apps/s3dvt/s3dvt.h	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -22,6 +22,9 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef _S3DVT_H_
++#define _S3DVT_H_
++
+ #include &lt;config-s3d.h&gt;
+ 
+ #ifndef S3DVTUNUSED
+@@ -66,3 +69,5 @@
+ 
+ extern int gotnewdata;
+ extern int cx, cy;
++
++#endif /* _S3DVT_H_ */
+
+Deleted: trunk/cmake/modules/InstallPaths.cmake
+===================================================================
+--- trunk/cmake/modules/InstallPaths.cmake	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/cmake/modules/InstallPaths.cmake	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -1,25 +0,0 @@
+-# This module defines a bunch of variables used as locations for install directories.
+-#
+-#  BIN_INSTALL_DIR  - the directory where executables will be installed
+-#  CFG_INSTALL_DIR  - the directory where configuration will be installed
+-#  LIB_INSTALL_DIR  - the directory where libraries will be installed
+-#  INCLUDE_INSTALL_DIR  - the directory where header will be installed
+-#  DATA_INSTALL_DIR - the parent directory where applications can install their data
+-#  HTML_INSTALL_DIR - the HTML install dir for documentation
+-#  MAN_INSTALL_DIR  - the man page install dir
+-#  PKGCFG_INSTALL_DIR  - the pkg-config install dir
+-
+-if (WIN32)
+-	set(CFG_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/etc&quot; CACHE PATH &quot;The s3d cfg install dir (default prefix/etc/)&quot;)
+-	set(LIB_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/bin&quot; CACHE PATH &quot;The s3d lib install dir (default prefix/bin/)&quot;)
+-else (WIN32)
+-	set(CFG_INSTALL_DIR &quot;/etc&quot; CACHE PATH &quot;The s3d cfg install dir (default /etc/)&quot;)
+-	set(LIB_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/lib&quot; CACHE PATH &quot;The s3d lib install dir (default prefix/lib/)&quot;)
+-endif (WIN32)
+-
+-set(BIN_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/bin&quot; CACHE PATH &quot;The s3d man install dir (default prefix/bin/)&quot;)
+-set(INCLUDE_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/include&quot; CACHE PATH &quot;The s3d header install dir (default prefix/include/)&quot;)
+-set(DATA_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/share/objs&quot; CACHE PATH &quot;The s3d objs install dir (default prefix/share/objs/)&quot;)
+-set(HTML_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/share/doc/s3d&quot; CACHE PATH &quot;The s3d html documentation install dir (default prefix/share/doc/s3d/)&quot;)
+-set(MAN_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/share/man&quot; CACHE PATH &quot;The s3d man install dir (default prefix/share/man/)&quot;)
+-set(PKGCFG_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/lib/pkgconfig&quot; CACHE PATH &quot;The s3d pkg-config install dir (default prefix/lib/pkgconfig/)&quot;)
+
+Added: trunk/cmake/modules/S3DInternals.cmake
+===================================================================
+--- trunk/cmake/modules/S3DInternals.cmake	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/cmake/modules/S3DInternals.cmake	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -0,0 +1,90 @@
++# This module defines a bunch of variables used as locations for install
++# directories and for library creation
++#
++#  BIN_INSTALL_DIR  - the directory where executables will be installed
++#  CFG_INSTALL_DIR  - the directory where configuration will be installed
++#  LIB_INSTALL_DIR  - the directory where libraries will be installed
++#  INCLUDE_INSTALL_DIR  - the directory where header will be installed
++#  DATA_INSTALL_DIR - the parent directory where applications can install their data
++#  HTML_INSTALL_DIR - the HTML install dir for documentation
++#  MAN_INSTALL_DIR  - the man page install dir
++#  PKGCFG_INSTALL_DIR  - the pkg-config install dir
++#
++# Copyright (C) 2007-2008  Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
++
++if (WIN32)
++	set(CFG_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/etc&quot; CACHE PATH &quot;The s3d cfg install dir (default prefix/etc/)&quot;)
++	set(LIB_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/bin&quot; CACHE PATH &quot;The s3d lib install dir (default prefix/bin/)&quot;)
++else (WIN32)
++	set(CFG_INSTALL_DIR &quot;/etc&quot; CACHE PATH &quot;The s3d cfg install dir (default /etc/)&quot;)
++	set(LIB_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/lib&quot; CACHE PATH &quot;The s3d lib install dir (default prefix/lib/)&quot;)
++endif (WIN32)
++
++set(BIN_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/bin&quot; CACHE PATH &quot;The s3d man install dir (default prefix/bin/)&quot;)
++set(INCLUDE_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/include&quot; CACHE PATH &quot;The s3d header install dir (default prefix/include/)&quot;)
++set(DATA_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/share/objs&quot; CACHE PATH &quot;The s3d objs install dir (default prefix/share/objs/)&quot;)
++set(HTML_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/share/doc/s3d&quot; CACHE PATH &quot;The s3d html documentation install dir (default prefix/share/doc/s3d/)&quot;)
++set(MAN_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/share/man&quot; CACHE PATH &quot;The s3d man install dir (default prefix/share/man/)&quot;)
++set(PKGCFG_INSTALL_DIR &quot;${CMAKE_INSTALL_PREFIX}/lib/pkgconfig&quot; CACHE PATH &quot;The s3d pkg-config install dir (default prefix/lib/pkgconfig/)&quot;)
++
++# add option for enabling/disabling pseudo 'global' optimisation
++option(ENABLE_FINAL &quot;Enable/disable support for 'global' optimisation&quot; OFF)
++
++macro (s3d_add_library _target _type)
++	if (ENABLE_FINAL)
++		s3d_create_final_include(${CMAKE_CURRENT_BINARY_DIR}/${_target_NAME}/final_include.c excluded ${ARGN})
++		set(src ${CMAKE_CURRENT_BINARY_DIR}/${_target_NAME}/final_include.c ${excluded})
++	else (ENABLE_FINAL)
++		set(src ${ARGN})
++	endif (ENABLE_FINAL)
++
++	add_library(${_target} ${_type} ${src})
++endmacro (s3d_add_library)
++
++macro (s3d_add_executable _target)
++	if (ENABLE_FINAL)
++		s3d_create_final_include(${CMAKE_CURRENT_BINARY_DIR}/${_target_NAME}/final_include.c excluded ${ARGN})
++		set(src ${CMAKE_CURRENT_BINARY_DIR}/${_target_NAME}/final_include.c ${excluded})
++	else (ENABLE_FINAL)
++		set(src ${ARGN})
++	endif (ENABLE_FINAL)
++
++	add_executable(${_target} ${src})
++endmacro (s3d_add_executable)
++
++macro (s3d_create_final_include _output _excluded)
++	file(WRITE &quot;${_output}&quot; &quot;/* GENERATED FILE - DO NOT EDIT */\n&quot;)
++	foreach (_file ${ARGN})
++		get_filename_component(_basename &quot;${_file}&quot; ABSOLUTE)
++		if (&quot;${_basename}&quot; MATCHES &quot;.+\\.c$&quot;)
++			file(APPEND &quot;${_output}&quot; &quot;#include \&quot;${_basename}\&quot;\n&quot;)
++		else (&quot;${_basename}&quot; MATCHES &quot;.+\\.c$&quot;)
++			 list(APPEND ${_excluded} &quot;${_basename}&quot;)
++		endif (&quot;${_basename}&quot; MATCHES &quot;.+\\.c$&quot;)
++	endforeach (_file)
++endmacro (s3d_create_final_include)
+
+Modified: trunk/example/CMakeLists.txt
+===================================================================
+--- trunk/example/CMakeLists.txt	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/example/CMakeLists.txt	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -4,45 +4,45 @@
+ if (EXAMPLES)
+ 	include_directories(${s3d_SOURCE_DIR}/libs3d ${s3d_SOURCE_DIR}/libs3dw)
+ 
+-	add_executable(filebrowser filebrowser.c)
++	s3d_add_executable(filebrowser filebrowser.c)
+ 	target_link_libraries(filebrowser s3d ${MATH_LIBRARIES})
+ 
+-	add_executable(hudtest hudtest.c)
++	s3d_add_executable(hudtest hudtest.c)
+ 	target_link_libraries(hudtest s3d ${MATH_LIBRARIES})
+ 
+-	add_executable(katze katze.c)
++	s3d_add_executable(katze katze.c)
+ 	target_link_libraries(katze s3d ${MATH_LIBRARIES})
+ 
+-	add_executable(linetest linetest.c)
++	s3d_add_executable(linetest linetest.c)
+ 	target_link_libraries(linetest s3d ${MATH_LIBRARIES})
+ 
+-	add_executable(modelloader modelloader.c)
++	s3d_add_executable(modelloader modelloader.c)
+ 	target_link_libraries(modelloader s3d ${MATH_LIBRARIES})
+ 
+-	add_executable(nichtsnutz nichtsnutz.c)
++	s3d_add_executable(nichtsnutz nichtsnutz.c)
+ 	target_link_libraries(nichtsnutz s3d ${MATH_LIBRARIES})
+ 
+-	add_executable(ptrtest ptrtest.c)
++	s3d_add_executable(ptrtest ptrtest.c)
+ 	target_link_libraries(ptrtest s3d ${MATH_LIBRARIES})
+ 
+-	add_executable(radius_test radius_test.c)
++	s3d_add_executable(radius_test radius_test.c)
+ 	target_link_libraries(radius_test s3d ${MATH_LIBRARIES})
+ 
+-	add_executable(s3dclock s3dclock.c)
++	s3d_add_executable(s3dclock s3dclock.c)
+ 	target_link_libraries(s3dclock s3d ${MATH_LIBRARIES})
+ 
+-	add_executable(snowman snowman.c)
++	s3d_add_executable(snowman snowman.c)
+ 	target_link_libraries(snowman s3d ${MATH_LIBRARIES})
+ 
+-	add_executable(strtest strtest.c)
++	s3d_add_executable(strtest strtest.c)
+ 	target_link_libraries(strtest s3d ${MATH_LIBRARIES})
+ 
+-	add_executable(texturetest texturetest.c)
++	s3d_add_executable(texturetest texturetest.c)
+ 	target_link_libraries(texturetest s3d ${MATH_LIBRARIES})
+ 
+-	add_executable(widgets widgets.c)
++	s3d_add_executable(widgets widgets.c)
+ 	target_link_libraries(widgets s3d s3dw ${MATH_LIBRARIES})
+ 
+-	add_executable(wiresphere wiresphere.c)
++	s3d_add_executable(wiresphere wiresphere.c)
+ 	target_link_libraries(wiresphere s3d ${MATH_LIBRARIES})
+ endif (EXAMPLES)
+
+Modified: trunk/experimental/comptest/CMakeLists.txt
+===================================================================
+--- trunk/experimental/comptest/CMakeLists.txt	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/experimental/comptest/CMakeLists.txt	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -3,7 +3,7 @@
+ if (X11_FOUND AND XCOMPOSITE_FOUND AND XDAMAGE_FOUND AND XFIXES_FOUND AND XRENDER_FOUND)
+ 	include_directories(${s3d_SOURCE_DIR}/libs3d)
+ 
+-	add_executable(comptest comptest.c window.c x11.c)
++	s3d_add_executable(comptest comptest.c window.c x11.c)
+ 	target_link_libraries(comptest s3d ${X11_LIBRARIES}
+ 		${XCOMPOSITE_LIBRARIES} ${XFIXES_LIBRARIES} ${XDAMAGE_LIBRARIES}
+ 		${XRENDER_LIBRARIES} ${MATH_LIBRARIES})
+
+Modified: trunk/experimental/comptest/comptest.h
+===================================================================
+--- trunk/experimental/comptest/comptest.h	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/experimental/comptest/comptest.h	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -21,6 +21,9 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef _COMPTEST_H_
++#define _COMPTEST_H_
++
+ #include &lt;s3d.h&gt;
+ #include &lt;X11/Xlib.h&gt;       /* Ximage, Display, X*() */
+ #include &lt;X11/Xutil.h&gt;       /* XDestroyImage() */
+@@ -96,3 +99,5 @@
+ char *x11_get_name(Window win);
+ void print_properties(Window win);
+ extern Display *dpy;
++
++#endif /* _COMPTEST_H_ */
+
+Modified: trunk/experimental/olsrs3d/CMakeLists.txt
+===================================================================
+--- trunk/experimental/olsrs3d/CMakeLists.txt	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/experimental/olsrs3d/CMakeLists.txt	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -2,7 +2,7 @@
+ 
+ include_directories(${s3d_SOURCE_DIR}/libs3d ${s3d_SOURCE_DIR}/libs3dw)
+ 
+-add_executable(olsrs3d main.c net.c process.c search.c)
++s3d_add_executable(olsrs3d main.c net.c process.c search.c)
+ target_link_libraries(olsrs3d s3d s3dw ${MATH_LIBRARIES})
+ 
+ # install
+
+Modified: trunk/experimental/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/experimental/olsrs3d/olsrs3d.h	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/experimental/olsrs3d/olsrs3d.h	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -23,6 +23,9 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef _OLSRS3D_H_
++#define _OLSRS3D_H_
++
+ #include &quot;structs.h&quot;
+ #include &lt;config-s3d.h&gt;
+ 
+@@ -86,3 +89,5 @@
+ void print_etx(void);
+ float dist(float p1[], float p2[]);
+ void window_error(const char *msg);
++
++#endif /* _OLSRS3D_H_ */
+
+Modified: trunk/experimental/olsrs3d/search.h
+===================================================================
+--- trunk/experimental/olsrs3d/search.h	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/experimental/olsrs3d/search.h	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -21,6 +21,9 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef _SEARCH_H_
++#define _SEARCH_H_
++
+ #define NOTHING 0  /* nothing ;) */
+ #define ABORT 1   /* widget has no focus */
+ #define WIDGET 2  /* focus on widget */
+@@ -39,3 +42,5 @@
+ void follow_node_by_click(struct olsr_node *olsr_node);
+ 
+ void show_search_window(void);
++
++#endif /* _SEARCH_H_ */
+
+Modified: trunk/experimental/olsrs3d/structs.h
+===================================================================
+--- trunk/experimental/olsrs3d/structs.h	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/experimental/olsrs3d/structs.h	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -23,6 +23,9 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef _STRUCTS_H_
++#define _STRUCTS_H_
++
+ #define NAMEMAX  128
+ #define MAXLINESIZE 1000  /* lines in a digraph just shouldn't get that longer ... */
+ #define MAXDATASIZE 100   /* max number of bytes we can get at once  */
+@@ -75,3 +78,4 @@
+ 	struct Obj_to_ip *prev;
+ };
+ 
++#endif /* _STRUCTS_H_ */
+
+Modified: trunk/experimental/testvis/CMakeLists.txt
+===================================================================
+--- trunk/experimental/testvis/CMakeLists.txt	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/experimental/testvis/CMakeLists.txt	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -1,7 +1,7 @@
+ project(testvis C)
+ 
+ if (PTHREADS_FOUND)
+-	add_executable(testvis testvis.c)
++	s3d_add_executable(testvis testvis.c)
+ 	target_link_libraries(testvis ${PTHREADS_LIBRARIES})
+ 
+ 	# install
+
+Modified: trunk/experimental/wiitest/CMakeLists.txt
+===================================================================
+--- trunk/experimental/wiitest/CMakeLists.txt	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/experimental/wiitest/CMakeLists.txt	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -3,7 +3,7 @@
+ if (CWIID_FOUND)
+ 	include_directories(${s3d_SOURCE_DIR}/libs3d ${CWIID_INCLUDE_DIR})
+ 
+-	add_executable(wiitest wiitest.c)
++	s3d_add_executable(wiitest wiitest.c)
+ 	target_link_libraries(wiitest s3d ${CWIID_LIBRARIES} ${MATH_LIBRARIES})
+ 
+ 	# install
+
+Modified: trunk/libs3d/CMakeLists.txt
+===================================================================
+--- trunk/libs3d/CMakeLists.txt	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/libs3d/CMakeLists.txt	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -2,7 +2,7 @@
+ 
+ set(S3D_LIBRARY_DEPENDENCIES  ${MATH_LIBRARIES} ${G3D_LIBRARIES} ${FONTCONFIG_LIBRARIES} ${FREETYPE_LIBRARIES})
+ 
+-add_library(s3d SHARED callback.c endian.c error.c event.c fontselect.c
++s3d_add_library(s3d SHARED callback.c endian.c error.c event.c fontselect.c
+ 	freetype.c io.c modelread.c network.c object_queue.c proto_in.c
+ 	proto_out.c sei_construct.c sei_misc.c sei_monotone.c sei_tri.c shm.c
+ 	shm_ringbuf.c tcp.c vector.c hash.c texture.c)
+
+Modified: trunk/libs3d/object_queue.c
+===================================================================
+--- trunk/libs3d/object_queue.c	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/libs3d/object_queue.c	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -45,9 +45,6 @@
+ static int queue_size = 0;   /*  the size of the object queue */
+ static int requested;      /*  counter of how many addtional */
+ /*  objects have been requested */
+-static struct timespec t = {
+-	0, 10*1000
+-}; /* 10 micro seconds */
+ /*  initializes the object queue */
+ int _queue_init(void)
+ {
+@@ -96,6 +93,10 @@
+ {
+ 	unsigned int ret;
+ 	int i, j;
++	static struct timespec t = {
++		0, 10*1000
++	}; /* 10 micro seconds */
++
+ 	j = 0;
+ 	do {
+ 		for (i = 0;i &lt; queue_size;i++)
+
+Modified: trunk/libs3d/s3d_keysym.h
+===================================================================
+--- trunk/libs3d/s3d_keysym.h	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/libs3d/s3d_keysym.h	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -22,6 +22,9 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef _S3D_KEYSYM_H_
++#define _S3D_KEYSYM_H_
++
+ /* this is just a copy of SDL_keysym.sh from the SDL Simple DirectMedia Layer Package,
+  * which seems to have a pretty useful Key definition base.
+  * For more Information about SDL, check <A HREF="http://sdlorg*/">http://sdlorg*/</A>
+@@ -312,3 +315,4 @@
+ #define S3D_KMOD_ALT (KMOD_LALT|KMOD_RALT)
+ #define S3D_KMOD_META (KMOD_LMETA|KMOD_RMETA)
+ 
++#endif /* _S3D_KEYSYM_H_ */
+
+Modified: trunk/libs3d/s3dlib.h
+===================================================================
+--- trunk/libs3d/s3dlib.h	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/libs3d/s3dlib.h	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -21,6 +21,8 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef _S3DLIB_H_
++#define _S3DLIB_H_
+ 
+ #include &lt;stdint.h&gt;
+ #include &quot;config.h&quot;
+@@ -189,3 +191,5 @@
+ void ntohlb(uint32_t* netint32, int num);
+ void htonsb(uint16_t* netint16, int num);
+ void ntohsb(uint16_t* netint16, int num);
++
++#endif /* _S3DLIB_H_ */
+
+Modified: trunk/libs3dw/CMakeLists.txt
+===================================================================
+--- trunk/libs3dw/CMakeLists.txt	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/libs3dw/CMakeLists.txt	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -2,7 +2,7 @@
+ 
+ set(S3DW_LIBRARY_DEPENDENCIES s3d ${MATH_LIBRARIES})
+ 
+-add_library(s3dw SHARED animate.c arrange.c button.c event.c input.c
++s3d_add_library(s3dw SHARED animate.c arrange.c button.c event.c input.c
+ 	label.c root.c scrollbar.c style.c surface.c textbox.c widget.c)
+ target_link_libraries(s3dw ${S3DW_LIBRARY_DEPENDENCIES})
+ set_target_properties(s3dw PROPERTIES VERSION ${VERSION} SOVERSION 2
+
+Modified: trunk/libs3dw/s3dw_int.h
+===================================================================
+--- trunk/libs3dw/s3dw_int.h	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/libs3dw/s3dw_int.h	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -21,6 +21,9 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef LIBS3DW_INT_H
++#define LIBS3DW_INT_H
++
+ #include &lt;s3dlib.h&gt; /* s3dprintf() */
+ #define MAXANI  128
+ #define ZOOMS  5
+@@ -121,3 +124,5 @@
+ void s3dw_arr_widgetcenter(s3dw_widget *widget, float *center);
+ void s3dw_arr_normdir(float *dir);
+ void s3dw_turn(void);
++
++#endif /* LIBS3DW_INT_H */
+
+Modified: trunk/server/CMakeLists.txt
+===================================================================
+--- trunk/server/CMakeLists.txt	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/server/CMakeLists.txt	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -15,7 +15,7 @@
+ endif (SDL_FOUND)
+ 
+ # compile base files + sdl specific parts
+-add_executable(server ${server_src})
++s3d_add_executable(server ${server_src})
+ 
+ target_link_libraries(server ${OPENGL_LIBRARY} ${MATH_LIBRARIES} ${server_libs})
+ set_target_properties(server PROPERTIES OUTPUT_NAME &quot;s3d&quot;)
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/server/global.h	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -21,6 +21,8 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef _GLOBAL_H_
++#define _GLOBAL_H_
+ 
+ #include &quot;config.h&quot;
+ #ifdef __APPLE__
+@@ -414,3 +416,5 @@
+ void ntohlb(uint32_t* netint32, int num);
+ void htonsb(uint16_t* netint16, int num);
+ void ntohsb(uint16_t* netint16, int num);
++
++#endif /* _GLOBAL_H_ */
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2008-11-22 18:19:16 UTC (rev 1032)
++++ trunk/server/main.c	2008-11-22 18:19:29 UTC (rev 1033)
+@@ -128,11 +128,12 @@
+ /*  things which should be done each time in main loop go here! this is */
+ /*  just for the case we use a function for the mainloop like we do for glut... */
+ 
+-static struct timespec t = {
+-	0, 10*1000*1000
+-}; /* 10 mili seconds */
+ void one_time(void)
+ {
++	struct timespec t = {
++		0, 10*1000*1000
++	}; /* 10 mili seconds */
++
+ 	nanosleep(&amp;t, NULL);
+ 	user_main();
+ 	network_main();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001012.html">[S3d-svn] r1032 - in trunk: . server
+</A></li>
+	<LI>Next message: <A HREF="001014.html">[S3d-svn] r1034 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1013">[ date ]</a>
+              <a href="thread.html#1013">[ thread ]</a>
+              <a href="subject.html#1013">[ subject ]</a>
+              <a href="author.html#1013">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

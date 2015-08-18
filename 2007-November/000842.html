@@ -1,0 +1,236 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r849 - trunk/svnonly/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r849%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711082218.lA8MIFR3018150%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000841.html">
+   <LINK REL="Next"  HREF="000843.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r849 - trunk/svnonly/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r849%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711082218.lA8MIFR3018150%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r849 - trunk/svnonly/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Thu Nov  8 23:18:15 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000841.html">[S3d-svn] r848 - trunk/svnonly/comptest
+</A></li>
+        <LI>Next message: <A HREF="000843.html">[S3d-svn] r850 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#842">[ date ]</a>
+              <a href="thread.html#842">[ thread ]</a>
+              <a href="subject.html#842">[ subject ]</a>
+              <a href="author.html#842">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-08 23:18:15 +0100 (Thu, 08 Nov 2007)
+New Revision: 849
+
+Modified:
+   trunk/svnonly/comptest/comptest.c
+Log:
+- handle window-create and destroy events
+
+
+Modified: trunk/svnonly/comptest/comptest.c
+===================================================================
+--- trunk/svnonly/comptest/comptest.c	2007-11-08 21:20:39 UTC (rev 848)
++++ trunk/svnonly/comptest/comptest.c	2007-11-08 22:18:15 UTC (rev 849)
+@@ -126,22 +126,13 @@
+ 		break;
+ 	}
+ 	if (event-&gt;type == xdamage.event + XDamageNotify) {
+-		/* XDamageNotifyEvent *e = (XDamageNotifyEvent*) event; */
+-		/* e-&gt;drawable is the window ID of the damaged window
+-		   e-&gt;geometry is the geometry of the damaged window
+-		   e-&gt;area     is the bounding rect for the damaged area
+-		   e-&gt;damage   is the damage handle returned by XDamageCreate() */
+-
+-		/* Subtract all the damage, repairing the window. */
+ 		name = &quot;Damage!!&quot;;
++		return(0); /* don't report this. */
+ 	} else if (event-&gt;type == ConfigureNotify) {
+-		/* XConfigureEvent *e = &amp;event-&gt;xconfigure; */
+-		/* The windows size, position or Z index in the stacking
+-		   order has changed */
+ 		name = &quot;Configure!!&quot;;
+ 	}
+ 
+-	/* printf(&quot;Event: %s\n&quot;, name);*/
++	printf(&quot;Event: %s\n&quot;, name);
+ 	return(0);
+ }
+ 
+@@ -266,6 +257,8 @@
+ 	int vindex, voffset, pindex;
+ 	int xpos, ypos;
+ 
++	printf(&quot;draw new deco_box!!\n&quot;);
++
+ 	win-&gt;oid = s3d_new_object();
+ 	/*
+ 	 for (i = 0;i &lt; 8;i++) {
+@@ -320,6 +313,7 @@
+ 		}
+ 		vindex++;
+ 	}
++	printf(&quot;win-&gt;no == %d\n&quot;, win-&gt;no);
+ 	s3d_translate(win-&gt;oid, win-&gt;attr.x / 20, -win-&gt;attr.y / 20, 1 * win-&gt;no);
+ 	/*  push data on texture 0 position (0,0) */
+ 	s3d_flags_on(win-&gt;oid, S3D_OF_VISIBLE);
+@@ -339,7 +333,7 @@
+ static void window_add(Display *dpy, Window id)
+ {
+ 	struct window *win;
+-	win = malloc(sizeof(*win));
++	win = malloc(sizeof(struct window));
+ 	if (!win)
+ 		return;
+ 	win-&gt;id = id;
+@@ -347,32 +341,51 @@
+ 
+ 	win-&gt;no = win_no++;
+ 	/* XSelectInput(dpy, win-&gt;id, ExposureMask|ButtonPressMask|KeyPressMask*/
+-	XSelectInput(dpy, win-&gt;id, ExposureMask
+-	             | SubstructureNotifyMask | ExposureMask | StructureNotifyMask | PropertyChangeMask);
+-	/* XSelectInput(dpy, win-&gt;id, ExposureMask);*/
++/*	XSelectInput(dpy, win-&gt;id, SubstructureNotifyMask | ExposureMask | StructureNotifyMask | PropertyChangeMask);*/
++	XSelectInput(dpy, win-&gt;id, 0);
++
++	win-&gt;damage = XDamageCreate(dpy, win-&gt;id, XDamageReportNonEmpty);
+ 	win-&gt;format = XRenderFindVisualFormat(dpy, win-&gt;attr.visual);
+ 
+ 	if (win-&gt;format != NULL) {
+ 		/* printf(&quot;add window: %d:%d size: %dx%d\n&quot;, win-&gt;attr.x, win-&gt;attr.y, win-&gt;attr.width, win-&gt;attr.height);*/
+-		win-&gt;damage = XDamageCreate(dpy, win-&gt;id, XDamageReportNonEmpty);
+-
+ 		win-&gt;pa.subwindow_mode = IncludeInferiors;
+ 		win-&gt;picture = XRenderCreatePicture(dpy, win-&gt;id, win-&gt;format, CPSubwindowMode, &amp;win-&gt;pa);
++	} else {
++		printf(&quot;Format = 0, no damage created\n&quot;);
++	}
++	win-&gt;oid = -1;
++	win-&gt;next = window_head;
++	window_head = win;
++	win-&gt;already_updated = 0;
++	window_update_content(win, 0, 0, win-&gt;attr.width, win-&gt;attr.height);
+ 
+-		win-&gt;oid = -1;
+-		win-&gt;already_updated = 0;
+ 
+-		window_update_content(win, 0, 0, win-&gt;attr.width, win-&gt;attr.height);
+ 
+-		win-&gt;next = window_head;
+-		window_head = win;
+-	}
+ }
+ 
+-static void window_remove(struct window *win)
++static void window_remove(Window id)
+ {
++	struct window *window, *h;
++	if (window_head == NULL)
++		return;
++	if (window_head-&gt;id == id) {
++		window = window_head;
++		window_head = window_head-&gt;next;
++	} else {
++		for (window = window_head; window != NULL; window = window-&gt;next) {
++			if ((window-&gt;next != NULL) &amp;&amp; (window-&gt;next-&gt;id == id)) {
++				h = window;
++				h-&gt;next = h-&gt;next-&gt;next;
++				window = window-&gt;next;
++			}
++		}
++		printf(&quot;not found (window %d) for removal.\n&quot;, (int)id);
++		return;
++	}
++
+ 	/* TODO */
+-	free(win);
++	free(window);
+ }
+ 
+ static void window_update_geometry(struct window *win, int x, int y, int width, int height)
+@@ -546,7 +559,8 @@
+ 	for (i = 0; i &lt; MAXEVENTS &amp;&amp; XPending(dpy); i++) {
+ 		XNextEvent(dpy, &amp;event);
+ 		print_event(dpy, &amp;event);
+-		if (event.type == xdamage.event + XDamageNotify) {
++		switch (event.type - xdamage.event) {
++		case XDamageNotify:{
+ 			XDamageNotifyEvent *e = (XDamageNotifyEvent*) &amp; event;
+ 			/*   printf(&quot;window = %d, geometry = %d:%d (at %d:%d), area = %d:%d (at %d:%d)\n&quot;,
+ 			          (int)e-&gt;drawable, e-&gt;geometry.width, e-&gt;geometry.height, e-&gt;geometry.x, e-&gt;geometry.y,
+@@ -555,7 +569,12 @@
+ 			window = window_find(e-&gt;drawable);
+ 			if (window != NULL)
+ 				window_update_content(window, e-&gt;area.x, e-&gt;area.y, e-&gt;area.width, e-&gt;area.height);
+-		} else if (event.type == ConfigureNotify) {
++			break;
++		   }
++
++		}
++		switch (event.type) {
++		case ConfigureNotify:{
+ 			XConfigureEvent *e = &amp;event.xconfigure;
+ 			window = window_find(e-&gt;window);
+ 			if (window != NULL) {
+@@ -565,6 +584,19 @@
+ 			} else {
+ 				printf(&quot;Configure: Could not find window to configure.\n&quot;);
+ 			}
++			break;
++			 }
++		case CreateNotify:{
++			XCreateWindowEvent *e = &amp;event.xcreatewindow;
++			window_add(e-&gt;display, e-&gt;window);
++			printf(&quot;window added!!\n&quot;);
++			break;
++			}
++		case DestroyNotify:{
++			XDestroyWindowEvent *e = &amp;event.xdestroywindow;
++			window_remove(e-&gt;window);
++			break;
++		   }
+ 		}
+ 	}
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000841.html">[S3d-svn] r848 - trunk/svnonly/comptest
+</A></li>
+	<LI>Next message: <A HREF="000843.html">[S3d-svn] r850 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#842">[ date ]</a>
+              <a href="thread.html#842">[ thread ]</a>
+              <a href="subject.html#842">[ subject ]</a>
+              <a href="author.html#842">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,249 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1022 - in trunk: apps/dot_mcp apps/s3dosm	experimental/olsrs3d server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1022%20-%20in%20trunk%3A%20apps/dot_mcp%20apps/s3dosm%0A%09experimental/olsrs3d%20server&In-Reply-To=%3C200811050059.mA50xZZe011637%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001001.html">
+   <LINK REL="Next"  HREF="001003.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1022 - in trunk: apps/dot_mcp apps/s3dosm	experimental/olsrs3d server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1022%20-%20in%20trunk%3A%20apps/dot_mcp%20apps/s3dosm%0A%09experimental/olsrs3d%20server&In-Reply-To=%3C200811050059.mA50xZZe011637%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1022 - in trunk: apps/dot_mcp apps/s3dosm	experimental/olsrs3d server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Wed Nov  5 01:59:35 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001001.html">[S3d-svn] r1021 - trunk/libs3d
+</A></li>
+        <LI>Next message: <A HREF="001003.html">[S3d-svn] r1023 - trunk/apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1002">[ date ]</a>
+              <a href="thread.html#1002">[ thread ]</a>
+              <a href="subject.html#1002">[ subject ]</a>
+              <a href="author.html#1002">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-11-05 01:59:33 +0100 (Wed, 05 Nov 2008)
+New Revision: 1022
+
+Modified:
+   trunk/apps/dot_mcp/main.c
+   trunk/apps/s3dosm/gps.c
+   trunk/experimental/olsrs3d/search.c
+   trunk/server/graphics.c
+   trunk/server/object.c
+   trunk/server/process.c
+Log:
+Mark functions with local declaration as static
+
+Modified: trunk/apps/dot_mcp/main.c
+===================================================================
+--- trunk/apps/dot_mcp/main.c	2008-11-03 22:58:05 UTC (rev 1021)
++++ trunk/apps/dot_mcp/main.c	2008-11-05 00:59:33 UTC (rev 1022)
+@@ -67,7 +67,7 @@
+ static float alpha = 0;
+ static int rotate, reset, min_but, close_but, sphere, menu = -1;
+ 
+-void place_apps(void);
++static void place_apps(void);
+ 
+ #define SIDES 60
+ #define RINGS 60
+@@ -242,7 +242,7 @@
+ 	return(0);
+ }
+ 
+-void place_apps(void)
++static void place_apps(void)
+ {
+ 	struct app *a = apps;
+ 	int j = 0;
+
+Modified: trunk/apps/s3dosm/gps.c
+===================================================================
+--- trunk/apps/s3dosm/gps.c	2008-11-03 22:58:05 UTC (rev 1021)
++++ trunk/apps/s3dosm/gps.c	2008-11-05 00:59:33 UTC (rev 1022)
+@@ -52,7 +52,7 @@
+ static float     lat_old, lon_old;
+ static float     speed_old = 0.0;
+ void      show_gpsdata(struct gps_data_t *dgps);
+-void     show_position(struct gps_data_t *dgps);
++static void     show_position(struct gps_data_t *dgps);
+ 
+ void show_gpsdata(struct gps_data_t *dgps)
+ {
+@@ -100,7 +100,7 @@
+ 	}
+ }
+ #define BUFSIZE  1024
+-void show_position(struct gps_data_t *dgps)
++static void show_position(struct gps_data_t *dgps)
+ {
+ 	int fix = 1;
+ 	float la, lo, heading, speed, slen;
+
+Modified: trunk/experimental/olsrs3d/search.c
+===================================================================
+--- trunk/experimental/olsrs3d/search.c	2008-11-03 22:58:05 UTC (rev 1021)
++++ trunk/experimental/olsrs3d/search.c	2008-11-05 00:59:33 UTC (rev 1022)
+@@ -41,9 +41,9 @@
+ static float _return_point[2][3];    /* cam position before move to the widget */
+ static int  _search_status = NOTHING;   /* status of search */
+ 
+-void _search_node(s3dw_widget *dummy);
+-void _new_search_node(s3dw_widget *dummy);
+-void _abort_search(s3dw_widget *dummy);
++static void _search_node(s3dw_widget *dummy);
++static void _new_search_node(s3dw_widget *dummy);
++static void _abort_search(s3dw_widget *dummy);
+ 
+ 
+ /* public */
+@@ -287,7 +287,7 @@
+ 	_node_root = root;
+ }
+ /* private */
+-void _new_search_node(s3dw_widget *dummy)
++static void _new_search_node(s3dw_widget *dummy)
+ {
+ 	char *ip;
+ 	int result;
+@@ -330,7 +330,7 @@
+ }
+ 
+ /* private */
+-void _search_node(s3dw_widget *OLSRS3DUNUSED(dummy))
++static void _search_node(s3dw_widget *OLSRS3DUNUSED(dummy))
+ {
+ 	char *ip;
+ 	int result;
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2008-11-03 22:58:05 UTC (rev 1021)
++++ trunk/server/graphics.c	2008-11-05 00:59:33 UTC (rev 1022)
+@@ -34,7 +34,7 @@
+ #endif
+ /*  this file handles graphics routines */
+ /*  local prototypes ... */
+-void render_virtual_object(struct t_obj *o);
++static void render_virtual_object(struct t_obj *o);
+ /*  ... and types/variables */
+ static int select_mode = 0;
+ int winw, winh;
+@@ -113,7 +113,7 @@
+ 	if (procs_p != NULL)
+ 		event_cam_changed();
+ }
+-void render_virtual_object(struct t_obj *o)
++static void render_virtual_object(struct t_obj *o)
+ {
+ 	struct t_process *ap;
+ 	struct t_vertex x, y;
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2008-11-03 22:58:05 UTC (rev 1021)
++++ trunk/server/object.c	2008-11-05 00:59:33 UTC (rev 1022)
+@@ -42,10 +42,10 @@
+ #define MAXLOOP 10
+ /*  if oid is always unsigned, we don't have to check oid&gt;=0 */
+ 
+-void obj_sys_update(struct t_process *p, int32_t oid);
++static void obj_sys_update(struct t_process *p, int32_t oid);
+ 
+-int texture_shm_register(struct t_tex *tex, int bufsize);
+-void texture_delete(struct t_tex *tex);
++static int texture_shm_register(struct t_tex *tex, int bufsize);
++static void texture_delete(struct t_tex *tex);
+ /*  debugging function for objects, prints out some stuff known about it... */
+ int obj_debug(struct t_process *p, int32_t oid)
+ {
+@@ -261,7 +261,7 @@
+ }
+ 
+ /* register the texture, if possible */
+-int texture_shm_register(struct t_tex *tex, int bufsize)
++static int texture_shm_register(struct t_tex *tex, int bufsize)
+ {
+ #ifdef SHM
+ 	int key;
+@@ -284,7 +284,7 @@
+ }
+ 
+ /* delete the texture, eventually detach from the shm segment */
+-void texture_delete(struct t_tex *tex)
++static void texture_delete(struct t_tex *tex)
+ {
+ 	GLuint t;
+ 	s3dprintf(HIGH, &quot;texture delete: shmid = %d, buf = %10p\n&quot;, tex-&gt;shmid, (void*)tex-&gt;buf);
+@@ -1343,7 +1343,7 @@
+ 		p-&gt;object[oid]-&gt;m_uptodate = 1;
+ 	}
+ }
+-void obj_sys_update(struct t_process *p, int32_t oid)
++static void obj_sys_update(struct t_process *p, int32_t oid)
+ {
+ 	struct t_process *mcp_p = get_proc_by_pid(MCP);
+ 	struct t_obj  *o;
+
+Modified: trunk/server/process.c
+===================================================================
+--- trunk/server/process.c	2008-11-03 22:58:05 UTC (rev 1021)
++++ trunk/server/process.c	2008-11-05 00:59:33 UTC (rev 1022)
+@@ -32,7 +32,7 @@
+ int       procs_n;      /* number of processes */
+ static int p_del(struct t_process *p);   /*  local prototype */
+ static int process_list_rm(int pid);
+-int process_sys_init(struct t_process *p);
++static int process_sys_init(struct t_process *p);
+ 
+ /* protocol request for process initialization */
+ struct t_process *process_protinit(struct t_process *p, const char *name) {
+@@ -87,7 +87,7 @@
+ 	return(p);
+ }
+ /* adds system objects to the app, like camera, pointers etc ... */
+-int process_sys_init(struct t_process *p)
++static int process_sys_init(struct t_process *p)
+ {
+ 	int cam, ptr;
+ 	struct t_obj *o;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001001.html">[S3d-svn] r1021 - trunk/libs3d
+</A></li>
+	<LI>Next message: <A HREF="001003.html">[S3d-svn] r1023 - trunk/apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1002">[ date ]</a>
+              <a href="thread.html#1002">[ thread ]</a>
+              <a href="subject.html#1002">[ subject ]</a>
+              <a href="author.html#1002">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

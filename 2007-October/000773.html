@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r781 - trunk/apps/s3d_x11gate
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r781%20-%20trunk/apps/s3d_x11gate&In-Reply-To=%3C200710190000.l9J00xwe031536%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000772.html">
+   <LINK REL="Next"  HREF="000774.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r781 - trunk/apps/s3d_x11gate</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r781%20-%20trunk/apps/s3d_x11gate&In-Reply-To=%3C200710190000.l9J00xwe031536%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r781 - trunk/apps/s3d_x11gate">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 02:00:59 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000772.html">[S3d-svn] r780 - trunk/apps/s3dvt
+</A></li>
+        <LI>Next message: <A HREF="000774.html">[S3d-svn] r782 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#773">[ date ]</a>
+              <a href="thread.html#773">[ thread ]</a>
+              <a href="subject.html#773">[ subject ]</a>
+              <a href="author.html#773">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 02:00:59 +0200 (Fri, 19 Oct 2007)
+New Revision: 781
+
+Modified:
+   trunk/apps/s3d_x11gate/s3d_x11gate.c
+Log:
+s3d_x11gate: Mark local functions and variables as static
+
+
+Modified: trunk/apps/s3d_x11gate/s3d_x11gate.c
+===================================================================
+--- trunk/apps/s3d_x11gate/s3d_x11gate.c	2007-10-19 00:00:52 UTC (rev 780)
++++ trunk/apps/s3d_x11gate/s3d_x11gate.c	2007-10-19 00:00:59 UTC (rev 781)
+@@ -47,24 +47,22 @@
+ #endif
+ #endif
+ 
+-int oid;
+-XImage *image;
+-Display *dpy = NULL;
+-int window, scr;
+-unsigned int width, height, height, depth;
+-int format;
+-char *data;
+-Visual *visual;
+-XShmSegmentInfo shminfo;
+-char *tex_image = NULL, *otex_image = NULL, *img1, *img2;
++static int oid;
++static XImage *image;
++static Display *dpy = NULL;
++static int window, scr;
++static unsigned int width, height, height, depth;
++static Visual *visual;
++static XShmSegmentInfo shminfo;
++static char *tex_image = NULL, *otex_image = NULL, *img1, *img2;
+ 
+ 
+ 
+-struct timeval start, end;
+-int iterations;
+-float count[3];
++static struct timeval start, end;
++static int iterations;
++static float count[3];
+ 
+-int get_shift(uint32_t t)
++static int get_shift(uint32_t t)
+ {
+ 	int i = 0;
+ 	while (t) {
+@@ -73,7 +71,7 @@
+ 	}
+ 	return(i);
+ }
+-void mainloop(void)
++static void mainloop(void)
+ {
+ #define MAGIC_CHANGED ((unsigned int)~0)
+ 	unsigned int x, y;
+@@ -156,7 +154,7 @@
+ 	/* XDestroyImage(image);*/
+ 	/* nanosleep(&amp;t,NULL); */
+ }
+-int keypress(struct s3d_evt *event)
++static int keypress(struct s3d_evt *event)
+ {
+ 	int key;
+ 	int kc;
+@@ -180,7 +178,7 @@
+ 	return(0);
+ 
+ }
+-int mouseclick(struct s3d_evt *S3DX11UNUSED(event))
++static int mouseclick(struct s3d_evt *S3DX11UNUSED(event))
+ {
+ 	int i;
+ 	printf(&quot;thats it, collecting:\n&quot;);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000772.html">[S3d-svn] r780 - trunk/apps/s3dvt
+</A></li>
+	<LI>Next message: <A HREF="000774.html">[S3d-svn] r782 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#773">[ date ]</a>
+              <a href="thread.html#773">[ thread ]</a>
+              <a href="subject.html#773">[ subject ]</a>
+              <a href="author.html#773">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

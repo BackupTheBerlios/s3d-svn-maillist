@@ -1,0 +1,188 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r666 - trunk/apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r666%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200709171343.l8HDh5fE026450%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000657.html">
+   <LINK REL="Next"  HREF="000659.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r666 - trunk/apps/s3dosm</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r666%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200709171343.l8HDh5fE026450%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r666 - trunk/apps/s3dosm">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 17 15:43:05 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000657.html">[S3d-svn] r665 - in trunk: apps/dot_mcp apps/kism3d apps/meshs3d	apps/olsrs3d apps/s3d_x11gate apps/s3dfm apps/s3dosm	apps/s3dvt example libs3d libs3dw server
+</A></li>
+        <LI>Next message: <A HREF="000659.html">[S3d-svn] r667 - in trunk: apps/dot_mcp apps/kism3d apps/meshs3d	apps/olsrs3d apps/s3d_x11gate apps/s3dfm apps/s3dosm	apps/s3dvt example libs3d libs3dw server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#658">[ date ]</a>
+              <a href="thread.html#658">[ thread ]</a>
+              <a href="subject.html#658">[ subject ]</a>
+              <a href="author.html#658">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-09-17 15:43:05 +0200 (Mon, 17 Sep 2007)
+New Revision: 666
+
+Modified:
+   trunk/apps/s3dosm/db.c
+Log:
+Reformatted apps/s3dosm/db.c
+
+
+Modified: trunk/apps/s3dosm/db.c
+===================================================================
+--- trunk/apps/s3dosm/db.c	2007-09-17 13:33:24 UTC (rev 665)
++++ trunk/apps/s3dosm/db.c	2007-09-17 13:43:05 UTC (rev 666)
+@@ -41,6 +41,7 @@
+ 	strncpy(clean, dirty, n);
+ 	clean[n-1]=0;
+ }
++
+ int db_add_tag(object_t *obj, char *key, char *val)
+ {
+ 	char tagquery[MAXQ];
+@@ -51,6 +52,7 @@
+ 	db_exec(tagquery, NULL, 0);
+ 	return(0);
+ }
++
+ int db_insert_node(node_t *node)
+ {
+ 	char addquery[MAXQ];
+@@ -87,6 +89,7 @@
+ 
+ 	return(0);
+ }
++
+ int db_insert_way_only(way_t *way)
+ {
+ 	char addquery[MAXQ];
+@@ -103,6 +106,7 @@
+ 	db_exec(addquery, NULL, 0);
+ 	return(0);
+ }
++
+ int db_insert_layer(char *layer_name)
+ {
+ 	char findquery[MAXQ];
+@@ -121,6 +125,7 @@
+ 	}
+ 	return(layerid);
+ }
++
+ #define MAGIC	1337 /* just to elevate the nodes a little bit */
+ static int found=0;
+ /* tries to find node coordinates of ip, returns 1 if has found something */
+@@ -147,6 +152,7 @@
+ 	found=0;
+ 	return(0);
+ }
++
+ /* initializes the starting point of nodes  by averaging its lon/lat */
+ int db_olsr_node_init(float *pos)
+ {
+@@ -202,6 +208,7 @@
+ 		strncpy((char *)string,argv[0],MAXQ);
+ 	return(0);
+ }
++
+ /* get the value for a a certain tagid and keyvalue (field). Write into target, which has to be allocated with MAXQ bytes of space.
+  * Nothing is written when nothing is found. */
+ int db_gettag(int tagid, char *field, char *target)
+@@ -222,6 +229,7 @@
+ 	printf(&quot;\n&quot;);
+ 	return 0;
+ }
++
+ static int db_really_exec(const char *query, sqlite3_callback callback, void *arg)
+ {
+ 	char *zErrMsg = 0;
+@@ -242,11 +250,12 @@
+ 	qbuf[0]=0;
+ 	qlen=0;
+ }
++
+ int db_exec(const char *query, sqlite3_callback callback, void *arg)
+ {
+ 	int ret;
+ #ifdef DB_STACK
+-	if (callback==NULL) { /* we can stack it */
++	if (callback == NULL) { /* we can stack it */
+ 		int len;
+ 		len=strlen(query);
+ 		if (len+qlen&gt;=QBUF)
+@@ -255,11 +264,14 @@
+ 		qlen+=strlen(query);
+ 		ret=0;
+ 	} else
+-#endif {
++#endif
++
++	{
+ 		ret=db_really_exec(query,callback,arg);		/* pass it to the real function */
++	}
++	return(ret);
+ }
+-return(ret);
+-}
++
+ int db_init(char *dbFile)
+ {
+ 	int rc;
+@@ -276,6 +288,7 @@
+ 	}
+ 	return(0);
+ }
++
+ int db_quit()
+ {
+ 	sqlite3_close(db);
+@@ -284,6 +297,7 @@
+ 			perror(&quot;db_quit()&quot;);
+ 	return(0);
+ }
++
+ int db_create()
+ {
+ 	db_exec(&quot;CREATE TABLE node (layer_id INT, node_id INTEGER , latitude DOUBLE PRECISION, longitude DOUBLE PRECISION, altitude DOUBLE PRECISION, visible BOOLEAN, tag_id INT, s3doid INT, PRIMARY KEY(layer_id,node_id));&quot;,NULL,0);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000657.html">[S3d-svn] r665 - in trunk: apps/dot_mcp apps/kism3d apps/meshs3d	apps/olsrs3d apps/s3d_x11gate apps/s3dfm apps/s3dosm	apps/s3dvt example libs3d libs3dw server
+</A></li>
+	<LI>Next message: <A HREF="000659.html">[S3d-svn] r667 - in trunk: apps/dot_mcp apps/kism3d apps/meshs3d	apps/olsrs3d apps/s3d_x11gate apps/s3dfm apps/s3dosm	apps/s3dvt example libs3d libs3dw server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#658">[ date ]</a>
+              <a href="thread.html#658">[ thread ]</a>
+              <a href="subject.html#658">[ subject ]</a>
+              <a href="author.html#658">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

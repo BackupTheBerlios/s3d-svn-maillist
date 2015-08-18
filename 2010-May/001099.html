@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-85-gc8dc95a
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2010-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20branch%2C%20master%2C%0A%09updated.%20v0.2.1.1-85-gc8dc95a&In-Reply-To=%3C201005041403.o44E3Rb1031473%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001098.html">
+   <LINK REL="Next"  HREF="001100.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-85-gc8dc95a</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20branch%2C%20master%2C%0A%09updated.%20v0.2.1.1-85-gc8dc95a&In-Reply-To=%3C201005041403.o44E3Rb1031473%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-85-gc8dc95a">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue May  4 16:03:27 CEST 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001098.html">[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-17-g1e7ba35
+</A></li>
+        <LI>Next message: <A HREF="001100.html">[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-18-g47ce5d7
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1099">[ date ]</a>
+              <a href="thread.html#1099">[ thread ]</a>
+              <a href="subject.html#1099">[ subject ]</a>
+              <a href="author.html#1099">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project &quot;Project s3d at BerliOS&quot;.
+
+The branch, master has been updated
+       via  c8dc95a22527185eb70ac39b6598dc0c17f4459d (commit)
+       via  e444279ad8222e41652c064900dd3b59476bfdd1 (commit)
+       via  67671774868f6079e2b683347cebf31929d621d7 (commit)
+       via  1e7ba353e2c9a1eba4c9c2a1046490d06a602567 (commit)
+       via  16c64e65ff64f92179b7ed65ae07d504d95ac5f2 (commit)
+       via  e015df26323a73f6228b1281e8ff30559759a6a8 (commit)
+      from  fdd7cbe76924d8d88a7c7ec743de7e0ce342b3ba (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit c8dc95a22527185eb70ac39b6598dc0c17f4459d
+Merge: e444279ad8222e41652c064900dd3b59476bfdd1 1e7ba353e2c9a1eba4c9c2a1046490d06a602567
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Tue May 4 16:02:53 2010 +0200
+
+    Merge branch 'maint'
+
+commit e444279ad8222e41652c064900dd3b59476bfdd1
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Tue May 4 14:45:29 2010 +0200
+
+    Use -fdata-sections and -ffunction-sections in ENABLE_FINAL
+    
+    -fdata-sections and -ffunction-sections allow the linker to perform
+    extra optimizations, but performs poorly when using -g at the same time.
+    Thus we enable it only when we do a final build.
+
+commit 67671774868f6079e2b683347cebf31929d621d7
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Tue May 4 13:28:14 2010 +0200
+
+    Allow whole-program optimization when using ENABLE_FINAL
+    
+    gcc can only optimize the whole program when it knows that the current
+    compilation unit is really the whole program. To support shared objects
+    as whole-program compilation units we must mark exported functions as
+    externally_visible - which means something like &quot;definitelly not
+    static&quot;. This is complete independent to the &quot;visibility=hidden&quot;
+    behavior we try to use for shared objects.
+    
+    It doesn't enable -fwhole-program by default when using ENABLE_FINAL due
+    to the gcc bug #40546.
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ apps/s3dfm/parse.c                                 |    2 +-
+ cmake/modules/S3DInternals.cmake                   |    7 +++++++
+ ...GCCVisibility.cmake =&gt; TestGCCExternally.cmake} |   10 +++++-----
+ ...stGCCVisibility.cmake =&gt; TestGCCSections.cmake} |   18 ++++++++++++------
+ libs3d/s3d.h                                       |   12 ++++++++++--
+ libs3d/s3dlib.h                                    |    6 ------
+ libs3d/sei_construct.c                             |    8 ++++----
+ libs3d/sei_triangulate.h                           |    1 -
+ libs3dw/s3dw.h                                     |   12 ++++++++++--
+ server/cull.c                                      |    6 +++++-
+ server/graphics.c                                  |    7 ++++---
+ server/object.c                                    |    4 ++++
+ 12 files changed, 62 insertions(+), 31 deletions(-)
+ copy cmake/modules/{TestGCCVisibility.cmake =&gt; TestGCCExternally.cmake} (85%)
+ copy cmake/modules/{TestGCCVisibility.cmake =&gt; TestGCCSections.cmake} (75%)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001098.html">[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-17-g1e7ba35
+</A></li>
+	<LI>Next message: <A HREF="001100.html">[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-18-g47ce5d7
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1099">[ date ]</a>
+              <a href="thread.html#1099">[ thread ]</a>
+              <a href="subject.html#1099">[ subject ]</a>
+              <a href="author.html#1099">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

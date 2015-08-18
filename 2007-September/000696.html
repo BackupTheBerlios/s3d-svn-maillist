@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r704 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r704%20-%20trunk/server&In-Reply-To=%3C200709240229.l8O2T6Rn013189%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000695.html">
+   <LINK REL="Next"  HREF="000697.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r704 - trunk/server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r704%20-%20trunk/server&In-Reply-To=%3C200709240229.l8O2T6Rn013189%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r704 - trunk/server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 24 04:29:06 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000695.html">[S3d-svn] r703 - in trunk: libs3d server
+</A></li>
+        <LI>Next message: <A HREF="000697.html">[S3d-svn] r705 - in trunk: . apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#696">[ date ]</a>
+              <a href="thread.html#696">[ thread ]</a>
+              <a href="subject.html#696">[ subject ]</a>
+              <a href="author.html#696">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-09-24 04:29:06 +0200 (Mon, 24 Sep 2007)
+New Revision: 704
+
+Modified:
+   trunk/server/object.c
+Log:
+Fix calculation of source pixels in tex_build_mipmaps
+
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2007-09-24 02:19:55 UTC (rev 703)
++++ trunk/server/object.c	2007-09-24 02:29:06 UTC (rev 704)
+@@ -1475,10 +1475,10 @@
+ 			for (x = 0; x &lt; w; x++)
+ 				for (c = 0; c &lt; 4; c++) {
+ 					buf[(y * w + x)*4 + c] = ((uint16_t)
+-					                          src[(2  * y      * w + 2 * x)     * 4 + c] +
+-					                          src[((2 * y + 1) * w + 2 * x)     * 4 + c] +
+-					                          src[(2  * y      * w + 2 * x + 1) * 4 + c] +
+-					                          src[((2 * y + 1) * w + 2 * x + 1) * 4 + c]) / 4;
++					                          src[(2  * y      * 2 * w + 2 * x)     * 4 + c] +
++					                          src[((2 * y + 1) * 2 * w + 2 * x)     * 4 + c] +
++					                          src[(2  * y      * 2 * w + 2 * x + 1) * 4 + c] +
++					                          src[((2 * y + 1) * 2 * w + 2 * x + 1) * 4 + c]) / 4;
+ 					/*     s3dprintf(MED,&quot;texture: %d, x = %d, y = %d, c = %d, buf = %02x\n&quot;, i, x, y, c, buf[(y * w + x)*4 + c]);*/
+ 
+ 				}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000695.html">[S3d-svn] r703 - in trunk: libs3d server
+</A></li>
+	<LI>Next message: <A HREF="000697.html">[S3d-svn] r705 - in trunk: . apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#696">[ date ]</a>
+              <a href="thread.html#696">[ thread ]</a>
+              <a href="subject.html#696">[ subject ]</a>
+              <a href="author.html#696">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

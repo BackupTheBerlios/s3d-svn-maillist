@@ -1,0 +1,262 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r950 - in trunk: apps/s3dosm experimental/comptest	experimental/testvis extras/swig
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r950%20-%20in%20trunk%3A%20apps/s3dosm%20experimental/comptest%0A%09experimental/testvis%20extras/swig&In-Reply-To=%3C200808181008.m7IA8lar025434%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000933.html">
+   <LINK REL="Next"  HREF="000935.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r950 - in trunk: apps/s3dosm experimental/comptest	experimental/testvis extras/swig</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r950%20-%20in%20trunk%3A%20apps/s3dosm%20experimental/comptest%0A%09experimental/testvis%20extras/swig&In-Reply-To=%3C200808181008.m7IA8lar025434%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r950 - in trunk: apps/s3dosm experimental/comptest	experimental/testvis extras/swig">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Aug 18 12:08:47 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000933.html">[S3d-svn] r949 - trunk/experimental/testvis
+</A></li>
+        <LI>Next message: <A HREF="000935.html">[S3d-svn] r951 - in trunk: libs3d libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#934">[ date ]</a>
+              <a href="thread.html#934">[ thread ]</a>
+              <a href="subject.html#934">[ subject ]</a>
+              <a href="author.html#934">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-08-18 12:08:46 +0200 (Mon, 18 Aug 2008)
+New Revision: 950
+
+Modified:
+   trunk/apps/s3dosm/nav.c
+   trunk/apps/s3dosm/s3dosm.h
+   trunk/experimental/comptest/comptest.h
+   trunk/experimental/testvis/testvis.c
+   trunk/extras/swig/s3d_test.pl
+   trunk/extras/swig/s3d_test.py
+Log:
+Add missing license headers
+
+Modified: trunk/apps/s3dosm/nav.c
+===================================================================
+--- trunk/apps/s3dosm/nav.c	2008-08-16 22:17:05 UTC (rev 949)
++++ trunk/apps/s3dosm/nav.c	2008-08-18 10:08:46 UTC (rev 950)
+@@ -1,3 +1,26 @@
++/*
++ * nav.c
++ *
++ * Copyright (C) 2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3dosm, a gps card application for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * s3dosm is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * s3dosm is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with s3dosm; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
+ #include &quot;s3dosm.h&quot;
+ #include &lt;s3d.h&gt;
+ #include &lt;string.h&gt; /* strcmp() */
+
+Modified: trunk/apps/s3dosm/s3dosm.h
+===================================================================
+--- trunk/apps/s3dosm/s3dosm.h	2008-08-16 22:17:05 UTC (rev 949)
++++ trunk/apps/s3dosm/s3dosm.h	2008-08-18 10:08:46 UTC (rev 950)
+@@ -1,3 +1,26 @@
++/*
++ * s3dosm.h
++ *
++ * Copyright (C) 2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3dosm, a gps card application for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * s3dosm is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * s3dosm is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with s3dosm; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
+ #include &lt;sqlite3.h&gt;
+ #include &lt;s3d.h&gt; /* s3devt structure */
+ #include &lt;config-s3d.h&gt;
+
+Modified: trunk/experimental/comptest/comptest.h
+===================================================================
+--- trunk/experimental/comptest/comptest.h	2008-08-16 22:17:05 UTC (rev 949)
++++ trunk/experimental/comptest/comptest.h	2008-08-18 10:08:46 UTC (rev 950)
+@@ -1,3 +1,26 @@
++/*
++ * comptest.h
++ *
++ * Copyright (C) 2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of comptest, a proof-of-concept composite manager hack.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * comptest is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * comptest is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with comptest; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
+ #include &lt;s3d.h&gt;
+ #include &lt;X11/Xlib.h&gt;       /* Ximage, Display, X*() */
+ #include &lt;X11/Xutil.h&gt;       /* XDestroyImage() */
+
+Modified: trunk/experimental/testvis/testvis.c
+===================================================================
+--- trunk/experimental/testvis/testvis.c	2008-08-16 22:17:05 UTC (rev 949)
++++ trunk/experimental/testvis/testvis.c	2008-08-18 10:08:46 UTC (rev 950)
+@@ -1,3 +1,26 @@
++/*
++ * testvis.c
++ *
++ * Copyright (C) 2007 Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
++ *
++ * This file is part of testvis, a simple dot drawing application.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * testvis is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * testvis is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with testvis; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
+ #include &lt;stdio.h&gt;
+ #include &lt;sys/types.h&gt;
+ #include &lt;sys/socket.h&gt;
+
+Modified: trunk/extras/swig/s3d_test.pl
+===================================================================
+--- trunk/extras/swig/s3d_test.pl	2008-08-16 22:17:05 UTC (rev 949)
++++ trunk/extras/swig/s3d_test.pl	2008-08-18 10:08:46 UTC (rev 950)
+@@ -1,3 +1,23 @@
++#!/usr/bin/perl
++
++# Copyright (C) 2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++#
++# See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++#
++# testvis is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# testvis is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with testvis; if not, write to the Free Software
++# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++
+ use s3d;
+ if (0==s3d::s3dpy_init(&quot;hello perl&quot;))
+ {
+
+Modified: trunk/extras/swig/s3d_test.py
+===================================================================
+--- trunk/extras/swig/s3d_test.py	2008-08-16 22:17:05 UTC (rev 949)
++++ trunk/extras/swig/s3d_test.py	2008-08-18 10:08:46 UTC (rev 950)
+@@ -1,4 +1,24 @@
+ #!/usr/bin/python
++# -*- coding: utf-8; -*-
++
++# Copyright (C) 2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++#
++# See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++#
++# testvis is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# testvis is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with testvis; if not, write to the Free Software
++# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++
+ from s3d import *
+ from time import sleep
+ if 0 == s3dpy_init(&quot;hello world&quot;):
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000933.html">[S3d-svn] r949 - trunk/experimental/testvis
+</A></li>
+	<LI>Next message: <A HREF="000935.html">[S3d-svn] r951 - in trunk: libs3d libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#934">[ date ]</a>
+              <a href="thread.html#934">[ thread ]</a>
+              <a href="subject.html#934">[ subject ]</a>
+              <a href="author.html#934">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

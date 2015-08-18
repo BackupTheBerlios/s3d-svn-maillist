@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1050 - trunk/experimental/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1050%20-%20trunk/experimental/comptest&In-Reply-To=%3C200812231055.mBNAtOme027579%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001029.html">
+   <LINK REL="Next"  HREF="001031.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1050 - trunk/experimental/comptest</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1050%20-%20trunk/experimental/comptest&In-Reply-To=%3C200812231055.mBNAtOme027579%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1050 - trunk/experimental/comptest">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Dec 23 11:55:24 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001029.html">[S3d-svn] r1049 - in trunk: apps/meshs3d experimental/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="001031.html">[S3d-svn] r1051 - in trunk: libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1030">[ date ]</a>
+              <a href="thread.html#1030">[ thread ]</a>
+              <a href="subject.html#1030">[ subject ]</a>
+              <a href="author.html#1030">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-12-23 11:55:23 +0100 (Tue, 23 Dec 2008)
+New Revision: 1050
+
+Modified:
+   trunk/experimental/comptest/comptest.h
+Log:
+comptest: Correct declaration of x11_addwindows
+
+Modified: trunk/experimental/comptest/comptest.h
+===================================================================
+--- trunk/experimental/comptest/comptest.h	2008-12-23 10:55:14 UTC (rev 1049)
++++ trunk/experimental/comptest/comptest.h	2008-12-23 10:55:23 UTC (rev 1050)
+@@ -94,7 +94,7 @@
+ int xinit(void);
+ int error(Display *COMPUNUSED(dpy), XErrorEvent *event);
+ int print_event(Display *COMPUNUSED(dpy), XEvent *event);
+-void x11_addwindows();
++void x11_addwindows(void);
+ char *x11_get_prop(Window win, char *prop);
+ char *x11_get_name(Window win);
+ void print_properties(Window win);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001029.html">[S3d-svn] r1049 - in trunk: apps/meshs3d experimental/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="001031.html">[S3d-svn] r1051 - in trunk: libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1030">[ date ]</a>
+              <a href="thread.html#1030">[ thread ]</a>
+              <a href="subject.html#1030">[ subject ]</a>
+              <a href="author.html#1030">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

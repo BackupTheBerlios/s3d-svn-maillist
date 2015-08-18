@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r705 - in trunk: . apps/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r705%20-%20in%20trunk%3A%20.%20apps/comptest&In-Reply-To=%3C200709241050.l8OAof58026682%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000696.html">
+   <LINK REL="Next"  HREF="000698.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r705 - in trunk: . apps/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r705%20-%20in%20trunk%3A%20.%20apps/comptest&In-Reply-To=%3C200709241050.l8OAof58026682%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r705 - in trunk: . apps/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 24 12:50:41 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000696.html">[S3d-svn] r704 - trunk/server
+</A></li>
+        <LI>Next message: <A HREF="000698.html">[S3d-svn] r706 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#697">[ date ]</a>
+              <a href="thread.html#697">[ thread ]</a>
+              <a href="subject.html#697">[ subject ]</a>
+              <a href="author.html#697">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-09-24 12:50:39 +0200 (Mon, 24 Sep 2007)
+New Revision: 705
+
+Modified:
+   trunk/
+   trunk/apps/comptest/comptest.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r2465 at kero</A>:  dotslash | 2007-09-24 12:50:24 +0200
+ - remove warnings for comptest
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2452
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2465
+
+Modified: trunk/apps/comptest/comptest.c
+===================================================================
+--- trunk/apps/comptest/comptest.c	2007-09-24 02:29:06 UTC (rev 704)
++++ trunk/apps/comptest/comptest.c	2007-09-24 10:50:39 UTC (rev 705)
+@@ -31,7 +31,18 @@
+ #include &lt;X11/extensions/Xcomposite.h&gt;
+ #include &lt;X11/extensions/Xdamage.h&gt;
+ #include &lt;X11/extensions/Xrender.h&gt;
++#include &lt;config-s3d.h&gt;
+ 
++#ifndef COMPUNUSED
++#if defined(UNUSEDPARAM_ATTRIBUTE)
++#define COMPUNUSED(x) (x)__attribute__((unused))
++#elif defined(UNUSEDPARAM_OMIT)
++#define COMPUNUSED(x) /* x */
++#else
++#define COMPUNUSED(x) x
++#endif
++#endif
++
+ struct extension {
+ 	int event, error;
+ };
+@@ -79,7 +90,7 @@
+ 	return(i);
+ }
+ 
+-static int error(Display *dpy, XErrorEvent *event)
++static int error(Display *COMPUNUSED(dpy), XErrorEvent *COMPUNUSED(event))
+ {
+ 	/*    printf (&quot;error %d request %d minor %d serial %d\n&quot;,
+ 	        event-&gt;error_code, event-&gt;request_code, event-&gt;minor_code, event-&gt;serial);*/
+@@ -218,7 +229,7 @@
+ 	int xi, yi;
+ 	int rs, gs, bs;
+ 	int bpp;
+-	unsigned char *img_ptr, *bmp_ptr;
++	char *img_ptr, *bmp_ptr;
+ 	unsigned long *s;
+ 	uint32_t *t;
+ 	XImage *image;
+@@ -272,7 +283,7 @@
+ 			bmp_ptr = win-&gt;bitmap + ((y + yi) * win-&gt;attr.width + x) * sizeof(uint32_t);
+ 		}
+ 		/*  s3d_load_texture(win-&gt;oid,0,x,y,width,height, ???); */
+-		s3d_load_texture(win-&gt;oid, 0, 0, 0, win-&gt;attr.width, win-&gt;attr.height, win-&gt;bitmap);
++		s3d_load_texture(win-&gt;oid, 0, 0, 0, win-&gt;attr.width, win-&gt;attr.height, (unsigned char *)win-&gt;bitmap);
+ 		/*  swap images */
+ 	}
+ 	XDestroyImage(image);
+@@ -298,7 +309,7 @@
+ 		for (scr_no = 0; scr_no &lt; ScreenCount(dpy); scr_no++) {
+ 			XCompositeRedirectSubwindows(dpy, RootWindow(dpy, scr_no), CompositeRedirectAutomatic);
+ 			XQueryTree(dpy, RootWindow(dpy, scr_no), &amp;root_return, &amp;parent_return, &amp;children, &amp;nchildren);
+-			for (i = 0; i &lt; nchildren; i++)
++			for (i = 0; i &lt; (int)nchildren; i++)
+ 				window_add(dpy, children[i]);
+ 			XFree(children);
+ 		}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000696.html">[S3d-svn] r704 - trunk/server
+</A></li>
+	<LI>Next message: <A HREF="000698.html">[S3d-svn] r706 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#697">[ date ]</a>
+              <a href="thread.html#697">[ thread ]</a>
+              <a href="subject.html#697">[ subject ]</a>
+              <a href="author.html#697">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

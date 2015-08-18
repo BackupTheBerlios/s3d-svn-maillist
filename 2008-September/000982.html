@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1002 - trunk/libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1002%20-%20trunk/libs3d&In-Reply-To=%3C200809252221.m8PMLGnP006651%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000981.html">
+   <LINK REL="Next"  HREF="000983.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1002 - trunk/libs3d</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1002%20-%20trunk/libs3d&In-Reply-To=%3C200809252221.m8PMLGnP006651%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1002 - trunk/libs3d">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 26 00:21:16 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000981.html">[S3d-svn] r1001 - trunk/server
+</A></li>
+        <LI>Next message: <A HREF="000983.html">[S3d-svn] r1003 - in trunk: libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#982">[ date ]</a>
+              <a href="thread.html#982">[ thread ]</a>
+              <a href="subject.html#982">[ subject ]</a>
+              <a href="author.html#982">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-26 00:21:16 +0200 (Fri, 26 Sep 2008)
+New Revision: 1002
+
+Modified:
+   trunk/libs3d/proto_out.c
+Log:
+Send S3D_P_C_LOAD_* instead of S3D_PC_PEP_* in s3d_load_* proto functions
+
+Modified: trunk/libs3d/proto_out.c
+===================================================================
+--- trunk/libs3d/proto_out.c	2008-09-25 22:21:01 UTC (rev 1001)
++++ trunk/libs3d/proto_out.c	2008-09-25 22:21:16 UTC (rev 1002)
+@@ -923,7 +923,7 @@
+ 		else
+ 			flen = (len - i * stepl);
+ 		memcpy(ptr, (char *)nbuf + i*stepl, flen);
+-		net_send(S3D_P_C_PEP_POLY_NORMAL, buf, flen + 8);
++		net_send(S3D_P_C_LOAD_POLY_NORMAL, buf, flen + 8);
+ 		mstart += stepl;
+ 	}
+ 	return(0);
+@@ -956,7 +956,7 @@
+ 		else
+ 			flen = (len - i * stepl);
+ 		memcpy(ptr, (char *)nbuf + i*stepl, flen);
+-		net_send(S3D_P_C_PEP_LINE_NORMAL, buf, flen + 8);
++		net_send(S3D_P_C_LOAD_LINE_NORMAL, buf, flen + 8);
+ 		mstart += stepl;
+ 	}
+ 	return(0);
+@@ -989,7 +989,7 @@
+ 		else
+ 			flen = (len - i * stepl);
+ 		memcpy(ptr, (char *)tbuf + i*stepl, flen);
+-		net_send(S3D_P_C_PEP_POLY_TEXC, buf, flen + 8);
++		net_send(S3D_P_C_LOAD_POLY_TEXC, buf, flen + 8);
+ 		mstart += stepl;
+ 	}
+ 	return(0);
+@@ -1022,7 +1022,7 @@
+ 		else
+ 			flen = (len - i * stepl);
+ 		memcpy(ptr, (char *)mbuf + i*stepl, flen);
+-		net_send(S3D_P_C_PEP_MAT, buf, flen + 8);
++		net_send(S3D_P_C_LOAD_MAT, buf, flen + 8);
+ 		mstart += stepl;
+ 	}
+ 	return(0);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000981.html">[S3d-svn] r1001 - trunk/server
+</A></li>
+	<LI>Next message: <A HREF="000983.html">[S3d-svn] r1003 - in trunk: libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#982">[ date ]</a>
+              <a href="thread.html#982">[ thread ]</a>
+              <a href="subject.html#982">[ subject ]</a>
+              <a href="author.html#982">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

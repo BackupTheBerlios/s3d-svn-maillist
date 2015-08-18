@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r489 - in trunk/extras/distro/gentoo/media-gfx: s3d	s3d-svn
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r489%20-%20in%20trunk/extras/distro/gentoo/media-gfx%3A%20s3d%0A%09s3d-svn&In-Reply-To=%3C200611261942.kAQJgF1q007275%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000481.html">
+   <LINK REL="Next"  HREF="000483.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r489 - in trunk/extras/distro/gentoo/media-gfx: s3d	s3d-svn</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r489%20-%20in%20trunk/extras/distro/gentoo/media-gfx%3A%20s3d%0A%09s3d-svn&In-Reply-To=%3C200611261942.kAQJgF1q007275%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r489 - in trunk/extras/distro/gentoo/media-gfx: s3d	s3d-svn">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 26 20:42:15 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000481.html">[S3d-svn] r488 - in trunk/extras/distro/gentoo/media-gfx/s3d-svn: .	files
+</A></li>
+        <LI>Next message: <A HREF="000483.html">[S3d-svn] r490 - trunk/apps/kism3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#482">[ date ]</a>
+              <a href="thread.html#482">[ thread ]</a>
+              <a href="subject.html#482">[ subject ]</a>
+              <a href="author.html#482">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2006-11-26 20:42:14 +0100 (Sun, 26 Nov 2006)
+New Revision: 489
+
+Modified:
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild
+   trunk/extras/distro/gentoo/media-gfx/s3d/Manifest
+   trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.1.1.ebuild
+Log:
+- add media-fonts/ttf-bitstream-vera as runtime dependency
+
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d/Manifest
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d/Manifest	2006-11-26 18:36:34 UTC (rev 488)
++++ trunk/extras/distro/gentoo/media-gfx/s3d/Manifest	2006-11-26 19:42:14 UTC (rev 489)
+@@ -1,8 +1,8 @@
+ DIST s3d-0.1.1.tar.bz2 1737935 RMD160 88189600659dd4d184be044dd668597ab2b17334 SHA1 3765171848d519784a436468ac613c9bfe85c3ae SHA256 1e2be7c806deaaf07e7f00d018f6f08723a1b26332419a80e732c8b7a1a515e4
+-EBUILD s3d-0.1.1.ebuild 779 RMD160 1139e842ece34fa21a6ec1bab8d46ec78f78f0d7 SHA1 849426853a809fb99af0b8d3993614ad1017f4ad SHA256 673bf5f1f0c2d03bb5da9483284b00d6038fe59fdf3dcf6289f4aac51f449937
+-MD5 a0b3edd9261aac5e7fe1acedb51e3b37 s3d-0.1.1.ebuild 779
+-RMD160 1139e842ece34fa21a6ec1bab8d46ec78f78f0d7 s3d-0.1.1.ebuild 779
+-SHA256 673bf5f1f0c2d03bb5da9483284b00d6038fe59fdf3dcf6289f4aac51f449937 s3d-0.1.1.ebuild 779
++EBUILD s3d-0.1.1.ebuild 811 RMD160 36bf79576e7d2a2ccf0cf89c4ed537ca51bc78ab SHA1 acbea5f89f40d0647b04eb995e4231182611faf8 SHA256 34f72a57351fd53658e44632f161e591b941b6a9e8c83c953845c298ddf855ae
++MD5 13108513bab3168db7b566ec750603a4 s3d-0.1.1.ebuild 811
++RMD160 36bf79576e7d2a2ccf0cf89c4ed537ca51bc78ab s3d-0.1.1.ebuild 811
++SHA256 34f72a57351fd53658e44632f161e591b941b6a9e8c83c953845c298ddf855ae s3d-0.1.1.ebuild 811
+ MISC ChangeLog 148 RMD160 cb8db163c4842d0f8d8d4ad41ba7516765f1b0a3 SHA1 70661ac4033b04c51f6928f82d9903bfa86eb0b3 SHA256 e61b9d97b0c64076e833b27201c5eda91b02f5d885a37b5f4d005c03a44c405c
+ MD5 31944463e2ea8d52f7172c7b838927be ChangeLog 148
+ RMD160 cb8db163c4842d0f8d8d4ad41ba7516765f1b0a3 ChangeLog 148
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.1.1.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.1.1.ebuild	2006-11-26 18:36:34 UTC (rev 488)
++++ trunk/extras/distro/gentoo/media-gfx/s3d/s3d-0.1.1.ebuild	2006-11-26 19:42:14 UTC (rev 489)
+@@ -19,6 +19,7 @@
+ 	&gt;=media-libs/libsdl-1.2.7
+ 	&gt;=media-libs/freetype-2
+ 	&gt;=dev-libs/glib-2
++	media-fonts/ttf-bitstream-vera
+ 	media-libs/fontconfig
+ 	media-libs/mesa
+ 
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest	2006-11-26 18:36:34 UTC (rev 488)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest	2006-11-26 19:42:14 UTC (rev 489)
+@@ -1,7 +1,7 @@
+-EBUILD s3d-svn-9999.ebuild 873 RMD160 c4e442fb6f0e09d42d9bfb55559268cac0c3c2c3 SHA1 df6b48857dfa7db86a7a48e30c674190657b2f0a SHA256 6df55733ec72ff628fc6069c2547064d02efa1475567f67250be4b6d95b481ca
+-MD5 14d3ec19b0272d64318178980bc619c5 s3d-svn-9999.ebuild 873
+-RMD160 c4e442fb6f0e09d42d9bfb55559268cac0c3c2c3 s3d-svn-9999.ebuild 873
+-SHA256 6df55733ec72ff628fc6069c2547064d02efa1475567f67250be4b6d95b481ca s3d-svn-9999.ebuild 873
++EBUILD s3d-svn-9999.ebuild 905 RMD160 34bd888b19648084ae8dc8e5d603f898a6e86774 SHA1 d228cd4a38efb52c06db1e680e5936c8ac7b55d8 SHA256 202c2a6c56bdfb6b9353dbfd755994e235cb0f9333f12d03d27c6fcabc87f447
++MD5 518f54a8fb0a29a9a3ec6e650da58480 s3d-svn-9999.ebuild 905
++RMD160 34bd888b19648084ae8dc8e5d603f898a6e86774 s3d-svn-9999.ebuild 905
++SHA256 202c2a6c56bdfb6b9353dbfd755994e235cb0f9333f12d03d27c6fcabc87f447 s3d-svn-9999.ebuild 905
+ MISC ChangeLog 295 RMD160 818b9134758d8a5d81be67d25ab990fe7cc71283 SHA1 529b5c00b3ad8067f06ce4bcc41d6a185fb2670d SHA256 cd5d36bee2dce3a94ce0f4f65ad7dc4ab8d299e48e57f48aa0a609eb06fe4885
+ MD5 569601eaa0bbba92427ed05da0dfc050 ChangeLog 295
+ RMD160 818b9134758d8a5d81be67d25ab990fe7cc71283 ChangeLog 295
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild	2006-11-26 18:36:34 UTC (rev 488)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild	2006-11-26 19:42:14 UTC (rev 489)
+@@ -23,6 +23,7 @@
+ 	&gt;=media-libs/libsdl-1.2.7
+ 	&gt;=media-libs/freetype-2
+ 	&gt;=dev-libs/glib-2
++	media-fonts/ttf-bitstream-vera
+ 	media-libs/fontconfig
+ 	media-libs/mesa
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000481.html">[S3d-svn] r488 - in trunk/extras/distro/gentoo/media-gfx/s3d-svn: .	files
+</A></li>
+	<LI>Next message: <A HREF="000483.html">[S3d-svn] r490 - trunk/apps/kism3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#482">[ date ]</a>
+              <a href="thread.html#482">[ thread ]</a>
+              <a href="subject.html#482">[ subject ]</a>
+              <a href="author.html#482">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

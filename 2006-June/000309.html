@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r316 - trunk/example
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r316%20-%20trunk/example&In-Reply-To=%3C200606021950.k52JoqPj016143%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000308.html">
+   <LINK REL="Next"  HREF="000310.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r316 - trunk/example</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r316%20-%20trunk/example&In-Reply-To=%3C200606021950.k52JoqPj016143%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r316 - trunk/example">dotslash at berlios.de
+       </A><BR>
+    <I>Fri Jun  2 21:50:52 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000308.html">[S3d-svn] r315 - in trunk: . example libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000310.html">[S3d-svn] r317 - trunk/example
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#309">[ date ]</a>
+              <a href="thread.html#309">[ thread ]</a>
+              <a href="subject.html#309">[ subject ]</a>
+              <a href="author.html#309">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-02 21:50:51 +0200 (Fri, 02 Jun 2006)
+New Revision: 316
+
+Modified:
+   trunk/example/Makefile.am
+Log:
+- flags for 3dsloader_g3d
+
+Modified: trunk/example/Makefile.am
+===================================================================
+--- trunk/example/Makefile.am	2006-06-02 18:52:36 UTC (rev 315)
++++ trunk/example/Makefile.am	2006-06-02 19:50:51 UTC (rev 316)
+@@ -19,9 +19,9 @@
+ 3dsloader_g3d_SOURCES=	3dsloader_g3d.c
+ 
+ CPPFLAGS=		-I$(top_srcdir)/server -I$(top_srcdir)/libs3d 
+-3dsloader_g3d_CFLAGS=	-I$(top_srcdir)/libs3d/libg3d/include
++LIBS=			$(top_builddir)/libs3d/libs3d.la  
++3dsloader_g3d_CFLAGS=	-I$(top_srcdir)/libs3d/libg3d/include @GLIB_CFLAGS@
+ widgets_CFLAGS=			-I$(top_srcdir)/libs3dw 
+-LIBS=			$(top_builddir)/libs3d/libs3d.la  
+ widgets_LDFLAGS=		$(top_builddir)/libs3dw/libs3dw.la
+ 3dsloader_g3d_LDFLAGS=	$(top_builddir)/libs3d/libg3d/src/libg3d.la
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000308.html">[S3d-svn] r315 - in trunk: . example libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000310.html">[S3d-svn] r317 - trunk/example
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#309">[ date ]</a>
+              <a href="thread.html#309">[ thread ]</a>
+              <a href="subject.html#309">[ subject ]</a>
+              <a href="author.html#309">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

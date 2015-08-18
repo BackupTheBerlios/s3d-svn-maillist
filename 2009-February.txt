@@ -1,0 +1,67 @@
+From lazhur at mail.berlios.de  Sun Feb 15 12:08:17 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun, 15 Feb 2009 12:08:17 +0100
+Subject: [S3d-svn] r1053 - in trunk: cmake/modules libs3d
+Message-ID: <200902151108.n1FB8H6A015991@sheep.berlios.de>
+
+Author: lazhur
+Date: 2009-02-15 12:08:16 +0100 (Sun, 15 Feb 2009)
+New Revision: 1053
+
+Modified:
+   trunk/cmake/modules/FindG3D.cmake
+   trunk/libs3d/modelread.c
+Log:
+Transform g3d model orientation to s3d orientation
+
+libg3d changed the model orientation in rev378 (precedes libg3d 0.0.7).
+All s3d programs expect a different rotation around the x axis and we
+should give them their data as before.
+g3d_model_transform is a new function in libg3d 0.0.7 so we need to
+depend at least on that version.
+
+Modified: trunk/cmake/modules/FindG3D.cmake
+===================================================================
+--- trunk/cmake/modules/FindG3D.cmake	2008-12-24 20:33:15 UTC (rev 1052)
++++ trunk/cmake/modules/FindG3D.cmake	2009-02-15 11:08:16 UTC (rev 1053)
+@@ -38,5 +38,5 @@
+ else (G3D_LIBRARIES AND G3D_INCLUDE_DIRS)
+ 	find_package(PkgConfig)
+ 
+-	pkg_search_module(G3D libg3d>=0.0.6)
++	pkg_search_module(G3D libg3d>=0.0.7)
+ endif (G3D_LIBRARIES AND G3D_INCLUDE_DIRS)
+
+Modified: trunk/libs3d/modelread.c
+===================================================================
+--- trunk/libs3d/modelread.c	2008-12-24 20:33:15 UTC (rev 1052)
++++ trunk/libs3d/modelread.c	2009-02-15 11:08:16 UTC (rev 1053)
+@@ -25,6 +25,7 @@
+ #include "s3d.h"
+ #include "s3dlib.h"
+ #include <g3d/g3d.h>
++#include <g3d/matrix.h>
+ #include <stdlib.h>   /*  exit(), malloc() */
+ #include <math.h>   /*  sqrt() */
+ #include <string.h>   /*  strncpy() */
+@@ -129,6 +130,7 @@
+ 	G3DObject     *object;
+ 	G3DFace     *face;
+ 	GSList      *oitem, *oface;
++	G3DMatrix rmatrix[16];
+ 	struct material2texture *mat2tex;
+ 	unsigned int i, k;
+ 	int       j, material_count, texture_count, voff, obj_id;
+@@ -143,6 +145,9 @@
+ 	model = g3d_model_load_full(context, file, 0);
+ 
+ 	if (model) {
++		g3d_matrix_identity(rmatrix);
++		g3d_matrix_rotate_xyz(G_PI * 90.0 / 180, 0.0, 0.0, rmatrix);
++		g3d_model_transform(model, rmatrix);
+ 
+ 		oitem = model->objects;
+ 		obj_id = s3d_new_object();
+
+
+

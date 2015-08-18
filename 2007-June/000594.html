@@ -1,0 +1,911 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r599 - in branches/s3d-cmake: . Documentation	Documentation/libg3d Documentation/libg3d/api	Documentation/libs3d Documentation/libs3dw	Documentation/manpages Documentation/server apps apps/dot_mcp	apps/kism3d apps/meshs3d apps/olsrs3d apps/s3d_x11gate	apps/s3dfm apps/s3dosm apps/s3dvt cmake cmake/modules example	libs3d libs3dw objs server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r599%20-%20in%20branches/s3d-cmake%3A%20.%20Documentation%0A%09Documentation/libg3d%20Documentation/libg3d/api%0A%09Documentation/libs3d%20Documentation/libs3dw%0A%09Documentation/manpages%20Documentation/server%20apps%20apps/dot_mcp%0A%09apps/kism3d%20apps/meshs3d%20apps/olsrs3d%20apps/s3d_x11gate%0A%09apps/s3dfm%20apps/s3dosm%20apps/s3dvt%20cmake%20cmake/modules%20example%0A%09libs3d%20libs3dw%20objs%20server&In-Reply-To=%3C200706252155.l5PLtr1x022873%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000591.html">
+   <LINK REL="Next"  HREF="000599.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r599 - in branches/s3d-cmake: . Documentation	Documentation/libg3d Documentation/libg3d/api	Documentation/libs3d Documentation/libs3dw	Documentation/manpages Documentation/server apps apps/dot_mcp	apps/kism3d apps/meshs3d apps/olsrs3d apps/s3d_x11gate	apps/s3dfm apps/s3dosm apps/s3dvt cmake cmake/modules example	libs3d libs3dw objs server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r599%20-%20in%20branches/s3d-cmake%3A%20.%20Documentation%0A%09Documentation/libg3d%20Documentation/libg3d/api%0A%09Documentation/libs3d%20Documentation/libs3dw%0A%09Documentation/manpages%20Documentation/server%20apps%20apps/dot_mcp%0A%09apps/kism3d%20apps/meshs3d%20apps/olsrs3d%20apps/s3d_x11gate%0A%09apps/s3dfm%20apps/s3dosm%20apps/s3dvt%20cmake%20cmake/modules%20example%0A%09libs3d%20libs3dw%20objs%20server&In-Reply-To=%3C200706252155.l5PLtr1x022873%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r599 - in branches/s3d-cmake: . Documentation	Documentation/libg3d Documentation/libg3d/api	Documentation/libs3d Documentation/libs3dw	Documentation/manpages Documentation/server apps apps/dot_mcp	apps/kism3d apps/meshs3d apps/olsrs3d apps/s3d_x11gate	apps/s3dfm apps/s3dosm apps/s3dvt cmake cmake/modules example	libs3d libs3dw objs server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Jun 25 23:55:53 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000591.html">[S3d-svn] r600 - branches/s3d-cmake/objs
+</A></li>
+        <LI>Next message: <A HREF="000599.html">[S3d-svn] r601 - in branches/s3d-cmake: . apps/dot_mcp apps/kism3d	apps/meshs3d apps/olsrs3d apps/s3d_x11gate apps/s3dfm	apps/s3dosm apps/s3dvt libs3d libs3dw objs server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#594">[ date ]</a>
+              <a href="thread.html#594">[ thread ]</a>
+              <a href="subject.html#594">[ subject ]</a>
+              <a href="author.html#594">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-06-25 23:55:50 +0200 (Mon, 25 Jun 2007)
+New Revision: 599
+
+Added:
+   branches/s3d-cmake/CMakeLists.txt
+   branches/s3d-cmake/ConfigureChecks.cmake
+   branches/s3d-cmake/Documentation/CMakeLists.txt
+   branches/s3d-cmake/Documentation/libg3d/CMakeLists.txt
+   branches/s3d-cmake/Documentation/libg3d/api/CMakeLists.txt
+   branches/s3d-cmake/Documentation/libs3d/CMakeLists.txt
+   branches/s3d-cmake/Documentation/libs3dw/CMakeLists.txt
+   branches/s3d-cmake/Documentation/manpages/CMakeLists.txt
+   branches/s3d-cmake/Documentation/server/CMakeLists.txt
+   branches/s3d-cmake/apps/CMakeLists.txt
+   branches/s3d-cmake/apps/dot_mcp/CMakeLists.txt
+   branches/s3d-cmake/apps/kism3d/CMakeLists.txt
+   branches/s3d-cmake/apps/meshs3d/CMakeLists.txt
+   branches/s3d-cmake/apps/olsrs3d/CMakeLists.txt
+   branches/s3d-cmake/apps/s3d_x11gate/CMakeLists.txt
+   branches/s3d-cmake/apps/s3dfm/CMakeLists.txt
+   branches/s3d-cmake/apps/s3dosm/CMakeLists.txt
+   branches/s3d-cmake/apps/s3dvt/CMakeLists.txt
+   branches/s3d-cmake/cmake/
+   branches/s3d-cmake/cmake/CMakeLists.txt
+   branches/s3d-cmake/cmake/modules/
+   branches/s3d-cmake/cmake/modules/CMakeLists.txt
+   branches/s3d-cmake/cmake/modules/FindFREETYPE.cmake
+   branches/s3d-cmake/cmake/modules/FindFontconfig.cmake
+   branches/s3d-cmake/cmake/modules/FindG3D.cmake
+   branches/s3d-cmake/cmake/modules/FindGLIB.cmake
+   branches/s3d-cmake/cmake/modules/SetCCWarnFlags.cmake
+   branches/s3d-cmake/cmake/modules/TestForSHM.cmake
+   branches/s3d-cmake/cmake/modules/TestForSIGS.cmake
+   branches/s3d-cmake/cmake/modules/TestForTCP.cmake
+   branches/s3d-cmake/config.h.cmake
+   branches/s3d-cmake/example/CMakeLists.txt
+   branches/s3d-cmake/libs3d/CMakeLists.txt
+   branches/s3d-cmake/libs3dw/CMakeLists.txt
+   branches/s3d-cmake/objs/CMakeLists.txt
+   branches/s3d-cmake/server/CMakeLists.txt
+Modified:
+   branches/s3d-cmake/TODO
+   branches/s3d-cmake/libs3d/config.h
+   branches/s3d-cmake/libs3d/s3dlib.h
+   branches/s3d-cmake/libs3d/sei_construct.c
+   branches/s3d-cmake/libs3d/sei_misc.c
+   branches/s3d-cmake/libs3d/sei_monotone.c
+   branches/s3d-cmake/libs3d/sei_tri.c
+   branches/s3d-cmake/server/config.h
+Log:
+- Add basic cmake stuff to compile most things
+
+
+Added: branches/s3d-cmake/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/CMakeLists.txt	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/CMakeLists.txt	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,20 @@
++project(s3d)
++
++# set path to objects
++set(OBJECTPATH &quot;${CMAKE_INSTALL_PREFIX}/objs:${CMAKE_CURRENT_SOURCE_DIR}/objs&quot;)
++
++# Run configure stuff
++include(ConfigureChecks.cmake)
++
++# Set some compiler flags
++include(SetCCWarnFlags)
++
++add_subdirectory(apps)
++add_subdirectory(cmake)
++add_subdirectory(Documentation)
++add_subdirectory(example)
++add_subdirectory(libs3d)
++add_subdirectory(libs3dw)
++add_subdirectory(objs)
++add_subdirectory(server)
++
+
+Added: branches/s3d-cmake/ConfigureChecks.cmake
+===================================================================
+--- branches/s3d-cmake/ConfigureChecks.cmake	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/ConfigureChecks.cmake	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,92 @@
++# Add directory with library checks to search path
++set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
++
++
++# find required lib and add include dir for FREETYPE
++find_package(FREETYPE REQUIRED)
++include_directories(${FREETYPE_INCLUDE_DIR})
++
++
++# find required lib and add include dir for FONTCONFIG
++find_package(Fontconfig REQUIRED)
++include_directories(${FONTCONFIG_INCLUDE_DIR})
++
++
++# find required lib and add include dir for GLIB
++find_package(GLIB REQUIRED)
++include_directories(${GLIB2_INCLUDE_DIR})
++add_definitions(${GLIB2_DEFINITIONS})
++
++
++# find required lib and add include dir for G3D
++find_package(G3D REQUIRED)
++include_directories(${G3D_INCLUDE_DIR})
++add_definitions(${G3D_DEFINITIONS})
++
++
++# find required lib and add include dir for OPENGL
++find_package(OpenGL REQUIRED)
++include_directories(${OPENGL_INCLUDE_DIR})
++
++## FindOpenGL.cmake doesnt support REQUIRED in cmake 2.4
++if (NOT OPENGL_FOUND)
++	message(FATAL_ERROR &quot;Could not find OpenGL-Header and/or OpenGL-Libs&quot;)
++endif (NOT OPENGL_FOUND)
++
++
++# try to find lib and add include dir for GLUT
++find_package(GLUT)
++if (GLUT_FOUND)
++	include_directories(${GLUT_INCLUDE_DIR})
++	set(G_GLUT GLUT_FOUND)
++endif (GLUT_FOUND)
++
++# try to find lib and add include dir for SDL
++find_package(SDL)
++if (SDL_FOUND)
++	include_directories(${SDL_INCLUDE_DIR})
++	set(G_SDL SDL_FOUND)
++endif (SDL_FOUND)
++
++# we need SDL and/or GLUT
++if (NOT SDL_FOUND AND NOT GLUT_FOUND)
++	message(FATAL_ERROR &quot;Could NOT find SDL or GLUT&quot;)
++endif (NOT SDL_FOUND AND NOT GLUT_FOUND)
++
++
++# try to find lib and add include dir for LibXml2
++find_package(LibXml2)
++if (LIBXML2_FOUND)
++	include_directories(${LIBXML2_INCLUDE_DIR})
++	add_definitions(${LIBXML2_DEFINITIONS})
++endif (LIBXML2_FOUND)
++
++
++# test for shm
++include(TestForSHM)
++if (HAVE_SHM)
++	set(SHM HAVE_SHM)
++endif (HAVE_SHM)
++
++
++# test for signal
++include(TestForSIGS)
++if (HAVE_SIGS)
++	set(SIGS HAVE_SIGS)
++endif (HAVE_SIGS)
++
++
++# test for socket
++include(TestForTCP)
++if (HAVE_TCP)
++	set(TCP HAVE_TCP)
++endif (HAVE_TCP)
++
++
++# link always against math library
++link_libraries(m)
++
++
++# Create config.h and add path to config.h to include search path
++configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
++include_directories(${CMAKE_CURRENT_BINARY_DIR})
+\ No newline at end of file
+
+Added: branches/s3d-cmake/Documentation/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/Documentation/CMakeLists.txt	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/Documentation/CMakeLists.txt	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,5 @@
++add_subdirectory(libg3d)
++add_subdirectory(libs3d)
++add_subdirectory(libs3dw)
++add_subdirectory(manpages)
++add_subdirectory(server)
+
+Added: branches/s3d-cmake/Documentation/libg3d/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/Documentation/libg3d/CMakeLists.txt	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/Documentation/libg3d/CMakeLists.txt	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1 @@
++add_subdirectory(api)
+
+Added: branches/s3d-cmake/Documentation/libg3d/api/CMakeLists.txt
+===================================================================
+
+Added: branches/s3d-cmake/Documentation/libs3d/CMakeLists.txt
+===================================================================
+
+Added: branches/s3d-cmake/Documentation/libs3dw/CMakeLists.txt
+===================================================================
+
+Added: branches/s3d-cmake/Documentation/manpages/CMakeLists.txt
+===================================================================
+
+Added: branches/s3d-cmake/Documentation/server/CMakeLists.txt
+===================================================================
+
+Modified: branches/s3d-cmake/TODO
+===================================================================
+--- branches/s3d-cmake/TODO	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/TODO	2007-06-25 21:55:50 UTC (rev 599)
+@@ -2,18 +2,10 @@
+ 	* FULLSCREEN!
+ dot_mcp:
+ 	* sane paths for applications
+-autotools:
+-	* OBJECTPATH for finding the object?
+-	* ./configure: line 23422: HAVE_PTHREAD: command not found &lt; huh?
+-	* ./configure: line 22373: MDL_HAVE_OPENGL: command not found
++cmake:
+ 	* Build the documentation (to html at least) if the user has
+ 	  docbook stuff installed.
+-	* hand down DEBUG-flag to libg3d if available
+-	* &quot;-Wall -pedantic&quot; default in CFLAGS? (if possible)
+-	* --enable-debug not honored when CFLAGS is set?
+-	* We should perhaps check for the correct versions of
+-	  autotools to avoid some confusion about some warnings.
+-	  At the time of writing, supported are:
+-	   automake 1.9, autoconf 2.59, libtool 1.5
++	* -DDEBUG=LOW (word or number)
++	* -DPROFILING
+ 	* verify the autogenerated s3drc.
+ 	* Apple todo: won't find -lX11 (for s3d_x11gate) while compiling
+
+Added: branches/s3d-cmake/apps/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/apps/CMakeLists.txt	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/apps/CMakeLists.txt	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,8 @@
++add_subdirectory(dot_mcp)
++add_subdirectory(kism3d)
++add_subdirectory(meshs3d)
++add_subdirectory(olsrs3d)
++add_subdirectory(s3dfm)
++add_subdirectory(s3dosm)
++add_subdirectory(s3dvt)
++add_subdirectory(s3d_x11gate)
+
+Added: branches/s3d-cmake/apps/dot_mcp/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/apps/dot_mcp/CMakeLists.txt	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/apps/dot_mcp/CMakeLists.txt	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,4 @@
++include_directories(${CMAKE_SOURCE_DIR}/libs3d)
++
++add_executable(dot_mpc main.c menu.c)
++target_link_libraries(dot_mpc s3d)
+\ No newline at end of file
+
+Added: branches/s3d-cmake/apps/kism3d/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/apps/kism3d/CMakeLists.txt	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/apps/kism3d/CMakeLists.txt	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,4 @@
++include_directories(${CMAKE_SOURCE_DIR}/libs3d ${CMAKE_SOURCE_DIR}/libs3dw)
++
++add_executable(kism3d client.c gui.c kism3d.c network.c)
++target_link_libraries(kism3d s3d s3dw)
+\ No newline at end of file
+
+Added: branches/s3d-cmake/apps/meshs3d/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/apps/meshs3d/CMakeLists.txt	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/apps/meshs3d/CMakeLists.txt	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,4 @@
++include_directories(${CMAKE_SOURCE_DIR}/libs3d ${CMAKE_SOURCE_DIR}/libs3dw)
++
++add_executable(meshs3d hash.c main.c net.c process.c)
++target_link_libraries(meshs3d s3d s3dw)
+\ No newline at end of file
+
+Added: branches/s3d-cmake/apps/olsrs3d/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/apps/olsrs3d/CMakeLists.txt	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/apps/olsrs3d/CMakeLists.txt	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,4 @@
++include_directories(${CMAKE_SOURCE_DIR}/libs3d ${CMAKE_SOURCE_DIR}/libs3dw)
++
++add_executable(olsrs3d main.c net.c process.c search.c)
++target_link_libraries(olsrs3d s3d s3dw)
+\ No newline at end of file
+
+Added: branches/s3d-cmake/apps/s3d_x11gate/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/apps/s3d_x11gate/CMakeLists.txt	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/apps/s3d_x11gate/CMakeLists.txt	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,4 @@
++#include_directories(${CMAKE_SOURCE_DIR}/libs3d ${CMAKE_SOURCE_DIR}/libs3dw)
++
++#add_executable(s3d_x11gate s3d_x11gate.c)
++#target_link_libraries(s3d_x11gate s3d s3dw)
+\ No newline at end of file
+
+Added: branches/s3d-cmake/apps/s3dfm/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/apps/s3dfm/CMakeLists.txt	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/apps/s3dfm/CMakeLists.txt	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,5 @@
++include_directories(${CMAKE_SOURCE_DIR}/libs3d ${CMAKE_SOURCE_DIR}/libs3dw)
++
++add_executable(s3dfm animation.c box.c dialog.c event.c fly.c focus.c fs.c
++	icon.c main.c node.c parse.c string.c)
++target_link_libraries(s3dfm s3d s3dw)
+\ No newline at end of file
+
+Added: branches/s3d-cmake/apps/s3dosm/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/apps/s3dosm/CMakeLists.txt	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/apps/s3dosm/CMakeLists.txt	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,7 @@
++#include_directories(${CMAKE_SOURCE_DIR}/libs3d ${CMAKE_SOURCE_DIR}/libs3dw)
++#
++#add_executable(s3dosm db.c draw.c gps.c http_error_codes.c http_fetcher.c#
++#	io.c kismet.c main.c nav.c net.c object.c olsrs3d.c osm.c
++#	process.c search.c tag.c ui.c)
++
++#target_link_libraries(s3dosm s3d s3dw)
+\ No newline at end of file
+
+Added: branches/s3d-cmake/apps/s3dvt/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/apps/s3dvt/CMakeLists.txt	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/apps/s3dvt/CMakeLists.txt	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,4 @@
++include_directories(${CMAKE_SOURCE_DIR}/libs3d)
++
++add_executable(s3dvt main.c terminal.c)
++target_link_libraries(s3dvt s3d)
+\ No newline at end of file
+
+Added: branches/s3d-cmake/cmake/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/cmake/CMakeLists.txt	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/cmake/CMakeLists.txt	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,2 @@
++add_subdirectory(modules)
++
+
+Added: branches/s3d-cmake/cmake/modules/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/cmake/modules/CMakeLists.txt	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/cmake/modules/CMakeLists.txt	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1 @@
++ 
+
+Added: branches/s3d-cmake/cmake/modules/FindFREETYPE.cmake
+===================================================================
+--- branches/s3d-cmake/cmake/modules/FindFREETYPE.cmake	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/cmake/modules/FindFREETYPE.cmake	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,55 @@
++# Try to find FreeType
++#  FREETYPE_FOUND - If false, do not try to use FREETYPE.
++#  FREETYPE_INCLUDE_DIR - where to find freetype/config/ftheader.h and ft2build.h, etc.
++#  FREETYPE_LIBRARIES - the libraries to link against
++#  FREETYPE_DEFINITIONS - switches required for FREETYPE
++
++
++if (FREETYPE_LIBRARIES AND FREETYPE_INCLUDE_DIR)
++	# path set by user or was found in the past
++	set(FREETYPE_FOUND TRUE)
++else (FREETYPE_LIBRARIES AND FREETYPE_INCLUDE_DIR)
++	include(UsePkgConfig)
++
++	pkgconfig(freetype2 _IncDir _LinkDir _LinkFlags _CFlags)
++	set(FREETYPE_DEFINITIONS ${_CFlags})
++	
++	find_path(FREETYPENORMAL_INCLUDE_DIR
++		NAMES freetype/config/ftheader.h
++		PATHS
++			${_IncDir}
++			${_IncDir}/freetype2
++	)
++	
++	find_path(FREETYPECONFIG_INCLUDE_DIR
++		NAMES ft2build.h
++		PATHS
++			${_IncDir}
++	)
++
++	find_library(FREETYPE_LIBRARIES
++		NAMES freetype
++		PATHS ${_LinkDir}
++	)
++	
++	if (FREETYPENORMAL_INCLUDE_DIR AND FREETYPECONFIG_INCLUDE_DIR)
++		set(FREETYPE_INCLUDE_DIR ${FREETYPENORMAL_INCLUDE_DIR} ${FREETYPECONFIG_INCLUDE_DIR})
++	endif (FREETYPENORMAL_INCLUDE_DIR AND FREETYPECONFIG_INCLUDE_DIR)
++
++	if (FREETYPE_INCLUDE_DIR AND FREETYPE_LIBRARIES)
++		set(FREETYPE_FOUND TRUE)
++	endif (FREETYPE_INCLUDE_DIR AND FREETYPE_LIBRARIES)
++
++	if (FREETYPE_FOUND)
++		if (NOT FREETYPE_FIND_QUIETLY)
++			message(STATUS &quot;Found FREETYPE: ${FREETYPE_LIBRARIES}&quot;)
++		endif (NOT FREETYPE_FIND_QUIETLY)
++	else (FREETYPE_FOUND)
++		if (FREETYPE_FIND_REQUIRED)
++			message(FATAL_ERROR &quot;Could not find FREETYPE&quot;)
++		endif (FREETYPE_FIND_REQUIRED)
++	endif (FREETYPE_FOUND)
++
++ 	mark_as_advanced(FREETYPE_INCLUDE_DIR FREETYPE_LIBRARIES FREETYPENORMAL_INCLUDE_DIR FREETYPECONFIG_INCLUDE_DIR)
++
++endif (FREETYPE_LIBRARIES AND FREETYPE_INCLUDE_DIR)
+\ No newline at end of file
+
+Added: branches/s3d-cmake/cmake/modules/FindFontconfig.cmake
+===================================================================
+--- branches/s3d-cmake/cmake/modules/FindFontconfig.cmake	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/cmake/modules/FindFontconfig.cmake	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,44 @@
++# Try to find Fontconfig
++#  FONTCONFIG_FOUND - If false, do not try to use FONTCONFIG.
++#  FONTCONFIG_INCLUDE_DIR - where to find fontconfig/fontconfig.h
++#  FONTCONFIG_LIBRARIES - the libraries to link against
++#  FONTCONFIG_DEFINITIONS - switches required for FONTCONFIG
++
++
++if (FONTCONFIG_LIBRARIES AND FONTCONFIG_INCLUDE_DIR)
++	# path set by user or was found in the past
++	set(FONTCONFIG_FOUND TRUE)
++else (FONTCONFIG_LIBRARIES AND FONTCONFIG_INCLUDE_DIR)
++	include(UsePkgConfig)
++
++	pkgconfig(fontconfig _IncDir _LinkDir _LinkFlags _CFlags)
++	set(FONTCONFIG_DEFINITIONS ${_CFlags})
++	
++	find_path(FONTCONFIG_INCLUDE_DIR
++		NAMES fontconfig/fontconfig.h
++		PATHS
++			${_IncDir}
++	)
++
++	find_library(FONTCONFIG_LIBRARIES
++		NAMES fontconfig
++		PATHS ${_LinkDir}
++	)
++
++	if (FONTCONFIG_INCLUDE_DIR AND FONTCONFIG_LIBRARIES)
++		set(FONTCONFIG_FOUND TRUE)
++	endif (FONTCONFIG_INCLUDE_DIR AND FONTCONFIG_LIBRARIES)
++
++	if (FONTCONFIG_FOUND)
++		if (NOT FONTCONFIG_FIND_QUIETLY)
++			message(STATUS &quot;Found FONTCONFIG: ${FONTCONFIG_LIBRARIES}&quot;)
++		endif (NOT FONTCONFIG_FIND_QUIETLY)
++	else (FONTCONFIG_FOUND)
++		if (FONTCONFIG_FIND_REQUIRED)
++			message(FATAL_ERROR &quot;Could not find FONTCONFIG&quot;)
++		endif (FONTCONFIG_FIND_REQUIRED)
++	endif (FONTCONFIG_FOUND)
++
++ 	mark_as_advanced(FONTCONFIG_INCLUDE_DIR FONTCONFIG_LIBRARIES)
++
++endif (FONTCONFIG_LIBRARIES AND FONTCONFIG_INCLUDE_DIR)
+\ No newline at end of file
+
+Added: branches/s3d-cmake/cmake/modules/FindG3D.cmake
+===================================================================
+--- branches/s3d-cmake/cmake/modules/FindG3D.cmake	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/cmake/modules/FindG3D.cmake	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,44 @@
++# Try to find G3D
++#  G3D_FOUND - If false, do not try to use G3D.
++#  G3D_INCLUDE_DIR - where to find g3d/g3d.h
++#  G3D_LIBRARIES - the libraries to link against
++#  G3D_DEFINITIONS - switches required for G3D
++
++
++if (G3D_LIBRARIES AND G3D_INCLUDE_DIR)
++	# path set by user or was found in the past
++	set(G3D_FOUND TRUE)
++else (G3D_LIBRARIES AND G3D_INCLUDE_DIR)
++	include(UsePkgConfig)
++
++	pkgconfig(libg3d _IncDir _LinkDir _LinkFlags _CFlags)
++	set(G3D_DEFINITIONS ${_CFlags})
++	
++	find_path(G3D_INCLUDE_DIR
++		NAMES g3d/g3d.h
++		PATHS
++			${_IncDir}
++	)
++
++	find_library(G3D_LIBRARIES
++		NAMES g3d
++		PATHS ${_LinkDir}
++	)
++
++	if (G3D_INCLUDE_DIR AND G3D_LIBRARIES)
++		set(G3D_FOUND TRUE)
++	endif (G3D_INCLUDE_DIR AND G3D_LIBRARIES)
++
++	if (G3D_FOUND)
++		if (NOT G3D_FIND_QUIETLY)
++			message(STATUS &quot;Found G3D: ${G3D_LIBRARIES}&quot;)
++		endif (NOT G3D_FIND_QUIETLY)
++	else (G3D_FOUND)
++		if (G3D_FIND_REQUIRED)
++			message(FATAL_ERROR &quot;Could not find G3D&quot;)
++		endif (G3D_FIND_REQUIRED)
++	endif (G3D_FOUND)
++
++ 	mark_as_advanced(G3D_INCLUDE_DIR G3D_LIBRARIES)
++
++endif (G3D_LIBRARIES AND G3D_INCLUDE_DIR)
+\ No newline at end of file
+
+Added: branches/s3d-cmake/cmake/modules/FindGLIB.cmake
+===================================================================
+--- branches/s3d-cmake/cmake/modules/FindGLIB.cmake	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/cmake/modules/FindGLIB.cmake	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,60 @@
++# Try to find GLIB2
++#  GLIB2_FOUND - If false, do not try to use GLIB2.
++#  GLIB2_INCLUDE_DIR - where to find glib.h and glibconfig.h, etc.
++#  GLIB2_LIBRARIES - the libraries to link against
++#  GLIB2_DEFINITIONS - switches required for GLIB2
++
++
++if (GLIB2_LIBRARIES AND GLIB2_INCLUDE_DIR)
++	# path set by user or was found in the past
++	set(GLIB2_FOUND TRUE)
++else (GLIB2_LIBRARIES AND GLIB2_INCLUDE_DIR)
++	include(UsePkgConfig)
++
++	pkgconfig(glib-2.0 _IncDir _LinkDir _LinkFlags _CFlags)
++	set(GLIB2_DEFINITIONS ${_CFlags})
++	
++	find_path(GLIBNORMAL_INCLUDE_DIR
++		NAMES glib.h
++		PATHS
++			${_IncDir}
++			${_IncDir}/glib-2.0
++			${_IncDir}/glib-2.0/include
++	)
++	
++	find_path(GLIBCONFIG_INCLUDE_DIR
++		NAMES glibconfig.h
++		PATHS
++			${_IncDir}
++			${_IncDir}/glib-2.0
++			${_IncDir}/glib-2.0/include
++			${_LinkDir}/glib-2.0
++			${_LinkDir}/glib-2.0/include
++	)
++
++	find_library(GLIB2_LIBRARIES
++		NAMES glib-2.0
++		PATHS ${_LinkDir}
++	)
++	
++	if (GLIBNORMAL_INCLUDE_DIR AND GLIBCONFIG_INCLUDE_DIR)
++		set(GLIB2_INCLUDE_DIR ${GLIBNORMAL_INCLUDE_DIR} ${GLIBCONFIG_INCLUDE_DIR})
++	endif (GLIBNORMAL_INCLUDE_DIR AND GLIBCONFIG_INCLUDE_DIR)
++
++	if (GLIB2_INCLUDE_DIR AND GLIB2_LIBRARIES)
++		set(GLIB2_FOUND TRUE)
++	endif (GLIB2_INCLUDE_DIR AND GLIB2_LIBRARIES)
++
++	if (GLIB2_FOUND)
++		if (NOT GLIB2_FIND_QUIETLY)
++			message(STATUS &quot;Found GLIB2: ${GLIB2_LIBRARIES}&quot;)
++		endif (NOT GLIB2_FIND_QUIETLY)
++	else (GLIB2_FOUND)
++		if (GLIB2_FIND_REQUIRED)
++			message(FATAL_ERROR &quot;Could not find GLIB2&quot;)
++		endif (GLIB2_FIND_REQUIRED)
++	endif (GLIB2_FOUND)
++
++ 	mark_as_advanced(GLIB2_INCLUDE_DIR GLIB2_LIBRARIES GLIBNORMAL_INCLUDE_DIR GLIBCONFIG_INCLUDE_DIR)
++
++endif (GLIB2_LIBRARIES AND GLIB2_INCLUDE_DIR)
+\ No newline at end of file
+
+Added: branches/s3d-cmake/cmake/modules/SetCCWarnFlags.cmake
+===================================================================
+--- branches/s3d-cmake/cmake/modules/SetCCWarnFlags.cmake	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/cmake/modules/SetCCWarnFlags.cmake	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,19 @@
++include(CheckCCompilerFlag)
++
++# Enable all warnings if possible (gnu cc)
++check_c_compiler_flag(&quot;-Wall&quot; SUPPORT_WALL)
++if (SUPPORT_WALL)
++	add_definitions(&quot;-Wall&quot;)
++endif (SUPPORT_WALL)
++
++# Enable even more warnings if possible (gnu cc)
++check_c_compiler_flag(&quot;-Wextra&quot; SUPPORT_WEXTRA)
++if (SUPPORT_WEXTRA)
++	add_definitions(&quot;-Wextra&quot;)
++endif (SUPPORT_WEXTRA)
++
++# Enable pedantic mode if possible (gnu cc)
++check_c_compiler_flag(&quot;-pedantic&quot; SUPPORT_PEDANTIC)
++if (SUPPORT_PEDANTIC)
++	add_definitions(&quot;-pedantic&quot;)
++endif (SUPPORT_PEDANTIC)
+\ No newline at end of file
+
+Added: branches/s3d-cmake/cmake/modules/TestForSHM.cmake
+===================================================================
+--- branches/s3d-cmake/cmake/modules/TestForSHM.cmake	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/cmake/modules/TestForSHM.cmake	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1 @@
++check_function_exists(shmget HAVE_SHM)
+\ No newline at end of file
+
+Added: branches/s3d-cmake/cmake/modules/TestForSIGS.cmake
+===================================================================
+--- branches/s3d-cmake/cmake/modules/TestForSIGS.cmake	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/cmake/modules/TestForSIGS.cmake	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1 @@
++check_function_exists(signal HAVE_SIGS)
+
+Added: branches/s3d-cmake/cmake/modules/TestForTCP.cmake
+===================================================================
+--- branches/s3d-cmake/cmake/modules/TestForTCP.cmake	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/cmake/modules/TestForTCP.cmake	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1 @@
++check_function_exists(socket HAVE_TCP)
+
+Added: branches/s3d-cmake/config.h.cmake
+===================================================================
+--- branches/s3d-cmake/config.h.cmake	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/config.h.cmake	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,16 @@
++#ifndef _CONFIG_H_
++#define _CONFIG_H_
++
++/* config.h.  Generated by cmake from config.h.cmake */
++
++#cmakedefine G_GLUT 1
++#cmakedefine G_SDL 1
++#cmakedefine HAVE_GPS 1
++#cmakedefine SHM 1
++#cmakedefine SIGS 1
++#cmakedefine TCP 1
++
++/* path where to find objects */
++#cmakedefine OBJECTPATH &quot;${OBJECTPATH}&quot;
++
++#endif /* _CONFIG_H_ */
+\ No newline at end of file
+
+Added: branches/s3d-cmake/example/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/example/CMakeLists.txt	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/example/CMakeLists.txt	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,44 @@
++include_directories(${CMAKE_SOURCE_DIR}/libs3d ${CMAKE_SOURCE_DIR}/libs3dw)
++
++add_executable(filebrowser filebrowser.c)
++target_link_libraries(filebrowser s3d)
++
++add_executable(hudtest hudtest.c)
++target_link_libraries(hudtest s3d)
++
++add_executable(katze katze.c)
++target_link_libraries(katze s3d)
++
++add_executable(linetest linetest.c)
++target_link_libraries(linetest s3d)
++
++add_executable(modelloader modelloader.c)
++target_link_libraries(modelloader s3d)
++
++add_executable(nichtsnutz nichtsnutz.c)
++target_link_libraries(nichtsnutz s3d)
++
++add_executable(ptrtest ptrtest.c)
++target_link_libraries(ptrtest s3d)
++
++add_executable(radius_test radius_test.c)
++target_link_libraries(radius_test s3d)
++
++add_executable(s3dclock s3dclock.c)
++target_link_libraries(s3dclock s3d)
++
++add_executable(snowman snowman.c)
++target_link_libraries(snowman s3d)
++
++add_executable(strtest strtest.c)
++target_link_libraries(strtest s3d)
++
++add_executable(texturetest texturetest.c)
++target_link_libraries(texturetest s3d)
++
++add_executable(widgets widgets.c)
++target_link_libraries(widgets s3d s3dw)
++
++add_executable(wiresphere wiresphere.c)
++target_link_libraries(wiresphere s3d)
++
+
+Added: branches/s3d-cmake/libs3d/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/libs3d/CMakeLists.txt	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/libs3d/CMakeLists.txt	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,7 @@
++include_directories(${CMAKE_SOURCE_DIR}/server)
++
++add_library(s3d SHARED callback.c error.c event.c fontselect.c freetype.c
++	io.c modelread.c network.c object_queue.c proto_in.c proto_out.c
++	sei_construct.c sei_misc.c sei_monotone.c sei_tri.c shm.c
++	shm_ringbuf.c tcp.c vector.c)
++target_link_libraries(s3d ${G3D_LIBRARIES} ${FONTCONFIG_LIBRARIES})
+
+Modified: branches/s3d-cmake/libs3d/config.h
+===================================================================
+--- branches/s3d-cmake/libs3d/config.h	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/libs3d/config.h	2007-06-25 21:55:50 UTC (rev 599)
+@@ -23,7 +23,7 @@
+ 
+ 
+ /* use the global config.h */
+-#include &quot;../config.h&quot; 
++#include &lt;config.h&gt;
+ 
+ /*  this is definitly the better way to pick fonts. */
+ 
+
+Modified: branches/s3d-cmake/libs3d/s3dlib.h
+===================================================================
+--- branches/s3d-cmake/libs3d/s3dlib.h	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/libs3d/s3dlib.h	2007-06-25 21:55:50 UTC (rev 599)
+@@ -23,7 +23,7 @@
+ 
+ 
+ #include &lt;stdint.h&gt;
+-#include &quot;../config.h&quot;
++#include &lt;config.h&gt;
+ #ifdef __APPLE__ 
+ #ifdef SHM
+ #undef SHM
+
+Modified: branches/s3d-cmake/libs3d/sei_construct.c
+===================================================================
+--- branches/s3d-cmake/libs3d/sei_construct.c	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/libs3d/sei_construct.c	2007-06-25 21:55:50 UTC (rev 599)
+@@ -37,7 +37,7 @@
+  */
+ 
+ 
+-#include &lt;sei_triangulate.h&gt;
++#include &quot;sei_triangulate.h&quot;
+ #include &lt;math.h&gt;
+ #include &lt;string.h&gt; /* memset() */
+ 
+
+Modified: branches/s3d-cmake/libs3d/sei_misc.c
+===================================================================
+--- branches/s3d-cmake/libs3d/sei_misc.c	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/libs3d/sei_misc.c	2007-06-25 21:55:50 UTC (rev 599)
+@@ -37,7 +37,7 @@
+  */
+ 
+ 
+-#include &lt;sei_triangulate.h&gt;
++#include &quot;sei_triangulate.h&quot;
+ #include &lt;sys/time.h&gt;
+ #include &lt;math.h&gt;
+ 
+
+Modified: branches/s3d-cmake/libs3d/sei_monotone.c
+===================================================================
+--- branches/s3d-cmake/libs3d/sei_monotone.c	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/libs3d/sei_monotone.c	2007-06-25 21:55:50 UTC (rev 599)
+@@ -37,7 +37,7 @@
+  */
+ 
+ 
+-#include &lt;sei_triangulate.h&gt;
++#include &quot;sei_triangulate.h&quot;
+ #include &lt;math.h&gt;
+ #include &lt;string.h&gt; /* memset() */
+ 
+
+Modified: branches/s3d-cmake/libs3d/sei_tri.c
+===================================================================
+--- branches/s3d-cmake/libs3d/sei_tri.c	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/libs3d/sei_tri.c	2007-06-25 21:55:50 UTC (rev 599)
+@@ -37,7 +37,7 @@
+  */
+ 
+ 
+-#include &lt;sei_triangulate.h&gt;
++#include &quot;sei_triangulate.h&quot;
+ #include &lt;sys/time.h&gt;
+ #include &lt;string.h&gt; /* memset() */
+ 
+
+Added: branches/s3d-cmake/libs3dw/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/libs3dw/CMakeLists.txt	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/libs3dw/CMakeLists.txt	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,4 @@
++include_directories(${CMAKE_SOURCE_DIR}/libs3d ${CMAKE_SOURCE_DIR}/libs3dw)
++
++add_library(s3dw SHARED animate.c arrange.c button.c event.c input.c
++	label.c root.c scrollbar.c style.c surface.c textbox.c widget.c)
+
+Added: branches/s3d-cmake/objs/CMakeLists.txt
+===================================================================
+
+Added: branches/s3d-cmake/server/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/server/CMakeLists.txt	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/server/CMakeLists.txt	2007-06-25 21:55:50 UTC (rev 599)
+@@ -0,0 +1,8 @@
++add_executable(s3d-server allocate.c cull.c error.c event.c graphics.c
++	graphics_sdl.c main.c matrix.c mcp.c
++	navigation.c network.c object.c process.c proto.c shm.c
++	shm_ringbuf.c tcp.c user.c user_sdl.c)
++
++target_link_libraries(s3d-server ${OPENGL_LIBRARY} ${SDL_LIBRARY})
++
++#graphics_glut.c user_glut.c 
+
+Modified: branches/s3d-cmake/server/config.h
+===================================================================
+--- branches/s3d-cmake/server/config.h	2007-06-20 21:41:34 UTC (rev 598)
++++ branches/s3d-cmake/server/config.h	2007-06-25 21:55:50 UTC (rev 599)
+@@ -22,7 +22,7 @@
+  */
+ 
+ /* use the global config.h */
+-#include &quot;../config.h&quot; 
++#include &lt;config.h&gt; 
+ 
+ /*  to be filled with configure options ...  */
+ /*   */
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000591.html">[S3d-svn] r600 - branches/s3d-cmake/objs
+</A></li>
+	<LI>Next message: <A HREF="000599.html">[S3d-svn] r601 - in branches/s3d-cmake: . apps/dot_mcp apps/kism3d	apps/meshs3d apps/olsrs3d apps/s3d_x11gate apps/s3dfm	apps/s3dosm apps/s3dvt libs3d libs3dw objs server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#594">[ date ]</a>
+              <a href="thread.html#594">[ thread ]</a>
+              <a href="subject.html#594">[ subject ]</a>
+              <a href="author.html#594">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

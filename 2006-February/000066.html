@@ -1,0 +1,374 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r70 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r70%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602151624.k1FGOeFb009846%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000065.html">
+   <LINK REL="Next"  HREF="000067.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r70 - trunk/apps/olsrs3d</H1>
+    <B>marec at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r70%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602151624.k1FGOeFb009846%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r70 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Wed Feb 15 17:24:40 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000065.html">[S3d-svn] r69 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000067.html">[S3d-svn] r71 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#66">[ date ]</a>
+              <a href="thread.html#66">[ thread ]</a>
+              <a href="subject.html#66">[ subject ]</a>
+              <a href="author.html#66">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-02-15 17:24:37 +0100 (Wed, 15 Feb 2006)
+New Revision: 70
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/olsrs3d.h
+   trunk/apps/olsrs3d/process.c
+Log:
+hna networks
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-02-15 15:47:38 UTC (rev 69)
++++ trunk/apps/olsrs3d/main.c	2006-02-15 16:24:37 UTC (rev 70)
+@@ -17,7 +17,7 @@
+ 
+ int node_count=-1;
+ int alpha=0;
+-int Olsr_node_obj,Olsr_node_inet_obj,mesh;
++int Olsr_node_obj, Olsr_node_inet_obj, Olsr_node_hna_net, mesh;
+ float asp=1.0;
+ float bottom=-1.0;
+ float left=-1.0;
+@@ -25,7 +25,7 @@
+ float CamPosition[2][3];   /* CamPosition[trans|rot][x-z] */
+ float ZeroPosition[3] = {0,0,0};   /* current position zero position */
+ int ZeroPoint;   /* object zeropoint */
+-int ColorSwitch = 0;
++int ColorSwitch = 0;   /* enable/disable colored olsr connections */
+ 
+ 
+ 
+@@ -158,7 +158,7 @@
+ 	if ( olsr_node == NULL ) return;
+ 
+ 	/* olsr node shape has been modified */
+-	if ( olsr_node-&gt;inet_gw_modified ) {
++	if ( olsr_node-&gt;node_type_modified ) {
+ 
+ 		/* delete old shape */
+ 		if ( olsr_node-&gt;obj_id != -1 ) {
+@@ -170,9 +170,12 @@
+ 		if ( olsr_node-&gt;desc_id != -1 ) s3d_del_object( olsr_node-&gt;desc_id );
+ 
+ 		/* create new shape */
+-		if ( olsr_node-&gt;inet_gw ) {
++		if ( olsr_node-&gt;node_type == 1 ) {
+ 			/* olsr node offers internet access */
+ 			olsr_node-&gt;obj_id = s3d_clone( Olsr_node_inet_obj );
++		} else if ( olsr_node-&gt;node_type == 2 ) {
++			/* olsr node offers internet access */
++			olsr_node-&gt;obj_id = s3d_clone( Olsr_node_hna_net );
+ 		} else {
+ 			/* normal olsr node */
+ 			olsr_node-&gt;obj_id = s3d_clone( Olsr_node_obj );
+@@ -191,7 +194,7 @@
+ 		s3d_translate( olsr_node-&gt;desc_id, -f/2,-2,0 );
+ 		s3d_flags_on( olsr_node-&gt;desc_id, S3D_OF_VISIBLE );
+ 
+-		olsr_node-&gt;inet_gw_modified = 0;
++		olsr_node-&gt;node_type_modified = 0;
+ 
+ 	}
+ 
+@@ -200,30 +203,32 @@
+ 	while ( Obj_to_ip_curr != Obj_to_ip_end ) {
+ 
+ 		/* myself ... */
+-// 		if ( strncmp( Obj_to_ip_curr-&gt;olsr_node-&gt;ip, olsr_node-&gt;ip, NAMEMAX ) == 0 ) continue;
++// 		if ( strncmp( Obj_to_ip_curr-&gt;olsr_node-&gt;ip, olsr_node-&gt;ip, NAMEMAX ) != 0 ) {
+ 
+-		olsr_con_list = olsr_node-&gt;olsr_con_list;
+-		while ( olsr_con_list != NULL ) {
++			olsr_con_list = olsr_node-&gt;olsr_con_list;
++			while ( olsr_con_list != NULL ) {
+ 
+-			/* nodes are related */
+-			if ( ( strncmp( olsr_con_list-&gt;olsr_con-&gt;left_olsr_node-&gt;ip, Obj_to_ip_curr-&gt;olsr_node-&gt;ip, NAMEMAX ) == 0 ) || ( strncmp( olsr_con_list-&gt;olsr_con-&gt;right_olsr_node-&gt;ip, Obj_to_ip_curr-&gt;olsr_node-&gt;ip, NAMEMAX ) == 0 ) ) break;
++				/* nodes are related */
++				if ( ( strncmp( olsr_con_list-&gt;olsr_con-&gt;left_olsr_node-&gt;ip, Obj_to_ip_curr-&gt;olsr_node-&gt;ip, NAMEMAX ) == 0 ) || ( strncmp( olsr_con_list-&gt;olsr_con-&gt;right_olsr_node-&gt;ip, Obj_to_ip_curr-&gt;olsr_node-&gt;ip, NAMEMAX ) == 0 ) ) break;
+ 
+-			olsr_con_list = olsr_con_list-&gt;next_olsr_con_list;
++				olsr_con_list = olsr_con_list-&gt;next_olsr_con_list;
+ 
+-		}
++			}
+ 
+-		/* nodes are not related - so drift */
+-		if ( olsr_con_list == NULL ) {
++			/* nodes are not related - so drift */
++			if ( olsr_con_list == NULL ) {
+ 
+-			distance = dirt( olsr_node-&gt;pos_vec, Obj_to_ip_curr-&gt;olsr_node-&gt;pos_vec, tmp_mov_vec );
+-			if ( distance &lt; 0.1 ) distance = 0.1;
+-			mov_add( olsr_node-&gt;mov_vec, tmp_mov_vec,-100 / ( distance * distance ) );
+-			mov_add( Obj_to_ip_curr-&gt;olsr_node-&gt;mov_vec, tmp_mov_vec, 100 / ( distance * distance ) );
++				distance = dirt( olsr_node-&gt;pos_vec, Obj_to_ip_curr-&gt;olsr_node-&gt;pos_vec, tmp_mov_vec );
++				if ( distance &lt; 0.1 ) distance = 0.1;
++				mov_add( olsr_node-&gt;mov_vec, tmp_mov_vec,-100 / ( distance * distance ) );
++				mov_add( Obj_to_ip_curr-&gt;olsr_node-&gt;mov_vec, tmp_mov_vec, 100 / ( distance * distance ) );
+ 
+-		}
++			}
+ 
+-		Obj_to_ip_curr = Obj_to_ip_curr-&gt;next;
++			Obj_to_ip_curr = Obj_to_ip_curr-&gt;next;
+ 
++// 		}
++
+ 	}
+ 
+ 	handle_olsr_node( olsr_node-&gt;left );
+@@ -276,7 +281,7 @@
+ 
+ 	float null_vec[3] = {0,0,0};
+ 	float tmp_mov_vec[3];
+-	float distance, etx;
++	float distance, etx, rgb;
+ 	struct olsr_con **olsr_con = &amp;Con_begin;
+ 
+ 	while ( (*olsr_con) != NULL ) {
+@@ -334,36 +339,54 @@
+ 		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[0] + ZeroPosition[0], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[1]+ 0.2 + ZeroPosition[1], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[2] + ZeroPosition[2] );
+ 		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[0] + ZeroPosition[0], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[1]- 0.2 + ZeroPosition[1], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[2] + ZeroPosition[2] );
+ 
+-		if(ColorSwitch) {
+-			float rgb;
+-			etx = ( ( ( (*olsr_con)-&gt;left_etx + (*olsr_con)-&gt;right_etx ) / 2.0 ) - 10.0 ) * 10.0;
+-	// 		if ( strncmp( (*olsr_con)-&gt;left_olsr_node-&gt;ip, &quot;104.0.23.1&quot;, NAMEMAX ) == 0 ) printf(&quot;%s: %f, %s: %f, etx: %f\n&quot;,(*olsr_con)-&gt;left_olsr_node-&gt;ip, (*olsr_con)-&gt;left_etx, (*olsr_con)-&gt;right_olsr_node-&gt;ip, (*olsr_con)-&gt;right_etx, etx);
+-			if ( ( etx &gt;= 1.0 ) &amp;&amp; ( etx &lt; 2.0 ) ) {
+-				rgb = etx - 1.0;
++		if ( ColorSwitch ) {
++
++			/* HNA */
++			if ( (*olsr_con)-&gt;left_etx == -1000.00 ) {
++
+ 				s3d_push_material( (*olsr_con)-&gt;obj_id,
+-							rgb,1.0,0.0,
+-							rgb,1.0,0.0,
+-							rgb,1.0,0.0);
+-	
+-			} else if ( ( etx &gt;= 2.0 ) &amp;&amp; ( etx &lt; 3.0 ) ) {
+-				rgb = 3.0 - etx;
+-				s3d_push_material( (*olsr_con)-&gt;obj_id,
+-							1.0,rgb,0.0,
+-							1.0,rgb,0.0,
+-							1.0,rgb,0.0);
+-	
++							   0.0,0.0,1.0,
++							   0.0,0.0,1.0,
++							   0.0,0.0,1.0);
++
+ 			} else {
+-				s3d_push_material( (*olsr_con)-&gt;obj_id,
+-							1.0,0.0,0.0,
+-							1.0,0.0,0.0,
+-							1.0,0.0,0.0);
+-	
++
++				etx = ( ( ( (*olsr_con)-&gt;left_etx + (*olsr_con)-&gt;right_etx ) / 2.0 ) - 10.0 ) * 10.0;
++
++				if ( ( etx &gt;= 1.0 ) &amp;&amp; ( etx &lt; 2.0 ) ) {
++
++					rgb = etx - 1.0;
++					s3d_push_material( (*olsr_con)-&gt;obj_id,
++								rgb,1.0,0.0,
++								rgb,1.0,0.0,
++								rgb,1.0,0.0);
++
++				} else if ( ( etx &gt;= 2.0 ) &amp;&amp; ( etx &lt; 3.0 ) ) {
++
++					rgb = 3.0 - etx;
++					s3d_push_material( (*olsr_con)-&gt;obj_id,
++								1.0,rgb,0.0,
++								1.0,rgb,0.0,
++								1.0,rgb,0.0);
++
++				} else {
++
++					s3d_push_material( (*olsr_con)-&gt;obj_id,
++								1.0,0.0,0.0,
++								1.0,0.0,0.0,
++								1.0,0.0,0.0);
++
++				}
++
+ 			}
++
+ 		} else {
++
+ 			s3d_push_material( (*olsr_con)-&gt;obj_id,
+ 						1.0,1.0,1.0,
+ 						1.0,1.0,1.0,
+ 						1.0,1.0,1.0);
++
+ 		}
+ 
+ 		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 0,4,5,0 );
+@@ -730,8 +753,9 @@
+ 			s3d_set_callback(S3D_EVENT_QUIT,stop);
+ 			if (s3d_select_font(&quot;vera&quot;))
+ 				printf(&quot;font not found\n&quot;);
+-			Olsr_node_obj=s3d_import_3ds_file(&quot;accesspoint.3ds&quot;);
+-			Olsr_node_inet_obj=s3d_import_3ds_file(&quot;accesspoint_inet.3ds&quot;);
++			Olsr_node_obj = s3d_import_3ds_file( &quot;accesspoint.3ds&quot; );
++			Olsr_node_inet_obj = s3d_import_3ds_file( &quot;accesspoint_inet.3ds&quot; );
++			Olsr_node_hna_net = s3d_import_3ds_file( &quot;internet.3ds&quot; );
+ 			mesh=s3d_import_3ds_file(&quot;meshnode.3ds&quot;);
+ 			s3d_link(mesh,0);
+ 			s3d_scale(mesh,0.15);
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-02-15 15:47:38 UTC (rev 69)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-02-15 16:24:37 UTC (rev 70)
+@@ -34,8 +34,8 @@
+ 	struct olsr_node *left;
+ 	struct olsr_node *right;
+ 	char ip[NAMEMAX];   /* host ip */
+-	int inet_gw;   /* internet gateway flag */
+-	int inet_gw_modified;   /* internet gateway modified flag */
++	int node_type;   /* normal = 0, internet gateway = 1, via hna announced network = 2 */
++	int node_type_modified;   /* node_type modified flag */
+ 	float pos_vec[3];   /* position vector in 3d &quot;space&quot; */
+ 	float mov_vec[3];   /* move vector */
+ 	int obj_id;   /* id of node object in s3d */
+@@ -65,6 +65,7 @@
+ extern int	*adj_obj;
+ extern int	Olsr_node_obj;
+ extern int	Olsr_node_inet_obj;
++extern int	Olsr_node_hna_net;
+ extern int	node_count;
+ extern float 	bottom,left;
+ 
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-02-15 15:47:38 UTC (rev 69)
++++ trunk/apps/olsrs3d/process.c	2006-02-15 16:24:37 UTC (rev 70)
+@@ -63,9 +63,19 @@
+ 		(*olsr_con)-&gt;left_olsr_node = con_from;
+ 		(*olsr_con)-&gt;right_olsr_node = con_to;
+ 
+-		(*olsr_con)-&gt;left_etx = etx;
+-		(*olsr_con)-&gt;right_etx = 0.0;
++		/* HNA */
++		if ( etx == -1000.00 ) {
+ 
++			(*olsr_con)-&gt;left_etx = etx;
++			(*olsr_con)-&gt;right_etx = etx;
++
++		} else {
++
++			(*olsr_con)-&gt;left_etx = etx;
++			(*olsr_con)-&gt;right_etx = 0.0;
++
++		}
++
+ 		(*olsr_con)-&gt;next_olsr_con = NULL;
+ 
+ 		/* add new olsr connection to olsr nodes in order to access the connection from the olsr node */
+@@ -203,8 +213,8 @@
+ 		(*olsr_node)-&gt;left = NULL;
+ 		(*olsr_node)-&gt;right = NULL;
+ 		strncpy( (*olsr_node)-&gt;ip, ip, NAMEMAX );
+-		(*olsr_node)-&gt;inet_gw = 0;
+-		(*olsr_node)-&gt;inet_gw_modified = 1;
++		(*olsr_node)-&gt;node_type = 0;
++		(*olsr_node)-&gt;node_type_modified = 1;
+ 
+ 		if ( Debug ) printf( &quot;new olsr node: %s\n&quot;, (*olsr_node)-&gt;ip );
+ 
+@@ -376,18 +386,34 @@
+ 
+ 				olsr_node1 = get_olsr_node( &amp;Olsr_root, data[0] );
+ 
+-				if ( olsr_node1-&gt;inet_gw == 0 ) {
++				if ( olsr_node1-&gt;node_type != 1 ) {
+ 
+-					olsr_node1-&gt;inet_gw = 1;
+-					olsr_node1-&gt;inet_gw_modified = 1;
++					olsr_node1-&gt;node_type = 1;
++					olsr_node1-&gt;node_type_modified = 1;
+ 					if ( Debug ) printf( &quot;new internet: %s\n&quot;, olsr_node1-&gt;ip );
+ 
+ 				}
+ 
++			/* normal HNA */
++			} else {
++
++				olsr_node1 = get_olsr_node( &amp;Olsr_root, data[0] );
++				olsr_node2 = get_olsr_node( &amp;Olsr_root, data[1] );
++
++				if ( olsr_node2-&gt;node_type != 2 ) {
++
++					olsr_node2-&gt;node_type = 2;
++					olsr_node2-&gt;node_type_modified = 1;
++					if ( Debug ) printf( &quot;new hna network: %s\n&quot;, olsr_node2-&gt;ip );
++
++				}
++
++				add_olsr_con( olsr_node1, olsr_node2, -1000.00 );
++
+ 			}
+ 
+-			/* TODO: other HNA hast to be done */
+ 
++
+ 		/* normal node */
+ 		} else {
+ // 			n1=get_node_num(data[0]);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000065.html">[S3d-svn] r69 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000067.html">[S3d-svn] r71 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#66">[ date ]</a>
+              <a href="thread.html#66">[ thread ]</a>
+              <a href="subject.html#66">[ subject ]</a>
+              <a href="author.html#66">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,249 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r715 - trunk/apps/meshs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r715%20-%20trunk/apps/meshs3d&In-Reply-To=%3C200710072133.l97LXMs8013935%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000706.html">
+   <LINK REL="Next"  HREF="000708.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r715 - trunk/apps/meshs3d</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r715%20-%20trunk/apps/meshs3d&In-Reply-To=%3C200710072133.l97LXMs8013935%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r715 - trunk/apps/meshs3d">nichtsnutz at mail.berlios.de
+       </A><BR>
+    <I>Sun Oct  7 23:33:22 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000706.html">[S3d-svn] r714 - trunk/apps/meshs3d
+</A></li>
+        <LI>Next message: <A HREF="000708.html">[S3d-svn] r716 - in trunk: . apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#707">[ date ]</a>
+              <a href="thread.html#707">[ thread ]</a>
+              <a href="subject.html#707">[ subject ]</a>
+              <a href="author.html#707">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2007-10-07 23:33:22 +0200 (Sun, 07 Oct 2007)
+New Revision: 715
+
+Modified:
+   trunk/apps/meshs3d/main.c
+   trunk/apps/meshs3d/meshs3d.h
+   trunk/apps/meshs3d/process.c
+Log:
+add node counter
+
+
+
+Modified: trunk/apps/meshs3d/main.c
+===================================================================
+--- trunk/apps/meshs3d/main.c	2007-10-06 12:32:09 UTC (rev 714)
++++ trunk/apps/meshs3d/main.c	2007-10-07 21:33:22 UTC (rev 715)
+@@ -40,6 +40,8 @@
+ 
+ /* global vars */
+ struct glob Global;
++
++
+ static struct timespec sleep_time = {
+ 	0, 100 * 1000 * 1000
+ };   /* 100 mili seconds */
+@@ -54,6 +56,11 @@
+ 	Global.obj_btn_close = 0;
+ 	Global.obj_s3d_url = 0;
+ 	Global.obj_zero_point = 0;
++	Global.obj_node_count = 0;
++	Global.node_count = 0;
++	Global.asp = 1.0;
++	Global.left = -1.0;
++	Global.bottom = -1.0;
+ 
+ }
+ 
+@@ -174,17 +181,23 @@
+ 
+ 	if (con_hash-&gt;elements == 0)
+ 		return;
++
+ 	hashit1 = hashit2 = NULL;
+-	printf(&quot;start iteration\n&quot;);
++
+ 	while (NULL != (hashit1 = hash_iterate(node_hash, hashit1))) {
++
+ 		first_node = (struct node *) hashit1-&gt;bucket-&gt;data;
+ 		while (NULL != (hashit2 = hash_iterate(node_hash, hashit2))) {
++
+ 			sec_node = (struct node *) hashit2-&gt;bucket-&gt;data;
+ 			if (first_node != sec_node &amp;&amp; (max(first_node-&gt;ip, sec_node-&gt;ip) == first_node-&gt;ip)) {
++
+ 				ip[0] = first_node-&gt;ip;
+ 				ip[1] = sec_node-&gt;ip;
+ 				distance = dirt(first_node-&gt;pos_vec, sec_node-&gt;pos_vec, tmp_mov_vec);
++
+ 				if (NULL != (con = hash_find(con_hash, ip))) {
++
+ 					/* we have a connection */
+ 					wish_distance = ((con-&gt;etx1_sqrt + con-&gt;etx2_sqrt)) + 4;
+ 					f = wish_distance / distance;
+@@ -206,10 +219,12 @@
+ 					                );
+ 
+ 				} else {
++
+ 					/* we have no connection */
+ 					if (distance &lt; 0.1) distance = 0.1;
+ 					mov_add(first_node-&gt;mov_vec, tmp_mov_vec, -100 / (distance * distance));
+ 					mov_add(sec_node-&gt;mov_vec, tmp_mov_vec, 100 / (distance * distance));
++
+ 				}
+ 			}
+ 		}
+@@ -234,13 +249,31 @@
+ 
+ void mainloop()
+ {
+-
++	static int last_count = 0;
+ 	int net_result;   /* result of function net_main */
++	char nc_str[20];
++	float str_len;
+ 
+ 	calc_node_mov();
+ 	handle_node();
+-	/* move_nodes(); */
+ 
++	
++	if( Global.node_count &amp;&amp; Global.node_count != last_count ) {
++
++		if( Global.obj_node_count ) s3d_del_object( Global.obj_node_count );
++		
++		snprintf(nc_str, 20, &quot;node count: %d&quot;, Global.node_count );
++		Global.obj_node_count = s3d_draw_string( nc_str, &amp;str_len );
++		
++		s3d_link( Global.obj_node_count, 0 );
++		s3d_flags_on( Global.obj_node_count, S3D_OF_VISIBLE );
++		s3d_scale( Global.obj_node_count, 0.2 );
++		s3d_translate( Global.obj_node_count, -Global.left * 3.0 - (str_len * 0.2), -Global.bottom * 3.0 - 0.7, -3.0 );
++		
++		last_count = Global.node_count;
++
++	}
++	
+ 	while ((net_result = net_main()) != 0) {
+ 		if (net_result == -1) {
+ 			printf(&quot;that's it folks\n&quot;);
+@@ -252,7 +285,33 @@
+ 	return;
+ }
+ 
++int object_info(struct s3d_evt *hrmz)
++{
++	struct s3d_obj_info *inf;
++	inf = (struct s3d_obj_info *)hrmz-&gt;buf;
++	s3dw_object_info(hrmz);
++	
++	if (inf-&gt;object == 0) {
++	
++		Global.asp = inf-&gt;scale;
++		
++		if ( Global.asp &gt; 1.0) {
+ 
++			Global.bottom = -1.0;
++			Global.left = -Global.asp;
++
++		} else {
++
++			Global.bottom = (-1.0 / Global.asp);
++			Global.left = -1.0;
++
++		}
++
++	}
++
++	return(0);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	int optchar;
+@@ -302,8 +361,10 @@
+ 	process_init();
+ 
+ 	if (!net_init(olsr_host)) {
+-		/* s3d_set_callback(S3D_EVENT_OBJ_INFO,object_info);
+-		s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
++		
++		s3d_set_callback( S3D_EVENT_OBJ_INFO, object_info );
++		
++		/*s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
+ 		s3d_set_callback(S3D_EVENT_KEY,keypress);
+ 		s3d_set_callback(S3D_EVENT_QUIT,stop); */
+ 
+
+Modified: trunk/apps/meshs3d/meshs3d.h
+===================================================================
+--- trunk/apps/meshs3d/meshs3d.h	2007-10-06 12:32:09 UTC (rev 714)
++++ trunk/apps/meshs3d/meshs3d.h	2007-10-07 21:33:22 UTC (rev 715)
+@@ -79,6 +79,11 @@
+ 	int obj_btn_close;
+ 	int obj_s3d_url;
+ 	int obj_zero_point;
++	int obj_node_count;
++	int node_count;
++	float asp;
++	float bottom;
++	float left;
+ };
+ 
+ extern char lbuf[MAXLINESIZE];
+
+Modified: trunk/apps/meshs3d/process.c
+===================================================================
+--- trunk/apps/meshs3d/process.c	2007-10-06 12:32:09 UTC (rev 714)
++++ trunk/apps/meshs3d/process.c	2007-10-07 21:33:22 UTC (rev 715)
+@@ -196,6 +196,7 @@
+ 		orig_node-&gt;obj_id = -1;
+ 		orig_node-&gt;desc_id = -1;
+ 		hash_add(node_hash, orig_node);
++		Global.node_count++;
+ 	}
+ 	return;
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000706.html">[S3d-svn] r714 - trunk/apps/meshs3d
+</A></li>
+	<LI>Next message: <A HREF="000708.html">[S3d-svn] r716 - in trunk: . apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#707">[ date ]</a>
+              <a href="thread.html#707">[ thread ]</a>
+              <a href="subject.html#707">[ subject ]</a>
+              <a href="author.html#707">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

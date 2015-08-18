@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r389 - trunk/libs3d/libg3d/plugins/import
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r389%20-%20trunk/libs3d/libg3d/plugins/import&In-Reply-To=%3C200609152247.k8FMlufB024456%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000381.html">
+   <LINK REL="Next"  HREF="000383.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r389 - trunk/libs3d/libg3d/plugins/import</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r389%20-%20trunk/libs3d/libg3d/plugins/import&In-Reply-To=%3C200609152247.k8FMlufB024456%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r389 - trunk/libs3d/libg3d/plugins/import">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep 16 00:47:56 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000381.html">[S3d-svn] r388 - trunk/libs3d/libg3d/plugins/import
+</A></li>
+        <LI>Next message: <A HREF="000383.html">[S3d-svn] r390 - in trunk/libs3d/libg3d: plugins/import src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#382">[ date ]</a>
+              <a href="thread.html#382">[ thread ]</a>
+              <a href="subject.html#382">[ subject ]</a>
+              <a href="author.html#382">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-16 00:47:55 +0200 (Sat, 16 Sep 2006)
+New Revision: 389
+
+Modified:
+   trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c
+Log:
+- imp_3ds chunk 4150, already smoothing something :)
+
+Modified: trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c
+===================================================================
+--- trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c	2006-09-15 22:31:45 UTC (rev 388)
++++ trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c	2006-09-15 22:47:55 UTC (rev 389)
+@@ -245,7 +245,6 @@
+ 		object-&gt;vertex_data[i * 3 + 1] = g3d_read_float_le(global-&gt;f);
+ 		object-&gt;vertex_data[i * 3 + 2] = g3d_read_float_le(global-&gt;f);
+ 
+-		printf(&quot;point array original vertex data: %f, %f, %f\n&quot;,object-&gt;vertex_data[i * 3 + 0], object-&gt;vertex_data[i * 3 + 1], object-&gt;vertex_data[i * 3 + 2]);
+ 		parent-&gt;nb -= 12;
+ 
+ 		if((i % 1000) == 0) x3ds_update_progress(global);
+@@ -423,10 +422,8 @@
+ 	v_t_buf=		g_new0(float,3*object-&gt;vertex_count);				/* normals per vertice */
+ 	smooth_list = 	g_new(guint32, polynum);
+ 	printf(&quot;reading %d int32 values\n&quot;,polynum);
+-	for ( i=0 ; i&lt;polynum ; i++ ) {
++	for ( i=0 ; i&lt;polynum ; i++ ) 
+ 		smooth_list[i] = g3d_read_int32_le(global-&gt;f);
+-		printf(&quot;smoothlist[%d] = %d\n&quot;,i,smooth_list[i]);
+-	}
+ 	parent-&gt;nb -= polynum * 4;
+ 	/* first, we calculate the normal by the polygon vertices (just vector product) */
+ 	i=0;
+@@ -466,6 +463,7 @@
+ 		for (i=0;i&lt;polynum;i++)
+ 			if ((group=smooth_list[i])!=-1) /* found a group */
+ 				break;
++		printf(&quot;handling group %d\n&quot;,group);
+ 		/* handle this group */
+ 		if (group!=-1)
+ 		{
+@@ -481,6 +479,7 @@
+ 			i=0;
+ 			for (oface=object-&gt;faces; oface != NULL ; oface=oface-&gt;next)
+ 			{
++				face=(G3DFace *) oface-&gt;data;
+ 				if (smooth_list[i]==group)
+ 				{
+ 					for (j=0;j&lt;3;j++) /* for all 3 vertices of the polygon */
+@@ -506,12 +505,15 @@
+ 						len=sqrt(	v_t_buf[k*3]   * v_t_buf[k]+
+ 									v_t_buf[k*3+1] * v_t_buf[k*3+1]+
+ 									v_t_buf[k*3+2] * v_t_buf[k*3+2]);
++						printf(&quot;vertex buffer : %f %f %f ... len = %f\n&quot;,v_t_buf[k*3],v_t_buf[k*3+1],v_t_buf[k*3+2],len);
+ 						if (len==0.0F)   /*  this should not happen. well ... */
+ 								for (n=0;n&lt;3;n++)	v_t_buf[k*3 + n]=0;
+ 						else	for (n=0;n&lt;3;n++)	v_t_buf[k*3 + n]/=len; /* normalize it */
+ 						
+ 						if (len!=0.0) 	memcpy(face-&gt;normals +j*3, v_t_buf+ 	k*3,sizeof(gfloat)*3);	/*  finally, we save the normal in our normal buffer */
+-						else  			memcpy(face-&gt;normals +j*3, pnormal_list+i*3,sizeof(gfloat)*3);	/*  use the pbuf normal */
++						else  			{memcpy(face-&gt;normals +j*3, pnormal_list+i*3,sizeof(gfloat)*3);	/*  use the pbuf normal */
++							printf(&quot;using pnormal_list as fallback\n&quot;);
++						}
+ 					}
+ 					smooth_list[i]=-1; /* finished this polygon */
+ 				}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000381.html">[S3d-svn] r388 - trunk/libs3d/libg3d/plugins/import
+</A></li>
+	<LI>Next message: <A HREF="000383.html">[S3d-svn] r390 - in trunk/libs3d/libg3d: plugins/import src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#382">[ date ]</a>
+              <a href="thread.html#382">[ thread ]</a>
+              <a href="subject.html#382">[ subject ]</a>
+              <a href="author.html#382">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

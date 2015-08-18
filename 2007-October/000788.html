@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r796 - in trunk: . apps/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r796%20-%20in%20trunk%3A%20.%20apps/comptest&In-Reply-To=%3C200710221107.l9MB73d4028766%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000787.html">
+   <LINK REL="Next"  HREF="000789.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r796 - in trunk: . apps/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r796%20-%20in%20trunk%3A%20.%20apps/comptest&In-Reply-To=%3C200710221107.l9MB73d4028766%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r796 - in trunk: . apps/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Oct 22 13:07:03 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000787.html">[S3d-svn] r795 - trunk/apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000789.html">[S3d-svn] r797 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#788">[ date ]</a>
+              <a href="thread.html#788">[ thread ]</a>
+              <a href="subject.html#788">[ subject ]</a>
+              <a href="author.html#788">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-10-22 13:07:03 +0200 (Mon, 22 Oct 2007)
+New Revision: 796
+
+Modified:
+   trunk/
+   trunk/apps/comptest/comptest.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r2743 at kero</A>:  dotslash | 2007-10-22 13:06:10 +0200
+ - limit ybottom to the end of the image. don't upload whole chunk if it's not complete.
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2735
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2743
+
+Modified: trunk/apps/comptest/comptest.c
+===================================================================
+--- trunk/apps/comptest/comptest.c	2007-10-21 12:45:35 UTC (rev 795)
++++ trunk/apps/comptest/comptest.c	2007-10-22 11:07:03 UTC (rev 796)
+@@ -497,6 +497,8 @@
+ 		/*  printf(&quot;load textures ...\n&quot;);*/
+ 		for (ytop = y; ytop &lt; y + height; ytop = ybottom) {
+ 			ybottom = (ytop + TEXH) &amp; ~(TEXH - 1);
++			if (ybottom &gt; y + height)
++				ybottom = y + height;
+ 			chunk_height = ybottom - ytop;
+ 			s3d_load_texture(win-&gt;oid, TEXNUM(win, xleft, ytop), xleft % TEXW, ytop % TEXH,
+ 			                 chunk_width, chunk_height, (unsigned char *)bitmap + chunk_width * (ytop - y) * 4);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000787.html">[S3d-svn] r795 - trunk/apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000789.html">[S3d-svn] r797 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#788">[ date ]</a>
+              <a href="thread.html#788">[ thread ]</a>
+              <a href="subject.html#788">[ subject ]</a>
+              <a href="author.html#788">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

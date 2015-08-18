@@ -1,0 +1,206 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r370 - in trunk: . libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r370%20-%20in%20trunk%3A%20.%20libs3d%20libs3dw&In-Reply-To=%3C200606302128.k5ULS1Wa031268%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000362.html">
+   <LINK REL="Next"  HREF="000364.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r370 - in trunk: . libs3d libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r370%20-%20in%20trunk%3A%20.%20libs3d%20libs3dw&In-Reply-To=%3C200606302128.k5ULS1Wa031268%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r370 - in trunk: . libs3d libs3dw">dotslash at berlios.de
+       </A><BR>
+    <I>Fri Jun 30 23:28:01 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000362.html">[S3d-svn] r369 - in trunk: . libs3d
+</A></li>
+        <LI>Next message: <A HREF="000364.html">[S3d-svn] r371 - in trunk: . apps/s3dfm example libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#363">[ date ]</a>
+              <a href="thread.html#363">[ thread ]</a>
+              <a href="subject.html#363">[ subject ]</a>
+              <a href="author.html#363">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-30 23:28:01 +0200 (Fri, 30 Jun 2006)
+New Revision: 370
+
+Modified:
+   trunk/
+   trunk/libs3d/event.c
+   trunk/libs3dw/arrange.c
+   trunk/libs3dw/surface.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r870 at balthasar</A>:  dotslash | 2006-06-30 23:27:52 +0200
+ - autofollow mode added
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:869
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:870
+
+Modified: trunk/libs3d/event.c
+===================================================================
+--- trunk/libs3d/event.c	2006-06-30 21:27:58 UTC (rev 369)
++++ trunk/libs3d/event.c	2006-06-30 21:28:01 UTC (rev 370)
+@@ -34,7 +34,7 @@
+ 	struct s3d_evt *p;
+ 	s3d_cb cb;
+ 
+-	s3dprintf(MED,&quot;pushed event %d&quot;,newevt-&gt;event);
++	s3dprintf(VLOW,&quot;pushed event %d&quot;,newevt-&gt;event);
+ 	 /*  this will always be called for S3D_EVENT_NEW_OBJECT!! */
+ 	if (newevt-&gt;event==S3D_EVENT_NEW_OBJECT)
+ 	{
+@@ -119,7 +119,7 @@
+ 		cb_lock=2; /* request later processing */
+ 		return;
+ 	}
+-	s3dprintf(LOW,&quot;processing stack ...&quot;);
++	s3dprintf(VLOW,&quot;processing stack ...&quot;);
+ 	while (p!=NULL)
+ 	{
+ 		
+
+Modified: trunk/libs3dw/arrange.c
+===================================================================
+--- trunk/libs3dw/arrange.c	2006-06-30 21:27:58 UTC (rev 369)
++++ trunk/libs3dw/arrange.c	2006-06-30 21:28:01 UTC (rev 370)
+@@ -65,7 +65,6 @@
+ 	dir[1]/=dirlen;
+ 	dir[2]/=dirlen;
+ }
+-int al=0;
+ void s3dw_turn()
+ {
+ 	s3dw_widget *w,*root=s3dw_getroot();
+@@ -75,11 +74,10 @@
+ 	a[0]=0;
+ 	a[1]=0;
+ 	a[2]=1;
+-	al++;
+ 	for (i=0;i&lt;root-&gt;nobj;i++)
+ 	{
+ 		w=root-&gt;pobj[i];
+-		if (w-&gt;oid!=0)
++		if ((w-&gt;oid!=0) &amp;&amp; (w-&gt;flags&amp;S3DW_TURN_CAM))
+ 		{
+ 			s3dw_arr_widgetcenter(w,op);
+ 			/* horizontal movement */
+@@ -111,6 +109,40 @@
+ 		}
+ 	}
+ }
++#define DIST	60.0
++void s3dw_follow()
++{
++	s3dw_widget *w,*root=s3dw_getroot();
++	int i;
++	float b[3];
++	float op[3];
++	float lsqr,l;
++	for (i=0;i&lt;root-&gt;nobj;i++)
++	{
++		w=root-&gt;pobj[i];
++		if ((w-&gt;oid!=0) &amp;&amp; (w-&gt;flags&amp;S3DW_FOLLOW_CAM))
++				
++		{
++			s3dw_arr_widgetcenter(w,op);
++			/* horizontal movement */
++			b[0]=cam-&gt;x - (w-&gt;x + op[0]);
++			b[1]=cam-&gt;y - (w-&gt;y + op[1]);
++			b[2]=cam-&gt;z - (w-&gt;z + op[2]);
++			if ((lsqr=(b[0]*b[0] + b[1]*b[1] + b[2]*b[2])) &gt; (DIST * DIST))
++			{
++				/* need to adjust ... */
++				l=sqrt(lsqr);
++				w-&gt;x+= b[0]-b[0]*DIST/l;
++				w-&gt;y+= b[1]-b[1]*DIST/l;
++				w-&gt;z+= b[2]-b[2]*DIST/l;
++				w-&gt;flags&amp;=~S3DW_ARRANGED;
++				ani_need_arr=1;
++				s3dw_ani_add(w);
++				
++			}
++		}
++	}
++}
+ void s3dw_arrange()
+ {
+ 	s3dw_widget *w1,*w2,*root=s3dw_getroot();
+@@ -121,12 +153,11 @@
+ 
+ 	/* test if there is anything to arrange ... */
+ 	arranged=1;
+-	ani_need_arr=0;
+ 	for (i=0;i&lt;root-&gt;nobj;i++)
+ 		if (!(root-&gt;pobj[i]-&gt;flags&amp;S3DW_ARRANGED)) arranged=0;
+-	if (arranged) return; /* no arrangement necceasary .... */
+-/*	if (cam-&gt;flags|S3DW_*/
++	if (arranged &amp;&amp; !ani_need_arr) return; /* no arrangement necceasary .... */
+ 		
++	ani_need_arr=0;
+ 	if (root-&gt;nobj==1)
+ 	{
+ 		w1=root-&gt;pobj[0];
+@@ -191,4 +222,5 @@
+ 	}
+ 	if (allarr)	ani_need_arr=0;
+ 	s3dw_turn();
++	s3dw_follow();
+ }
+
+Modified: trunk/libs3dw/surface.c
+===================================================================
+--- trunk/libs3dw/surface.c	2006-06-30 21:27:58 UTC (rev 369)
++++ trunk/libs3dw/surface.c	2006-06-30 21:28:01 UTC (rev 370)
+@@ -143,6 +143,7 @@
+ 	widget-&gt;x=-f1[0];
+ 	widget-&gt;y=-f1[1];
+ 	widget-&gt;z=-f1[2];
++	widget-&gt;flags|=S3DW_FOLLOW_CAM|S3DW_TURN_CAM;
+ 	s3dw_widget_append(s3dw_getroot(),widget);
+ 	s3dw_surface_draw(widget);
+ 	s3dw_ani_needarr();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000362.html">[S3d-svn] r369 - in trunk: . libs3d
+</A></li>
+	<LI>Next message: <A HREF="000364.html">[S3d-svn] r371 - in trunk: . apps/s3dfm example libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#363">[ date ]</a>
+              <a href="thread.html#363">[ thread ]</a>
+              <a href="subject.html#363">[ subject ]</a>
+              <a href="author.html#363">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

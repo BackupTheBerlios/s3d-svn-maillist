@@ -1,0 +1,276 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r887 - trunk/svnonly/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r887%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200712311818.lBVIILq1018087%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000879.html">
+   <LINK REL="Next"  HREF="000881.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r887 - trunk/svnonly/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r887%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200712311818.lBVIILq1018087%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r887 - trunk/svnonly/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Dec 31 19:18:21 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000879.html">[S3d-svn] r886 - trunk/server
+</A></li>
+        <LI>Next message: <A HREF="000881.html">[S3d-svn] r888 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#880">[ date ]</a>
+              <a href="thread.html#880">[ thread ]</a>
+              <a href="subject.html#880">[ subject ]</a>
+              <a href="author.html#880">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-12-31 19:18:21 +0100 (Mon, 31 Dec 2007)
+New Revision: 887
+
+Modified:
+   trunk/svnonly/comptest/comptest.h
+   trunk/svnonly/comptest/window.c
+   trunk/svnonly/comptest/x11.c
+Log:
+- determine window names, find s3d window and set it on top
+
+
+Modified: trunk/svnonly/comptest/comptest.h
+===================================================================
+--- trunk/svnonly/comptest/comptest.h	2007-12-31 17:46:46 UTC (rev 886)
++++ trunk/svnonly/comptest/comptest.h	2007-12-31 18:18:21 UTC (rev 887)
+@@ -31,15 +31,16 @@
+ struct window {
+ 	Window        id;
+ 	XWindowAttributes    attr;   /* position, size etc. */
+-	XImage      *image;
+-	Damage       damage;  /* damage notification */
+-	Pixmap			pix;
++	XImage     *image;
++	Damage      damage;  /* damage notification */
++	Pixmap		pix;
+ 	int			geometry_update_needed;
+ 	int     	content_update_needed;
+ 	XRectangle	content_update;
+-	int        oid;
+-	int		   no;
++	int			oid;
++	int			no;
+ 	int 		mapped;
++	char		*name;
+ 
+ 	struct window     *next;
+ };
+@@ -62,9 +63,13 @@
+ 
+ extern struct window   *window_head;
+ /* x11.c */
++void x11_always_on_top(Window win);
+ void event(void);
+ int xinit(void);
+ int error(Display *COMPUNUSED(dpy), XErrorEvent *event);
+ int print_event(Display *COMPUNUSED(dpy), XEvent *event);
+ void x11_addwindows();
++char *x11_get_prop(Window win, char *prop);
++char *x11_get_name(Window win); 
++void print_properties(Window win);
+ extern Display *dpy;
+
+Modified: trunk/svnonly/comptest/window.c
+===================================================================
+--- trunk/svnonly/comptest/window.c	2007-12-31 17:46:46 UTC (rev 886)
++++ trunk/svnonly/comptest/window.c	2007-12-31 18:18:21 UTC (rev 887)
+@@ -89,6 +89,9 @@
+ 		return(NULL);
+ 	}
+ 	win-&gt;id = id;
++/*	print_properties(id);*/
++	win-&gt;name = x11_get_name(id);
++	printf(&quot;###################### name = %s\n&quot;, win-&gt;name);
+ 	win-&gt;next = window_head;
+ 	window_head = win;
+ 	win-&gt;damage = None;
+@@ -133,7 +136,6 @@
+ 	printf(&quot;window_map(%d)\n&quot;, (int)win-&gt;id);
+ 	if (win-&gt;mapped)
+ 		return;
+-
+ 	win-&gt;mapped = 1;
+ 	win-&gt;content_update_needed = 1;
+ 	win-&gt;content_update.x = 0;
+
+Modified: trunk/svnonly/comptest/x11.c
+===================================================================
+--- trunk/svnonly/comptest/x11.c	2007-12-31 17:46:46 UTC (rev 886)
++++ trunk/svnonly/comptest/x11.c	2007-12-31 18:18:21 UTC (rev 887)
+@@ -24,6 +24,7 @@
+ #include &quot;comptest.h&quot;
+ #include &lt;stdio.h&gt;		/* printf() */
+ #include &lt;string.h&gt;		/* memcpy() */
++#include &lt;stdlib.h&gt;		/* free() */
+ #include &lt;X11/Xproto.h&gt;	/* X_* request defines */
+ 
+ #define XCOMPOSITE_VERSION_0_2 200
+@@ -123,7 +124,125 @@
+ 	return(0);
+ }
+ 
++void print_properties(Window win)
++{
++	Atom *p;
++	int num, j;
++	char *aname;
++	Atom type;
++	int format;
++	unsigned long nitems, bytes_after;
++	unsigned char *ret = NULL;
+ 
++	p = XListProperties(dpy, win, &amp;num);
++	printf(&quot;found %d properties for window %d\n&quot;, num, (int)win);
++	for (j = 0; j &lt; num; j++) {
++		aname = XGetAtomName(dpy, p[j]);
++		if (aname) {
++			if(Success == XGetWindowProperty(dpy, win, XInternAtom(dpy, aname, False),
++						0L, ~0L, False, XA_STRING,
++						&amp;type, &amp;format, &amp;nitems,
++						&amp;bytes_after, &amp;ret))
++			{
++/*				printf(&quot;format = %d, nitems = %d, bytes_after = %d\n&quot;, format, nitems, bytes_after);*/
++				printf(&quot;%s = %s\n&quot;, aname, ret);
++				XFree(ret);
++			}
++			XFree(aname);
++		} else printf(&quot;NULL\n&quot;);
++	}
++	XFree(p);
++}
++char *x11_get_prop(Window win, char *prop) 
++{
++	Atom type;
++	int format;
++	unsigned long nitems, bytes_after;
++	unsigned char *reqret = NULL;
++	char *ret = NULL;
++
++
++	if(Success == XGetWindowProperty(dpy, win, XInternAtom(dpy, prop, False),
++		0L, ~0L, False, /*XA_STRING*/ AnyPropertyType,
++		&amp;type, &amp;format, &amp;nitems,
++		&amp;bytes_after, &amp;reqret)) {
++		if (reqret != NULL) {
++			ret = strdup((char *)reqret);
++			XFree(reqret);
++		} 
++	}
++	return(ret);
++}
++char *x11_get_name(Window win) 
++{
++	unsigned int nchildren;
++	Window *children;
++	Window root, parent;
++	char *role, *name;
++	int j;
++
++	role = x11_get_prop(win, &quot;WM_WINDOW_ROLE&quot;);
++	if (role != NULL) {
++		if (strcmp(role, &quot;decoration widget&quot;) == 0){
++			free(role);
++			return(NULL);
++		}
++		free(role);
++	}
++	name = x11_get_prop(win, &quot;WM_NAME&quot;);
++	if (name != NULL) {
++		if (strcmp(name, &quot;S3D&quot;) == 0) {
++			printf(&quot;setting s3d to always on top\n&quot;);
++			x11_always_on_top(win);
++		}
++		return(name);
++	}
++
++	XQueryTree(dpy, win, &amp;root, &amp;parent, &amp;children, &amp;nchildren);
++
++	for (j = 0; j &lt; (int)nchildren; j++) {
++		name = x11_get_name(children[j]);
++		if (name != NULL)
++			break;
++	}
++	XFree(children);
++	return(name);
++
++}
++
++/* set always on top property to s3d server */
++void x11_always_on_top(Window win)
++{
++	Atom net_wm_state_stays_on_top, net_wm_state;
++	XClientMessageEvent xev;
++	int scr_no;
++
++	net_wm_state = XInternAtom(dpy, &quot;_NET_WM_STATE&quot;, False);
++	if (net_wm_state == None)
++		fprintf(stderr, &quot;No _NET_WM_STATE\n&quot;);
++
++	net_wm_state_stays_on_top = XInternAtom(dpy, &quot;_NET_WM_STATE_STAYS_ON_TOP&quot;, 0);
++	if (net_wm_state_stays_on_top == None)
++		fprintf(stderr, &quot;No _NET_WM_STATE_STAYS_ON_TOP\n&quot;);
++
++	memset(&amp;xev, 0, sizeof(xev));
++	xev.type = ClientMessage;
++	xev.message_type = net_wm_state;
++	xev.display = dpy;
++	xev.window = win;
++	xev.format = 32;
++	xev.data.l[0] = 1;
++	xev.data.l[1] = net_wm_state_stays_on_top;
++	xev.data.l[2] = 0;
++
++	for (scr_no = 0; scr_no &lt; ScreenCount(dpy); scr_no++) {
++		if (!XSendEvent(dpy, RootWindow(dpy, scr_no), False, SubstructureRedirectMask, (XEvent *) &amp; xev))
++			fprintf(stderr, &quot;Error XSendEvent() on type of event: _NET_WM_STATE\n&quot;);
++	}
++	XFlush(dpy);
++}
++
++
+ int xinit(void)
+ {
+ 	int composite_major, composite_minor;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000879.html">[S3d-svn] r886 - trunk/server
+</A></li>
+	<LI>Next message: <A HREF="000881.html">[S3d-svn] r888 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#880">[ date ]</a>
+              <a href="thread.html#880">[ thread ]</a>
+              <a href="subject.html#880">[ subject ]</a>
+              <a href="author.html#880">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

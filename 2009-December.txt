@@ -1,0 +1,275 @@
+From lazhur at mail.berlios.de  Wed Dec  2 19:04:46 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Wed, 2 Dec 2009 19:04:46 +0100
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	updated. v0.2.1.1-12-gabd4912
+Message-ID: <200912021804.nB2I4kAt009097@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been updated
+       via  abd491235c15efe708a1c5f43304e3b777bcc253 (commit)
+      from  9b3c27659380e3bf3e5632c4951ac1174d6a81f6 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit abd491235c15efe708a1c5f43304e3b777bcc253
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Dec 2 19:02:15 2009 +0100
+
+    Cleanup of old Release Notes
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/RelNotes-0.0.1.txt   |   69 +++
+ Documentation/RelNotes-0.0.2.txt   |   16 +
+ Documentation/RelNotes-0.1.1.txt   |    8 +-
+ Documentation/RelNotes-0.1.txt     |  938 ++++++++++++++++++++----------------
+ Documentation/RelNotes-0.2.1.1.txt |   41 +-
+ Documentation/RelNotes-0.2.1.txt   |   20 +-
+ Documentation/RelNotes-0.2.txt     |   33 +-
+ 7 files changed, 658 insertions(+), 467 deletions(-)
+ create mode 100644 Documentation/RelNotes-0.0.1.txt
+ create mode 100644 Documentation/RelNotes-0.0.2.txt
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Tue Dec  8 21:21:49 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 8 Dec 2009 21:21:49 +0100
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	updated. v0.2.1.1-14-g3a39868
+Message-ID: <200912082021.nB8KLnaH019615@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been updated
+       via  3a398686a496dfb8c5262ff5e9bb30c30f7d3006 (commit)
+       via  7e7dff28b9f1be643e7c762cee7fdd647da2bbf6 (commit)
+      from  abd491235c15efe708a1c5f43304e3b777bcc253 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 3a398686a496dfb8c5262ff5e9bb30c30f7d3006
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue Dec 8 21:21:22 2009 +0100
+
+    Start release notes for 0.2.1.2
+
+commit 7e7dff28b9f1be643e7c762cee7fdd647da2bbf6
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue Dec 8 21:04:35 2009 +0100
+
+    Depend on libgps 2.90 for s3dosm GPS support
+    
+    gpsd as stated with version 2.90 that the binary breakage with nearly
+    each update should stop and that they want to have a better binary
+    stability by now.
+    
+    As this is the first hard break in the development of it, we start to
+    support only the current version and all following compatible versions
+    instead of fixing each small breakage using cmake checks due to the old
+    development model with each minor update of gpsd.
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ ConfigureChecks.cmake              |    6 +---
+ Documentation/RelNotes-0.2.1.2.txt |   18 +++++++++++++++++
+ apps/s3dosm/gps.c                  |   37 +++++------------------------------
+ cmake/modules/FindGPS.cmake        |   23 ----------------------
+ config.h.cmake                     |    1 -
+ 5 files changed, 26 insertions(+), 59 deletions(-)
+ create mode 100644 Documentation/RelNotes-0.2.1.2.txt
+ delete mode 100644 cmake/modules/FindGPS.cmake
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Tue Dec  8 21:41:43 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 8 Dec 2009 21:41:43 +0100
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-78-g49e45b0
+Message-ID: <200912082041.nB8KfhFv021730@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  49e45b072bc0ec989bfe1f2b3c8461b48340758f (commit)
+       via  3a398686a496dfb8c5262ff5e9bb30c30f7d3006 (commit)
+       via  7e7dff28b9f1be643e7c762cee7fdd647da2bbf6 (commit)
+       via  abd491235c15efe708a1c5f43304e3b777bcc253 (commit)
+      from  9496d99deba405598d014163440ea9194693e66d (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 49e45b072bc0ec989bfe1f2b3c8461b48340758f
+Merge: 9496d99deba405598d014163440ea9194693e66d 3a398686a496dfb8c5262ff5e9bb30c30f7d3006
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue Dec 8 21:40:30 2009 +0100
+
+    Merge branch 'maint'
+    
+    Conflicts:
+    	Documentation/RelNotes-0.1.txt
+    	cmake/modules/FindGPS.cmake
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ ConfigureChecks.cmake              |    6 +-
+ Documentation/RelNotes-0.0.1.txt   |   69 +++
+ Documentation/RelNotes-0.0.2.txt   |   16 +
+ Documentation/RelNotes-0.1.1.txt   |    8 +-
+ Documentation/RelNotes-0.1.txt     |  938 ++++++++++++++++++++----------------
+ Documentation/RelNotes-0.2.1.1.txt |   41 +-
+ Documentation/RelNotes-0.2.1.2.txt |   18 +
+ Documentation/RelNotes-0.2.1.txt   |   20 +-
+ Documentation/RelNotes-0.2.txt     |   33 +-
+ apps/s3dosm/gps.c                  |   37 +--
+ cmake/modules/FindGPS.cmake        |   51 --
+ config.h.cmake                     |    1 -
+ 12 files changed, 684 insertions(+), 554 deletions(-)
+ create mode 100644 Documentation/RelNotes-0.0.1.txt
+ create mode 100644 Documentation/RelNotes-0.0.2.txt
+ create mode 100644 Documentation/RelNotes-0.2.1.2.txt
+ delete mode 100644 cmake/modules/FindGPS.cmake
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Tue Dec  8 21:42:08 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 8 Dec 2009 21:42:08 +0100
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-3-3-gf2402ff
+Message-ID: <200912082042.nB8Kg8Uw021884@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  f2402ff69d5ef9f99337430326e8c7bff1802141 (commit)
+       via  f24051c85e7d03f72810175ffb9af1e3c1790b69 (commit)
+      from  0648fc4d5f2c6aee3db461f889afab629fbea40d (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit f2402ff69d5ef9f99337430326e8c7bff1802141
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue Dec 8 21:35:04 2009 +0100
+
+    Release s3d 0.2.1.1-4
+
+commit f24051c85e7d03f72810175ffb9af1e3c1790b69
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue Dec 8 21:32:36 2009 +0100
+
+    Fix FTBFS with libgps-2.90
+    
+    gpsd as stated with version 2.90 that the binary breakage with nearly each
+    update should stop and that they want to have a better binary stability by now.
+    
+    As this is the first hard break in the development of it, we start to support
+    only the current version and all following compatible versions instead of
+    fixing each small breakage using cmake checks due to the old development model
+    with each minor update of gpsd.
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog                 |    6 +-
+ debian/control                   |    2 +-
+ debian/patches/libgps_2_90.patch |  182 ++++++++++++++++++++++++++++++++++++++
+ debian/patches/series            |    1 +
+ 4 files changed, 188 insertions(+), 3 deletions(-)
+ create mode 100644 debian/patches/libgps_2_90.patch
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Tue Dec  8 21:42:10 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 8 Dec 2009 21:42:10 +0100
+Subject: [S3d-svn] Project s3d at BerliOS annotated tag, debian/0.2.1.1-4,
+	created. debian/0.2.1.1-4
+Message-ID: <200912082042.nB8KgAux021941@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The annotated tag, debian/0.2.1.1-4 has been created
+        at  6730698c3758fdf0222114ebc3c621ab71670e08 (tag)
+   tagging  f2402ff69d5ef9f99337430326e8c7bff1802141 (commit)
+  replaces  debian/0.2.1.1-3
+ tagged by  Sven Eckelmann
+        on  Tue Dec 8 21:37:02 2009 +0100
+
+- Log -----------------------------------------------------------------
+Debian release 0.2.1.1-4
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQIcBAABCgAGBQJLHrjuAAoJEF2HCgfBJntGBAsQAJZ+0TfxcchcuzC0tEJr1tbB
+UTkoLG28+nYcJtlKcX9fsVe9DLCRbKiTKvnUH9U6xqvGFLOkEZ9UgIcLRArDYXwK
+UdAUA0aEeDKJcTjBaziYJtHDi6snPL4xrzrkN/+OKxcRB3Dhf1Sl3kzXr1J2+RVi
+FDe0MTXJ6MrrIqe1XLqBFuhLsWfUo0dl23nke+CtWxbVImi0SRFcIVbXY4tWciG8
+wNnzo6rZpPsutu4JP/NnUcnTY5wOtJT8f6aZxybt2PRz0XkWOTSG2sTW4nF3mvPH
+kGL/9BA0qwTmusWWh6RZ3uNnmZLO/EG0jYHFmxmBPeZCF2f5B0a9MF0QB+b9STgX
+xQdiu5k/AFGGXAQoSZd02IUQmc3G1XrOKScbvsnrKqHDb9YrWF88xxkTe1VBJ2yI
+xISmjQvcwEu3Y706ItQso2iJfdA4CAhov1+I3lZ/GMkF5yQRgLp+juhyIe2k9a9P
+ldgwm2o14vRmj7WoJqxACkLg4IKj53OYEOYbJdCb/uIO5xJ5AfIzZfT8HB/L4QVL
+sh/w4uWUZriz4jkNeKdgMwPvwljlptngrUYKNipjlEN+jRbKOi+WiaaYYVnAaK/U
+7biyxDta9fCbp+Mwzue5C2sHnzEnC2dqrrgOgGt3RcFMu1QIu+Mm7UtlbcM1aN5S
+/mDeY+W4+XZE42MA5c15
+=9c6d
+-----END PGP SIGNATURE-----
+
+Sven Eckelmann (3):
+      Register HTML documentation in doc-base
+      Fix FTBFS with libgps-2.90
+      Release s3d 0.2.1.1-4
+
+-----------------------------------------------------------------------
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

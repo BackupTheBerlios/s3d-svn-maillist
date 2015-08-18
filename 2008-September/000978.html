@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r998 - in trunk: Documentation/libs3d	Documentation/manpages/man3 libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r998%20-%20in%20trunk%3A%20Documentation/libs3d%0A%09Documentation/manpages/man3%20libs3d&In-Reply-To=%3C200809080942.m889gbZx028346%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000977.html">
+   <LINK REL="Next"  HREF="000979.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r998 - in trunk: Documentation/libs3d	Documentation/manpages/man3 libs3d</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r998%20-%20in%20trunk%3A%20Documentation/libs3d%0A%09Documentation/manpages/man3%20libs3d&In-Reply-To=%3C200809080942.m889gbZx028346%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r998 - in trunk: Documentation/libs3d	Documentation/manpages/man3 libs3d">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep  8 11:42:37 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000977.html">[S3d-svn] r997 - in trunk: Documentation/libs3dw	Documentation/manpages/man9 libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000979.html">[S3d-svn] r999 - in trunk/Documentation: . libs3d libs3dw	manpages/man3
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#978">[ date ]</a>
+              <a href="thread.html#978">[ thread ]</a>
+              <a href="subject.html#978">[ subject ]</a>
+              <a href="author.html#978">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-08 11:42:36 +0200 (Mon, 08 Sep 2008)
+New Revision: 998
+
+Modified:
+   trunk/Documentation/libs3d/functions.docbook
+   trunk/Documentation/manpages/man3/s3d_load_texture.3
+   trunk/libs3d/proto_out.c
+Log:
+Replace documentation of s3d_load_texture with original version
+
+Modified: trunk/Documentation/libs3d/functions.docbook
+===================================================================
+--- trunk/Documentation/libs3d/functions.docbook	2008-09-08 09:42:31 UTC (rev 997)
++++ trunk/Documentation/libs3d/functions.docbook	2008-09-08 09:42:36 UTC (rev 998)
+@@ -81,8 +81,7 @@
+ &lt;sect2 id=&quot;s3d_load_line_normals&quot;&gt;&lt;title&gt;s3d_load_line_normals&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_load_line_normals&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const float *&lt;parameter&gt;nbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;start&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Just as &lt;link linkend=&quot;s3d_pep_line_normals&quot;&gt;s3d_pep_line_normals&lt;/link&gt;(), with the difference you won't alter the latest n lines but n lines starting with index start.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_load_polygon_normals&quot;&gt;&lt;title&gt;s3d_load_polygon_normals&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_load_polygon_normals&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const float *&lt;parameter&gt;nbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;start&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Just as &lt;link linkend=&quot;s3d_pep_polygon_normals&quot;&gt;s3d_pep_polygon_normals&lt;/link&gt;(), with the difference you won't alter the latest n polygons but n polygons starting with index start.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_load_polygon_tex_coords&quot;&gt;&lt;title&gt;s3d_load_polygon_tex_coords&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_load_polygon_tex_coords&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const float *&lt;parameter&gt;tbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;start&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Just as &lt;link linkend=&quot;s3d_pep_polygon_tex_coords&quot;&gt;s3d_pep_polygon_tex_coords&lt;/link&gt;(), with the difference you won't alter the latest n polygons but n polygons starting with index start.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_load_texture&quot;&gt;&lt;title&gt;s3d_load_texture&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_load_texture&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;tex&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;xpos&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;ypos&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;w&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;h&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const uint8_t *&lt;parameter&gt;data&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Creates a new object, returning the object id.&lt;/para&gt;&lt;warning&gt;&lt;para&gt;Of course, you won't forget to toggle it visible, won't you? 
+-        &lt;/para&gt;&lt;/warning&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_load_texture&quot;&gt;&lt;title&gt;s3d_load_texture&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_load_texture&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;tex&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;xpos&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;ypos&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;w&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;h&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const uint8_t *&lt;parameter&gt;data&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;This will load an 32bit rgba image supplied in data at position xpos,ypos of the texture tex. The image has the width w and height h. This can be used to update only parts of the texture. It's no problem to supply big textures, as the image will be sent to server in fragments. Of course, you will have created the texture with &lt;link linkend=&quot;s3d_p!
+ ush_texture&quot;&gt;s3d_push_texture&lt;/link&gt;, have an material assigned to the texture with &lt;link linkend=&quot;s3d_pep_material_texture&quot;&gt;s3d_pep_material_texture&lt;/link&gt;() and have your polygons set sane polygon texture coords using &lt;link linkend=&quot;s3d_pep_polygon_tex_coord&quot;&gt;s3d_pep_polygon_tex_coord&lt;/link&gt;().         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_new_object&quot;&gt;&lt;title&gt;s3d_new_object&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_new_object&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Creates a new object, returning the object id.&lt;/para&gt;&lt;warning&gt;&lt;para&gt;Of course, you won't forget to toggle it visible, won't you? 
+         &lt;/para&gt;&lt;/warning&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_del_object&quot;&gt;&lt;title&gt;s3d_del_object&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_del_object&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;oid&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Deletes the object referenced by oid.         &lt;/para&gt;&lt;/sect2&gt;
+
+Modified: trunk/Documentation/manpages/man3/s3d_load_texture.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_load_texture.3	2008-09-08 09:42:31 UTC (rev 997)
++++ trunk/Documentation/manpages/man3/s3d_load_texture.3	2008-09-08 09:42:36 UTC (rev 998)
+@@ -17,12 +17,5 @@
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+-Creates a new object, returning the object id. 
+-.PP 
+-.RS 
+-\fBWarning:   
+-.PP 
+-Of course, you won't forget to toggle it visible, won't you?  
+- 
+-.RE 
++This will load an 32bit rgba image supplied in data at position xpos,ypos of the texture tex. The image has the width w and height h. This can be used to update only parts of the texture. It's no problem to supply big textures, as the image will be sent to server in fragments. Of course, you will have created the texture with s3d_push_texture, have an material assigned to the texture with s3d_pep_material_texture() and have your polygons set sane polygon texture coords using s3d_pep_polygon_tex_coord().          
+ .\&quot; created by instant / docbook-to-man
+
+Modified: trunk/libs3d/proto_out.c
+===================================================================
+--- trunk/libs3d/proto_out.c	2008-09-08 09:42:31 UTC (rev 997)
++++ trunk/libs3d/proto_out.c	2008-09-08 09:42:36 UTC (rev 998)
+@@ -1067,9 +1067,13 @@
+ 
+ /** \brief load texture from memory
+  *
+- * Creates a new object, returning the object id.
+- *
+- * \remarks Of course, you won't forget to toggle it visible, won't you?
++ * This will load an 32bit rgba image supplied in data at position xpos,ypos of
++ * the texture tex. The image has the width w and height h. This can be used to
++ * update only parts of the texture. It's no problem to supply big textures,
++ * as the image will be sent to server in fragments. Of course, you will have
++ * created the texture with s3d_push_texture, have an material assigned to the
++ * texture with s3d_pep_material_texture() and have your polygons set sane
++ * polygon texture coords using s3d_pep_polygon_tex_coord().
+  */
+ int s3d_load_texture(int object, uint32_t tex, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h, const uint8_t *data)
+ {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000977.html">[S3d-svn] r997 - in trunk: Documentation/libs3dw	Documentation/manpages/man9 libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000979.html">[S3d-svn] r999 - in trunk/Documentation: . libs3d libs3dw	manpages/man3
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#978">[ date ]</a>
+              <a href="thread.html#978">[ thread ]</a>
+              <a href="subject.html#978">[ subject ]</a>
+              <a href="author.html#978">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

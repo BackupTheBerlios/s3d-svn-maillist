@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r353 - in trunk: . apps/dot_mcp
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r353%20-%20in%20trunk%3A%20.%20apps/dot_mcp&In-Reply-To=%3C200606101658.k5AGwGb2021970%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000345.html">
+   <LINK REL="Next"  HREF="000347.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r353 - in trunk: . apps/dot_mcp</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r353%20-%20in%20trunk%3A%20.%20apps/dot_mcp&In-Reply-To=%3C200606101658.k5AGwGb2021970%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r353 - in trunk: . apps/dot_mcp">dotslash at berlios.de
+       </A><BR>
+    <I>Sat Jun 10 18:58:16 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000345.html">[S3d-svn] r352 - in trunk: . example
+</A></li>
+        <LI>Next message: <A HREF="000347.html">[S3d-svn] r354 - in trunk: . extras
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#346">[ date ]</a>
+              <a href="thread.html#346">[ thread ]</a>
+              <a href="subject.html#346">[ subject ]</a>
+              <a href="author.html#346">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-10 18:58:14 +0200 (Sat, 10 Jun 2006)
+New Revision: 353
+
+Modified:
+   trunk/
+   trunk/apps/dot_mcp/main.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r755 at balthasar</A>:  dotslash | 2006-06-10 18:58:10 +0200
+ - moving with keyup/keydown-events (smooth!)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:753
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:755
+
+Modified: trunk/apps/dot_mcp/main.c
+===================================================================
+--- trunk/apps/dot_mcp/main.c	2006-06-10 16:57:51 UTC (rev 352)
++++ trunk/apps/dot_mcp/main.c	2006-06-10 16:58:14 UTC (rev 353)
+@@ -30,12 +30,16 @@
+ #include &lt;string.h&gt;  /*  strncpy() */
+ #include &lt;stdio.h&gt;  /*  printf() */
+ #include &lt;math.h&gt;	/* sin(), cos() */
++#include &lt;time.h&gt;	/* nanosleep() */
++static struct timespec t={0,33*1000*1000}; 
++
+ #define bsize 	0.2
+ struct tver
+ {
+ 	float x,y,z;
+ };
+ struct tver campos, camrot;
++float xdif=0,ydif=0;
+ 
+ struct app {
+ 	unsigned int oid,oid_c;
+@@ -443,34 +447,46 @@
+ 		alpha=alpha+0.1;
+ 		if (alpha&gt;360.0) alpha=0.0;
+ 	}
+-	usleep(10000);
++	if (ego_mode)
++	{
++		if ((ydif!=0) || (xdif!=0))
++		{
++			campos.x+=ydif*sin((camrot.y*M_PI)/180);
++			campos.z+=ydif*cos((camrot.y*M_PI)/180);
++			campos.x+=xdif*cos((-camrot.y*M_PI)/180);
++			campos.z+=xdif*sin((-camrot.y*M_PI)/180);
++			campos.y+=ydif*sin((-camrot.x*M_PI)/180);
++			s3d_translate(	0,campos.x,campos.y,campos.z);
++		}
++	}
++	nanosleep(&amp;t,NULL); 
+ }
+-void keypress(struct s3d_evt *event)
++
++void keydown(struct s3d_evt *event)
+ {
+-	int key;
+-	float xdif=0,ydif=0;
+-	key=*((unsigned short *)event-&gt;buf);
+-	switch (key)
++	struct s3d_key_event *keys=(struct s3d_key_event *)event-&gt;buf;
++	switch (keys-&gt;keysym)
+ 	{
+ 		case S3DK_F1:  ego_mode=(ego_mode+1)%2;
+ 				 printf(&quot;ego mode %d\n&quot;,ego_mode);
+ 				 break;
+-		case 'w':ydif=-2;break;
+-		case 'a':xdif=-2;break;
+-		case 's':ydif= 2;break;
+-		case 'd':xdif= 2;break;
+-		default:
+-			printf(&quot;unknown/not handled key %d\n&quot;, key);
++		case 'w':ydif+=-1.0;break;
++		case 'a':xdif+=-1.0;break;
++		case 's':ydif+= 1.0;break;
++		case 'd':xdif+= 1.0;break;
+ 	}
+-	if (ego_mode)
++}
++void keyup(struct s3d_evt *event)
++{
++	struct s3d_key_event *keys=(struct s3d_key_event *)event-&gt;buf;
++	switch (keys-&gt;keysym)
+ 	{
+-		campos.x+=ydif*sin((camrot.y*M_PI)/180);
+-		campos.z+=ydif*cos((camrot.y*M_PI)/180);
+-		campos.x+=xdif*cos((-camrot.y*M_PI)/180);
+-		campos.z+=xdif*sin((-camrot.y*M_PI)/180);
+-		campos.y+=ydif*sin((-camrot.x*M_PI)/180);
+-		s3d_translate(	0,campos.x,campos.y,campos.z);
++		case 'w':ydif-=-1.0;break;
++		case 'a':xdif-=-1.0;break;
++		case 's':ydif-= 1.0;break;
++		case 'd':xdif-= 1.0;break;
+ 	}
++
+ }
+ 
+ int main (int argc, char **argv)
+@@ -480,7 +496,8 @@
+ 	s3d_set_callback(S3D_EVENT_QUIT,stop);
+ 	s3d_set_callback(S3D_MCP_DEL_OBJECT,mcp_del_object);
+ 	s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
+-	s3d_set_callback(S3D_EVENT_KEY,keypress);
++	s3d_set_callback(S3D_EVENT_KEYDOWN,keydown);
++	s3d_set_callback(S3D_EVENT_KEYUP,keyup);
+ 
+ 	if (!s3d_init(&amp;argc,&amp;argv,&quot;mcp&quot;))	
+ 	{
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000345.html">[S3d-svn] r352 - in trunk: . example
+</A></li>
+	<LI>Next message: <A HREF="000347.html">[S3d-svn] r354 - in trunk: . extras
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#346">[ date ]</a>
+              <a href="thread.html#346">[ thread ]</a>
+              <a href="subject.html#346">[ subject ]</a>
+              <a href="author.html#346">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

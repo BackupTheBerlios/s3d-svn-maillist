@@ -1,0 +1,217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r207 - in trunk: . example
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r207%20-%20in%20trunk%3A%20.%20example&In-Reply-To=%3C200603181459.k2IExZ5f010754%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000202.html">
+   <LINK REL="Next"  HREF="000204.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r207 - in trunk: . example</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r207%20-%20in%20trunk%3A%20.%20example&In-Reply-To=%3C200603181459.k2IExZ5f010754%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r207 - in trunk: . example">dotslash at berlios.de
+       </A><BR>
+    <I>Sat Mar 18 15:59:35 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000202.html">[S3d-svn] r206 - trunk/client
+</A></li>
+        <LI>Next message: <A HREF="000204.html">[S3d-svn] r208 - in trunk: . apps/dot_mcp apps/olsrs3d apps/s3dvt server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#203">[ date ]</a>
+              <a href="thread.html#203">[ thread ]</a>
+              <a href="subject.html#203">[ subject ]</a>
+              <a href="author.html#203">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-03-18 15:59:33 +0100 (Sat, 18 Mar 2006)
+New Revision: 207
+
+Added:
+   trunk/example/ptrtest.c
+Modified:
+   trunk/
+   trunk/example/Makefile.am
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r312 at balthasar</A>:  dotslash | 2006-03-18 15:57:06 +0100
+ - here you are: ptrtest added 
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:308
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:312
+
+Modified: trunk/example/Makefile.am
+===================================================================
+--- trunk/example/Makefile.am	2006-03-18 14:54:04 UTC (rev 206)
++++ trunk/example/Makefile.am	2006-03-18 14:59:33 UTC (rev 207)
+@@ -1,5 +1,5 @@
+ noinst_PROGRAMS=	3dsloader filebrowser hudtest katze \
+-			radius_test s3dclock snowman \
++			ptrtest radius_test s3dclock snowman \
+ 			strtest texturetest linetest
+ 			
+ 3dsloader_SOURCES=	3dsloader.c
+@@ -12,6 +12,7 @@
+ snowman_SOURCES=	snowman.c
+ strtest_SOURCES=	strtest.c
+ texturetest_SOURCES=	texturetest.c
++ptrtest_SOURCES=	ptrtest.c
+ 
+ CPPFLAGS=		-I$(top_srcdir)/server -I$(top_srcdir)/client
+ LIBS=			$(top_builddir)/client/libs3d.la
+
+Added: trunk/example/ptrtest.c
+===================================================================
+--- trunk/example/ptrtest.c	2006-03-18 14:54:04 UTC (rev 206)
++++ trunk/example/ptrtest.c	2006-03-18 14:59:33 UTC (rev 207)
+@@ -0,0 +1,109 @@
++/*
++ * ptrtest.c
++ * 
++ * Copyright (C) 2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
++#include &lt;s3d.h&gt;
++#include &lt;stdio.h&gt;  /*  NULL*/
++#include &lt;time.h&gt;	/* nanosleep() */
++int i;
++int o;
++float bottom=-1.0;
++float left=-1.0;
++float asp=1.0;
++float len=1.0;
++int alpha=0;
++static struct timespec t={0,100*1000*1000}; /* 100 mili seconds */
++void stop(struct s3d_evt *evt)
++{
++	s3d_quit();
++}
++
++void mainloop()
++{
++	alpha=(alpha+5)%360;
++	s3d_rotate(o,alpha,0,0);
++	nanosleep(&amp;t,NULL); 
++}
++void object_info(struct s3d_evt *hrmz)
++{
++	struct s3d_obj_info *inf;
++	inf=(struct s3d_obj_info *)hrmz-&gt;buf;
++	if (inf-&gt;object==0)
++	{
++		if (asp!=inf-&gt;scale)
++		{
++			asp=inf-&gt;scale;
++			printf(&quot;screen aspect: %f\n&quot;,asp);
++			if (asp&gt;1.0) /* wide screen */
++			{
++				bottom=-1.0;
++				left=-asp;
++			} else {  /* high screen */
++				bottom=(-1.0/asp);
++				left=-1.0;
++			}
++		}
++	}
++	if (inf-&gt;object==1)
++	{ /* of course, a link s3d_link(o,1 would be much easier ... */
++		s3d_translate(o,(inf-&gt;trans_x)*2.0,(inf-&gt;trans_y)*2.0,-2);
++	}
++}
++void mbutton_press(struct s3d_evt *hrmz)
++{
++	struct s3d_but_info *inf;
++	char s[256];
++	inf=(struct s3d_but_info *)hrmz-&gt;buf;
++	snprintf(s,256,&quot;button %d, state %d&quot;, inf-&gt;button,inf-&gt;state);
++	printf(&quot;button %d, state %d\n&quot;, inf-&gt;button,inf-&gt;state);
++	s3d_del_object(o);
++	o=s3d_draw_string(s,&amp;len);
++	s3d_translate(o,0,0,-2);
++	s3d_scale(o,0.2);
++	s3d_link(o,0);			/* link to cam */
++/*	s3d_link(o,1);*/
++	s3d_flags_on(o,S3D_OF_VISIBLE);
++}
++int main (int argc, char **argv)
++{
++	i=0;
++	if (!s3d_init(&amp;argc,&amp;argv,&quot;ptrtest&quot;))	
++	{
++		s3d_set_callback(S3D_EVENT_OBJ_INFO,object_info);
++		s3d_set_callback(S3D_EVENT_MBUTTON,mbutton_press);
++		s3d_set_callback(S3D_EVENT_QUIT,stop);
++		s3d_set_callback(S3D_EVENT_OBJ_CLICK,stop);
++		s3d_select_font(&quot;vera&quot;);
++		o=s3d_draw_string(&quot;hello&quot;,&amp;len);
++		s3d_translate(o,0,0,-2);
++		s3d_link(o,0);			/* link to cam */
++/*		s3d_link(o,1);*/
++		s3d_scale(o,0.2);
++		s3d_flags_on(o,S3D_OF_VISIBLE);
++		s3d_mainloop(mainloop);
++		 /*  wait for some object to be clicked */
++		s3d_quit();
++	}
++	return(0);
++}
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000202.html">[S3d-svn] r206 - trunk/client
+</A></li>
+	<LI>Next message: <A HREF="000204.html">[S3d-svn] r208 - in trunk: . apps/dot_mcp apps/olsrs3d apps/s3dvt server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#203">[ date ]</a>
+              <a href="thread.html#203">[ thread ]</a>
+              <a href="subject.html#203">[ subject ]</a>
+              <a href="author.html#203">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

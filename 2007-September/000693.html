@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r701 - in trunk: . apps apps/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r701%20-%20in%20trunk%3A%20.%20apps%20apps/comptest&In-Reply-To=%3C200709240219.l8O2JdFf012759%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000692.html">
+   <LINK REL="Next"  HREF="000694.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r701 - in trunk: . apps apps/comptest</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r701%20-%20in%20trunk%3A%20.%20apps%20apps/comptest&In-Reply-To=%3C200709240219.l8O2JdFf012759%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r701 - in trunk: . apps apps/comptest">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 24 04:19:39 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000692.html">[S3d-svn] r700 - trunk/cmake/modules
+</A></li>
+        <LI>Next message: <A HREF="000694.html">[S3d-svn] r702 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#693">[ date ]</a>
+              <a href="thread.html#693">[ thread ]</a>
+              <a href="subject.html#693">[ subject ]</a>
+              <a href="author.html#693">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-09-24 04:19:38 +0200 (Mon, 24 Sep 2007)
+New Revision: 701
+
+Added:
+   trunk/apps/comptest/CMakeLists.txt
+Removed:
+   trunk/apps/comptest/Makefile
+Modified:
+   trunk/ConfigureChecks.cmake
+   trunk/apps/CMakeLists.txt
+Log:
+Added comptest to normal s3d build environment
+
+
+Modified: trunk/ConfigureChecks.cmake
+===================================================================
+--- trunk/ConfigureChecks.cmake	2007-09-24 02:19:33 UTC (rev 700)
++++ trunk/ConfigureChecks.cmake	2007-09-24 02:19:38 UTC (rev 701)
+@@ -76,6 +76,30 @@
+ endif (LIBXML2_FOUND)
+ 
+ 
++# try to find lib and add include dir for Xcomposite
++find_package(Xcomposite)
++if (XCOMPOSITE_FOUND)
++	add_definitions(${XCOMPOSITE_DEFINITIONS})
++endif (XCOMPOSITE_FOUND)
++
++# try to find lib and add include dir for Xdamage
++find_package(Xdamage)
++if (XDAMAGE_FOUND)
++	add_definitions(${XDAMAGE_DEFINITIONS})
++endif (XDAMAGE_FOUND)
++
++# try to find lib and add include dir for Xfixes
++find_package(Xfixes)
++if (XFIXES_FOUND)
++	add_definitions(${XFIXES_DEFINITIONS})
++endif (XFIXES_FOUND)
++
++# try to find lib and add include dir for Xrender
++find_package(Xrender)
++if (XRENDER_FOUND)
++	add_definitions(${XRENDER_DEFINITIONS})
++endif (XRENDER_FOUND)
++
+ # try to find lib and add include dir for Xtst
+ find_package(Xtst)
+ if (XTST_FOUND)
+
+Modified: trunk/apps/CMakeLists.txt
+===================================================================
+--- trunk/apps/CMakeLists.txt	2007-09-24 02:19:33 UTC (rev 700)
++++ trunk/apps/CMakeLists.txt	2007-09-24 02:19:38 UTC (rev 701)
+@@ -1,3 +1,4 @@
++add_subdirectory(comptest)
+ add_subdirectory(dot_mcp)
+ add_subdirectory(kism3d)
+ add_subdirectory(meshs3d)
+
+Added: trunk/apps/comptest/CMakeLists.txt
+===================================================================
+--- trunk/apps/comptest/CMakeLists.txt	2007-09-24 02:19:33 UTC (rev 700)
++++ trunk/apps/comptest/CMakeLists.txt	2007-09-24 02:19:38 UTC (rev 701)
+@@ -0,0 +1,31 @@
++project(comptest)
++
++if (XCOMPOSITE_FOUND AND XDAMAGE_FOUND AND XFIXES_FOUND AND XRENDER_FOUND)
++	include_directories(${s3d_SOURCE_DIR}/libs3d)
++
++	add_executable(comptest comptest.c)
++	target_link_libraries(comptest s3d ${XCOMPOSITE_LIBRARIES}
++		${XFIXES_LIBRARIES} ${XDAMAGE_LIBRARIES} ${XRENDER_LIBRARIES})
++
++	# install
++	install(TARGETS comptest RUNTIME DESTINATION bin)
++else (XCOMPOSITE_FOUND AND XDAMAGE_FOUND AND XFIXES_FOUND AND XRENDER_FOUND)
++	if (NOT XCOMPOSITE_FOUND)
++		PkgStatus_Later(&quot;xcomposite (pkg name: libxcomposite-dev)&quot;)
++	endif (NOT XCOMPOSITE_FOUND)
++	
++	if (NOT XDAMAGE_FOUND)
++		PkgStatus_Later(&quot;xdamage (pkg name: libxdamage-dev)&quot;)
++	endif (NOT XDAMAGE_FOUND)
++	
++	if (NOT XFIXES_FOUND)
++		PkgStatus_Later(&quot;xfixes (pkg name: libxfixes-dev)&quot;)
++	endif (NOT XFIXES_FOUND)
++	
++	if (NOT XRENDER_FOUND)
++		PkgStatus_Later(&quot;xrender (pkg name: libxrender-dev)&quot;)
++	endif (NOT XRENDER_FOUND)
++	
++	# print late status
++	Collected_PkgStatus(&quot;comptest&quot;)
++endif (XCOMPOSITE_FOUND AND XDAMAGE_FOUND AND XFIXES_FOUND AND XRENDER_FOUND)
+
+Deleted: trunk/apps/comptest/Makefile
+===================================================================
+--- trunk/apps/comptest/Makefile	2007-09-24 02:19:33 UTC (rev 700)
++++ trunk/apps/comptest/Makefile	2007-09-24 02:19:38 UTC (rev 701)
+@@ -1,18 +0,0 @@
+-LIBS=-lXcomposite -lXdamage -lXfixes -lXrender -lX11 -lXext -ls3d  -lm 
+-CFLAGS= -I/usr/local/x.org/include -I../../libs3d -g -O2
+-LDFLAGS=-g -O2 $(LIBS)  -L../../build/libs3d
+-SOURCES=comptest.c
+-OBJS=$(SOURCES:.c=.o)
+-CC=gcc
+-LD=gcc
+-BIN=comptest
+-
+-
+-.SUFFIXES: .c .o
+-all:	comptest
+-comptest:	$(OBJS)
+-	$(LD) $(LDFLAGS) $&lt; -o $@
+-.c.o:  $(HEADERS)
+-	   $(CC) $(CFLAGS) -c $&lt; -o $@
+-clean:
+-	rm -rf $(OBJS) $(BIN)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000692.html">[S3d-svn] r700 - trunk/cmake/modules
+</A></li>
+	<LI>Next message: <A HREF="000694.html">[S3d-svn] r702 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#693">[ date ]</a>
+              <a href="thread.html#693">[ thread ]</a>
+              <a href="subject.html#693">[ subject ]</a>
+              <a href="author.html#693">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

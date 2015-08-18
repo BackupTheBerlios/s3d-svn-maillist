@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r878 - in trunk: example libs3d server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r878%20-%20in%20trunk%3A%20example%20libs3d%20server&In-Reply-To=%3C200711251955.lAPJtmrf025228%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000870.html">
+   <LINK REL="Next"  HREF="000872.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r878 - in trunk: example libs3d server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r878%20-%20in%20trunk%3A%20example%20libs3d%20server&In-Reply-To=%3C200711251955.lAPJtmrf025228%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r878 - in trunk: example libs3d server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 25 20:55:48 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000870.html">[S3d-svn] r877 - trunk/server
+</A></li>
+        <LI>Next message: <A HREF="000872.html">[S3d-svn] r879 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#871">[ date ]</a>
+              <a href="thread.html#871">[ thread ]</a>
+              <a href="subject.html#871">[ subject ]</a>
+              <a href="author.html#871">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-25 20:55:47 +0100 (Sun, 25 Nov 2007)
+New Revision: 878
+
+Modified:
+   trunk/example/texturetest.c
+   trunk/libs3d/proto_in.c
+   trunk/libs3d/s3dlib.h
+   trunk/server/event.c
+Log:
+- prepare event handling in the client
+- send shmid with the event
+- change texturetest to non-power-of-2 size, to show mipmap problem
+
+
+Modified: trunk/example/texturetest.c
+===================================================================
+--- trunk/example/texturetest.c	2007-11-25 19:39:45 UTC (rev 877)
++++ trunk/example/texturetest.c	2007-11-25 19:55:47 UTC (rev 878)
+@@ -37,8 +37,8 @@
+ 	s3d_rotate(oid, 0, i, 0);
+ 	nanosleep(&amp;t, NULL);
+ }
+-#define MAXX 32
+-#define MAXY 32
++#define MAXX 24
++#define MAXY 24
+ int main(int argc, char **argv)
+ {
+ 	unsigned int x, y;
+
+Modified: trunk/libs3d/proto_in.c
+===================================================================
+--- trunk/libs3d/proto_in.c	2007-11-25 19:39:45 UTC (rev 877)
++++ trunk/libs3d/proto_in.c	2007-11-25 19:55:47 UTC (rev 878)
+@@ -35,6 +35,7 @@
+ 	struct s3d_evt *s3devt = NULL;
+ 	struct mcp_object *mo;
+ 	struct s3d_obj_info *oi;
++	struct s3d_texshm *tshm;
+ 	switch (opcode) {
+ 	case S3D_P_S_INIT:
+ 		s3dprintf(MED, &quot;S3D_P_S_INIT: init!!&quot;);
+@@ -138,7 +139,27 @@
+ 			}
+ 		} else s3dprintf(MED, &quot;wrong length for S3D_P_S_OINFO length %d != %d&quot;, length, sizeof(struct s3d_obj_info));
+ 		break;
++	case S3D_P_S_SHMTEX:
++		if (length == sizeof(struct s3d_texshm)) {
++			tshm = (struct s3d_texshm *)buf;
+ 
++			/* this is only handled internally ... */
++			tshm-&gt;oid = ntohl(tshm-&gt;oid);
++			tshm-&gt;tex = ntohl(tshm-&gt;tex);
++			tshm-&gt;shmid = ntohl(tshm-&gt;shmid);
++			tshm-&gt;tw = ntohs(tshm-&gt;tw);
++			tshm-&gt;th = ntohs(tshm-&gt;th);
++			tshm-&gt;w = ntohs(tshm-&gt;w);
++			tshm-&gt;h = ntohs(tshm-&gt;h);
++
++			s3dprintf(MED, &quot;S3D_P_S_SHMTEX: texture %d of object %d is available under shmid %d&quot;,
++						tshm-&gt;tex, tshm-&gt;oid, tshm-&gt;shmid);
++
++		} else 
++			s3dprintf(MED, &quot;wrong length for S3D_P_S_SHMTEX length %d != %d&quot;, length, sizeof(struct s3d_texshm));
++		break;
++
++
+ 	case S3D_P_MCP_DEL_OBJECT:
+ 		if (length == 4) {
+ 			if (NULL != (s3devt = malloc(sizeof(struct s3d_evt)))) {
+
+Modified: trunk/libs3d/s3dlib.h
+===================================================================
+--- trunk/libs3d/s3dlib.h	2007-11-25 19:39:45 UTC (rev 877)
++++ trunk/libs3d/s3dlib.h	2007-11-25 19:55:47 UTC (rev 878)
+@@ -114,6 +114,11 @@
+ #ifdef SIGS
+ extern int _s3d_sigio;
+ #endif
++/* proto_in.c */
++struct s3d_texshm {
++	int32_t oid, tex, shmid;
++	uint16_t tw, th, w, h;
++} __attribute__((__packed__));
+ /*  network.c */
+ extern int con_type;
+ int net_send(uint8_t opcode, char *buf, uint16_t length);
+
+Modified: trunk/server/event.c
+===================================================================
+--- trunk/server/event.c	2007-11-25 19:39:45 UTC (rev 877)
++++ trunk/server/event.c	2007-11-25 19:55:47 UTC (rev 878)
+@@ -117,13 +117,15 @@
+ {
+ 	struct t_obj *o;
+ 	struct {
+-		int32_t oid, tex;
+-		int16_t tw, th, w, h;
++		int32_t oid, tex, shmid;
++		uint16_t tw, th, w, h;
+ 	} __attribute__((__packed__)) shmtex_packet;
+-	s3dprintf(HIGH, &quot;informing process about new texture on oid %d, texture %d\n&quot;, oid, tex);
+ 	if (OBJ_VALID(p, oid, o)) {
++		s3dprintf(LOW, &quot;informing process about new texture on oid %d, texture %d, which is available under id %d\n&quot;, 
++						oid, tex, o-&gt;p_tex[tex].shmid);
+ 		shmtex_packet.oid = htonl(oid);
+ 		shmtex_packet.tex = htonl(tex);
++		shmtex_packet.shmid = htonl(o-&gt;p_tex[tex].shmid);
+ 		shmtex_packet.tw = htons(o-&gt;p_tex[tex].tw);
+ 		shmtex_packet.th = htons(o-&gt;p_tex[tex].th);
+ 		shmtex_packet.w = htons(o-&gt;p_tex[tex].w);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000870.html">[S3d-svn] r877 - trunk/server
+</A></li>
+	<LI>Next message: <A HREF="000872.html">[S3d-svn] r879 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#871">[ date ]</a>
+              <a href="thread.html#871">[ thread ]</a>
+              <a href="subject.html#871">[ subject ]</a>
+              <a href="author.html#871">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

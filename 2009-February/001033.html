@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1053 - in trunk: cmake/modules libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2009-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1053%20-%20in%20trunk%3A%20cmake/modules%20libs3d&In-Reply-To=%3C200902151108.n1FB8H6A015991%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1053 - in trunk: cmake/modules libs3d</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1053%20-%20in%20trunk%3A%20cmake/modules%20libs3d&In-Reply-To=%3C200902151108.n1FB8H6A015991%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1053 - in trunk: cmake/modules libs3d">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Feb 15 12:08:17 CET 2009</I>
+    <P><UL>
+        
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1033">[ date ]</a>
+              <a href="thread.html#1033">[ thread ]</a>
+              <a href="subject.html#1033">[ subject ]</a>
+              <a href="author.html#1033">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2009-02-15 12:08:16 +0100 (Sun, 15 Feb 2009)
+New Revision: 1053
+
+Modified:
+   trunk/cmake/modules/FindG3D.cmake
+   trunk/libs3d/modelread.c
+Log:
+Transform g3d model orientation to s3d orientation
+
+libg3d changed the model orientation in rev378 (precedes libg3d 0.0.7).
+All s3d programs expect a different rotation around the x axis and we
+should give them their data as before.
+g3d_model_transform is a new function in libg3d 0.0.7 so we need to
+depend at least on that version.
+
+Modified: trunk/cmake/modules/FindG3D.cmake
+===================================================================
+--- trunk/cmake/modules/FindG3D.cmake	2008-12-24 20:33:15 UTC (rev 1052)
++++ trunk/cmake/modules/FindG3D.cmake	2009-02-15 11:08:16 UTC (rev 1053)
+@@ -38,5 +38,5 @@
+ else (G3D_LIBRARIES AND G3D_INCLUDE_DIRS)
+ 	find_package(PkgConfig)
+ 
+-	pkg_search_module(G3D libg3d&gt;=0.0.6)
++	pkg_search_module(G3D libg3d&gt;=0.0.7)
+ endif (G3D_LIBRARIES AND G3D_INCLUDE_DIRS)
+
+Modified: trunk/libs3d/modelread.c
+===================================================================
+--- trunk/libs3d/modelread.c	2008-12-24 20:33:15 UTC (rev 1052)
++++ trunk/libs3d/modelread.c	2009-02-15 11:08:16 UTC (rev 1053)
+@@ -25,6 +25,7 @@
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
+ #include &lt;g3d/g3d.h&gt;
++#include &lt;g3d/matrix.h&gt;
+ #include &lt;stdlib.h&gt;   /*  exit(), malloc() */
+ #include &lt;math.h&gt;   /*  sqrt() */
+ #include &lt;string.h&gt;   /*  strncpy() */
+@@ -129,6 +130,7 @@
+ 	G3DObject     *object;
+ 	G3DFace     *face;
+ 	GSList      *oitem, *oface;
++	G3DMatrix rmatrix[16];
+ 	struct material2texture *mat2tex;
+ 	unsigned int i, k;
+ 	int       j, material_count, texture_count, voff, obj_id;
+@@ -143,6 +145,9 @@
+ 	model = g3d_model_load_full(context, file, 0);
+ 
+ 	if (model) {
++		g3d_matrix_identity(rmatrix);
++		g3d_matrix_rotate_xyz(G_PI * 90.0 / 180, 0.0, 0.0, rmatrix);
++		g3d_model_transform(model, rmatrix);
+ 
+ 		oitem = model-&gt;objects;
+ 		obj_id = s3d_new_object();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1033">[ date ]</a>
+              <a href="thread.html#1033">[ thread ]</a>
+              <a href="subject.html#1033">[ subject ]</a>
+              <a href="author.html#1033">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

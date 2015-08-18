@@ -1,0 +1,215 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r519 - trunk/apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r519%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200612072050.kB7Koc1a000366%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000511.html">
+   <LINK REL="Next"  HREF="000513.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r519 - trunk/apps/s3dosm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r519%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200612072050.kB7Koc1a000366%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r519 - trunk/apps/s3dosm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Thu Dec  7 21:50:38 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000511.html">[S3d-svn] r518 - in trunk: . apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000513.html">[S3d-svn] r520 - in trunk: . apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#512">[ date ]</a>
+              <a href="thread.html#512">[ thread ]</a>
+              <a href="subject.html#512">[ subject ]</a>
+              <a href="author.html#512">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-12-07 21:50:37 +0100 (Thu, 07 Dec 2006)
+New Revision: 519
+
+Modified:
+   trunk/apps/s3dosm/draw.c
+Log:
+- nearly finished drawing algo for ways
+
+Modified: trunk/apps/s3dosm/draw.c
+===================================================================
+--- trunk/apps/s3dosm/draw.c	2006-12-05 22:22:52 UTC (rev 518)
++++ trunk/apps/s3dosm/draw.c	2006-12-07 20:50:37 UTC (rev 519)
+@@ -151,6 +151,16 @@
+ 	}
+ 	return(0);
+ }
++static float temp;
++#define		V_COPY(a,b)		a[0]=b[0];	a[1]=b[1];	a[2]=b[2];
++#define 	V_ADD(a,b,c)	c[0]=a[0]+b[0];	c[1]=a[1]+b[1];	c[2]=a[2]+b[2];
++#define 	V_SUB(a,b,c)	c[0]=a[0]-b[0];	c[1]=a[1]-b[1];	c[2]=a[2]-b[2];
++#define		V_DOT(a,b)		a[0]*b[0] + a[1]*b[1] + a[2] * b[2]
++#define		V_CROSS(a,b,c)	c[0]=a[1]*b[2] - a[2]*b[1];		c[1]=a[2]*b[0] - a[0]*b[2]; 	c[2]=a[0]*b[1] - a[1]*b[0];
++#define		V_LEN(a)		sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2]);
++#define		V_SCAL(a,s)		a[0]=s*a[0];	a[1]=s*a[1];	a[2]=s*a[2];
++#define		V_NORM(a)		temp=V_LEN(a); V_SCAL(a,1/temp);
++
+ /* draw waylist, clear the queue */
+ void waylist_draw(char *filter)
+ {
+@@ -161,6 +171,13 @@
+ 	int way_obj;
+ 	int waytype=0;
+ 	int adj_seg;
++	float a[3],b[3],*left,*right,*swap;
++	float street_width=1; /* TODO: dynamically adjust? */
++	float an[3];		/* normal on the plane, orthogonal on the right side of the left segment */
++	float n[3];			/* the direction vector in which the intersecion should be placed */
++	float s[3];			/* intersection point */
++	float n_len,scale;
++
+ /*	printf(&quot;way: %d - %d segments\n&quot;,lastid,waylist_n);*/
+ 	way_obj=s3d_new_object();
+ 	if (lastid!=-1) {
+@@ -232,18 +249,11 @@
+ 					{
+ 						float test[3],normal[3],linevector[3];
+ 						/* (re)calc test direction */
+-						s3d_vector_subtract(nodelist_p[adjlist_p[j].node_id].x,
+-											nodelist_p[adjlist_p[j+1].node_id].x,
+-												linevector);
+-						s3d_vector_cross_product(
+-												nodelist_p[adjlist_p[j].node_id].normal,
+-												linevector,
+-												normal); /* normal should look outside of our circle now. */
++						V_SUB(nodelist_p[adjlist_p[j].node_id].x,	nodelist_p[adjlist_p[j+1].node_id].x,	linevector);
++						V_CROSS(nodelist_p[adjlist_p[j].node_id].normal,	linevector,		normal); /* normal should look outside of our circle now. */
+ 						while (k&lt;adjlist_n) {
+ 							/* determine on which side the point is. if its between our testvector, we'll need to swap. */
+-							s3d_vector_subtract(nodelist_p[adjlist_p[j].node_id].x,
+-												nodelist_p[adjlist_p[k].node_id].x,
+-												test);
++							V_SUB(nodelist_p[adjlist_p[j].node_id].x,nodelist_p[adjlist_p[k].node_id].x,test);
+ 							if (s3d_vector_dot_product(normal,test)&gt;0) { /* same side, means adjacent line k is nearer to our point j
+ 																			than our point j+1 which is supposed to be the nearest point, 
+ 																			so we swap them and call a break to get the new test-normal */
+@@ -263,12 +273,37 @@
+ 				}
+ 				*/
+ 			}
++			left=a;
++			right=b;
++			V_SUB(nodelist_p[adjlist_p[0].node_id], nodelist_p[i].x, right);
++			V_NORM(right);
+ 
++
+ 			for (j=0;j&lt;adjlist_n;j++)
+ 			{
++				swap=left;
++				left=right;			/* use last right segment as new left segment */
++				right=left;			/* get space for the next right segment */
++				V_SUB(nodelist_p[adjlist_p[(j+1)%adjlist_n].node_id], nodelist_p[i].x, right);
++				V_NORM(right);
++				V_CROSS(nodelist_p[i].normal, left ,an);	/* an is also normalized, as first and second argument are already length 1 */
++				V_ADD(left, right, n);						/* direction which our intersection is */
++				n_len=V_LEN(n);
++				if (n_len&lt;0.001)
++				{	/* too low, don't use, just have intersection 90 degree of it. */
++					V_SCALE(an, street_width);		/* S = P + street_width * an */
++					V_ADD(nodelist_p[i].x, an, s);
++
++				} else {
++					V_COPY(s, nodelist_p[i].x);	/* s = P + (street_width/ ( n * an)) * n */
++					scale=V_DOT(n,an);	/* get cos (alpha/2), alpha is opposite angel of left and right segment */
++					V_SCALE(n,1/scale);
++					V_ADD(s, n, s);
++				}
++				
++				
+ 				printf(&quot;calc intersection\n&quot;);
+-				/* TODO: calc segpoints for j and j+1%adjlist_n */
+-/*				s3d_push_vertices(way_obj,segpoint,1);*/
++				s3d_push_vertices(way_obj,s,1);
+ 				adj_seg=adjlist_p[j].seg_id;
+ 				if (nodelist_p[i].node_id==waylist_p[adj_seg].node_from)	waylist_p[adj_seg].node_from_r=vert;
+ 					else													waylist_p[adj_seg].node_to_l=vert;
+@@ -282,21 +317,39 @@
+ 				/* TODO: fill the intersection polygon */
+ 			}
+ 		} else {
+-			int a,b;
+ 			printf(&quot;calc 2 endpoints\n&quot;);
+ 			/* endpoint */
+-			/* TODO calculate segpoint and set to/from pointers appropriate */
++			V_SUB(nodelist_p[adjlist_p[0].node_id], nodelist_p[i].x, a);
++			V_NORM(a);
++			V_CROSS(nodelist_p[i].normal, a ,an);	/* an is also normalized, as first and second argument are already length 1 */
++
++			V_COPY(s,nodelist_p[i].normal);
++			V_ADD(s,an,s);
++			s3d_push_vertices(way_obj,an,s);
++			j=vert;
++			vert++;
++			V_SCAL(an,-1);
++			V_COPY(s,nodelist_p[i].normal);
++			V_ADD(s,an,s);
++			k=vert;
++			vert++;
++			
+ 			adj_seg=adjlist_p[0].seg_id;
+ 			if (nodelist_p[i].node_id==waylist_p[adj_seg].node_from)	{
+-				waylist_p[adj_seg].node_from_l=a;
+-				waylist_p[adj_seg].node_from_r=b;
++				waylist_p[adj_seg].node_from_l=j;
++				waylist_p[adj_seg].node_from_r=k;
+ 			} else {
+-				waylist_p[adj_seg].node_to_l=b;
+-				waylist_p[adj_seg].node_to_r=a;
+-
++				waylist_p[adj_seg].node_to_l=k;
++				waylist_p[adj_seg].node_to_r=j;
+ 			}
+ 		}
+ 	}
++	for (i=0;i&lt;waylist_n;i++) {
++		printf(&quot;drawing way from points %d %d %d %d\n&quot;,waylist_p[i].node_from_l, waylist_p[i].node_to_l, waylist_p[i].node_to_r,waylist_p[i].node_from_r);
++		s3d_push_polygon(way_obj, waylist_p[i].node_from_l, waylist_p[i].node_to_l, waylist_p[i].node_to_r, 0);
++		s3d_push_polygon(way_obj, waylist_p[i].node_from_l, waylist_p[i].node_to_r, waylist_p[i].node_from_r, 0);
++		
++	}
+ 	s3d_link(way_obj,oidy);
+ 	s3d_flags_on(way_obj,S3D_OF_VISIBLE);
+ 	waylist_n=0;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000511.html">[S3d-svn] r518 - in trunk: . apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000513.html">[S3d-svn] r520 - in trunk: . apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#512">[ date ]</a>
+              <a href="thread.html#512">[ thread ]</a>
+              <a href="subject.html#512">[ subject ]</a>
+              <a href="author.html#512">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

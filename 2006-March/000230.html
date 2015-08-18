@@ -1,0 +1,318 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r237 - in trunk: . apps/dot_mcp apps/s3dfm example objs
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r237%20-%20in%20trunk%3A%20.%20apps/dot_mcp%20apps/s3dfm%20example%20objs&In-Reply-To=%3C200603252059.k2PKxVYE015562%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000229.html">
+   <LINK REL="Next"  HREF="000231.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r237 - in trunk: . apps/dot_mcp apps/s3dfm example objs</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r237%20-%20in%20trunk%3A%20.%20apps/dot_mcp%20apps/s3dfm%20example%20objs&In-Reply-To=%3C200603252059.k2PKxVYE015562%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r237 - in trunk: . apps/dot_mcp apps/s3dfm example objs">dotslash at berlios.de
+       </A><BR>
+    <I>Sat Mar 25 21:59:31 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000229.html">[S3d-svn] r236 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000231.html">[S3d-svn] r238 - trunk/objs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#230">[ date ]</a>
+              <a href="thread.html#230">[ thread ]</a>
+              <a href="subject.html#230">[ subject ]</a>
+              <a href="author.html#230">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-03-25 21:59:22 +0100 (Sat, 25 Mar 2006)
+New Revision: 237
+
+Modified:
+   trunk/TODO
+   trunk/apps/dot_mcp/menu.c
+   trunk/apps/s3dfm/main.c
+   trunk/example/Makefile.am
+   trunk/example/filebrowser.c
+   trunk/objs/AUTHORS
+   trunk/objs/Makefile.am
+Log:
+- using yds icons in the filebrowser
+- 3dsloader and filebrowser -&gt; installing (within Makefile.am)
+
+Modified: trunk/TODO
+===================================================================
+--- trunk/TODO	2006-03-25 20:05:44 UTC (rev 236)
++++ trunk/TODO	2006-03-25 20:59:22 UTC (rev 237)
+@@ -1,3 +1,6 @@
++general:
++	* svn add reset.3ds?!
++	* FULLSCREEN!
+ dot_mcp:
+ 	* sane paths for applications
+ autotools:
+
+Modified: trunk/apps/dot_mcp/menu.c
+===================================================================
+--- trunk/apps/dot_mcp/menu.c	2006-03-25 20:05:44 UTC (rev 236)
++++ trunk/apps/dot_mcp/menu.c	2006-03-25 20:59:22 UTC (rev 237)
+@@ -89,7 +89,7 @@
+ 	int i,menu_o;
+ 	menu_o=s3d_new_object();
+ 	act=0; /* menu deactived */
+-	go=s3d_import_3ds_file(&quot;objs/go_button.3ds&quot;);
++	go=s3d_import_3ds_file(&quot;objs/s3dstart.3ds&quot;);
+ 	s3d_flags_on(go,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 	s3d_link(go,menu_o);
+ 	for (i=0;i&lt;(sizeof(menu)/sizeof(struct menu_entry));i++)
+
+Modified: trunk/apps/s3dfm/main.c
+===================================================================
+--- trunk/apps/s3dfm/main.c	2006-03-25 20:05:44 UTC (rev 236)
++++ trunk/apps/s3dfm/main.c	2006-03-25 20:59:22 UTC (rev 237)
+@@ -46,6 +46,7 @@
+ int folder,geometry,mp3,duno,dot,dotdot,dirstep;
+ struct t_item {
+ 	int icon, str;							/* object ids ...*/
++	int block;								/* oid of the block */
+ 	char name[M_NAME];						/* name (e.g. file name) */
+ 	struct t_item *parent;					/* parent item */
+ 	struct t_item *list;					/* list of items  (if it's a subdir)*/
+@@ -56,7 +57,39 @@
+ 	int disp;
+ };
+ struct t_item root;
++/* draw a block */
++int new_block(struct t_item *dir)
++{
++	float vertices[]=
++			{-1,0,-1,
++			 -1,0, 1,
++			  1,0, 1,
++			  1,0,-1,
++			 -1,1,-1,
++			 -1,1, 1,
++			  1,1, 1,
++			  1,1,-1};
+ 
++			 
++	dir-&gt;block=s3d_new_object();
++	s3d_push_vertices(dir-&gt;block,vertices,8);
++	s3d_push_material(dir-&gt;block,
++						1,1,1,
++						1,1,1,
++						1,1,1);
++	s3d_push_polygon(dir-&gt;block,4,5,6,0);
++	s3d_push_polygon(dir-&gt;block,4,6,7,0);
++
++	s3d_push_polygon(dir-&gt;block,0,4,5,0);
++	s3d_push_polygon(dir-&gt;block,0,5,1,0);
++	
++	s3d_push_polygon(dir-&gt;block,3,7,4,0);
++	s3d_push_polygon(dir-&gt;block,3,4,0,0);
++
++	s3d_push_polygon(dir-&gt;block,2,6,7,0);
++	s3d_push_polygon(dir-&gt;block,2,7,3,0);
++
++}
+ int display_dir(struct t_item *dir)
+ {
+ 	int i;
+@@ -64,6 +97,10 @@
+ 	float dss; /* dirstep size */
+ 	int dirn, dirc,dps;
+ 	int icon;
++	float vertices[]={	-1,-1,0,
++						-1, 1,0,
++						 1, 1,0,
++						 1,-1,0};
+ 	px=pz=0.0;
+ 	if (dir-&gt;disp)
+ 		return(-1); /* already displayed ... */ 
+@@ -75,52 +112,34 @@
+ 		if (dir-&gt;list[i].type==T_FOLDER)
+ 			dirn++;
+ 	}
+-	dps=(dirn+3)/4; /* directories per side */
+-	dirc=0;			/* no directories counted yet */
+-	dss=1.0/(2.0*dps+1.0);
+-	dir-&gt;scale=dss;
++	dps=ceil(sqrt(dir-&gt;n_item)); /* directories per line */
+ 	printf(&quot;having %d directories, %d per side. one is scaled down to %3.3f \n&quot;,dirn,dps,dss);
++	root.icon=s3d_new_object();
+ 	for (i=0;i&lt;dir-&gt;n_item;i++)
+ 	{
+-		if (dir-&gt;list[i].type==T_FOLDER)
++		dir-&gt;list[i].px=((float)(i%dps)+0.5)/((float)dps)-0.5;
++		dir-&gt;list[i].pz=((float)i/dps+0.5)/((float)dps)-0.5;
++		dir-&gt;list[i].block=s3d_new_object();
++		s3d_link(dir-&gt;list[i].block,dir-&gt;block);
++		s3d_push_vertices(dir-&gt;list[i].block,vertices,2);
++		switch (dir-&gt;list[i].type)
+ 		{
+-			icon=dir-&gt;list[i].icon=s3d_clone(dirstep);
+-			printf(&quot;processing %d [%s] icon %d\n&quot;,dirc,dir-&gt;list[i].name,icon);
+-			s3d_scale(icon,dss);
+-		    s3d_flags_on(icon,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-			s3d_link(icon,dir-&gt;icon);
+-			/* castle style:
+-			 * direcotires are clockwise oredered, starting from the lower left corner on the 
+-			 * underlying dirstep */
+-			switch (dirc/dps)
+-			{
+-				case 0:
+-					px=-1.0+dss;
+-					pz=-1.0+(dirc*2+0.5)*2*dss;
+-					break;
+-				case 1:
+-					px=-1.0+((dirc-dps)*2+0.5)*2*dss;
+-					pz=1.0-dss;
+-					break;
+-				case 2:
+-					px=1.0-dss;
+-					pz=1.0-((dirc-2*dps)*2+0.5)*2*dss;
+-					break;
+-				case 3:
+-					px=1.0-((dirc-dps*3)*2+0.5)*2*dss;
+-					pz=-1.0+dss;
+-					break;
+-			}
+-			s3d_translate(icon, px,SH,pz);
+-			dir-&gt;list[i].px=px;
+-			dir-&gt;list[i].pz=pz;
+-			dir-&gt;list[i].str=s3d_draw_string(dir-&gt;list[i].name,NULL);
+-			s3d_translate(	dir-&gt;list[i].str, px,1.0+SH,pz);
+-			s3d_link(		dir-&gt;list[i].str,icon);
+-			s3d_flags_on(	dir-&gt;list[i].str,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-			dirc++;
+-			
+-        }
++			case T_FOLDER:
++				s3d_push_material(dir-&gt;list[i].block,
++										1,1,0,
++										1,1,0,
++										1,1,0);
++				break;
++			default:
++				s3d_push_material(dir-&gt;list[i].block,
++										0,0,1,
++										0,0,1,
++										0,0,1);
++		};
++		s3d_push_polygon(dir-&gt;list[i].block,0,1,2,0);
++		s3d_push_polygon(dir-&gt;list[i].block,0,2,3,0);
++		s3d_scale(dir-&gt;list[i].block,1.0/((float)dps));
++		s3d_flags_on(dir-&gt;list[i].block,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 	}
+ 	dir-&gt;disp=1;
+ 	return(0);
+@@ -290,8 +309,10 @@
+ 		root.icon=s3d_clone(dirstep);
+ 		root.px=root.pz=0.0;
+ 		root.scale=1.0;
++		new_block(&amp;root);
+ 		rescale(&amp;root);
+ 	    s3d_flags_on(root.icon,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++	    s3d_flags_on(root.block,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 		parse_dir(&amp;root);
+ 		display_dir(&amp;root);
+ 		s3d_mainloop(mainloop);
+
+Modified: trunk/example/Makefile.am
+===================================================================
+--- trunk/example/Makefile.am	2006-03-25 20:05:44 UTC (rev 236)
++++ trunk/example/Makefile.am	2006-03-25 20:59:22 UTC (rev 237)
+@@ -1,6 +1,7 @@
+-noinst_PROGRAMS=	3dsloader filebrowser hudtest katze \
++noinst_PROGRAMS=	hudtest katze \
+ 			ptrtest radius_test s3dclock snowman \
+ 			strtest texturetest linetest
++bin_PROGRAMS= filebrowser 3dsloader
+ 			
+ 3dsloader_SOURCES=	3dsloader.c
+ filebrowser_SOURCES=	filebrowser.c
+
+Modified: trunk/example/filebrowser.c
+===================================================================
+--- trunk/example/filebrowser.c	2006-03-25 20:05:44 UTC (rev 236)
++++ trunk/example/filebrowser.c	2006-03-25 20:59:22 UTC (rev 237)
+@@ -230,7 +230,7 @@
+ 		folder=s3d_import_3ds_file(&quot;objs/folder.3ds&quot;);
+ 		geometry=s3d_import_3ds_file(&quot;objs/geometry.3ds&quot;);
+ 		mp3=s3d_import_3ds_file(&quot;objs/notes.3ds&quot;);
+-		movie=s3d_import_3ds_file(&quot;objs/notes.3ds&quot;);
++		movie=s3d_import_3ds_file(&quot;objs/film.3ds&quot;);
+ 		duno=s3d_import_3ds_file(&quot;objs/duno.3ds&quot;);
+ 		dot=s3d_import_3ds_file(&quot;objs/dot.3ds&quot;);
+ 		dotdot=s3d_import_3ds_file(&quot;objs/dotdot.3ds&quot;);
+
+Modified: trunk/objs/AUTHORS
+===================================================================
+--- trunk/objs/AUTHORS	2006-03-25 20:05:44 UTC (rev 236)
++++ trunk/objs/AUTHORS	2006-03-25 20:59:22 UTC (rev 237)
+@@ -29,7 +29,9 @@
+ cube.3ds
+ cubey.3ds
+ cubeyholes.3ds
++film.3ds
+ miu.3ds
++s3dstart.3ds
+ spikeybla.3ds
+ star.3ds
+ 
+
+Modified: trunk/objs/Makefile.am
+===================================================================
+--- trunk/objs/Makefile.am	2006-03-25 20:05:44 UTC (rev 236)
++++ trunk/objs/Makefile.am	2006-03-25 20:59:22 UTC (rev 237)
+@@ -1,5 +1,6 @@
+ objsdir=	$(pkgdatadir)/objs
+ dist_objs_DATA = \
++	s3dstart.3ds \
+ 	internet.3ds \
+ 	katze_tail.3ds \
+ 	sec_p.3ds \
+@@ -15,6 +16,7 @@
+ 	katze_leg.3ds \
+ 	weirdball.3ds \
+ 	cubey.3ds \
++	film.3ds \
+ 	accesspoint.3ds \
+ 	folder.3ds \
+ 	snow_foot.3ds \
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000229.html">[S3d-svn] r236 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000231.html">[S3d-svn] r238 - trunk/objs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#230">[ date ]</a>
+              <a href="thread.html#230">[ thread ]</a>
+              <a href="subject.html#230">[ subject ]</a>
+              <a href="author.html#230">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,539 @@
+From lazhur at mail.berlios.de  Tue Apr 14 22:25:23 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 14 Apr 2009 22:25:23 +0200
+Subject: [S3d-svn] r1055 - in trunk: . apps/s3dosm cmake/modules
+Message-ID: <200904142025.n3EKPNsB012311@sheep.berlios.de>
+
+Author: lazhur
+Date: 2009-04-14 22:25:23 +0200 (Tue, 14 Apr 2009)
+New Revision: 1055
+
+Added:
+   trunk/cmake/modules/gpsd_fix.c
+Modified:
+   trunk/ConfigureChecks.cmake
+   trunk/apps/s3dosm/gps.c
+   trunk/cmake/modules/FindGPS.cmake
+   trunk/config.h.cmake
+Log:
+Correct check for new style gpsd structs in s3dosm
+
+gpsd changed the name of the defines which were used to detect if it is
+a version with their new style data structures. It is a better idea to
+check if the the structure gps_data_t has a member with the name fix
+instead of guessing it by looking at some defines which maybe changes
+over time.
+
+Modified: trunk/ConfigureChecks.cmake
+===================================================================
+--- trunk/ConfigureChecks.cmake	2009-03-17 21:17:15 UTC (rev 1054)
++++ trunk/ConfigureChecks.cmake	2009-04-14 20:25:23 UTC (rev 1055)
+@@ -82,6 +82,9 @@
+ find_package(GPS)
+ if (GPS_FOUND)
+ 	set(HAVE_GPS GPS_FOUND)
++	if (GPS_NEW_STRUCT)
++		set(HAVE_GPS_NEW GPS_NEW_STRUCT)
++	endif  (GPS_NEW_STRUCT)
+ endif (GPS_FOUND)
+ 
+ 
+
+Modified: trunk/apps/s3dosm/gps.c
+===================================================================
+--- trunk/apps/s3dosm/gps.c	2009-03-17 21:17:15 UTC (rev 1054)
++++ trunk/apps/s3dosm/gps.c	2009-04-14 20:25:23 UTC (rev 1055)
+@@ -28,12 +28,6 @@
+ #ifdef HAVE_GPS
+ static int user_icon = -1, user_icon_rotator = -1;
+ #include <gps.h>  /* gps_*() */
+-#ifdef NMEA_CHANNELS
+-#define GPS_NEW
+-#endif
+-#ifdef SIRF_CHANNELS
+-#define GPS_NEW
+-#endif
+ 
+ #include <errno.h>  /* errno */
+ #include <stdlib.h> /* malloc(), free() */
+@@ -58,7 +52,7 @@
+ {
+ 	if (!dgps->online)
+ 		printf("WARNING: no connection to gps device\n");
+-#ifdef GPS_NEW
++#ifdef HAVE_GPS_NEW
+ 	printf("[%d] lat/long: [%f|%f], altitude %f\n", frame, dgps->fix.latitude, dgps->fix.longitude, dgps->fix.altitude);
+ 	printf("speed [kph]: %f\n", dgps->fix.speed / KNOTS_TO_KPH);
+ 	printf("used %d/%d satellits\n", dgps->satellites_used, dgps->satellites);
+@@ -79,7 +73,7 @@
+ 		printf("status: dgps fix\n");
+ 		break;
+ 	}
+-#ifdef GPS_NEW
++#ifdef HAVE_GPS_NEW
+ 	switch (dgps->fix.mode)
+ #else
+ 	switch (dgps->mode)
+@@ -105,7 +99,7 @@
+ 	int fix = 1;
+ 	float la, lo, heading, speed, slen;
+ 	char buf[BUFSIZE+1];
+-#ifdef GPS_NEW
++#ifdef HAVE_GPS_NEW
+ 	if (!dgps->online)
+ 		fix = 0;
+ 	switch (dgps->fix.mode) {
+
+Modified: trunk/cmake/modules/FindGPS.cmake
+===================================================================
+--- trunk/cmake/modules/FindGPS.cmake	2009-03-17 21:17:15 UTC (rev 1054)
++++ trunk/cmake/modules/FindGPS.cmake	2009-04-14 20:25:23 UTC (rev 1055)
+@@ -2,6 +2,7 @@
+ #  GPS_FOUND - If false, do not try to use GPS.
+ #  GPS_INCLUDE_DIRS - where to find gps.h
+ #  GPS_LIBRARIES - the libraries to link against
++#  GPS_NEW_STRUCT - if new style gps_t struct was found
+ #
+ # Copyright (C) 2007-2008  Sven Eckelmann <sven.eckelmann at gmx.de>
+ #
+@@ -61,3 +62,19 @@
+ 	mark_as_advanced(GPS_INCLUDE_DIRS GPS_LIBRARIES)
+ 
+ endif (GPS_LIBRARIES AND GPS_INCLUDE_DIRS)
++
++if (GPS_FOUND)
++	message(STATUS "Check for new style gpsd struct")
++	try_compile(CMAKE_GPSD_NEW_STRUCT  ${CMAKE_BINARY_DIR}
++	            ${CMAKE_SOURCE_DIR}/cmake/modules/gpsd_fix.c
++	            CMAKE_FLAGS "-DLINK_LIBRARIES:STRING=${GPS_LIBRARIES}" "-DINCLUDE_DIRECTORIES=${GPS_INCLUDE_DIRS}")
++	if (CMAKE_GPSD_NEW_STRUCT)
++		message(STATUS "Check for new style gpsd struct - found")
++		set(GPS_NEW_STRUCT 1 CACHE INTERNAL
++		    "Does the gpsd support new style structs.")
++	else (CMAKE_GPSD_NEW_STRUCT)
++		message(STATUS "Check for new style gpsd struct - not found")
++		set(GPS_NEW_STRUCT 0 CACHE INTERNAL
++		    "Does the gpsd support new style structs.")
++	endif (CMAKE_GPSD_NEW_STRUCT)
++endif (GPS_FOUND)
+
+Added: trunk/cmake/modules/gpsd_fix.c
+===================================================================
+--- trunk/cmake/modules/gpsd_fix.c	2009-03-17 21:17:15 UTC (rev 1054)
++++ trunk/cmake/modules/gpsd_fix.c	2009-04-14 20:25:23 UTC (rev 1055)
+@@ -0,0 +1,13 @@
++#include <gps.h>
++
++#ifdef __CLASSIC_C__
++int main(){
++  int ac;
++  char*av[];
++#else
++int main(int ac, char*av[]){
++#endif
++  struct gps_data_t t;
++  sizeof(t.fix);
++  return 0;
++}
+
+Modified: trunk/config.h.cmake
+===================================================================
+--- trunk/config.h.cmake	2009-03-17 21:17:15 UTC (rev 1054)
++++ trunk/config.h.cmake	2009-04-14 20:25:23 UTC (rev 1055)
+@@ -5,6 +5,7 @@
+ 
+ #cmakedefine G_SDL 1
+ #cmakedefine HAVE_GPS 1
++#cmakedefine HAVE_GPS_NEW 1
+ #cmakedefine SHM 1
+ #cmakedefine SIGS 1
+ #cmakedefine TCP 1
+
+
+
+From lazhur at mail.berlios.de  Sat Apr 18 15:11:16 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 18 Apr 2009 15:11:16 +0200
+Subject: [S3d-svn] r1056 - trunk/apps/s3dosm
+Message-ID: <200904181311.n3IDBGm5009776@sheep.berlios.de>
+
+Author: lazhur
+Date: 2009-04-18 15:11:16 +0200 (Sat, 18 Apr 2009)
+New Revision: 1056
+
+Modified:
+   trunk/apps/s3dosm/io.c
+Log:
+s3dosm: Require argument in short option of --osm
+
+Modified: trunk/apps/s3dosm/io.c
+===================================================================
+--- trunk/apps/s3dosm/io.c	2009-04-14 20:25:23 UTC (rev 1055)
++++ trunk/apps/s3dosm/io.c	2009-04-18 13:11:16 UTC (rev 1056)
+@@ -69,7 +69,7 @@
+ 	};
+ 	optind = 0;
+ 	opterr = 0;
+-	while (-1 != (c = getopt_long(argc, argv, "dH:?ho", long_options, &lopt_idx))) {
++	while (-1 != (c = getopt_long(argc, argv, "dH:?ho:", long_options, &lopt_idx))) {
+ 		switch (c) {
+ 		case 0:
+ 			break;
+
+
+
+From lazhur at mail.berlios.de  Sat Apr 18 15:11:20 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 18 Apr 2009 15:11:20 +0200
+Subject: [S3d-svn] r1057 - trunk/libs3d
+Message-ID: <200904181311.n3IDBKDX009816@sheep.berlios.de>
+
+Author: lazhur
+Date: 2009-04-18 15:11:19 +0200 (Sat, 18 Apr 2009)
+New Revision: 1057
+
+Modified:
+   trunk/libs3d/io.c
+Log:
+Only strip out libs3d options from argv
+
+The idea of parse_args of libs3d was to parse all known opts and than
+stop before the parameter for the program starts. argv and argc is than
+modified to start at the first option not recognised by libs3d.
+This implementation was faulty and stripped of all valid options
+beginning with a dash in different versions of getopt. A better idea is
+to parse all parameters regardless of their first character and move
+them to the left to override libs3d options. The order in which libs3d
+and application specific option occurred isn't important anymore.
+
+Modified: trunk/libs3d/io.c
+===================================================================
+--- trunk/libs3d/io.c	2009-04-18 13:11:16 UTC (rev 1056)
++++ trunk/libs3d/io.c	2009-04-18 13:11:19 UTC (rev 1057)
+@@ -81,16 +81,22 @@
+ {
+ 	int     c;
+ 	int      lopt_idx;
++	int     old_argc, curopt;
+ 	struct option long_options[] = {
+-		{"s3d-url", 1, NULL, 0
+-		}, {"help", 0, NULL, 'h'}, {"s3d-help", 0, NULL, 'h'}, {NULL, 0, NULL, 0}
++		{"s3d-url", 1, NULL, 'u'},
++		{"help", 0, NULL, 'h'},
++		{"s3d-help", 0, NULL, 'h'},
++		{NULL, 0, NULL, 0}
+ 	};
+ 	if ((argc == NULL) || (argv == NULL)) return(0); /* nothing to parse */
++	old_argc = *argc;
+ 	optind = 0;
+ 	opterr = 0; /* we don't want to be bothered if there is some error */
+-	while (-1 != (c = getopt_long(*argc, *argv, "?h", long_options, &lopt_idx))) {
++	*argc = 1;
++	curopt = 1;
++	while (-1 != (c = getopt_long(old_argc, *argv, "-h", long_options, &lopt_idx))) {
+ 		switch (c) {
+-		case 0:
++		case 'u':
+ 			if (0 == strcmp(long_options[lopt_idx].name, "s3d-url")) {
+ 				if (optarg) {
+ 					url = optarg;
+@@ -104,13 +110,15 @@
+ 			return(-1);
+ 		default:
+ 			/* ignore args which are not for us, but maybe the app which builds on us */
++			(*argv)[(*argc)] = (*argv)[curopt];
++			(*argc)++;
+ 			break;
+ 		}
++		curopt = optind;
+ 	}
+-	if (*argc > 0) {
+-		*argc -= (optind - 1);  /*  hide s3d-options */
+-		(*argv)[optind-1] = (*argv)[0]; /*  restore program path */
+-		*argv += (optind - 1);  /*  set the string pointer at the right position */
++	for (c = optind; c < old_argc; c++) {
++		(*argv)[(*argc)] = (*argv)[c];
++		(*argc)++;
+ 	}
+ 	optind = 0;
+ 	return(0);
+
+
+
+From lazhur at mail.berlios.de  Sat Apr 18 15:11:24 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 18 Apr 2009 15:11:24 +0200
+Subject: [S3d-svn] r1058 - trunk/apps/s3dosm
+Message-ID: <200904181311.n3IDBOo3009861@sheep.berlios.de>
+
+Author: lazhur
+Date: 2009-04-18 15:11:23 +0200 (Sat, 18 Apr 2009)
+New Revision: 1058
+
+Modified:
+   trunk/apps/s3dosm/osm.c
+Log:
+s3dosm: Move to upcoming osm api 0.6
+
+Openstreetmap.org changes it's api to a newer version on
+17-19th April, 2009. No further changes should be needed for read-only
+applications.
+
+Modified: trunk/apps/s3dosm/osm.c
+===================================================================
+--- trunk/apps/s3dosm/osm.c	2009-04-18 13:11:19 UTC (rev 1057)
++++ trunk/apps/s3dosm/osm.c	2009-04-18 13:11:23 UTC (rev 1058)
+@@ -149,7 +149,7 @@
+ 	char url[1024];
+ 	char *fileBuf;      /* Pointer to downloaded data */
+ 	layer_t *layer;
+-	snprintf(url, 1024, "www.openstreetmap.org/api/0.5/map?bbox=%f,%f,%f,%f", minlon, minlat, maxlon, maxlat);
++	snprintf(url, 1024, "www.openstreetmap.org/api/0.6/map?bbox=%f,%f,%f,%f", minlon, minlat, maxlon, maxlat);
+ 	printf("downloading url [ %s ]\n", url);
+ 
+ 	ret = http_fetch(url, &fileBuf); /* Downloads page */
+
+
+
+From lazhur at mail.berlios.de  Mon Apr 27 22:59:05 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Mon, 27 Apr 2009 22:59:05 +0200
+Subject: [S3d-svn] r1059 - in trunk: apps/dot_mcp apps/meshs3d apps/s3dosm
+	experimental/olsrs3d
+Message-ID: <200904272059.n3RKx570026457@sheep.berlios.de>
+
+Author: lazhur
+Date: 2009-04-27 22:59:04 +0200 (Mon, 27 Apr 2009)
+New Revision: 1059
+
+Modified:
+   trunk/apps/dot_mcp/menu.c
+   trunk/apps/meshs3d/net.c
+   trunk/apps/s3dosm/db.c
+   trunk/experimental/olsrs3d/net.c
+Log:
+Prevent buffer overrun when using strncat
+
+strncat interprets n different than strncpy. It writes max. n
+characters to dest + '\0' as delimiter. This makes len(dest)+n+1 chars
+in dest when specifying n as max. number of characters taken from src.
+
+Modified: trunk/apps/dot_mcp/menu.c
+===================================================================
+--- trunk/apps/dot_mcp/menu.c	2009-04-18 13:11:23 UTC (rev 1058)
++++ trunk/apps/dot_mcp/menu.c	2009-04-27 20:59:04 UTC (rev 1059)
+@@ -66,14 +66,21 @@
+ 	if (act) {
+ 		for (i = 0;i < (sizeof(menu_items) / sizeof(struct menu_entry));i++) {
+ 			if ((oid == menu_items[i].icon_oid) || (oid == menu_items[i].str_oid)) {
++				int len;
+ 				if (0 == strncmp(menu_items[i].path, "LOGOUT", 6)) {
+ 					s3d_quit();
+ 					return;
+ 				}
+ 				strncpy(exec, menu_items[i].path, 256);
+-				strncat(exec, "> /dev/null 2>&1 &", 256); /* ignoring output, starting in background */
+-				printf("executing [%s]\n", exec);
+-				system(exec);
++				exec[255]= '\0';
++				len = strlen(exec);
++				if (len < 256) {
++					strncat(exec, "> /dev/null 2>&1 &", 255 - len); /* ignoring output, starting in background */
++					printf("executing [%s]\n", exec);
++					system(exec);
++				} else {
++					fprintf(stderr, "path too long to execute\n");
++				}
+ 				return;
+ 			}
+ 		}
+
+Modified: trunk/apps/meshs3d/net.c
+===================================================================
+--- trunk/apps/meshs3d/net.c	2009-04-18 13:11:23 UTC (rev 1058)
++++ trunk/apps/meshs3d/net.c	2009-04-27 20:59:04 UTC (rev 1059)
+@@ -73,6 +73,7 @@
+ int net_main(void)
+ {
+ 	static int net_read_count = 0;
++	int len_lbuf;
+ 
+ 	if ((numbytes = recv(sockfd, buf, MAXDATASIZE - 1, 0)) == -1) {
+ 		if (errno == EAGAIN)
+@@ -89,22 +90,25 @@
+ 	buf[numbytes] = '\0';
+ 
+ 	/* check for potential buffer overflow */
+-	if ((strlen(lbuf) + strlen(buf)) < MAXLINESIZE) {
++	len_lbuf = strlen(lbuf);
++	if ((len_lbuf + strlen(buf)) < MAXLINESIZE) {
+ 
+-		strncat(lbuf, buf, MAXLINESIZE);
++		strncat(lbuf, buf, MAXLINESIZE - len_lbuf - 1);
+ 
+ 	} else {
+ 
+ 		/* hope that carriage return is now in buf */
+-		if (strlen(lbuf) < MAXLINESIZE) {
++		if (len_lbuf < MAXLINESIZE) {
+ 
+ 			if (Global.debug) printf("WARNING: lbuf almost filled without *any* carriage return within that data !\nAppending truncated buf to lbuf to prevent buffer overflow.\n");
+-			strncat(lbuf, buf, MAXLINESIZE - strlen(lbuf));
++			strncat(lbuf, buf, MAXLINESIZE - len_lbuf - 1);
+ 
+ 		} else {
+ 
+ 			if (Global.debug) printf("ERROR: lbuf filled without *any* carriage return within that data !\nClearing lbuf to prevent buffer overflow.\n");
+ 			strncpy(lbuf, buf, MAXLINESIZE);
++			if (MAXLINESIZE > 0)
++				lbuf[MAXLINESIZE - 1] = '\0';
+ 
+ 		}
+ 
+
+Modified: trunk/apps/s3dosm/db.c
+===================================================================
+--- trunk/apps/s3dosm/db.c	2009-04-18 13:11:23 UTC (rev 1058)
++++ trunk/apps/s3dosm/db.c	2009-04-27 20:59:04 UTC (rev 1059)
+@@ -254,11 +254,16 @@
+ 	if (callback == NULL) { /* we can stack it */
+ 		int len;
+ 		len = strlen(query);
+-		if (len + qlen >= QBUF)
++		if (len + qlen >= QBUF) {
+ 			db_flush();
+-		strncat(qbuf, query, QBUF);
+-		qlen += strlen(query);
+-		ret = 0;
++
++		if (len >= QBUF) {
++			ret = db_really_exec(query, callback, arg);  /* pass it to the real function */
++		} else {
++			strncat(qbuf, query, QBUF - qlen - 1);
++			qlen += strlen(query);
++			ret = 0;
++		}
+ 	} else
+ #endif
+ 
+
+Modified: trunk/experimental/olsrs3d/net.c
+===================================================================
+--- trunk/experimental/olsrs3d/net.c	2009-04-18 13:11:23 UTC (rev 1058)
++++ trunk/experimental/olsrs3d/net.c	2009-04-27 20:59:04 UTC (rev 1059)
+@@ -73,6 +73,7 @@
+ 
+ int net_main(void)
+ {
++	int len_lbuf;
+ 
+ 	if ((numbytes = recv(sockfd, buf, MAXDATASIZE - 1, 0)) == -1) {
+ 		if (errno == EAGAIN)
+@@ -89,22 +90,25 @@
+ 	buf[numbytes] = '\0';
+ 
+ 	/* check for potential buffer overflow */
+-	if ((strlen(lbuf) + strlen(buf)) < MAXLINESIZE) {
++	len_lbuf = strlen(lbuf);
++	if ((len_lbuf + strlen(buf)) < MAXLINESIZE) {
+ 
+-		strncat(lbuf, buf, MAXLINESIZE);
++		strncat(lbuf, buf, MAXLINESIZE - len_lbuf - 1);
+ 
+ 	} else {
+ 
+ 		/* hope that carriage return is now in buf */
+-		if (strlen(lbuf) < MAXLINESIZE) {
++		if (len_lbuf < MAXLINESIZE) {
+ 
+ 			if (Debug) printf("WARNING: lbuf almost filled without *any* carriage return within that data !\nAppending truncated buf to lbuf to prevent buffer overflow.\n");
+-			strncat(lbuf, buf, MAXLINESIZE - strlen(lbuf));
++			strncat(lbuf, buf, MAXLINESIZE - len_lbuf - 1);
+ 
+ 		} else {
+ 
+ 			if (Debug) printf("ERROR: lbuf filled without *any* carriage return within that data !\nClearing lbuf to prevent buffer overflow.\n");
+ 			strncpy(lbuf, buf, MAXLINESIZE);
++			if (MAXLINESIZE > 0)
++				lbuf[MAXLINESIZE - 1] = '\0';
+ 
+ 		}
+ 
+
+
+
+From lazhur at mail.berlios.de  Mon Apr 27 22:59:08 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Mon, 27 Apr 2009 22:59:08 +0200
+Subject: [S3d-svn] r1060 - trunk/apps/s3dfm
+Message-ID: <200904272059.n3RKx8ck026471@sheep.berlios.de>
+
+Author: lazhur
+Date: 2009-04-27 22:59:08 +0200 (Mon, 27 Apr 2009)
+New Revision: 1060
+
+Modified:
+   trunk/apps/s3dfm/fs.c
+Log:
+s3dfm: Close source when target cannot be opened in fs_copy
+
+Modified: trunk/apps/s3dfm/fs.c
+===================================================================
+--- trunk/apps/s3dfm/fs.c	2009-04-27 20:59:04 UTC (rev 1059)
++++ trunk/apps/s3dfm/fs.c	2009-04-27 20:59:08 UTC (rev 1060)
+@@ -199,6 +199,7 @@
+ 		printf("open dest...");
+ 		if (NULL == (fpd = fopen(dest, "wb"))) {
+ 			fs_error("fs_copy():fopen(source)", source);
++			fclose(fps);
+ 			return(-1);
+ 		}
+ 		printf("ok\n");
+
+
+
+From lazhur at mail.berlios.de  Mon Apr 27 23:28:26 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Mon, 27 Apr 2009 23:28:26 +0200
+Subject: [S3d-svn] r1061 - in trunk/apps: dot_mcp s3dosm
+Message-ID: <200904272128.n3RLSQ3r028869@sheep.berlios.de>
+
+Author: lazhur
+Date: 2009-04-27 23:28:18 +0200 (Mon, 27 Apr 2009)
+New Revision: 1061
+
+Modified:
+   trunk/apps/dot_mcp/main.c
+   trunk/apps/s3dosm/draw.c
+Log:
+Remove unused variables from structs
+
+Modified: trunk/apps/dot_mcp/main.c
+===================================================================
+--- trunk/apps/dot_mcp/main.c	2009-04-27 20:59:08 UTC (rev 1060)
++++ trunk/apps/dot_mcp/main.c	2009-04-27 21:28:18 UTC (rev 1061)
+@@ -44,7 +44,7 @@
+ static float xdif = 0, ydif = 0;
+ 
+ struct app {
+-	int oid, oid_c;
++	int oid;
+ 	float r;
+ 	int init;
+ 	float trans_x, trans_y, trans_z;
+
+Modified: trunk/apps/s3dosm/draw.c
+===================================================================
+--- trunk/apps/s3dosm/draw.c	2009-04-27 20:59:08 UTC (rev 1060)
++++ trunk/apps/s3dosm/draw.c	2009-04-27 21:28:18 UTC (rev 1061)
+@@ -56,7 +56,6 @@
+ 	float la, lo, alt;  /* earth coords */
+ 	float x[3];    /* euclid coords */
+ 	float normal[3];
+-	float len;
+ };
+ /* list element for adjacent nodes */
+ struct adjlist {
+
+
+

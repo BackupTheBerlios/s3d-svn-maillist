@@ -1,0 +1,326 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r875 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r875%20-%20trunk/server&In-Reply-To=%3C200711251559.lAPFxteY016862%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000867.html">
+   <LINK REL="Next"  HREF="000869.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r875 - trunk/server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r875%20-%20trunk/server&In-Reply-To=%3C200711251559.lAPFxteY016862%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r875 - trunk/server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 25 16:59:55 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000867.html">[S3d-svn] r874 - trunk/svnonly/comptest
+</A></li>
+        <LI>Next message: <A HREF="000869.html">[S3d-svn] r876 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#868">[ date ]</a>
+              <a href="thread.html#868">[ thread ]</a>
+              <a href="subject.html#868">[ subject ]</a>
+              <a href="author.html#868">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-25 16:59:54 +0100 (Sun, 25 Nov 2007)
+New Revision: 875
+
+Modified:
+   trunk/server/global.h
+   trunk/server/object.c
+   trunk/server/shm.c
+Log:
+- prepare server for SHM textures
+
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2007-11-21 15:30:13 UTC (rev 874)
++++ trunk/server/global.h	2007-11-25 15:59:54 UTC (rev 875)
+@@ -110,6 +110,7 @@
+ 	uint16_t tw, th;  /*  texture width */
+ 	uint8_t *buf;   /*  the data */
+ 	float xs, ys;  /*  scale data for gl-implementations which require 2^x */
++	int shmid;		/* shared memory id, is -1 if it's not attached */
+ 	/*  texture sizes. */
+ 	int32_t gl_texnum;  /*  the gl texture number. */
+ };
+@@ -236,6 +237,7 @@
+ int shm_init(void);
+ int shm_quit(void);
+ int shm_main(void);
++int shm_next_key(void);
+ int shm_remove(struct t_process *p);
+ int shm_writen(struct buf_t *rb, uint8_t *buf, int n);
+ int shm_readn(struct buf_t *rb, uint8_t *buf, int n);
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2007-11-21 15:30:13 UTC (rev 874)
++++ trunk/server/object.c	2007-11-25 15:59:54 UTC (rev 875)
+@@ -30,13 +30,23 @@
+ #define _ISOC99_SOURCE
+ #endif
+ #include &lt;math.h&gt;   /*  sin(),cos() */
++#include &lt;errno.h&gt;	/* errno */
++#ifdef SHM
++#include &lt;sys/types.h&gt;
++#include &lt;sys/ipc.h&gt;
++#include &lt;sys/shm.h&gt;
++#endif
+ 
++
+ #define MAXLOOP 10
+ /*  if oid is always unsigned, we don't have to check oid&gt;=0 */
+ 
+ static void obj_update_tex(struct t_tex *tex, u_int16_t x, u_int16_t y, u_int16_t w, u_int16_t h, u_int8_t *pixbuf);
+ void obj_sys_update(struct t_process *p, int32_t oid);
+ 
++int texture_shm_register(struct t_tex *tex, int bufsize);
++void texture_delete(struct t_tex *tex);
++
+ /*  debugging function for objects, prints out some stuff known about it... */
+ int obj_debug(struct t_process *p, int32_t oid)
+ {
+@@ -250,6 +260,54 @@
+ 	}
+ 	return(0);
+ }
++
++/* register the texture, if possible */
++int texture_shm_register(struct t_tex *tex, int bufsize) 
++{
++#ifdef SHM
++	int key;
++	key = shm_next_key();
++	if ((tex-&gt;shmid = shmget(key, bufsize, 0644 | IPC_CREAT)) == -1) {
++		errnf(&quot;texture_shm_register():shmget()&quot;, errno);
++		return(-1);
++	}
++	tex-&gt;buf = shmat(tex-&gt;shmid, (void *)0, 0);
++	if ((key_t *)tex-&gt;buf == (key_t *)(-1)) {
++		errnf(&quot;shm_init():shmat()&quot;, errno);
++		shmctl(tex-&gt;shmid, IPC_RMID, NULL);
++		tex-&gt;shmid = -1;
++		return(-1);
++	}
++	return(0);
++#else
++	return(-1);
++#endif
++}
++
++/* delete the texture, eventually detach from the shm segment */
++void texture_delete(struct t_tex *tex) 
++{
++	GLuint t;
++	s3dprintf(HIGH, &quot;texture delete: shmid = %d, buf = %010p\n&quot;,tex-&gt;shmid, tex-&gt;buf);
++#ifdef SHM
++	if (tex-&gt;shmid != -1) {
++		if (tex-&gt;buf != NULL) {
++			shmdt(tex-&gt;buf);
++			tex-&gt;buf= NULL;
++		}
++		shmctl(tex-&gt;shmid, IPC_RMID, NULL);
++		tex-&gt;shmid = -1;
++	}
++#endif
++
++	if (tex-&gt;buf != NULL) 
++		free(tex-&gt;buf);
++	if (tex-&gt;gl_texnum) {
++		t = tex-&gt;gl_texnum;
++		glDeleteTextures(1, &amp;t);
++	}
++	
++}
+ /* creates n new textures on the texture stack, of object oid, with (w,h)
+  * given through *x */
+ int obj_push_tex(struct t_process *p, int32_t oid, uint16_t *x, int32_t n)
+@@ -258,6 +316,7 @@
+ 	struct t_tex *p_tex;
+ 	struct t_obj *obj;
+ 	uint16_t *px, hm;
++	int bufsize;
+ 	if (OBJ_VALID(p, oid, obj)) {
+ 		if (obj-&gt;oflags&amp;OF_NODATA) {
+ 			errds(MED, &quot;obj_push_tex()&quot;, &quot;error: no data on object allowed!&quot;);
+@@ -275,6 +334,7 @@
+ 			obj-&gt;p_tex = p_tex;
+ 			for (i = 0;i &lt; n;i++) {
+ 				obj-&gt;p_tex[m+i].gl_texnum = -1;
++				obj-&gt;p_tex[m+i].shmid = -1;
+ 				obj-&gt;p_tex[m+i].tw = *(px++);
+ 				obj-&gt;p_tex[m+i].th = *(px++);
+ 				if ((obj-&gt;p_tex[m+i].tw &lt;= TEXTURE_MAX_W) &amp;&amp; (obj-&gt;p_tex[m+i].th &lt;= TEXTURE_MAX_H) &amp;&amp;
+@@ -301,14 +361,22 @@
+ 						obj-&gt;p_tex[m+i].h = hm;
+ 						obj-&gt;p_tex[m+i].ys = (float)((double)obj-&gt;p_tex[m+i].th) / ((double)obj-&gt;p_tex[m+i].h);
+ 					}
+-					obj-&gt;p_tex[m+i].buf = malloc(obj-&gt;p_tex[m+i].h * obj-&gt;p_tex[m+i].w * 4);
+-					memset(obj-&gt;p_tex[m+i].buf, 0, obj-&gt;p_tex[m+i].h*obj-&gt;p_tex[m+i].w*4);
+ 					errds(LOW, &quot;obj_push_tex()&quot;, &quot;setting up %d %d (in mem: %d %d) texture&quot;,
+ 					      obj-&gt;p_tex[m+i].tw,
+ 					      obj-&gt;p_tex[m+i].th,
+ 					      obj-&gt;p_tex[m+i].w,
+ 					      obj-&gt;p_tex[m+i].h);
+ 
++					bufsize = obj-&gt;p_tex[m+i].h * obj-&gt;p_tex[m+i].w * 4;
++
++					if (texture_shm_register(&amp;(obj-&gt;p_tex[m+i]), bufsize) == -1) {
++						obj-&gt;p_tex[m+i].buf = malloc(bufsize);
++					}
++					memset(obj-&gt;p_tex[m+i].buf, 0, bufsize);
++
++
++
++	
+ 				} else {
+ 					errds(MED, &quot;obj_push_tex()&quot;, &quot;bad size for texture %d (requested size: %dx%d, max %dx%d)&quot;, m + i,
+ 					      obj-&gt;p_tex[m+i].tw, obj-&gt;p_tex[m+i].th, TEXTURE_MAX_W, TEXTURE_MAX_H);
+@@ -1009,7 +1077,6 @@
+ 	int32_t i;
+ 	struct t_tex *p_tex;
+ 	struct t_obj *obj;
+-	GLuint t;
+ 	if (OBJ_VALID(p, oid, obj)) {
+ 		if (obj-&gt;oflags&amp;OF_NODATA) {
+ 			errds(MED, &quot;obj_del_tex()&quot;, &quot;error: can't delete textures in this object!&quot;);
+@@ -1019,28 +1086,15 @@
+ 		s3dprintf(VLOW, &quot;deleting %d textures of pid %d/ oid %d&quot;, n, p-&gt;id, oid);
+ 		m = obj-&gt;n_tex;  /*  saving the first number of textures  */
+ 		if (n &gt;= m) {
+-			for (i = 0;i &lt; m;i++) {
+-				if ((obj-&gt;p_tex[i].buf) != NULL)
+-					free(obj-&gt;p_tex[i].buf);
+-				if (obj-&gt;p_tex[i].gl_texnum) {
+-					t = obj-&gt;p_tex[i].gl_texnum;
+-					glDeleteTextures(1, &amp;t);
+-				}
+-			}
++			for (i = 0;i &lt; m;i++) 
++				texture_delete(&amp;(obj-&gt;p_tex[i]));
+ 			if (m &gt; 0)
+ 				free(obj-&gt;p_tex);
+ 			obj-&gt;n_tex = 0;
+ 			obj-&gt;p_tex = NULL;
+ 		} else if (n &gt; 0) {
+-			for (i = (m - n);i &lt; m;i++) {
+-				if (obj-&gt;p_tex[i].buf != NULL)
+-					free(obj-&gt;p_tex[i].buf);
+-				if (obj-&gt;p_tex[i].gl_texnum) {
+-					t = obj-&gt;p_tex[i].gl_texnum;
+-					glDeleteTextures(1, &amp;t);
+-				}
+-
+-			}
++			for (i = (m - n);i &lt; m;i++) 
++				texture_delete(&amp;(obj-&gt;p_tex[i]));
+ 			if (NULL != (p_tex = realloc(obj-&gt;p_tex, sizeof(struct t_tex) * (m - n)))) {
+ 				if (obj-&gt;dplist) {
+ 					s3dprintf(VLOW, &quot;freeing display list %d to get new data&quot;, obj-&gt;dplist);
+@@ -1967,7 +2021,6 @@
+ int obj_free(struct t_process *p, int32_t oid)
+ {
+ 	int32_t i;
+-	GLuint t;
+ 	struct t_obj *o = p-&gt;object[oid];
+ 	s3dprintf(HIGH, &quot;deleting object %d of process %d&quot;, oid, p-&gt;id);
+ 
+@@ -1987,14 +2040,8 @@
+ 		if (o-&gt;n_vertex &gt; 0) free(o-&gt;p_vertex);
+ 		if (o-&gt;n_poly &gt; 0) free(o-&gt;p_poly);
+ 		if (o-&gt;n_mat &gt; 0) free(o-&gt;p_mat);
+-		for (i = 0;i &lt; o-&gt;n_tex;i++) {
+-			if (o-&gt;p_tex[i].buf != NULL)
+-				free(o-&gt;p_tex[i].buf);
+-			if (o-&gt;p_tex[i].gl_texnum) {
+-				t = o-&gt;p_tex[i].gl_texnum;
+-				glDeleteTextures(1, &amp;t);
+-			}
+-		}
++		for (i = 0;i &lt; o-&gt;n_tex;i++) 
++			texture_delete(&amp;(o-&gt;p_tex[i]));
+ 		if (o-&gt;n_tex &gt; 0) free(o-&gt;p_tex);
+ 
+ 	}
+
+Modified: trunk/server/shm.c
+===================================================================
+--- trunk/server/shm.c	2007-11-21 15:30:13 UTC (rev 874)
++++ trunk/server/shm.c	2007-11-25 15:59:54 UTC (rev 875)
+@@ -52,9 +52,10 @@
+ 
+ static int shm_new_comblock(key_t *data);
+ 
+-static int next_key(int oldkey)
++int shm_next_key(void)
+ {
+-	return(oldkey + 1);
++	mkey = mkey + 1;
++	return(mkey);
+ }
+ int shm_init(void)
+ {
+@@ -70,7 +71,8 @@
+ 		return(1);
+ 	}
+ 	s3dprintf(LOW, &quot;shm_init(): init key is 0x%08x&quot;, key);
+-	mkey = next_key(key);
++	mkey = key;
++
+ 	/* connect to (and possibly create) the segment: */
+ 	if ((shmid = shmget(key, SHM_SIZE, 0644 | IPC_CREAT)) == -1) {
+ 		errnf(&quot;shm_init():shmget()&quot;, errno);
+@@ -101,10 +103,8 @@
+ 	struct t_shmcb *mycb;
+ 	comblock_init(&amp;waiting_comblock);
+ 	mycb = &amp;waiting_comblock;
+-	mycb-&gt;key_stoc = mkey;
+-	mkey = next_key(mkey);
+-	mycb-&gt;key_ctos = mkey;
+-	mkey = next_key(mkey);
++	mycb-&gt;key_stoc = shm_next_key();
++	mycb-&gt;key_ctos = shm_next_key();
+ 	s3dprintf(MED, &quot;shm_open_comblock():stoc: %08x, ctos: %08x&quot;, mycb-&gt;key_stoc, mycb-&gt;key_ctos);
+ 	/* connect &amp; create the client to server segment: */
+ 	if ((mycb-&gt;shmid_ctos = shmget(mycb-&gt;key_ctos, RB_STD_SIZE, 0644 | IPC_CREAT)) == -1) {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000867.html">[S3d-svn] r874 - trunk/svnonly/comptest
+</A></li>
+	<LI>Next message: <A HREF="000869.html">[S3d-svn] r876 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#868">[ date ]</a>
+              <a href="thread.html#868">[ thread ]</a>
+              <a href="subject.html#868">[ subject ]</a>
+              <a href="author.html#868">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

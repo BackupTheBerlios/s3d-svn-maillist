@@ -1,0 +1,194 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r526 - in trunk: . apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r526%20-%20in%20trunk%3A%20.%20apps/s3dosm&In-Reply-To=%3C200612102105.kBAL5669026174%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000518.html">
+   <LINK REL="Next"  HREF="000520.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r526 - in trunk: . apps/s3dosm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r526%20-%20in%20trunk%3A%20.%20apps/s3dosm&In-Reply-To=%3C200612102105.kBAL5669026174%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r526 - in trunk: . apps/s3dosm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Dec 10 22:05:06 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000518.html">[S3d-svn] r525 - in trunk: . apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000520.html">[S3d-svn] r527 - in trunk: libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#519">[ date ]</a>
+              <a href="thread.html#519">[ thread ]</a>
+              <a href="subject.html#519">[ subject ]</a>
+              <a href="author.html#519">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-12-10 22:05:06 +0100 (Sun, 10 Dec 2006)
+New Revision: 526
+
+Added:
+   trunk/apps/s3dosm/bbbikepol_to_osm.pl
+Modified:
+   trunk/
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1269 at kero</A>:  dotslash | 2006-12-10 22:05:01 +0100
+ - bbbike to osm converter (watchout, perl!)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1265
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1269
+
+Added: trunk/apps/s3dosm/bbbikepol_to_osm.pl
+===================================================================
+--- trunk/apps/s3dosm/bbbikepol_to_osm.pl	2006-12-10 15:19:16 UTC (rev 525)
++++ trunk/apps/s3dosm/bbbikepol_to_osm.pl	2006-12-10 21:05:06 UTC (rev 526)
+@@ -0,0 +1,99 @@
++#!/usr/bin/env perl
++#
++# 
++# Copyright (C) 2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++#
++# This file is part of s3dosm, a gps card application for s3d.
++# See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++# 
++# s3dosm is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++# 
++# s3dosm is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++# 
++# You should have received a copy of the GNU General Public License
++# along with s3dosm; if not, write to the Free Software
++# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++#
++#
++#
++# takes a bbbike[1] streetfile as input and converts it to some osm xml file format.
++# 
++# bbbike files are usually not in polar coordinate format, you will have to convert them first, e.g.
++# like this (from within your local bbbike checkout): 
++#
++#  perl ./miscsrc/convert_coordsys standard polar &lt; data/strassen &gt; /tmp/strassen.polar
++#
++#  [1]:	bbbike is the free Berlin bike map system: <A HREF="http://bbbike.sourceforge.net/">http://bbbike.sourceforge.net/</A>
++#  		use the cvs download from sourceforge to retrieve the scripts and data.
++#  
++use Switch;
++$created_by=&quot;dotslashs crufty bbbike converter&quot;;
++$node_string=&quot;&quot;;
++$seg_string=&quot;&quot;;
++$way_string=&quot;&quot;;
++$id=1;
++( $sec, $min, $hour, $day, $month, $year ) = ( localtime ) [ 0, 1, 2, 3, 4, 5 ];
++%translate = (&quot;HH&quot;,&quot;primary&quot;,&quot;H&quot;,&quot;secondary&quot;,&quot;N&quot;,&quot;residential&quot;, &quot;NN&quot;,&quot;residential&quot;);
++$timestamp =sprintf(&quot;%04d-%02d-%02d %02d:%02d:%02d&quot;,1900+$year,$month,$day, $hour,$min,$sec);
++print &quot;&lt;?xml version='1.0' encoding='UTF-8'?&gt;\n&quot;;
++print &quot;&lt;osm version='0.3' generator='$created_by'&gt;\n&quot;;
++
++while (&lt;&gt;) {
++	if (/^\#/) {
++		next;
++	}
++	@array=split(/\t/,$_);
++	$name=$array[0];
++	$name=~ s/\'//eg;	# remove bad '
++	$name=~ s/([\x80-\xFF])/chr(0xC0|ord($1)&gt;&gt;6).chr(0x80|ord($1)&amp;0x3F)/eg;	#latin1 -&gt; utf8
++	($type, @coords)=split(/[\s]/,$array[1]);
++#		$type=shift(@coords);			# actually the first entry isn't some coord .. 	
++	if ($type eq&quot;Pl&quot;) {	
++		($lo, $la)=split(/,/,$coords[0]);
++		$node_string.=&quot; &lt;node id='$id' timestamp='$timestamp' lat='$la' lon='$lo'&gt;\n&quot;;
++		$node_string.=&quot;   &lt;tag k='created_by' v='$created_by' /&gt;\n&quot;;
++		$node_string.=&quot;   &lt;tag k='amenity' v='foo' /&gt;\n&quot;;
++		$node_string.=&quot;   &lt;tag k='name' v='$name' /&gt;\n&quot;;
++		$node_string.=&quot; &lt;/node&gt;\n&quot;;
++			$id++;
++	} else {
++		@nodeid=(0,0);
++		@segs=();
++		foreach (@coords) {
++			($lo, $la)=split(/,/,$_);
++			$node_string.=&quot; &lt;node id='$id' timestamp='$timestamp' lat='$la' lon='$lo' /&gt;\n&quot;;
++			$nodeid[1]=$nodeid[0];
++			$nodeid[0]=$id;
++			$id++;
++			if ($nodeid[1]&gt;0) {
++				$seg_string.=&quot; &lt;segment id='$id' from='&quot;.$nodeid[1].&quot;' to='&quot;.$nodeid[0].&quot;' /&gt;\n&quot;;
++				push(@segs,$id);
++				$id++;
++			}
++			
++		}
++		
++		$way_string.=&quot; &lt;way id='$id' timestamp='$timestamp'&gt;\n&quot;;
++		foreach (@segs) {	$way_string.=&quot;   &lt;seg id='$_' /&gt;\n&quot;;	}
++		$way_string.=&quot;   &lt;tag k='name' v='$name' /&gt;\n&quot;;
++		$way_string.=&quot;   &lt;tag k='motorcar' v='yes' /&gt;\n&quot;;
++		$way_string.=&quot;   &lt;tag k='bicycle' v='yes' /&gt;\n&quot;;
++		$way_string.=&quot;   &lt;tag k='foot' v='yes' /&gt;\n&quot;;
++		$way_string.=&quot;   &lt;tag k='class' v='motorway' /&gt;\n&quot;;
++		$way_string.=&quot;   &lt;tag k='highway' v='&quot;.$translate{$type}.&quot;' /&gt;\n&quot;;
++		$way_string.=&quot;   &lt;tag k='created_by' v='$created_by' /&gt;\n&quot;;
++
++		$way_string.=&quot; &lt;/way&gt;\n&quot;;
++	}
++} 
++
++print $node_string;
++print $seg_string;
++print $way_string;
++print &quot;&lt;/osm&gt;\n&quot;;
+
+
+Property changes on: trunk/apps/s3dosm/bbbikepol_to_osm.pl
+___________________________________________________________________
+Name: svn:executable
+   + *
+Name: svn:mime-type
+   + text/script
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000518.html">[S3d-svn] r525 - in trunk: . apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000520.html">[S3d-svn] r527 - in trunk: libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#519">[ date ]</a>
+              <a href="thread.html#519">[ thread ]</a>
+              <a href="subject.html#519">[ subject ]</a>
+              <a href="author.html#519">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

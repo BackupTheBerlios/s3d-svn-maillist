@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r617 - in branches/s3d-cmake: libs3d server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r617%20-%20in%20branches/s3d-cmake%3A%20libs3d%20server&In-Reply-To=%3C200707011314.l61DExIj032017%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000610.html">
+   <LINK REL="Next"  HREF="000609.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r617 - in branches/s3d-cmake: libs3d server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r617%20-%20in%20branches/s3d-cmake%3A%20libs3d%20server&In-Reply-To=%3C200707011314.l61DExIj032017%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r617 - in branches/s3d-cmake: libs3d server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Jul  1 15:14:59 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000610.html">[S3d-svn] r616 - in branches/s3d-cmake: . apps/s3dosm libs3d server
+</A></li>
+        <LI>Next message: <A HREF="000609.html">[S3d-svn] r618 - in branches/s3d-cmake: libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#608">[ date ]</a>
+              <a href="thread.html#608">[ thread ]</a>
+              <a href="subject.html#608">[ subject ]</a>
+              <a href="author.html#608">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-07-01 15:14:59 +0200 (Sun, 01 Jul 2007)
+New Revision: 617
+
+Modified:
+   branches/s3d-cmake/libs3d/s3dlib.h
+   branches/s3d-cmake/server/global.h
+Log:
+- Corrected order of static, __inline__ and void in function declaration
+
+
+Modified: branches/s3d-cmake/libs3d/s3dlib.h
+===================================================================
+--- branches/s3d-cmake/libs3d/s3dlib.h	2007-07-01 13:14:58 UTC (rev 616)
++++ branches/s3d-cmake/libs3d/s3dlib.h	2007-07-01 13:14:59 UTC (rev 617)
+@@ -66,9 +66,9 @@
+ void errds(int relevance,char *func, const char *fmt, ...);
+ 
+ #else 
+-void static __inline__ s3dprintf(int relevance, const char *fmt, ...) {}
+-void static __inline__ errdn(int relevance, char *func,int en) {}
+-void static __inline__ errds(int relevance,char *func, const char *fmt, ...) {}
++static __inline__ void s3dprintf(int relevance, const char *fmt, ...) {}
++static __inline__ void errdn(int relevance, char *func,int en) {}
++static __inline__ void errds(int relevance,char *func, const char *fmt, ...) {}
+ 
+ #endif
+ void errn(char *func,int en);
+
+Modified: branches/s3d-cmake/server/global.h
+===================================================================
+--- branches/s3d-cmake/server/global.h	2007-07-01 13:14:58 UTC (rev 616)
++++ branches/s3d-cmake/server/global.h	2007-07-01 13:14:59 UTC (rev 617)
+@@ -277,8 +277,8 @@
+ void errds(int relevance,char *func, const char *fmt, ...);
+ void s3dprintf(int relevance, const char *msg, ...);
+ #else
+-static void __inline__ errds(int relevance,char *func, const char *fmt, ...) {}
+-static void __inline__ s3dprintf(int relevance, const char *msg, ...) {}
++static __inline__ void errds(int relevance, char *func, const char *fmt, ...) {}
++static __inline__ void s3dprintf(int relevance, const char *msg, ...) {}
+ #endif
+ /*  graphics.c */
+ int graphics_quit(void);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000610.html">[S3d-svn] r616 - in branches/s3d-cmake: . apps/s3dosm libs3d server
+</A></li>
+	<LI>Next message: <A HREF="000609.html">[S3d-svn] r618 - in branches/s3d-cmake: libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#608">[ date ]</a>
+              <a href="thread.html#608">[ thread ]</a>
+              <a href="subject.html#608">[ subject ]</a>
+              <a href="author.html#608">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

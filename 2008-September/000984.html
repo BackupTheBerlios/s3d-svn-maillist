@@ -1,0 +1,479 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1004 - in trunk: libs3d server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1004%20-%20in%20trunk%3A%20libs3d%20server&In-Reply-To=%3C200809252221.m8PMLvwm006722%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000983.html">
+   <LINK REL="Next"  HREF="000985.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1004 - in trunk: libs3d server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1004%20-%20in%20trunk%3A%20libs3d%20server&In-Reply-To=%3C200809252221.m8PMLvwm006722%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1004 - in trunk: libs3d server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 26 00:21:57 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000983.html">[S3d-svn] r1003 - in trunk: libs3d server
+</A></li>
+        <LI>Next message: <A HREF="000985.html">[S3d-svn] r1005 - in trunk: experimental/testvis libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#984">[ date ]</a>
+              <a href="thread.html#984">[ thread ]</a>
+              <a href="subject.html#984">[ subject ]</a>
+              <a href="author.html#984">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-26 00:21:51 +0200 (Fri, 26 Sep 2008)
+New Revision: 1004
+
+Added:
+   trunk/libs3d/endian.c
+   trunk/server/endian.c
+Modified:
+   trunk/libs3d/CMakeLists.txt
+   trunk/libs3d/proto_in.c
+   trunk/libs3d/proto_out.c
+   trunk/libs3d/s3dlib.h
+   trunk/server/CMakeLists.txt
+   trunk/server/event.c
+   trunk/server/global.h
+   trunk/server/mcp.c
+   trunk/server/proto.c
+Log:
+Simplify block endian conversations
+
+Modified: trunk/libs3d/CMakeLists.txt
+===================================================================
+--- trunk/libs3d/CMakeLists.txt	2008-09-25 22:21:32 UTC (rev 1003)
++++ trunk/libs3d/CMakeLists.txt	2008-09-25 22:21:51 UTC (rev 1004)
+@@ -2,9 +2,9 @@
+ 
+ set(S3D_LIBRARY_DEPENDENCIES  ${MATH_LIBRARIES} ${G3D_LIBRARIES} ${FONTCONFIG_LIBRARIES} ${FREETYPE_LIBRARIES})
+ 
+-add_library(s3d SHARED callback.c error.c event.c fontselect.c freetype.c
+-	io.c modelread.c network.c object_queue.c proto_in.c proto_out.c
+-	sei_construct.c sei_misc.c sei_monotone.c sei_tri.c shm.c
++add_library(s3d SHARED callback.c endian.c error.c event.c fontselect.c
++	freetype.c io.c modelread.c network.c object_queue.c proto_in.c
++	proto_out.c sei_construct.c sei_misc.c sei_monotone.c sei_tri.c shm.c
+ 	shm_ringbuf.c tcp.c vector.c hash.c texture.c)
+ target_link_libraries(s3d ${S3D_LIBRARY_DEPENDENCIES})
+ set_target_properties(s3d PROPERTIES VERSION ${VERSION} SOVERSION 2)
+
+Added: trunk/libs3d/endian.c
+===================================================================
+--- trunk/libs3d/endian.c	2008-09-25 22:21:32 UTC (rev 1003)
++++ trunk/libs3d/endian.c	2008-09-25 22:21:51 UTC (rev 1004)
+@@ -0,0 +1,79 @@
++/*
++ * event.c
++ *
++ * Copyright (C) 2004-2008 S3D contributors
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#include &lt;arpa/inet.h&gt; /*  htonl(),htons() */
++#include &lt;stdint.h&gt;
++
++/* convert buffer with floats from host to network endianess */
++void htonfb(float* netfloat, int num)
++{
++	int i;
++	for (i = 0; i &lt; num; i++) {
++		*(uint32_t*)&amp;netfloat[i] = htonl(*(uint32_t*)&amp;netfloat[i]);
++	}
++}
++
++/* convert buffer with floats from network to host endianess */
++void ntohfb(float* netfloat, int num)
++{
++	int i;
++	for (i = 0; i &lt; num; i++) {
++		*(uint32_t*)&amp;netfloat[i] = ntohl(*(uint32_t*)&amp;netfloat[i]);
++	}
++}
++
++/* convert buffer with uint32_ts from host to network endianess */
++void htonlb(uint32_t* netint32, int num)
++{
++	int i;
++	for (i = 0; i &lt; num; i++) {
++		netint32[i] = htonl(netint32[i]);
++	}
++}
++
++/* convert buffer with uint32_ts from network to host endianess */
++void ntohlb(uint32_t* netint32, int num)
++{
++	int i;
++	for (i = 0; i &lt; num; i++) {
++		netint32[i] = ntohl(netint32[i]);
++	}
++}
++
++/* convert buffer with uint16_ts from host to network endianess */
++void htonsb(uint16_t* netint16, int num)
++{
++	int i;
++	for (i = 0; i &lt; num; i++) {
++		netint16[i] = htons(netint16[i]);
++	}
++}
++
++/* convert buffer with uint16_ts from network to host endianess */
++void ntohsb(uint16_t* netint16, int num)
++{
++	int i;
++	for (i = 0; i &lt; num; i++) {
++		netint16[i] = ntohs(netint16[i]);
++	}
++}
+
+Modified: trunk/libs3d/proto_in.c
+===================================================================
+--- trunk/libs3d/proto_in.c	2008-09-25 22:21:32 UTC (rev 1003)
++++ trunk/libs3d/proto_in.c	2008-09-25 22:21:51 UTC (rev 1004)
+@@ -29,15 +29,6 @@
+ #include &lt;errno.h&gt;   /*  errno */
+ #include &lt;stdlib.h&gt;   /*  malloc(), free() */
+ 
+-/* convert buffer with floats from network to host endianess */
+-static void ntohfb(float* netfloat, int num)
+-{
+-	int i;
+-	for (i = 0; i &lt; num; i++) {
+-		*(uint32_t*)&amp;netfloat[i] = ntohl(*(uint32_t*)&amp;netfloat[i]);
+-	}
+-}
+-
+ /*  this proccesses the commands and pushes s3d-events, or does other things ;) */
+ int net_prot_in(uint8_t opcode, uint16_t length, char *buf)
+ {
+
+Modified: trunk/libs3d/proto_out.c
+===================================================================
+--- trunk/libs3d/proto_out.c	2008-09-25 22:21:32 UTC (rev 1003)
++++ trunk/libs3d/proto_out.c	2008-09-25 22:21:51 UTC (rev 1004)
+@@ -38,15 +38,6 @@
+ 
+ #define MF_LEN 65530  /*  maximum fragmentation length */
+ 
+-/* convert buffer with floats from host to network endianess */
+-static void htonfb(float* netfloat, int num)
+-{
+-	int i;
+-	for (i = 0; i &lt; num; i++) {
+-		*(uint32_t*)&amp;netfloat[i] = htonl(*(uint32_t*)&amp;netfloat[i]);
+-	}
+-}
+-
+ /** \brief create new object
+  *
+  * Creates a new object, returning the object id.
+
+Modified: trunk/libs3d/s3dlib.h
+===================================================================
+--- trunk/libs3d/s3dlib.h	2008-09-25 22:21:32 UTC (rev 1003)
++++ trunk/libs3d/s3dlib.h	2008-09-25 22:21:51 UTC (rev 1004)
+@@ -172,3 +172,10 @@
+ void _s3d_handle_texshm(struct s3d_texshm *tshm);
+ int _s3d_load_texture_shm(int object, uint32_t tid, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h, const uint8_t *data);
+ 
++/* endian.c */
++void htonfb(float* netfloat, int num);
++void ntohfb(float* netfloat, int num);
++void htonlb(uint32_t* netint32, int num);
++void ntohlb(uint32_t* netint32, int num);
++void htonsb(uint16_t* netint16, int num);
++void ntohsb(uint16_t* netint16, int num);
+
+Modified: trunk/server/CMakeLists.txt
+===================================================================
+--- trunk/server/CMakeLists.txt	2008-09-25 22:21:32 UTC (rev 1003)
++++ trunk/server/CMakeLists.txt	2008-09-25 22:21:51 UTC (rev 1004)
+@@ -1,7 +1,7 @@
+ include_directories(${s3d_SOURCE_DIR}/libs3d)
+ 
+ # base files
+-set(server_src allocate.c cull.c error.c event.c graphics.c
++set(server_src allocate.c cull.c endian.c error.c event.c graphics.c
+ 	main.c matrix.c mcp.c navigation.c network.c object.c
+ 	process.c proto.c shm.c	shm_ringbuf.c tcp.c user.c)
+ 
+
+Added: trunk/server/endian.c
+===================================================================
+--- trunk/server/endian.c	2008-09-25 22:21:32 UTC (rev 1003)
++++ trunk/server/endian.c	2008-09-25 22:21:51 UTC (rev 1004)
+@@ -0,0 +1,79 @@
++/*
++ * event.c
++ *
++ * Copyright (C) 2004-2008 S3D contributors
++ *
++ * This file is part of s3d, a 3d network display server.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * s3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * s3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#include &lt;arpa/inet.h&gt; /*  htonl(),htons() */
++#include &lt;stdint.h&gt;
++
++/* convert buffer with floats from host to network endianess */
++void htonfb(float* netfloat, int num)
++{
++	int i;
++	for (i = 0; i &lt; num; i++) {
++		*(uint32_t*)&amp;netfloat[i] = htonl(*(uint32_t*)&amp;netfloat[i]);
++	}
++}
++
++/* convert buffer with floats from network to host endianess */
++void ntohfb(float* netfloat, int num)
++{
++	int i;
++	for (i = 0; i &lt; num; i++) {
++		*(uint32_t*)&amp;netfloat[i] = ntohl(*(uint32_t*)&amp;netfloat[i]);
++	}
++}
++
++/* convert buffer with uint32_ts from host to network endianess */
++void htonlb(uint32_t* netint32, int num)
++{
++	int i;
++	for (i = 0; i &lt; num; i++) {
++		netint32[i] = htonl(netint32[i]);
++	}
++}
++
++/* convert buffer with uint32_ts from network to host endianess */
++void ntohlb(uint32_t* netint32, int num)
++{
++	int i;
++	for (i = 0; i &lt; num; i++) {
++		netint32[i] = ntohl(netint32[i]);
++	}
++}
++
++/* convert buffer with uint16_ts from host to network endianess */
++void htonsb(uint16_t* netint16, int num)
++{
++	int i;
++	for (i = 0; i &lt; num; i++) {
++		netint16[i] = htons(netint16[i]);
++	}
++}
++
++/* convert buffer with uint16_ts from network to host endianess */
++void ntohsb(uint16_t* netint16, int num)
++{
++	int i;
++	for (i = 0; i &lt; num; i++) {
++		netint16[i] = ntohs(netint16[i]);
++	}
++}
+
+Modified: trunk/server/event.c
+===================================================================
+--- trunk/server/event.c	2008-09-25 22:21:32 UTC (rev 1003)
++++ trunk/server/event.c	2008-09-25 22:21:51 UTC (rev 1004)
+@@ -32,15 +32,6 @@
+ #endif
+ #include &lt;string.h&gt;  /*  strlen(),strcpy() */
+ 
+-/* convert buffer with floats from host to network endianess */
+-static void htonfb(float* netfloat, int num)
+-{
+-	int i;
+-	for (i = 0; i &lt; num; i++) {
+-		*(uint32_t*)&amp;netfloat[i] = htonl(*(uint32_t*)&amp;netfloat[i]);
+-	}
+-}
+-
+ /*  I don't plan to keep this until the end, but it can show us how */
+ /*  to interact ... */
+ int event_obj_click(struct t_process *p, int32_t oid)
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2008-09-25 22:21:32 UTC (rev 1003)
++++ trunk/server/global.h	2008-09-25 22:21:51 UTC (rev 1004)
+@@ -397,3 +397,11 @@
+ #define free(x)   debugFree(x);
+ #define realloc(x,y) debugRealloc(x,y,42)
+ #endif
++
++/* endian.c */
++void htonfb(float* netfloat, int num);
++void ntohfb(float* netfloat, int num);
++void htonlb(uint32_t* netint32, int num);
++void ntohlb(uint32_t* netint32, int num);
++void htonsb(uint16_t* netint16, int num);
++void ntohsb(uint16_t* netint16, int num);
+
+Modified: trunk/server/mcp.c
+===================================================================
+--- trunk/server/mcp.c	2008-09-25 22:21:32 UTC (rev 1003)
++++ trunk/server/mcp.c	2008-09-25 22:21:51 UTC (rev 1004)
+@@ -31,16 +31,6 @@
+ #endif
+ #include &lt;string.h&gt;    /*  strncpy() */
+ 
+-/* convert buffer with floats from host to network endianess */
+-static void htonfb(float* netfloat, int num)
+-{
+-	int i;
+-	for (i = 0; i &lt; num; i++) {
+-		*(uint32_t*)&amp;netfloat[i] = htonl(*(uint32_t*)&amp;netfloat[i]);
+-	}
+-}
+-
+-
+ /*  this interacts with the actual mcp client */
+ struct mcp_object {
+ 	uint32_t object;
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2008-09-25 22:21:32 UTC (rev 1003)
++++ trunk/server/proto.c	2008-09-25 22:21:51 UTC (rev 1004)
+@@ -37,17 +37,6 @@
+ int focus_oid = -1;  /*  initially focus the pid */
+ /*  handle an incoming command from the client .. */
+ 
+-
+-/* convert buffer with floats from network to host endianess */
+-static void ntohfb(float* netfloat, int num)
+-{
+-	int i;
+-	for (i = 0; i &lt; num; i++) {
+-		*(uint32_t*)&amp;netfloat[i] = ntohl(*(uint32_t*)&amp;netfloat[i]);
+-	}
+-}
+-
+-
+ int prot_com_in(struct t_process *p, uint8_t *pbuf)
+ {
+ 	uint8_t  command;
+@@ -146,9 +135,7 @@
+ 			cptr += 4;
+ 			num = (length - 4) / (4 * 4);
+ 			/*      s3dprintf(LOW,&quot;received %d new polygons for object oid...%d&quot;, num, oid); */
+-			for (i = 0;i &lt; (num*4);i++)
+-				*((uint32_t *)cptr + i) =
+-				        ntohl(*((uint32_t *)cptr + i));
++			ntohlb((uint32_t *)cptr, num*4);
+ 			/*  convert index names */
+ 			obj_push_poly(p, oid, (uint32_t *)cptr, num);
+ 		}
+@@ -159,9 +146,7 @@
+ 			cptr += 4;
+ 			num = (length - 4) / (4 * 3);
+ 			s3dprintf(VLOW, &quot;received %d new lines for object oid...%d&quot;, num, oid);
+-			for (i = 0;i &lt; (num*3);i++)
+-				*((uint32_t *)cptr + i) =
+-				        ntohl(*((uint32_t *)cptr + i));
++			ntohlb((uint32_t *)cptr, num*3);
+ 			/*  convert index names */
+ 			obj_push_line(p, oid, (uint32_t *)cptr, num);
+ 		}
+@@ -172,9 +157,7 @@
+ 			cptr += 4;
+ 			num = (length - 4) / (2 * 2);
+ 			s3dprintf(LOW, &quot;received %d new textures for object oid...%d&quot;, num, oid);
+-			for (i = 0;i &lt; (num*2);i++)
+-				*((uint16_t *)cptr + i) =
+-				        ntohs(*((uint16_t *)cptr + i));
++			ntohsb((uint16_t *)cptr , num*2);
+ 			/*  convert index names */
+ 			obj_push_tex(p, oid, (uint16_t *)cptr, num);
+ 		}
+@@ -236,9 +219,7 @@
+ 			cptr += 4;
+ 			num = (length - 4) / (4);
+ 			s3dprintf(VLOW, &quot;PEP_MAT_TEX[%d]: %d materials for object oid...%d&quot;, length, num, oid);
+-			for (i = 0;i &lt; num;i++)
+-				*((uint32_t *)cptr + i) =
+-				        ntohl(*((uint32_t *)cptr + i));
++			ntohlb((uint32_t *)cptr, num);
+ 			obj_pep_mat_tex(p, oid, (uint32_t *)cptr, num);
+ 		}
+ 		break;
+@@ -248,9 +229,7 @@
+ 			cptr += 4;
+ 			num = (length - 4) / (4 * 3);
+ 			s3dprintf(VLOW, &quot;pepping %d new lines for object oid...%d&quot;, num, oid);
+-			for (i = 0;i &lt; (num*3);i++)
+-				*((uint32_t *)cptr + i) =
+-				        ntohl(*((uint32_t *)cptr + i));
++			ntohlb((uint32_t *)cptr, num*3);
+ 			obj_pep_line(p, oid, (uint32_t *)cptr, num);
+ 		}
+ 		break;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000983.html">[S3d-svn] r1003 - in trunk: libs3d server
+</A></li>
+	<LI>Next message: <A HREF="000985.html">[S3d-svn] r1005 - in trunk: experimental/testvis libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#984">[ date ]</a>
+              <a href="thread.html#984">[ thread ]</a>
+              <a href="subject.html#984">[ subject ]</a>
+              <a href="author.html#984">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

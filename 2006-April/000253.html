@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r260 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-April/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r260%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200604251746.k3PHkSn3029710%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000252.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r260 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r260%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200604251746.k3PHkSn3029710%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r260 - in trunk: . server">dotslash at berlios.de
+       </A><BR>
+    <I>Tue Apr 25 19:46:28 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000252.html">[S3d-svn] r259 - trunk/apps/olsrs3d
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#253">[ date ]</a>
+              <a href="thread.html#253">[ thread ]</a>
+              <a href="subject.html#253">[ subject ]</a>
+              <a href="author.html#253">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-04-25 19:46:25 +0200 (Tue, 25 Apr 2006)
+New Revision: 260
+
+Modified:
+   trunk/
+   trunk/server/config.h
+   trunk/server/cull.c
+   trunk/server/graphics.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r460 at balthasar</A>:  dotslash | 2006-04-25 19:46:08 +0200
+ - culling fixed and reenabled
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:417
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:460
+
+Modified: trunk/server/config.h
+===================================================================
+--- trunk/server/config.h	2006-04-23 02:12:50 UTC (rev 259)
++++ trunk/server/config.h	2006-04-25 17:46:25 UTC (rev 260)
+@@ -40,7 +40,7 @@
+ #define HIGH	4
+ #define	VHIGH	5
+ /*  which is the minimum level of debugmessage we want to see? */
+-#define DEBUG	VHIGH
++#define DEBUG	LOW
+ #ifndef DEBUG
+ #define errds(...) /* nothing */
+ #define dprintf(...) /* nothing */
+
+Modified: trunk/server/cull.c
+===================================================================
+--- trunk/server/cull.c	2006-04-23 02:12:50 UTC (rev 259)
++++ trunk/server/cull.c	2006-04-25 17:46:25 UTC (rev 260)
+@@ -109,7 +109,6 @@
+ {
+ 	int i;
+ 	struct t_plane *p;
+-	return(1);
+ 	for(i=0;i&lt;6;i++)
+ 	{
+ 		p=&amp;frustumPlane[i];
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2006-04-23 02:12:50 UTC (rev 259)
++++ trunk/server/graphics.c	2006-04-25 17:46:25 UTC (rev 260)
+@@ -107,7 +107,7 @@
+ void render_virtual_object(struct t_obj *o)
+ {
+ 	struct t_process *ap;
+-	struct t_vertex x;
++	struct t_vertex x,y;
+ 	uint32_t j,k;
+ 	t_mtrx m;
+ 
+@@ -130,7 +130,13 @@
+ 					x.x=x.y=x.z=0.0f;
+ 					mySetMatrix(ap-&gt;object[j]-&gt;m); /* get into position ... */
+ 					myTransformV(&amp;x);
+-					k=cull_sphere_in_frustum(&amp;x,ap-&gt;object[j]-&gt;r);
++					y.x=1.0;y.y=y.z=0.0f;
++					myTransformV(&amp;y);
++					y.x-=x.x;
++					y.y-=x.y;
++					y.z-=x.z;
++
++					k=cull_sphere_in_frustum(&amp;x,ap-&gt;object[j]-&gt;r * sqrt(y.x*y.x + y.y*y.y + y.z*y.z));
+ 					if (k)
+ 					{
+ /*						dprintf(HIGH,&quot;object %d is in %s frustum&quot;,j,k?&quot;&quot;:&quot;not&quot;);*/
+@@ -153,7 +159,7 @@
+ 	struct t_process *p=get_proc_by_pid(MCP);
+ 	uint32_t i;
+ 	struct t_obj *o;
+-	struct t_vertex x;
++	struct t_vertex x,y;
+ 	int k;
+ 	for (i=0;i&lt;p-&gt;n_obj;i++)
+ 	{
+@@ -170,7 +176,13 @@
+ 						mySetMatrix(o-&gt;m);
+ 						x.x=x.y=x.z=0.0f;
+ 						myTransformV(&amp;x);
+-						k=cull_sphere_in_frustum(&amp;x,o-&gt;r);
++						y.x=1.0;y.y=y.z=0.0f;
++						myTransformV(&amp;y);
++						y.x-=x.x;
++						y.y-=x.y;
++						y.z-=x.z;
++
++						k=cull_sphere_in_frustum(&amp;x,o-&gt;r * sqrt(y.x*y.x + y.y*y.y + y.z*y.z));
+ 						dprintf(VLOW,&quot;mcp-object %d is in %s frustum&quot;,i,k?&quot;&quot;:&quot;not&quot;);
+ 						if (k)
+ 							{
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000252.html">[S3d-svn] r259 - trunk/apps/olsrs3d
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#253">[ date ]</a>
+              <a href="thread.html#253">[ thread ]</a>
+              <a href="subject.html#253">[ subject ]</a>
+              <a href="author.html#253">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

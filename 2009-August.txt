@@ -1,0 +1,318 @@
+From lazhur at mail.berlios.de  Sun Aug 16 02:45:41 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun, 16 Aug 2009 02:45:41 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-1-1-g5860867
+Message-ID: <200908160045.n7G0jfXM032191@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  58608670f156523e0540947bdceadf149adbff8e (commit)
+      from  125e1a405a1c5e7f750184a00143bcc7acd313da (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 58608670f156523e0540947bdceadf149adbff8e
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sun Aug 16 02:45:36 2009 +0200
+
+    Upgraded to policy 3.8.3, no changes required
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    6 ++++++
+ debian/control   |    2 +-
+ 2 files changed, 7 insertions(+), 1 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sun Aug 16 15:21:14 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun, 16 Aug 2009 15:21:14 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-59-g8946abc
+Message-ID: <200908161321.n7GDLEh7009891@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  8946abcd327175475cc19b58c2d86786d56e831c (commit)
+       via  b4f828788f639654c995da3f75f42e956d3a2a91 (commit)
+       via  d3398c56c172be060043cc731443e7baa5e02b78 (commit)
+       via  847b2d2125f3233f27fe7a27ea2b1b8b986f5ddb (commit)
+       via  d94055fa14bcdb0536f98460373b1bca8f1f0260 (commit)
+       via  455997152e248366614f6e9fe3618994d7500f36 (commit)
+      from  8df53d578be48065fe60e7d616ba078f27bacfe5 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 8946abcd327175475cc19b58c2d86786d56e831c
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sun Aug 16 15:19:18 2009 +0200
+
+    Document support for mac addresses in meshs3d
+
+commit b4f828788f639654c995da3f75f42e956d3a2a91
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sun Aug 16 15:15:39 2009 +0200
+
+    meshs3d: Add parsing of mac addresses
+
+commit d3398c56c172be060043cc731443e7baa5e02b78
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sun Aug 16 15:12:35 2009 +0200
+
+    meshs3d: Map orig_choose and orig_comp to more generic id_* functions
+
+commit 847b2d2125f3233f27fe7a27ea2b1b8b986f5ddb
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sun Aug 16 14:46:19 2009 +0200
+
+    meshs3d: Make parsing of addresses more abstract
+    
+    To support more address types it must be easy to add a new parsing
+    method for an address. This means that the parsing function must not
+    be added everywhere were a address is read.
+
+commit d94055fa14bcdb0536f98460373b1bca8f1f0260
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sun Aug 16 14:43:09 2009 +0200
+
+    meshs3d: Only split address and network part if network part is available
+
+commit 455997152e248366614f6e9fe3618994d7500f36
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sun Aug 16 13:46:25 2009 +0200
+
+    meshs3d: Add batman-adv test data
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/RelNotes-0.2.2.txt |    4 +-
+ apps/meshs3d/batman-adv.data     |   26 ++++++++++
+ apps/meshs3d/process.c           |   94 +++++++++++++++++++++++++-------------
+ 3 files changed, 91 insertions(+), 33 deletions(-)
+ create mode 100644 apps/meshs3d/batman-adv.data
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sun Aug 16 15:32:28 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun, 16 Aug 2009 15:32:28 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-60-gf7f67f7
+Message-ID: <200908161332.n7GDWS1s011199@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  f7f67f72f11af57afbf7b350981e1a399df5b86f (commit)
+      from  8946abcd327175475cc19b58c2d86786d56e831c (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit f7f67f72f11af57afbf7b350981e1a399df5b86f
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sun Aug 16 15:32:12 2009 +0200
+
+    meshs3d: Add real batman-adv testdata
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ apps/meshs3d/batman-adv.data |   42 +++++++++++++++++-------------------------
+ 1 files changed, 17 insertions(+), 25 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Mon Aug 17 21:22:21 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Mon, 17 Aug 2009 21:22:21 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	updated. v0.2.1.1-4-g3138bf5
+Message-ID: <200908171922.n7HJMLPK007708@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been updated
+       via  3138bf53baec43ffafd798d3d7966061bf8b0805 (commit)
+      from  6485f87317bd9a688e0b21c67c87d7cff763138e (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+-----------------------------------------------------------------------
+
+Summary of changes:
+ .gitattributes |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Mon Aug 17 21:22:22 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Mon, 17 Aug 2009 21:22:22 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-64-g4f06fb8
+Message-ID: <200908171922.n7HJMMDv007735@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  4f06fb8ff9bace03342618c48c5b803f0e73cdaf (commit)
+       via  3138bf53baec43ffafd798d3d7966061bf8b0805 (commit)
+       via  6485f87317bd9a688e0b21c67c87d7cff763138e (commit)
+       via  dd2347ca2c00828568258e4c907843b3f30a0acd (commit)
+      from  f7f67f72f11af57afbf7b350981e1a399df5b86f (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 4f06fb8ff9bace03342618c48c5b803f0e73cdaf
+Merge: f7f67f72f11af57afbf7b350981e1a399df5b86f 3138bf53baec43ffafd798d3d7966061bf8b0805
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Mon Aug 17 21:21:17 2009 +0200
+
+    Merge branch 'maint'
+    
+    Conflicts:
+    	ConfigureChecks.cmake
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ .gitattributes             |    2 ++
+ CMakeLists.txt             |    2 +-
+ ConfigureChecks.cmake      |    2 +-
+ Documentation/Maintain.txt |    2 ++
+ 4 files changed, 6 insertions(+), 2 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Fri Aug 21 16:00:26 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Fri, 21 Aug 2009 16:00:26 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-65-g0f9c384
+Message-ID: <200908211400.n7LE0QZT016790@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  0f9c384b6a60ab7ea7b6954e1e72d3ae799d5515 (commit)
+      from  4f06fb8ff9bace03342618c48c5b803f0e73cdaf (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 0f9c384b6a60ab7ea7b6954e1e72d3ae799d5515
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Aug 20 23:34:15 2009 +0200
+
+    Add support for ipv6 addresses
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ apps/meshs3d/ipv6.data |    9 +++++++++
+ apps/meshs3d/meshs3d.h |    2 ++
+ apps/meshs3d/process.c |   15 +++++++++++++++
+ 3 files changed, 26 insertions(+), 0 deletions(-)
+ create mode 100644 apps/meshs3d/ipv6.data
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Wed Aug 26 01:24:10 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Wed, 26 Aug 2009 01:24:10 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-1-2-gbc883ed
+Message-ID: <200908252324.n7PNOA6q010011@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  bc883eda0767440b2dcf21a8bd105db3c4fa4238 (commit)
+      from  58608670f156523e0540947bdceadf149adbff8e (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit bc883eda0767440b2dcf21a8bd105db3c4fa4238
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Aug 26 01:24:03 2009 +0200
+
+    Add README.source with informations about patch management
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/README.source |    8 ++++++++
+ debian/changelog     |    1 +
+ 2 files changed, 9 insertions(+), 0 deletions(-)
+ create mode 100644 debian/README.source
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

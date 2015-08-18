@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-59-g8946abc
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2009-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20branch%2C%20master%2C%0A%09updated.%20v0.2.1.1-59-g8946abc&In-Reply-To=%3C200908161321.n7GDLEh7009891%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001063.html">
+   <LINK REL="Next"  HREF="001065.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-59-g8946abc</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20branch%2C%20master%2C%0A%09updated.%20v0.2.1.1-59-g8946abc&In-Reply-To=%3C200908161321.n7GDLEh7009891%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-59-g8946abc">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Aug 16 15:21:14 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001063.html">[S3d-svn] Project s3d at BerliOS branch, debian,	updated. debian/0.2.1.1-1-1-g5860867
+</A></li>
+        <LI>Next message: <A HREF="001065.html">[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-60-gf7f67f7
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1064">[ date ]</a>
+              <a href="thread.html#1064">[ thread ]</a>
+              <a href="subject.html#1064">[ subject ]</a>
+              <a href="author.html#1064">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project &quot;Project s3d at BerliOS&quot;.
+
+The branch, master has been updated
+       via  8946abcd327175475cc19b58c2d86786d56e831c (commit)
+       via  b4f828788f639654c995da3f75f42e956d3a2a91 (commit)
+       via  d3398c56c172be060043cc731443e7baa5e02b78 (commit)
+       via  847b2d2125f3233f27fe7a27ea2b1b8b986f5ddb (commit)
+       via  d94055fa14bcdb0536f98460373b1bca8f1f0260 (commit)
+       via  455997152e248366614f6e9fe3618994d7500f36 (commit)
+      from  8df53d578be48065fe60e7d616ba078f27bacfe5 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 8946abcd327175475cc19b58c2d86786d56e831c
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Sun Aug 16 15:19:18 2009 +0200
+
+    Document support for mac addresses in meshs3d
+
+commit b4f828788f639654c995da3f75f42e956d3a2a91
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Sun Aug 16 15:15:39 2009 +0200
+
+    meshs3d: Add parsing of mac addresses
+
+commit d3398c56c172be060043cc731443e7baa5e02b78
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Sun Aug 16 15:12:35 2009 +0200
+
+    meshs3d: Map orig_choose and orig_comp to more generic id_* functions
+
+commit 847b2d2125f3233f27fe7a27ea2b1b8b986f5ddb
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Sun Aug 16 14:46:19 2009 +0200
+
+    meshs3d: Make parsing of addresses more abstract
+    
+    To support more address types it must be easy to add a new parsing
+    method for an address. This means that the parsing function must not
+    be added everywhere were a address is read.
+
+commit d94055fa14bcdb0536f98460373b1bca8f1f0260
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Sun Aug 16 14:43:09 2009 +0200
+
+    meshs3d: Only split address and network part if network part is available
+
+commit 455997152e248366614f6e9fe3618994d7500f36
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Sun Aug 16 13:46:25 2009 +0200
+
+    meshs3d: Add batman-adv test data
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/RelNotes-0.2.2.txt |    4 +-
+ apps/meshs3d/batman-adv.data     |   26 ++++++++++
+ apps/meshs3d/process.c           |   94 +++++++++++++++++++++++++-------------
+ 3 files changed, 91 insertions(+), 33 deletions(-)
+ create mode 100644 apps/meshs3d/batman-adv.data
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001063.html">[S3d-svn] Project s3d at BerliOS branch, debian,	updated. debian/0.2.1.1-1-1-g5860867
+</A></li>
+	<LI>Next message: <A HREF="001065.html">[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-60-gf7f67f7
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1064">[ date ]</a>
+              <a href="thread.html#1064">[ thread ]</a>
+              <a href="subject.html#1064">[ subject ]</a>
+              <a href="author.html#1064">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

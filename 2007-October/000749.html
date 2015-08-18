@@ -1,0 +1,223 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r757 - trunk/apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r757%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200710182357.l9INvGrg030022%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000748.html">
+   <LINK REL="Next"  HREF="000750.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r757 - trunk/apps/s3dosm</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r757%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200710182357.l9INvGrg030022%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r757 - trunk/apps/s3dosm">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 01:57:16 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000748.html">[S3d-svn] r756 - trunk/apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000750.html">[S3d-svn] r758 - trunk/apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#749">[ date ]</a>
+              <a href="thread.html#749">[ thread ]</a>
+              <a href="subject.html#749">[ subject ]</a>
+              <a href="author.html#749">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 01:57:14 +0200 (Fri, 19 Oct 2007)
+New Revision: 757
+
+Modified:
+   trunk/apps/s3dosm/db.c
+   trunk/apps/s3dosm/draw.c
+   trunk/apps/s3dosm/io.c
+   trunk/apps/s3dosm/ui.c
+Log:
+s3dosm: Use NULL for pointers instead of plain 0
+
+
+Modified: trunk/apps/s3dosm/db.c
+===================================================================
+--- trunk/apps/s3dosm/db.c	2007-10-18 23:57:01 UTC (rev 756)
++++ trunk/apps/s3dosm/db.c	2007-10-18 23:57:14 UTC (rev 757)
+@@ -49,7 +49,7 @@
+ 	clean_string(mkey, key, MAXQ);
+ 	clean_string(mval, val, MAXQ);
+ 	snprintf(tagquery, MAXQ, &quot;INSERT INTO tag VALUES (%d, '%s','%s' );&quot;, (int)obj-&gt;tagid, mkey, mval);
+-	db_exec(tagquery, NULL, 0);
++	db_exec(tagquery, NULL, NULL);
+ 	return(0);
+ }
+ 
+@@ -65,7 +65,7 @@
+ 		snprintf(addquery, MAXQ, &quot;INSERT INTO node (layer_id, node_id,latitude, longitude, altitude, visible, tag_id) VALUES (%d, %d, %f, %f, %f, %d, %d);&quot;,
+ 		         (int)node-&gt;base.layerid, (int)node-&gt;base.id, node-&gt;lat,  node-&gt;lon,  node-&gt;alt,  node-&gt;visible, (int)node-&gt;base.tagid);
+ 
+-	db_exec(addquery, NULL, 0);
++	db_exec(addquery, NULL, NULL);
+ 	return(0);
+ }
+ 
+@@ -85,7 +85,7 @@
+ 	 else*/
+ 	snprintf(addquery, MAXQ, &quot;INSERT INTO segment (layer_id, seg_id, node_from, node_to, tag_id) VALUES (%d, %d, %d, %d, %d);&quot;,
+ 	         (int)seg-&gt;base.layerid, (int)seg-&gt;base.id, (int)seg-&gt;from, (int)seg-&gt;to, (int)seg-&gt;base.tagid);
+-	db_exec(addquery, NULL, 0);
++	db_exec(addquery, NULL, NULL);
+ 
+ 	return(0);
+ }
+@@ -95,7 +95,7 @@
+ 	char addquery[MAXQ];
+ 	way-&gt;base.tagid = tagid++;
+ 	snprintf(addquery, MAXQ, &quot;INSERT INTO way (layer_id, way_id, tag_id) VALUES (%d, %d, %d);&quot;, (int)way-&gt;base.layerid, (int)way-&gt;base.id, (int)way-&gt;base.tagid);
+-	db_exec(addquery, NULL, 0);
++	db_exec(addquery, NULL, NULL);
+ 	return(0);
+ }
+ 
+@@ -103,7 +103,7 @@
+ {
+ 	char addquery[MAXQ];
+ 	snprintf(addquery, MAXQ, &quot;UPDATE segment SET way_id=%d WHERE seg_id=%d AND layer_id=%d;&quot;, (int)way-&gt;base.id, seg_n, (int)way-&gt;base.layerid);
+-	db_exec(addquery, NULL, 0);
++	db_exec(addquery, NULL, NULL);
+ 	return(0);
+ }
+ 
+@@ -119,7 +119,7 @@
+ 	db_exec(findquery, db_getint, &amp;layerid);
+ 	if (layerid == -1) { /* need to add */
+ 		snprintf(addquery, MAXQ, &quot;INSERT INTO layer(name) VALUES ('%s');&quot;, clayer);
+-		db_exec(addquery, NULL, 0);
++		db_exec(addquery, NULL, NULL);
+ 		db_flush();
+ 		db_exec(findquery, db_getint, &amp;layerid);
+ 	}
+@@ -232,7 +232,7 @@
+ 
+ static int db_really_exec(const char *query, sqlite3_callback callback, void *arg)
+ {
+-	char *zErrMsg = 0;
++	char *zErrMsg = NULL;
+ 	int rc;
+ 	if (SQLITE_OK != (rc = sqlite3_exec(db, query, callback, arg, &amp;zErrMsg))) {
+ 		fprintf(stderr, &quot;query: %s\n&quot;, query);
+@@ -246,7 +246,7 @@
+ void db_flush(void)
+ {
+ 	if (qlen &gt; 0)
+-		db_really_exec(qbuf, NULL, 0);
++		db_really_exec(qbuf, NULL, NULL);
+ 	qbuf[0] = 0;
+ 	qlen = 0;
+ }
+@@ -300,16 +300,16 @@
+ 
+ int db_create(void)
+ {
+-	db_exec(&quot;CREATE TABLE node (layer_id INT, node_id INTEGER , latitude DOUBLE PRECISION, longitude DOUBLE PRECISION, altitude DOUBLE PRECISION, visible BOOLEAN, tag_id INT, s3doid INT, PRIMARY KEY(layer_id,node_id));&quot;, NULL, 0);
+-	db_exec(&quot;CREATE TABLE segment (layer_id INT, seg_id INTEGER, node_from INT, node_to INT, tag_id INT, way_id INT,PRIMARY KEY(layer_id,seg_id));&quot;, NULL, 0);
+-	db_exec(&quot;CREATE TABLE way (layer_id INTEGER, way_id INTEGER, tag_id INT, s3doid INT, PRIMARY KEY(layer_id,way_id));&quot;, NULL, 0);
+-	db_exec(&quot;CREATE TABLE layer (layer_id INTEGER, name TEXT, PRIMARY KEY(layer_id));&quot;, NULL, 0);
+-	db_exec(&quot;CREATE TABLE tag (tag_id INT, tagkey TEXT, tagvalue TEXT, PRIMARY KEY(tag_id, tagkey));&quot;, NULL, 0);
++	db_exec(&quot;CREATE TABLE node (layer_id INT, node_id INTEGER , latitude DOUBLE PRECISION, longitude DOUBLE PRECISION, altitude DOUBLE PRECISION, visible BOOLEAN, tag_id INT, s3doid INT, PRIMARY KEY(layer_id,node_id));&quot;, NULL, NULL);
++	db_exec(&quot;CREATE TABLE segment (layer_id INT, seg_id INTEGER, node_from INT, node_to INT, tag_id INT, way_id INT,PRIMARY KEY(layer_id,seg_id));&quot;, NULL, NULL);
++	db_exec(&quot;CREATE TABLE way (layer_id INTEGER, way_id INTEGER, tag_id INT, s3doid INT, PRIMARY KEY(layer_id,way_id));&quot;, NULL, NULL);
++	db_exec(&quot;CREATE TABLE layer (layer_id INTEGER, name TEXT, PRIMARY KEY(layer_id));&quot;, NULL, NULL);
++	db_exec(&quot;CREATE TABLE tag (tag_id INT, tagkey TEXT, tagvalue TEXT, PRIMARY KEY(tag_id, tagkey));&quot;, NULL, NULL);
+ 
+ 	/*
+-	db_exec(&quot;CREATE UNIQUE INDEX node_id_index ON node (node_id,layer_id);&quot;, NULL, 0);
+-	db_exec(&quot;CREATE UNIQUE INDEX segment_id_index ON segment (seg_id,layer_id);&quot;, NULL, 0);
+-	db_exec(&quot;CREATE UNIQUE INDEX tag_id_index ON tag (tag_id,tagkey);&quot;, NULL, 0);
++	db_exec(&quot;CREATE UNIQUE INDEX node_id_index ON node (node_id,layer_id);&quot;, NULL, NULL);
++	db_exec(&quot;CREATE UNIQUE INDEX segment_id_index ON segment (seg_id,layer_id);&quot;, NULL, NULL);
++	db_exec(&quot;CREATE UNIQUE INDEX tag_id_index ON tag (tag_id,tagkey);&quot;, NULL, NULL);
+ 	*/
+ 	db_flush();
+ 	return(0);
+
+Modified: trunk/apps/s3dosm/draw.c
+===================================================================
+--- trunk/apps/s3dosm/draw.c	2007-10-18 23:57:01 UTC (rev 756)
++++ trunk/apps/s3dosm/draw.c	2007-10-18 23:57:14 UTC (rev 757)
+@@ -360,7 +360,7 @@
+ 	s3d_link(way_obj, oidy);
+ 	s3d_flags_on(way_obj, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+ 	snprintf(query, MAXQ, &quot;UPDATE way SET s3doid=%d WHERE way_id=%d AND %s;&quot;, way_obj, lastid, filter);
+-	db_exec(query, NULL, 0);
++	db_exec(query, NULL, NULL);
+ 
+ 	waylist_n = 0;
+ 
+
+Modified: trunk/apps/s3dosm/io.c
+===================================================================
+--- trunk/apps/s3dosm/io.c	2007-10-18 23:57:01 UTC (rev 756)
++++ trunk/apps/s3dosm/io.c	2007-10-18 23:57:14 UTC (rev 757)
+@@ -64,8 +64,8 @@
+ 	float     minlat, minlon, maxlat, maxlon;
+ 	char      info[1024];
+ 	struct option long_options[] = {
+-		{&quot;help&quot;, 0, 0, 'h'
+-		}, {&quot;osm&quot;, 1, 0, 'o'}, {0, 0, 0, 0}
++		{&quot;help&quot;, 0, NULL, 'h'
++		}, {&quot;osm&quot;, 1, NULL, 'o'}, {NULL, 0, NULL, 0}
+ 	};
+ 	optind = 0;
+ 	opterr = 0;
+
+Modified: trunk/apps/s3dosm/ui.c
+===================================================================
+--- trunk/apps/s3dosm/ui.c	2007-10-18 23:57:01 UTC (rev 756)
++++ trunk/apps/s3dosm/ui.c	2007-10-18 23:57:14 UTC (rev 757)
+@@ -111,9 +111,9 @@
+ 	char query[MAXQ];
+ 	if (s3dw_handle_click(evt)) return(0);
+ 	snprintf(query, MAXQ, &quot;SELECT * FROM node WHERE s3doid=%d;&quot;, oid);
+-	db_exec(query, ui_getinfo_node, 0);
++	db_exec(query, ui_getinfo_node, NULL);
+ 	snprintf(query, MAXQ, &quot;SELECT * FROM way WHERE s3doid=%d;&quot;, oid);
+-	db_exec(query, ui_getinfo_way, 0);
++	db_exec(query, ui_getinfo_way, NULL);
+ 
+ 	return(0);
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000748.html">[S3d-svn] r756 - trunk/apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000750.html">[S3d-svn] r758 - trunk/apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#749">[ date ]</a>
+              <a href="thread.html#749">[ thread ]</a>
+              <a href="subject.html#749">[ subject ]</a>
+              <a href="author.html#749">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

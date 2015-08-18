@@ -1,0 +1,249 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r731 - trunk/apps/meshs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r731%20-%20trunk/apps/meshs3d&In-Reply-To=%3C200710181551.l9IFpBb8031364%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000722.html">
+   <LINK REL="Next"  HREF="000724.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r731 - trunk/apps/meshs3d</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r731%20-%20trunk/apps/meshs3d&In-Reply-To=%3C200710181551.l9IFpBb8031364%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r731 - trunk/apps/meshs3d">nichtsnutz at mail.berlios.de
+       </A><BR>
+    <I>Thu Oct 18 17:51:11 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000722.html">[S3d-svn] r730 - trunk/apps/meshs3d
+</A></li>
+        <LI>Next message: <A HREF="000724.html">[S3d-svn] r732 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#723">[ date ]</a>
+              <a href="thread.html#723">[ thread ]</a>
+              <a href="subject.html#723">[ subject ]</a>
+              <a href="author.html#723">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2007-10-18 17:51:11 +0200 (Thu, 18 Oct 2007)
+New Revision: 731
+
+Modified:
+   trunk/apps/meshs3d/main.c
+   trunk/apps/meshs3d/meshs3d.h
+   trunk/apps/meshs3d/olsrd1.data
+   trunk/apps/meshs3d/process.c
+Log:
+add handling to remove nodes and connections
+
+
+Modified: trunk/apps/meshs3d/main.c
+===================================================================
+--- trunk/apps/meshs3d/main.c	2007-10-18 15:11:12 UTC (rev 730)
++++ trunk/apps/meshs3d/main.c	2007-10-18 15:51:11 UTC (rev 731)
+@@ -59,6 +59,8 @@
+ 	Global.obj_node_count = 0;
+ 	Global.node_count = 0;
+ 	Global.color_switch = 0;
++	Global.output_block_counter = 0;
++	Global.output_block_completed = 0;
+ 	Global.asp = 1.0;
+ 	Global.left = -1.0;
+ 	Global.bottom = -1.0;
+@@ -105,17 +107,20 @@
+ 
+ void handle_node()
+ {
+-	struct node *node;
+-	struct hash_it_t *hashit;
++	struct node *node,*tmp_node;
++	struct node_con *con;
++	struct hash_it_t *hashit,*tmp_hashit=NULL;
++	int ip[2];
+ 
+ 	if (node_hash-&gt;elements == 0)
+ 		return;
+ 	hashit = NULL;
+ 	while (NULL != (hashit = hash_iterate(node_hash, hashit))) {
++
+ 		node = (struct node *) hashit-&gt;bucket-&gt;data;
++
+ 		if (node-&gt;node_type_modified) {
+ 
+-
+ 			if (node-&gt;obj_id &gt; 0) s3d_del_object(node-&gt;obj_id);
+ 			if (node-&gt;desc_id &gt; 0) s3d_del_object(node-&gt;desc_id);
+ 
+@@ -136,6 +141,29 @@
+ 			node-&gt;node_type_modified = 0;
+ 
+ 		}
++
++		if ((node-&gt;last_seen &lt; Global.output_block_counter - 1) &amp;&amp; (node-&gt;visible)) {
++
++			s3d_del_object(node-&gt;desc_id);
++			s3d_del_object(node-&gt;obj_id);
++			node-&gt;desc_id = -1;
++			node-&gt;obj_id = -1;
++			node-&gt;visible = 0;
++			Global.node_count--;
++			while (NULL != (tmp_hashit = hash_iterate(node_hash, tmp_hashit))) {
++				tmp_node = (struct node *) tmp_hashit-&gt;bucket-&gt;data;
++				if ( node != tmp_node &amp;&amp; (max(node-&gt;ip, tmp_node-&gt;ip) == node-&gt;ip)) {
++					ip[0] = node-&gt;ip;
++					ip[1] = tmp_node-&gt;ip;
++					if (NULL != (con = hash_find(con_hash, ip))) {
++						s3d_del_object(con-&gt;obj_id);
++						con-&gt;obj_id = -1;
++					}
++				}
++			}
++
++		}
++
+ 	}
+ 	return;
+ }
+@@ -159,7 +187,6 @@
+ 	if (!((node-&gt;mov_vec[0] == 0) &amp;&amp; (node-&gt;mov_vec[1] == 0) &amp;&amp; (node-&gt;mov_vec[2] == 0)) &amp;&amp; node-&gt;visible) {
+ 		distance = dirt(node-&gt;pos_vec, null_vec, tmp_mov_vec);
+ 		mov_add(node-&gt;mov_vec, tmp_mov_vec, distance / 100);   /* move a little bit to point zero */
+-		/* mov_add(node-&gt;mov_vec, tmp_mov_vec, 1); */   /* move a little bit to point zero */
+ 
+ 		if ((distance = dist(node-&gt;mov_vec, null_vec)) &gt; 10.0)
+ 			mov_add(node-&gt;pos_vec, node-&gt;mov_vec, 1.0 / ((float) distance));
+@@ -360,6 +387,13 @@
+ 
+ 	}
+ 
++	if (Global.output_block_completed) {
++
++		Global.output_block_counter++;
++		Global.output_block_completed = 0;
++
++	}
++	
+ 	while ((net_result = net_main()) != 0) {
+ 		if (net_result == -1) {
+ 			printf(&quot;that's it folks\n&quot;);
+
+Modified: trunk/apps/meshs3d/meshs3d.h
+===================================================================
+--- trunk/apps/meshs3d/meshs3d.h	2007-10-18 15:11:12 UTC (rev 730)
++++ trunk/apps/meshs3d/meshs3d.h	2007-10-18 15:51:11 UTC (rev 731)
+@@ -82,6 +82,8 @@
+ 	int obj_node_count;
+ 	int node_count;
+ 	int color_switch;
++	int output_block_counter;
++	int output_block_completed;
+ 	float asp;
+ 	float bottom;
+ 	float left;
+
+Modified: trunk/apps/meshs3d/olsrd1.data
+===================================================================
+--- trunk/apps/meshs3d/olsrd1.data	2007-10-18 15:11:12 UTC (rev 730)
++++ trunk/apps/meshs3d/olsrd1.data	2007-10-18 15:51:11 UTC (rev 731)
+@@ -3,6 +3,17 @@
+ &quot;104.131.131.1&quot; -&gt; &quot;104.131.0.71&quot;[label=&quot;0.00&quot;, style=dashed];
+ &quot;104.131.131.1&quot; -&gt; &quot;104.131.0.42&quot;[label=&quot;58.29&quot;, style=solid];
+ &quot;104.131.0.42&quot;[shape=box];
+-04.192.0.40&quot; -&gt; &quot;104.192.192.166&quot;[label=&quot;2.06&quot;];
++&quot;104.192.0.40&quot; -&gt; &quot;104.192.192.166&quot;[label=&quot;2.06&quot;];
++&quot;104.65.0.42&quot; -&gt; &quot;0.0.0.0/0.0.0.0&quot;[label=&quot;HNA&quot;];
++&quot;0.0.0.0/0.0.0.0&quot;[shape=diamond];
+ }
+ 
++digraph topology
++{
++&quot;104.131.131.1&quot; -&gt; &quot;104.131.0.71&quot;[label=&quot;0.00&quot;, style=dashed];
++&quot;104.131.131.1&quot; -&gt; &quot;104.131.0.42&quot;[label=&quot;58.29&quot;, style=solid];
++&quot;104.131.0.42&quot;[shape=box];
++&quot;104.192.0.40&quot; -&gt; &quot;104.192.192.166&quot;[label=&quot;2.06&quot;];
++&quot;104.65.0.42&quot;;
++}
++
+
+Modified: trunk/apps/meshs3d/process.c
+===================================================================
+--- trunk/apps/meshs3d/process.c	2007-10-18 15:11:12 UTC (rev 730)
++++ trunk/apps/meshs3d/process.c	2007-10-18 15:51:11 UTC (rev 731)
+@@ -147,6 +147,18 @@
+ 		hash_add(con_hash, con);
+ 	}
+ 
++	if(con-&gt;obj_id == -1) {
++		con-&gt;obj_id = s3d_new_object();
++		s3d_push_material(con-&gt;obj_id,
++			1.0, 1.0, 1.0,
++      			1.0, 1.0, 1.0,
++      			1.0, 1.0, 1.0);
++		s3d_push_vertex(con-&gt;obj_id, 0, 0, 0);
++		s3d_push_vertex(con-&gt;obj_id, 0, 0, 0);
++		s3d_push_line(con-&gt;obj_id, 0, 1, 0);
++		s3d_flags_on(con-&gt;obj_id, S3D_OF_VISIBLE);
++	}
++
+ 	if (con-&gt;ip[0] == ip1) {
+ 		con-&gt;etx1 = etx;
+ 		con-&gt;etx1_sqrt = sqrt(etx);
+@@ -198,6 +210,13 @@
+ 		hash_add(node_hash, orig_node);
+ 		Global.node_count++;
+ 	}
++
++	if(!orig_node-&gt;visible) {
++		orig_node-&gt;visible = 1;
++		orig_node-&gt;node_type_modified = 1;
++		Global.node_count++;
++	}
++	orig_node-&gt;last_seen = Global.output_block_counter;
+ 	return(orig_node);
+ }
+ 
+@@ -326,6 +345,8 @@
+ 
+ 		} else if (((*lbuf_ptr) == '}') &amp;&amp; ((*(lbuf_ptr + 1)) == '\n')) {
+ 
++			Global.output_block_completed = 1;
++
+ 		}
+ 
+ 		lbuf_ptr++;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000722.html">[S3d-svn] r730 - trunk/apps/meshs3d
+</A></li>
+	<LI>Next message: <A HREF="000724.html">[S3d-svn] r732 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#723">[ date ]</a>
+              <a href="thread.html#723">[ thread ]</a>
+              <a href="subject.html#723">[ subject ]</a>
+              <a href="author.html#723">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

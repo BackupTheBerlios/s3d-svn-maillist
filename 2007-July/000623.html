@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r631 - in trunk: . apps/kism3d apps/s3dfm apps/s3dvt	cmake/modules
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r631%20-%20in%20trunk%3A%20.%20apps/kism3d%20apps/s3dfm%20apps/s3dvt%0A%09cmake/modules&In-Reply-To=%3C200707050000.l6500M7p004368%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000624.html">
+   <LINK REL="Next"  HREF="000625.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r631 - in trunk: . apps/kism3d apps/s3dfm apps/s3dvt	cmake/modules</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r631%20-%20in%20trunk%3A%20.%20apps/kism3d%20apps/s3dfm%20apps/s3dvt%0A%09cmake/modules&In-Reply-To=%3C200707050000.l6500M7p004368%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r631 - in trunk: . apps/kism3d apps/s3dfm apps/s3dvt	cmake/modules">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Thu Jul  5 02:00:22 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000624.html">[S3d-svn] r632 - trunk/extras/distro/gentoo/media-gfx/s3d-svn
+</A></li>
+        <LI>Next message: <A HREF="000625.html">[S3d-svn] r633 - in trunk: apps/s3dfm cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#623">[ date ]</a>
+              <a href="thread.html#623">[ thread ]</a>
+              <a href="subject.html#623">[ subject ]</a>
+              <a href="author.html#623">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-07-05 02:00:12 +0200 (Thu, 05 Jul 2007)
+New Revision: 631
+
+Added:
+   trunk/cmake/modules/FindPThreads.cmake
+Modified:
+   trunk/ConfigureChecks.cmake
+   trunk/apps/kism3d/CMakeLists.txt
+   trunk/apps/s3dfm/CMakeLists.txt
+   trunk/apps/s3dvt/CMakeLists.txt
+Log:
+- Added Test for pthreads
+- Only compile kism3d, s3dfm and s3dvt when pthreads are available
+
+
+Modified: trunk/ConfigureChecks.cmake
+===================================================================
+--- trunk/ConfigureChecks.cmake	2007-07-04 14:25:10 UTC (rev 630)
++++ trunk/ConfigureChecks.cmake	2007-07-05 00:00:12 UTC (rev 631)
+@@ -79,6 +79,13 @@
+ endif (SQLITE3_FOUND)
+ 
+ 
++# try to find lib and add include dir for PThreads
++find_package(PThreads)
++if (PTHREADS_FOUND)
++	include_directories(${PTHREADS_INCLUDE_DIR})
++endif (PTHREADS_FOUND)
++
++
+ # test for shm
+ include(TestForSHM)
+ if (HAVE_SHM)
+
+Modified: trunk/apps/kism3d/CMakeLists.txt
+===================================================================
+--- trunk/apps/kism3d/CMakeLists.txt	2007-07-04 14:25:10 UTC (rev 630)
++++ trunk/apps/kism3d/CMakeLists.txt	2007-07-05 00:00:12 UTC (rev 631)
+@@ -1,7 +1,9 @@
+-include_directories(${CMAKE_SOURCE_DIR}/libs3d ${CMAKE_SOURCE_DIR}/libs3dw)
++if (PTHREADS_FOUND)
++	include_directories(${CMAKE_SOURCE_DIR}/libs3d ${CMAKE_SOURCE_DIR}/libs3dw)
+ 
+-add_executable(kism3d client.c gui.c kism3d.c network.c)
+-target_link_libraries(kism3d s3d s3dw)
++	add_executable(kism3d client.c gui.c kism3d.c network.c)
++	target_link_libraries(kism3d s3d s3dw ${PTHREADS_LIBRARIES})
+ 
+-# install 
+-install(TARGETS kism3d RUNTIME DESTINATION bin)
++	# install 
++	install(TARGETS kism3d RUNTIME DESTINATION bin)
++endif (PTHREADS_FOUND)
+
+Modified: trunk/apps/s3dfm/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3dfm/CMakeLists.txt	2007-07-04 14:25:10 UTC (rev 630)
++++ trunk/apps/s3dfm/CMakeLists.txt	2007-07-05 00:00:12 UTC (rev 631)
+@@ -1,8 +1,10 @@
+-include_directories(${CMAKE_SOURCE_DIR}/libs3d ${CMAKE_SOURCE_DIR}/libs3dw)
++if (PTHREADS_FOUND)
++	include_directories(${CMAKE_SOURCE_DIR}/libs3d ${CMAKE_SOURCE_DIR}/libs3dw)
+ 
+-add_executable(s3dfm animation.c box.c dialog.c event.c fly.c focus.c fs.c
+-	icon.c main.c node.c parse.c string.c)
+-target_link_libraries(s3dfm s3d s3dw)
++	add_executable(s3dfm animation.c box.c dialog.c event.c fly.c focus.c fs.c
++		icon.c main.c node.c parse.c string.c)
++	target_link_libraries(s3dfm s3d s3dw $&#194;{PTHREADS_LIBRARIES})
+ 
+-# install 
+-install(TARGETS s3dfm RUNTIME DESTINATION bin)
++	# install 
++	install(TARGETS s3dfm RUNTIME DESTINATION bin)
++endif (PTHREADS_FOUND)
+
+Modified: trunk/apps/s3dvt/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3dvt/CMakeLists.txt	2007-07-04 14:25:10 UTC (rev 630)
++++ trunk/apps/s3dvt/CMakeLists.txt	2007-07-05 00:00:12 UTC (rev 631)
+@@ -1,7 +1,9 @@
+-include_directories(${CMAKE_SOURCE_DIR}/libs3d)
++if (PTHREADS_FOUND)
++	include_directories(${CMAKE_SOURCE_DIR}/libs3d)
+ 
+-add_executable(s3dvt main.c terminal.c)
+-target_link_libraries(s3dvt s3d)
++	add_executable(s3dvt main.c terminal.c)
++	target_link_libraries(s3dvt s3d ${PTHREADS_LIBRARIES})
+ 
+-# install
+-install(TARGETS s3dvt RUNTIME DESTINATION bin)
++	# install
++	install(TARGETS s3dvt RUNTIME DESTINATION bin)
++endif (PTHREADS_FOUND)
+
+Added: trunk/cmake/modules/FindPThreads.cmake
+===================================================================
+--- trunk/cmake/modules/FindPThreads.cmake	2007-07-04 14:25:10 UTC (rev 630)
++++ trunk/cmake/modules/FindPThreads.cmake	2007-07-05 00:00:12 UTC (rev 631)
+@@ -0,0 +1,36 @@
++# Try to find PThreads
++#  PTHREADS_FOUND - If false, do not try to use PThreads.
++#  PTHREADS_INCLUDE_DIR - where to find pthreads.h
++#  PTHREADS_LIBRARIES - the libraries to link against
++
++
++if (PTHREADS_LIBRARIES AND PTHREADS_INCLUDE_DIR)
++	# path set by user or was found in the past
++	set(PTHREADS_FOUND TRUE)
++else (PTHREADS_LIBRARIES AND PTHREADS_INCLUDE_DIR)
++	find_path(PTHREADS_INCLUDE_DIR
++		NAMES pthreads.h
++	)
++
++	find_library(PTHREADS_LIBRARIES
++		NAMES pthreads
++	)
++
++	if (PTHREADS_INCLUDE_DIR AND PTHREADS_LIBRARIES)
++		set(PTHREADS_FOUND TRUE)
++	endif (PTHREADS_INCLUDE_DIR AND PTHREADS_LIBRARIES)
++
++	if (PTHREADS_FOUND)
++		if (NOT PTHREADS_FIND_QUIETLY)
++			message(STATUS &quot;Found PThreads: ${PTHREADS_LIBRARIES}&quot;)
++		endif (NOT PTHREADS_FIND_QUIETLY)
++	else (PTHREADS_FOUND)
++		if (PTHREADS_FIND_REQUIRED)
++			message(FATAL_ERROR &quot;Could not find PThreads&quot;)
++		endif (PTHREADS_FIND_REQUIRED)
++	endif (PTHREADS_FOUND)
++
++	# set visibility in cache
++ 	mark_as_advanced(PTHREADS_INCLUDE_DIR PTHREADS_LIBRARIES)
++
++endif (PTHREADS_LIBRARIES AND PTHREADS_INCLUDE_DIR)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000624.html">[S3d-svn] r632 - trunk/extras/distro/gentoo/media-gfx/s3d-svn
+</A></li>
+	<LI>Next message: <A HREF="000625.html">[S3d-svn] r633 - in trunk: apps/s3dfm cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#623">[ date ]</a>
+              <a href="thread.html#623">[ thread ]</a>
+              <a href="subject.html#623">[ subject ]</a>
+              <a href="author.html#623">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

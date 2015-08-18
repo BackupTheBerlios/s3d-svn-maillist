@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r616 - in branches/s3d-cmake: . apps/s3dosm libs3d server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r616%20-%20in%20branches/s3d-cmake%3A%20.%20apps/s3dosm%20libs3d%20server&In-Reply-To=%3C200707011314.l61DEwZA031999%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000607.html">
+   <LINK REL="Next"  HREF="000608.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r616 - in branches/s3d-cmake: . apps/s3dosm libs3d server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r616%20-%20in%20branches/s3d-cmake%3A%20.%20apps/s3dosm%20libs3d%20server&In-Reply-To=%3C200707011314.l61DEwZA031999%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r616 - in branches/s3d-cmake: . apps/s3dosm libs3d server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Jul  1 15:14:58 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000607.html">[S3d-svn] r615 - in branches/s3d-cmake: libs3d server
+</A></li>
+        <LI>Next message: <A HREF="000608.html">[S3d-svn] r617 - in branches/s3d-cmake: libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#610">[ date ]</a>
+              <a href="thread.html#610">[ thread ]</a>
+              <a href="subject.html#610">[ subject ]</a>
+              <a href="author.html#610">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-07-01 15:14:58 +0200 (Sun, 01 Jul 2007)
+New Revision: 616
+
+Modified:
+   branches/s3d-cmake/ConfigureChecks.cmake
+   branches/s3d-cmake/apps/s3dosm/s3dosm.h
+   branches/s3d-cmake/libs3d/config.h
+   branches/s3d-cmake/libs3d/s3dlib.h
+   branches/s3d-cmake/server/config.h
+Log:
+- Changed global config.h to config-s3d.h to better distinguish between local and global config
+- Include local config.h in s3dlib.h instead of config-s3d.h to compile again with cmake
+
+
+Modified: branches/s3d-cmake/ConfigureChecks.cmake
+===================================================================
+--- branches/s3d-cmake/ConfigureChecks.cmake	2007-07-01 13:14:56 UTC (rev 615)
++++ branches/s3d-cmake/ConfigureChecks.cmake	2007-07-01 13:14:58 UTC (rev 616)
+@@ -91,5 +91,5 @@
+ 
+ 
+ # Create config.h and add path to config.h to include search path
+-configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+\ No newline at end of file
++configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-s3d.h)
++include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+Modified: branches/s3d-cmake/apps/s3dosm/s3dosm.h
+===================================================================
+--- branches/s3d-cmake/apps/s3dosm/s3dosm.h	2007-07-01 13:14:56 UTC (rev 615)
++++ branches/s3d-cmake/apps/s3dosm/s3dosm.h	2007-07-01 13:14:58 UTC (rev 616)
+@@ -1,6 +1,6 @@
+ #include &lt;sqlite3.h&gt;
+ #include &lt;s3d.h&gt;	/* s3devt structure */
+-#include &quot;../../config.h&quot;
++#include &lt;config-s3d.h&gt;
+ #define	ESIZE	637800		/* earth size */
+ #define	RESCALE	1
+ #define VIEWHEIGHT 3
+
+Modified: branches/s3d-cmake/libs3d/config.h
+===================================================================
+--- branches/s3d-cmake/libs3d/config.h	2007-07-01 13:14:56 UTC (rev 615)
++++ branches/s3d-cmake/libs3d/config.h	2007-07-01 13:14:58 UTC (rev 616)
+@@ -23,7 +23,7 @@
+ 
+ 
+ /* use the global config.h */
+-#include &lt;config.h&gt;
++#include &lt;config-s3d.h&gt;
+ 
+ /*  this is definitly the better way to pick fonts. */
+ 
+
+Modified: branches/s3d-cmake/libs3d/s3dlib.h
+===================================================================
+--- branches/s3d-cmake/libs3d/s3dlib.h	2007-07-01 13:14:56 UTC (rev 615)
++++ branches/s3d-cmake/libs3d/s3dlib.h	2007-07-01 13:14:58 UTC (rev 616)
+@@ -23,7 +23,7 @@
+ 
+ 
+ #include &lt;stdint.h&gt;
+-#include &lt;config.h&gt;
++#include &quot;config.h&quot;
+ #ifdef __APPLE__ 
+ #ifdef SHM
+ #undef SHM
+@@ -123,5 +123,3 @@
+ 	int next,prev,done;
+ };
+ int _s3d_tesselate(struct tessp_t *t,struct t_buf *b);
+-
+-
+
+Modified: branches/s3d-cmake/server/config.h
+===================================================================
+--- branches/s3d-cmake/server/config.h	2007-07-01 13:14:56 UTC (rev 615)
++++ branches/s3d-cmake/server/config.h	2007-07-01 13:14:58 UTC (rev 616)
+@@ -22,7 +22,7 @@
+  */
+ 
+ /* use the global config.h */
+-#include &lt;config.h&gt; 
++#include &lt;config-s3d.h&gt; 
+ 
+ /*  to be filled with configure options ...  */
+ /*   */
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000607.html">[S3d-svn] r615 - in branches/s3d-cmake: libs3d server
+</A></li>
+	<LI>Next message: <A HREF="000608.html">[S3d-svn] r617 - in branches/s3d-cmake: libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#610">[ date ]</a>
+              <a href="thread.html#610">[ thread ]</a>
+              <a href="subject.html#610">[ subject ]</a>
+              <a href="author.html#610">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

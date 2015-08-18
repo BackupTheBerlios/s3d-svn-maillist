@@ -1,0 +1,687 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r983 - trunk/Documentation/manpages/man1
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r983%20-%20trunk/Documentation/manpages/man1&In-Reply-To=%3C200809011853.m81Ir4U0005743%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000962.html">
+   <LINK REL="Next"  HREF="000964.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r983 - trunk/Documentation/manpages/man1</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r983%20-%20trunk/Documentation/manpages/man1&In-Reply-To=%3C200809011853.m81Ir4U0005743%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r983 - trunk/Documentation/manpages/man1">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep  1 20:53:04 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000962.html">[S3d-svn] r982 - in trunk/Documentation: . libs3d libs3dw manpages	manpages/man1 manpages/man3 manpages/man9
+</A></li>
+        <LI>Next message: <A HREF="000964.html">[S3d-svn] r984 - in trunk/Documentation/manpages: . man1 man3 man9
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#963">[ date ]</a>
+              <a href="thread.html#963">[ thread ]</a>
+              <a href="subject.html#963">[ subject ]</a>
+              <a href="author.html#963">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-01 20:53:03 +0200 (Mon, 01 Sep 2008)
+New Revision: 983
+
+Added:
+   trunk/Documentation/manpages/man1/dot_mcp.sgml
+   trunk/Documentation/manpages/man1/kism3d.sgml
+   trunk/Documentation/manpages/man1/meshs3d.sgml
+   trunk/Documentation/manpages/man1/s3d.sgml
+   trunk/Documentation/manpages/man1/s3d_x11gate.sgml
+   trunk/Documentation/manpages/man1/s3dfm.sgml
+   trunk/Documentation/manpages/man1/s3dosm.sgml
+   trunk/Documentation/manpages/man1/s3dvt.sgml
+Log:
+Readd program sgml's for man pages
+
+Added: trunk/Documentation/manpages/man1/dot_mcp.sgml
+===================================================================
+--- trunk/Documentation/manpages/man1/dot_mcp.sgml	2008-09-01 18:45:05 UTC (rev 982)
++++ trunk/Documentation/manpages/man1/dot_mcp.sgml	2008-09-01 18:53:03 UTC (rev 983)
+@@ -0,0 +1,58 @@
++&lt;!DOCTYPE refentry PUBLIC &quot;-//OASIS//DTD DocBook V4.1//EN&quot; [
++  &lt;!ENTITY gnu         &quot;&lt;acronym&gt;GNU&lt;/acronym&gt;&quot;&gt;
++
++  &lt;!ENTITY program     &quot;dot_mcp&quot;&gt;
++]&gt;
++&lt;refentry id=&quot;dotmcp&quot;&gt;
++
++	&lt;refmeta&gt; 
++		&lt;refentrytitle&gt;&program;&lt;/refentrytitle&gt;
++		&lt;manvolnum&gt;1&lt;/manvolnum&gt;
++	&lt;/refmeta&gt; 
++	
++	&lt;refnamediv&gt; 
++		&lt;refname&gt;&program;&lt;/refname&gt;
++		&lt;refpurpose&gt; mcp for s3d &lt;/refpurpose&gt;
++	&lt;/refnamediv&gt;
++
++	&lt;refsynopsisdiv&gt;
++		&lt;cmdsynopsis&gt;
++			&lt;command&gt;&program;&lt;/command&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;--s3d-url &lt;replaceable&gt;url&lt;/replaceable&gt;&lt;/arg&gt;
++		&lt;/cmdsynopsis&gt;
++	&lt;/refsynopsisdiv&gt;
++
++	&lt;refsect1&gt;
++		&lt;title&gt;OPTIONS&lt;/title&gt;
++		&lt;para&gt;
++			This program follows the usual &gnu; command line syntax. A summary of
++			the options supported by &lt;command&gt;&program;&lt;/command&gt; is below.
++		&lt;/para&gt;
++		&lt;variablelist&gt;
++			&lt;varlistentry&gt;
++				&lt;term&gt;&lt;option&gt;--s3d-url &lt;replaceable&gt;url&lt;/replaceable&gt;&lt;/option&gt;&lt;/term&gt;
++				&lt;listitem&gt;
++					&lt;para&gt; skip S3D environment and connect to this url &lt;/para&gt;
++				&lt;/listitem&gt;
++			&lt;/varlistentry&gt;
++		&lt;/variablelist&gt;
++	&lt;/refsect1&gt; 
++	
++	&lt;refsect1&gt; 
++		&lt;title&gt;DESCRIPTION&lt;/title&gt; 
++		&lt;para&gt;
++			&lt;command&gt;&program;(1)&lt;/command&gt; is a mcp (which is the window manager in s3d-terms) for s3d.
++		&lt;/para&gt;
++		&lt;para&gt; &lt;/para&gt;
++	&lt;/refsect1&gt; 
++	
++	&lt;refsect1&gt;
++		&lt;title&gt;SEE ALSO&lt;/title&gt;
++		&lt;para&gt;&lt;command&gt;s3d&lt;/command&gt;(1).&lt;/para&gt;
++
++		&lt;para&gt; &lt;ulink url=&quot;<A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>&quot;&gt; s3d project page on berlios &lt;/ulink&gt; &lt;/para&gt;
++		&lt;!--TODO: ADD REFERENCE TO APPS AND /usr/share/doc/s3d/ --&gt;
++	&lt;/refsect1&gt;
++	
++&lt;/refentry&gt; 
++
+
+Added: trunk/Documentation/manpages/man1/kism3d.sgml
+===================================================================
+--- trunk/Documentation/manpages/man1/kism3d.sgml	2008-09-01 18:45:05 UTC (rev 982)
++++ trunk/Documentation/manpages/man1/kism3d.sgml	2008-09-01 18:53:03 UTC (rev 983)
+@@ -0,0 +1,59 @@
++&lt;!DOCTYPE refentry PUBLIC &quot;-//OASIS//DTD DocBook V4.1//EN&quot; [
++  &lt;!ENTITY gnu         &quot;&lt;acronym&gt;GNU&lt;/acronym&gt;&quot;&gt;
++
++  &lt;!ENTITY program     &quot;kism3d&quot;&gt;
++]&gt;
++&lt;refentry id=&quot;kism3d&quot;&gt;
++
++	&lt;refmeta&gt; 
++		&lt;refentrytitle&gt;&program;&lt;/refentrytitle&gt;
++		&lt;manvolnum&gt;1&lt;/manvolnum&gt;
++	&lt;/refmeta&gt; 
++	
++	&lt;refnamediv&gt; 
++		&lt;refname&gt;&program;&lt;/refname&gt;
++		&lt;refpurpose&gt; 802.11 visualizer for s3d &lt;/refpurpose&gt;
++	&lt;/refnamediv&gt;
++	
++	&lt;refsynopsisdiv&gt; 
++		&lt;cmdsynopsis&gt; 
++			&lt;command&gt;&program;&lt;/command&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;--s3d-url &lt;replaceable&gt;url&lt;/replaceable&gt;&lt;/arg&gt;
++			&lt;arg choice=&quot;plain&quot;&gt;&lt;replaceable&gt;HOST&lt;/replaceable&gt;:&lt;replaceable&gt;PORT&lt;/replaceable&gt;&lt;/arg&gt;
++		&lt;/cmdsynopsis&gt;
++	&lt;/refsynopsisdiv&gt; 
++	
++	&lt;refsect1&gt; 
++		&lt;title&gt;DESCRIPTION&lt;/title&gt; 
++		&lt;para&gt;
++			&lt;command&gt;&program;(1)&lt;/command&gt; is a 3D 802.11 visualizer for kismet.
++		&lt;/para&gt;
++		&lt;para&gt; &lt;/para&gt;
++	&lt;/refsect1&gt; 
++	
++	&lt;refsect1&gt;
++		&lt;title&gt;OPTIONS&lt;/title&gt; 
++		&lt;para&gt; 
++			This program follows the usual &gnu; command line syntax. A summary of
++			the options supported by &lt;command&gt;&program;&lt;/command&gt; is below.
++		&lt;/para&gt;
++		&lt;variablelist&gt;
++			&lt;varlistentry&gt;
++				&lt;term&gt;&lt;option&gt;--s3d-url &lt;replaceable&gt;url&lt;/replaceable&gt;&lt;/option&gt;&lt;/term&gt;
++				&lt;listitem&gt;
++					&lt;para&gt; skip S3D environment and connect to this url &lt;/para&gt;
++				&lt;/listitem&gt;
++			&lt;/varlistentry&gt;
++		&lt;/variablelist&gt; 
++	&lt;/refsect1&gt; 
++		
++	&lt;refsect1&gt; 
++		&lt;title&gt;SEE ALSO&lt;/title&gt;
++		&lt;para&gt; &lt;command&gt;s3d&lt;/command&gt;(1), &lt;command&gt;kismet&lt;/command&gt;(1).&lt;/para&gt;
++
++		&lt;para&gt; &lt;ulink url=&quot;<A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>&quot;&gt; s3d project page on berlios &lt;/ulink&gt; &lt;/para&gt;
++		&lt;!--TODO: ADD REFERENCE TO APPS AND /usr/share/doc/s3d/ --&gt;
++	&lt;/refsect1&gt;
++	
++&lt;/refentry&gt; 
++
+
+Added: trunk/Documentation/manpages/man1/meshs3d.sgml
+===================================================================
+--- trunk/Documentation/manpages/man1/meshs3d.sgml	2008-09-01 18:45:05 UTC (rev 982)
++++ trunk/Documentation/manpages/man1/meshs3d.sgml	2008-09-01 18:53:03 UTC (rev 983)
+@@ -0,0 +1,80 @@
++&lt;!DOCTYPE refentry PUBLIC &quot;-//OASIS//DTD DocBook V4.1//EN&quot; [
++  &lt;!ENTITY gnu         &quot;&lt;acronym&gt;GNU&lt;/acronym&gt;&quot;&gt;
++
++  &lt;!ENTITY program     &quot;meshs3d&quot;&gt;
++]&gt;
++&lt;refentry id=&quot;meshs3d&quot;&gt;
++
++	&lt;refmeta&gt; 
++		&lt;refentrytitle&gt;&program;&lt;/refentrytitle&gt;
++		&lt;manvolnum&gt;1&lt;/manvolnum&gt;
++	&lt;/refmeta&gt; 
++	
++	&lt;refnamediv&gt; 
++		&lt;refname&gt;&program;&lt;/refname&gt;
++		&lt;refpurpose&gt; olsr/batman topology visualizer for s3d &lt;/refpurpose&gt;
++	&lt;/refnamediv&gt;
++	
++	&lt;refsynopsisdiv&gt; 
++		&lt;cmdsynopsis&gt; 
++			&lt;command&gt;&program;&lt;/command&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;-d&lt;/arg&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;-H &lt;replaceable&gt;node&lt;/replaceable&gt;&lt;/arg&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;-h|--help&lt;/arg&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;--s3d-url &lt;replaceable&gt;url&lt;/replaceable&gt;&lt;/arg&gt;
++		&lt;/cmdsynopsis&gt;
++	&lt;/refsynopsisdiv&gt; 
++	
++	&lt;refsect1&gt; 
++		&lt;title&gt;DESCRIPTION&lt;/title&gt; 
++		&lt;para&gt;
++			&lt;command&gt;&program;(1)&lt;/command&gt; is a 3D topology visualizer for olsr/batman and compatible data.
++		&lt;/para&gt;
++		&lt;para&gt; &lt;/para&gt;
++	&lt;/refsect1&gt; 
++	
++	&lt;refsect1&gt;
++		&lt;title&gt;OPTIONS&lt;/title&gt; 
++		&lt;para&gt; 
++			This program follows the usual &gnu; command line syntax. A summary of
++			the options supported by &lt;command&gt;&program;&lt;/command&gt; is below.
++		&lt;/para&gt;
++		&lt;variablelist&gt;
++			&lt;varlistentry&gt;
++				&lt;term&gt;&lt;option&gt;-h&lt;/option&gt;, &lt;option&gt;--help&lt;/option&gt;
++				&lt;/term&gt;
++				&lt;listitem&gt; 
++					&lt;para&gt; Show summary of options and exit. &lt;/para&gt; 
++				&lt;/listitem&gt; 
++			&lt;/varlistentry&gt; 
++			&lt;varlistentry&gt; 
++				&lt;term&gt;&lt;option&gt;-d&lt;/option&gt;&lt;/term&gt;
++				&lt;listitem&gt; 
++					&lt;para&gt; Enable debug mode &lt;/para&gt;
++				&lt;/listitem&gt;
++			&lt;/varlistentry&gt; 
++			&lt;varlistentry&gt; 
++				&lt;term&gt;&lt;option&gt;-H &lt;replaceable&gt;node&lt;/replaceable&gt;&lt;/option&gt;&lt;/term&gt;
++				&lt;listitem&gt; 
++					&lt;para&gt; connect to olsr node. By default &program; uses localhost&lt;/para&gt;
++				&lt;/listitem&gt; 
++			&lt;/varlistentry&gt;
++			&lt;varlistentry&gt;
++				&lt;term&gt;&lt;option&gt;--s3d-url &lt;replaceable&gt;url&lt;/replaceable&gt;&lt;/option&gt;&lt;/term&gt;
++				&lt;listitem&gt;
++					&lt;para&gt; skip S3D environment and connect to this url &lt;/para&gt;
++				&lt;/listitem&gt;
++			&lt;/varlistentry&gt;
++		&lt;/variablelist&gt; 
++	&lt;/refsect1&gt; 
++		
++	&lt;refsect1&gt; 
++		&lt;title&gt;SEE ALSO&lt;/title&gt;
++		&lt;para&gt; &lt;command&gt;s3d&lt;/command&gt;(1), &lt;command&gt;olsrd&lt;/command&gt;(8), &lt;command&gt;batmand&lt;/command&gt; (8).&lt;/para&gt;
++
++		&lt;para&gt; &lt;ulink url=&quot;<A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>&quot;&gt; s3d project page on berlios &lt;/ulink&gt; &lt;/para&gt;
++		&lt;!--TODO: ADD REFERENCE TO APPS AND /usr/share/doc/s3d/ --&gt;
++	&lt;/refsect1&gt;
++	
++&lt;/refentry&gt; 
++
+
+Added: trunk/Documentation/manpages/man1/s3d.sgml
+===================================================================
+--- trunk/Documentation/manpages/man1/s3d.sgml	2008-09-01 18:45:05 UTC (rev 982)
++++ trunk/Documentation/manpages/man1/s3d.sgml	2008-09-01 18:53:03 UTC (rev 983)
+@@ -0,0 +1,80 @@
++&lt;!DOCTYPE refentry PUBLIC &quot;-//OASIS//DTD DocBook V4.1//EN&quot; [
++  &lt;!ENTITY gnu         &quot;&lt;acronym&gt;GNU&lt;/acronym&gt;&quot;&gt;
++  &lt;!ENTITY debian      &quot;&lt;productname&gt;Debian&lt;/productname&gt;&quot;&gt;
++
++  &lt;!ENTITY program     &quot;s3d&quot;&gt;
++]&gt;
++&lt;refentry id=&quot;s3d&quot;&gt; 
++
++	&lt;refmeta&gt; 
++		&lt;refentrytitle&gt;&program;&lt;/refentrytitle&gt;
++		&lt;manvolnum&gt;1&lt;/manvolnum&gt;
++	&lt;/refmeta&gt; 
++	
++	&lt;refnamediv&gt; 
++		&lt;refname&gt;&program;&lt;/refname&gt;
++		&lt;refpurpose&gt; network display server &lt;/refpurpose&gt;
++	&lt;/refnamediv&gt;
++	
++	&lt;refsynopsisdiv&gt; 
++		&lt;cmdsynopsis&gt; 
++			&lt;command&gt;&program;&lt;/command&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;-s|--use-sdl&lt;/arg&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;-r|--rc &lt;replaceable&gt;rc-script&lt;/replaceable&gt;&lt;/arg&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;-n|--no-rc&lt;/arg&gt;
++		&lt;/cmdsynopsis&gt;
++	&lt;/refsynopsisdiv&gt; 
++	
++	&lt;refsect1&gt; 
++		&lt;title&gt;DESCRIPTION&lt;/title&gt; 
++		&lt;para&gt;
++			&lt;command&gt;&program;(1)&lt;/command&gt; is a network display server which can be used as 3d desktop environment.
++		&lt;/para&gt;
++		&lt;para&gt; &lt;/para&gt;
++	&lt;/refsect1&gt; 
++	
++	&lt;refsect1&gt;
++		&lt;title&gt;OPTIONS&lt;/title&gt; 
++		&lt;para&gt; 
++			This program follows the usual &gnu; command line syntax. A summary of
++			the options supported by &lt;command&gt;&program;&lt;/command&gt; is below.
++		&lt;/para&gt;
++		&lt;variablelist&gt;
++			&lt;varlistentry&gt; 
++				&lt;term&gt;&lt;option&gt;-s&lt;/option&gt;, &lt;option&gt;--use-sdl&lt;/option&gt;&lt;/term&gt;
++				&lt;listitem&gt; 
++					&lt;para&gt; Tells &program; to use SDL as graphics framework system. &lt;/para&gt;
++				&lt;/listitem&gt;
++			&lt;/varlistentry&gt; 
++			&lt;varlistentry&gt; 
++				&lt;term&gt;&lt;option&gt;-r &lt;replaceable&gt;rc-script&lt;/replaceable&gt;&lt;/option&gt;, &lt;option&gt;--rc &lt;replaceable&gt;rc-script&lt;/replaceable&gt;&lt;/option&gt;&lt;/term&gt;
++				&lt;listitem&gt; 
++					&lt;para&gt; Use the specified file as rc-script. By default &program; uses ~/.s3drc as
++						   per-user rc-script and /etc/s3drc as system-wide rc-script&lt;/para&gt;
++				&lt;/listitem&gt; 
++			&lt;/varlistentry&gt;
++			&lt;varlistentry&gt; 
++				&lt;term&gt;&lt;option&gt;-n&lt;/option&gt;, &lt;option&gt;--no-rc&lt;/option&gt;&lt;/term&gt;
++				&lt;listitem&gt; 
++					&lt;para&gt; Don't use rc-scripts even if the exist in the apropriate locations. &lt;/para&gt;
++				&lt;/listitem&gt; 
++			&lt;/varlistentry&gt;
++		&lt;/variablelist&gt; 
++	&lt;/refsect1&gt; 
++		
++	&lt;refsect1&gt; 
++		&lt;title&gt;SEE ALSO&lt;/title&gt;
++		&lt;para&gt; &lt;ulink url=&quot;<A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>&quot;&gt; s3d project page on berlios &lt;/ulink&gt; &lt;/para&gt;
++		&lt;!--TODO: ADD REFERENCE TO APPS AND /usr/share/doc/s3d/ --&gt;
++	&lt;/refsect1&gt;
++
++	&lt;refsect1&gt; 
++		&lt;title&gt;AUTHOR&lt;/title&gt;
++		&lt;para&gt;
++			This manual page was written by Timo Schneider &lt;email&gt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">timo.schneider at s2004.tu-chemnitz.de</A>&lt;/email&gt; 
++			for the &debian; project (but may be used by others).
++		&lt;/para&gt;
++	&lt;/refsect1&gt;
++	
++&lt;/refentry&gt; 
++
+
+Added: trunk/Documentation/manpages/man1/s3d_x11gate.sgml
+===================================================================
+--- trunk/Documentation/manpages/man1/s3d_x11gate.sgml	2008-09-01 18:45:05 UTC (rev 982)
++++ trunk/Documentation/manpages/man1/s3d_x11gate.sgml	2008-09-01 18:53:03 UTC (rev 983)
+@@ -0,0 +1,66 @@
++&lt;!DOCTYPE refentry PUBLIC &quot;-//OASIS//DTD DocBook V4.1//EN&quot; [
++  &lt;!ENTITY gnu         &quot;&lt;acronym&gt;GNU&lt;/acronym&gt;&quot;&gt;
++
++  &lt;!ENTITY program     &quot;s3d_x11gate&quot;&gt;
++]&gt;
++&lt;refentry id=&quot;s3dx11gate&quot;&gt;
++
++	&lt;refmeta&gt;
++		&lt;refentrytitle&gt;&program;&lt;/refentrytitle&gt;
++		&lt;manvolnum&gt;1&lt;/manvolnum&gt;
++	&lt;/refmeta&gt;
++
++	&lt;refnamediv&gt;
++		&lt;refname&gt;&program;&lt;/refname&gt;
++		&lt;refpurpose&gt; 3d gateway for x11 desktops &lt;/refpurpose&gt;
++	&lt;/refnamediv&gt;
++
++	&lt;refsynopsisdiv&gt;
++		&lt;cmdsynopsis&gt;
++			&lt;command&gt;&program;&lt;/command&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;-h|--help&lt;/arg&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;--s3d-url &lt;replaceable&gt;url&lt;/replaceable&gt;&lt;/arg&gt;
++		&lt;/cmdsynopsis&gt;
++	&lt;/refsynopsisdiv&gt;
++
++	&lt;refsect1&gt;
++		&lt;title&gt;DESCRIPTION&lt;/title&gt;
++		&lt;para&gt;
++			&lt;command&gt;&program;(1)&lt;/command&gt; is a 3D gateway for x11 desktops.
++		&lt;/para&gt;
++		&lt;para&gt; &lt;/para&gt;
++	&lt;/refsect1&gt;
++
++	&lt;refsect1&gt;
++		&lt;title&gt;OPTIONS&lt;/title&gt;
++		&lt;para&gt;
++			This program follows the usual &gnu; command line syntax. A summary of
++			the options supported by &lt;command&gt;&program;&lt;/command&gt; is below.
++		&lt;/para&gt;
++		&lt;variablelist&gt;
++			&lt;varlistentry&gt;
++				&lt;term&gt;&lt;option&gt;-h&lt;/option&gt;, &lt;option&gt;--help&lt;/option&gt;
++				&lt;/term&gt;
++				&lt;listitem&gt;
++					&lt;para&gt;Show summary of options and exit. &lt;/para&gt;
++				&lt;/listitem&gt;
++			&lt;/varlistentry&gt;
++			&lt;varlistentry&gt;
++				&lt;term&gt;&lt;option&gt;--s3d-url &lt;replaceable&gt;url&lt;/replaceable&gt;&lt;/option&gt;&lt;/term&gt;
++				&lt;listitem&gt;
++					&lt;para&gt; skip S3D environment and connect to this url &lt;/para&gt;
++				&lt;/listitem&gt;
++			&lt;/varlistentry&gt;
++		&lt;/variablelist&gt;
++	&lt;/refsect1&gt;
++
++	&lt;refsect1&gt;
++		&lt;title&gt;SEE ALSO&lt;/title&gt;
++		&lt;para&gt; &lt;command&gt;s3d&lt;/command&gt;(1).&lt;/para&gt;
++
++		&lt;para&gt; &lt;ulink url=&quot;<A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>&quot;&gt; s3d project page on berlios &lt;/ulink&gt; &lt;/para&gt;
++		&lt;!--TODO: ADD REFERENCE TO APPS AND /usr/share/doc/s3d/ --&gt;
++	&lt;/refsect1&gt;
++
++&lt;/refentry&gt;
++
+
+Added: trunk/Documentation/manpages/man1/s3dfm.sgml
+===================================================================
+--- trunk/Documentation/manpages/man1/s3dfm.sgml	2008-09-01 18:45:05 UTC (rev 982)
++++ trunk/Documentation/manpages/man1/s3dfm.sgml	2008-09-01 18:53:03 UTC (rev 983)
+@@ -0,0 +1,66 @@
++&lt;!DOCTYPE refentry PUBLIC &quot;-//OASIS//DTD DocBook V4.1//EN&quot; [
++  &lt;!ENTITY gnu         &quot;&lt;acronym&gt;GNU&lt;/acronym&gt;&quot;&gt;
++
++  &lt;!ENTITY program     &quot;s3dfm&quot;&gt;
++]&gt;
++&lt;refentry id=&quot;s3dfm&quot;&gt; 
++
++	&lt;refmeta&gt; 
++		&lt;refentrytitle&gt;&program;&lt;/refentrytitle&gt;
++		&lt;manvolnum&gt;1&lt;/manvolnum&gt;
++	&lt;/refmeta&gt; 
++	
++	&lt;refnamediv&gt; 
++		&lt;refname&gt;&program;&lt;/refname&gt;
++		&lt;refpurpose&gt; s3d file manager &lt;/refpurpose&gt;
++	&lt;/refnamediv&gt;
++	
++	&lt;refsynopsisdiv&gt; 
++		&lt;cmdsynopsis&gt; 
++			&lt;command&gt;&program;&lt;/command&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;-h|--help&lt;/arg&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;--s3d-url &lt;replaceable&gt;url&lt;/replaceable&gt;&lt;/arg&gt;
++		&lt;/cmdsynopsis&gt;
++	&lt;/refsynopsisdiv&gt; 
++	
++	&lt;refsect1&gt; 
++		&lt;title&gt;DESCRIPTION&lt;/title&gt; 
++		&lt;para&gt;
++			&lt;command&gt;&program;(1)&lt;/command&gt; is a 3D file manager.
++		&lt;/para&gt;
++		&lt;para&gt; &lt;/para&gt;
++	&lt;/refsect1&gt; 
++	
++	&lt;refsect1&gt;
++		&lt;title&gt;OPTIONS&lt;/title&gt; 
++		&lt;para&gt; 
++			This program follows the usual &gnu; command line syntax. A summary of
++			the options supported by &lt;command&gt;&program;&lt;/command&gt; is below.
++		&lt;/para&gt;
++		&lt;variablelist&gt;
++			&lt;varlistentry&gt;
++				&lt;term&gt;&lt;option&gt;-h&lt;/option&gt;, &lt;option&gt;--help&lt;/option&gt;
++				&lt;/term&gt;
++				&lt;listitem&gt; 
++					&lt;para&gt; Show summary of options and exit. &lt;/para&gt; 
++				&lt;/listitem&gt; 
++			&lt;/varlistentry&gt;
++			&lt;varlistentry&gt;
++				&lt;term&gt;&lt;option&gt;--s3d-url &lt;replaceable&gt;url&lt;/replaceable&gt;&lt;/option&gt;&lt;/term&gt;
++				&lt;listitem&gt;
++					&lt;para&gt; skip S3D environment and connect to this url &lt;/para&gt;
++				&lt;/listitem&gt;
++			&lt;/varlistentry&gt;
++		&lt;/variablelist&gt; 
++	&lt;/refsect1&gt; 
++		
++	&lt;refsect1&gt; 
++		&lt;title&gt;SEE ALSO&lt;/title&gt;
++		&lt;para&gt; &lt;command&gt;s3d&lt;/command&gt;(1).&lt;/para&gt;
++
++		&lt;para&gt; &lt;ulink url=&quot;<A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>&quot;&gt; s3d project page on berlios &lt;/ulink&gt; &lt;/para&gt;
++		&lt;!--TODO: ADD REFERENCE TO APPS AND /usr/share/doc/s3d/ --&gt;
++	&lt;/refsect1&gt;
++	
++&lt;/refentry&gt; 
++
+
+Added: trunk/Documentation/manpages/man1/s3dosm.sgml
+===================================================================
+--- trunk/Documentation/manpages/man1/s3dosm.sgml	2008-09-01 18:45:05 UTC (rev 982)
++++ trunk/Documentation/manpages/man1/s3dosm.sgml	2008-09-01 18:53:03 UTC (rev 983)
+@@ -0,0 +1,87 @@
++&lt;!DOCTYPE refentry PUBLIC &quot;-//OASIS//DTD DocBook V4.1//EN&quot; [
++  &lt;!ENTITY gnu         &quot;&lt;acronym&gt;GNU&lt;/acronym&gt;&quot;&gt;
++
++  &lt;!ENTITY program     &quot;s3dosm&quot;&gt;
++]&gt;
++&lt;refentry id=&quot;s3dosm&quot;&gt;
++
++	&lt;refmeta&gt;
++		&lt;refentrytitle&gt;&program;&lt;/refentrytitle&gt;
++		&lt;manvolnum&gt;1&lt;/manvolnum&gt;
++	&lt;/refmeta&gt;
++
++	&lt;refnamediv&gt;
++		&lt;refname&gt;&program;&lt;/refname&gt;
++		&lt;refpurpose&gt; gps card application for s3d &lt;/refpurpose&gt;
++	&lt;/refnamediv&gt;
++
++	&lt;refsynopsisdiv&gt;
++		&lt;cmdsynopsis&gt;
++			&lt;command&gt;&program;&lt;/command&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;-o|--osm &lt;replaceable&gt;MINLAT&lt;/replaceable&gt;,&lt;replaceable&gt;MINLON&lt;/replaceable&gt;,&lt;replaceable&gt;MAXLAT&lt;/replaceable&gt;,&lt;replaceable&gt;MAXLON&lt;/replaceable&gt;&lt;/arg&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;-h|--help&lt;/arg&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;--s3d-url &lt;replaceable&gt;url&lt;/replaceable&gt;&lt;/arg&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;&lt;replaceable&gt;files&lt;/replaceable&gt;&lt;/arg&gt;
++		&lt;/cmdsynopsis&gt;
++	&lt;/refsynopsisdiv&gt;
++
++	&lt;refsect1&gt;
++		&lt;title&gt;DESCRIPTION&lt;/title&gt;
++		&lt;para&gt;
++			&lt;command&gt;&program;(1)&lt;/command&gt; is a 3D gps card application for openstreetmap/kismet xml card data.
++		&lt;/para&gt;
++		&lt;para&gt; &lt;/para&gt;
++	&lt;/refsect1&gt;
++
++	&lt;refsect1&gt;
++		&lt;title&gt;OPTIONS&lt;/title&gt;
++		&lt;para&gt;
++			This program follows the usual &gnu; command line syntax. A summary of
++			the options supported by &lt;command&gt;&program;&lt;/command&gt; is below.
++		&lt;/para&gt;
++		&lt;variablelist&gt;
++			&lt;varlistentry&gt;
++				&lt;term&gt;&lt;option&gt;-h&lt;/option&gt;, &lt;option&gt;--help&lt;/option&gt;
++				&lt;/term&gt;
++				&lt;listitem&gt;
++					&lt;para&gt; Show summary of options and exit. &lt;/para&gt;
++				&lt;/listitem&gt;
++			&lt;/varlistentry&gt;
++			&lt;varlistentry&gt;
++				&lt;term&gt;&lt;option&gt;-o&lt;/option&gt;, &lt;option&gt;--osm&lt;/option&gt; &lt;replaceable&gt;MINLAT&lt;/replaceable&gt;,&lt;replaceable&gt;MINLON&lt;/replaceable&gt;,&lt;replaceable&gt;MAXLAT&lt;/replaceable&gt;,&lt;replaceable&gt;MAXLON&lt;/replaceable&gt;
++				&lt;/term&gt;
++				&lt;listitem&gt;
++					&lt;para&gt; Load a map with the given bounding box from the openstreetmap server. &lt;/para&gt;
++				&lt;/listitem&gt;
++			&lt;/varlistentry&gt;
++			&lt;varlistentry&gt;
++				&lt;term&gt;&lt;option&gt;--s3d-url &lt;replaceable&gt;url&lt;/replaceable&gt;&lt;/option&gt;&lt;/term&gt;
++				&lt;listitem&gt;
++					&lt;para&gt; skip S3D environment and connect to this url &lt;/para&gt;
++				&lt;/listitem&gt;
++			&lt;/varlistentry&gt;
++		&lt;/variablelist&gt;
++	&lt;/refsect1&gt;
++
++	&lt;refsect1&gt;
++		&lt;title&gt;EXAMPLES&lt;/title&gt;
++		&lt;para&gt;
++		&lt;screen
++&gt;&lt;prompt&gt;$ &lt;/prompt&gt;&lt;userinput&gt;s3osm --osm &lt;replaceable&gt;12.90142,50.82475,12.93352,50.84592&lt;/replaceable&gt;&lt;/userinput&gt;
++
++&lt;prompt&gt;$ &lt;/prompt&gt;&lt;userinput&gt;s3osm &lt;replaceable&gt;osmdata&lt;/replaceable&gt;.xml&lt;/userinput&gt;
++&lt;/screen&gt;
++
++		&lt;/para&gt;
++	&lt;/refsect1&gt;
++
++	&lt;refsect1&gt;
++		&lt;title&gt;SEE ALSO&lt;/title&gt;
++		&lt;para&gt; &lt;command&gt;s3d&lt;/command&gt;(1).&lt;/para&gt;
++
++		&lt;para&gt; &lt;ulink url=&quot;<A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>&quot;&gt; s3d project page on berlios &lt;/ulink&gt; &lt;/para&gt;
++		&lt;!--TODO: ADD REFERENCE TO APPS AND /usr/share/doc/s3d/ --&gt;
++	&lt;/refsect1&gt;
++
++&lt;/refentry&gt;
++
+
+Added: trunk/Documentation/manpages/man1/s3dvt.sgml
+===================================================================
+--- trunk/Documentation/manpages/man1/s3dvt.sgml	2008-09-01 18:45:05 UTC (rev 982)
++++ trunk/Documentation/manpages/man1/s3dvt.sgml	2008-09-01 18:53:03 UTC (rev 983)
+@@ -0,0 +1,66 @@
++&lt;!DOCTYPE refentry PUBLIC &quot;-//OASIS//DTD DocBook V4.1//EN&quot; [
++  &lt;!ENTITY gnu         &quot;&lt;acronym&gt;GNU&lt;/acronym&gt;&quot;&gt;
++
++  &lt;!ENTITY program     &quot;s3dvt&quot;&gt;
++]&gt;
++&lt;refentry id=&quot;s3dvt&quot;&gt;
++
++	&lt;refmeta&gt;
++		&lt;refentrytitle&gt;&program;&lt;/refentrytitle&gt;
++		&lt;manvolnum&gt;1&lt;/manvolnum&gt;
++	&lt;/refmeta&gt;
++
++	&lt;refnamediv&gt;
++		&lt;refname&gt;&program;&lt;/refname&gt;
++		&lt;refpurpose&gt; 3d terminal emulator for s3d &lt;/refpurpose&gt;
++	&lt;/refnamediv&gt;
++
++	&lt;refsynopsisdiv&gt;
++		&lt;cmdsynopsis&gt;
++			&lt;command&gt;&program;&lt;/command&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;-h|--help&lt;/arg&gt;
++			&lt;arg choice=&quot;opt&quot;&gt;--s3d-url &lt;replaceable&gt;url&lt;/replaceable&gt;&lt;/arg&gt;
++		&lt;/cmdsynopsis&gt;
++	&lt;/refsynopsisdiv&gt;
++
++	&lt;refsect1&gt;
++		&lt;title&gt;DESCRIPTION&lt;/title&gt;
++		&lt;para&gt;
++			&lt;command&gt;&program;(1)&lt;/command&gt; is a terminal emulator.
++		&lt;/para&gt;
++		&lt;para&gt; &lt;/para&gt;
++	&lt;/refsect1&gt;
++
++	&lt;refsect1&gt;
++		&lt;title&gt;OPTIONS&lt;/title&gt;
++		&lt;para&gt;
++			This program follows the usual &gnu; command line syntax. A summary of
++			the options supported by &lt;command&gt;&program;&lt;/command&gt; is below.
++		&lt;/para&gt;
++		&lt;variablelist&gt;
++			&lt;varlistentry&gt;
++				&lt;term&gt;&lt;option&gt;-h&lt;/option&gt;, &lt;option&gt;--help&lt;/option&gt;
++				&lt;/term&gt;
++				&lt;listitem&gt;
++					&lt;para&gt; Show summary of options and exit. &lt;/para&gt;
++				&lt;/listitem&gt;
++			&lt;/varlistentry&gt;
++			&lt;varlistentry&gt;
++				&lt;term&gt;&lt;option&gt;--s3d-url &lt;replaceable&gt;url&lt;/replaceable&gt;&lt;/option&gt;&lt;/term&gt;
++				&lt;listitem&gt;
++					&lt;para&gt; skip S3D environment and connect to this url &lt;/para&gt;
++				&lt;/listitem&gt;
++			&lt;/varlistentry&gt;
++		&lt;/variablelist&gt;
++	&lt;/refsect1&gt;
++
++	&lt;refsect1&gt;
++		&lt;title&gt;SEE ALSO&lt;/title&gt;
++		&lt;para&gt; &lt;command&gt;s3d&lt;/command&gt;(1).&lt;/para&gt;
++
++		&lt;para&gt; &lt;ulink url=&quot;<A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>&quot;&gt; s3d project page on berlios &lt;/ulink&gt; &lt;/para&gt;
++		&lt;!--TODO: ADD REFERENCE TO APPS AND /usr/share/doc/s3d/ --&gt;
++	&lt;/refsect1&gt;
++
++&lt;/refentry&gt;
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000962.html">[S3d-svn] r982 - in trunk/Documentation: . libs3d libs3dw manpages	manpages/man1 manpages/man3 manpages/man9
+</A></li>
+	<LI>Next message: <A HREF="000964.html">[S3d-svn] r984 - in trunk/Documentation/manpages: . man1 man3 man9
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#963">[ date ]</a>
+              <a href="thread.html#963">[ thread ]</a>
+              <a href="subject.html#963">[ subject ]</a>
+              <a href="author.html#963">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

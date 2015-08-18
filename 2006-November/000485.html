@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r492 - in trunk: . apps/kism3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r492%20-%20in%20trunk%3A%20.%20apps/kism3d&In-Reply-To=%3C200611271610.kARGA65c012098%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000484.html">
+   <LINK REL="Next"  HREF="000486.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r492 - in trunk: . apps/kism3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r492%20-%20in%20trunk%3A%20.%20apps/kism3d&In-Reply-To=%3C200611271610.kARGA65c012098%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r492 - in trunk: . apps/kism3d">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Nov 27 17:10:06 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000484.html">[S3d-svn] r491 - trunk/apps/kism3d
+</A></li>
+        <LI>Next message: <A HREF="000486.html">[S3d-svn] r493 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#485">[ date ]</a>
+              <a href="thread.html#485">[ thread ]</a>
+              <a href="subject.html#485">[ subject ]</a>
+              <a href="author.html#485">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-11-27 17:10:05 +0100 (Mon, 27 Nov 2006)
+New Revision: 492
+
+Modified:
+   trunk/
+   trunk/apps/kism3d/gui.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1169 at kero</A>:  dotslash | 2006-11-27 17:09:58 +0100
+ - some fix
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1161
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1169
+
+Modified: trunk/apps/kism3d/gui.c
+===================================================================
+--- trunk/apps/kism3d/gui.c	2006-11-27 15:20:41 UTC (rev 491)
++++ trunk/apps/kism3d/gui.c	2006-11-27 16:10:05 UTC (rev 492)
+@@ -106,8 +106,8 @@
+ 	return(o);
+ }
+ 
++#define BSSID_SCALE		0.2
+ 
+-
+ int handle_networks() {
+ 
+ 	struct list_head *network_pos;
+@@ -142,8 +142,8 @@
+ 			s3d_translate( wlan_network-&gt;wrsphr_id, 0, -6 + wlan_network-&gt;scale_fac, wlan_network-&gt;scale_fac );
+ 			s3d_scale( wlan_network-&gt;obj_id, wlan_network-&gt;scale_fac );
+ 
+-			real_node_pos_x = sin( ( 360 / Num_networks ) * network_index ) * ( M_PI / 180 ) * ( ( ( 100 * Num_networks ) / 2 * M_PI ) );
+-			real_node_pos_z = cos( ( 360 / Num_networks ) * network_index ) * ( M_PI / 180 ) * ( ( ( 100 * Num_networks ) / 2 * M_PI ) );
++			real_node_pos_x = sin( 2.0* M_PI * network_index / ((float) Num_networks ) ) * ( ( ( 1 * Num_networks ) / 2 * M_PI ) );
++			real_node_pos_z = cos( 2.0* M_PI * network_index / ((float) Num_networks ) ) * ( ( ( 1 * Num_networks ) / 2 * M_PI ) );
+ 
+ 			if ( ( fabs( wlan_network-&gt;pos_vec[0] - real_node_pos_x ) &gt; 0.5 ) || ( fabs( wlan_network-&gt;pos_vec[2] - real_node_pos_z ) &gt; 0.5 ) ) {
+ 
+@@ -173,7 +173,7 @@
+ 					wlan_network-&gt;bssid_id = s3d_draw_string( wlan_network-&gt;bssid, &amp;wlan_network-&gt;bssid_len );
+ 					s3d_link( wlan_network-&gt;bssid_id, wlan_network-&gt;obj_id );
+ 					s3d_translate( wlan_network-&gt;bssid_id, - wlan_network-&gt;bssid_len / 2, -2, 0 );
+-					s3d_scale( wlan_network-&gt;bssid_id, 0.2 );
++					s3d_scale( wlan_network-&gt;bssid_id, BSSID_SCALE );
+ 					s3d_flags_on( wlan_network-&gt;bssid_id, S3D_OF_VISIBLE );
+ 
+ 				}
+@@ -211,7 +211,7 @@
+ 
+ 			s3d_rotate( wlan_network-&gt;bssid_id, 0, angle , 0 );
+ 
+-			s3d_translate( wlan_network-&gt;bssid_id, -cos(angle_rad) * wlan_network-&gt;bssid_len / 2 ,-1.5, sin(angle_rad) * wlan_network-&gt;bssid_len / 2 );
++			s3d_translate( wlan_network-&gt;bssid_id, -cos(angle_rad) * BSSID_SCALE * wlan_network-&gt;bssid_len / 2 ,-1.5, sin(angle_rad) * BSSID_SCALE * wlan_network-&gt;bssid_len / 2 );
+ 
+ 			wlan_network-&gt;rotation = ( wlan_network-&gt;rotation + 1 ) % 360;
+ 			s3d_rotate( wlan_network-&gt;wrsphr_id, 0, wlan_network-&gt;rotation, 0 );
+@@ -300,4 +300,4 @@
+ 	Kism3d_aborted = 1;
+ 	return(0);
+ 
+-}
+\ No newline at end of file
++}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000484.html">[S3d-svn] r491 - trunk/apps/kism3d
+</A></li>
+	<LI>Next message: <A HREF="000486.html">[S3d-svn] r493 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#485">[ date ]</a>
+              <a href="thread.html#485">[ thread ]</a>
+              <a href="subject.html#485">[ subject ]</a>
+              <a href="author.html#485">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

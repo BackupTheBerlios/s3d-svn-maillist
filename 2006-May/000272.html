@@ -1,0 +1,303 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r279 - in trunk: . apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r279%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200605061655.k46GtRku019899%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000271.html">
+   <LINK REL="Next"  HREF="000273.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r279 - in trunk: . apps/s3dfm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r279%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200605061655.k46GtRku019899%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r279 - in trunk: . apps/s3dfm">dotslash at berlios.de
+       </A><BR>
+    <I>Sat May  6 18:55:27 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000271.html">[S3d-svn] r278 - in trunk: . server
+</A></li>
+        <LI>Next message: <A HREF="000273.html">[S3d-svn] r280 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#272">[ date ]</a>
+              <a href="thread.html#272">[ thread ]</a>
+              <a href="subject.html#272">[ subject ]</a>
+              <a href="author.html#272">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-06 18:55:25 +0200 (Sat, 06 May 2006)
+New Revision: 279
+
+Modified:
+   trunk/
+   trunk/apps/s3dfm/box.c
+   trunk/apps/s3dfm/main.c
+   trunk/apps/s3dfm/s3dfm.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r536 at balthasar</A>:  dotslash | 2006-05-06 18:54:21 +0200
+ - fixed floating rests
+ - title bar added (well, only the bar ;)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:534
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:536
+
+Modified: trunk/apps/s3dfm/box.c
+===================================================================
+--- trunk/apps/s3dfm/box.c	2006-05-06 16:25:01 UTC (rev 278)
++++ trunk/apps/s3dfm/box.c	2006-05-06 16:55:25 UTC (rev 279)
+@@ -35,6 +35,9 @@
+ 	dir-&gt;block=-1;
+ 	dir-&gt;str=-1;
+ 	dir-&gt;close=-1;
++	dir-&gt;select=-1;
++	dir-&gt;title=-1;
++	dir-&gt;titlestr=-1;
+ 
+ 	dir-&gt;len=0;
+ 	dir-&gt;disp=0;
+@@ -76,8 +79,11 @@
+ 	dir-&gt;list[i].dpz = dir-&gt;list[i].pz=1.0;
+ 	dir-&gt;list[i].scale = dir-&gt;list[i].dscale = (float)1.0/((float)dps);
+ 	/* create the block */
+-	if (dir-&gt;list[i].close!=-1)		s3d_del_object(dir-&gt;list[i].close);
+-	if (dir-&gt;list[i].block!=-1)		s3d_del_object(dir-&gt;list[i].block);
++	if (dir-&gt;list[i].close!=-1)		{	s3d_del_object(dir-&gt;list[i].close);		dir-&gt;list[i].close=-1; }
++	if (dir-&gt;list[i].select!=-1)	{	s3d_del_object(dir-&gt;list[i].select);	dir-&gt;list[i].select=-1; }
++	if (dir-&gt;list[i].title!=-1)		{	s3d_del_object(dir-&gt;list[i].title);		dir-&gt;list[i].title=-1; }
++	if (dir-&gt;list[i].titlestr!=-1)	{	s3d_del_object(dir-&gt;list[i].titlestr);	dir-&gt;list[i].titlestr=-1; }
++	if (dir-&gt;list[i].block!=-1)			s3d_del_object(dir-&gt;list[i].block);
+ 	dir-&gt;list[i].block=s3d_new_object();
+ 	s3d_push_vertices(dir-&gt;list[i].block,vertices,8);
+ 	d=((int)(((i+(dps+1)%2*(i/dps)))%2))*0.2;
+@@ -147,18 +153,45 @@
+ 				};
+ 	float xvertices[]=
+ 			{
+-			  0.8,BOXHEIGHT-0.2, 0.8,
+-			  0.8,BOXHEIGHT    , 0.8,
+-			  1.0,BOXHEIGHT    , 0.8,
+-			  1.0,BOXHEIGHT-0.2, 0.8,
+-			  0.8,BOXHEIGHT-0.2, 1.0,
+-			  0.8,BOXHEIGHT    , 1.0,
+-			  1.0,BOXHEIGHT    , 1.0,
+-			  1.0,BOXHEIGHT-0.2, 1.0
++			  0.8,BHH-0.2, 0.8,
++			  0.8,BHH    , 0.8,
++			  BHP,BHH    , 0.8,
++			  BHP,BHH-0.2, 0.8,
++			  0.8,BHH-0.2, 1.0,
++			  0.8,BHH    , 1.0,
++			  BHP,BHH    , 1.0,
++			  BHP,BHH-0.2, 1.0
++			 };
++	float svertices[]=
++			{
++			  0.6,BHH-0.2, 0.8,
++			  0.6,BHH    , 0.8,
++			  0.8,BHH    , 0.8,
++			  0.8,BHH-0.2, 0.8,
++			  0.6,BHH-0.2, 1.0,
++			  0.6,BHH    , 1.0,
++			  0.8,BHH    , 1.0,
++			  0.8,BHH-0.2, 1.0
++			 };
++	float tvertices[]=
++			{
++			  -BHP,BHH-0.2, 0.8,
++			  -BHP,BHH    , 0.8,
++			  0.6, BHH    , 0.8,
++			  0.6, BHH-0.2, 0.8,
++			  -BHP,BHH-0.2, 1.0,
++			  -BHP,BHH    , 1.0,
++			  0.6, BHH    , 1.0,
++			  0.6, BHH-0.2, 1.0
++			 };
++	unsigned long bar_poly[]={
++		4,5,6,0,
++		4,6,7,0,
++		3,7,4,0,
++		3,4,0,0
++	};
++	printf(&quot;new block for %s\n&quot;,dir-&gt;name);
+ 
+-			 };
+-	struct t_item *d;
+-	float f;	 
+ 	dir-&gt;block=s3d_new_object();
+ 	s3d_push_vertices(dir-&gt;block,vertices,sizeof(vertices)/(3*sizeof(float)));
+ 	s3d_push_material(dir-&gt;block,
+@@ -166,17 +199,10 @@
+ 						0.5,0.5,0.5,
+ 						0.5,0.5,0.5
+ 					);
+-	d=dir;
+-	f=0;
+-	while (d-&gt;parent!=NULL)
+-	{
+-		f=(f+1)/4;
+-		d=d-&gt;parent;
+-	}
+ 	s3d_push_material(dir-&gt;block,
+-						0.5+f/2,0.5+f,0.6,
+-						0.5+f/2,0.5+f,0.6,
+-						0.5+f/2,0.5+f,0.6);
++						0.5,0.5,0.6,
++						0.5,0.5,0.6,
++						0.5,0.5,0.6);
+ 
+ 	s3d_push_polygon(dir-&gt;block,4,5,6,1);
+ 	s3d_push_polygon(dir-&gt;block,4,6,7,1);
+@@ -192,20 +218,36 @@
+ 	
+ 	s3d_push_polygon(dir-&gt;block,8,9,10,0);
+ 	s3d_push_polygon(dir-&gt;block,8,10,11,0);
++
+ 	dir-&gt;close=s3d_new_object();
+-	s3d_push_vertices(dir-&gt;close,xvertices,sizeof(xvertices)/(3*sizeof(float)));
+ 	s3d_push_material(dir-&gt;close,
+-						0.5,0.1,0.1,
+-						0.5,0.1,0.1,
+-						0.5,0.1,0.1
++						0.5,0.3,0.3,
++						0.5,0.3,0.3,
++						0.5,0.3,0.3
+ 					);
+-	s3d_push_polygon(dir-&gt;close,4,5,6,0);
+-	s3d_push_polygon(dir-&gt;close,4,6,7,0);
+-	s3d_push_polygon(dir-&gt;close,0,4,5,0);
+-	s3d_push_polygon(dir-&gt;close,0,5,1,0);
+-	s3d_push_polygon(dir-&gt;close,3,7,4,0);
+-	s3d_push_polygon(dir-&gt;close,3,4,0,0);
++	s3d_push_vertices(dir-&gt;close,xvertices,sizeof(xvertices)/(3*sizeof(float)));
++	s3d_push_polygons(dir-&gt;close,bar_poly,sizeof(bar_poly)/(sizeof(unsigned long)*4));
+ 	s3d_link(dir-&gt;close,dir-&gt;block);
++	
++	dir-&gt;select=s3d_new_object();
++	s3d_push_material(dir-&gt;select,
++						0.1,0.1,0.3,
++						0.1,0.1,0.3,
++						0.1,0.1,0.3
++					);
++	s3d_push_vertices(dir-&gt;select,svertices,sizeof(svertices)/(3*sizeof(float)));
++	s3d_push_polygons(dir-&gt;select,bar_poly,sizeof(bar_poly)/(sizeof(unsigned long)*4));
++	s3d_link(dir-&gt;select,dir-&gt;block);
++	
++	dir-&gt;title=s3d_new_object();
++	s3d_push_material(dir-&gt;title,
++						0.3,0.3,0.3,
++						0.3,0.3,0.3,
++						0.3,0.3,0.3
++					);
++	s3d_push_vertices(dir-&gt;title,tvertices,sizeof(tvertices)/(3*sizeof(float)));
++	s3d_push_polygons(dir-&gt;title,bar_poly,sizeof(bar_poly)/(sizeof(unsigned long)*4));
++	s3d_link(dir-&gt;title,dir-&gt;block);
+ 	return(0);
+ }
+ 
+@@ -253,6 +295,9 @@
+ 	box_sidelabel(dir);
+     s3d_flags_on(dir-&gt;block,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+     s3d_flags_on(dir-&gt;close,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++    s3d_flags_on(dir-&gt;title,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++    s3d_flags_on(dir-&gt;select,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++    s3d_flags_on(dir-&gt;titlestr,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 	return(0);
+ }
+ 
+@@ -305,9 +350,7 @@
+ 	{
+ 		box_position_kids(dir-&gt;parent);
+ 	}
+-
+ 	return(0);
+-
+ }
+ /* only display dir and its kids, but nothing below. */
+ int box_collapse_grandkids(struct t_item *dir)
+
+Modified: trunk/apps/s3dfm/main.c
+===================================================================
+--- trunk/apps/s3dfm/main.c	2006-05-06 16:25:01 UTC (rev 278)
++++ trunk/apps/s3dfm/main.c	2006-05-06 16:55:25 UTC (rev 279)
+@@ -28,7 +28,7 @@
+ #include &lt;stdlib.h&gt;	 /*  malloc() */
+ #include &lt;string.h&gt;  /*  strlen(), strncmp(), strrchr() */
+ #include &lt;time.h&gt;	/* nanosleep() */
+-static struct timespec t={0,33*1000*1000}; /* 30 fps */
++static struct timespec t={0,33*1000*1000}; 
+ struct t_item root,cam;
+ 
+ void get_path(struct t_item *dir, char *path)
+@@ -66,7 +66,6 @@
+ 		dir-&gt;n_item=n;
+ 		printf(&quot;found %d items, processing ...\n&quot;,n);
+         while(n--) {
+-
+ 			box_init(&amp;list[n]);
+ 			nstr=namelist[n]-&gt;d_name;
+ 			strncpy(list[n].name,nstr,M_NAME);
+@@ -155,8 +154,8 @@
+ }
+ void mainloop()
+ {
+-	nanosleep(&amp;t,NULL); 
+ 	ani_mate();
++	nanosleep(&amp;t,NULL); 
+ }
+ int main (int argc, char **argv)
+ {
+
+Modified: trunk/apps/s3dfm/s3dfm.h
+===================================================================
+--- trunk/apps/s3dfm/s3dfm.h	2006-05-06 16:25:01 UTC (rev 278)
++++ trunk/apps/s3dfm/s3dfm.h	2006-05-06 16:55:25 UTC (rev 279)
+@@ -43,7 +43,7 @@
+ /* zoomspeed */
+ 
+ struct t_item {
+-	int str,close;							/* object ids ...*/
++	int str,close,select,title,titlestr;	/* object ids ...*/
+ 	int block;								/* oid of the block */
+ 	int dirs_opened;						/* how many directories are on the block */
+ 	char name[M_NAME];						/* name (e.g. file name) */
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000271.html">[S3d-svn] r278 - in trunk: . server
+</A></li>
+	<LI>Next message: <A HREF="000273.html">[S3d-svn] r280 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#272">[ date ]</a>
+              <a href="thread.html#272">[ thread ]</a>
+              <a href="subject.html#272">[ subject ]</a>
+              <a href="author.html#272">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

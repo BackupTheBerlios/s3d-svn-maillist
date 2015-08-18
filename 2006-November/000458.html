@@ -1,0 +1,544 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r465 - in trunk: . apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r465%20-%20in%20trunk%3A%20.%20apps/s3dosm&In-Reply-To=%3C200611092200.kA9M0tBd025828%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000457.html">
+   <LINK REL="Next"  HREF="000459.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r465 - in trunk: . apps/s3dosm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r465%20-%20in%20trunk%3A%20.%20apps/s3dosm&In-Reply-To=%3C200611092200.kA9M0tBd025828%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r465 - in trunk: . apps/s3dosm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Thu Nov  9 23:00:55 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000457.html">[S3d-svn] r464 - trunk/apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000459.html">[S3d-svn] r466 - in trunk: . apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#458">[ date ]</a>
+              <a href="thread.html#458">[ thread ]</a>
+              <a href="subject.html#458">[ subject ]</a>
+              <a href="author.html#458">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-11-09 23:00:54 +0100 (Thu, 09 Nov 2006)
+New Revision: 465
+
+Added:
+   trunk/apps/s3dosm/nav.c
+Modified:
+   trunk/
+   trunk/apps/s3dosm/Makefile
+   trunk/apps/s3dosm/draw.c
+   trunk/apps/s3dosm/kismet.c
+   trunk/apps/s3dosm/main.c
+   trunk/apps/s3dosm/osm.c
+   trunk/apps/s3dosm/s3dosm.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1121 at kero</A>:  dotslash | 2006-11-09 23:00:43 +0100
+ - draw access points found by kismet
+ - some more navigation formalism
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1114
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1121
+
+Modified: trunk/apps/s3dosm/Makefile
+===================================================================
+--- trunk/apps/s3dosm/Makefile	2006-11-09 20:03:22 UTC (rev 464)
++++ trunk/apps/s3dosm/Makefile	2006-11-09 22:00:54 UTC (rev 465)
+@@ -1,6 +1,6 @@
+ BIN=s3dosm
+ VERS=0.0.1
+-SOURCES=main.c http_fetcher.c http_error_codes.c osm.c avl.c object.c draw.c kismet.c
++SOURCES=main.c http_fetcher.c http_error_codes.c osm.c avl.c object.c draw.c kismet.c nav.c tag.c
+ HEADERS=s3dosm.h http_fetcher.h
+ OBJS=$(SOURCES:.c=.o)
+ CFLAGS=-Wall -ggdb -pedantic `xml2-config --cflags`
+
+Modified: trunk/apps/s3dosm/draw.c
+===================================================================
+--- trunk/apps/s3dosm/draw.c	2006-11-09 20:03:22 UTC (rev 464)
++++ trunk/apps/s3dosm/draw.c	2006-11-09 22:00:54 UTC (rev 465)
+@@ -2,7 +2,7 @@
+ #include &lt;s3d.h&gt;
+ #include &lt;math.h&gt;	/* sin(), cos() */
+ #include &lt;stdio.h&gt;	/* printf() */
+-#define	ESIZE	6378
++#include &lt;string.h&gt;	/* strcmp() */
+ 
+ struct vdata{
+ 	layer_t *layer;
+@@ -24,6 +24,7 @@
+ void draw_add_vertices(object_t *t, void *data)
+ {
+ 	struct vdata *v=data;
++	tag_t *tag;
+ 	
+ 	if (t-&gt;type==T_NODE)
+ 	{
+@@ -32,7 +33,33 @@
+ 		node-&gt;vid=v-&gt;vnum;
+ 		calc_earth_to_eukl(node-&gt;lon,node-&gt;lat,x);
+ 		s3d_push_vertex(v-&gt;oid,x[0],x[1],x[2]);
+-		printf(&quot;vertex  %d: %f %f %f\n&quot;,node-&gt;vid,x[0],x[1],x[2]);
++		if (node-&gt;visible==2) /* something special */
++		{
++			if (NULL!=(tag=tag_get(OBJECT_T(node), &quot;amenity&quot;)))
++			{
++				if (0==(strcmp(tag-&gt;v,&quot;wifi&quot;)))
++				{
++					tag_t *wtag,*ttag;
++					if (NULL!=(ttag=tag_get(OBJECT_T(node),&quot;wifi_type&quot;)))
++					if (0==strcmp(ttag-&gt;v,&quot;infrastructure&quot;))
++					{	
++						if (NULL!=(wtag=tag_get(OBJECT_T(node), &quot;wifi_wep&quot;)))
++							if (0==strcmp(wtag-&gt;v,&quot;true&quot;))
++								node-&gt;base.oid=s3d_clone(icons[ICON_AP_OPEN].oid);
++							else
++								node-&gt;base.oid=s3d_clone(icons[ICON_AP].oid);
++						else
++							node-&gt;base.oid=s3d_clone(icons[ICON_AP].oid);
++						s3d_translate(node-&gt;base.oid,x[0],x[1],x[2]);
++						s3d_link(node-&gt;base.oid,v-&gt;oid);
++						s3d_flags_on(node-&gt;base.oid,S3D_OF_VISIBLE);
++						s3d_rotate(node-&gt;base.oid,(90-node-&gt;lat),node-&gt;lon,0);
++					} else {
++						printf(&quot;not an ap\n&quot;);
++					}
++				}
++			}
++		}
+ 		v-&gt;vnum++;
+ 		v-&gt;lonsum+=node-&gt;lon;
+ 		v-&gt;latsum+=node-&gt;lat;
+@@ -43,42 +70,50 @@
+ void draw_add_segments(object_t *t, void *data)
+ {
+ 	struct vdata *v=data;
++	tag_t *tag;
++	int color;
+ 	if (t-&gt;type==T_SEGMENT)
+ 	{
+ 		node_t *from, *to;
+ 		segment_t *seg=SEGMENT_T(t);
+ 		from=NODE_T(avl_find(v-&gt;layer-&gt;tree,seg-&gt;from));
+ 		to=NODE_T(avl_find(v-&gt;layer-&gt;tree,seg-&gt;to));
++
++		color=0;
++		/* TODO: look at the ways using it, not the segments  */
++		if (NULL!=(tag=tag_get(OBJECT_T(seg), &quot;highway&quot;)))
++		{
++			if (0==(strcmp(tag-&gt;v,&quot;motorway&quot;))) color=1;
++			else if (0==(strcmp(tag-&gt;v,&quot;motorway_link&quot;))) color=2;
++			else if (0==(strcmp(tag-&gt;v,&quot;primary&quot;))) color=3;
++			else if (0==(strcmp(tag-&gt;v,&quot;secondary&quot;))) color=4;
++			else if (0==(strcmp(tag-&gt;v,&quot;residential&quot;))) color=5;
++		}
+ 		if (from!=NULL &amp;&amp; to!=NULL)
+-			s3d_push_line(v-&gt;oid,from-&gt;vid,to-&gt;vid,0);
++			s3d_push_line(v-&gt;oid,from-&gt;vid,to-&gt;vid,color);
+ 	}
+ }
+-int oidx, oidy;
+ int draw_layer(layer_t *layer)
+ {
+ 	struct vdata v;
+ 	int oid;
+-	double lo,la,x[3];
+ 	oid=s3d_new_object();
+-	oidx=s3d_new_object();
+-	oidy=s3d_new_object();
+ 	s3d_link(oid,oidy);
+-	s3d_link(oidy,oidx);
+ 	v.layer=layer;
+ 	v.oid=oid;
+ 	v.vnum=0;
+ 	v.n=0;
+ 	v.lonsum=v.latsum=0;
+-	s3d_push_material(oid,1,1,1,	1,1,1,	1,1,1);
++	s3d_push_material(oid,1,1,1,		1,1,1,		1,1,1); /* default */
++	s3d_push_material(oid,0.3,0.3,1,	0.3,0.3,1.0,	0.3,0.3,1.0);	/* motorway */
++	s3d_push_material(oid,0.5,0.5,0.8,	0.5,0.5,0.8,	0.5,0.5,0.8);	/* motorway_link*/
++	s3d_push_material(oid,1.0,1.0,0.0,	1.0,1.0,0.0, 	1.0,1.0,0.0);	/* primary */
++	s3d_push_material(oid,0.8,0.8,0.2,	0.8,0.8,0.2, 	0.8,0.8,0.2);	/* secondary */
++	s3d_push_material(oid,0.7,0.7,0.4,	0.7,0.7,0.4, 	0.7,0.7,0.4);	/* secondary */
+ 	avl_tree_trav(layer-&gt;tree,draw_add_vertices,(void *)&amp;v);
+ 	avl_tree_trav(layer-&gt;tree,draw_add_segments,(void *)&amp;v);
+-	lo=(v.lonsum)/v.n;
+-	la=(v.latsum)/v.n;
+-	s3d_rotate(oidy,0,-lo,0);
+-	s3d_rotate(oidx,-(90-la),0,0);
+-	calc_earth_to_eukl(lo,la,x);
+-	s3d_translate(oidx,0,-ESIZE*10,0);
+-	s3d_scale(oidx,10);
++	layer-&gt;center_lo=(v.lonsum)/v.n;
++	layer-&gt;center_la=(v.latsum)/v.n;	
+ 	s3d_flags_on(oid,S3D_OF_VISIBLE);
+ 	return(0);
+ 
+
+Modified: trunk/apps/s3dosm/kismet.c
+===================================================================
+--- trunk/apps/s3dosm/kismet.c	2006-11-09 20:03:22 UTC (rev 464)
++++ trunk/apps/s3dosm/kismet.c	2006-11-09 22:00:54 UTC (rev 465)
+@@ -3,22 +3,6 @@
+ #include &lt;stdlib.h&gt;			/* strtof(),strtod(),strtol() */
+ #include &lt;libxml/parser.h&gt;
+ #include &lt;libxml/tree.h&gt;
+-void add_tag(object_t *obj,char *k, char *v)
+-{
+-	tag_t *t;
+-	obj-&gt;tag_n++;
+-	obj-&gt;tag_p=realloc(obj-&gt;tag_p,obj-&gt;tag_n*sizeof(tag_t));
+-	if (k!=NULL &amp;&amp; v!=NULL)
+-	{
+-		t=&amp;(obj-&gt;tag_p[obj-&gt;tag_n-1]);
+-		t-&gt;ttype=TAG_UNKNOWN;
+-		t-&gt;k=strdup(k);
+-		t-&gt;v=strdup(v);
+-		t-&gt;d.s=v;
+-		if (0==strcmp(k,&quot;name&quot;))	t-&gt;ttype=TAG_NAME;
+-	}
+-
+-}
+ object_t *parse_kismet_node(xmlNodePtr cur)
+ {
+ 	node_t *node;
+@@ -31,12 +15,13 @@
+ 	for (attr=cur-&gt;properties;attr;attr=attr-&gt;next)
+ 	{
+ 		if (0==strcmp((char *)attr-&gt;name,&quot;number&quot;)) 		node-&gt;base.id=		strtol((char *)attr-&gt;children-&gt;content,NULL,10);
+-		else if (0==strcmp((char *)attr-&gt;name,&quot;wep&quot;)) 		add_tag(OBJECT_T(node),&quot;wep&quot;,(char *)attr-&gt;children-&gt;content);
++		else if (0==strcmp((char *)attr-&gt;name,&quot;wep&quot;)) 		tag_add(OBJECT_T(node),&quot;wifi_wep&quot;,(char *)attr-&gt;children-&gt;content);
++		else if (0==strcmp((char *)attr-&gt;name,&quot;type&quot;)) 		tag_add(OBJECT_T(node),&quot;wifi_type&quot;,(char *)attr-&gt;children-&gt;content);
+ 	}
+ 	for (kids=cur-&gt;children;kids;kids=kids-&gt;next)
+ 	{
+-		if (0==strcmp((char *)kids-&gt;name,&quot;SSID&quot;)) 			add_tag(OBJECT_T(node),&quot;SSID&quot;,(char *)xmlNodeGetContent(kids-&gt;children));
+-		if (0==strcmp((char *)kids-&gt;name,&quot;BSSID&quot;)) 			add_tag(OBJECT_T(node),&quot;BSSID&quot;,(char *)xmlNodeGetContent(kids-&gt;children));
++		if (0==strcmp((char *)kids-&gt;name,&quot;SSID&quot;)) 			tag_add(OBJECT_T(node),&quot;wifi_SSID&quot;,(char *)xmlNodeGetContent(kids-&gt;children));
++		if (0==strcmp((char *)kids-&gt;name,&quot;BSSID&quot;)) 			tag_add(OBJECT_T(node),&quot;wifi_BSSID&quot;,(char *)xmlNodeGetContent(kids-&gt;children));
+ 		if (0==strcmp((char *)kids-&gt;name,&quot;gps-info&quot;))
+ 		{
+ 			for (gpskids=kids-&gt;children;gpskids;gpskids=gpskids-&gt;next)
+@@ -48,11 +33,11 @@
+ 				if (0==strcmp((char *)gpskids-&gt;name,&quot;max-lon&quot;)) 		node-&gt;lon=node-&gt;lon + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
+ 				if (0==strcmp((char *)gpskids-&gt;name,&quot;min-alt&quot;)) 		node-&gt;alt=node-&gt;alt + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
+ 				if (0==strcmp((char *)gpskids-&gt;name,&quot;max-alt&quot;)) 		node-&gt;alt=node-&gt;alt + strtod((char *)xmlNodeGetContent(gpskids-&gt;children),NULL)/2;
+-
+-
+ 			}
+ 		}
+ 	}
++	node-&gt;visible=2;	/* something special */
++	tag_add(OBJECT_T(node), &quot;amenity&quot;, &quot;wifi&quot;);
+ 
+ 	if (node-&gt;base.id&gt;0 &amp;&amp; (node-&gt;lon!=0.0) &amp;&amp; (node-&gt;lat!=0.0)) /* really, i don't want to discriminate anyone at 0 lat 0 lon running a wifi hotspot, even
+ 																	if it's in the middle of the ocean. i'm very sorry. */
+@@ -96,6 +81,12 @@
+ 		}
+ 	}
+ 	xmlFreeDoc(doc);
+-
+ 	return(layer);
+ }
++layer_t *load_kismet_file(char *filename)
++{
++	int length;
++	char *file;
++	if (NULL==(file=read_file(filename,&amp;length))) return(NULL);
++	return parse_kismet(file,length);
++}
+
+Modified: trunk/apps/s3dosm/main.c
+===================================================================
+--- trunk/apps/s3dosm/main.c	2006-11-09 20:03:22 UTC (rev 464)
++++ trunk/apps/s3dosm/main.c	2006-11-09 22:00:54 UTC (rev 465)
+@@ -2,7 +2,6 @@
+ #include &lt;stdlib.h&gt;		 /*  malloc(),free() */
+ #include &lt;sys/stat.h&gt;	 /*  fstat() */
+ #include &lt;s3d.h&gt;
+-#include &quot;http_fetcher.h&quot;
+ #include &quot;s3dosm.h&quot;
+ #include &lt;time.h&gt;	 /*  nanosleep(), struct tm, time_t...  */
+ 
+@@ -11,27 +10,7 @@
+ 	struct timespec t={0,100*1000*1000}; /* 100 mili seconds */
+ 	nanosleep(&amp;t,NULL); 
+ }
+-char *read_osm(float minlon, float minlat, float maxlon, float maxlat,int *length)
+-{
+-	int ret;
+-	char *user = &quot;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">foo at packetmixer.de</A>&quot;;
+-	char *pass = &quot;foobar&quot;;
+-	char url[1024];
+-	char *fileBuf;						/* Pointer to downloaded data */
+-	snprintf(url,1024,&quot;www.openstreetmap.org/api/0.3/map?bbox=%f,%f,%f,%f&quot;,minlon,minlat,maxlon,maxlat);
+-	printf(&quot;downloading url [ %s ]\n&quot;,url);
+ 
+-	http_setAuth(user,pass);
+-	ret = http_fetch(url, &amp;fileBuf);	/* Downloads page */
+-	if(ret == -1)
+-	{	
+-		http_perror(&quot;http_fetch&quot;);	
+-		return(NULL);
+-	}
+-	if (length!=NULL) *length=ret;
+-	return(fileBuf);
+-	
+-}
+ char *read_file(char *fname, int *fsize)
+ {
+ 	FILE *fp;
+@@ -51,19 +30,23 @@
+ 
+ int main(int argc, char **argv)
+ {
+-	char *file=NULL;
+-	layer_t *layer;
+-	int length;
+-	file=read_file(&quot;kismet_sample.xml&quot;,&amp;length);
+-/*	printf(&quot;reading data from server ...\n&quot;);
+-	file=read_osm(11.610952060700235,49.409270464751515,14.453271808922661,52.338403146460365,&amp;length);
+-	file=read_osm(12.8,50.6,13,51,&amp;length);*/
+-	printf(&quot;okay, parsing data...\n&quot;);
+-	layer=parse_kismet(file,length);
++	layer_t *layer1,*layer2;
++	printf(&quot;loading data&quot;);
++	layer1=load_kismet_file(&quot;kismet_sample.xml&quot;);
++/*	layer2=load_osm_web(11.610952060700235,49.409270464751515,14.453271808922661,52.338403146460365);	*/	/* sachsen */
++	layer2=load_osm_file(&quot;sachsen.osm&quot;);
++	if (layer1==NULL || layer2==NULL)
++	{
++		printf(&quot;could not read data :(&quot;);
++		return(-1);
++	}
+ 	printf(&quot;okay, drawing layer...\n&quot;);
+ 	if (!s3d_init(&amp;argc,&amp;argv,&quot;s3dosm&quot;))
+ 	{
+-		draw_layer(layer);
++		nav_init();
++		draw_layer(layer1);
++		draw_layer(layer2);
++		nav_center(layer2-&gt;center_la,layer2-&gt;center_lo);
+ 		s3d_mainloop(mainloop);
+ 		s3d_quit();
+ 	}
+
+Added: trunk/apps/s3dosm/nav.c
+===================================================================
+--- trunk/apps/s3dosm/nav.c	2006-11-09 20:03:22 UTC (rev 464)
++++ trunk/apps/s3dosm/nav.c	2006-11-09 22:00:54 UTC (rev 465)
+@@ -0,0 +1,32 @@
++#include &quot;s3dosm.h&quot;
++#include &lt;s3d.h&gt;
++icon_t icons[ICON_NUM]={
++		{&quot;objs/accesspoint.3ds&quot;,0},
++		{&quot;objs/star.3ds&quot;,0},
++	};
++int oidx, oidy;
++void nav_loadicons()
++{
++	int i;
++	for (i=0;i&lt;ICON_NUM;i++)
++	{
++		icons[i].oid=s3d_import_model_file(icons[i].path);
++	}
++}
++void nav_init()
++{
++	nav_loadicons();
++	oidx=s3d_new_object();
++	oidy=s3d_new_object();
++	s3d_link(oidy,oidx);
++}
++void nav_center(float la, float lo)
++{
++	double x[3];
++	s3d_rotate(oidy,0,-lo,0);
++	s3d_rotate(oidx,-(90-la),0,0);
++	calc_earth_to_eukl(lo,la,x);
++	s3d_translate(oidx,0,-ESIZE*RESCALE,0);
++	s3d_scale(oidx,RESCALE);
++}
++
+
+Modified: trunk/apps/s3dosm/osm.c
+===================================================================
+--- trunk/apps/s3dosm/osm.c	2006-11-09 20:03:22 UTC (rev 464)
++++ trunk/apps/s3dosm/osm.c	2006-11-09 22:00:54 UTC (rev 465)
+@@ -3,6 +3,7 @@
+ #include &lt;stdlib.h&gt;			/* strtof(),strtod(),strtol() */
+ #include &lt;libxml/parser.h&gt;
+ #include &lt;libxml/tree.h&gt;
++#include &quot;http_fetcher.h&quot;
+ int parse_osm_tags(object_t *obj, xmlNodePtr cur)
+ {
+ 	
+@@ -216,3 +217,29 @@
+ 
+ 	return(layer);
+ }
++layer_t *load_osm_web(float minlon, float minlat, float maxlon, float maxlat)
++{
++	int ret;
++	char *user = &quot;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">foo at packetmixer.de</A>&quot;;
++	char *pass = &quot;foobar&quot;;
++	char url[1024];
++	char *fileBuf;						/* Pointer to downloaded data */
++	snprintf(url,1024,&quot;www.openstreetmap.org/api/0.3/map?bbox=%f,%f,%f,%f&quot;,minlon,minlat,maxlon,maxlat);
++	printf(&quot;downloading url [ %s ]\n&quot;,url);
++
++	http_setAuth(user,pass);
++	ret = http_fetch(url, &amp;fileBuf);	/* Downloads page */
++	if(ret == -1)
++	{	
++		http_perror(&quot;http_fetch&quot;);	
++		return(NULL);
++	}
++	return parse_osm(fileBuf, ret);
++}
++layer_t *load_osm_file(char *filename)
++{
++	int length;
++	char *file;
++	if (NULL==(file=read_file(filename,&amp;length))) return(NULL);
++	return parse_osm(file,length);
++}
+
+Modified: trunk/apps/s3dosm/s3dosm.h
+===================================================================
+--- trunk/apps/s3dosm/s3dosm.h	2006-11-09 20:03:22 UTC (rev 464)
++++ trunk/apps/s3dosm/s3dosm.h	2006-11-09 22:00:54 UTC (rev 465)
+@@ -1,3 +1,6 @@
++#define	ESIZE	637800		/* earth size */
++#define	RESCALE	1
++
+ typedef struct _layer_t layer_t;
+ typedef struct _adj_t adj_t;
+ typedef struct _object_t object_t;
+@@ -5,15 +8,22 @@
+ typedef struct _segment_t segment_t;
+ typedef struct _way_t way_t;
+ typedef struct _tag_t tag_t;
++typedef struct _icon_t icon_t;
+ typedef unsigned long ID_T;
+ #define OBJECT_T(x)		((object_t *)x)
+ #define NODE_T(x)		((node_t *)x)
+ #define SEGMENT_T(x)	((segment_t *)x)
+ #define WAY_T(x)		((way_t *)x)
++
+ struct _layer_t {
+ 	object_t *tree;
++	float center_lo, center_la;
+ };
+ 
++struct _icon_t {
++	char *path;
++	int oid;
++};
+ enum {
+ 	T_OBJECT,
+ 	T_NODE,
+@@ -21,10 +31,16 @@
+ 	T_WAY
+ };
+ enum {
++	ICON_AP,
++	ICON_AP_OPEN,
++	ICON_NUM
++};
++enum {
+ 	TAG_UNKNOWN,
+ 	TAG_NAME,
+ 	TAG_N
+ };
++extern icon_t icons[];
+ typedef void (*avl_func)(object_t *, void *);
+ struct _tag_t {
+ 	char *k, *v;
+@@ -57,7 +73,7 @@
+ 	double 		 lon;		/* longitude */
+ 	double 		 lat;		/* latitude */
+ 	double 		 alt;		/* altitude */
+-	char 		 visible;	/* node visible? */
++	char 		 visible;	/* node visible? 0 = no, 1 = yes, 2 = some sepcial object */
+ 	int 		 vid;		/* vertex id */
+ /*	time_t time;*/
+ 	int 		 adj_n;		/* adjacence list */
+@@ -89,12 +105,16 @@
+ void 		 node_free(node_t *node);
+ void 		 segment_free(segment_t *segment);
+ void 		 way_free(way_t *way);
++/* main.c */
++char *read_file(char *fname, int *fsize);
+ /* osm.c */
+ void debug_obj(object_t *obj, void *dummy);
+ layer_t *parse_osm(char *buf, int length);
++layer_t *load_osm_file(char *filename);
++layer_t *load_osm_web(float minlon, float minlat, float maxlon, float maxlat);
+ /* kismet.c */
+ layer_t *parse_kismet(char *buf, int length);
+-/* void xml_parse(xmlNode *a_node); */
++layer_t *load_kismet_file(char *filename);
+ void 		 avl_tree_trav(object_t *t, avl_func func, void *data);
+ object_t 	*avl_find(object_t *t, int val);
+ object_t 	*avl_rotate_right(object_t *t);
+@@ -106,4 +126,12 @@
+ int 		 avl_height(object_t *t);
+ int 		 draw_layer(layer_t *layer);
+ /* draw.c */
++void calc_earth_to_eukl(double lon, double lat, double *x);
+ int draw_layer(layer_t *layer);
++/* nav.c */
++void nav_init();
++void nav_center(float la, float lo);
++extern int oidy;
++/* tag.c */
++void tag_add(object_t *obj,char *k, char *v);
++tag_t *tag_get(object_t *obj, char *k);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000457.html">[S3d-svn] r464 - trunk/apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000459.html">[S3d-svn] r466 - in trunk: . apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#458">[ date ]</a>
+              <a href="thread.html#458">[ thread ]</a>
+              <a href="subject.html#458">[ subject ]</a>
+              <a href="author.html#458">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

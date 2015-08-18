@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r734 - trunk/apps/meshs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r734%20-%20trunk/apps/meshs3d&In-Reply-To=%3C200710181702.l9IH2lK7015713%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000725.html">
+   <LINK REL="Next"  HREF="000727.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r734 - trunk/apps/meshs3d</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r734%20-%20trunk/apps/meshs3d&In-Reply-To=%3C200710181702.l9IH2lK7015713%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r734 - trunk/apps/meshs3d">nichtsnutz at mail.berlios.de
+       </A><BR>
+    <I>Thu Oct 18 19:02:47 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000725.html">[S3d-svn] r733 - trunk/apps/meshs3d
+</A></li>
+        <LI>Next message: <A HREF="000727.html">[S3d-svn] r735 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#726">[ date ]</a>
+              <a href="thread.html#726">[ thread ]</a>
+              <a href="subject.html#726">[ subject ]</a>
+              <a href="author.html#726">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2007-10-18 19:02:46 +0200 (Thu, 18 Oct 2007)
+New Revision: 734
+
+Modified:
+   trunk/apps/meshs3d/process.c
+Log:
+handle hna nodes
+
+
+Modified: trunk/apps/meshs3d/process.c
+===================================================================
+--- trunk/apps/meshs3d/process.c	2007-10-18 16:27:04 UTC (rev 733)
++++ trunk/apps/meshs3d/process.c	2007-10-18 17:02:46 UTC (rev 734)
+@@ -161,10 +161,16 @@
+ 
+ 	if (con-&gt;ip[0] == ip1) {
+ 		con-&gt;etx1 = etx;
+-		con-&gt;etx1_sqrt = sqrt(etx);
++		if(etx != -1000.00)
++			con-&gt;etx1_sqrt = sqrt(etx);
++		else
++			con-&gt;etx1_sqrt = sqrt(2.0);
+ 	} else {
+ 		con-&gt;etx2 = etx;
+-		con-&gt;etx2_sqrt = sqrt(etx);
++		if(etx != -1000.00)
++			con-&gt;etx2_sqrt = sqrt(etx);
++		else
++			con-&gt;etx2_sqrt = sqrt(2.0);
+ 	}
+ 
+ 
+@@ -278,7 +284,12 @@
+ 				if (strncmp(etx, &quot;HNA&quot;, NAMEMAX) == 0) {
+ 				
+ 					if (strncmp(con_to, &quot;0.0.0.0/0.0.0.0&quot;, NAMEMAX) == 0) {
+-					
++
++						if (inet_pton(AF_INET, con_from, &amp;int_con_from) &lt; 1) {
++							printf(&quot;%s is not a valid ip address\n&quot;, con_from);
++							continue;
++						}
++
+ 						tmp_node = handle_mesh_node(int_con_from, con_from);
+ 
+ 						if (tmp_node-&gt;node_type != 1) {
+@@ -299,6 +310,18 @@
+ 							strcpy(tmp_char, hna_name);
+ 						}
+ 
++						tmp_char--;
++						tmp_char[0] = 0;
++						if (inet_pton(AF_INET, con_from, &amp;int_con_from) &lt; 1) {
++							printf(&quot;%s is not a valid ip address\n&quot;, con_from);
++							continue;
++						}
++						if (inet_pton(AF_INET, hna_node, &amp;int_con_to) &lt; 1) {
++							printf(&quot;%s is not a valid ip address\n&quot;, hna_node);
++							continue;
++						}
++						tmp_char[0] = '/';
++
+ 						handle_mesh_node(int_con_from, con_from);
+ 						tmp_node = handle_mesh_node(int_con_to, hna_node);
+ 
+@@ -310,7 +333,7 @@
+ 
+ 						}
+ 						
+-						handle_con(int_con_from, int_con_to, -1000.00);
++						handle_con(int_con_from, int_con_to, -1000);
+ 					
+ 					}
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000725.html">[S3d-svn] r733 - trunk/apps/meshs3d
+</A></li>
+	<LI>Next message: <A HREF="000727.html">[S3d-svn] r735 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#726">[ date ]</a>
+              <a href="thread.html#726">[ thread ]</a>
+              <a href="subject.html#726">[ subject ]</a>
+              <a href="author.html#726">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

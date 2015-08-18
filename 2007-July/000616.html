@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r625 - in branches/s3d-cmake: . cmake/modules libs3d	libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r625%20-%20in%20branches/s3d-cmake%3A%20.%20cmake/modules%20libs3d%0A%09libs3dw&In-Reply-To=%3C200707011315.l61DFDck032210%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000617.html">
+   <LINK REL="Next"  HREF="000619.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r625 - in branches/s3d-cmake: . cmake/modules libs3d	libs3dw</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r625%20-%20in%20branches/s3d-cmake%3A%20.%20cmake/modules%20libs3d%0A%09libs3dw&In-Reply-To=%3C200707011315.l61DFDck032210%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r625 - in branches/s3d-cmake: . cmake/modules libs3d	libs3dw">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Jul  1 15:15:13 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000617.html">[S3d-svn] r624 - in branches/s3d-cmake: libs3d server
+</A></li>
+        <LI>Next message: <A HREF="000619.html">[S3d-svn] r626 - in branches/s3d-cmake: apps/dot_mcp apps/kism3d	apps/olsrs3d apps/s3dfm libs3d libs3dw server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#616">[ date ]</a>
+              <a href="thread.html#616">[ thread ]</a>
+              <a href="subject.html#616">[ subject ]</a>
+              <a href="author.html#616">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-07-01 15:15:12 +0200 (Sun, 01 Jul 2007)
+New Revision: 625
+
+Added:
+   branches/s3d-cmake/cmake/modules/TestGCCVisibility.cmake
+Modified:
+   branches/s3d-cmake/ConfigureChecks.cmake
+   branches/s3d-cmake/libs3d/s3d.h
+   branches/s3d-cmake/libs3d/vector.c
+   branches/s3d-cmake/libs3dw/s3dw.h
+Log:
+- Only export functions mentioned in s3d.h or s3dw.h
+
+
+Modified: branches/s3d-cmake/ConfigureChecks.cmake
+===================================================================
+--- branches/s3d-cmake/ConfigureChecks.cmake	2007-07-01 13:15:11 UTC (rev 624)
++++ branches/s3d-cmake/ConfigureChecks.cmake	2007-07-01 13:15:12 UTC (rev 625)
+@@ -86,6 +86,10 @@
+ endif (HAVE_TCP)
+ 
+ 
++# test for -fvisibility=hidden
++include(TestGCCVisibility)
++
++
+ # link always against math library
+ link_libraries(m)
+ 
+
+Added: branches/s3d-cmake/cmake/modules/TestGCCVisibility.cmake
+===================================================================
+--- branches/s3d-cmake/cmake/modules/TestGCCVisibility.cmake	2007-07-01 13:15:11 UTC (rev 624)
++++ branches/s3d-cmake/cmake/modules/TestGCCVisibility.cmake	2007-07-01 13:15:12 UTC (rev 625)
+@@ -0,0 +1,7 @@
++include(CheckCCompilerFlag)
++
++# Hide non exported functions/variables
++check_c_compiler_flag(&quot;-fvisibility=hidden -DHAVE_GCCVISIBILITY&quot; HAVE_GCCVISIBILITY)
++if (HAVE_GCCVISIBILITY)
++	add_definitions(&quot;-fvisibility=hidden -DHAVE_GCCVISIBILITY&quot;)
++endif (HAVE_GCCVISIBILITY)
+
+Modified: branches/s3d-cmake/libs3d/s3d.h
+===================================================================
+--- branches/s3d-cmake/libs3d/s3d.h	2007-07-01 13:15:11 UTC (rev 624)
++++ branches/s3d-cmake/libs3d/s3d.h	2007-07-01 13:15:12 UTC (rev 625)
+@@ -83,7 +83,11 @@
+ 	uint16_t modifier;	/* any modifiers involved */
+ 	uint16_t state;		/* 0 = pressed, 1 = released */
+ };
++
+ /* framework functions */
++#ifdef HAVE_GCCVISIBILITY
++#pragma GCC visibility push(default) /* Only export following functions */
++#endif
+ void s3d_usage();
+ int s3d_init(int *argc, char ***argv, char *name);
+ int s3d_quit();
+@@ -186,4 +190,8 @@
+ 
+ /* for apps which don't employ s3d_mainloop() */
+ int s3d_net_check();
++#ifdef HAVE_GCCVISIBILITY
++#pragma GCC visibility pop
+ #endif
++
++#endif
+
+Modified: branches/s3d-cmake/libs3d/vector.c
+===================================================================
+--- branches/s3d-cmake/libs3d/vector.c	2007-07-01 13:15:11 UTC (rev 624)
++++ branches/s3d-cmake/libs3d/vector.c	2007-07-01 13:15:12 UTC (rev 625)
+@@ -24,6 +24,7 @@
+  */
+ 
+ #include &lt;math.h&gt;		/* sqrt() */
++#include &quot;s3d.h&quot;
+ 
+ /***
+  *
+
+Modified: branches/s3d-cmake/libs3dw/s3dw.h
+===================================================================
+--- branches/s3d-cmake/libs3dw/s3dw.h	2007-07-01 13:15:11 UTC (rev 624)
++++ branches/s3d-cmake/libs3dw/s3dw.h	2007-07-01 13:15:12 UTC (rev 625)
+@@ -159,6 +159,9 @@
+ 	float title_text_mat[12];	/* material for the text on the title bar */
+ };
+ /* button.c */
++#ifdef HAVE_GCCVISIBILITY
++#pragma GCC visibility push(default) /* Only export following functions */
++#endif
+ s3dw_button 		*s3dw_button_new(s3dw_surface *surface, char *text, float posx, float posy);
+ s3dw_label	 		*s3dw_label_new(s3dw_surface *surface, char *text, float posx, float posy);
+ s3dw_input 			*s3dw_input_new(s3dw_surface *surface, float width, float posx, float posy);
+@@ -186,4 +189,8 @@
+ int 				 s3dw_object_info(struct s3d_evt *evt);
+ 
+ void 				 s3dw_ani_mate();
++#ifdef HAVE_GCCVISIBILITY
++#pragma GCC visibility pop
+ #endif
++
++#endif
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000617.html">[S3d-svn] r624 - in branches/s3d-cmake: libs3d server
+</A></li>
+	<LI>Next message: <A HREF="000619.html">[S3d-svn] r626 - in branches/s3d-cmake: apps/dot_mcp apps/kism3d	apps/olsrs3d apps/s3dfm libs3d libs3dw server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#616">[ date ]</a>
+              <a href="thread.html#616">[ thread ]</a>
+              <a href="subject.html#616">[ subject ]</a>
+              <a href="author.html#616">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

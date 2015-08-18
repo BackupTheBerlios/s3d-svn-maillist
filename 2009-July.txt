@@ -1,0 +1,2164 @@
+From lazhur at mail.berlios.de  Fri Jul  3 17:54:43 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Fri, 3 Jul 2009 17:54:43 +0200
+Subject: [S3d-svn] r1066 - trunk/apps/meshs3d
+Message-ID: <200907031554.n63FshX6004046@sheep.berlios.de>
+
+Author: lazhur
+Date: 2009-07-03 17:54:43 +0200 (Fri, 03 Jul 2009)
+New Revision: 1066
+
+Modified:
+   trunk/apps/meshs3d/main.c
+   trunk/apps/meshs3d/meshs3d.h
+   trunk/apps/meshs3d/process.c
+Log:
+meshs3d: Make data structures more flexibel in terms of ids
+
+The current data structures and hard on ips and a specific layout
+in memory. To support batman-adv we must also be able to accept
+mac addresses. These are longer and must be handled special.
+
+Modified: trunk/apps/meshs3d/main.c
+===================================================================
+--- trunk/apps/meshs3d/main.c	2009-05-12 15:46:40 UTC (rev 1065)
++++ trunk/apps/meshs3d/main.c	2009-07-03 15:54:43 UTC (rev 1066)
+@@ -110,7 +110,7 @@
+ 	struct node *node, *tmp_node;
+ 	struct node_con *con;
+ 	struct hash_it_t *hashit, *tmp_hashit = NULL;
+-	int ip[2];
++	struct node_con ids;
+ 	float angle, angle_rad;
+ 	float tmp_mov_vec[3], desc_norm_vec[3] = {0, 0, -1};
+ 
+@@ -135,7 +135,7 @@
+ 
+ 			s3d_flags_on(node->obj_id, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+ 
+-			node->desc_id = s3d_draw_string(node->ip_string, &node->desc_length);
++			node->desc_id = s3d_draw_string(node->name_string, &node->desc_length);
+ 			s3d_link(node->desc_id, node->obj_id);
+ 			s3d_translate(node->desc_id, - node->desc_length / 2, -2, 0);
+ 			s3d_flags_on(node->desc_id, S3D_OF_VISIBLE);
+@@ -156,10 +156,10 @@
+ 
+ 
+ 				if (node != tmp_node) {
+-					ip[0] = max(node->ip, tmp_node->ip);
+-					ip[1] = min(node->ip, tmp_node->ip);
++					ids.address[0] = max_id(node->address, tmp_node->address);
++					ids.address[1] = min_id(node->address, tmp_node->address);
+ 
+-					if (NULL != (con = (struct node_con*)hash_find(con_hash, ip))) {
++					if (NULL != (con = (struct node_con*)hash_find(con_hash, &ids))) {
+ 						s3d_del_object(con->obj_id);
+ 						con->obj_id = -1;
+ 					}
+@@ -321,7 +321,7 @@
+ 	float distance;
+ 	float tmp_mov_vec[3], vertex_buf[6];
+ 	float f, wish_distance;
+-	int ip[2];
++	struct node_con ids;
+ 	struct node_con *con;
+ 	struct node *first_node, *sec_node;
+ 	struct hash_it_t *hashit1, *hashit2;
+@@ -338,18 +338,21 @@
+ 			continue;
+ 
+ 		while (NULL != (hashit2 = hash_iterate(node_hash, hashit2))) {
++			struct node_id max_node;
+ 
+ 			sec_node = (struct node *) hashit2->bucket->data;
+ 			if (!sec_node->visible)
+ 				continue;
+ 
+-			if (first_node != sec_node && (max(first_node->ip, sec_node->ip) == first_node->ip)) {
++			max_node = max_id(first_node->address, sec_node->address);
+ 
+-				ip[0] = first_node->ip;
+-				ip[1] = sec_node->ip;
++			if (first_node != sec_node && id_comp(&max_node, &first_node->address) == 0) {
++
++				ids.address[0] = first_node->address;
++				ids.address[1] = sec_node->address;
+ 				distance = dirt(first_node->pos_vec, sec_node->pos_vec, tmp_mov_vec);
+ 
+-				if ((NULL != (con = (struct node_con*)hash_find(con_hash, ip)))) {
++				if ((NULL != (con = (struct node_con*)hash_find(con_hash, &ids)))) {
+ 
+ 					/* we have a connection */
+ 					wish_distance = ((con->etx1_sqrt + con->etx2_sqrt)) + 4;
+
+Modified: trunk/apps/meshs3d/meshs3d.h
+===================================================================
+--- trunk/apps/meshs3d/meshs3d.h	2009-05-12 15:46:40 UTC (rev 1065)
++++ trunk/apps/meshs3d/meshs3d.h	2009-07-03 15:54:43 UTC (rev 1066)
+@@ -28,13 +28,29 @@
+ 
+ #define max(x,y) ((x)>(y)?(x):(y))
+ #define min(x,y) ((x)<(y)?(x):(y))
++#define max_id(x,y) (id_comp(&(x), &(y)) > 0?(x):(y))
++#define min_id(x,y) (id_comp(&(x), &(y)) <=0?(x):(y))
++
+ #define NAMEMAX  128
+ #define MAXLINESIZE 1000  /* lines in a digraph just shouldn't get that longer ... */
+ #define MAXDATASIZE 100   /* max number of bytes we can get at once  */
+ 
++enum node_type {
++	node_undefined = 0,
++	node_ip /*,
++	node_mac */
++};
++
++struct node_id {
++	union {
++		uint32_t ip;
++	} id;
++	enum node_type type;
++};
++
+ /* linked list for the all connections */
+ struct node_con {
+-	unsigned int ip[2];
++	struct node_id address[2];
+ 	float etx1;       /* etx of left olsr node */
+ 	float etx2;      /* etx of right olsr node */
+ 	float etx1_sqrt;     /* sqrt of etx of left olsr node */
+@@ -54,8 +70,8 @@
+ 
+ /* we contruct a binary tree to handle the nodes */
+ struct node {
+-	unsigned int ip;
+-	char ip_string[NAMEMAX];  /* host ip */
++	struct node_id address;
++	char name_string[NAMEMAX];  /* host ip */
+ 	int node_type;     /* normal = 0, internet gateway = 1, via hna announced network = 2 */
+ 	int node_type_modified;   /* node_type modified flag */
+ 	int last_seen;     /* last seen counter */
+@@ -67,14 +83,6 @@
+ 	float desc_length;    /* length of node description object in s3d */
+ };
+ 
+-
+-struct obj_to_ip {
+-	int id;
+-	struct olsr_node *olsr_node;
+-	struct obj_to_ip *next;
+-	struct obj_to_ip *prev;
+-};
+-
+ struct glob {
+ 	int debug;
+ 	int obj_node_normal;
+@@ -108,6 +116,7 @@
+ void lst_out(void);
+ struct olsr_node *move_lst_ptr(int *id);
+ */
++int id_comp(const struct node_id* id1, const struct node_id* id2);
+ int process_main(void);
+ void process_init(void);
+ 
+
+Modified: trunk/apps/meshs3d/process.c
+===================================================================
+--- trunk/apps/meshs3d/process.c	2009-05-12 15:46:40 UTC (rev 1065)
++++ trunk/apps/meshs3d/process.c	2009-07-03 15:54:43 UTC (rev 1066)
+@@ -45,29 +45,82 @@
+ struct hashtable_t *node_hash;
+ struct hashtable_t *con_hash;
+ 
++int id_comp(const struct node_id* id1, const struct node_id* id2)
++{
++	if (id1->type == id2->type) {
++		switch (id1->type) {
++		case node_ip:
++			if (id1->id.ip == id2->id.ip) {
++				return 0;
++			} else if (id1->id.ip < id2->id.ip) {
++				return -1;
++			} else {
++				return 1;
++			}
++			break;
++		case node_undefined:
++			return 0;
++		};
++	} else if (id1->type < id2->type) {
++		return -1;
++	} else {
++		return 1;
++	}
+ 
+-static int long_comp(const void *data1, const void *data2)
+-{
+-	return(memcmp(data1, data2, 8));
++	return 0;
+ }
+ 
+-static int long_choose(const void *data, int32_t size)
++static int id_choose(const struct node_id *id, int32_t size)
+ {
+-	unsigned char *key = (unsigned char*)data;
+ 	uint32_t hash = 0;
+ 	size_t i;
++	struct node_id tmp = *id;
+ 
+-	for (i = 0; i < 8; i++) {
+-		hash += key[i];
+-		hash += (hash << 10);
+-		hash ^= (hash >> 6);
+-	}
++	switch (id->type) {
++	case node_ip:
++		for (i = 0; i < sizeof(id->id.ip); i++) {
++			hash += tmp.id.ip & 0xff;
++			tmp.id.ip = tmp.id.ip >> 8;
++			hash += (hash << 10);
++			hash ^= (hash >> 6);
++		}
++		break;
++	case node_undefined:
++		hash = 0;
++	};
++
+ 	hash += (hash << 3);
+ 	hash ^= (hash >> 11);
+ 	hash += (hash << 15);
+ 	return (hash % size);
+ }
+ 
++static int long_comp(const void *data1, const void *data2)
++{
++	struct node_con *con1 = (struct node_con*)data1;
++	struct node_con *con2 = (struct node_con*)data2;
++	int cmp1, cmp2;
++
++	cmp1 = id_comp(&con1->address[0], &con2->address[0]);
++	cmp2 = id_comp(&con1->address[1], &con2->address[1]);
++
++	if (cmp1 == 0) {
++		return cmp2;
++	} else {
++		return cmp1;
++	}
++
++	return 0;
++}
++
++static int long_choose(const void *data, int32_t size)
++{
++	struct node_con *con = (struct node_con*)data;
++	int hash = id_choose(&con->address[0], size)+id_choose(&con->address[1], size);
++
++	return (hash % size);
++}
++
+ static int orig_comp(const void *data1, const void *data2)
+ {
+ 	return(memcmp(data1, data2, 4));
+@@ -112,21 +165,21 @@
+ 	return;
+ }
+ 
+-static void handle_con(unsigned int ip1, unsigned int ip2, float etx)
++static void handle_con(struct node_id id1, struct node_id id2, float etx)
+ {
+ 
+-	unsigned int ip[2];
++	struct node_con ids;
+ 	struct node_con *con;
+ 	struct hashtable_t *swaphash;
+ 
+-	ip[0] = max(ip1, ip2);
+-	ip[1] = min(ip1, ip2);
++	ids.address[0] = max_id(id1, id2);
++	ids.address[1] = min_id(id1, id2);
+ 
+-	con = (struct node_con*) hash_find(con_hash, ip);
++	con = (struct node_con*) hash_find(con_hash, &ids);
+ 	if (con == NULL) {
+ 		con = (struct node_con *) debugMalloc(sizeof(struct node_con), 102);
+-		con->ip[0] = ip[0];
+-		con->ip[1] = ip[1];
++		con->address[0] = ids.address[0];
++		con->address[1] = ids.address[1];
+ 		con->color = 0;
+ 		/* draw line */
+ 		con->obj_id = s3d_new_object();
+@@ -159,7 +212,7 @@
+ 		s3d_flags_on(con->obj_id, S3D_OF_VISIBLE);
+ 	}
+ 
+-	if (con->ip[0] == ip1) {
++	if (id_comp(&con->address[0], &id1) == 0) {
+ 		con->etx1 = etx;
+ 		if (etx != -1000.00)
+ 			con->etx1_sqrt = sqrt(etx);
+@@ -185,7 +238,7 @@
+ 
+ }
+ 
+-static struct node *handle_mesh_node(unsigned int ip, char *ip_string)
++static struct node *handle_mesh_node(struct node_id id, char *name_string)
+ {
+ 	struct node *orig_node;
+ 	struct hashtable_t *swaphash;
+@@ -196,12 +249,12 @@
+ 			exit_error("Couldn't resize hash table \n");
+ 		node_hash = swaphash;
+ 	}
+-	orig_node = (struct node *) hash_find(node_hash, &ip);
++	orig_node = (struct node *) hash_find(node_hash, &id);
+ 
+ 	if (NULL == orig_node) {
+ 		orig_node = (struct node *)debugMalloc(sizeof(struct node), 101);
+-		orig_node->ip = ip;
+-		strncpy(orig_node->ip_string, ip_string, NAMEMAX);
++		orig_node->address = id;
++		strncpy(orig_node->name_string, name_string, NAMEMAX);
+ 
+ 		orig_node->node_type = 0;
+ 		orig_node->node_type_modified = 1;
+@@ -240,7 +293,8 @@
+ 	char hna_node[NAMEMAX];
+ 
+ 	struct node *tmp_node;
+-	unsigned int int_con_from = 0, int_con_to = 0, address;
++	struct node_id int_con_from, int_con_to;
++	unsigned int address;
+ 
+ 	lbuf_ptr = lbuf;
+ 	last_cr_ptr = NULL;
+@@ -248,6 +302,8 @@
+ 	con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
+ 	dn = 0;
+ 
++	memset(&int_con_from, '\0', sizeof(struct node_id));
++	memset(&int_con_to, '\0', sizeof(struct node_id));
+ 
+ 	while ((*lbuf_ptr) != '\0') {
+ 		if ((*lbuf_ptr) == '\n') {
+@@ -293,6 +349,7 @@
+ 							printf("%s is not a valid ip address\n", con_from);
+ 							continue;
+ 						}
++						int_con_from.type = node_ip;
+ 
+ 						tmp_node = handle_mesh_node(int_con_from, con_from);
+ 
+@@ -300,7 +357,7 @@
+ 
+ 							tmp_node->node_type = 1;
+ 							tmp_node->node_type_modified = 1;
+-							if (Global.debug) printf("new internet: %s\n", tmp_node->ip_string);
++							if (Global.debug) printf("new internet: %s\n", tmp_node->name_string);
+ 
+ 						}
+ 
+@@ -320,10 +377,12 @@
+ 							printf("%s is not a valid ip address\n", con_from);
+ 							continue;
+ 						}
++						int_con_from.type = node_ip;
+ 						if (inet_pton(AF_INET, hna_node, &int_con_to) < 1) {
+ 							printf("%s is not a valid ip address\n", hna_node);
+ 							continue;
+ 						}
++						int_con_to.type = node_ip;
+ 						tmp_char[0] = '/';
+ 
+ 						handle_mesh_node(int_con_from, con_from);
+@@ -333,7 +392,7 @@
+ 
+ 							tmp_node->node_type = 2;
+ 							tmp_node->node_type_modified = 1;
+-							if (Global.debug) printf("new hna network: %s\n", tmp_node->ip_string);
++							if (Global.debug) printf("new hna network: %s\n", tmp_node->name_string);
+ 
+ 						}
+ 
+@@ -351,10 +410,12 @@
+ 						printf("%s is not a valid ip address\n", con_from);
+ 						continue;
+ 					}
++					int_con_from.type = node_ip;
+ 					if (inet_pton(AF_INET, con_to, &int_con_to) < 1) {
+ 						printf("%s is not a valid ip address\n", con_to);
+ 						continue;
+ 					}
++					int_con_to.type = node_ip;
+ 
+ 					handle_mesh_node(int_con_from, con_from);
+ 					handle_mesh_node(int_con_to, con_to);
+@@ -363,8 +424,8 @@
+ 				}
+ 				/* remove zerobyte */
+ 				(*con_from_end) = (*con_to_end) = (*etx_end) = '"';
+-				int_con_from = 0;
+-				int_con_to = 0;
++				memset(&int_con_from, '\0', sizeof(struct node_id));
++				memset(&int_con_to, '\0', sizeof(struct node_id));
+ 				con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
+ 				dn = 0;
+ 				last_cr_ptr = lbuf_ptr;
+
+
+
+From lazhur at mail.berlios.de  Sat Jul  4 09:24:25 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 4 Jul 2009 09:24:25 +0200
+Subject: [S3d-svn] r1067 - trunk/apps/meshs3d
+Message-ID: <200907040724.n647OPip017357@sheep.berlios.de>
+
+Author: lazhur
+Date: 2009-07-04 09:24:24 +0200 (Sat, 04 Jul 2009)
+New Revision: 1067
+
+Modified:
+   trunk/apps/meshs3d/meshs3d.h
+   trunk/apps/meshs3d/process.c
+Log:
+meshs3d: Add mac support to data structures
+
+Modified: trunk/apps/meshs3d/meshs3d.h
+===================================================================
+--- trunk/apps/meshs3d/meshs3d.h	2009-07-03 15:54:43 UTC (rev 1066)
++++ trunk/apps/meshs3d/meshs3d.h	2009-07-04 07:24:24 UTC (rev 1067)
+@@ -37,13 +37,14 @@
+ 
+ enum node_type {
+ 	node_undefined = 0,
+-	node_ip /*,
+-	node_mac */
++	node_ip,
++	node_mac
+ };
+ 
+ struct node_id {
+ 	union {
+ 		uint32_t ip;
++		uint8_t mac[6];
+ 	} id;
+ 	enum node_type type;
+ };
+
+Modified: trunk/apps/meshs3d/process.c
+===================================================================
+--- trunk/apps/meshs3d/process.c	2009-07-03 15:54:43 UTC (rev 1066)
++++ trunk/apps/meshs3d/process.c	2009-07-04 07:24:24 UTC (rev 1067)
+@@ -58,6 +58,8 @@
+ 				return 1;
+ 			}
+ 			break;
++		case node_mac:
++			return memcmp(id1->id.mac, id2->id.mac, sizeof(id1->id.mac));
+ 		case node_undefined:
+ 			return 0;
+ 		};
+@@ -85,6 +87,13 @@
+ 			hash ^= (hash >> 6);
+ 		}
+ 		break;
++	case node_mac:
++		for (i = 0; i < sizeof(id->id.mac); i++) {
++			hash += tmp.id.mac[i];
++			hash += (hash << 10);
++			hash ^= (hash >> 6);
++		}
++		break;
+ 	case node_undefined:
+ 		hash = 0;
+ 	};
+
+
+
+From lazhur at mail.berlios.de  Thu Jul  9 02:46:30 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 9 Jul 2009 02:46:30 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1-89-g10b3abc
+Message-ID: <200907090046.n690kUXn029794@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+  discards  0325f5f2cf303aef813632e6712add2bf8dd5b53 (commit)
+  discards  0c50b81608101eb6a4f56a2631a030e9ba8addab (commit)
+  discards  44b83f6f7eaf3dd81391f687276ace1057006b60 (commit)
+  discards  55e77ba1ae46e8846d21c32a6f234c6f8e27ab8f (commit)
+  discards  34cf43453f410e3cd00794f32729b712b4c0b97d (commit)
+  discards  848f0a036aec3f6ac133cc7065cac8d08446df8c (commit)
+  discards  396c1a0d3107cf8bc46927f989eb0a1c3c0b4704 (commit)
+  discards  edf7ec720dd44424ab4979e9ab530ab942827566 (commit)
+  discards  51f603eb33e448155f39e40ef2a75ff9fdb972c9 (commit)
+  discards  ca729dce39d56ac1abecd5729d06ff8d8c532e3c (commit)
+  discards  d1f50947b92662a831d3c2fd24349924ef9ed702 (commit)
+  discards  185a96e01b1916d1dc405d926421c7f666932018 (commit)
+  discards  d0b206b8be5388112350c8459d2aaf51c3a6c142 (commit)
+  discards  c3f6ca8a7e715929732cd000552c469e6859ed6e (commit)
+  discards  ed9ca2736bf3d18a709a7ab2a477d098b13174b2 (commit)
+  discards  724c13c6db03330eab647d4b781f36982dd4b6ab (commit)
+  discards  58834b0f11af0e4baf92cd8af6627470f8b7cef2 (commit)
+  discards  93c6c643dc81b421166c92bf93661f999cf2d0f6 (commit)
+  discards  5666cf899be2d20e178ed327ca9b83aef02d3bb6 (commit)
+  discards  41dd2f1e1b604ba57f18f34c89346b665026f099 (commit)
+  discards  410eae6deb1b9fae695a8975c20588554c0579a6 (commit)
+  discards  5839e101d0ab52adcc2055c74499fabe92854c7f (commit)
+  discards  73f2d8da5d332257c6806033b54f37176ed9581b (commit)
+  discards  d0264bb7e00fbd92405467ebe4c81035f3e257dc (commit)
+  discards  05bd96eaf3f354f963a67a6d04f86cae615a0e34 (commit)
+  discards  0bb2a743180ad28c07f26e7e911e89ba127da2c6 (commit)
+  discards  e122e5f55a910ced834b430b786fa7c3670c4a11 (commit)
+  discards  10e623d982aae709308d67c04f637d10cbf8faa3 (commit)
+  discards  92cd28c7d174b2e49ea94a86932d91432e709e96 (commit)
+  discards  097d811ccc96101d8426872530122545cc43e518 (commit)
+  discards  9ab6a78a342667efbb62d35938ccdeb70272683d (commit)
+  discards  2b3638cfb03f5dd70de1752cf3af37ea3baab273 (commit)
+  discards  69eb7655393dd2923e0019c3e6c565108dfba531 (commit)
+  discards  6a101a16dea356ff4926d98626b17b76d45a2629 (commit)
+  discards  9a018ab4d4e1323aa87775d66bf7a84a65e367e6 (commit)
+  discards  b52edf9ef557d1ab3e30242798f9b4ad087f348c (commit)
+  discards  d4e89a0a8bab37d71ceae7cb0cd427e441a0f87a (commit)
+  discards  025b05231a19c3666ab8f407cc8bba1d7aded53d (commit)
+  discards  6752e2eedc9b71913bc0a6f8c650f363c5fe9506 (commit)
+  discards  6cdba3939d1c690fca4cb1b5eee06548001a9c12 (commit)
+  discards  aa1f367750d3deebf915accf21b22be70bea7ec2 (commit)
+  discards  72bbd11aa00b8f589d681d993b3363fb03c23035 (commit)
+  discards  31df58a5155ab3b3b3109fd638f07d3fe9b5811e (commit)
+  discards  960176d49954246e7f8a182939bbadc873aa0149 (commit)
+  discards  70f7449bd538e21102e038977658c079db28d6a0 (commit)
+  discards  8ba7baf3c87b5b036def205af91b7a550b097135 (commit)
+  discards  ae20965455cdd7742534146839cf2b74782c9dd5 (commit)
+  discards  6756903399f6f207019a033a200263bc87ee2824 (commit)
+  discards  a2fa22b90e5d7acd223bc8e090875176b633a77e (commit)
+  discards  9247ddd92a9883530a6796aba3c26ca2ebae5064 (commit)
+  discards  a4162072c603e25415969f17a017cbfdc8bc0269 (commit)
+  discards  7a5d75bab754da01418981000df95b72a3d9e64c (commit)
+  discards  09eceb6b5b02a02b1a51ebce4667574d5af9c0df (commit)
+  discards  55efcf904d01436de0465ea1d03274c327df5131 (commit)
+  discards  34fa2c4582bc548074fbca77d05e4721bd9468cc (commit)
+  discards  ce2baffe39ab65b0263999f260ac4a5b0dc9ad45 (commit)
+  discards  d8d1c057308eb44c3f44608e471b4aa45d606d30 (commit)
+  discards  cd39ccd21b94c306a4a1cffdf327a475e41d1560 (commit)
+  discards  0acf48e122541d96a2b467c1e594f586afec0401 (commit)
+  discards  4860ca62671bbb4249ae79978c32332a2642ea50 (commit)
+  discards  2261138d0f30ff491f7b214e5bc922357d2662a6 (commit)
+  discards  19f74e79a5c895315f0c88a56b92ba2b2316bbe9 (commit)
+  discards  30854bdba6dca90672e914841a823112b1afbc77 (commit)
+  discards  703248cc522cd9d4500667c4738202a79e29ce2b (commit)
+  discards  06b0d6db8250742c49c3cbeb46732ed9bdee3062 (commit)
+  discards  f95cc8339974898e86be878a755bb5aaaa1030d3 (commit)
+  discards  2ff508b1c6f3fe3284992962a80aa84c3e59e7ee (commit)
+  discards  336788f17eb650353e27f7510cc97e77ba085a4f (commit)
+       via  10b3abc77e6b288e0fbc8663fa0be9f8ef30e27f (commit)
+       via  b7997b776bde7795905ceb5c56cac7e7f5bcfb33 (commit)
+       via  79e4411e7c6a1a25177f1502e32757a929da9ab2 (commit)
+       via  2923c740c8f168624df60919115e75d5b08c8528 (commit)
+       via  4d8fa222962b7c03606d95e8353c537d7a6b634b (commit)
+       via  ef92ae40d43228ec0d295e37ef86b94154af46a0 (commit)
+       via  d9dcf7cbc1d27deacd86e60c9a3d05e945179f20 (commit)
+       via  4f149320d5f8efac8ad7b4014440ce272f47d6c7 (commit)
+       via  83fa97d5a62adce6ef82b9015230083743f81901 (commit)
+       via  bfc02633c43422984925c4a264f11df4990b08b9 (commit)
+       via  0c78670e511261cf02359d4f539a577d240e641d (commit)
+       via  332a0bdeef5fa06043ed85ac481dca46529c4afc (commit)
+       via  1f3740330573e5091d87cfdfee105b5dbb3fec17 (commit)
+       via  a642639e5bd93a98880b64db8b04d056f07debc0 (commit)
+       via  f6d55abd27c89ddae0982bb6298b173c4c58551e (commit)
+       via  a4e9ae8bb7b0a61d5638431cbd70162f58db8439 (commit)
+       via  e92d36d682da3638206e0c6734bb1e93c8943ff2 (commit)
+       via  13cbf85a5ffeed4b2ff6d2051fa8cca6c198f56d (commit)
+       via  18991e77604377bb1a6f21b0fbdb2aeef1b5cbdc (commit)
+       via  26f5c18176272cb38919fa3ae4b111472430e6cd (commit)
+       via  20777350b81a5c705d3bbb3e12d895a1d8519f19 (commit)
+       via  c89167d43fa3617ee8477d2cc3d72a8346767e9c (commit)
+       via  7761265da52002914a6b7c3068f9d68ba8f7cf1e (commit)
+       via  3cbc2aee426176c18065d95009da7cc04dfeb2fe (commit)
+       via  63b91faf2abb1149f929c3030c10df978708d2cd (commit)
+       via  af8b898cc2d8de323f1900ad58bab65f0b03b8e7 (commit)
+       via  4551e99cdba91e0210d5a33b8fc4697bf2467dba (commit)
+       via  bcb58ca9737e10ac21dd9b05cd4ebb266c2b8ef1 (commit)
+       via  f587847fc2e1cde5472eb1ae4aeb920d8587d2e1 (commit)
+       via  c1678f05d017f55fb765527b88c43a886dc9e5f2 (commit)
+       via  1b2ca0e9e760a31276db3f5b47a4d8b4783f069b (commit)
+       via  12961cee4354f4d1abc358fb9d35a70314b251a8 (commit)
+       via  190fa807e622a979a0e0aafdd56beee7bdbbe9bb (commit)
+       via  5c4e524e53af21dfa9b4159de537779f89b695b6 (commit)
+       via  36fdc3d528041df88867ecfba49e0c9681e93711 (commit)
+       via  6eb216161158e197a55d91b3e93c1f7152a76acc (commit)
+       via  589fd7d988c4963e2c26227c67600c057160a613 (commit)
+       via  3e2dc13217c730a69c6c7f6b4b583eee65a1b188 (commit)
+       via  096debb2b837b758899bde7f13246e5427b55865 (commit)
+       via  5591bb9672d7a78b53885b70ad950856df4fe79e (commit)
+       via  164199967929bed87dc3cdb4b1a3e28a9b630cfb (commit)
+       via  b91cb6063f3dbfeaffb641a2617a83498fbb372c (commit)
+       via  3a85e0081a3f5874e219d875dd296382746e94ac (commit)
+       via  8e73d445a7cfc8a417289616adba01f8497eedc3 (commit)
+       via  7dc0a1182e7125e7780ba28a6d77ff5810a69a15 (commit)
+       via  79f05f7da8d3209ae324b57c8866c4148a1a0fab (commit)
+       via  d3c4c939401920a715aea39943f5f47a498988a0 (commit)
+       via  3cb4880c07efeb96f41bfe3c8dd303bc3f1a30d4 (commit)
+       via  56218a4483dabc6b0f986f257ce39228362819c7 (commit)
+       via  ccc1b22787d0f4e7ec711efbd359255537b68b46 (commit)
+       via  912f11c5ead7d7e1f8726af2fc33c330f4376679 (commit)
+       via  24fcd15c769b4d3c58d8d76c1a1be200c38231f7 (commit)
+       via  f0d3a231e34bddfc85279ffc69ecf6ae5e356865 (commit)
+       via  2c2f9ac9150caecbc756d8b3837636947c25f39e (commit)
+       via  fe31dbe7061d9b105613ac8849dbe76e6e4c1878 (commit)
+       via  4ec1bb89d5c676964fabbe82ecb45a7e4946b40a (commit)
+       via  2a3932bc0e2ccd34fc722bb12923cafe8f22bf10 (commit)
+       via  ba5ccbb6d6da037fdf28f43c872ed75fa4412b05 (commit)
+       via  c445ab148b1cedc1f5a865962bd0295c20bbedd4 (commit)
+       via  8dc5d184600fa5e28a0df45705dc2cb3075eb66a (commit)
+       via  0dceaafe252cd3a91a1a6b34779c61bfff5de21f (commit)
+       via  9f2b920ef6e58746b289d60dff218526e7c205ed (commit)
+       via  e36626ffa218221f12ac5239e2b1bd48019fc3b7 (commit)
+       via  49bad2cb664b23f46c82b53c3c189520fd33bf9a (commit)
+       via  0f2fd469b6acad7db3ef5b49fcbf12e57d707ba0 (commit)
+       via  9828bb7fd62f552de7827d393153960eac37fa85 (commit)
+       via  1d723cf85f1af8b766adc29f48107b51feef667e (commit)
+
+This update added new revisions after undoing existing revisions.  That is
+to say, the old revision is not a strict subset of the new revision.  This
+situation occurs when you --force push a change and generate a repository
+containing something like this:
+
+ * -- * -- B -- O -- O -- O (0325f5f2cf303aef813632e6712add2bf8dd5b53)
+            \
+             N -- N -- N (10b3abc77e6b288e0fbc8663fa0be9f8ef30e27f)
+
+When this happens we assume that you've already had alert emails for all
+of the O revisions, and so we here report only the revisions in the N
+branch from the common base, B.
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 10b3abc77e6b288e0fbc8663fa0be9f8ef30e27f
+Merge: b7997b776bde7795905ceb5c56cac7e7f5bcfb33 bcb58ca9737e10ac21dd9b05cd4ebb266c2b8ef1
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Jul 9 02:35:14 2009 +0200
+
+    Merge branch 'maint'
+    
+    Conflicts:
+    	apps/dot_mcp/CMakeLists.txt
+    	apps/dot_mcp/menu.c
+    	apps/kism3d/CMakeLists.txt
+    	apps/meshs3d/CMakeLists.txt
+    	apps/s3d_x11gate/CMakeLists.txt
+    	apps/s3dvt/CMakeLists.txt
+    	cmake/modules/FindGPS.cmake
+    	example/CMakeLists.txt
+    	experimental/comptest/CMakeLists.txt
+    	experimental/olsrs3d/CMakeLists.txt
+    	experimental/wiitest/CMakeLists.txt
+    	libs3d/CMakeLists.txt
+    	libs3d/io.c
+    	libs3d/s3dlib.h
+    	libs3dw/CMakeLists.txt
+    	server/global.h
+
+commit b7997b776bde7795905ceb5c56cac7e7f5bcfb33
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Jul 4 07:24:24 2009 +0000
+
+    meshs3d: Add mac support to data structures
+
+commit 79e4411e7c6a1a25177f1502e32757a929da9ab2
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Fri Jul 3 15:54:43 2009 +0000
+
+    meshs3d: Make data structures more flexibel in terms of ids
+    
+    The current data structures and hard on ips and a specific layout
+    in memory. To support batman-adv we must also be able to accept
+    mac addresses. These are longer and must be handled special.
+
+commit 2923c740c8f168624df60919115e75d5b08c8528
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Mon May 11 22:17:51 2009 +0000
+
+    Add brief description of structs for manpage whatis
+
+commit 4d8fa222962b7c03606d95e8353c537d7a6b634b
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Mon May 11 20:10:47 2009 +0000
+
+    Add more meta informations to manpages
+    
+    docbook-xsl-1.75 requires a bigger amount of meta informations which
+    will be included in the generated manpages. In the case that these
+    informations are missing it will generate a "fixme" entry.
+
+commit ef92ae40d43228ec0d295e37ef86b94154af46a0
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat May 2 08:50:03 2009 +0000
+
+    testvis: Return value in server for pthread_join
+    
+    server(..) is started by pthread_create. When it gets stopped
+    pthread_join assigns value_ptr the address this function returns as
+    return value of the thread.
+
+commit d9dcf7cbc1d27deacd86e60c9a3d05e945179f20
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Mon Apr 27 21:28:18 2009 +0000
+
+    Remove unused variables from structs
+
+commit 4f149320d5f8efac8ad7b4014440ce272f47d6c7
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue Dec 23 10:55:23 2008 +0000
+
+    comptest: Correct declaration of x11_addwindows
+
+commit 83fa97d5a62adce6ef82b9015230083743f81901
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Dec 13 12:04:55 2008 +0000
+
+    Make documentation extractor compatible with Python 3.0
+
+commit bfc02633c43422984925c4a264f11df4990b08b9
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Jul 9 02:12:07 2009 +0200
+
+    Allow pseudo global optimisations
+    
+    A new cmake cache variable ENABLE_FINAL is introduced to enable pseudo global
+    optimisations by generating a c file which includes all other files of a target
+    and compiles that in single compiler call.
+
+commit 0c78670e511261cf02359d4f539a577d240e641d
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Nov 22 18:19:16 2008 +0000
+
+    Use prefix S3D_ for all #define'd *_INSTALL_DIR strings
+
+commit 332a0bdeef5fa06043ed85ac481dca46529c4afc
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Nov 19 12:14:08 2008 +0000
+
+    Fix documentation of CFG_INSTALL_DIR
+
+commit 1f3740330573e5091d87cfdfee105b5dbb3fec17
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Nov 19 12:02:36 2008 +0000
+
+    Make installation (sub)paths complete configurable
+
+commit a642639e5bd93a98880b64db8b04d056f07debc0
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Nov 5 00:59:41 2008 +0000
+
+    s3dvt: Simplify test for digit with isdigit
+
+commit f6d55abd27c89ddae0982bb6298b173c4c58551e
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Nov 5 00:59:33 2008 +0000
+
+    Mark functions with local declaration as static
+
+commit a4e9ae8bb7b0a61d5638431cbd70162f58db8439
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Jul 9 01:51:28 2009 +0200
+
+    Format copyright lines according to the example from GPL (+mail)
+
+commit e92d36d682da3638206e0c6734bb1e93c8943ff2
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue Oct 28 22:46:57 2008 +0000
+
+    Add BSD-3 copyright notice to cmake/modules/*.cmake
+
+commit 13cbf85a5ffeed4b2ff6d2051fa8cca6c198f56d
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue Oct 28 22:46:49 2008 +0000
+
+    Move Copyright header to easier grep-able format
+
+commit 18991e77604377bb1a6f21b0fbdb2aeef1b5cbdc
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Oct 23 23:28:44 2008 +0000
+
+    Mark functions without side effect as pure
+    
+    Functions which read from global memory and which will not write to
+    global memory can be declared as pure.
+    This makes it safe for the optimizer in some cases to create less calls then
+    specified by the source code.
+
+commit 26f5c18176272cb38919fa3ae4b111472430e6cd
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Oct 23 23:28:39 2008 +0000
+
+    Mark functions without side effect and local storage as const
+    
+    Functions which doesn't read from global memory and which will not write to
+    global memory can be declared as const. The function must not read anything but
+    the function parameters to create the return value.
+    This makes it safe for the optimizer in some cases to create less calls then
+    specified by the source code.
+
+commit 20777350b81a5c705d3bbb3e12d895a1d8519f19
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Oct 23 23:28:29 2008 +0000
+
+    Mark functions with important return as warn_unused_return
+    
+    Functions which will create dangling resources when nothing is done with the
+    return creates a warning when the return is not saved inside the calling
+    function.
+    This could for example also added to functions which create a security risk or
+    where it is a general bug to omit the return.
+
+commit c89167d43fa3617ee8477d2cc3d72a8346767e9c
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Oct 23 23:28:24 2008 +0000
+
+    Enable gcc format string checking for debug functions
+
+commit 7761265da52002914a6b7c3068f9d68ba8f7cf1e
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Sep 27 18:30:19 2008 +0000
+
+    olsrs3d: mark not returning functions with __noreturn__
+    
+    The gcc feature for functions that will definitely not return should help the
+    static analyzer and the optimizer slightly.
+
+commit 3cbc2aee426176c18065d95009da7cc04dfeb2fe
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Sep 27 11:44:37 2008 +0000
+
+    Use ANSI style functions declaration instead of K&R in documentation
+
+commit 63b91faf2abb1149f929c3030c10df978708d2cd
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Sep 27 11:44:08 2008 +0000
+
+    Convert man pages to xml docbook
+
+commit af8b898cc2d8de323f1900ad58bab65f0b03b8e7
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Fri Sep 26 21:07:03 2008 +0000
+
+    Mark xyz(void) functions correct as void in docbook
+
+commit 4551e99cdba91e0210d5a33b8fc4697bf2467dba
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Fri Sep 26 19:25:15 2008 +0000
+
+    Change docbook compiler to xmlto
+    
+    We are using a xml based version of docbook and not the (original) sgml
+    version. (Open)Jade will fail on most distributions when it tries to compile
+    the xml docbook. The correct way to build them is to use xsl to transform the
+    document into the target file.
+    The usage of raw xsltproc depends too much on the environment and will
+    definitely fail on some distributions. The easiest way to get the same
+    functionality as before is to use xmlto - a bash script which will be offered
+    by the distributions and should always know where the correct xsl files can
+    be found.
+
+commit bcb58ca9737e10ac21dd9b05cd4ebb266c2b8ef1
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Jul 9 00:54:19 2009 +0200
+
+    Move changelogs to Documentation RelNotes
+
+commit f587847fc2e1cde5472eb1ae4aeb920d8587d2e1
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Jul 9 00:42:23 2009 +0200
+
+    Add notes about the current git layout and releases
+
+commit c1678f05d017f55fb765527b88c43a886dc9e5f2
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue May 12 15:46:40 2009 +0000
+
+    s3dosm: Fix compilation with DB_STACK
+
+commit 1b2ca0e9e760a31276db3f5b47a4d8b4783f069b
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Mon Apr 27 20:59:08 2009 +0000
+
+    s3dfm: Close source when target cannot be opened in fs_copy
+
+commit 12961cee4354f4d1abc358fb9d35a70314b251a8
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Mon Apr 27 20:59:04 2009 +0000
+
+    Prevent buffer overrun when using strncat
+    
+    strncat interprets n different than strncpy. It writes max. n
+    characters to dest + '\0' as delimiter. This makes len(dest)+n+1 chars
+    in dest when specifying n as max. number of characters taken from src.
+
+commit 190fa807e622a979a0e0aafdd56beee7bdbbe9bb
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Apr 18 13:11:23 2009 +0000
+
+    s3dosm: Move to upcoming osm api 0.6
+    
+    Openstreetmap.org changes it's api to a newer version on
+    17-19th April, 2009. No further changes should be needed for read-only
+    applications.
+
+commit 5c4e524e53af21dfa9b4159de537779f89b695b6
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Apr 18 13:11:19 2009 +0000
+
+    Only strip out libs3d options from argv
+    
+    The idea of parse_args of libs3d was to parse all known opts and than
+    stop before the parameter for the program starts. argv and argc is than
+    modified to start at the first option not recognised by libs3d.
+    This implementation was faulty and stripped of all valid options
+    beginning with a dash in different versions of getopt. A better idea is
+    to parse all parameters regardless of their first character and move
+    them to the left to override libs3d options. The order in which libs3d
+    and application specific option occurred isn't important anymore.
+
+commit 36fdc3d528041df88867ecfba49e0c9681e93711
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Apr 18 13:11:16 2009 +0000
+
+    s3dosm: Require argument in short option of --osm
+
+commit 6eb216161158e197a55d91b3e93c1f7152a76acc
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue Apr 14 20:25:23 2009 +0000
+
+    Correct check for new style gpsd structs in s3dosm
+    
+    gpsd changed the name of the defines which were used to detect if it is
+    a version with their new style data structures. It is a better idea to
+    check if the the structure gps_data_t has a member with the name fix
+    instead of guessing it by looking at some defines which maybe changes
+    over time.
+
+commit 589fd7d988c4963e2c26227c67600c057160a613
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue Mar 17 21:17:15 2009 +0000
+
+    Fix FTBFS with cmake 2.6.3
+    
+    cmake 2.6.3 changes the behaviour slightly by using the new PkgConfig
+    makro to utilise pkg-config. This changes the names of the previously
+    internal used variables. ConfigureChecks.cmake used some of them by
+    accident instead of the ones written in the documentation.
+    ConfigureChecks.cmake also doesn't use all possible variables to find
+    headers. This could have lead to further build failures in the future.
+
+commit 3e2dc13217c730a69c6c7f6b4b583eee65a1b188
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sun Feb 15 11:08:16 2009 +0000
+
+    Transform g3d model orientation to s3d orientation
+    
+    libg3d changed the model orientation in rev378 (precedes libg3d 0.0.7).
+    All s3d programs expect a different rotation around the x axis and we
+    should give them their data as before.
+    g3d_model_transform is a new function in libg3d 0.0.7 so we need to
+    depend at least on that version.
+
+commit 096debb2b837b758899bde7f13246e5427b55865
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Dec 24 20:33:15 2008 +0000
+
+    Remove binary files without free copyright status
+    
+    All files from Martin Stern aren't under a (known) free license. This
+    could end in s3d being marked as non-free software in distributions with
+    an hard copyright check. Non of the files are used by s3d or related
+    programs and should not create any missing dependencies when they get
+    removed.
+    This commit can be reverted when the copyright status changes to a
+    compatible license.
+
+commit 5591bb9672d7a78b53885b70ad950856df4fe79e
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue Dec 23 10:55:29 2008 +0000
+
+    Make declarations available for hton*b function definitions
+
+commit 164199967929bed87dc3cdb4b1a3e28a9b630cfb
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue Dec 23 10:55:14 2008 +0000
+
+    Don't convert to int when we compare two float after rintf
+
+commit b91cb6063f3dbfeaffb641a2617a83498fbb372c
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue Dec 2 09:59:37 2008 +0000
+
+    Open files explicit as binary file
+    
+    Unix operating systems ignore the t or b modi in fopen and will open
+    them without any modifications. Windows will try to convert line endings
+    \n to \r\n.
+
+commit 3a85e0081a3f5874e219d875dd296382746e94ac
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Fri Nov 28 20:32:38 2008 +0000
+
+    server: Include glext.h for post-1.2 OpenGL constants
+    
+    To compile s3d on cygwin with windows we need a different name mangling
+    than the one used by mesa's opengl headers. We should include the one
+    provided by w32api but the GL/gl.h doesn't provide constants for
+    extension introduced later then OpenGL 1.2. The best way to get it
+    working with mesa and w32api is to include GL/glext.h even if we don't
+    need it on systems using mesa.
+
+commit 8e73d445a7cfc8a417289616adba01f8497eedc3
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Nov 26 23:48:47 2008 +0000
+
+    s3dfm: Use correct path names for parsing directory items
+
+commit 7dc0a1182e7125e7780ba28a6d77ff5810a69a15
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Nov 26 23:48:34 2008 +0000
+
+    Rewrote directory detection with posix stat
+    
+    Not all posix plattforms provide struct stat::d_type for a directory.
+    It is safer use stat for each entry in a directory and then test for
+    directory modes.
+
+commit 79f05f7da8d3209ae324b57c8866c4148a1a0fab
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Nov 26 21:24:42 2008 +0000
+
+    server: Process tcp data even if shm is deactivated
+    
+    If server is compiled with `cmake . -DHAVE_SHM=0` no data of a process
+    will be consumed. If it is compiled with SHM support turn will be reset
+    to 1 in each shm_main. To get the same behaviour without shm_main we set
+    turn to 1 in each call to network_main.
+
+commit d3c4c939401920a715aea39943f5f47a498988a0
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Nov 26 20:44:31 2008 +0000
+
+    server: Disable kill of childs in quit() when no signals available
+
+commit 3cb4880c07efeb96f41bfe3c8dd303bc3f1a30d4
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Nov 26 20:32:43 2008 +0000
+
+    server: Link only against GL and not against glu
+
+commit 56218a4483dabc6b0f986f257ce39228362819c7
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Nov 26 20:32:38 2008 +0000
+
+    Fix installation of cygs3d(w).dll under windows
+
+commit ccc1b22787d0f4e7ec711efbd359255537b68b46
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Nov 26 20:32:32 2008 +0000
+
+    s3dfm: Disable usage of d_type until it was rewritten to use stat
+
+commit 912f11c5ead7d7e1f8726af2fc33c330f4376679
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Nov 26 20:32:26 2008 +0000
+
+    s3dvt: Disable TIOCSCTTY if not supported
+
+commit 24fcd15c769b4d3c58d8d76c1a1be200c38231f7
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sun Nov 23 16:02:18 2008 +0000
+
+    Build examples/filebrowser.c even if data structure is different in cygwin
+    
+    It is possible that the cygwin build is complete useless because not all needed
+    informations for directory traversel are available. Maybe a better workaround
+    should be added or the compilation of this example must be removed under
+    windows.
+
+commit f0d3a231e34bddfc85279ffc69ecf6ae5e356865
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sun Nov 23 16:02:13 2008 +0000
+
+    meshs3d: Unify parameters of debugFree declaration and definition
+
+commit 2c2f9ac9150caecbc756d8b3837636947c25f39e
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sun Nov 23 16:02:07 2008 +0000
+
+    Use stdint uint*_t instead of u_int*_t
+
+commit fe31dbe7061d9b105613ac8849dbe76e6e4c1878
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sun Nov 23 16:02:01 2008 +0000
+
+    Define _s3d_ready status variable even if no signals are available
+
+commit 4ec1bb89d5c676964fabbe82ecb45a7e4946b40a
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Nov 22 18:19:07 2008 +0000
+
+    Don't require already linked libraries in pkg-config
+    
+    Programs only need all libraries libg3d linked against when they link a static
+    version of the library. Calling `pkg-config --libs --static libs3d` will reveal
+    the complete list for that.
+
+commit 2a3932bc0e2ccd34fc722bb12923cafe8f22bf10
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue Nov 18 00:37:28 2008 +0000
+
+    Don't clutter up the CMakeCache with library dependencies
+    
+    binutils-gold has fixed it's library NEEDED tracking in upstream and don't need
+    information about already linked shared objects anymore. The names of target
+    can now be used for linking again instead of library name and it's
+    dependencies.
+
+commit ba5ccbb6d6da037fdf28f43c872ed75fa4412b05
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue Nov 18 00:07:08 2008 +0000
+
+    Link libs3dw against libm
+
+commit c445ab148b1cedc1f5a865962bd0295c20bbedd4
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Mon Nov 17 23:54:05 2008 +0000
+
+    Reduce number of indirectly linked libraries
+
+commit 8dc5d184600fa5e28a0df45705dc2cb3075eb66a
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue Oct 28 22:47:03 2008 +0000
+
+    Specify which version of GPL is meant for objs
+
+commit 0dceaafe252cd3a91a1a6b34779c61bfff5de21f
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Oct 23 23:28:50 2008 +0000
+
+    Fix obvious format string errors
+    
+    Only format string errors which gcc noticed where fixed. Many %d should also be
+    changed to the corresponding inttypes.h PRIdXX definition.
+
+commit 9f2b920ef6e58746b289d60dff218526e7c205ed
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Sep 25 22:22:32 2008 +0000
+
+    Fix possible null pointer dereferences
+
+commit e36626ffa218221f12ac5239e2b1bd48019fc3b7
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Sep 25 22:22:14 2008 +0000
+
+    Remove dead stores
+
+commit 49bad2cb664b23f46c82b53c3c189520fd33bf9a
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Sep 25 22:21:32 2008 +0000
+
+    Use floats in network endian byte order
+    
+    Floats are also affected by the little and big endian byte order. Currently
+    there is no function available to convert byte in a network safe byte order.
+    To be sure that both ends can read and write ieee 32 bit floats we can use
+    ntohl and htonl to convert the byte order of any 32 bit data type.
+
+commit 0f2fd469b6acad7db3ef5b49fcbf12e57d707ba0
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Sep 25 22:21:16 2008 +0000
+
+    Send S3D_P_C_LOAD_* instead of S3D_PC_PEP_* in s3d_load_* proto functions
+
+commit 9828bb7fd62f552de7827d393153960eac37fa85
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Sep 25 22:21:01 2008 +0000
+
+    Read incoming data from aligned address
+    
+    When mips reads data from a unaligned address a sigbus will be generated.If it
+    we will read it into a general register the kernel will emulate the read after
+    noticing the cpu exception, but if we read into a fpu register the program will
+    receive a sighub and stops. As workaround we read the 8 bit cmd and the 16 bit
+    length into the input buffer and the user data will be saved to a address
+    4 bytes or more away from the beginning of the start of te input buffer.
+    This should be an aligned address. To establish this we use int_least32_t as
+    reference data type.
+
+commit 1d723cf85f1af8b766adc29f48107b51feef667e
+Author: Simon Wunderlich <siwu at hrz.tu-chemnitz.de>
+Date:   Thu Sep 25 22:15:00 2008 +0000
+
+    update README
+    
+    YAY, revision 1000. ????????????
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/RelNotes-0.1.1.txt            |    6 ++
+ ChangeLog => Documentation/RelNotes-0.1.txt |   99 +++++++++-----------------
+ Documentation/RelNotes-0.2.1.txt            |   11 +++
+ Documentation/RelNotes-0.2.txt              |   17 +++++
+ Documentation/maintain.txt                  |  101 +++++++++++++++++++++++++++
+ 5 files changed, 170 insertions(+), 64 deletions(-)
+ create mode 100644 Documentation/RelNotes-0.1.1.txt
+ rename ChangeLog => Documentation/RelNotes-0.1.txt (84%)
+ create mode 100644 Documentation/RelNotes-0.2.1.txt
+ create mode 100644 Documentation/RelNotes-0.2.txt
+ create mode 100644 Documentation/maintain.txt
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Thu Jul  9 02:47:07 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 9 Jul 2009 02:47:07 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	created. v0.2.1-40-gbcb58ca
+Message-ID: <200907090047.n690l7Dl030137@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been created
+        at  bcb58ca9737e10ac21dd9b05cd4ebb266c2b8ef1 (commit)
+
+- Log -----------------------------------------------------------------
+-----------------------------------------------------------------------
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Thu Jul  9 03:07:59 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 9 Jul 2009 03:07:59 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	updated. v0.2.1-41-g94b5a5c
+Message-ID: <200907090107.n6917xUX003600@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been updated
+       via  94b5a5c477def054cdfb9c1f502387475a6f398c (commit)
+      from  bcb58ca9737e10ac21dd9b05cd4ebb266c2b8ef1 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 94b5a5c477def054cdfb9c1f502387475a6f398c
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Jul 9 03:07:49 2009 +0200
+
+    Add initial release notes for 0.2.1.1
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/RelNotes-0.2.1.1.txt |   17 +++++++++++++++++
+ 1 files changed, 17 insertions(+), 0 deletions(-)
+ create mode 100644 Documentation/RelNotes-0.2.1.1.txt
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Thu Jul  9 17:10:18 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 9 Jul 2009 17:10:18 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	updated. v0.2.1-42-gb3330d1
+Message-ID: <200907091510.n69FAIOd006178@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been updated
+       via  b3330d182f2c9601bfed65f0f434ae5bb3c4529d (commit)
+      from  94b5a5c477def054cdfb9c1f502387475a6f398c (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit b3330d182f2c9601bfed65f0f434ae5bb3c4529d
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Jul 9 17:09:59 2009 +0200
+
+    Add smaller cleanups and clarifications to Maintainer notes
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/{maintain.txt => Maintain.txt} |   38 +++++++++++++++-----------
+ Documentation/RelNotes-0.2.1.1.txt           |    1 -
+ 2 files changed, 22 insertions(+), 17 deletions(-)
+ rename Documentation/{maintain.txt => Maintain.txt} (79%)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Thu Jul  9 20:24:34 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 9 Jul 2009 20:24:34 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1-97-g82ac162
+Message-ID: <200907091824.n69IOYDd008398@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  82ac1621d230643fbeadb43d9f17185e6037818a (commit)
+       via  c412e450a7702d05ad71febc32bf3dad612b259d (commit)
+       via  eadb3ace349f2e514c2f87c63bc4b1400162e8ab (commit)
+       via  847a5274e6b4a98cd08f6aa23cef41d9a0c9be50 (commit)
+       via  aaf0a3df8b8b65bf9143f5e3215d9bdf7864dbe9 (commit)
+       via  33a0e78cd6aa826c89371b12b364e252d896f6c5 (commit)
+       via  b3330d182f2c9601bfed65f0f434ae5bb3c4529d (commit)
+       via  94b5a5c477def054cdfb9c1f502387475a6f398c (commit)
+      from  10b3abc77e6b288e0fbc8663fa0be9f8ef30e27f (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 82ac1621d230643fbeadb43d9f17185e6037818a
+Merge: 10b3abc77e6b288e0fbc8663fa0be9f8ef30e27f c412e450a7702d05ad71febc32bf3dad612b259d
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Jul 9 20:21:03 2009 +0200
+
+    Merge branch 'maint'
+    
+    Conflicts:
+    	Documentation/manpages/build-manpages.sh
+    	Documentation/manpages/dot_mcp.1
+    	Documentation/manpages/kism3d.1
+    	Documentation/manpages/man1/s3d_x11gate.sgml
+    	Documentation/manpages/meshs3d.1
+    	Documentation/manpages/s3d.1
+    	Documentation/manpages/s3d_x11gate.1
+    	Documentation/manpages/s3d_x11gate.sgml
+    	Documentation/manpages/s3d_x11gatemanpage.sgml
+    	Documentation/manpages/s3dfm.1
+    	Documentation/manpages/s3dosm.1
+    	Documentation/manpages/s3dvt.1
+    	cmake/modules/FindDocbook.cmake
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/{maintain.txt => Maintain.txt} |   40 +++++++++++++++-----------
+ Documentation/RelNotes-0.2.1.1.txt           |   17 +++++++++++
+ Documentation/SubmittingPatches              |   37 ++++++++++++++++++++++++
+ 3 files changed, 77 insertions(+), 17 deletions(-)
+ rename Documentation/{maintain.txt => Maintain.txt} (77%)
+ create mode 100644 Documentation/RelNotes-0.2.1.1.txt
+ create mode 100644 Documentation/SubmittingPatches
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Thu Jul  9 20:24:33 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 9 Jul 2009 20:24:33 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	updated. v0.2.1-47-gc412e45
+Message-ID: <200907091824.n69IOX48008365@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been updated
+       via  c412e450a7702d05ad71febc32bf3dad612b259d (commit)
+       via  eadb3ace349f2e514c2f87c63bc4b1400162e8ab (commit)
+       via  847a5274e6b4a98cd08f6aa23cef41d9a0c9be50 (commit)
+       via  aaf0a3df8b8b65bf9143f5e3215d9bdf7864dbe9 (commit)
+       via  33a0e78cd6aa826c89371b12b364e252d896f6c5 (commit)
+      from  b3330d182f2c9601bfed65f0f434ae5bb3c4529d (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/CMakeLists.txt                       |    4 +-
+ Documentation/Maintain.txt                         |    4 +-
+ Documentation/RelNotes-0.2.1.1.txt                 |    1 +
+ Documentation/SubmittingPatches                    |   37 ++++++++
+ Documentation/manpages/build-manpages.sh           |    4 +
+ Documentation/manpages/dot_mcp.1                   |   54 ++++++-------
+ Documentation/manpages/kism3d.1                    |   55 ++++++-------
+ Documentation/manpages/meshs3d.1                   |   70 +++++++---------
+ Documentation/manpages/meshs3dmanpage.sgml         |    3 +-
+ Documentation/manpages/s3d.1                       |   72 ++++++++---------
+ Documentation/manpages/s3d_x11gate.1               |   59 ++++++-------
+ .../{s3d_x11gate.sgml => s3d_x11gatemanpage.sgml}  |    5 +-
+ Documentation/manpages/s3dfm.1                     |   60 ++++++-------
+ Documentation/manpages/s3dfmmanpage.sgml           |    3 +-
+ Documentation/manpages/s3dmanpage.sgml             |    9 +--
+ Documentation/manpages/s3dosm.1                    |   87 ++++++++++----------
+ Documentation/manpages/s3dosmmanpage.sgml          |    8 +-
+ Documentation/manpages/s3dvt.1                     |   59 ++++++-------
+ Documentation/manpages/s3dvtmanpage.sgml           |    3 +-
+ Documentation/s3d.docbook                          |    4 +-
+ cmake/modules/FindDocbook.cmake                    |   63 ++-------------
+ 21 files changed, 309 insertions(+), 355 deletions(-)
+ create mode 100644 Documentation/SubmittingPatches
+ create mode 100644 Documentation/manpages/build-manpages.sh
+ rename Documentation/manpages/{s3d_x11gate.sgml => s3d_x11gatemanpage.sgml} (93%)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Jul 11 17:05:55 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 11 Jul 2009 17:05:55 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1-14-59-g125e1a4
+Message-ID: <200907111505.n6BF5tjJ029288@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  125e1a405a1c5e7f750184a00143bcc7acd313da (commit)
+       via  8710de28d10d38d5a0fd22c76cd6fcf302f508d9 (commit)
+       via  4adba8d7a735afa35f0fd4b7e7576410d90e3f0d (commit)
+       via  337848032671b692aad459a21a16885af1f67a86 (commit)
+       via  00e71be5b6791455d792b470289d4ad9b4166a33 (commit)
+       via  c412e450a7702d05ad71febc32bf3dad612b259d (commit)
+       via  eadb3ace349f2e514c2f87c63bc4b1400162e8ab (commit)
+       via  847a5274e6b4a98cd08f6aa23cef41d9a0c9be50 (commit)
+       via  aaf0a3df8b8b65bf9143f5e3215d9bdf7864dbe9 (commit)
+       via  33a0e78cd6aa826c89371b12b364e252d896f6c5 (commit)
+       via  b3330d182f2c9601bfed65f0f434ae5bb3c4529d (commit)
+       via  94b5a5c477def054cdfb9c1f502387475a6f398c (commit)
+       via  bcb58ca9737e10ac21dd9b05cd4ebb266c2b8ef1 (commit)
+       via  f587847fc2e1cde5472eb1ae4aeb920d8587d2e1 (commit)
+       via  c1678f05d017f55fb765527b88c43a886dc9e5f2 (commit)
+       via  1b2ca0e9e760a31276db3f5b47a4d8b4783f069b (commit)
+       via  12961cee4354f4d1abc358fb9d35a70314b251a8 (commit)
+       via  190fa807e622a979a0e0aafdd56beee7bdbbe9bb (commit)
+       via  5c4e524e53af21dfa9b4159de537779f89b695b6 (commit)
+       via  36fdc3d528041df88867ecfba49e0c9681e93711 (commit)
+       via  6eb216161158e197a55d91b3e93c1f7152a76acc (commit)
+       via  589fd7d988c4963e2c26227c67600c057160a613 (commit)
+       via  3e2dc13217c730a69c6c7f6b4b583eee65a1b188 (commit)
+       via  096debb2b837b758899bde7f13246e5427b55865 (commit)
+       via  5591bb9672d7a78b53885b70ad950856df4fe79e (commit)
+       via  164199967929bed87dc3cdb4b1a3e28a9b630cfb (commit)
+       via  b91cb6063f3dbfeaffb641a2617a83498fbb372c (commit)
+       via  3a85e0081a3f5874e219d875dd296382746e94ac (commit)
+       via  8e73d445a7cfc8a417289616adba01f8497eedc3 (commit)
+       via  7dc0a1182e7125e7780ba28a6d77ff5810a69a15 (commit)
+       via  79f05f7da8d3209ae324b57c8866c4148a1a0fab (commit)
+       via  d3c4c939401920a715aea39943f5f47a498988a0 (commit)
+       via  3cb4880c07efeb96f41bfe3c8dd303bc3f1a30d4 (commit)
+       via  56218a4483dabc6b0f986f257ce39228362819c7 (commit)
+       via  ccc1b22787d0f4e7ec711efbd359255537b68b46 (commit)
+       via  912f11c5ead7d7e1f8726af2fc33c330f4376679 (commit)
+       via  24fcd15c769b4d3c58d8d76c1a1be200c38231f7 (commit)
+       via  f0d3a231e34bddfc85279ffc69ecf6ae5e356865 (commit)
+       via  2c2f9ac9150caecbc756d8b3837636947c25f39e (commit)
+       via  fe31dbe7061d9b105613ac8849dbe76e6e4c1878 (commit)
+       via  4ec1bb89d5c676964fabbe82ecb45a7e4946b40a (commit)
+       via  2a3932bc0e2ccd34fc722bb12923cafe8f22bf10 (commit)
+       via  ba5ccbb6d6da037fdf28f43c872ed75fa4412b05 (commit)
+       via  c445ab148b1cedc1f5a865962bd0295c20bbedd4 (commit)
+       via  8dc5d184600fa5e28a0df45705dc2cb3075eb66a (commit)
+       via  0dceaafe252cd3a91a1a6b34779c61bfff5de21f (commit)
+       via  9f2b920ef6e58746b289d60dff218526e7c205ed (commit)
+       via  e36626ffa218221f12ac5239e2b1bd48019fc3b7 (commit)
+       via  49bad2cb664b23f46c82b53c3c189520fd33bf9a (commit)
+       via  0f2fd469b6acad7db3ef5b49fcbf12e57d707ba0 (commit)
+       via  9828bb7fd62f552de7827d393153960eac37fa85 (commit)
+       via  1d723cf85f1af8b766adc29f48107b51feef667e (commit)
+      from  fe0705a32a6661ad492ad86d4996e7819e4fbe9a (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 125e1a405a1c5e7f750184a00143bcc7acd313da
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Jul 11 17:00:57 2009 +0200
+
+    Release s3d 0.2.1.1-1
+
+commit 8710de28d10d38d5a0fd22c76cd6fcf302f508d9
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Jul 11 16:43:05 2009 +0200
+
+    Install upstream changelogs
+
+commit 4adba8d7a735afa35f0fd4b7e7576410d90e3f0d
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Jul 11 16:31:31 2009 +0200
+
+    Update patches for s3d 0.2.1.1
+
+commit 337848032671b692aad459a21a16885af1f67a86
+Merge: fe0705a32a6661ad492ad86d4996e7819e4fbe9a 00e71be5b6791455d792b470289d4ad9b4166a33
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Jul 11 15:33:41 2009 +0200
+
+    Merge commit 'v0.2.1.1' into debian
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ CMakeLists.txt                                     |    4 +-
+ ConfigureChecks.cmake                              |   16 +-
+ Documentation/CMakeLists.txt                       |    4 +-
+ Documentation/Maintain.txt                         |  134 ++++
+ Documentation/RelNotes-0.1.1.txt                   |    6 +
+ ChangeLog => Documentation/RelNotes-0.1.txt        |   97 +--
+ Documentation/RelNotes-0.2.1.1.txt                 |   17 +
+ Documentation/RelNotes-0.2.1.txt                   |   11 +
+ Documentation/RelNotes-0.2.txt                     |   17 +
+ Documentation/SubmittingPatches                    |   37 +
+ Documentation/manpages/build-manpages.sh           |    4 +
+ Documentation/manpages/dot_mcp.1                   |   54 +-
+ Documentation/manpages/kism3d.1                    |   55 +-
+ Documentation/manpages/meshs3d.1                   |   70 +-
+ Documentation/manpages/meshs3dmanpage.sgml         |    3 +-
+ Documentation/manpages/s3d.1                       |   72 +-
+ Documentation/manpages/s3d_x11gate.1               |   59 +-
+ .../{s3d_x11gate.sgml => s3d_x11gatemanpage.sgml}  |    5 +-
+ Documentation/manpages/s3dfm.1                     |   60 +-
+ Documentation/manpages/s3dfmmanpage.sgml           |    3 +-
+ Documentation/manpages/s3dmanpage.sgml             |    9 +-
+ Documentation/manpages/s3dosm.1                    |   87 ++-
+ Documentation/manpages/s3dosmmanpage.sgml          |    8 +-
+ Documentation/manpages/s3dvt.1                     |   59 +-
+ Documentation/manpages/s3dvtmanpage.sgml           |    3 +-
+ Documentation/s3d.docbook                          |    4 +-
+ README                                             |   22 +-
+ apps/dot_mcp/CMakeLists.txt                        |    2 +-
+ apps/dot_mcp/menu.c                                |   13 +-
+ apps/kism3d/CMakeLists.txt                         |    4 +-
+ apps/kism3d/kism3d.c                               |   11 +-
+ apps/meshs3d/CMakeLists.txt                        |    3 +-
+ apps/meshs3d/allocate.c                            |    2 +-
+ apps/meshs3d/main.c                                |    8 +-
+ apps/meshs3d/net.c                                 |   12 +-
+ apps/s3d_x11gate/CMakeLists.txt                    |    4 +-
+ apps/s3dfm/CMakeLists.txt                          |    3 +-
+ apps/s3dfm/event.c                                 |    2 +-
+ apps/s3dfm/fs.c                                    |   19 +-
+ apps/s3dfm/parse.c                                 |    9 +-
+ apps/s3dfm/s3dfm.h                                 |    1 +
+ apps/s3dosm/CMakeLists.txt                         |    4 +-
+ apps/s3dosm/db.c                                   |   11 +-
+ apps/s3dosm/gps.c                                  |   12 +-
+ apps/s3dosm/io.c                                   |    4 +-
+ apps/s3dosm/osm.c                                  |    2 +-
+ apps/s3dvt/CMakeLists.txt                          |    2 +-
+ apps/s3dvt/main.c                                  |    2 +
+ cmake/modules/FindDocbook.cmake                    |   63 +--
+ cmake/modules/FindG3D.cmake                        |    2 +-
+ cmake/modules/FindGPS.cmake                        |   17 +
+ cmake/modules/gpsd_fix.c                           |   13 +
+ config.h.cmake                                     |    1 +
+ debian/changelog                                   |   15 +-
+ debian/patches/100-hyphen-used-as-minus-sign.patch |  811 --------------------
+ ...amples.patch => 100-installable-examples.patch} |   11 +-
+ debian/patches/101-fix-sigbus-on-mips.patch        |   88 ---
+ .../patches/102-send-correct-load-over-net.patch   |   52 --
+ debian/patches/103-endian-safe-float.patch         |  437 -----------
+ debian/patches/104-reduce-depends.patch            |   62 --
+ debian/patches/105-s3dfm-pathnames.patch           |   24 -
+ debian/patches/106-g3dorientation.patch            |   59 --
+ debian/patches/107-fix-cmake-ftbfs.patch           |  109 ---
+ debian/patches/108-fix-gpsd-ftbfs.patch            |  143 ----
+ debian/patches/109-strip-libs3d-parameters.patch   |   71 --
+ debian/patches/110-s3dosm-api06.patch              |   42 -
+ debian/patches/111-xmlto-documentation.patch       |  154 ----
+ debian/patches/series                              |   14 +-
+ debian/rules                                       |    2 +-
+ example/CMakeLists.txt                             |   28 +-
+ example/filebrowser.c                              |   11 +-
+ experimental/comptest/CMakeLists.txt               |    2 +-
+ experimental/olsrs3d/CMakeLists.txt                |    3 +-
+ experimental/olsrs3d/main.c                        |    8 +-
+ experimental/olsrs3d/net.c                         |   12 +-
+ experimental/testvis/testvis.c                     |    4 +-
+ experimental/wiitest/CMakeLists.txt                |    2 +-
+ libs3d/CMakeLists.txt                              |   11 +-
+ libs3d/endian.c                                    |   81 ++
+ libs3d/io.c                                        |   31 +-
+ libs3d/libs3d.pc.cmake                             |    3 +-
+ libs3d/modelread.c                                 |    6 +-
+ libs3d/network.c                                   |    6 +-
+ libs3d/proto_in.c                                  |   15 +-
+ libs3d/proto_out.c                                 |   73 ++-
+ libs3d/s3dlib.h                                    |    7 +
+ libs3d/shm.c                                       |    2 +-
+ libs3d/tcp.c                                       |    2 +-
+ libs3dw/CMakeLists.txt                             |    7 +-
+ libs3dw/animate.c                                  |    2 +-
+ libs3dw/button.c                                   |    4 +-
+ libs3dw/libs3dw.pc.cmake                           |    3 +-
+ libs3dw/widget.c                                   |    2 +-
+ objs/AUTHORS                                       |   15 +-
+ objs/martin_stern/Cube 300.3ds                     |  Bin 67061 -> 0 bytes
+ objs/martin_stern/Cube 300.c4d                     |  Bin 179106 -> 0 bytes
+ objs/martin_stern/Kopie von WRT 54.c4d             |  Bin 102617 -> 0 bytes
+ objs/martin_stern/Testprojekt.c4d                  |  Bin 467266 -> 0 bytes
+ objs/martin_stern/WRT 54 und Cube 300 2.c4d        |  Bin 423266 -> 0 bytes
+ objs/martin_stern/WRT 54 version 2.3ds             |  Bin 157292 -> 0 bytes
+ objs/martin_stern/WRT 54 version 2.c4d             |  Bin 313384 -> 0 bytes
+ objs/martin_stern/WRT 54.c4d                       |  Bin 103873 -> 0 bytes
+ server/CMakeLists.txt                              |    4 +-
+ server/endian.c                                    |   80 ++
+ server/event.c                                     |    1 +
+ server/global.h                                    |    8 +
+ server/graphics.c                                  |    3 +-
+ server/graphics_sdl.c                              |   20 +-
+ server/main.c                                      |    2 +
+ server/mcp.c                                       |    3 +-
+ server/network.c                                   |    2 +
+ server/object.c                                    |   15 +-
+ server/proto.c                                     |   79 +-
+ server/shm.c                                       |    6 +-
+ server/tcp.c                                       |    3 +-
+ 115 files changed, 1080 insertions(+), 2726 deletions(-)
+ create mode 100644 Documentation/Maintain.txt
+ create mode 100644 Documentation/RelNotes-0.1.1.txt
+ rename ChangeLog => Documentation/RelNotes-0.1.txt (84%)
+ create mode 100644 Documentation/RelNotes-0.2.1.1.txt
+ create mode 100644 Documentation/RelNotes-0.2.1.txt
+ create mode 100644 Documentation/RelNotes-0.2.txt
+ create mode 100644 Documentation/SubmittingPatches
+ create mode 100644 Documentation/manpages/build-manpages.sh
+ rename Documentation/manpages/{s3d_x11gate.sgml => s3d_x11gatemanpage.sgml} (93%)
+ create mode 100644 cmake/modules/gpsd_fix.c
+ delete mode 100644 debian/patches/100-hyphen-used-as-minus-sign.patch
+ rename debian/patches/{112-installable-examples.patch => 100-installable-examples.patch} (95%)
+ delete mode 100644 debian/patches/101-fix-sigbus-on-mips.patch
+ delete mode 100644 debian/patches/102-send-correct-load-over-net.patch
+ delete mode 100644 debian/patches/103-endian-safe-float.patch
+ delete mode 100644 debian/patches/104-reduce-depends.patch
+ delete mode 100644 debian/patches/105-s3dfm-pathnames.patch
+ delete mode 100644 debian/patches/106-g3dorientation.patch
+ delete mode 100644 debian/patches/107-fix-cmake-ftbfs.patch
+ delete mode 100644 debian/patches/108-fix-gpsd-ftbfs.patch
+ delete mode 100644 debian/patches/109-strip-libs3d-parameters.patch
+ delete mode 100644 debian/patches/110-s3dosm-api06.patch
+ delete mode 100644 debian/patches/111-xmlto-documentation.patch
+ create mode 100644 libs3d/endian.c
+ delete mode 100755 objs/martin_stern/Cube 300.3ds
+ delete mode 100755 objs/martin_stern/Cube 300.c4d
+ delete mode 100755 objs/martin_stern/Kopie von WRT 54.c4d
+ delete mode 100755 objs/martin_stern/Testprojekt.c4d
+ delete mode 100755 objs/martin_stern/WRT 54 und Cube 300 2.c4d
+ delete mode 100755 objs/martin_stern/WRT 54 version 2.3ds
+ delete mode 100755 objs/martin_stern/WRT 54 version 2.c4d
+ delete mode 100755 objs/martin_stern/WRT 54.c4d
+ create mode 100644 server/endian.c
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Jul 11 17:05:57 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 11 Jul 2009 17:05:57 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	updated. v0.2.1-48-g00e71be
+Message-ID: <200907111505.n6BF5vhB029371@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been updated
+       via  00e71be5b6791455d792b470289d4ad9b4166a33 (commit)
+      from  c412e450a7702d05ad71febc32bf3dad612b259d (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/Maintain.txt |   27 +++++++++++++++++++++++++++
+ 1 files changed, 27 insertions(+), 0 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Jul 11 17:05:57 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 11 Jul 2009 17:05:57 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, pristine-tar,
+	updated. ac2c5c8af71129993e527b5e79fbce0a3e8b70e0
+Message-ID: <200907111505.n6BF5vAi029399@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, pristine-tar has been updated
+       via  ac2c5c8af71129993e527b5e79fbce0a3e8b70e0 (commit)
+      from  a0b0d217fae464eb5abe9fe8c69b364bc11c33ae (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit ac2c5c8af71129993e527b5e79fbce0a3e8b70e0
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Jul 11 15:34:04 2009 +0200
+
+    pristine-tar data for s3d_0.2.1.1.orig.tar.gz
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ s3d_0.2.1.1.orig.tar.gz.delta |  Bin 0 -> 8731 bytes
+ s3d_0.2.1.1.orig.tar.gz.id    |    1 +
+ 2 files changed, 1 insertions(+), 0 deletions(-)
+ create mode 100644 s3d_0.2.1.1.orig.tar.gz.delta
+ create mode 100644 s3d_0.2.1.1.orig.tar.gz.id
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Jul 11 17:06:03 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 11 Jul 2009 17:06:03 +0200
+Subject: [S3d-svn] Project s3d at BerliOS annotated tag, v0.2.1.1,
+	created. v0.2.1.1
+Message-ID: <200907111506.n6BF63Fc029476@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The annotated tag, v0.2.1.1 has been created
+        at  f34c113fb78068e8b3e537267e5f352a7556c196 (tag)
+   tagging  00e71be5b6791455d792b470289d4ad9b4166a33 (commit)
+  replaces  v0.2.1
+ tagged by  Sven Eckelmann
+        on  Sat Jul 11 15:33:12 2009 +0200
+
+- Log -----------------------------------------------------------------
+s3d 0.2.1.1
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iQIcBAABCgAGBQJKWJSYAAoJEF2HCgfBJntGT2IQAIW8aTMn0Yqq5f8yQtlep45Z
+rJnE5Kea/zdOQNxGaR6OtVRRR4E7zcGXhRdGCRxAuI4mEz2eoMYnohAM+2JPiL26
+QcKGvEFYL45kyN0soaA6EEZWObwEcLOYovlQiX3S5it4soY9mwMWVZHY2yCyvFD+
+WtjoJXeXBjEFU5uJHOzrtTy5nOckRS3RnlQEm6B3PsNjlKKmC2l9BfqmbV+F/Gon
+Lc7IeVKIHKChhP5DU97LS8QJ5YNZ6kR6GczMBmic60jN6iQtQf/IgzFYwGoomZUp
+GE4ZlJCvkTMB5Tk9KtOq3VaPqm1sBL0y8+Q84x49s0Ei06ldkw3f7HIYPnQwKWmR
+5mhQ6Qar9399DMuAudugSeVq+gvv3GkMjelJgmzZxBjtEGu4J55dGfXfV/UPqWbx
+d1ccJWwhBkuZv400PzaYQ3euaddJQEaMgJuMUNhzWMAL40F2ZP0JbGEdE/pt/q/7
+GKswdS8xCbn4AAp15f9ubi/Al6a3h/x1tEomubX88DMAbAcs8NfZR4xao4SuUaSm
+ofyWJCRITL2u5nraryQFJcVBXV9EmaavZMyP6no/pQ/nk+KEn6lCdIOEm4EHjmTs
+zVnOwZPBvF/GeS13LS2KoiYhLA1DsS8QbB51r1OFEKEFNto+/PqgijvrXBCJTmi0
+fuGcJbH/ZwMmWgM341bI
+=wBWG
+-----END PGP SIGNATURE-----
+
+Simon Wunderlich (1):
+      update README
+
+Sven Eckelmann (47):
+      Read incoming data from aligned address
+      Send S3D_P_C_LOAD_* instead of S3D_PC_PEP_* in s3d_load_* proto functions
+      Use floats in network endian byte order
+      Remove dead stores
+      Fix possible null pointer dereferences
+      Fix obvious format string errors
+      Specify which version of GPL is meant for objs
+      Reduce number of indirectly linked libraries
+      Link libs3dw against libm
+      Don't clutter up the CMakeCache with library dependencies
+      Don't require already linked libraries in pkg-config
+      Define _s3d_ready status variable even if no signals are available
+      Use stdint uint*_t instead of u_int*_t
+      meshs3d: Unify parameters of debugFree declaration and definition
+      Build examples/filebrowser.c even if data structure is different in cygwin
+      s3dvt: Disable TIOCSCTTY if not supported
+      s3dfm: Disable usage of d_type until it was rewritten to use stat
+      Fix installation of cygs3d(w).dll under windows
+      server: Link only against GL and not against glu
+      server: Disable kill of childs in quit() when no signals available
+      server: Process tcp data even if shm is deactivated
+      Rewrote directory detection with posix stat
+      s3dfm: Use correct path names for parsing directory items
+      server: Include glext.h for post-1.2 OpenGL constants
+      Open files explicit as binary file
+      Don't convert to int when we compare two float after rintf
+      Make declarations available for hton*b function definitions
+      Remove binary files without free copyright status
+      Transform g3d model orientation to s3d orientation
+      Fix FTBFS with cmake 2.6.3
+      Correct check for new style gpsd structs in s3dosm
+      s3dosm: Require argument in short option of --osm
+      Only strip out libs3d options from argv
+      s3dosm: Move to upcoming osm api 0.6
+      Prevent buffer overrun when using strncat
+      s3dfm: Close source when target cannot be opened in fs_copy
+      s3dosm: Fix compilation with DB_STACK
+      Add notes about the current git layout and releases
+      Move changelogs to Documentation RelNotes
+      Add initial release notes for 0.2.1.1
+      Add smaller cleanups and clarifications to Maintainer notes
+      Add informations how to submit patches
+      Correct smaller spelling errors in maintainer guide
+      Rebuild manpages with docbook-to-man
+      Change docbook compiler to xmlto
+      Update RelNotes-0.2.1.1
+      Add informations about packaging new release for debian
+
+-----------------------------------------------------------------------
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Jul 11 17:06:03 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 11 Jul 2009 17:06:03 +0200
+Subject: [S3d-svn] Project s3d at BerliOS annotated tag, debian/0.2.1.1-1,
+	created. debian/0.2.1.1-1
+Message-ID: <200907111506.n6BF63nB029452@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The annotated tag, debian/0.2.1.1-1 has been created
+        at  fd14efd42221e541449cf34da9737d34b74274f6 (tag)
+   tagging  125e1a405a1c5e7f750184a00143bcc7acd313da (commit)
+  replaces  v0.2.1.1
+ tagged by  Sven Eckelmann
+        on  Sat Jul 11 17:04:10 2009 +0200
+
+- Log -----------------------------------------------------------------
+Debian release 0.2.1.1-1
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iQIcBAABCgAGBQJKWKnqAAoJEF2HCgfBJntGLK8QALMzEqd1WK5tWTxjhNiCaC3+
+wBwXkdRP2qZoFsYi0NWAWjbFRZ6ESL7xAp/1Bp/aJCcAxJjOo8IzC9zLXKtVrkfO
+ahIiP2mKQbwZsrVDecVw8WNg+p6MuvkPlqpjU3ZPbMeLKi+pczM8O57Z/x74UVhk
+OmkBNVX9IlNen34VxSgstOxq+N6Rmvu2TxiwEwV8L1CgRjPjzSSc1IDKmImI7D27
+6NY4jmvuc6nqrzHAHcV20bVpUxYfKKETryYwzmCbXsWEI5zAIWMKgV1CpfsdUbBS
+s1dJ4+1XIwYvAhtivtpcdbMz1tdraV5cUjhIzMGsFHmpx2smYG6lfLm0eqq1NZ13
+prsiJC76JZMIkpQJk+UTENEcjOGUFCOVMPSWW1zfF7NlR1ag1SZ8yOMP5fqpfO9V
+coNEIQexZy62uP8NK160Z2Q05lI4d28NPdNGa7ajPehvG/WxHzZYPGxM8RfoVhXi
+udyKH6zf4z+uaxRcevGdSZ8WuGOJ4Kx3JW9QjhyzBYxSreH3VPimG/6TWesbSHF0
+bx9Kneoy1uFrpYe+wPOH5BMrr1X3quY5MXfzlq/1Tkp+ThrnAGwe1JyMya2TEaLV
+MwyPvrD+R6aPPwAf4E1dBGcKCu/tlo2IhE74eOiz11aPhGs7lWHvjj4Op6WRyo7y
+zKH11YzvNIGL5VwTC/D8
+=Yr5O
+-----END PGP SIGNATURE-----
+
+Sven Eckelmann (71):
+      Initial debian package
+      Merge branch 'master' into debian
+      Use @packages.debian.org packages address as maintainer
+      Build with more debug informations
+      Merge commit 'v0.2.1' into debian
+      Add watchfile for next releases
+      Add missing newlines in *.install files
+      Use dpkg-gensymbols
+      Don't use hyphens as minus signs in manpages
+      Update changelog for 0.2.1-2
+      Use debian policy feature to break uploaders list
+      Remove useless dh_install(examples|mans) from rules
+      Update changelog for 0.2.1-3
+      Fix float related problems on big/little endian connections
+      Add seperate copyright notice for debian/* in debian/copyright
+      Cleanup comments in debian/rules
+      Don't remove *-stamps in clean target (dh_clean does that)
+      Sign all tags when using git-buildpackage programs
+      Add missing copyright holders to debian/copyright
+      Use repeatable Copyright fields as suggested by newer CopyrightFormat
+      Release s3d-0.2.1-5
+      Use pristine-tar to save orig.tar.gz
+      Update debian/patches/103-endian-safe-float.patch
+      Call make always from current dir
+      Add 104-reduce-depends.patch to reduce number of lib dependencies
+      Enable final build for better optimisation if possible
+      Release s3d-0.2.1-6
+      Correct spelling of OLSR and B.A.T.M.A.N. in descriptions
+      Remove commented out code in debian/rules
+      Replace s3d at packages.debian.org maintainer with first Uploader
+      Move VCS-Git repository to berlios in debian/control
+      Workaround for GCC bug with disappearing minimized dot_mcp programs
+      Add patch to correct detection of filetypes in subpaths in s3dfm
+      Replace dh_clean -k with dh_prep
+      Release s3d-0.2.1-8
+      Use CFLAGS and LDFLAGS from dpkg-buildpackage
+      Correct short description of libs3dw2
+      Update debian/watch to find .tar.gz
+      Only depend on at least one binary package for s3d-dbg
+      Add 106-g3dorientation.patch, correct model orientation with libg3d-0.0.8
+      Release s3d-0.2.1-9
+      Update copyright years in debian/copyright
+      Rewrote debian/rules using cdbs
+      Move s3d to section devel
+      Move s3d-dbg to new section debug
+      Upgraded to policy 3.8.1, no changes required
+      Add 107-fix-cmake-ftbfs.patch to fix FTBFS with cmake 2.6.3 (Closes: #520163)
+      Release s3d-0.2.1-10
+      Don't install TODO file with every package
+      Add 108-fix-gpsd-ftbfs.patch to fix ftbfs with gps 2.39
+      Update 104-reduce-depends.patch to apply without warnings
+      Add 109-strip-libs3d-parameters.patch to only strip out libs3d parameters
+      Add 110-s3dosm-api06.patch to use API version 0.6 of Openstreetmaps.org
+      Depend on docbook-xml to disable inet DTD lookup by docbook2html
+      Allow Debian Maintainers to upload new versions of s3d
+      Release s3d-0.2.1-13
+      Add function and structure manpages for libs3d2 and libs3dw
+      Add whatis entry for man9 manpages
+      Use xmlto for generation of html documentation
+      Release s3d-0.2.1-14
+      Reduce debhelper dependency to 5
+      Only depend on xmlto and docbook-xml in Build-Depends-Indep
+      Reorder source section in debian/control
+      Make example usable without extra headers
+      Install examples with libs3d-dev and libs3dw-dev
+      Convert debian/copyright to new dep5 version
+      Upgraded to policy 3.8.2, no changes required
+      Merge commit 'v0.2.1.1' into debian
+      Update patches for s3d 0.2.1.1
+      Install upstream changelogs
+      Release s3d 0.2.1.1-1
+
+-----------------------------------------------------------------------
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Jul 11 17:57:45 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 11 Jul 2009 17:57:45 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-52-g0a0156b
+Message-ID: <200907111557.n6BFvjsF003946@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  0a0156b0e5d9d631eb5d05740da6b193d89ddad5 (commit)
+       via  789d50c1ccbec375fabec64cc946ad9fdd4e2dec (commit)
+       via  00e71be5b6791455d792b470289d4ad9b4166a33 (commit)
+      from  82ac1621d230643fbeadb43d9f17185e6037818a (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 0a0156b0e5d9d631eb5d05740da6b193d89ddad5
+Merge: 82ac1621d230643fbeadb43d9f17185e6037818a 789d50c1ccbec375fabec64cc946ad9fdd4e2dec
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Jul 11 17:56:15 2009 +0200
+
+    Merge branch 'maint'
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/Maintain.txt         |   27 +++++++++++++++++++++++++++
+ Documentation/RelNotes-0.2.1.1.txt |    4 ++--
+ 2 files changed, 29 insertions(+), 2 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Jul 11 17:57:45 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 11 Jul 2009 17:57:45 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	updated. v0.2.1.1-1-g789d50c
+Message-ID: <200907111557.n6BFvjdq003919@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been updated
+       via  789d50c1ccbec375fabec64cc946ad9fdd4e2dec (commit)
+      from  00e71be5b6791455d792b470289d4ad9b4166a33 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/RelNotes-0.2.1.1.txt |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Jul 11 22:50:05 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 11 Jul 2009 22:50:05 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-53-g8df53d5
+Message-ID: <200907112050.n6BKo5Dh029606@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  8df53d578be48065fe60e7d616ba078f27bacfe5 (commit)
+      from  0a0156b0e5d9d631eb5d05740da6b193d89ddad5 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 8df53d578be48065fe60e7d616ba078f27bacfe5
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Jul 11 22:44:04 2009 +0200
+
+    Started to document features for next release
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/RelNotes-0.2.2.txt |   13 +++++++++++++
+ 1 files changed, 13 insertions(+), 0 deletions(-)
+ create mode 100644 Documentation/RelNotes-0.2.2.txt
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Fri Jul 17 08:16:57 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Fri, 17 Jul 2009 08:16:57 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	updated. v0.2.1.1-3-g2a8ff11
+Message-ID: <200907170616.n6H6Gvl0011254@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been updated
+       via  2a8ff117d2e50fbce29a59449020575d3461a03c (commit)
+       via  89e7f074dc18e835120425cb2042a81da0d3bb34 (commit)
+      from  789d50c1ccbec375fabec64cc946ad9fdd4e2dec (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 2a8ff117d2e50fbce29a59449020575d3461a03c
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Fri Jul 17 08:13:40 2009 +0200
+
+    Make the dependency to libg3d 0.0.7 more visible
+    
+    Their are currently users which see that cmake cannot find libg3d even
+    if they have libg3d-0.0.6 installed and then overriding the INCLUDE
+    and LIBRARY informations for libg3d in their cmake configuration.
+    It is better to make the information about the version dependency more
+    visible for users during an configure failure.
+
+commit 89e7f074dc18e835120425cb2042a81da0d3bb34
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Fri Jul 17 08:10:16 2009 +0200
+
+    Remove currently unused version number in cmake
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ CMakeLists.txt        |    1 -
+ ConfigureChecks.cmake |    2 +-
+ 2 files changed, 1 insertions(+), 2 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

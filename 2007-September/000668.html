@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r676 - trunk/apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r676%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200709221754.l8MHsBtQ030356%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000667.html">
+   <LINK REL="Next"  HREF="000669.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r676 - trunk/apps/s3dosm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r676%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200709221754.l8MHsBtQ030356%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r676 - trunk/apps/s3dosm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep 22 19:54:11 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000667.html">[S3d-svn] r675 - trunk/libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000669.html">[S3d-svn] r677 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#668">[ date ]</a>
+              <a href="thread.html#668">[ thread ]</a>
+              <a href="subject.html#668">[ subject ]</a>
+              <a href="author.html#668">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-09-22 19:54:11 +0200 (Sat, 22 Sep 2007)
+New Revision: 676
+
+Modified:
+   trunk/apps/s3dosm/gps.c
+   trunk/apps/s3dosm/main.c
+Log:
+- nonblocking gps mode, don't block if gps does not send data
+
+Modified: trunk/apps/s3dosm/gps.c
+===================================================================
+--- trunk/apps/s3dosm/gps.c	2007-09-22 16:52:22 UTC (rev 675)
++++ trunk/apps/s3dosm/gps.c	2007-09-22 17:54:11 UTC (rev 676)
+@@ -41,6 +41,8 @@
+ #include &lt;stdio.h&gt;   /*  snprintf(), printf(), NULL */
+ #include &lt;time.h&gt;  /*  nanosleep(), struct tm, time_t...  */
+ #include &lt;math.h&gt; /* fabs(), finite () */
++#include &lt;fcntl.h&gt;  /* fcntl() */
++#include &lt;unistd.h&gt; /* fcntl() */
+ static struct gps_data_t  *dgps;
+ static int       frame = 0;
+ static int       lastfix = 0;
+@@ -175,6 +177,7 @@
+ }
+ int gps_init(char *gpshost)
+ {
++	int sock_opts;
+ 	char *err_str;
+ 	dgps = gps_open(gpshost, &quot;2947&quot;);
+ 	if (dgps == NULL) {
+@@ -205,6 +208,9 @@
+ 		fprintf(stderr, &quot;s3dosm: no gpsd running or network error: %d, %s\n&quot; ,  errno, err_str);
+ 		return(-1);
+ 	}
++	sock_opts = fcntl(dgps-&gt;gps_fd, F_GETFL, 0);
++	fcntl(dgps-&gt;gps_fd, F_SETFL, sock_opts | O_NONBLOCK);
++
+ 	user_icon = s3d_clone(icons[ICON_ARROW].oid);
+ 	user_icon_rotator = s3d_new_object();
+ 	s3d_link(user_icon, user_icon_rotator);
+@@ -221,8 +227,11 @@
+ {
+ 	if (gps_active &amp;&amp; ((frame % 6) == 0)) {
+ 		if (gps_poll(dgps) &lt; 0) {
+-			printf(&quot;read error on server socket\n&quot;);
+-			gps_quit();
++			if (errno != EWOULDBLOCK) {
++
++				printf(&quot;read error on server socket\n&quot;);
++				gps_quit();
++			}
+ 		}
+ 
+ 		/*show_gpsdata(dgps);*/
+
+Modified: trunk/apps/s3dosm/main.c
+===================================================================
+--- trunk/apps/s3dosm/main.c	2007-09-22 16:52:22 UTC (rev 675)
++++ trunk/apps/s3dosm/main.c	2007-09-22 17:54:11 UTC (rev 676)
+@@ -39,17 +39,7 @@
+ 		gps_main();
+ 		nav_main();
+ 		s3dw_ani_mate();
+-	} /* else {
+-  s3d_net_check(); / * we are not yet in the mainloop of
+-       s3d_mainloop(), because ready==0,
+-       so we check protocol things ourselves.
+-       This just prevents timing out from the server
+-       because map loading takes so long, you shouldn't take
+-       this as good example and write proper threaded or
+-       timesliced loaders :) * /
+-  s3d_process_stack();
+- }
+- s3dw_ani_mate();*/
++	}
+ }
+ int init(int argc, char **argv)
+ {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000667.html">[S3d-svn] r675 - trunk/libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000669.html">[S3d-svn] r677 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#668">[ date ]</a>
+              <a href="thread.html#668">[ thread ]</a>
+              <a href="subject.html#668">[ subject ]</a>
+              <a href="author.html#668">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

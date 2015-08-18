@@ -1,0 +1,546 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r951 - in trunk: libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r951%20-%20in%20trunk%3A%20libs3d%20libs3dw&In-Reply-To=%3C200808182148.m7ILmjuB008298%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000934.html">
+   <LINK REL="Next"  HREF="000936.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r951 - in trunk: libs3d libs3dw</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r951%20-%20in%20trunk%3A%20libs3d%20libs3dw&In-Reply-To=%3C200808182148.m7ILmjuB008298%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r951 - in trunk: libs3d libs3dw">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Aug 18 23:48:45 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000934.html">[S3d-svn] r950 - in trunk: apps/s3dosm experimental/comptest	experimental/testvis extras/swig
+</A></li>
+        <LI>Next message: <A HREF="000936.html">[S3d-svn] r952 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#935">[ date ]</a>
+              <a href="thread.html#935">[ thread ]</a>
+              <a href="subject.html#935">[ subject ]</a>
+              <a href="author.html#935">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-08-18 23:48:44 +0200 (Mon, 18 Aug 2008)
+New Revision: 951
+
+Modified:
+   trunk/libs3d/event.c
+   trunk/libs3d/proto_out.c
+   trunk/libs3d/s3d.h
+   trunk/libs3d/s3dlib.h
+   trunk/libs3d/texture.c
+   trunk/libs3d/vector.c
+   trunk/libs3dw/button.c
+   trunk/libs3dw/event.c
+   trunk/libs3dw/input.c
+   trunk/libs3dw/label.c
+   trunk/libs3dw/s3dw.h
+   trunk/libs3dw/textbox.c
+Log:
+Mark arrays/pointers of api functions as const if elements will not be changed
+
+Modified: trunk/libs3d/event.c
+===================================================================
+--- trunk/libs3d/event.c	2008-08-18 10:08:46 UTC (rev 950)
++++ trunk/libs3d/event.c	2008-08-18 21:48:44 UTC (rev 951)
+@@ -72,7 +72,7 @@
+ 	}
+ 	return(NULL);
+ }
+-int s3d_delete_event(struct s3d_evt *devt)
++int s3d_delete_event(const struct s3d_evt *devt)
+ {
+ 	struct s3d_evt *previous = NULL;
+ 	struct s3d_evt *p = s3d_stack;
+
+Modified: trunk/libs3d/proto_out.c
+===================================================================
+--- trunk/libs3d/proto_out.c	2008-08-18 10:08:46 UTC (rev 950)
++++ trunk/libs3d/proto_out.c	2008-08-18 21:48:44 UTC (rev 951)
+@@ -113,7 +113,7 @@
+ }
+ /*  like vertex add, but you can add a lot of vertices with this. */
+ /*  it's to be used for file readers or fast coders :) */
+-int s3d_push_vertices(int object, float *vbuf, uint16_t n)
++int s3d_push_vertices(int object, const float *vbuf, uint16_t n)
+ {
+ 	char    buf[MF_LEN+4], *ptr;
+ 	int     f, i, len = n * 4 * 3;
+@@ -224,7 +224,7 @@
+ 	return(0);  /*  nothing yet */
+ }
+ /*  push a material array (with alpha information!) */
+-int s3d_push_materials_a(int object, float *mbuf, uint16_t n)
++int s3d_push_materials_a(int object, const float *mbuf, uint16_t n)
+ {
+ 	char    buf[MF_LEN+4], *ptr;
+ 	int     f, i, len = n * 4 * 12;
+@@ -287,10 +287,11 @@
+ 
+ /*  this is the polygon array version */
+ /*  assumes to have a list of polys which consists of v1,v2,v3,material */
+-int s3d_push_polygons(int object, uint32_t *pbuf, uint16_t n)
++int s3d_push_polygons(int object, const uint32_t *pbuf, uint16_t n)
+ {
+ 	uint32_t  buf[(MF_LEN+4)/4];
+-	uint32_t  *s, *d;
++	const uint32_t  *s;
++	uint32_t  *d;
+ 	int     f, i, j, len = n * 4 * 4;
+ 	int     flen, stepl;
+ 	if (n &lt; 1)
+@@ -311,10 +312,11 @@
+ 	}
+ 	return(0);
+ }
+-int s3d_push_lines(int object, uint32_t *lbuf, uint16_t n)
++int s3d_push_lines(int object, const uint32_t *lbuf, uint16_t n)
+ {
+ 	uint32_t  buf[(MF_LEN+4)/4];
+-	uint32_t  *s, *d;
++	const uint32_t  *s;
++	uint32_t  *d;
+ 	int     f, i, j, len = n * 4 * 3;
+ 	int     flen, stepl;
+ 	if (n &lt; 1)
+@@ -351,10 +353,11 @@
+ 	net_send(S3D_P_C_PUSH_TEX, buf, len);
+ 	return(0);
+ }
+-int s3d_push_textures(int object, uint16_t *tbuf, uint16_t n)
++int s3d_push_textures(int object, const uint16_t *tbuf, uint16_t n)
+ {
+ 	uint32_t  buf[(MF_LEN+4)/4];
+-	uint16_t  *s, *d;
++	const uint16_t  *s;
++	uint16_t *d;
+ 
+ 	int     f, i, j, len = n * 2 * 2;
+ 	int     flen, stepl;
+@@ -515,7 +518,7 @@
+ 	net_send(S3D_P_C_PEP_MAT, buf, len);
+ 	return(0);  /*  nothing yet */
+ }
+-int s3d_pep_materials_a(int object, float *mbuf, uint16_t n)
++int s3d_pep_materials_a(int object, const float *mbuf, uint16_t n)
+ {
+ 	char    buf[MF_LEN+4];
+ 	if ((n*12*sizeof(float) + 4) &gt; MF_LEN) {
+@@ -529,7 +532,7 @@
+ }
+ 
+ /*  adds normal information to the last n polygons. */
+-int s3d_pep_polygon_normals(int object, float *nbuf, uint16_t n)
++int s3d_pep_polygon_normals(int object, const float *nbuf, uint16_t n)
+ {
+ 	uint8_t buf[MF_LEN+4];
+ 	if ((n*9*sizeof(float) + 4) &gt; MF_LEN) {
+@@ -543,7 +546,7 @@
+ 
+ }
+ /*  adds normal information to the last n line. */
+-int s3d_pep_line_normals(int object, float *nbuf, uint16_t n)
++int s3d_pep_line_normals(int object, const float *nbuf, uint16_t n)
+ {
+ 	uint8_t buf[MF_LEN+4];
+ 	if ((n*9*sizeof(float) + 4) &gt; MF_LEN) {
+@@ -595,7 +598,7 @@
+ 
+ 
+ /*  replaces the last n lines. */
+-int s3d_pep_lines(int object, uint32_t *lbuf, uint16_t n)
++int s3d_pep_lines(int object, const uint32_t *lbuf, uint16_t n)
+ {
+ 	uint32_t  buf[MF_LEN+4];
+ 	int    i;
+@@ -611,7 +614,7 @@
+ 
+ }
+ /*  replaces the last n vertices. */
+-int s3d_pep_vertices(int object, float *vbuf, uint16_t n)
++int s3d_pep_vertices(int object, const float *vbuf, uint16_t n)
+ {
+ 	uint8_t buf[MF_LEN+4];
+ 	if ((n*3*sizeof(float) + 4) &gt; MF_LEN) {
+@@ -647,7 +650,7 @@
+ 	return(0);
+ }
+ /*  adds texture coordinates to the last n polygons. */
+-int s3d_pep_polygon_tex_coords(int object, float *tbuf, uint16_t n)
++int s3d_pep_polygon_tex_coords(int object, const float *tbuf, uint16_t n)
+ {
+ 	char buf[MF_LEN+4];
+ 	if ((n*6*sizeof(float)) &gt; MF_LEN) {
+@@ -660,7 +663,7 @@
+ 	return(0);
+ }
+ /*  adds normal information to the last n polygons. */
+-int s3d_load_polygon_normals(int object, float *nbuf, uint32_t start, uint16_t n)
++int s3d_load_polygon_normals(int object, const float *nbuf, uint32_t start, uint16_t n)
+ {
+ 	char    buf[MF_LEN+4], *ptr;
+ 	int     f, i, len = n * 9 * 4;
+@@ -688,7 +691,7 @@
+ 	return(0);
+ }
+ /*  adds normal information to the last n polygons. */
+-int s3d_load_line_normals(int object, float *nbuf, uint32_t start, uint16_t n)
++int s3d_load_line_normals(int object, const float *nbuf, uint32_t start, uint16_t n)
+ {
+ 	char    buf[MF_LEN+4], *ptr;
+ 	int     f, i, len = n * 6 * 4;
+@@ -716,7 +719,7 @@
+ 	return(0);
+ }
+ /*  adds texture coordinates to the last n polygons. */
+-int s3d_load_polygon_tex_coords(int object, float *tbuf, uint32_t start, uint16_t n)
++int s3d_load_polygon_tex_coords(int object, const float *tbuf, uint32_t start, uint16_t n)
+ {
+ 	char    buf[MF_LEN+4], *ptr;
+ 	int     f, i, len = n * 6 * 4;
+@@ -744,7 +747,7 @@
+ 	return(0);
+ }
+ /*  load n materials at position start, overwriting old ones */
+-int s3d_load_materials_a(int object, float *mbuf, uint32_t start, uint16_t n)
++int s3d_load_materials_a(int object, const float *mbuf, uint32_t start, uint16_t n)
+ {
+ 	char    buf[MF_LEN+4], *ptr;
+ 	int     f, i, len = n * 12 * 4;
+@@ -802,7 +805,7 @@
+ 
+ }
+ /*  load data (which has width w and height h) into object, texture tex at position (xpos,ypos) */
+-int s3d_load_texture(int object, uint32_t tex, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h, uint8_t *data)
++int s3d_load_texture(int object, uint32_t tex, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h, const uint8_t *data)
+ {
+ 	char    buf[MF_LEN+4], *ptr;
+ 	int     linestep, lines, i;
+
+Modified: trunk/libs3d/s3d.h
+===================================================================
+--- trunk/libs3d/s3d.h	2008-08-18 10:08:46 UTC (rev 950)
++++ trunk/libs3d/s3d.h	2008-08-18 21:48:44 UTC (rev 951)
+@@ -98,7 +98,7 @@
+ 
+ /* object manipulations */
+ S3DEXPORT int s3d_push_vertex(int object, float x, float y, float z);
+-S3DEXPORT int s3d_push_vertices(int object, float *vbuf, uint16_t n);
++S3DEXPORT int s3d_push_vertices(int object, const float *vbuf, uint16_t n);
+ S3DEXPORT int s3d_push_material(int object,
+                       float amb_r, float amb_g, float amb_b,
+                       float spec_r, float spec_g, float spec_b,
+@@ -111,39 +111,39 @@
+                         float amb_r, float amb_g, float amb_b, float amb_a,
+                         float spec_r, float spec_g, float spec_b, float spec_a,
+                         float diff_r, float diff_g, float diff_b, float diff_a);
+-S3DEXPORT int s3d_push_materials_a(int object, float *mbuf, uint16_t n);
++S3DEXPORT int s3d_push_materials_a(int object, const float *mbuf, uint16_t n);
+ S3DEXPORT int s3d_pep_material_a(int object,
+                        float amb_r, float amb_g, float amb_b, float amb_a,
+                        float spec_r, float spec_g, float spec_b, float spec_a,
+                        float diff_r, float diff_g, float diff_b, float diff_a);
+ 
+-S3DEXPORT int s3d_pep_materials_a(int object, float *mbuf, uint16_t n);
+-S3DEXPORT int s3d_load_materials_a(int object, float *mbuf, uint32_t start, uint16_t n);
++S3DEXPORT int s3d_pep_materials_a(int object, const float *mbuf, uint16_t n);
++S3DEXPORT int s3d_load_materials_a(int object, const float *mbuf, uint32_t start, uint16_t n);
+ S3DEXPORT int s3d_push_polygon(int object, uint32_t v1, uint32_t v2, uint32_t v3, uint32_t material);
+-S3DEXPORT int s3d_push_polygons(int object, uint32_t *pbuf, uint16_t n);
++S3DEXPORT int s3d_push_polygons(int object, const uint32_t *pbuf, uint16_t n);
+ S3DEXPORT int s3d_push_line(int object, uint32_t v1, uint32_t v2, uint32_t material);
+-S3DEXPORT int s3d_push_lines(int object, uint32_t *lbuf, uint16_t n);
++S3DEXPORT int s3d_push_lines(int object, const uint32_t *lbuf, uint16_t n);
+ S3DEXPORT int s3d_push_texture(int object, uint16_t w, uint16_t h);
+-S3DEXPORT int s3d_push_textures(int object, uint16_t *tbuf, uint16_t n);
++S3DEXPORT int s3d_push_textures(int object, const uint16_t *tbuf, uint16_t n);
+ S3DEXPORT int s3d_pop_vertex(int object, uint32_t n);
+ S3DEXPORT int s3d_pop_polygon(int object, uint32_t n);
+ S3DEXPORT int s3d_pop_material(int object, uint32_t n);
+ S3DEXPORT int s3d_pop_texture(int object, uint32_t n);
+ S3DEXPORT int s3d_pop_polygon(int object, uint32_t n);
+ S3DEXPORT int s3d_pop_line(int object, uint32_t n);
+-S3DEXPORT int s3d_pep_line_normals(int object, float *nbuf, uint16_t n);
+-S3DEXPORT int s3d_pep_polygon_normals(int object, float *nbuf, uint16_t n);
++S3DEXPORT int s3d_pep_line_normals(int object, const float *nbuf, uint16_t n);
++S3DEXPORT int s3d_pep_polygon_normals(int object, const float *nbuf, uint16_t n);
+ S3DEXPORT int s3d_pep_polygon_tex_coord(int object, float x1, float y1, float x2, float y2, float x3, float y3);
+-S3DEXPORT int s3d_pep_polygon_tex_coords(int object, float *tbuf, uint16_t n);
++S3DEXPORT int s3d_pep_polygon_tex_coords(int object, const float *tbuf, uint16_t n);
+ S3DEXPORT int s3d_pep_material_texture(int object, uint32_t tex);
+ S3DEXPORT int s3d_pep_vertex(int object, float x, float y, float z);
+-S3DEXPORT int s3d_pep_vertices(int object, float *vbuf, uint16_t n);
++S3DEXPORT int s3d_pep_vertices(int object, const float *vbuf, uint16_t n);
+ S3DEXPORT int s3d_pep_line(int object, int v1, int v2, int material);
+-S3DEXPORT int s3d_pep_lines(int object, uint32_t *lbuf, uint16_t n);
+-S3DEXPORT int s3d_load_line_normals(int object, float *nbuf, uint32_t start, uint16_t n);
+-S3DEXPORT int s3d_load_polygon_normals(int object, float *nbuf, uint32_t start, uint16_t n) ;
+-S3DEXPORT int s3d_load_polygon_tex_coords(int object, float *tbuf, uint32_t start, uint16_t n);
+-S3DEXPORT int s3d_load_texture(int object, uint32_t tex, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h, uint8_t *data);
++S3DEXPORT int s3d_pep_lines(int object, const uint32_t *lbuf, uint16_t n);
++S3DEXPORT int s3d_load_line_normals(int object, const float *nbuf, uint32_t start, uint16_t n);
++S3DEXPORT int s3d_load_polygon_normals(int object, const float *nbuf, uint32_t start, uint16_t n) ;
++S3DEXPORT int s3d_load_polygon_tex_coords(int object, const float *tbuf, uint32_t start, uint16_t n);
++S3DEXPORT int s3d_load_texture(int object, uint32_t tex, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h, const uint8_t *data);
+ 
+ S3DEXPORT int s3d_new_object(void);
+ S3DEXPORT int s3d_del_object(int oid);
+@@ -169,18 +169,18 @@
+ 
+ /* some vector calculation helpers */
+ 
+-S3DEXPORT float s3d_vector_length(float vector[]);
+-S3DEXPORT float s3d_vector_dot_product(float vector1[], float vector2[]);
+-S3DEXPORT void s3d_vector_subtract(float vector1[], float vector2[], float result_vector[]);
+-S3DEXPORT float s3d_vector_angle(float vector1[], float vector2[]);
+-S3DEXPORT float s3d_angle_to_cam(float obj_pos[], float cam_pos[], float *angle_rad);
+-S3DEXPORT void s3d_vector_cross_product(float vector1[], float vector2[], float result_vector[]);
++S3DEXPORT float s3d_vector_length(const float vector[]);
++S3DEXPORT float s3d_vector_dot_product(const float vector1[], const float vector2[]);
++S3DEXPORT void s3d_vector_subtract(const float vector1[], const float vector2[], float result_vector[]);
++S3DEXPORT float s3d_vector_angle(const float vector1[], const float vector2[]);
++S3DEXPORT float s3d_angle_to_cam(const float obj_pos[], const float cam_pos[], float *angle_rad);
++S3DEXPORT void s3d_vector_cross_product(const float vector1[], const float vector2[], float result_vector[]);
+ 
+ /* event handlers */
+ S3DEXPORT void s3d_push_event(struct s3d_evt *newevt);
+ S3DEXPORT struct s3d_evt *s3d_pop_event(void);
+ S3DEXPORT struct s3d_evt *s3d_find_event(uint8_t event);
+-S3DEXPORT int s3d_delete_event(struct s3d_evt *devt);
++S3DEXPORT int s3d_delete_event(const struct s3d_evt *devt);
+ 
+ S3DEXPORT void s3d_set_callback(uint8_t event, s3d_cb func);
+ S3DEXPORT void s3d_clear_callback(uint8_t event);
+
+Modified: trunk/libs3d/s3dlib.h
+===================================================================
+--- trunk/libs3d/s3dlib.h	2008-08-18 10:08:46 UTC (rev 950)
++++ trunk/libs3d/s3dlib.h	2008-08-18 21:48:44 UTC (rev 951)
+@@ -170,5 +170,5 @@
+ int _s3d_texture_init(void);
+ int _s3d_texture_quit(void);
+ void _s3d_handle_texshm(struct s3d_texshm *tshm);
+-int _s3d_load_texture_shm(int object, uint32_t tid, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h, uint8_t *data);
++int _s3d_load_texture_shm(int object, uint32_t tid, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h, const uint8_t *data);
+ 
+
+Modified: trunk/libs3d/texture.c
+===================================================================
+--- trunk/libs3d/texture.c	2008-08-18 10:08:46 UTC (rev 950)
++++ trunk/libs3d/texture.c	2008-08-18 21:48:44 UTC (rev 951)
+@@ -93,7 +93,7 @@
+ #endif
+ 	return;
+ }
+-int _s3d_load_texture_shm(int object, uint32_t tid, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h, uint8_t *data)
++int _s3d_load_texture_shm(int object, uint32_t tid, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h, const uint8_t *data)
+ {
+ 	struct s3d_texshm check;
+ 	struct s3d_tex *tex;
+
+Modified: trunk/libs3d/vector.c
+===================================================================
+--- trunk/libs3d/vector.c	2008-08-18 10:08:46 UTC (rev 950)
++++ trunk/libs3d/vector.c	2008-08-18 21:48:44 UTC (rev 951)
+@@ -36,7 +36,7 @@
+  *
+  ***/
+ 
+-float s3d_vector_length(float vector[])
++float s3d_vector_length(const float vector[])
+ {
+ 
+ 	return (sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]));
+@@ -54,7 +54,7 @@
+  *
+  ***/
+ 
+-void s3d_vector_subtract(float vector1[], float vector2[], float result_vector[])
++void s3d_vector_subtract(const float vector1[], const float vector2[], float result_vector[])
+ {
+ 
+ 	result_vector[0] = vector2[0] - vector1[0];
+@@ -74,7 +74,7 @@
+  *
+  ***/
+ 
+-float s3d_vector_dot_product(float vector1[], float vector2[])
++float s3d_vector_dot_product(const float vector1[], const float vector2[])
+ {
+ 	return (vector1[0] * vector2[0] + vector1[1] * vector2[1] + vector1[2] * vector2[2]);
+ }
+@@ -90,7 +90,7 @@
+  *
+  ***/
+ 
+-void s3d_vector_cross_product(float vector1[], float vector2[], float result_vector[])
++void s3d_vector_cross_product(const float vector1[], const float vector2[], float result_vector[])
+ {
+ 	result_vector[0] = vector1[1] * vector2[2] - vector1[2] * vector2[1];
+ 	result_vector[1] = vector1[2] * vector2[0] - vector1[0] * vector2[2];
+@@ -109,7 +109,7 @@
+  *
+  ***/
+ 
+-float s3d_vector_angle(float vector1[], float vector2[])
++float s3d_vector_angle(const float vector1[], const float vector2[])
+ {
+ 
+ 	return (acos(s3d_vector_dot_product(vector1, vector2) / (s3d_vector_length(vector1) * s3d_vector_length(vector2))));
+@@ -128,7 +128,7 @@
+  *
+  ***/
+ 
+-float s3d_angle_to_cam(float obj_pos[], float cam_pos[], float *angle_rad)
++float s3d_angle_to_cam(const float obj_pos[], const float cam_pos[], float *angle_rad)
+ {
+ 
+ 	float angle, tmp_mov_vec[3], desc_norm_vec[3] = { 0.0, 0.0, -1.0 };
+
+Modified: trunk/libs3dw/button.c
+===================================================================
+--- trunk/libs3dw/button.c	2008-08-18 10:08:46 UTC (rev 950)
++++ trunk/libs3dw/button.c	2008-08-18 21:48:44 UTC (rev 951)
+@@ -87,7 +87,7 @@
+ }
+ 
+ /* create a new button in the surface */
+-s3dw_button *s3dw_button_new(s3dw_surface *surface, const char *text, float posx, float posy)
++s3dw_button *s3dw_button_new(const s3dw_surface *surface, const char *text, float posx, float posy)
+ {
+ 	s3dw_button *button;
+ 	s3dw_widget *widget;
+
+Modified: trunk/libs3dw/event.c
+===================================================================
+--- trunk/libs3dw/event.c	2008-08-18 10:08:46 UTC (rev 950)
++++ trunk/libs3dw/event.c	2008-08-18 21:48:44 UTC (rev 951)
+@@ -25,12 +25,12 @@
+ #include &lt;s3dw.h&gt;
+ #include &lt;s3dw_int.h&gt;
+ 
+-int s3dw_handle_click(struct s3d_evt *evt)
++int s3dw_handle_click(const struct s3d_evt *evt)
+ {
+ 	uint32_t oid = *((uint32_t *)evt-&gt;buf);
+ 	return(s3dw_widget_event_click(s3dw_getroot(), oid));
+ }
+-int s3dw_handle_key(struct s3d_evt *evt)
++int s3dw_handle_key(const struct s3d_evt *evt)
+ {
+ 	struct s3d_key_event *keys = (struct s3d_key_event *)evt-&gt;buf;
+ 	return(s3dw_widget_event_key(s3dw_getroot(), keys));
+
+Modified: trunk/libs3dw/input.c
+===================================================================
+--- trunk/libs3dw/input.c	2008-08-18 10:08:46 UTC (rev 950)
++++ trunk/libs3dw/input.c	2008-08-18 21:48:44 UTC (rev 951)
+@@ -138,7 +138,7 @@
+ 	s3d_flags_off(input-&gt;oid_text, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+ }
+ /* create a new input in the surface */
+-s3dw_input *s3dw_input_new(s3dw_surface *surface, float width, float posx, float posy)
++s3dw_input *s3dw_input_new(const s3dw_surface *surface, float width, float posx, float posy)
+ {
+ 	s3dw_input *input;
+ 	s3dw_widget *widget;
+
+Modified: trunk/libs3dw/label.c
+===================================================================
+--- trunk/libs3dw/label.c	2008-08-18 10:08:46 UTC (rev 950)
++++ trunk/libs3dw/label.c	2008-08-18 21:48:44 UTC (rev 951)
+@@ -65,7 +65,7 @@
+ 
+ 
+ /* create a new label in the surface */
+-s3dw_label *s3dw_label_new(s3dw_surface *surface, const char *text, float posx, float posy)
++s3dw_label *s3dw_label_new(const s3dw_surface *surface, const char *text, float posx, float posy)
+ {
+ 	s3dw_label *label;
+ 	s3dw_widget *widget;
+
+Modified: trunk/libs3dw/s3dw.h
+===================================================================
+--- trunk/libs3dw/s3dw.h	2008-08-18 10:08:46 UTC (rev 950)
++++ trunk/libs3dw/s3dw.h	2008-08-18 21:48:44 UTC (rev 951)
+@@ -171,10 +171,10 @@
+ #endif
+ 
+ /* button.c */
+-S3DWEXPORT s3dw_button   *s3dw_button_new(s3dw_surface *surface, const char *text, float posx, float posy);
+-S3DWEXPORT s3dw_label    *s3dw_label_new(s3dw_surface *surface, const char *text, float posx, float posy);
+-S3DWEXPORT s3dw_input    *s3dw_input_new(s3dw_surface *surface, float width, float posx, float posy);
+-S3DWEXPORT s3dw_textbox   *s3dw_textbox_new(s3dw_surface *surface, const char *text, float posx, float posy, float width, float height);
++S3DWEXPORT s3dw_button   *s3dw_button_new(const s3dw_surface *surface, const char *text, float posx, float posy);
++S3DWEXPORT s3dw_label    *s3dw_label_new(const s3dw_surface *surface, const char *text, float posx, float posy);
++S3DWEXPORT s3dw_input    *s3dw_input_new(const s3dw_surface *surface, float width, float posx, float posy);
++S3DWEXPORT s3dw_textbox   *s3dw_textbox_new(const s3dw_surface *surface, const char *text, float posx, float posy, float width, float height);
+ S3DWEXPORT char     *s3dw_input_gettext(s3dw_input *input);
+ S3DWEXPORT void      s3dw_input_change_text(s3dw_input *input, const char *text);
+ S3DWEXPORT void      s3dw_label_change_text(s3dw_label *label, const char *text);
+@@ -193,8 +193,8 @@
+ S3DWEXPORT void      s3dw_textbox_scrollto(s3dw_textbox *textbox, int x, int y);
+ S3DWEXPORT void      s3dw_textbox_change_text(s3dw_textbox *textbox, const char *text);
+ 
+-S3DWEXPORT int      s3dw_handle_click(struct s3d_evt *evt);
+-S3DWEXPORT int      s3dw_handle_key(struct s3d_evt *evt);
++S3DWEXPORT int      s3dw_handle_click(const struct s3d_evt *evt);
++S3DWEXPORT int      s3dw_handle_key(const struct s3d_evt *evt);
+ S3DWEXPORT int      s3dw_object_info(struct s3d_evt *evt);
+ 
+ S3DWEXPORT void      s3dw_ani_mate(void);
+
+Modified: trunk/libs3dw/textbox.c
+===================================================================
+--- trunk/libs3dw/textbox.c	2008-08-18 10:08:46 UTC (rev 950)
++++ trunk/libs3dw/textbox.c	2008-08-18 21:48:44 UTC (rev 951)
+@@ -196,7 +196,7 @@
+ }
+ 
+ /* create a new textbox in the surface */
+-s3dw_textbox *s3dw_textbox_new(s3dw_surface *surface, const char *text, float posx, float posy, float width, float height)
++s3dw_textbox *s3dw_textbox_new(const s3dw_surface *surface, const char *text, float posx, float posy, float width, float height)
+ {
+ 	s3dw_textbox *textbox;
+ 	s3dw_widget *widget;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000934.html">[S3d-svn] r950 - in trunk: apps/s3dosm experimental/comptest	experimental/testvis extras/swig
+</A></li>
+	<LI>Next message: <A HREF="000936.html">[S3d-svn] r952 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#935">[ date ]</a>
+              <a href="thread.html#935">[ thread ]</a>
+              <a href="subject.html#935">[ subject ]</a>
+              <a href="author.html#935">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

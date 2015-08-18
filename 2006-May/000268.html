@@ -1,0 +1,289 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r275 - in trunk: . apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r275%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200605051755.k45HtIra017440%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000267.html">
+   <LINK REL="Next"  HREF="000269.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r275 - in trunk: . apps/s3dfm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r275%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200605051755.k45HtIra017440%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r275 - in trunk: . apps/s3dfm">dotslash at berlios.de
+       </A><BR>
+    <I>Fri May  5 19:55:18 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000267.html">[S3d-svn] r274 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000269.html">[S3d-svn] r276 - in trunk: . apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#268">[ date ]</a>
+              <a href="thread.html#268">[ thread ]</a>
+              <a href="subject.html#268">[ subject ]</a>
+              <a href="author.html#268">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-05 19:55:05 +0200 (Fri, 05 May 2006)
+New Revision: 275
+
+Modified:
+   trunk/
+   trunk/apps/s3dfm/animation.c
+   trunk/apps/s3dfm/box.c
+   trunk/apps/s3dfm/main.c
+   trunk/apps/s3dfm/s3dfm.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r526 at balthasar</A>:  dotslash | 2006-05-05 19:54:14 +0200
+ - swoosh effects :D
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:524
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:526
+
+Modified: trunk/apps/s3dfm/animation.c
+===================================================================
+--- trunk/apps/s3dfm/animation.c	2006-05-05 17:35:59 UTC (rev 274)
++++ trunk/apps/s3dfm/animation.c	2006-05-05 17:55:05 UTC (rev 275)
+@@ -53,7 +53,7 @@
+ 	return(scale);
+ }
+ /* center f for the viewer, therefore moving the root box ... */
+-void ani_rescale(struct t_item *f)
++void ani_focus(struct t_item *f)
+ {
+ 	root.px=0.0;
+ 	root.py=0.0;
+@@ -77,6 +77,7 @@
+ 			if (ani_s[i]==f)
+ 				return;		/* already in list */
+ 		ani_s[ani_n]=f;
++		ani_iterate(f);
+ 		printf(&quot;[A]ni ADD %d\n&quot;,ani_n);
+ 		ani_n++;
+ 	}
+
+Modified: trunk/apps/s3dfm/box.c
+===================================================================
+--- trunk/apps/s3dfm/box.c	2006-05-05 17:35:59 UTC (rev 274)
++++ trunk/apps/s3dfm/box.c	2006-05-05 17:55:05 UTC (rev 275)
+@@ -71,8 +71,10 @@
+ 	int dps;
+ 	dps=ceil(sqrt(dir-&gt;n_item)); /* directories per line */
+ 	/* find position for the new block in our directory box */
+-	dir-&gt;list[i].px=((float)((int)i%dps)+0.5)/((float)dps)-0.5;
+-	dir-&gt;list[i].pz=((float)((int)i/dps)+0.5)/((float)dps)-0.5;
++	dir-&gt;list[i].dpx = dir-&gt;list[i].px=-1 +2*  ((float)((int)i%dps)+0.5)/((float)dps);
++	dir-&gt;list[i].dpy = dir-&gt;list[i].py=0.5+((float)((int)i/dps)+0.5)/((float)dps)-0.5;
++	dir-&gt;list[i].dpz = dir-&gt;list[i].pz=1.0;
++	dir-&gt;list[i].scale = dir-&gt;list[i].dscale = (float)1.0/((float)dps);
+ 	/* create the block */
+ 	if (dir-&gt;list[i].close!=-1)		s3d_del_object(dir-&gt;list[i].close);
+ 	if (dir-&gt;list[i].block!=-1)		s3d_del_object(dir-&gt;list[i].block);
+@@ -94,8 +96,6 @@
+ 									0,0,0.5-d);
+ 	};
+ 	s3d_push_polygons(dir-&gt;list[i].block,polys,10);
+-	s3d_scale(dir-&gt;list[i].block,(float)1.0/((float)dps));
+-	s3d_translate(dir-&gt;list[i].block,dir-&gt;list[i].px*2,dir-&gt;list[i].pz+0.5,1.0);
+ 	s3d_link(dir-&gt;list[i].block,dir-&gt;block);
+ 
+ 	/* draw and position the string */
+@@ -107,10 +107,11 @@
+ 	}
+ 	else 
+ 		len=dir-&gt;list[i].len;
+-	s3d_scale(dir-&gt;list[i].str,(float)1.8/(((float)dps)*len));
+-	s3d_translate(dir-&gt;list[i].str,dir-&gt;list[i].px*2-0.9/(float)dps,dir-&gt;list[i].pz-0.4/(float)dps+0.5,1.01);
++	s3d_scale(dir-&gt;list[i].str,(float)1.8/len);
++	s3d_translate(dir-&gt;list[i].str,-0.9,-0.3,0.1);
+ 	s3d_rotate(dir-&gt;list[i].str,0,0,0);
+-	s3d_link(dir-&gt;list[i].str,dir-&gt;block);
++	s3d_link(dir-&gt;list[i].str,dir-&gt;list[i].block);
++	ani_finish(&amp;dir-&gt;list[i],-1); /* apply transformation */
+ 	return(0);
+ }
+ 
+@@ -219,7 +220,6 @@
+ 		return(-1); /* already displayed ... */ 
+ 	s3d_del_object(dir-&gt;block);
+ 	box_buildblock(dir);
+-	box_sidelabel(dir);
+ 	if (dir-&gt;parent!=NULL)
+ 		dir-&gt;parent-&gt;dirs_opened++;
+ 	dir-&gt;dirs_opened=0;
+@@ -238,14 +238,19 @@
+ 	if (dir-&gt;parent!=NULL)
+ 	{
+ 		s3d_link(dir-&gt;block,dir-&gt;parent-&gt;block);
+-		printf(&quot;[L] parent: linking against %d\n&quot;,dir-&gt;parent-&gt;block);
++		dir-&gt;dpx=0.0;
++		dir-&gt;dpy=BOXHEIGHT;
++		dir-&gt;dpz=0.0;
++		dir-&gt;dscale=0.0;
+ 		box_position_kids(dir-&gt;parent);
++		ani_doit(dir);
+ 	}
+ 	for (i=0;i&lt;dir-&gt;n_item;i++)
+ 	{
+ 		s3d_flags_on(dir-&gt;list[i].block,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 		s3d_flags_on(dir-&gt;list[i].str,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 	}
++	box_sidelabel(dir);
+     s3d_flags_on(dir-&gt;block,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+     s3d_flags_on(dir-&gt;close,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 	return(0);
+@@ -296,6 +301,11 @@
+ 	}
+ 	dir-&gt;dirs_opened=0;
+ 	dir-&gt;disp=0;
++	if (dir-&gt;parent!=NULL)
++	{
++		box_position_kids(dir-&gt;parent);
++	}
++
+ 	return(0);
+ 
+ }
+@@ -328,9 +338,10 @@
+ 				if (dir-&gt;list[i].disp)
+ 				{
+ 					dir-&gt;list[i].px=0.0;
++					dir-&gt;list[i].py=BOXHEIGHT;
+ 					dir-&gt;list[i].pz=0.0;
+-					s3d_translate(dir-&gt;list[i].block,0,BOXHEIGHT,0);
+-					s3d_scale    (dir-&gt;list[i].block,0.2);
++					dir-&gt;list[i].scale=0.2;
++					ani_add(&amp;dir-&gt;list[i]);
+ 				}
+ 			}
+ 			break;
+@@ -341,9 +352,10 @@
+ 				if (dir-&gt;list[i].disp)
+ 				{
+ 					dir-&gt;list[i].px=0.8 * sin(((float)j*2*M_PI)/((float)dir-&gt;dirs_opened));
++					dir-&gt;list[i].py=BOXHEIGHT;
+ 					dir-&gt;list[i].pz=0.8 * cos(((float)j*2*M_PI)/((float)dir-&gt;dirs_opened));
+-					s3d_translate(dir-&gt;list[i].block,dir-&gt;list[i].px,BOXHEIGHT,dir-&gt;list[i].pz);
+-					s3d_scale(dir-&gt;list[i].block,0.2);
++					dir-&gt;list[i].scale=0.2;
++					ani_add(&amp;dir-&gt;list[i]);
+ 					j++;
+ 				}
+ 
+
+Modified: trunk/apps/s3dfm/main.c
+===================================================================
+--- trunk/apps/s3dfm/main.c	2006-05-05 17:35:59 UTC (rev 274)
++++ trunk/apps/s3dfm/main.c	2006-05-05 17:55:05 UTC (rev 275)
+@@ -29,9 +29,6 @@
+ #include &lt;string.h&gt;  /*  strlen(), strncmp(), strrchr() */
+ #include &lt;time.h&gt;	/* nanosleep() */
+ static struct timespec t={0,33*1000*1000}; /* 30 fps */
+-
+-
+-int folder,geometry,mp3,duno,dot,dotdot;
+ struct t_item root;
+ 
+ void get_path(struct t_item *dir, char *path)
+@@ -130,6 +127,8 @@
+ 		if (f-&gt;close==oid)
+ 		{
+ 			box_collapse(f);
++			if (f-&gt;parent!=NULL)
++				ani_focus(f-&gt;parent);
+ 			return;
+ 		}
+ 		if (f-&gt;type==T_FOLDER)
+@@ -137,7 +136,7 @@
+ 			printf(&quot;[F]ound, expanding %s\n&quot;,f-&gt;name);
+ 			parse_dir(f);
+ 			box_expand(f);
+-			ani_rescale(f);
++			ani_focus(f);
+ 		} else
+ 			printf(&quot;[F]ound, but is %s no folder\n&quot;,f-&gt;name);
+ 	} else {
+@@ -151,17 +150,8 @@
+ }
+ int main (int argc, char **argv)
+ {
+-	int i;
+ 	if (!s3d_init(&amp;argc,&amp;argv,&quot;s3dfm&quot;))	
+ 	{
+-		i=0;
+-		 /*  load the object files */
+-		folder=s3d_import_3ds_file(&quot;objs/folder.3ds&quot;);
+-		geometry=s3d_import_3ds_file(&quot;objs/geometry.3ds&quot;);
+-		mp3=s3d_import_3ds_file(&quot;objs/notes.3ds&quot;);
+-		duno=s3d_import_3ds_file(&quot;objs/duno.3ds&quot;);
+-		dot=s3d_import_3ds_file(&quot;objs/dot.3ds&quot;);
+-		dotdot=s3d_import_3ds_file(&quot;objs/dotdot.3ds&quot;);
+ 		s3d_select_font(&quot;vera&quot;);
+ 		s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
+ 		
+@@ -174,7 +164,8 @@
+ 		if (root.len&lt;2) root.len=2;
+ 		parse_dir(&amp;root);
+ 		box_expand(&amp;root);
+-		ani_rescale(&amp;root);
++		ani_doit(&amp;root);
++		ani_focus(&amp;root);
+ 		s3d_mainloop(mainloop);
+ 		s3d_quit();
+ 	}
+
+Modified: trunk/apps/s3dfm/s3dfm.h
+===================================================================
+--- trunk/apps/s3dfm/s3dfm.h	2006-05-05 17:35:59 UTC (rev 274)
++++ trunk/apps/s3dfm/s3dfm.h	2006-05-05 17:55:05 UTC (rev 275)
+@@ -66,7 +66,7 @@
+ void mainloop();
+ /* animation.c */
+ float ani_get_scale(struct t_item *f);
+-void ani_rescale(struct t_item *f);
++void ani_focus(struct t_item *f);
+ void ani_mate();
+ void ani_add(struct t_item *f);
+ void ani_del(int i);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000267.html">[S3d-svn] r274 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000269.html">[S3d-svn] r276 - in trunk: . apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#268">[ date ]</a>
+              <a href="thread.html#268">[ thread ]</a>
+              <a href="subject.html#268">[ subject ]</a>
+              <a href="author.html#268">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

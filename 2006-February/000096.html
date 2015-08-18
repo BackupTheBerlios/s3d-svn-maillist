@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r100 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r100%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200602221805.k1MI5PDT014158%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000095.html">
+   <LINK REL="Next"  HREF="000097.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r100 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r100%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200602221805.k1MI5PDT014158%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r100 - in trunk: . server">dotslash at berlios.de
+       </A><BR>
+    <I>Wed Feb 22 19:05:25 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000095.html">[S3d-svn] r99 - in trunk: . client
+</A></li>
+        <LI>Next message: <A HREF="000097.html">[S3d-svn] r101 - in trunk: . apps/dot_mcp client
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#96">[ date ]</a>
+              <a href="thread.html#96">[ thread ]</a>
+              <a href="subject.html#96">[ subject ]</a>
+              <a href="author.html#96">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-02-22 19:05:06 +0100 (Wed, 22 Feb 2006)
+New Revision: 100
+
+Modified:
+   trunk/
+   trunk/ChangeLog
+   trunk/server/graphics.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r136 at balthasar</A>:  dotslash | 2006-02-22 19:04:53 +0100
+ - only select the nearest hit when clicking, not all on the line
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:132
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:136
+
+Modified: trunk/ChangeLog
+===================================================================
+--- trunk/ChangeLog	2006-02-22 16:15:38 UTC (rev 99)
++++ trunk/ChangeLog	2006-02-22 18:05:06 UTC (rev 100)
+@@ -1,3 +1,8 @@
++2006-02-22  Simon Wunderlich - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++	- only select the nearest hit when clicking, not all on the line
++	- fopen errors are not that important when looking through the
++	  search path ...
++	- SIGNAL -&gt; WITH_SIGNALS
+ 2006-02-20  Simon Wunderlich - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+ 	- added mplayer patch: patch your mplayer, use -vo s3d on
+ 	  the commandline and watch your videos in s3d in 3d space - yay
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2006-02-22 16:15:38 UTC (rev 99)
++++ trunk/server/graphics.c	2006-02-22 18:05:06 UTC (rev 100)
+@@ -7,6 +7,7 @@
+ #include &lt;SDL.h&gt;	 /*  SDL_GL_SwapBuffers */
+ #endif
+ #include &lt;math.h&gt;		 /*  sin(),cos() */
++#define INFINITY 1&lt;&lt;30
+ /*  this file handles graphics routines */
+ /*  local prototypes ... */
+ void render_virtual_object(struct t_obj *o);
+@@ -195,6 +196,8 @@
+ 	int i,j;
+ 	GLint viewport[4];
+ 	GLfloat xpos,ypos;
++	float big,z1;
++	int found;
+ 	uint32_t mcp_o,o;
+ 	struct t_process *p=get_proc_by_pid(MCP);
+ 	GLuint select_buf[SBSIZE],*ptr,names,hits;
+@@ -235,40 +238,51 @@
+ 	render_by_mcp();
+ 	glFlush();
+ 	hits=glRenderMode(GL_RENDER);
+-	dprintf(LOW,&quot;had %d hits&quot;,hits);
+-	ptr=select_buf;
+-	for (i=0;i&lt;hits;i++)
++	if (hits&gt;0)
+ 	{
+-		names=*ptr;
+-		dprintf(LOW,&quot;number of names for hit = %d&quot;, names); ptr++;
+-	    dprintf(LOW,&quot;  z1 is %g;&quot;, (float) *ptr/0x7fffffff); ptr++;
+-	    dprintf(LOW,&quot; z2 is %g&quot;, (float) *ptr/0x7fffffff); ptr++;
++		big=INFINITY;
++		dprintf(LOW,&quot;had %d hits&quot;,hits);
++		ptr=select_buf;
+ 		mcp_o=o=-1;
+-		for (j=0;j&lt;names;j++)
++		/* check all the hits, only select the nearest ... */
++		for (i=0;i&lt;hits;i++)
+ 		{
+-			switch (j)
++			names=*ptr;
++			dprintf(LOW,&quot;number of names for hit = %d&quot;, names); ptr++;
++			z1=*ptr/0x7fffffff;
++		    dprintf(LOW,&quot; z1 is %g;&quot;, (float) *ptr/0x7fffffff); ptr++;
++		    dprintf(LOW,&quot; z2 is %g&quot;, (float) *ptr/0x7fffffff); ptr++;
++			mcp_o=o=-1;
++			for (j=0;j&lt;names;j++)
+ 			{
+-				case 0:mcp_o=	*ptr;break;
+-				case 1:o=		*ptr;break;
++				if (z1&lt;big)
++				{
++					switch (j)
++					{
++						case 0:mcp_o=	*ptr;break;
++						case 1:o=		*ptr;break;
++					}
++				}
++				ptr++;
+ 			}
+-			ptr++;
+ 		}
+ 		dprintf(MED,&quot;mcp_o= %d, o= %d&quot;,mcp_o,o);
++		ptr=select_buf;
+ 		if (mcp_o==-1) /* it's an mcp object */
+ 		{
+ 			dprintf(MED,&quot;clicked on mcp-object no. %d&quot;,o);
+ 			event_obj_click(p,o);
+ 		} else 
+ 		if ((names&gt;1) &amp;&amp; ((mcp_o&gt;=0)&amp;&amp;(mcp_o&lt;p-&gt;n_obj)))
+-		{
++		{ /* it's an usual object */
+ 			dprintf(LOW,&quot;clicked on mcp-object %d, object %d&quot;,mcp_o,o);
+ 			if (p-&gt;object[mcp_o]!=NULL)  /*  that shouldn't happen anyways ... */
+ 			{
+-				obj_debug(get_proc_by_pid(p-&gt;object[mcp_o]-&gt;n_mat),o);
++				obj_debug(get_proc_by_pid(p-&gt;object[mcp_o]-&gt;n_mat),o); 
+ 				event_obj_click(get_proc_by_pid(p-&gt;object[mcp_o]-&gt;n_mat),o);
+ 			}
+-		}
+  	}
++	}
+ 	glMatrixMode(GL_PROJECTION);
+ 	glPopMatrix();
+ 	glMatrixMode(GL_MODELVIEW);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000095.html">[S3d-svn] r99 - in trunk: . client
+</A></li>
+	<LI>Next message: <A HREF="000097.html">[S3d-svn] r101 - in trunk: . apps/dot_mcp client
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#96">[ date ]</a>
+              <a href="thread.html#96">[ thread ]</a>
+              <a href="subject.html#96">[ subject ]</a>
+              <a href="author.html#96">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

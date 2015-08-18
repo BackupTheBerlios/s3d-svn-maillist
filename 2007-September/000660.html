@@ -1,0 +1,256 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r668 - in trunk: . libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r668%20-%20in%20trunk%3A%20.%20libs3dw&In-Reply-To=%3C200709211439.l8LEdnON019044%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000659.html">
+   <LINK REL="Next"  HREF="000661.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r668 - in trunk: . libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r668%20-%20in%20trunk%3A%20.%20libs3dw&In-Reply-To=%3C200709211439.l8LEdnON019044%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r668 - in trunk: . libs3dw">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 21 16:39:49 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000659.html">[S3d-svn] r667 - in trunk: apps/dot_mcp apps/kism3d apps/meshs3d	apps/olsrs3d apps/s3d_x11gate apps/s3dfm apps/s3dosm	apps/s3dvt example libs3d libs3dw server
+</A></li>
+        <LI>Next message: <A HREF="000661.html">[S3d-svn] r669 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#660">[ date ]</a>
+              <a href="thread.html#660">[ thread ]</a>
+              <a href="subject.html#660">[ subject ]</a>
+              <a href="author.html#660">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-09-21 16:39:49 +0200 (Fri, 21 Sep 2007)
+New Revision: 668
+
+Modified:
+   trunk/
+   trunk/libs3dw/animate.c
+   trunk/libs3dw/root.c
+   trunk/libs3dw/s3dw_int.h
+   trunk/libs3dw/scrollbar.c
+   trunk/libs3dw/textbox.c
+   trunk/libs3dw/widget.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r2408 at kero</A>:  dotslash | 2007-09-21 16:39:29 +0200
+ - remove some ugly bug: 
+      pointers in the animation stack were not properly removed when widget was deleted, so the animation
+ 	 was still executed on a not (or re-)allocated chunk of memory, causing fancy things to happen.
+ - remove warnings for -W
+ 
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2374
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2408
+
+Modified: trunk/libs3dw/animate.c
+===================================================================
+--- trunk/libs3dw/animate.c	2007-09-17 13:51:17 UTC (rev 667)
++++ trunk/libs3dw/animate.c	2007-09-21 14:39:49 UTC (rev 668)
+@@ -33,25 +33,26 @@
+ int ani_need_arr = 0;
+ 
+ /* is item f already on stack? */
+-int s3dw_ani_onstack(s3dw_widget *f)
++int s3dw_ani_stackpos(s3dw_widget *f)
+ {
+ 	int i;
+ 	for (i = 0;i &lt; ani_n;i++)
+ 		if (ani_s[i] == f)
+-			return(1);  /* already in list */
+-	return(0);
++			return(i);  /* already in list */
++	return(-1);
+ 
+ }
+ /* add an item on the animation stack */
+ void s3dw_ani_add(s3dw_widget *f)
+ {
+ 
++	s3dprintf(VLOW, &quot;[A]ni ADD (%010p), oid = %d, ani_n = %d, type is %s\n&quot;, f, f-&gt;oid, ani_n, s3dw_get_type_string(f-&gt;type));
+ 	if ((f-&gt;oid == 0) &amp;&amp; (f-&gt;type != S3DW_TCAM)) {
+-		s3dprintf(HIGH, &quot;s3dw_ani_add() assert failed: weird, moving cam but its not a cam obeject?&quot;);
++		s3dprintf(HIGH, &quot;s3dw_ani_add() assert failed: weird, moving cam but its not a cam object?&quot;);
+ 		return;
+ 	}
+ 	if ((ani_n &lt; MAXANI) &amp;&amp; (animation_on)) {
+-		if (s3dw_ani_onstack(f))
++		if (s3dw_ani_stackpos(f) != -1)
+ 			return;  /* already in list */
+ 		ani_s[ani_n] = f;
+ 		s3dw_ani_iterate(f);
+@@ -63,18 +64,18 @@
+ void s3dw_ani_del(int i)
+ {
+ 	if ((i &gt;= 0) &amp;&amp; (i &lt; ani_n)) {
+-		/*  printf(&quot;[A]ni DEL %d\n&quot;,i);*/
++		s3dprintf(VLOW, &quot;[A]ni DEL %d, ani_n = %d\n&quot;,i, ani_n);
+ 		ani_n--;
+ 		ani_s[i] = ani_s[ani_n]; /* that should also work if i is the last one */
+ 	} else {
+ 		s3dprintf(MED, &quot;[F]ATAL: can't delete animation!\n&quot;);
+ 	}
+ }
+-/* well ... */
++/* apply the animation */
+ void s3dw_ani_doit(s3dw_widget *f)
+ {
+ 	if ((f-&gt;oid == 0) &amp;&amp; (f-&gt;type != S3DW_TCAM)) {
+-		s3dprintf(HIGH, &quot;s3dw_ani_doit() assert failed: weird, moving cam but its not a cam obeject?&quot;);
++		s3dprintf(HIGH, &quot;s3dw_ani_doit() assert failed: weird, moving cam but its not a cam object?&quot;);
+ 	} else {
+ 		if (f-&gt;oid == 0) {
+ 			s3dprintf(HIGH, &quot;moving cam&quot;);
+@@ -99,6 +100,7 @@
+ 	if (i != -1)
+ 		s3dw_ani_del(i);
+ }
++/* do one step of the animation */
+ void s3dw_ani_iterate(s3dw_widget *f)
+ {
+ 	f-&gt;ax = (f-&gt;x + f-&gt;ax * ZOOMS) / (ZOOMS + 1);
+
+Modified: trunk/libs3dw/root.c
+===================================================================
+--- trunk/libs3dw/root.c	2007-09-17 13:51:17 UTC (rev 667)
++++ trunk/libs3dw/root.c	2007-09-21 14:39:49 UTC (rev 668)
+@@ -54,6 +54,21 @@
+ 	return(0);
+ }
+ 
++char *s3dw_get_type_string(int type) 
++{
++	switch (type) {
++	case S3DW_TROOT: 		return(&quot;root&quot;);
++	case S3DW_TCAM: 		return(&quot;cam&quot;);
++	case S3DW_TSURFACE:		return(&quot;surface&quot;);
++	case S3DW_TBUTTON: 		return(&quot;button&quot;);
++	case S3DW_TLABEL: 		return(&quot;label&quot;);
++	case S3DW_TINPUT: 		return(&quot;input&quot;);
++	case S3DW_TTEXTBOX: 	return(&quot;textbox&quot;);
++	case S3DW_TSCROLLBAR: 	return(&quot;scrollbar&quot;);
++	}
++	return(NULL);
++}
++
+ /* get the root .... if it's NULL, the lib is not initialized, so do this too ... */
+ s3dw_widget *s3dw_getroot()
+ {
+
+Modified: trunk/libs3dw/s3dw_int.h
+===================================================================
+--- trunk/libs3dw/s3dw_int.h	2007-09-17 13:51:17 UTC (rev 667)
++++ trunk/libs3dw/s3dw_int.h	2007-09-21 14:39:49 UTC (rev 668)
+@@ -39,6 +39,7 @@
+ int s3dw_click_nothing(s3dw_widget *widget, uint32_t dummy);
+ int s3dw_key_nothing(s3dw_widget *widget, struct s3d_key_event *dummy);
+ void s3dw_root_destroy(s3dw_widget *widget);
++char *s3dw_get_type_string(int type);
+ /* widget.c */
+ s3dw_widget *s3dw_widget_new();
+ void s3dw_widget_append(s3dw_widget *parent, s3dw_widget *widget);
+@@ -105,7 +106,7 @@
+ /* style.c */
+ extern s3dw_style def_style;
+ /* animate.c */
+-int  s3dw_ani_onstack(s3dw_widget *f);
++int  s3dw_ani_stackpos(s3dw_widget *f);
+ void s3dw_ani_add(s3dw_widget *f);
+ void s3dw_ani_del(int i);
+ void s3dw_ani_doit(s3dw_widget *f);
+
+Modified: trunk/libs3dw/scrollbar.c
+===================================================================
+--- trunk/libs3dw/scrollbar.c	2007-09-17 13:51:17 UTC (rev 667)
++++ trunk/libs3dw/scrollbar.c	2007-09-21 14:39:49 UTC (rev 668)
+@@ -372,11 +372,11 @@
+ int s3dw_scrollbar_event_click(s3dw_widget *widget, uint32_t oid)
+ {
+ 	s3dw_scrollbar *scrollbar = (s3dw_scrollbar *)widget;
+-	if (scrollbar-&gt;loid == oid) {
++	if (scrollbar-&gt;loid == (int)oid) {
+ 		scrollbar-&gt;lonclick(widget);
+ 		return(1);
+ 	}
+-	if (scrollbar-&gt;roid == oid) {
++	if (scrollbar-&gt;roid == (int)oid) {
+ 		scrollbar-&gt;ronclick(widget);
+ 		return(1);
+ 	}
+
+Modified: trunk/libs3dw/textbox.c
+===================================================================
+--- trunk/libs3dw/textbox.c	2007-09-17 13:51:17 UTC (rev 667)
++++ trunk/libs3dw/textbox.c	2007-09-21 14:39:49 UTC (rev 668)
+@@ -124,7 +124,7 @@
+ 	rest = text = strdup(textbox-&gt;text);
+ 	while (NULL != (linefeedpos = strchr(rest, '\n'))) { /* process every line */
+ 		linefeedpos[0] = 0;
+-		if ((x &lt; strlen(rest)) &amp;&amp; ((y &gt;= 0) &amp;&amp; y &lt; textbox-&gt;n_lineoids)) { /* don't bother, if it's not visible anyway */
++		if ((x &lt; (int)strlen(rest)) &amp;&amp; ((y &gt;= 0) &amp;&amp; y &lt; textbox-&gt;n_lineoids)) { /* don't bother, if it's not visible anyway */
+ 			rest += x; /* ignore the first x chars because we've scrolled a bit right */
+ 			while ((strlen(rest) &gt; 0) &amp;&amp; (s3d_strlen(rest) &gt; width))
+ 				rest[strlen(rest)-1] = 0; /* remove last character and try again until it fits */
+
+Modified: trunk/libs3dw/widget.c
+===================================================================
+--- trunk/libs3dw/widget.c	2007-09-17 13:51:17 UTC (rev 667)
++++ trunk/libs3dw/widget.c	2007-09-21 14:39:49 UTC (rev 668)
+@@ -82,7 +82,11 @@
+ void s3dw_widget_remove(s3dw_widget *widget)
+ {
+ 	s3dw_widget *parent = widget-&gt;parent;
+-	int i;
++	int i, stackpos;
++
++    stackpos = s3dw_ani_stackpos(widget);
++	if (stackpos != -1 )
++		s3dw_ani_del(stackpos);
+ 	if (parent == NULL) return;
+ 
+ 	for (i = 0;i &lt; parent-&gt;nobj;i++) /* search ... */
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000659.html">[S3d-svn] r667 - in trunk: apps/dot_mcp apps/kism3d apps/meshs3d	apps/olsrs3d apps/s3d_x11gate apps/s3dfm apps/s3dosm	apps/s3dvt example libs3d libs3dw server
+</A></li>
+	<LI>Next message: <A HREF="000661.html">[S3d-svn] r669 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#660">[ date ]</a>
+              <a href="thread.html#660">[ thread ]</a>
+              <a href="subject.html#660">[ subject ]</a>
+              <a href="author.html#660">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

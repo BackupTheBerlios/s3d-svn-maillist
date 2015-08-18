@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r897 - trunk/apps/s3dvt
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-January/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r897%20-%20trunk/apps/s3dvt&In-Reply-To=%3C200801072325.m07NPThx029533%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000889.html">
+   <LINK REL="Next"  HREF="000891.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r897 - trunk/apps/s3dvt</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r897%20-%20trunk/apps/s3dvt&In-Reply-To=%3C200801072325.m07NPThx029533%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r897 - trunk/apps/s3dvt">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan  8 00:25:29 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000889.html">[S3d-svn] r896 - trunk/apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000891.html">[S3d-svn] r898 - trunk/example
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#890">[ date ]</a>
+              <a href="thread.html#890">[ thread ]</a>
+              <a href="subject.html#890">[ subject ]</a>
+              <a href="author.html#890">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-01-08 00:25:28 +0100 (Tue, 08 Jan 2008)
+New Revision: 897
+
+Modified:
+   trunk/apps/s3dvt/main.c
+   trunk/apps/s3dvt/terminal.c
+Log:
+s3dvt: Remove nearly unused variables
+
+
+Modified: trunk/apps/s3dvt/main.c
+===================================================================
+--- trunk/apps/s3dvt/main.c	2008-01-07 23:25:13 UTC (rev 896)
++++ trunk/apps/s3dvt/main.c	2008-01-07 23:25:28 UTC (rev 897)
+@@ -110,9 +110,7 @@
+ 	int uid = 0, gid = 0;
+ 	char exe[] = &quot;/bin/bash&quot;;
+ 	char curchar;
+-	char *disp;
+ 
+-	disp = getenv(&quot;DISPLAY&quot;);
+ 	uid = getuid();
+ 	gid = getgid();
+ 	term_mode = M_PTY;
+@@ -185,24 +183,20 @@
+ 
+ static int pipe_init_terminal(void)
+ {
+-	char buf[256];
+ 	int uid = 0, gid = 0;
+ 	char *exe = &quot;/bin/bash&quot;;
+ 	char *args = &quot;-i&quot;;
+-	char *disp;
+ 
+ 	term_mode = M_PIPE;
+ 	if ((pipe(mpipe_in) == -1) || (pipe(mpipe_out) == -1)) {
+ 		printf(&quot;pipe failed\n&quot;);
+ 		return(-1);
+ 	}
+-	disp = getenv(&quot;DISPLAY&quot;);
+ 	uid = getuid();
+ 	gid = getgid();
+ 	pid = fork();
+ 	if (pid == 0) { /*  the child */
+ 		char tmpstr[1024];
+-		buf[5] = 't';
+ 		setuid(uid);
+ 		setgid(gid);
+ 		if (setsid() &lt; 0)
+@@ -265,7 +259,7 @@
+ {
+ 	int cline;
+ 	int c;
+-	unsigned char ch, och;
++	unsigned char ch;
+ 	unsigned int ci;
+ 	int i, line_end;
+ 
+@@ -275,7 +269,7 @@
+ 		line_end = 0;
+ 		for (c = 0;c &lt; MAX_CHARS;c++) {
+ 			i = cline * MAX_CHARS + c;    /*  calculate position */
+-			if (((ch = line[cline].chars[c].character) != (och = last_c[i]))) {
++			if (((ch = line[cline].chars[c].character) != last_c[i])) {
+ 				if (screenbuf[i] == -1) {
+ 					screenbuf[i] = s3d_new_object();
+ 					s3d_translate(screenbuf[i], c*X_RATIO*CS - CS*X_RATIO*MAX_CHARS / 2, -cline*CS + CS*MAX_LINES / 2, 0);
+@@ -543,7 +537,6 @@
+ }
+ int main(int argc, char **argv)
+ {
+-	unsigned int b;
+ 	chars_init();
+ 	init_terminal();
+ 	s3d_set_callback(S3D_EVENT_QUIT, stop);
+@@ -555,7 +548,7 @@
+ 			printf(&quot;font not found\n&quot;);
+ 			exit(-1);
+ 		}
+-		b = draw_background();
++		draw_background();
+ 		chars_s3d_init();
+ 		s3d_mainloop(mainloop);
+ 		s3d_quit();
+
+Modified: trunk/apps/s3dvt/terminal.c
+===================================================================
+--- trunk/apps/s3dvt/terminal.c	2008-01-07 23:25:13 UTC (rev 896)
++++ trunk/apps/s3dvt/terminal.c	2008-01-07 23:25:28 UTC (rev 897)
+@@ -242,11 +242,10 @@
+ static void delete_x_letters(char *arg1)
+ {
+ 	int tmpint;
+-	t_line *pcurline;
+ 	int i;
+ 	if (arg1[0]) tmpint = atoi(arg1);
+ 	else     tmpint = 1;
+-	pcurline = (t_line*) &amp; line + cy;
++
+ 	if (tmpint + cx &gt; MAX_CHARS)
+ 		tmpint = MAX_CHARS - cx;
+ 	for (i = cx;i &lt; cx + tmpint;i++)
+@@ -255,21 +254,18 @@
+ static void move_x_letters(int mode, char *arg1)
+ {
+ 	int tmpint;
+-	t_line *pcurline;
+ 	int i;
+ 	if (arg1[0])
+ 		tmpint = atoi(arg1);
+ 	else
+ 		tmpint = 1;
+-	pcurline = (t_line*) &amp; line + cy;
++
+ 	switch (mode) {
+ 	case MOVE_RIGHT:
+ 		for (i = 0;i &lt; tmpint;i++) {
+-			/*          pcurline-&gt;nextchar++;
+-			    lastchar++;*/
+ 			cx++;
+ 			if (cx == MAX_CHARS)
+-				pcurline = line_is_full();  /*  our line is full */
++				line_is_full();  /*  our line is full */
+ 		}
+ 		break;
+ 	case MOVE_LEFT:
+@@ -277,7 +273,6 @@
+ 			cx--;
+ 			if (cx == -1) {
+ 				cy--;
+-				pcurline = (t_line*) &amp; line + cy;
+ 				cx = MAX_CHARS - 1;
+ 			}  /*  need to go up one line */
+ 		}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000889.html">[S3d-svn] r896 - trunk/apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000891.html">[S3d-svn] r898 - trunk/example
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#890">[ date ]</a>
+              <a href="thread.html#890">[ thread ]</a>
+              <a href="subject.html#890">[ subject ]</a>
+              <a href="author.html#890">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

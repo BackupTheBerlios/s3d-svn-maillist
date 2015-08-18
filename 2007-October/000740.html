@@ -1,0 +1,520 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r748 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r748%20-%20trunk/server&In-Reply-To=%3C200710182355.l9INtK1K029590%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000739.html">
+   <LINK REL="Next"  HREF="000741.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r748 - trunk/server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r748%20-%20trunk/server&In-Reply-To=%3C200710182355.l9INtK1K029590%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r748 - trunk/server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 01:55:20 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000739.html">[S3d-svn] r747 - trunk/example
+</A></li>
+        <LI>Next message: <A HREF="000741.html">[S3d-svn] r749 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#740">[ date ]</a>
+              <a href="thread.html#740">[ thread ]</a>
+              <a href="subject.html#740">[ subject ]</a>
+              <a href="author.html#740">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 01:55:18 +0200 (Fri, 19 Oct 2007)
+New Revision: 748
+
+Modified:
+   trunk/server/cull.c
+   trunk/server/event.c
+   trunk/server/graphics.c
+   trunk/server/graphics_glut.c
+   trunk/server/graphics_sdl.c
+   trunk/server/main.c
+   trunk/server/matrix.c
+   trunk/server/mcp.c
+   trunk/server/navigation.c
+   trunk/server/network.c
+   trunk/server/process.c
+   trunk/server/shm.c
+   trunk/server/tcp.c
+   trunk/server/user.c
+   trunk/server/user_glut.c
+   trunk/server/user_sdl.c
+Log:
+server: Convert to ANSI function declarations
+
+
+Modified: trunk/server/cull.c
+===================================================================
+--- trunk/server/cull.c	2007-10-18 23:55:05 UTC (rev 747)
++++ trunk/server/cull.c	2007-10-18 23:55:18 UTC (rev 748)
+@@ -38,7 +38,7 @@
+ #define PNEAR 4
+ #define PFAR 5
+ static struct t_plane frustumPlane[6];
+-void cull_get_planes()
++void cull_get_planes(void)
+ {
+ 	t_mtrx m, mproj, mmodel;
+ 	struct t_plane *p;
+
+Modified: trunk/server/event.c
+===================================================================
+--- trunk/server/event.c	2007-10-18 23:55:05 UTC (rev 747)
++++ trunk/server/event.c	2007-10-18 23:55:18 UTC (rev 748)
+@@ -89,7 +89,7 @@
+ 	return(0);
+ }
+ /* the cam changed?! we should run and tell this the mcp/focused client! */
+-int event_cam_changed()
++int event_cam_changed(void)
+ {
+ 	struct t_process *p;
+ 	struct t_obj  *o;
+@@ -100,7 +100,7 @@
+ 	return(0);
+ }
+ /* same for the mouse movement! */
+-int event_ptr_changed()
++int event_ptr_changed(void)
+ {
+ 	struct t_process *p;
+ 	struct t_obj  *o;
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2007-10-18 23:55:05 UTC (rev 747)
++++ trunk/server/graphics.c	2007-10-18 23:55:18 UTC (rev 748)
+@@ -47,7 +47,7 @@
+ extern int frame_mode;  /*  GLUT, SDL, ... ? */
+ /*  this detects and opens the SDL things */
+ 
+-int graphics_init()
++int graphics_init(void)
+ {
+ 	GLfloat shin[] = {16.0};
+ 	switch (frame_mode) {
+@@ -169,7 +169,7 @@
+ }
+ /*  this functions renders by going from mcp objects [as it should be],  */
+ /*  recursively positiniong the objects into the space. */
+-int render_by_mcp()
++int render_by_mcp(void)
+ {
+ 	struct t_process *p = get_proc_by_pid(MCP);
+ 	int32_t i;
+@@ -332,7 +332,7 @@
+ }
+ 
+ 
+-void graphics_main()
++void graphics_main(void)
+ {
+ 	struct t_process *p = get_proc_by_pid(MCP);
+ 	t_mtrx m;
+@@ -392,7 +392,7 @@
+ }
+ 
+ /*  quit the graphic-interface */
+-int graphics_quit()
++int graphics_quit(void)
+ {
+ 	return(0);
+ }
+
+Modified: trunk/server/graphics_glut.c
+===================================================================
+--- trunk/server/graphics_glut.c	2007-10-18 23:55:05 UTC (rev 747)
++++ trunk/server/graphics_glut.c	2007-10-18 23:55:18 UTC (rev 748)
+@@ -31,7 +31,7 @@
+ #include &lt;GL/gl.h&gt;   /*  of course, the gl header */
+ #include &lt;stdlib.h&gt;  /* atexit() */
+ /*  glut version of graphics init ... */
+-int graphics_init_glut()
++int graphics_init_glut(void)
+ {
+ 	/* XXX: Faking argc and argv is probably not a good idea. */
+ 	int argc = 1;
+@@ -49,7 +49,7 @@
+ 	return(0);
+ }
+ /*  nothing to be done ... */
+-int graphics_quit_glut()
++int graphics_quit_glut(void)
+ {
+ 	return(0);
+ }
+
+Modified: trunk/server/graphics_sdl.c
+===================================================================
+--- trunk/server/graphics_sdl.c	2007-10-18 23:55:05 UTC (rev 747)
++++ trunk/server/graphics_sdl.c	2007-10-18 23:55:18 UTC (rev 748)
+@@ -28,7 +28,7 @@
+ #include &lt;SDL.h&gt;
+ 
+ int SDLFlags = 0;      /*  some flags for SDL */
+-int graphics_init_sdl()
++int graphics_init_sdl(void)
+ {
+ 	SDL_Surface *GLwin = NULL;
+ 	SDL_VideoInfo *VideoInfo;
+@@ -113,7 +113,7 @@
+ 	graphics_reshape(X_RES, Y_RES);
+ 	return(0);
+ }
+-int graphics_quit_sdl()
++int graphics_quit_sdl(void)
+ {
+ 	SDL_Quit();
+ 	return(0);
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2007-10-18 23:55:05 UTC (rev 747)
++++ trunk/server/main.c	2007-10-18 23:55:18 UTC (rev 748)
+@@ -134,7 +134,7 @@
+ struct timespec t = {
+ 	0, 10*1000*1000
+ }; /* 10 mili seconds */
+-void one_time()
++void one_time(void)
+ {
+ 	nanosleep(&amp;t, NULL);
+ 	user_main();
+@@ -142,7 +142,7 @@
+ 	graphics_main();
+ }
+ /*  this initalizes all components.  */
+-int init()
++int init(void)
+ {
+ #ifdef __APPLE__
+ 	NSApplicationLoad();
+@@ -183,7 +183,7 @@
+ }
+ 
+ /*  things to be cleaned up  */
+-void quit()
++void quit(void)
+ {
+ 	if (running != 0) {
+ 		user_quit();
+
+Modified: trunk/server/matrix.c
+===================================================================
+--- trunk/server/matrix.c	2007-10-18 23:55:05 UTC (rev 747)
++++ trunk/server/matrix.c	2007-10-18 23:55:18 UTC (rev 748)
+@@ -34,7 +34,7 @@
+ 	0.0, 0.0, 1.0, 0.0,
+ 	0.0, 0.0, 0.0, 1.0
+ };
+-void myLoadIdentity()
++void myLoadIdentity(void)
+ {
+ 	memcpy(MAT, Identity, sizeof(t_mtrx));
+ }
+@@ -97,7 +97,7 @@
+ #define M(x, y)  Mm[I(x, y)]
+ #define P(x, y)  Pm[I(x, y)]
+ /* this inverts the matrix M into P in the gauss way */
+-int myInvert()
++int myInvert(void)
+ {
+ 	t_mtrx Mm, Pm;
+ 	int l, lh; /* line*/
+
+Modified: trunk/server/mcp.c
+===================================================================
+--- trunk/server/mcp.c	2007-10-18 23:55:05 UTC (rev 747)
++++ trunk/server/mcp.c	2007-10-18 23:55:18 UTC (rev 748)
+@@ -44,7 +44,7 @@
+ };
+ #define MCP_NEW_OBJECT 1
+ /*  call when a new mcp connects */
+-int mcp_init()
++int mcp_init(void)
+ {
+ 	struct t_process *p;
+ 	uint32_t i;
+
+Modified: trunk/server/navigation.c
+===================================================================
+--- trunk/server/navigation.c	2007-10-18 23:55:05 UTC (rev 747)
++++ trunk/server/navigation.c	2007-10-18 23:55:18 UTC (rev 748)
+@@ -27,19 +27,19 @@
+ int alphax, alphay;
+ float view_x, view_y, view_z;
+ extern int winw, winh;
+-void navi_right()
++void navi_right(void)
+ {
+ 	navi_pos(1, 0);
+ }
+-void navi_left()
++void navi_left(void)
+ {
+ 	navi_pos(-1, 0);
+ }
+-void navi_fwd()
++void navi_fwd(void)
+ {
+ 	navi_pos(0, 1);
+ }
+-void navi_back()
++void navi_back(void)
+ {
+ 	navi_pos(0, -1);
+ }
+
+Modified: trunk/server/network.c
+===================================================================
+--- trunk/server/network.c	2007-10-18 23:55:05 UTC (rev 747)
++++ trunk/server/network.c	2007-10-18 23:55:18 UTC (rev 748)
+@@ -59,7 +59,7 @@
+ }
+ #endif
+ /*  maybe change the errors to fatal errors ... */
+-int network_init()
++int network_init(void)
+ {
+ #ifdef SIGS
+ 	/* struct sigaction act;*/
+@@ -90,7 +90,7 @@
+ }
+ 
+ /*  this basicly polls for new connection */
+-int network_main()
++int network_main(void)
+ {
+ #ifdef TCP
+ #ifdef SIGS
+@@ -162,7 +162,7 @@
+ 	return(-1);
+ }
+ 
+-int network_quit()
++int network_quit(void)
+ {
+ #ifdef TCP
+ 	tcp_quit();
+
+Modified: trunk/server/process.c
+===================================================================
+--- trunk/server/process.c	2007-10-18 23:55:05 UTC (rev 747)
++++ trunk/server/process.c	2007-10-18 23:55:18 UTC (rev 748)
+@@ -126,7 +126,7 @@
+ }
+ 
+ /* this is to be called when a new connection appears. a pointer to the added process will be returned */
+-struct t_process *process_add() {
++struct t_process *process_add(void) {
+ 	struct t_process *new_p;
+ 	procs_n++;
+ 	procs_p = realloc(procs_p, sizeof(struct t_process)*procs_n); /* increase the block */
+@@ -218,7 +218,7 @@
+ 	}
+ 	return(0);  /*  successfully deleted */
+ }
+-int process_init()
++int process_init(void)
+ {
+ 	procs_n = 0;
+ 	procs_p = NULL;
+@@ -229,7 +229,7 @@
+ 	process_sys_init(mcp_p);
+ 	return(0);
+ }
+-int process_quit()
++int process_quit(void)
+ {
+ 	int i;
+ 	s3dprintf(HIGH, &quot;telling %d processes to go away&quot;, procs_n);
+
+Modified: trunk/server/shm.c
+===================================================================
+--- trunk/server/shm.c	2007-10-18 23:55:05 UTC (rev 747)
++++ trunk/server/shm.c	2007-10-18 23:55:18 UTC (rev 748)
+@@ -59,7 +59,7 @@
+ {
+ 	return(oldkey + 1);
+ }
+-int shm_init()
++int shm_init(void)
+ {
+ 	FILE *fp;
+ 	key_t key;
+@@ -140,7 +140,7 @@
+ 	return(0);
+ }
+ 
+-int shm_quit()
++int shm_quit(void)
+ {
+ 	/* detach from the segment: */
+ 	s3dprintf(LOW, &quot;shm_quit()...&quot;);
+@@ -172,7 +172,7 @@
+ }
+ 
+ extern int turn; /* set turn to 0 when timeslice is over */
+-int shm_main()
++int shm_main(void)
+ {
+ 	int      i/*,found*/;
+ 	struct buf_t   *dai; /* data in, data out */
+
+Modified: trunk/server/tcp.c
+===================================================================
+--- trunk/server/tcp.c	2007-10-18 23:55:05 UTC (rev 747)
++++ trunk/server/tcp.c	2007-10-18 23:55:18 UTC (rev 748)
+@@ -49,7 +49,7 @@
+ extern uint8_t ibuf[MAXPLEN];
+ extern int idc;
+ int tcp_sockid;
+-int tcp_init()
++int tcp_init(void)
+ {
+ 	int yes = 1;
+ 	struct sockaddr_in my_addr;
+@@ -84,7 +84,7 @@
+ 	return(0);
+ 
+ }
+-int tcp_quit()
++int tcp_quit(void)
+ {
+ 	close(tcp_sockid);
+ #ifdef WIN32
+@@ -93,7 +93,7 @@
+ 	return(0);
+ }
+ /*  watches the port for new connections */
+-int tcp_pollport()
++int tcp_pollport(void)
+ {
+ 	fd_set     fs_port;   /*  filedescriptor set for listening port(s) */
+ 	int      newsd;   /*  new socket descriptor */
+@@ -137,7 +137,7 @@
+ extern int procs_n;
+ /*  this is about looking for new data on the sockets */
+ /*  returns 1 when there was new data. */
+-int tcp_pollproc()
++int tcp_pollproc(void)
+ {
+ 	fd_set     fs_proc;   /*  filedescriptor set for listening port(s) */
+ 	struct timeval   tv;   /*  time structure */
+
+Modified: trunk/server/user.c
+===================================================================
+--- trunk/server/user.c	2007-10-18 23:55:05 UTC (rev 747)
++++ trunk/server/user.c	2007-10-18 23:55:18 UTC (rev 748)
+@@ -27,7 +27,7 @@
+ static int ox, oy;
+ static int pressed;
+ int but = -1;
+-int user_init()
++int user_init(void)
+ {
+ 	switch (frame_mode) {
+ #ifdef G_GLUT
+@@ -47,7 +47,7 @@
+ 	ox = oy = 0xFFFFFF;
+ 	return(0);
+ }
+-int user_main()
++int user_main(void)
+ {
+ 	switch (frame_mode) {
+ #ifdef G_GLUT
+@@ -128,7 +128,7 @@
+ 	/* mouse changed? */
+ 	ptr_move(x, y);
+ }
+-int user_quit()
++int user_quit(void)
+ {
+ 	return(0);
+ }
+
+Modified: trunk/server/user_glut.c
+===================================================================
+--- trunk/server/user_glut.c	2007-10-18 23:55:05 UTC (rev 747)
++++ trunk/server/user_glut.c	2007-10-18 23:55:18 UTC (rev 748)
+@@ -32,7 +32,7 @@
+ void passive_mouse_motion(int x, int y);
+ extern int but;
+ /*  init user input things for glut */
+-int user_init_glut()
++int user_init_glut(void)
+ {
+ 	s3dprintf(MED, &quot;using GLUT for user input&quot;);
+ 	glutKeyboardFunc(keyboard);
+
+Modified: trunk/server/user_sdl.c
+===================================================================
+--- trunk/server/user_sdl.c	2007-10-18 23:55:05 UTC (rev 747)
++++ trunk/server/user_sdl.c	2007-10-18 23:55:18 UTC (rev 748)
+@@ -28,12 +28,12 @@
+ /*  this is done right now by SDL-polling */
+ 
+ extern int SDLFlags;
+-int user_init_sdl()
++int user_init_sdl(void)
+ {
+ 	SDL_EnableUNICODE(1);
+ 	return(0);
+ }
+-int user_main_sdl()
++int user_main_sdl(void)
+ {
+ 	SDL_Event  event;
+ 	SDL_Surface *GLwin = NULL;
+@@ -159,7 +159,7 @@
+ 	return(0);
+ 
+ }
+-int user_quit_sdl()
++int user_quit_sdl(void)
+ {
+ 	return(0);
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000739.html">[S3d-svn] r747 - trunk/example
+</A></li>
+	<LI>Next message: <A HREF="000741.html">[S3d-svn] r749 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#740">[ date ]</a>
+              <a href="thread.html#740">[ thread ]</a>
+              <a href="subject.html#740">[ subject ]</a>
+              <a href="author.html#740">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r382 - trunk/libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r382%20-%20trunk/libs3d&In-Reply-To=%3C200609151625.k8FGPu7o018688%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000374.html">
+   <LINK REL="Next"  HREF="000376.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r382 - trunk/libs3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r382%20-%20trunk/libs3d&In-Reply-To=%3C200609151625.k8FGPu7o018688%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r382 - trunk/libs3d">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 15 18:25:56 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000374.html">[S3d-svn] r381 - in trunk: example libs3d libs3d/libg3d/include/g3d	libs3d/libg3d/plugins/image libs3d/libg3d/plugins/import	libs3d/libg3d/src
+</A></li>
+        <LI>Next message: <A HREF="000376.html">[S3d-svn] r383 - in trunk/libs3d/libg3d: . plugins/import
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#375">[ date ]</a>
+              <a href="thread.html#375">[ thread ]</a>
+              <a href="subject.html#375">[ subject ]</a>
+              <a href="author.html#375">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-15 18:25:56 +0200 (Fri, 15 Sep 2006)
+New Revision: 382
+
+Modified:
+   trunk/libs3d/3dsread.c
+Log:
+-evil printf
+
+Modified: trunk/libs3d/3dsread.c
+===================================================================
+--- trunk/libs3d/3dsread.c	2006-09-15 16:23:16 UTC (rev 381)
++++ trunk/libs3d/3dsread.c	2006-09-15 16:25:56 UTC (rev 382)
+@@ -390,12 +390,11 @@
+ 			break;
+ 		  case 0x4150:
+ 			s3dprintf(VLOW,&quot;-- smoothing group information (length %d [%d])&quot;, clen,clen/4);
+-			printf( &quot;-- smoothing group information (length %d [%d])&quot;, clen, clen/4 );
+ 			smooth_list=(unsigned long *)ptr;
+ 			for (j=0;j&lt;(clen/4);j++)
+ 			{
+ 				smooth_list[j]=gintl(ptr+j*4);
+-				printf( &quot;smooth_list[%i] = %i&quot;, j, smooth_list[j] );
++				s3dprintf(VLOW, &quot;smooth_list[%i] = %i&quot;, j, smooth_list[j] );
+ 			}
+ 
+ 			ptr=(char *)ptr+(clen-6);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000374.html">[S3d-svn] r381 - in trunk: example libs3d libs3d/libg3d/include/g3d	libs3d/libg3d/plugins/image libs3d/libg3d/plugins/import	libs3d/libg3d/src
+</A></li>
+	<LI>Next message: <A HREF="000376.html">[S3d-svn] r383 - in trunk/libs3d/libg3d: . plugins/import
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#375">[ date ]</a>
+              <a href="thread.html#375">[ thread ]</a>
+              <a href="subject.html#375">[ subject ]</a>
+              <a href="author.html#375">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

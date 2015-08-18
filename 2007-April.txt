@@ -1,0 +1,2271 @@
+From dotslash at mail.berlios.de  Sun Apr  1 06:07:23 2007
+From: dotslash at mail.berlios.de (dotslash at BerliOS)
+Date: Sun, 1 Apr 2007 06:07:23 +0200
+Subject: [S3d-svn] r585 - in trunk: . Documentation
+Message-ID: <200704010407.l3147Nxr006700@sheep.berlios.de>
+
+Author: dotslash
+Date: 2007-04-01 06:07:22 +0200 (Sun, 01 Apr 2007)
+New Revision: 585
+
+Added:
+   trunk/Documentation/s3d.docbook
+Modified:
+   trunk/
+Log:
+ r1496 at kero:  dotslash | 2007-04-01 06:07:17 +0200
+ - forgot to add s3d.docbook
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1410
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1496
+
+Added: trunk/Documentation/s3d.docbook
+===================================================================
+--- trunk/Documentation/s3d.docbook	2007-03-10 17:45:52 UTC (rev 584)
++++ trunk/Documentation/s3d.docbook	2007-04-01 04:07:22 UTC (rev 585)
+@@ -0,0 +1,16 @@
++<?xml version="1.0" encoding="UTF-8" ?>
++<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" [
++  <!ENTITY bookinfo SYSTEM "bookinfo.docbook">
++  <!ENTITY server SYSTEM "server/server.docbook">
++  <!ENTITY libs3d SYSTEM "libs3d/libs3d.docbook">
++  <!ENTITY libs3dw SYSTEM "libs3dw/libs3dw.docbook">
++  <!ENTITY misc SYSTEM "misc.docbook">
++]>
++<book id="s3d" lang="en">
++&bookinfo;
++&server;
++&libs3d;
++&libs3dw;
++&misc;
++
++</book>
+
+
+
+From nichtsnutz at mail.berlios.de  Wed Apr 18 11:34:09 2007
+From: nichtsnutz at mail.berlios.de (nichtsnutz at BerliOS)
+Date: Wed, 18 Apr 2007 11:34:09 +0200
+Subject: [S3d-svn] r586 - trunk/apps/meshs3d
+Message-ID: <200704180934.l3I9Y9bv019841@sheep.berlios.de>
+
+Author: nichtsnutz
+Date: 2007-04-18 11:34:08 +0200 (Wed, 18 Apr 2007)
+New Revision: 586
+
+Modified:
+   trunk/apps/meshs3d/Makefile.am
+   trunk/apps/meshs3d/main.c
+   trunk/apps/meshs3d/meshs3d.h
+   trunk/apps/meshs3d/process.c
+Log:
+some new stuff
+
+Modified: trunk/apps/meshs3d/Makefile.am
+===================================================================
+--- trunk/apps/meshs3d/Makefile.am	2007-04-01 04:07:22 UTC (rev 585)
++++ trunk/apps/meshs3d/Makefile.am	2007-04-18 09:34:08 UTC (rev 586)
+@@ -3,12 +3,13 @@
+ meshs3dincludedir = $(pkgincludedir)/meshs3d
+ 
+ meshs3dinclude_HEADERS =  \
+-	meshs3d.h
++	meshs3d.h hash.h
+ 	
+ meshs3d_SOURCES =  \
+ 	main.c \
+ 	net.c \
+-	process.c
++	process.c \
++	hash.c
+ 
+ meshs3d_CPPFLAGS=	-pg -I$(top_srcdir)/libs3d -I$(top_srcdir)/libs3dw
+ meshs3d_LDADD=		$(top_builddir)/libs3d/libs3d.la $(top_builddir)/libs3dw/libs3dw.la
+
+Modified: trunk/apps/meshs3d/main.c
+===================================================================
+--- trunk/apps/meshs3d/main.c	2007-04-01 04:07:22 UTC (rev 585)
++++ trunk/apps/meshs3d/main.c	2007-04-18 09:34:08 UTC (rev 586)
+@@ -35,13 +35,17 @@
+ #include <stdlib.h>
+ #include <stdint.h>
+ #include "meshs3d.h"
++#include "allocate.h"
++#include "hash.h"
+ 
+ /* global vars */
+ struct glob Global;
++static struct timespec sleep_time = { 0, 100 * 1000 * 1000 };   /* 100 mili seconds */
+ 
++
+ void init_globals( void )
+ {
+-	Global.debug = 0;
++	Global.debug = 1;
+ 	Global.obj_node_hna = 0;
+ 	Global.obj_node_inet = 0;
+ 	Global.obj_node_normal = 0;
+@@ -63,82 +67,314 @@
+ 	s3d_usage();
+ }
+ 
++float dist(float p1[], float p2[])
++{
++	float p[3];
++	p[0]=p1[0]-p2[0];
++	p[1]=p1[1]-p2[1];
++	p[2]=p1[2]-p2[2];
++	return (sqrt(p[0]*p[0]   +  p[1]*p[1]  +  p[2]*p[2]));
++}
++
++float dirt(float p1[], float p2[], float p3[])
++{
++	float d;
++	d=dist(p1,p2);
++	if (d==0) {
++		p3[0]=(( float ) 0.2 * rand() ) / RAND_MAX - 0.1;
++		p3[1]=(( float ) 0.2 * rand() ) / RAND_MAX - 0.1;
++		p3[2]=(( float ) 0.2 * rand() ) / RAND_MAX - 0.1;
++		d=s3d_vector_length(p3);
++	} else {
++		p3[0]=p2[0]-p1[0];
++		p3[1]=p2[1]-p1[1];
++		p3[2]=p2[2]-p1[2];
++	}
++	return(d);
++}
++
++void handle_node()
++{
++	struct node *node;
++	struct hash_it_t *hashit;
++
++	if( node_hash->elements == 0 )
++		return;
++	hashit = NULL;
++	while ( NULL != ( hashit = hash_iterate( node_hash, hashit ) ) )
++	{
++		node = (struct node *) hashit->bucket->data;
++		if( node->node_type_modified ) {
++			
++			node->node_type_modified = 0;
++			if ( node->obj_id != -1 )
++			{
++				s3d_del_object( node->obj_id );
++			}
++
++			if ( node->desc_id != -1 ) s3d_del_object( node->desc_id );
++
++			if ( node->node_type == 1 ) {
++				node->obj_id = s3d_clone( Global.obj_node_inet );
++			} else if ( node->node_type == 2 ) {
++				node->obj_id = s3d_clone( Global.obj_node_hna );
++			} else {
++				node->obj_id = s3d_clone( Global.obj_node_normal );
++			}
++
++			s3d_flags_on( node->obj_id, S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++
++		}
++	}
++	return;
++}
++
++void mov_add(float mov[], float p[], float fac)
++{
++/*	if (fac>1000)
++		return;
++	fac=1000; */
++	mov[0]+=fac*p[0];
++	mov[1]+=fac*p[1];
++	mov[2]+=fac*p[2];
++}
++
++void calc_node_mov( void ) {
++
++	float distance;
++	float tmp_mov_vec[3];
++	float f;
++	struct node_con *con;
++	struct node *first_node, *sec_node;
++	struct hash_it_t *hashit;
++
++	if( con_hash->elements == 0 )
++		return;
++	hashit = NULL;
++	while ( NULL != ( hashit = hash_iterate( con_hash, hashit ) ) )
++	{
++		con = (struct node_con *) hashit->bucket->data;
++		first_node = hash_find( node_hash, &con->ip1 );
++		sec_node = hash_find( node_hash, &con->ip2 );
++		distance = dirt( first_node->pos_vec, sec_node->pos_vec, tmp_mov_vec );
++		f = ( ( con->etx1_sqrt + con->etx2_sqrt ) / 4.0 ) / distance;
++// 
++// 		/***
++// 		 * drift factor - 0.0 < factor < 1.0 ( best results: 0.3 < factor < 0.9
++// 		 * small factor: fast and strong drift to neighbours
++// 		 ***/
++// 		if ( f < Factor ) f = Factor;
++
++		mov_add( first_node->mov_vec, tmp_mov_vec, 1 / f - 1 );
++		mov_add( sec_node->mov_vec, tmp_mov_vec, - ( 1 / f - 1 ) );
++	}
++
++}
++
++void move_nodes( void ) {
++
++	float null_vec[3] = {0,0,0}, vertex_buf[6];
++	float tmp_mov_vec[3];
++	float distance, etx, rgb;
++	struct node_con *con;
++	struct node *first_node, *sec_node;
++	struct hash_it_t *hashit;
++
++	if( con_hash->elements == 0 )
++		return;
++	hashit = NULL;
++	while ( NULL != ( hashit = hash_iterate( con_hash, hashit ) ) )
++	{
++		con = (struct node_con *) hashit->bucket->data;
++		first_node = hash_find( node_hash, &con->ip1 );
++		sec_node = hash_find( node_hash, &con->ip2 );
++		/* move left olsr node if it has not been moved yet */
++		if ( !( ( first_node->mov_vec[0] == 0 ) && ( first_node->mov_vec[1] == 0 ) && ( first_node->mov_vec[2] == 0 ) ) && first_node->visible ) {
++			distance = dirt( first_node->pos_vec, null_vec, tmp_mov_vec );
++			mov_add( first_node->mov_vec, tmp_mov_vec, distance / 100 ); /* move a little bit to point zero */
++			mov_add( first_node->mov_vec, tmp_mov_vec, 1 ); /* move a little bit to point zero */
++
++			if ( ( distance = dist( first_node->mov_vec, null_vec ) ) > 10.0 ) {
++				mov_add( first_node->pos_vec, first_node->mov_vec, 1.0 / ( ( float ) distance ) );
++			} else {
++				mov_add( first_node->pos_vec, first_node->mov_vec, 0.1 );
++			}
++
++			s3d_translate( first_node->obj_id, first_node->pos_vec[0], first_node->pos_vec[1], first_node->pos_vec[2] );
++
++			/* reset movement vector */
++			first_node->mov_vec[0] = first_node->mov_vec[1] = first_node->mov_vec[2] = 0.0;
++
++		}
++
++		/* move right olsr node if it has not been moved yet */
++		if ( !( ( sec_node->mov_vec[0] == 0 ) && ( sec_node->mov_vec[1] == 0 ) && ( sec_node->mov_vec[2] == 0 ) ) && sec_node->visible ) {
++
++			distance = dirt( sec_node->pos_vec, null_vec, tmp_mov_vec );
++			mov_add( sec_node->mov_vec, tmp_mov_vec, distance / 100 ); /* move a little bit to point zero */
++			mov_add( sec_node->mov_vec, tmp_mov_vec, 1 ); /* move a little bit to point zero */
++
++			if ( ( distance = dist( sec_node->mov_vec, null_vec ) ) > 10.0 ) {
++				mov_add( sec_node->pos_vec, sec_node->mov_vec, 1.0 / ( ( float ) distance ) );
++			} else {
++				mov_add( sec_node->pos_vec, sec_node->mov_vec, 0.1 );
++			}
++
++			s3d_translate( sec_node->obj_id, sec_node->pos_vec[0], sec_node->pos_vec[1], sec_node->pos_vec[2] );
++
++			/* reset movement vector */
++			sec_node->mov_vec[0] = sec_node->mov_vec[1] = sec_node->mov_vec[2] = 0.0;
++
++		}
++
++
++		/* move connection between left and right olsr node */
++		vertex_buf[0] = first_node->pos_vec[0];
++		vertex_buf[1] = first_node->pos_vec[1];
++		vertex_buf[2] = first_node->pos_vec[2];
++		vertex_buf[3] = sec_node->pos_vec[0];
++		vertex_buf[4] = sec_node->pos_vec[1];
++		vertex_buf[5] = sec_node->pos_vec[2];
++
++		s3d_pep_vertices( con->obj_id, vertex_buf, 2 );
++
++
++// 		if ( ColorSwitch ) {
++// 
++// 			/* HNA */
++// 			if ( olsr_con->left_etx == -1000.00 ) {
++// 
++// 				if(olsr_con->color != 1) {
++// 					s3d_pep_material( olsr_con->obj_id,
++// 								   0.0,0.0,1.0,
++// 								   0.0,0.0,1.0,
++// 								   0.0,0.0,1.0);
++// 					olsr_con->color = 1;
++// 				}
++// 
++// 			} else {
++// 
++// 				etx = ( olsr_con->left_etx + olsr_con->right_etx ) / 2.0;
++// 
++// 				/* very good link - bright blue */
++// 				if ( ( etx >= 1.0 ) && ( etx < 1.5 ) ) {
++// 
++// 					if(olsr_con->color != 2) {
++// 						s3d_pep_material( olsr_con->obj_id,
++// 								0.5,1.0,1.0,
++// 								0.5,1.0,1.0,
++// 								0.5,1.0,1.0);
++// 						olsr_con->color = 2;
++// 					}
++// 
++// 				/* good link - bright yellow */
++// 				} else if ( ( etx >= 1.5 ) && ( etx < 2.0 ) ) {
++// 
++// 					rgb = 2.0 - etx;
++// 					if( olsr_con->color != 3 || (olsr_con->color == 3 && (int) rintf(olsr_con->rgb * 10) !=  (int) rintf(rgb * 10))) {
++// 						s3d_pep_material( olsr_con->obj_id,
++// 								1.0,1.0,rgb,
++// 								1.0,1.0,rgb,
++// 								1.0,1.0,rgb);
++// 						olsr_con->color = 3;
++// 
++// 						olsr_con->rgb =  rgb;
++// 					}
++// 
++// 				/* not so good link - orange */
++// 				} else if ( ( etx >= 2.0 ) && ( etx < 3.0 ) ) {
++// 
++// 					rgb = 1.5 - ( etx / 2.0 );
++// 					if( olsr_con->color != 4 || (olsr_con->color == 4 && (int) rintf(olsr_con->rgb * 10) !=  (int) rintf(rgb * 10))) {
++// 						s3d_pep_material( olsr_con->obj_id,
++// 								1.0,rgb,0.0,
++// 								1.0,rgb,0.0,
++// 								1.0,rgb,0.0);
++// 						olsr_con->color = 4;
++// 
++// 						olsr_con->rgb = rgb;
++// 					}
++// 
++// 				/* bad link (almost dead) - brown */
++// 				} else if ( ( etx >= 3.0 ) && ( etx < 5.0 ) ) {
++// 
++// 					rgb = 1.75 - ( etx / 4.0 );
++// 
++// 					if( olsr_con->color != 5 || (olsr_con->color == 5 && (int) rintf(olsr_con->rgb * 10) !=  (int) rintf(rgb * 10)) ) {
++// 
++// 						s3d_pep_material( olsr_con->obj_id,
++// 								rgb,rgb - 0.5,0.0,
++// 								rgb,rgb - 0.5,0.0,
++// 								rgb,rgb - 0.5,0.0);
++// 						olsr_con->color = 5;
++// 
++// 						olsr_con->rgb = rgb;
++// 					}
++// 
++// 				/* zombie link - grey */
++// 				} else if ( ( etx >= 5.0 ) && ( etx < 1000.0 ) ) {
++// 
++// 					rgb = 1000.0 / ( 1500.0 + etx );
++// 
++// 					if( olsr_con->color != 6 || (olsr_con->color == 6 && (int) rintf(olsr_con->rgb * 10) !=  (int) rintf(rgb * 10)) ) {
++// 
++// 						s3d_pep_material( olsr_con->obj_id,
++// 								rgb,rgb,rgb,
++// 								rgb,rgb,rgb,
++// 								rgb,rgb,rgb);
++// 						olsr_con->color = 6;
++// 
++// 						olsr_con->rgb = rgb;
++// 					}
++// 
++// 				/* wtf - dark grey */
++// 				} else {
++// 
++// 					if(olsr_con->color != 7) {
++// 						s3d_pep_material( olsr_con->obj_id,
++// 								0.3,0.3,0.3,
++// 								0.3,0.3,0.3,
++// 								0.3,0.3,0.3);
++// 						olsr_con->color = 7;
++// 					}
++// 
++// 				}
++// 
++// 			}
++// 
++// 		} else {
++
++			if( con->color == 0) {
++				s3d_pep_material( con->obj_id,
++							1.0,1.0,1.0,
++							1.0,1.0,1.0,
++							1.0,1.0,1.0);
++				con->color = 0;
++			}
++
++// 		}
++
++	}
++
++}
++
+ void mainloop()
+ {
+ 
+ 	int net_result;   /* result of function net_main */
+-//	char nc_str[20];
+-//	float strLen;
+-//
+-//	/* calculate new movement vector */
+-//	calc_olsr_node_mov();
+-//
+-//	/* prepare nodes */
+-//	handle_olsr_node( Olsr_root );
+-//
+-//	/* move it */
+-//	move_olsr_nodes();
+-//
+-//	/* if we have more or less nodes now - redraw node count */
+-//	if ( Olsr_node_count != Last_olsr_node_count ) {
+-//
+-//		if ( Olsr_node_count_obj != -1 ) s3d_del_object( Olsr_node_count_obj );
+-//		snprintf( nc_str, 20, "node count: %d", Olsr_node_count );
+-//		Olsr_node_count_obj = s3d_draw_string( nc_str, &strLen );
+-//		s3d_link( Olsr_node_count_obj, 0 );
+-//		s3d_flags_on( Olsr_node_count_obj, S3D_OF_VISIBLE );
+-//		s3d_scale( Olsr_node_count_obj, 0.2 );
+-//		s3d_translate( Olsr_node_count_obj, -Left*3.0-(strLen * 0.2), -Bottom*3.0-0.5, -3.0 );
+-//		Last_olsr_node_count = Olsr_node_count;
+-//
+-//	}
+-//
+-//	if ( Output_block_completed ) {
+-//
+-//		Output_block_counter++;
+-//		Output_block_completed = 0;
+-//
+-//	}
+ 
+-//	/* read data from socket */
+-//	Net_read_count = 0;
++	calc_node_mov();
++	handle_node();
++	move_nodes();
++
+ 	while ( ( net_result = net_main() ) != 0 ) {
+ 		if ( net_result == -1 ) {
+ 			s3d_quit();
+ 			break;
+ 		}
+ 	}
+-//
+-//	/* rotate modus */
+-//	if(RotateSwitch) {
+-//		Zp_rotate = ( Zp_rotate + RotateSpeed ) > 360 ? 0.0 : ( Zp_rotate + RotateSpeed );
+-//		s3d_rotate(ZeroPoint,0,Zp_rotate,0);
+-//	}
+-//
+-//	/* calc for node description */
+-//	CamPosition2[0][0]=  CamPosition[0][0]*cos(Zp_rotate*M_PI/180.0) - CamPosition[0][2] * sin (Zp_rotate*M_PI/180.0);
+-//	CamPosition2[0][1]=  CamPosition[0][1];
+-//	CamPosition2[0][2]=  CamPosition[0][0]*sin(Zp_rotate*M_PI/180.0) + CamPosition[0][2] * cos (Zp_rotate*M_PI/180.0);
+-//
+-//	/* check search status */
+-///*	if( get_search_status() == WIDGET )
+-//		move_to_search_widget( CamPosition[0], CamPosition[1] );*/
+-//	if( get_search_status() == FOLLOW )
+-//		follow_node( CamPosition[0], CamPosition[1], Zp_rotate );
+-///*	if( get_search_status() == ABORT )
+-//		move_to_return_point( CamPosition[0], CamPosition[1] );*/
+-//
+-//
+-//	if( Olsr_ip_label_obj != -1 )
+-//	{
+-//		print_etx();
+-//	}
+-//	s3dw_ani_mate();
+-//
+-//	nanosleep( &sleep_time, NULL );
+-//
++	nanosleep( &sleep_time, NULL );
+ 	return;
+-
+ }
+ 
+ 
+@@ -187,6 +423,7 @@
+ 	/* set extern int optind = 0 for parse_args in io.c */
+ 	optind = 0;
+ 
++	process_init();
+ 
+ 	if (!net_init(olsr_host))
+ 	{
+@@ -224,4 +461,4 @@
+ 		}
+ 	}
+ 	return(0);
+-}
+\ No newline at end of file
++}
+
+Modified: trunk/apps/meshs3d/meshs3d.h
+===================================================================
+--- trunk/apps/meshs3d/meshs3d.h	2007-04-01 04:07:22 UTC (rev 585)
++++ trunk/apps/meshs3d/meshs3d.h	2007-04-18 09:34:08 UTC (rev 586)
+@@ -23,23 +23,21 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
+-#define max(x,y) {((x)>(y)?(x):(y))}
+-#define min(x,y) {((x)<(y)?(x):(y))}
++#define max(x,y) ((x)>(y)?(x):(y))
++#define min(x,y) ((x)<(y)?(x):(y))
+ #define NAMEMAX		128
+ #define MAXLINESIZE 1000		/* lines in a digraph just shouldn't get that longer ... */
+ #define MAXDATASIZE 100			/* max number of bytes we can get at once  */
+ 
+ /* linked list for the all connections */
+-struct olsr_con 
++struct node_con
+ {
+-	struct olsr_con *next_olsr_con;			/* pointer to next connection */
+-	struct olsr_con *prev_olsr_con;			/* pointer to previous connection */
+-	struct olsr_node *left_olsr_node;		/* pointer to left end point of the connection */
+-	struct olsr_node *right_olsr_node;		/* pointer to right end point of the connection */
+-	float left_etx;							/* etx of left olsr node */
+-	float right_etx;						/* etx of right olsr node */
+-	float left_etx_sqrt;					/* sqrt of etx of left olsr node */
+-	float right_etx_sqrt;					/* sqrt etx of right olsr node */
++	int ip1;
++	int ip2;
++	float etx1;							/* etx of left olsr node */
++	float etx2;						/* etx of right olsr node */
++	float etx1_sqrt;					/* sqrt of etx of left olsr node */
++	float etx2_sqrt;					/* sqrt etx of right olsr node */
+ 	int obj_id;								/* id of connection object in s3d */
+ 	int color;
+ 	float rgb;
+@@ -55,11 +53,10 @@
+ 
+ 
+ /* we contruct a binary tree to handle the nodes */
+-struct olsr_node 
++struct node 
+ {
+-	struct olsr_node *left;
+-	struct olsr_node *right;
+-	char ip[NAMEMAX];				/* host ip */
++	int ip;
++	char ip_string[NAMEMAX];		/* host ip */
+ 	int node_type;					/* normal = 0, internet gateway = 1, via hna announced network = 2 */
+ 	int node_type_modified;			/* node_type modified flag */
+ 	int last_seen;					/* last seen counter */
+@@ -69,7 +66,6 @@
+ 	int obj_id;						/* id of node object in s3d */
+ 	int desc_id;					/* id of node description object in s3d */
+ 	float desc_length;				/* length of node description object in s3d */
+-	struct olsr_neigh_list *olsr_neigh_list;	/* pointer to first neighbour */
+ };
+ 
+ 
+@@ -93,6 +89,8 @@
+ 
+ extern char lbuf[MAXLINESIZE];
+ extern struct glob Global;
++extern struct hashtable_t *node_hash;
++extern struct hashtable_t *con_hash;
+ 
+ /* process.c */
+ //void lst_initialize();
+@@ -102,6 +100,7 @@
+ //void lst_out();
+ //struct olsr_node *move_lst_ptr(int *id);
+ //int process_main();
++void process_init();
+ 
+ /* net.c */
+ int net_init(char *host);
+
+Modified: trunk/apps/meshs3d/process.c
+===================================================================
+--- trunk/apps/meshs3d/process.c	2007-04-01 04:07:22 UTC (rev 585)
++++ trunk/apps/meshs3d/process.c	2007-04-18 09:34:08 UTC (rev 586)
+@@ -33,362 +33,178 @@
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
++#include <stdarg.h>
++#include <stdint.h>
++#include "allocate.c"
++#include "hash.h"
+ #include "meshs3d.h"
+ 
+-
++/* extern used in net.c */
+ char lbuf[MAXLINESIZE];
+ 
++struct hashtable_t *node_hash;
++struct hashtable_t *con_hash;
+ 
+ 
+-/***
+- *
+- * create new or alter connection between 2 nodes
+- *
+- *   con_from =>   current node
+- *   con_to   =>   node to connect to
+- *   etx      =>   ETX
+- *
+- ***/
++int long_comp(void *data1, void *data2)
++{
++	return(memcmp(data1, data2, 8));
++}
+ 
+-//int add_olsr_con( struct olsr_node *con_from, struct olsr_node *con_to, float etx ) {
+-//
+-//	struct olsr_con **olsr_con = &Con_begin;
+-//	struct olsr_con *prev_olsr_con = NULL;   /* previous olsr connection */
+-//	struct olsr_neigh_list **olsr_neigh_list;
+-//
+-//	while ( (*olsr_con) != NULL ) {
+-//
+-//		/* connection already exists */
+-//		if ( ( strncmp( (*olsr_con)->left_olsr_node->ip, con_from->ip, NAMEMAX ) == 0 ) && ( strncmp( (*olsr_con)->right_olsr_node->ip, con_to->ip, NAMEMAX ) == 0 ) ) {
+-//			(*olsr_con)->left_etx = etx;
+-//			(*olsr_con)->left_etx_sqrt = (etx==-1000.00)? 10.0 : sqrt( etx ) ;
+-//			break;
+-//
+-//		} else if ( ( strncmp( (*olsr_con)->right_olsr_node->ip, con_from->ip, NAMEMAX ) == 0 ) && ( strncmp( (*olsr_con)->left_olsr_node->ip, con_to->ip, NAMEMAX ) == 0 ) ) {
+-//
+-//			(*olsr_con)->right_etx = etx;
+-//			(*olsr_con)->right_etx_sqrt = (etx==-1000.00)? 10.0 : sqrt( etx ) ;
+-//			break;
+-//
+-//		}
+-//
+-//		/* save previous olsr connection for later use */
+-//		prev_olsr_con = (*olsr_con);
+-//
+-//		olsr_con = &(*olsr_con)->next_olsr_con;
+-//
+-//	}
+-//
+-//	/* new connection */
+-//	if ( (*olsr_con) == NULL ) {
+-//
+-//		(*olsr_con) = malloc( sizeof( struct olsr_con ) );
+-//		if ( (*olsr_con) == NULL ) out_of_mem();
+-//
+-//		/* create connection object */
+-//		(*olsr_con)->obj_id = s3d_new_object();
+-//
+-//		/* add olsr node to new olsr connection in order to access the nodes from the connection list */
+-//		(*olsr_con)->left_olsr_node = con_from;
+-//		(*olsr_con)->right_olsr_node = con_to;
+-//
+-//		/* add connection color */
+-//		(*olsr_con)->color = 0;
+-//		s3d_push_material( (*olsr_con)->obj_id,
+-//				  1.0,1.0,1.0,
+-//				  1.0,1.0,1.0,
+-//				  1.0,1.0,1.0);
+-//
+-//		/* add connection endpoints */
+-//		s3d_push_vertex( (*olsr_con)->obj_id, (*olsr_con)->left_olsr_node->pos_vec[0], (*olsr_con)->left_olsr_node->pos_vec[1], (*olsr_con)->left_olsr_node->pos_vec[2] );
+-//		s3d_push_vertex( (*olsr_con)->obj_id, (*olsr_con)->right_olsr_node->pos_vec[0], (*olsr_con)->right_olsr_node->pos_vec[1], (*olsr_con)->right_olsr_node->pos_vec[2] );
+-//
+-//		s3d_push_line( (*olsr_con)->obj_id, 0,1,0 );
+-//
+-//		s3d_flags_on( (*olsr_con)->obj_id, S3D_OF_VISIBLE );
+-//
+-//		s3d_link( (*olsr_con)->obj_id,  ZeroPoint );
+-//
+-//		/* HNA */
+-//		if ( etx == -1000.00 ) {
+-//
+-//			(*olsr_con)->left_etx = etx;
+-//			(*olsr_con)->left_etx_sqrt = 10.0;
+-//			(*olsr_con)->right_etx = etx;
+-//			(*olsr_con)->right_etx_sqrt = 10.0;
+-//
+-//		} else {
+-//
+-//			(*olsr_con)->left_etx = etx;
+-//			(*olsr_con)->left_etx_sqrt = sqrt( etx );
+-//			(*olsr_con)->right_etx = 999.0;
+-//			(*olsr_con)->right_etx_sqrt = sqrt( 999.0 );
+-//
+-//		}
+-//
+-//		(*olsr_con)->next_olsr_con = NULL;
+-//		(*olsr_con)->prev_olsr_con = prev_olsr_con;
+-//
+-//		/* add new olsr connection to olsr nodes in order to access the connection from the olsr node */
+-//		olsr_neigh_list = &(*olsr_con)->left_olsr_node->olsr_neigh_list;
+-//		while ( (*olsr_neigh_list) != NULL ) olsr_neigh_list = &(*olsr_neigh_list)->next_olsr_neigh_list;
+-//		(*olsr_neigh_list) = malloc( sizeof( struct olsr_neigh_list ) );
+-//		if ( (*olsr_neigh_list) == NULL ) out_of_mem();
+-//		(*olsr_neigh_list)->olsr_con = (*olsr_con);
+-//		(*olsr_neigh_list)->next_olsr_neigh_list = NULL;
+-//
+-//		olsr_neigh_list = &(*olsr_con)->right_olsr_node->olsr_neigh_list;
+-//		while ( (*olsr_neigh_list) != NULL ) olsr_neigh_list = &(*olsr_neigh_list)->next_olsr_neigh_list;
+-//		(*olsr_neigh_list) = malloc( sizeof( struct olsr_neigh_list ) );
+-//		if ( (*olsr_neigh_list) == NULL ) out_of_mem();
+-//		(*olsr_neigh_list)->olsr_con = (*olsr_con);
+-//		(*olsr_neigh_list)->next_olsr_neigh_list = NULL;
+-//
+-//	}
+-//
+-//	return(0);
+-//
+-//}
+-//
+-//
+-//
+-///***
+-// *
+-// * get pointer to olsr node or create new node if node string could not be found
+-// *
+-// *   **node =>   pointer to current olsr_node
+-// *   *ip    =>   node ip
+-// *
+-// *   return olsr node pointer
+-// *
+-// ***/
+-//
+-//void *get_olsr_node( struct olsr_node **olsr_node, char *ip ) {
+-//
+-//	int result;   /* result of strcmp */
+-//
+-//	while ( (*olsr_node) != NULL ) {
+-//
+-//		result = strncmp( (*olsr_node)->ip, ip, NAMEMAX );
+-//
+-//		/* we found the node */
+-//		if ( result == 0 ) {
+-//
+-//			(*olsr_node)->last_seen = Output_block_counter;
+-//
+-//			/* former invisble (deleted) node */
+-//			if ( (*olsr_node)->visible == 0 ) {
+-//
+-//				(*olsr_node)->node_type = 0;
+-//				(*olsr_node)->node_type_modified = 1;
+-//
+-//				(*olsr_node)->visible = 1;
+-//
+-//				(*olsr_node)->mov_vec[0] = (*olsr_node)->mov_vec[1] = (*olsr_node)->mov_vec[2] = 0.0;
+-//
+-//				if ( Debug ) printf( "new olsr node: %s\n", (*olsr_node)->ip );
+-//
+-//				Olsr_node_count++;
+-//
+-//			}
+-//
+-//			return (*olsr_node);
+-//
+-//		}
+-//
+-//		/* the searched node must be in the subtree */
+-//		if ( result < 0 ) {
+-//			olsr_node = &(*olsr_node)->right;
+-//		} else {
+-//			olsr_node = &(*olsr_node)->left;
+-//		}
+-//
+-//	}
+-//
+-//	/* if node is NULL we reached the end of the tree and must create a new olsr_node */
+-//	if ( (*olsr_node) == NULL ) {
+-//
+-//		(*olsr_node) = malloc( sizeof( struct olsr_node ) );
+-//		if ( (*olsr_node) == NULL ) out_of_mem();
+-//
+-//		(*olsr_node)->left = NULL;
+-//		(*olsr_node)->right = NULL;
+-//
+-//		strncpy( (*olsr_node)->ip, ip, NAMEMAX );
+-//
+-//		(*olsr_node)->node_type = 0;
+-//		(*olsr_node)->node_type_modified = 1;
+-//
+-//		(*olsr_node)->last_seen = Output_block_counter;
+-//		(*olsr_node)->visible = 1;
+-//
+-//		if ( Debug ) printf( "new olsr node: %s\n", (*olsr_node)->ip );
+-//
+-//		Olsr_node_count++;
+-//
+-//		(*olsr_node)->pos_vec[0] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
+-//		(*olsr_node)->pos_vec[1] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
+-//		(*olsr_node)->pos_vec[2] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
+-//		(*olsr_node)->mov_vec[0] = (*olsr_node)->mov_vec[1] = (*olsr_node)->mov_vec[2] = 0.0;
+-//
+-//		(*olsr_node)->obj_id = -1;
+-//		(*olsr_node)->desc_id = -1;
+-//		(*olsr_node)->olsr_neigh_list = NULL;
+-//
+-//		return (*olsr_node);
+-//
+-//	}
+-//	return(0);
+-//}
+-//
+-///*
+-// *
+-// * initialize the struct for a linked list obj2ip
+-// *
+-// */
+-//
+-//void lst_initialize() {
+-//	Obj_to_ip_head = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
+-//	Obj_to_ip_end = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
+-//	if(Obj_to_ip_head == NULL || Obj_to_ip_end == NULL)
+-//		out_of_mem();
+-//	Obj_to_ip_head->id = 0;
+-//	Obj_to_ip_end->id = 0;
+-//	Obj_to_ip_head->prev = Obj_to_ip_end->prev = Obj_to_ip_head;
+-//	Obj_to_ip_head->next = Obj_to_ip_end->next = Obj_to_ip_end;
+-//	List_ptr = Obj_to_ip_head;
+-//}
+-//
+-///*
+-// *
+-// * add a link object_id to olsr_node, to get ip adress and coordinates per object_id
+-// *                 id => object_id, returned from s3d_clone or s3d_new_object
+-// *  **olsr_node => pointer to pointer of current olsr_node
+-// *
+-// */
+-//
+-//void lst_add(int id,struct olsr_node **olsr_node) {
+-//	struct Obj_to_ip *new;
+-//	new = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
+-//	if(new == NULL)
+-//		out_of_mem();
+-//	new->id = id;
+-//	new->olsr_node = *olsr_node;
+-//	move_lst_ptr(&id);
+-//	new->prev = List_ptr;
+-//	new->next = List_ptr->next;
+-//	List_ptr->next->prev = new;
+-//	List_ptr->next = new;
+-//	/* printf("obj2ip: add object %d between %d .. %d ip %s to list\n",new->id,new->prev->id,new->next->id,new->olsr_node->ip); */
+-//}
+-//
+-///*
+-// *void move_lst_ptr(int *id)
+-// * remove element from obj2ip linked list
+-// * id => object_id, returned from s3d_clone or s3d_new_object
+-// *
+-// */
+-//
+-//void lst_del(int id) {
+-//	struct Obj_to_ip *del;
+-//	move_lst_ptr(&id);
+-//	if(id != List_ptr->id)
+-//	{
+-//		printf("obj2ip: remove id %d failed move_lst_ptr return id %d\n",id,List_ptr->next->id);
+-//	} else {
+-//		del = List_ptr;
+-//		List_ptr->next->prev = List_ptr->prev;
+-//		List_ptr->prev->next = List_ptr->next;
+-//		/* printf("obj2ip: remove object %d --> %d <-- %d ip %s from list\n",List_ptr->prev->id,del->id,List_ptr->next->id,del->olsr_node->ip); */
+-//		free(del);
+-//	}
+-//}
+-//
+-///*
+-// *
+-// * move the List_ptr one positon ahead the searched element
+-// *	*id => pointer of object_id , returned from s3d_clone or s3d_new_object
+-// *
+-// */
+-//
+-//struct olsr_node *move_lst_ptr(int *id) {
+-//	/* printf("obj2ip: move for %d\n",*id); */
+-//	/* head to point at end or id lass then first element in linked list*/
+-//	if(Obj_to_ip_head->next == Obj_to_ip_head || *id < Obj_to_ip_head->next->id) {
+-//		List_ptr = Obj_to_ip_head;
+-//		return NULL;
+-// 	/* id is greather then last element in linked list */
+-//	} else if(*id > Obj_to_ip_end->prev->id) {
+-//		List_ptr = Obj_to_ip_end->prev;
+-//		return NULL;
+-//	} else {
+-//		/* printf("obj2ip: ok i search deeper ;-) for id=%d\n",*id); */
+-//		if((*id - (int) Obj_to_ip_head->next->id) <= ((int)(Obj_to_ip_end->prev->id)-*id)) {
+-//			List_ptr = Obj_to_ip_head;
+-//			/* printf("obj2ip: start at head id %d - %d <= %d - %d \n",*id,Obj_to_ip_head->next->id,Obj_to_ip_end->prev->id,*id); */
+-//			while(*id >= List_ptr->next->id) {
+-//				/* printf("obj2ip: %d > %d move to ",*id,List_ptr->id); */
+-//				List_ptr = List_ptr->next;
+-//				/* printf("%d\n",List_ptr->id); */
+-//			}
+-//		} else {
+-//			List_ptr = Obj_to_ip_end;
+-//			/* printf("obj2ip: start at end id %d - %d > %d - %d \n",*id,Obj_to_ip_head->next->id,Obj_to_ip_end->prev->id,*id);  */
+-//			/*  do List_ptr = List_ptr->prev; while(*id > List_ptr->prev->id); */
+-//			while(*id < List_ptr->prev->id) {
+-//				/* printf("obj2ip: %d < %d move to ",*id,List_ptr->id); */
+-//				List_ptr = List_ptr->prev;
+-//				/* printf("%d\n",List_ptr->id); */
+-//			}
+-//			List_ptr = List_ptr->prev;
+-//		}
+-//
+-//		if ( List_ptr->id == *id )
+-//			return List_ptr->olsr_node;
+-//		else
+-//			return NULL;
+-//
+-//		/* printf("obj2ip: found id to insert between %d--> .. <--%d to search/delete %d--> .. <--%d\n",List_ptr->id,List_ptr->next->next->id,List_ptr->prev->id,List_ptr->next->id); */
+-//	}
+-//}
+-//
+-///*
+-// *
+-// * search a object_id in linked list and return pointer on struct olsr_node
+-// *	id => object_id , returned from s3d_clone or s3d_new_object
+-// *
+-// * <example>
+-// *     struct olsr_node *olsr_node;
+-// *     olsr_node = *lst_search(oid);
+-// *     printf("obj2ip: search return %s\n",olsr_node->ip);
+-// * </example>
+-// *
+-// */
+-//
+-//struct olsr_node *lst_search(int id) {
+-//
+-//	return( move_lst_ptr(&id) );
+-//
+-//}
+-//
+-//void lst_out() {
+-//	struct Obj_to_ip *ptr;
+-//	ptr = Obj_to_ip_head;
+-//	while(ptr != ptr->next) {
+-//		printf("id-> %d\n",ptr->id);
+-//		ptr = ptr->next;
+-//	}
+-//}
+-//
++int long_choose(void *data, int32_t size)
++{
++	unsigned char *key= data;
++	uint32_t hash = 0;
++	size_t i;
++
++	for (i = 0; i < 8; i++)
++	{
++		hash += key[i];
++		hash += (hash << 10);
++		hash ^= (hash >> 6);
++	}
++	hash += (hash << 3);
++	hash ^= (hash >> 11);
++	hash += (hash << 15);
++	return (hash%size);
++}
++
++int orig_comp(void *data1, void *data2)
++{
++	return(memcmp(data1, data2, 4));
++}
++
++/* hashfunction to choose an entry in a hash table of given size */
++/* hash algorithm from http://en.wikipedia.org/wiki/Hash_table */
++int orig_choose(void *data, int32_t size)
++{
++	unsigned char *key= data;
++	uint32_t hash = 0;
++	size_t i;
++
++	for (i = 0; i < 4; i++) {
++		hash += key[i];
++		hash += (hash << 10);
++		hash ^= (hash >> 6);
++	}
++	hash += (hash << 3);
++	hash ^= (hash >> 11);
++	hash += (hash << 15);
++	return (hash%size);
++}
++
++void exit_error(char *format, ...)
++{
++	va_list args;
++
++	va_start(args, format);
++	vprintf(format, args);
++	va_end(args);
++	exit( EXIT_FAILURE );
++}
++
++void process_init()
++{
++	/* initialize hashtable */
++	if ( NULL == ( node_hash = hash_new( 1600, orig_comp, orig_choose ) ) )
++		exit_error( "Can't create hashtable node_hash\n");
++	if ( NULL == ( con_hash = hash_new( 1600, long_comp, long_choose ) ) )
++		exit_error( "Can't create hashtable con_hash\n");
++	return;
++}
++
++void handle_con( int ip1, int ip2, float etx )
++{
++
++	int ip[2];
++	struct node_con *con;
++	struct hashtable_t *swaphash;
++
++	ip[0] = max(ip1,ip2);
++	ip[1] = min(ip1,ip2);
++
++	con = ( struct node_con* ) hash_find( con_hash, ip);
++	if( con == NULL )
++	{
++		con = (struct node_con *) debugMalloc( sizeof(struct node_con), 102 );
++		con->ip1 = ip[0];
++		con->ip2 = ip[1];
++		con->color = 0;
++		con->obj_id = 0;
++		con->rgb = 0.00;
++		con->etx1 = 0.00;
++		con->etx2 = 0.00;
++		con->etx1_sqrt = 0.00;
++		con->etx2_sqrt = 0.00;
++		hash_add( con_hash, con );
++	}
++
++	if( con->ip1 == ip1 )
++	{
++		con->etx1 = etx;
++		con->etx1_sqrt = sqrt( etx );
++	} else {
++		con->etx2 = etx;
++		con->etx2_sqrt = sqrt( etx );
++	}
++
++
++	if ( con_hash->elements * 4 > con_hash->size )
++	{
++		swaphash = hash_resize( con_hash, con_hash->size * 2 );
++		if ( swaphash == NULL )
++			exit_error("Couldn't resize hash table \n" );
++		con_hash = swaphash;
++	}
++
++}
++
++void handle_mesh_node( int *ip, char *ip_string )
++{
++	struct node *orig_node;
++	struct hashtable_t *swaphash;
++
++	if ( node_hash->elements * 4 > node_hash->size )
++	{
++		swaphash = hash_resize( node_hash, node_hash->size * 2 );
++		if ( swaphash == NULL )
++			exit_error("Couldn't resize hash table \n" );
++		node_hash = swaphash;
++	}
++	orig_node = (struct node *) hash_find( node_hash, ip );
++
++	if( NULL == orig_node )
++	{
++		orig_node = (struct node *)debugMalloc( sizeof(struct node), 101 );
++		orig_node->ip = *ip;
++		strncpy( orig_node->ip_string, ip_string, NAMEMAX );
++
++		orig_node->node_type = 0;
++		orig_node->node_type_modified = 1;
++
++		orig_node->visible = 1;
++
++		orig_node->pos_vec[0] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
++		orig_node->pos_vec[1] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
++		orig_node->pos_vec[2] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
++		orig_node->mov_vec[0] = orig_node->mov_vec[1] = orig_node->mov_vec[2] = 0.0;
++
++		orig_node->obj_id = -1;
++		orig_node->desc_id = -1;
++		hash_add( node_hash, orig_node );
++	}
++	return;
++}
++
+ int process_main()
+ {
+ 
+ 	int dn;
+ 	float f;
+ 	char *lbuf_ptr, *last_cr_ptr, *con_from, *con_from_end, *con_to, *con_to_end, *etx, *etx_end, *tmpChar;
+-	struct olsr_node *olsr_node1;   /* pointer to olsr nodes */
+-	struct olsr_node *olsr_node2;
+-	int address;
++	struct node *node_from, *node_to;
++
++	int int_con_from=0, int_con_to=0;
+ 	char hna_name[NAMEMAX];
+ 	char hna_node[NAMEMAX];
+ 
+@@ -398,20 +214,14 @@
+ 	con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
+ 	dn = 0;
+ 
+-	/*printf("---lbuf-start---\n%s\n---lbuf-end---\n",lbuf);*/
+ 
+ 	while ( (*lbuf_ptr) != '\0' )
+ 	{
+-
+-		/* printf( "%c",(*lbuf_ptr) ); */
+-
+ 		if ( (*lbuf_ptr) == '\n' )
+ 		{
+-
+ 			last_cr_ptr = lbuf_ptr;
+ 			con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
+ 			dn = 0;
+-
+ 		}
+ 
+ 		if ( (*lbuf_ptr) == '"' )
+@@ -441,79 +251,47 @@
+ 			if ( ++dn == 6 )
+ 			{
+ 
+-				/* terminate strings - but not before 6 times '"' */
+ 				(*con_from_end) = (*con_to_end) = (*etx_end) = '\0';
+ 
+-				if( Global.debug ) printf( "con_from: %s, con_to: %s, etx: %s\n", con_from, con_to, etx );
++// 				if( Global.debug ) printf( "con_from: %s, con_to: %s, etx: %s\n", con_from, con_to, etx );
+ 
+ 				/* announced network via HNA */
+ 				if ( strncmp( etx, "HNA", NAMEMAX ) == 0 )
+ 				{
+ 
+-					/* connection to internet */
+-					if ( strncmp( con_to, "0.0.0.0/0.0.0.0", NAMEMAX ) == 0 )
+-					{
+-
+-//						olsr_node1 = get_olsr_node( &Olsr_root, con_from );
+-
+-						if ( olsr_node1->node_type != 1 )
+-						{
+-
+-							olsr_node1->node_type = 1;
+-							olsr_node1->node_type_modified = 1;
+-							if ( Global.debug ) printf( "new internet: %s\n", olsr_node1->ip );
+-
+-						}
+-
+-					/* normal HNA */
+-					} else {
+-						memmove(hna_node,con_to,NAMEMAX);
+-						if( (tmpChar = strchr(hna_node, (int)'/')))
+-						{
+-							tmpChar++;
+-							address = (int)-inet_network(tmpChar);
+-							sprintf(hna_name,"%d",(int)(32 - ceil(log(address)/log(2))));
+-							strcpy(tmpChar,hna_name);
+-						}
+-
+-//						olsr_node1 = get_olsr_node( &Olsr_root, con_from );
+-//						olsr_node2 = get_olsr_node( &Olsr_root, hna_node );
+-
+-						if ( olsr_node2->node_type != 2 ) {
+-
+-							olsr_node2->node_type = 2;
+-							olsr_node2->node_type_modified = 1;
+-							if ( Global.debug ) printf( "new hna network: %s\n", olsr_node2->ip );
+-
+-						}
+-//						if ( olsr_node1->visible && olsr_node2->visible )
+-//							add_olsr_con( olsr_node1, olsr_node2, -1000.00 );
+-
+-					}
+-
+-				/* normal node */
+ 				} else {
+ 
+-//					olsr_node1 = get_olsr_node( &Olsr_root, con_from );
+-//					olsr_node2 = get_olsr_node( &Olsr_root, con_to );
+ 					f = strtod(etx,NULL);
+ 					if ( f < 1.0 )
+ 						f = 999.0;
+-//					add_olsr_con( olsr_node1, olsr_node2, f );
++				
++					if( inet_pton(AF_INET, con_from, &int_con_from ) < 1 )
++					{
++						printf("%s is not a valid ip address\n", con_from );
++						continue;
++					}
++					if( inet_pton(AF_INET, con_to, &int_con_to ) < 1 )
++					{
++						printf("%s is not a valid ip address\n", con_to );
++						continue;
++					}
++					handle_mesh_node( &int_con_from, con_from );
++					handle_mesh_node( &int_con_to, con_to );
++					handle_con( int_con_from, int_con_to, f);
++// 					node_from = (struct node *) hash_find( node_hash, &int_con_from );
++// 					node_to = (struct node *) hash_find( node_hash, &int_con_to );
+ 				}
+ 				/* remove zerobyte */
+ 				(*con_from_end) = (*con_to_end) = (*etx_end) = '"';
+-
++				int_con_from = 0;
++				int_con_to = 0;
+ 				con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
+ 				dn = 0;
+ 				last_cr_ptr = lbuf_ptr;
+-
+ 			}
+ 
+ 		} else if ( ( (*lbuf_ptr) == '}' ) && ( (*(lbuf_ptr + 1)) == '\n' ) ) {
+ 
+-//			Output_block_completed = 1;
+-
+ 		}
+ 
+ 		lbuf_ptr++;
+@@ -521,7 +299,6 @@
+ 	}
+ 
+ 	if ( last_cr_ptr != NULL ) memmove( lbuf, last_cr_ptr + 1, strlen( last_cr_ptr ) );
+-	/*printf("---memmove-lbuf-start---\n%s\n---memmove-lbuf-end---\n",lbuf);*/
+ 	return(0);
+ 
+ }
+
+
+
+From nichtsnutz at mail.berlios.de  Wed Apr 18 11:43:47 2007
+From: nichtsnutz at mail.berlios.de (nichtsnutz at BerliOS)
+Date: Wed, 18 Apr 2007 11:43:47 +0200
+Subject: [S3d-svn] r587 - trunk/apps/meshs3d
+Message-ID: <200704180943.l3I9hlEl021163@sheep.berlios.de>
+
+Author: nichtsnutz
+Date: 2007-04-18 11:43:46 +0200 (Wed, 18 Apr 2007)
+New Revision: 587
+
+Added:
+   trunk/apps/meshs3d/allocate.c
+   trunk/apps/meshs3d/allocate.h
+   trunk/apps/meshs3d/hash.c
+   trunk/apps/meshs3d/hash.h
+Log:
+forgot some stuff
+
+Added: trunk/apps/meshs3d/allocate.c
+===================================================================
+--- trunk/apps/meshs3d/allocate.c	2007-04-18 09:34:08 UTC (rev 586)
++++ trunk/apps/meshs3d/allocate.c	2007-04-18 09:43:46 UTC (rev 587)
+@@ -0,0 +1,369 @@
++/*
++ * Copyright (C) 2006 B.A.T.M.A.N. contributors:
++ * Thomas Lopatic, Corinna 'Elektra' Aichele, Axel Neumann, Marek Lindner
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of version 2 of the GNU General Public
++ * License as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++ * 02110-1301, USA
++ *
++ */
++
++
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++
++#include "allocate.h"
++
++#define DEBUG_MALLOC
++#define MEMORY_USAGE
++
++#define MAGIC_NUMBER 0x12345678
++
++#if defined DEBUG_MALLOC
++
++struct chunkHeader *chunkList = NULL;
++
++struct chunkHeader
++{
++	struct chunkHeader *next;
++	uint32_t length;
++	int32_t tag;
++	uint32_t magicNumber;
++};
++
++struct chunkTrailer
++{
++	uint32_t magicNumber;
++};
++
++
++
++#if defined MEMORY_USAGE
++
++struct memoryUsage *memoryList = NULL;
++
++
++struct memoryUsage
++{
++	struct memoryUsage *next;
++	uint32_t length;
++	uint32_t counter;
++	int32_t tag;
++};
++
++
++void addMemory( uint32_t length, int32_t tag ) {
++
++	struct memoryUsage *walker;
++
++
++	for ( walker = memoryList; walker != NULL; walker = walker->next ) {
++
++		if ( walker->tag == tag ) {
++
++			walker->counter++;
++			break;
++
++		}
++
++	}
++
++	if ( walker == NULL ) {
++
++		walker = malloc( sizeof(struct memoryUsage) );
++
++		walker->length = length;
++		walker->tag = tag;
++		walker->counter = 1;
++
++		walker->next = memoryList;
++		memoryList = walker;
++
++	}
++
++}
++
++
++void removeMemory( int32_t tag, int32_t freetag ) {
++
++	struct memoryUsage *walker;
++
++
++	for ( walker = memoryList; walker != NULL; walker = walker->next ) {
++
++		if ( walker->tag == tag ) {
++
++			if ( walker->counter == 0 ) {
++
++				fprintf( stderr, "Freeing more memory than was allocated: malloc tag = %d, free tag = %d\n", tag, freetag );
++				exit(1);
++
++			}
++
++			walker->counter--;
++			break;
++
++		}
++
++	}
++
++	if ( walker == NULL ) {
++
++		fprintf( stderr, "Freeing memory that was never allocated: malloc tag = %d, free tag = %d\n", tag, freetag );
++		exit(1);
++
++	}
++
++}
++
++#endif
++
++
++
++void checkIntegrity(void)
++{
++	struct chunkHeader *walker;
++	struct chunkTrailer *chunkTrailer;
++	unsigned char *memory;
++
++
++#if defined MEMORY_USAGE
++
++	struct memoryUsage *memoryWalker;
++
++	fprintf( stderr, " \nMemory usage information:\n" );
++
++	for ( memoryWalker = memoryList; memoryWalker != NULL; memoryWalker = memoryWalker->next ) {
++
++		if ( memoryWalker->counter != 0 )
++			fprintf( stderr, "   tag: %d, num malloc: %4i, bytes per malloc: %u, total: %6i\n", memoryWalker->tag, memoryWalker->counter, memoryWalker->length, memoryWalker->counter * memoryWalker->length );
++
++	}
++
++#endif
++
++
++	for (walker = chunkList; walker != NULL; walker = walker->next)
++	{
++		if (walker->magicNumber != MAGIC_NUMBER)
++		{
++			fprintf(stderr, "checkIntegrity - invalid magic number in header: %08x, malloc tag = %d\n", walker->magicNumber, walker->tag);
++			exit(1);
++		}
++
++		memory = (unsigned char *)walker;
++
++		chunkTrailer = (struct chunkTrailer *)(memory + sizeof(struct chunkHeader) + walker->length);
++
++		if (chunkTrailer->magicNumber != MAGIC_NUMBER)
++		{
++			fprintf(stderr, "checkIntegrity - invalid magic number in trailer: %08x, malloc tag = %d\n", chunkTrailer->magicNumber, walker->tag);
++			exit(1);
++		}
++	}
++}
++
++void checkLeak(void)
++{
++	struct chunkHeader *walker;
++
++	for (walker = chunkList; walker != NULL; walker = walker->next)
++		fprintf(stderr, "Memory leak detected, malloc tag = %d\n", walker->tag);
++}
++
++void *debugMalloc(uint32_t length, int32_t tag)
++{
++	unsigned char *memory;
++	struct chunkHeader *chunkHeader;
++	struct chunkTrailer *chunkTrailer;
++	unsigned char *chunk;
++
++// 	printf("sizeof(struct chunkHeader) = %u, sizeof (struct chunkTrailer) = %u\n", sizeof (struct chunkHeader), sizeof (struct chunkTrailer));
++
++	memory = malloc(length + sizeof(struct chunkHeader) + sizeof(struct chunkTrailer));
++
++	if (memory == NULL)
++	{
++		fprintf(stderr, "Cannot allocate %u bytes, malloc tag = %d\n", (unsigned int)(length + sizeof(struct chunkHeader) + sizeof(struct chunkTrailer)), tag);
++		exit(1);
++	}
++
++	chunkHeader = (struct chunkHeader *)memory;
++	chunk = memory + sizeof(struct chunkHeader);
++	chunkTrailer = (struct chunkTrailer *)(memory + sizeof(struct chunkHeader) + length);
++
++	chunkHeader->length = length;
++	chunkHeader->tag = tag;
++	chunkHeader->magicNumber = MAGIC_NUMBER;
++
++	chunkTrailer->magicNumber = MAGIC_NUMBER;
++
++	chunkHeader->next = chunkList;
++	chunkList = chunkHeader;
++
++#if defined MEMORY_USAGE
++
++	addMemory( length, tag );
++
++#endif
++
++	return chunk;
++}
++
++void *debugRealloc(void *memoryParameter, uint32_t length, int32_t tag)
++{
++	unsigned char *memory;
++	struct chunkHeader *chunkHeader;
++	struct chunkTrailer *chunkTrailer;
++	unsigned char *result;
++	uint32_t copyLength;
++
++	if (memoryParameter) { /* if memoryParameter==NULL, realloc() should work like malloc() !! */
++		memory = memoryParameter;
++		chunkHeader = (struct chunkHeader *)(memory - sizeof(struct chunkHeader));
++
++		if (chunkHeader->magicNumber != MAGIC_NUMBER)
++		{
++			fprintf(stderr, "debugRealloc - invalid magic number in header: %08x, malloc tag = %d\n", chunkHeader->magicNumber, chunkHeader->tag);
++			exit(1);
++		}
++
++		chunkTrailer = (struct chunkTrailer *)(memory + chunkHeader->length);
++
++		if (chunkTrailer->magicNumber != MAGIC_NUMBER)
++		{
++			fprintf(stderr, "debugRealloc - invalid magic number in trailer: %08x, malloc tag = %d\n", chunkTrailer->magicNumber, chunkHeader->tag);
++			exit(1);
++		}
++	}
++
++
++	result = debugMalloc(length, tag);
++	if (memoryParameter) {
++		copyLength = length;
++
++		if (copyLength > chunkHeader->length)
++			copyLength = chunkHeader->length;
++
++		memcpy(result, memoryParameter, copyLength);
++		debugFree(memoryParameter, 9999);
++	}
++
++
++	return result;
++}
++
++void debugFree(void *memoryParameter, int tag)
++{
++	unsigned char *memory;
++	struct chunkHeader *chunkHeader;
++	struct chunkTrailer *chunkTrailer;
++	struct chunkHeader *walker;
++	struct chunkHeader *previous;
++
++	memory = memoryParameter;
++	chunkHeader = (struct chunkHeader *)(memory - sizeof(struct chunkHeader));
++
++	if (chunkHeader->magicNumber != MAGIC_NUMBER)
++	{
++		fprintf(stderr, "debugFree - invalid magic number in header: %08x, malloc tag = %d, free tag = %d\n", chunkHeader->magicNumber, chunkHeader->tag, tag);
++		exit(1);
++	}
++
++	previous = NULL;
++
++	for (walker = chunkList; walker != NULL; walker = walker->next)
++	{
++		if (walker == chunkHeader)
++			break;
++
++		previous = walker;
++	}
++
++	if (walker == NULL)
++	{
++		fprintf(stderr, "Double free detected, malloc tag = %d, free tag = %d\n", chunkHeader->tag, tag);
++		exit(1);
++	}
++
++	if (previous == NULL)
++		chunkList = walker->next;
++
++	else
++		previous->next = walker->next;
++
++	chunkTrailer = (struct chunkTrailer *)(memory + chunkHeader->length);
++
++	if (chunkTrailer->magicNumber != MAGIC_NUMBER)
++	{
++		fprintf(stderr, "debugFree - invalid magic number in trailer: %08x, malloc tag = %d, free tag = %d\n", chunkTrailer->magicNumber, chunkHeader->tag, tag);
++		exit(1);
++	}
++
++#if defined MEMORY_USAGE
++
++	removeMemory( chunkHeader->tag, tag );
++
++#endif
++
++	free(chunkHeader);
++
++}
++
++#else
++
++void checkIntegrity(void)
++{
++}
++
++void checkLeak(void)
++{
++}
++
++void *debugMalloc(uint32_t length, int32_t tag)
++{
++	void *result;
++
++	result = malloc(length);
++
++	if (result == NULL)
++	{
++		fprintf(stderr, "Cannot allocate %u bytes, malloc tag = %d\n", length, tag);
++		exit(1);
++	}
++
++	return result;
++}
++
++void *debugRealloc(void *memory, uint32_t length, int32_t tag)
++{
++	void *result;
++
++	result = realloc(memory, length);
++
++	if (result == NULL)
++	{
++		fprintf(stderr, "Cannot re-allocate %u bytes, malloc tag = %d\n", length, tag);
++		exit(1);
++	}
++
++	return result;
++}
++
++void debugFree(void *memory, int32_t tag)
++{
++	free(memory);
++}
++
++#endif
+
+Added: trunk/apps/meshs3d/allocate.h
+===================================================================
+--- trunk/apps/meshs3d/allocate.h	2007-04-18 09:34:08 UTC (rev 586)
++++ trunk/apps/meshs3d/allocate.h	2007-04-18 09:43:46 UTC (rev 587)
+@@ -0,0 +1,33 @@
++/*
++ * Copyright (C) 2006 B.A.T.M.A.N. contributors:
++ * Thomas Lopatic, Corinna 'Elektra' Aichele, Axel Neumann, Marek Lindner
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of version 2 of the GNU General Public
++ * License as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++ * 02110-1301, USA
++ *
++ */
++
++
++#ifndef _ALLOCATE_H
++#define _ALLOCATE_H 1
++#include <stdint.h>
++
++
++
++void checkIntegrity(void);
++void checkLeak(void);
++void *debugMalloc(uint32_t length, int32_t tag);
++void *debugRealloc(void *memory, uint32_t length, int32_t tag);
++void debugFree(void *memoryParameter, int32_t tag);
++
++#endif
+
+Added: trunk/apps/meshs3d/hash.c
+===================================================================
+--- trunk/apps/meshs3d/hash.c	2007-04-18 09:34:08 UTC (rev 586)
++++ trunk/apps/meshs3d/hash.c	2007-04-18 09:43:46 UTC (rev 587)
+@@ -0,0 +1,310 @@
++/* Copyright (C) 2006 B.A.T.M.A.N. contributors:
++ * Simon Wunderlich, Marek Lindner
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of version 2 of the GNU General Public
++ * License as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++ * 02110-1301, USA
++ *
++ */
++
++
++#include <stdio.h>		/* NULL */
++#include "hash.h"
++#include "allocate.h"
++
++
++/* clears the hash */
++void hash_init(struct hashtable_t *hash) {
++	int i;
++	hash->elements=0;
++	for (i=0 ; i<hash->size ; i++) {
++		hash->table[i] = NULL;
++	}
++}
++
++
++/* remove the hash structure. if hashdata_free_cb != NULL,
++ * this function will be called to remove the elements inside of the hash.
++ * if you don't remove the elements, memory might be leaked. */
++void hash_delete(struct hashtable_t *hash, hashdata_free_cb free_cb) {
++	struct element_t *bucket, *last_bucket;
++	int i;
++
++	for (i=0; i<hash->size; i++) {
++
++		bucket= hash->table[i];
++		while (bucket != NULL) {
++
++			if (free_cb!=NULL)
++				free_cb( bucket->data );
++
++			last_bucket= bucket;
++			bucket= bucket->next;
++			debugFree(last_bucket, 1301);
++
++		}
++
++	}
++	hash_destroy(hash);
++}
++
++
++
++/* free only the hashtable and the hash itself. */
++void hash_destroy(struct hashtable_t *hash) {
++
++	debugFree( hash->table, 1302 );
++	debugFree( hash, 1303 );
++
++}
++
++
++
++
++/* iterate though the hash. first element is selected with iter_in NULL.
++ * use the returned iterator to access the elements until hash_it_t returns NULL. */
++struct hash_it_t *hash_iterate(struct hashtable_t *hash, struct hash_it_t *iter_in) {
++	struct hash_it_t *iter;
++
++	if (iter_in == NULL) {
++		iter= debugMalloc(sizeof(struct hash_it_t), 301);
++		iter->index =  -1;
++		iter->bucket = NULL;
++		iter->prev_bucket = NULL;
++	} else
++		iter= iter_in;
++
++	/* sanity checks first (if our bucket got deleted in the last iteration): */
++	if (iter->bucket!=NULL) {
++		if (iter->first_bucket != NULL) {
++
++			/* we're on the first element and it got removed after the last iteration. */
++			if ((*iter->first_bucket) != iter->bucket) {
++
++				/* there are still other elements in the list */
++				if ( (*iter->first_bucket) != NULL ) {
++					iter->prev_bucket = NULL;
++					iter->bucket= (*iter->first_bucket);
++					iter->first_bucket = &hash->table[ iter->index ];
++					return(iter);
++				} else {
++					iter->bucket = NULL;
++				}
++
++			}
++
++		} else if ( iter->prev_bucket != NULL ) {
++
++			/* we're not on the first element, and the bucket got removed after the last iteration.
++			* the last bucket's next pointer is not pointing to our actual bucket anymore.
++			* select the next. */
++			if ( iter->prev_bucket->next != iter->bucket )
++				iter->bucket= iter->prev_bucket;
++
++		}
++
++	}
++
++	/* now as we are sane, select the next one if there is some */
++	if (iter->bucket!=NULL) {
++		if (iter->bucket->next!=NULL) {
++			iter->prev_bucket= iter->bucket;
++			iter->bucket= iter->bucket->next;
++			iter->first_bucket = NULL;
++			return(iter);
++		}
++	}
++	/* if not returned yet, we've reached the last one on the index and have to search forward */
++
++	iter->index++;
++	while ( iter->index < hash->size ) {		/* go through the entries of the hash table */
++		if ((hash->table[ iter->index ]) != NULL){
++			iter->prev_bucket = NULL;
++			iter->bucket = hash->table[ iter->index ];
++			iter->first_bucket = &hash->table[ iter->index ];
++			return(iter);						/* if this table entry is not null, return it */
++		} else
++			iter->index++;						/* else, go to the next */
++	}
++	/* nothing to iterate over anymore */
++	debugFree(iter, 1304);
++	return(NULL);
++}
++
++
++/* allocates and clears the hash */
++struct hashtable_t *hash_new(int size, hashdata_compare_cb compare, hashdata_choose_cb choose) {
++	struct hashtable_t *hash;
++
++	hash= debugMalloc( sizeof(struct hashtable_t) , 302);
++	if ( hash == NULL ) 			/* could not allocate the hash control structure */
++		return (NULL);
++
++	hash->size= size;
++	hash->table= debugMalloc( sizeof(struct element_t *) * size, 303);
++	if ( hash->table == NULL ) {	/* could not allocate the table */
++		debugFree(hash, 1305);
++		return(NULL);
++	}
++	hash->compare= compare;
++	hash->choose= choose;
++	return(hash);
++}
++
++
++/* adds data to the hashtable. returns 0 on success, -1 on error */
++int hash_add(struct hashtable_t *hash, void *data) {
++	int index;
++	struct element_t *bucket, *prev_bucket = NULL;
++
++	index = hash->choose( data, hash->size );
++	bucket = hash->table[index];
++
++	while ( bucket!=NULL ) {
++		if (0 == hash->compare( bucket->data, data ))
++			return(-1);
++
++		prev_bucket = bucket;
++		bucket= bucket->next;
++	}
++
++	/* found the tail of the list, add new element */
++	if (NULL == (bucket= debugMalloc(sizeof(struct element_t),304)))
++		return(-1); /* debugMalloc failed */
++
++	bucket->data= data;				/* init the new bucket */
++	bucket->next= NULL;
++
++	/* and link it */
++	if ( prev_bucket == NULL ) {
++		hash->table[index] = bucket;
++	} else {
++		prev_bucket->next = bucket;
++	}
++
++	hash->elements++;
++	return(0);
++
++}
++/* finds data, based on the key in keydata. returns the found data on success, or NULL on error */
++void *hash_find(struct hashtable_t *hash, void *keydata) {
++	int index;
++	struct element_t *bucket;
++
++	index = hash->choose( keydata , hash->size );
++	bucket = hash->table[index];
++
++	while ( bucket!=NULL ) {
++		if (0 == hash->compare( bucket->data, keydata ))
++			return( bucket->data );
++
++		bucket= bucket->next;
++	}
++
++	return(NULL);
++
++}
++
++/* remove bucket (this might be used in hash_iterate() if you already found the bucket
++ * you want to delete and don't need the overhead to find it again with hash_remove().
++ * But usually, you don't want to use this function, as it fiddles with hash-internals. */
++void *hash_remove_bucket(struct hashtable_t *hash, struct hash_it_t *hash_it_t) {
++	void *data_save;
++
++	data_save = hash_it_t->bucket->data;	/* save the pointer to the data */
++
++	if ( hash_it_t->prev_bucket != NULL ) {
++		hash_it_t->prev_bucket->next = hash_it_t->bucket->next;
++	} else if ( hash_it_t->first_bucket != NULL ) {
++		(*hash_it_t->first_bucket) = hash_it_t->bucket->next;
++	}
++
++	debugFree(hash_it_t->bucket, 1306);
++
++	hash->elements--;
++	return( data_save );
++
++}
++
++
++/* removes data from hash, if found. returns pointer do data on success,
++ * so you can remove the used structure yourself, or NULL on error .
++ * data could be the structure you use with just the key filled,
++ * we just need the key for comparing. */
++void *hash_remove(struct hashtable_t *hash, void *data) {
++	struct hash_it_t hash_it_t;
++
++	hash_it_t.index = hash->choose( data, hash->size );
++	hash_it_t.bucket = hash->table[hash_it_t.index];
++	hash_it_t.prev_bucket = NULL;
++
++	while ( hash_it_t.bucket!=NULL ) {
++		if (0 == hash->compare( hash_it_t.bucket->data, data )) {
++			hash_it_t.first_bucket = (hash_it_t.bucket == hash->table[hash_it_t.index] ? &hash->table[ hash_it_t.index ] : NULL);
++			return( hash_remove_bucket(hash, &hash_it_t) );
++		}
++
++		hash_it_t.prev_bucket = hash_it_t.bucket;
++		hash_it_t.bucket= hash_it_t.bucket->next;
++	}
++
++	return(NULL);
++
++}
++
++
++/* resize the hash, returns the pointer to the new hash or NULL on error. removes the old hash on success. */
++struct hashtable_t *hash_resize(struct hashtable_t *hash, int size) {
++	struct hashtable_t *new_hash;
++	struct element_t *bucket;
++	int i;
++
++	/* initialize a new hash with the new size */
++	if (NULL == (new_hash= hash_new(size, hash->compare, hash->choose)))
++		return(NULL);
++
++	/* copy the elements */
++	for (i=0; i<hash->size; i++) {
++		bucket= hash->table[i];
++		while (bucket != NULL) {
++			hash_add( new_hash, bucket->data );
++			bucket= bucket->next;
++		}
++	}
++	hash_delete(hash, NULL);	/* remove hash and eventual overflow buckets but not the content itself. */
++
++	return( new_hash);
++
++}
++
++
++/* print the hash table for debugging */
++void hash_debug(struct hashtable_t *hash) {
++	int i;
++	struct element_t *bucket;
++
++	for (i=0; i<hash->size;i++) {
++		printf("[%d] ",i);
++		bucket= hash->table[i];
++
++		while (bucket != NULL) {
++			printf("-> [%10p] ", bucket);
++			bucket= bucket->next;
++		}
++
++		printf("\n");
++
++	}
++	printf("\n");
++}
++
+
+Added: trunk/apps/meshs3d/hash.h
+===================================================================
+--- trunk/apps/meshs3d/hash.h	2007-04-18 09:34:08 UTC (rev 586)
++++ trunk/apps/meshs3d/hash.h	2007-04-18 09:43:46 UTC (rev 587)
+@@ -0,0 +1,89 @@
++/* Copyright (C) 2006 B.A.T.M.A.N. contributors:
++ * Simon Wunderlich, Marek Lindner
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of version 2 of the GNU General Public
++ * License as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++ * 02110-1301, USA
++ *
++ */
++
++
++typedef int (*hashdata_compare_cb)(void *, void *);
++typedef int (*hashdata_choose_cb)(void *, int);
++typedef void (*hashdata_free_cb)(void *);
++
++struct element_t {
++	void *data;						/* pointer to the data */
++	struct element_t *next;			/* overflow bucket pointer */
++};
++
++struct hash_it_t {
++	int index;
++	struct element_t *bucket;
++	struct element_t *prev_bucket;
++	struct element_t **first_bucket;
++};
++
++struct hashtable_t {
++	struct element_t **table;					/* the hashtable itself, with the buckets */
++	int elements;								/* number of elements registered */
++	int size;									/* size of hashtable */
++	hashdata_compare_cb compare;			    /* callback to a compare function.
++												 * should compare 2 element datas for their keys,
++												 * return 0 if same and not 0 if not same */
++	hashdata_choose_cb choose;					/* the hashfunction, should return an index based
++												 * on the key in the data of the first argument
++												 * and the size the second */
++};
++
++/* clears the hash */
++void 				 hash_init(struct hashtable_t *hash);
++
++/* allocates and clears the hash */
++struct hashtable_t	*hash_new(int size, hashdata_compare_cb compare, hashdata_choose_cb choose);
++
++/* remove bucket (this might be used in hash_iterate() if you already found the bucket
++ * you want to delete and don't need the overhead to find it again with hash_remove().
++ * But usually, you don't want to use this function, as it fiddles with hash-internals. */
++void 				*hash_remove_bucket(struct hashtable_t *hash, struct hash_it_t *hash_it_t);
++
++/* remove the hash structure. if hashdata_free_cb != NULL,
++ * this function will be called to remove the elements inside of the hash.
++ * if you don't remove the elements, memory might be leaked. */
++void 				 hash_delete(struct hashtable_t *hash, hashdata_free_cb free_cb);
++
++/* free only the hashtable and the hash itself. */
++void 				 hash_destroy(struct hashtable_t *hash);
++
++/* adds data to the hashtable. returns 0 on success, -1 on error */
++int 				 hash_add(struct hashtable_t *hash, void *data);
++
++/* removes data from hash, if found. returns pointer do data on success,
++ * so you can remove the used structure yourself, or NULL on error .
++ * data could be the structure you use with just the key filled,
++ * we just need the key for comparing. */
++void 				*hash_remove(struct hashtable_t *hash, void *data);
++
++/* adds data to the hashtable. returns 0 on success, -1 on error */
++void 				*hash_find(struct hashtable_t *hash, void *keydata);
++
++/* resize the hash, returns the pointer to the new hash or NULL on error. removes the old hash on success */
++struct hashtable_t	*hash_resize(struct hashtable_t *hash, int size);
++
++/* print the hash table for debugging */
++void 				 hash_debug( struct hashtable_t *hash);
++
++/* iterate though the hash. first element is selected with iter_in NULL.
++ * use the returned iterator to access the elements until hash_it_t returns NULL. */
++struct hash_it_t *hash_iterate(struct hashtable_t *hash, struct hash_it_t *iter_in);
++
+
+
+
+From nichtsnutz at mail.berlios.de  Wed Apr 18 11:57:51 2007
+From: nichtsnutz at mail.berlios.de (nichtsnutz at BerliOS)
+Date: Wed, 18 Apr 2007 11:57:51 +0200
+Subject: [S3d-svn] r588 - trunk/apps/meshs3d
+Message-ID: <200704180957.l3I9vpdX021853@sheep.berlios.de>
+
+Author: nichtsnutz
+Date: 2007-04-18 11:57:50 +0200 (Wed, 18 Apr 2007)
+New Revision: 588
+
+Modified:
+   trunk/apps/meshs3d/meshs3d.h
+   trunk/apps/meshs3d/process.c
+Log:
+unsigned int for ip
+
+Modified: trunk/apps/meshs3d/meshs3d.h
+===================================================================
+--- trunk/apps/meshs3d/meshs3d.h	2007-04-18 09:43:46 UTC (rev 587)
++++ trunk/apps/meshs3d/meshs3d.h	2007-04-18 09:57:50 UTC (rev 588)
+@@ -32,8 +32,8 @@
+ /* linked list for the all connections */
+ struct node_con
+ {
+-	int ip1;
+-	int ip2;
++	unsigned int ip1;
++	unsigned int ip2;
+ 	float etx1;							/* etx of left olsr node */
+ 	float etx2;						/* etx of right olsr node */
+ 	float etx1_sqrt;					/* sqrt of etx of left olsr node */
+@@ -55,7 +55,7 @@
+ /* we contruct a binary tree to handle the nodes */
+ struct node 
+ {
+-	int ip;
++	unsigned int ip;
+ 	char ip_string[NAMEMAX];		/* host ip */
+ 	int node_type;					/* normal = 0, internet gateway = 1, via hna announced network = 2 */
+ 	int node_type_modified;			/* node_type modified flag */
+
+Modified: trunk/apps/meshs3d/process.c
+===================================================================
+--- trunk/apps/meshs3d/process.c	2007-04-18 09:43:46 UTC (rev 587)
++++ trunk/apps/meshs3d/process.c	2007-04-18 09:57:50 UTC (rev 588)
+@@ -113,10 +113,10 @@
+ 	return;
+ }
+ 
+-void handle_con( int ip1, int ip2, float etx )
++void handle_con( unsigned int ip1, unsigned int ip2, float etx )
+ {
+ 
+-	int ip[2];
++	unsigned int ip[2];
+ 	struct node_con *con;
+ 	struct hashtable_t *swaphash;
+ 
+@@ -159,7 +159,7 @@
+ 
+ }
+ 
+-void handle_mesh_node( int *ip, char *ip_string )
++void handle_mesh_node( unsigned int *ip, char *ip_string )
+ {
+ 	struct node *orig_node;
+ 	struct hashtable_t *swaphash;
+@@ -204,7 +204,7 @@
+ 	char *lbuf_ptr, *last_cr_ptr, *con_from, *con_from_end, *con_to, *con_to_end, *etx, *etx_end, *tmpChar;
+ 	struct node *node_from, *node_to;
+ 
+-	int int_con_from=0, int_con_to=0;
++	unsigned int int_con_from=0, int_con_to=0;
+ 	char hna_name[NAMEMAX];
+ 	char hna_node[NAMEMAX];
+ 
+
+
+
+From nichtsnutz at mail.berlios.de  Wed Apr 18 17:05:53 2007
+From: nichtsnutz at mail.berlios.de (nichtsnutz at BerliOS)
+Date: Wed, 18 Apr 2007 17:05:53 +0200
+Subject: [S3d-svn] r589 - trunk/apps/meshs3d
+Message-ID: <200704181505.l3IF5rBX025402@sheep.berlios.de>
+
+Author: nichtsnutz
+Date: 2007-04-18 17:05:52 +0200 (Wed, 18 Apr 2007)
+New Revision: 589
+
+Modified:
+   trunk/apps/meshs3d/main.c
+   trunk/apps/meshs3d/meshs3d.h
+   trunk/apps/meshs3d/process.c
+Log:
+search hash_resize bug
+
+Modified: trunk/apps/meshs3d/main.c
+===================================================================
+--- trunk/apps/meshs3d/main.c	2007-04-18 09:57:50 UTC (rev 588)
++++ trunk/apps/meshs3d/main.c	2007-04-18 15:05:52 UTC (rev 589)
+@@ -154,8 +154,8 @@
+ 	while ( NULL != ( hashit = hash_iterate( con_hash, hashit ) ) )
+ 	{
+ 		con = (struct node_con *) hashit->bucket->data;
+-		first_node = hash_find( node_hash, &con->ip1 );
+-		sec_node = hash_find( node_hash, &con->ip2 );
++		first_node = hash_find( node_hash, &con->ip[0] );
++		sec_node = hash_find( node_hash, &con->ip[1] );
+ 		distance = dirt( first_node->pos_vec, sec_node->pos_vec, tmp_mov_vec );
+ 		f = ( ( con->etx1_sqrt + con->etx2_sqrt ) / 4.0 ) / distance;
+ // 
+@@ -186,8 +186,8 @@
+ 	while ( NULL != ( hashit = hash_iterate( con_hash, hashit ) ) )
+ 	{
+ 		con = (struct node_con *) hashit->bucket->data;
+-		first_node = hash_find( node_hash, &con->ip1 );
+-		sec_node = hash_find( node_hash, &con->ip2 );
++		first_node = hash_find( node_hash, &con->ip[0] );
++		sec_node = hash_find( node_hash, &con->ip[1] );
+ 		/* move left olsr node if it has not been moved yet */
+ 		if ( !( ( first_node->mov_vec[0] == 0 ) && ( first_node->mov_vec[1] == 0 ) && ( first_node->mov_vec[2] == 0 ) ) && first_node->visible ) {
+ 			distance = dirt( first_node->pos_vec, null_vec, tmp_mov_vec );
+
+Modified: trunk/apps/meshs3d/meshs3d.h
+===================================================================
+--- trunk/apps/meshs3d/meshs3d.h	2007-04-18 09:57:50 UTC (rev 588)
++++ trunk/apps/meshs3d/meshs3d.h	2007-04-18 15:05:52 UTC (rev 589)
+@@ -32,8 +32,7 @@
+ /* linked list for the all connections */
+ struct node_con
+ {
+-	unsigned int ip1;
+-	unsigned int ip2;
++	unsigned int ip[2];
+ 	float etx1;							/* etx of left olsr node */
+ 	float etx2;						/* etx of right olsr node */
+ 	float etx1_sqrt;					/* sqrt of etx of left olsr node */
+@@ -43,7 +42,6 @@
+ 	float rgb;
+ };
+ 
+-
+ /* linked list for the neighbours of each olsr node */
+ struct olsr_neigh_list
+ {
+
+Modified: trunk/apps/meshs3d/process.c
+===================================================================
+--- trunk/apps/meshs3d/process.c	2007-04-18 09:57:50 UTC (rev 588)
++++ trunk/apps/meshs3d/process.c	2007-04-18 15:05:52 UTC (rev 589)
+@@ -126,9 +126,9 @@
+ 	con = ( struct node_con* ) hash_find( con_hash, ip);
+ 	if( con == NULL )
+ 	{
+-		con = (struct node_con *) debugMalloc( sizeof(struct node_con), 102 );
+-		con->ip1 = ip[0];
+-		con->ip2 = ip[1];
++		con = ( struct node_con * ) debugMalloc( sizeof( struct node_con ), 102 );
++		con->ip[0] = ip[0];
++		con->ip[1] = ip[1];
+ 		con->color = 0;
+ 		con->obj_id = 0;
+ 		con->rgb = 0.00;
+@@ -139,7 +139,7 @@
+ 		hash_add( con_hash, con );
+ 	}
+ 
+-	if( con->ip1 == ip1 )
++	if( con->ip[0] == ip1 )
+ 	{
+ 		con->etx1 = etx;
+ 		con->etx1_sqrt = sqrt( etx );
+@@ -153,7 +153,7 @@
+ 	{
+ 		swaphash = hash_resize( con_hash, con_hash->size * 2 );
+ 		if ( swaphash == NULL )
+-			exit_error("Couldn't resize hash table \n" );
++			exit_error("Couldn't resize hash table \n");
+ 		con_hash = swaphash;
+ 	}
+ 
+
+
+

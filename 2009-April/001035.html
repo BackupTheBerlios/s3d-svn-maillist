@@ -1,0 +1,204 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1055 - in trunk: . apps/s3dosm cmake/modules
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2009-April/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1055%20-%20in%20trunk%3A%20.%20apps/s3dosm%20cmake/modules&In-Reply-To=%3C200904142025.n3EKPNsB012311%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="001036.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1055 - in trunk: . apps/s3dosm cmake/modules</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1055%20-%20in%20trunk%3A%20.%20apps/s3dosm%20cmake/modules&In-Reply-To=%3C200904142025.n3EKPNsB012311%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1055 - in trunk: . apps/s3dosm cmake/modules">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Apr 14 22:25:23 CEST 2009</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="001036.html">[S3d-svn] r1056 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1035">[ date ]</a>
+              <a href="thread.html#1035">[ thread ]</a>
+              <a href="subject.html#1035">[ subject ]</a>
+              <a href="author.html#1035">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2009-04-14 22:25:23 +0200 (Tue, 14 Apr 2009)
+New Revision: 1055
+
+Added:
+   trunk/cmake/modules/gpsd_fix.c
+Modified:
+   trunk/ConfigureChecks.cmake
+   trunk/apps/s3dosm/gps.c
+   trunk/cmake/modules/FindGPS.cmake
+   trunk/config.h.cmake
+Log:
+Correct check for new style gpsd structs in s3dosm
+
+gpsd changed the name of the defines which were used to detect if it is
+a version with their new style data structures. It is a better idea to
+check if the the structure gps_data_t has a member with the name fix
+instead of guessing it by looking at some defines which maybe changes
+over time.
+
+Modified: trunk/ConfigureChecks.cmake
+===================================================================
+--- trunk/ConfigureChecks.cmake	2009-03-17 21:17:15 UTC (rev 1054)
++++ trunk/ConfigureChecks.cmake	2009-04-14 20:25:23 UTC (rev 1055)
+@@ -82,6 +82,9 @@
+ find_package(GPS)
+ if (GPS_FOUND)
+ 	set(HAVE_GPS GPS_FOUND)
++	if (GPS_NEW_STRUCT)
++		set(HAVE_GPS_NEW GPS_NEW_STRUCT)
++	endif  (GPS_NEW_STRUCT)
+ endif (GPS_FOUND)
+ 
+ 
+
+Modified: trunk/apps/s3dosm/gps.c
+===================================================================
+--- trunk/apps/s3dosm/gps.c	2009-03-17 21:17:15 UTC (rev 1054)
++++ trunk/apps/s3dosm/gps.c	2009-04-14 20:25:23 UTC (rev 1055)
+@@ -28,12 +28,6 @@
+ #ifdef HAVE_GPS
+ static int user_icon = -1, user_icon_rotator = -1;
+ #include &lt;gps.h&gt;  /* gps_*() */
+-#ifdef NMEA_CHANNELS
+-#define GPS_NEW
+-#endif
+-#ifdef SIRF_CHANNELS
+-#define GPS_NEW
+-#endif
+ 
+ #include &lt;errno.h&gt;  /* errno */
+ #include &lt;stdlib.h&gt; /* malloc(), free() */
+@@ -58,7 +52,7 @@
+ {
+ 	if (!dgps-&gt;online)
+ 		printf(&quot;WARNING: no connection to gps device\n&quot;);
+-#ifdef GPS_NEW
++#ifdef HAVE_GPS_NEW
+ 	printf(&quot;[%d] lat/long: [%f|%f], altitude %f\n&quot;, frame, dgps-&gt;fix.latitude, dgps-&gt;fix.longitude, dgps-&gt;fix.altitude);
+ 	printf(&quot;speed [kph]: %f\n&quot;, dgps-&gt;fix.speed / KNOTS_TO_KPH);
+ 	printf(&quot;used %d/%d satellits\n&quot;, dgps-&gt;satellites_used, dgps-&gt;satellites);
+@@ -79,7 +73,7 @@
+ 		printf(&quot;status: dgps fix\n&quot;);
+ 		break;
+ 	}
+-#ifdef GPS_NEW
++#ifdef HAVE_GPS_NEW
+ 	switch (dgps-&gt;fix.mode)
+ #else
+ 	switch (dgps-&gt;mode)
+@@ -105,7 +99,7 @@
+ 	int fix = 1;
+ 	float la, lo, heading, speed, slen;
+ 	char buf[BUFSIZE+1];
+-#ifdef GPS_NEW
++#ifdef HAVE_GPS_NEW
+ 	if (!dgps-&gt;online)
+ 		fix = 0;
+ 	switch (dgps-&gt;fix.mode) {
+
+Modified: trunk/cmake/modules/FindGPS.cmake
+===================================================================
+--- trunk/cmake/modules/FindGPS.cmake	2009-03-17 21:17:15 UTC (rev 1054)
++++ trunk/cmake/modules/FindGPS.cmake	2009-04-14 20:25:23 UTC (rev 1055)
+@@ -2,6 +2,7 @@
+ #  GPS_FOUND - If false, do not try to use GPS.
+ #  GPS_INCLUDE_DIRS - where to find gps.h
+ #  GPS_LIBRARIES - the libraries to link against
++#  GPS_NEW_STRUCT - if new style gps_t struct was found
+ #
+ # Copyright (C) 2007-2008  Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+ #
+@@ -61,3 +62,19 @@
+ 	mark_as_advanced(GPS_INCLUDE_DIRS GPS_LIBRARIES)
+ 
+ endif (GPS_LIBRARIES AND GPS_INCLUDE_DIRS)
++
++if (GPS_FOUND)
++	message(STATUS &quot;Check for new style gpsd struct&quot;)
++	try_compile(CMAKE_GPSD_NEW_STRUCT  ${CMAKE_BINARY_DIR}
++	            ${CMAKE_SOURCE_DIR}/cmake/modules/gpsd_fix.c
++	            CMAKE_FLAGS &quot;-DLINK_LIBRARIES:STRING=${GPS_LIBRARIES}&quot; &quot;-DINCLUDE_DIRECTORIES=${GPS_INCLUDE_DIRS}&quot;)
++	if (CMAKE_GPSD_NEW_STRUCT)
++		message(STATUS &quot;Check for new style gpsd struct - found&quot;)
++		set(GPS_NEW_STRUCT 1 CACHE INTERNAL
++		    &quot;Does the gpsd support new style structs.&quot;)
++	else (CMAKE_GPSD_NEW_STRUCT)
++		message(STATUS &quot;Check for new style gpsd struct - not found&quot;)
++		set(GPS_NEW_STRUCT 0 CACHE INTERNAL
++		    &quot;Does the gpsd support new style structs.&quot;)
++	endif (CMAKE_GPSD_NEW_STRUCT)
++endif (GPS_FOUND)
+
+Added: trunk/cmake/modules/gpsd_fix.c
+===================================================================
+--- trunk/cmake/modules/gpsd_fix.c	2009-03-17 21:17:15 UTC (rev 1054)
++++ trunk/cmake/modules/gpsd_fix.c	2009-04-14 20:25:23 UTC (rev 1055)
+@@ -0,0 +1,13 @@
++#include &lt;gps.h&gt;
++
++#ifdef __CLASSIC_C__
++int main(){
++  int ac;
++  char*av[];
++#else
++int main(int ac, char*av[]){
++#endif
++  struct gps_data_t t;
++  sizeof(t.fix);
++  return 0;
++}
+
+Modified: trunk/config.h.cmake
+===================================================================
+--- trunk/config.h.cmake	2009-03-17 21:17:15 UTC (rev 1054)
++++ trunk/config.h.cmake	2009-04-14 20:25:23 UTC (rev 1055)
+@@ -5,6 +5,7 @@
+ 
+ #cmakedefine G_SDL 1
+ #cmakedefine HAVE_GPS 1
++#cmakedefine HAVE_GPS_NEW 1
+ #cmakedefine SHM 1
+ #cmakedefine SIGS 1
+ #cmakedefine TCP 1
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="001036.html">[S3d-svn] r1056 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1035">[ date ]</a>
+              <a href="thread.html#1035">[ thread ]</a>
+              <a href="subject.html#1035">[ subject ]</a>
+              <a href="author.html#1035">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

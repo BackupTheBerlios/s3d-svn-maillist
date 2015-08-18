@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r689 - trunk/apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r689%20-%20trunk/apps/s3dfm&In-Reply-To=%3C200709232158.l8NLw3Yo013597%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000681.html">
+   <LINK REL="Next"  HREF="000683.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r689 - trunk/apps/s3dfm</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r689%20-%20trunk/apps/s3dfm&In-Reply-To=%3C200709232158.l8NLw3Yo013597%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r689 - trunk/apps/s3dfm">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Sep 23 23:58:03 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000681.html">[S3d-svn] r688 - trunk/apps/kism3d
+</A></li>
+        <LI>Next message: <A HREF="000683.html">[S3d-svn] r690 - trunk/apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#680">[ date ]</a>
+              <a href="thread.html#680">[ thread ]</a>
+              <a href="subject.html#680">[ subject ]</a>
+              <a href="author.html#680">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-09-23 23:58:02 +0200 (Sun, 23 Sep 2007)
+New Revision: 689
+
+Modified:
+   trunk/apps/s3dfm/dialog.c
+   trunk/apps/s3dfm/s3dfm.h
+Log:
+Mark unused parameter in s3dfm as S3DFMUNUSED to fix warnings
+
+
+Modified: trunk/apps/s3dfm/dialog.c
+===================================================================
+--- trunk/apps/s3dfm/dialog.c	2007-09-23 21:57:54 UTC (rev 688)
++++ trunk/apps/s3dfm/dialog.c	2007-09-23 21:58:02 UTC (rev 689)
+@@ -140,7 +140,7 @@
+ 	fs_lock = TYPE_NONE;
+ 	s3dw_delete(button-&gt;parent); /* parent =surface. this means close containing window */
+ }
+-void *thread_start(void *ptr)
++void *thread_start(void *S3DFMUNUSED(ptr))
+ {
+ 	switch (fs_lock) {
+ 	case TYPE_COPY:
+@@ -165,7 +165,7 @@
+ 	pthread_create(&amp;filethread, NULL, thread_start, NULL);
+ 	s3dw_delete(button-&gt;parent); /* parent =surface. this means close containing window */
+ }
+-void window_copy(char *path)
++void window_copy(char *S3DFMUNUSED(path))
+ {
+ 	s3dw_surface *infwin;
+ 	s3dw_button  *okbutton, *abortbutton;
+@@ -309,7 +309,7 @@
+ 	s3dw_show(S3DWIDGET(infwin));
+ }
+ 
+-void window_move(char *path)
++void window_move(char *S3DFMUNUSED(path))
+ {
+ 	s3dw_surface *infwin;
+ 	s3dw_button  *button;
+
+Modified: trunk/apps/s3dfm/s3dfm.h
+===================================================================
+--- trunk/apps/s3dfm/s3dfm.h	2007-09-23 21:57:54 UTC (rev 688)
++++ trunk/apps/s3dfm/s3dfm.h	2007-09-23 21:58:02 UTC (rev 689)
+@@ -25,6 +25,18 @@
+ #include &lt;s3d.h&gt;
+ #include &lt;s3dw.h&gt;
+ #include &lt;stdlib.h&gt;  /* uintXX_t */
++#include &lt;config-s3d.h&gt;
++
++#ifndef S3DFMUNUSED
++#if defined(UNUSEDPARAM_ATTRIBUTE)
++#define S3DFMUNUSED(x) (x)__attribute__((unused))
++#elif defined(UNUSEDPARAM_OMIT)
++#define S3DFMUNUSED(x) /* x */
++#else
++#define S3DFMUNUSED(x) x
++#endif
++#endif
++
+ #define T_DUNO  0
+ #define T_FOLDER 1
+ #define T_TYPENUM 2
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000681.html">[S3d-svn] r688 - trunk/apps/kism3d
+</A></li>
+	<LI>Next message: <A HREF="000683.html">[S3d-svn] r690 - trunk/apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#680">[ date ]</a>
+              <a href="thread.html#680">[ thread ]</a>
+              <a href="subject.html#680">[ subject ]</a>
+              <a href="author.html#680">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

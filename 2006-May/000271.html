@@ -1,0 +1,186 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r278 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r278%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200605061625.k46GP2rk000174%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000270.html">
+   <LINK REL="Next"  HREF="000272.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r278 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r278%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200605061625.k46GP2rk000174%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r278 - in trunk: . server">dotslash at berlios.de
+       </A><BR>
+    <I>Sat May  6 18:25:02 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000270.html">[S3d-svn] r277 - in trunk: . apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000272.html">[S3d-svn] r279 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#271">[ date ]</a>
+              <a href="thread.html#271">[ thread ]</a>
+              <a href="subject.html#271">[ subject ]</a>
+              <a href="author.html#271">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-06 18:25:01 +0200 (Sat, 06 May 2006)
+New Revision: 278
+
+Modified:
+   trunk/
+   trunk/server/graphics.c
+   trunk/server/proto.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r534 at balthasar</A>:  dotslash | 2006-05-06 18:24:06 +0200
+ - less debug
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:532
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:534
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2006-05-06 12:47:15 UTC (rev 277)
++++ trunk/server/graphics.c	2006-05-06 16:25:01 UTC (rev 278)
+@@ -151,16 +151,10 @@
+ 					{
+ /*						dprintf(HIGH,&quot;object %d is in %s frustum&quot;,j,k?&quot;&quot;:&quot;not&quot;);*/
+ 						if (select_mode==1)
+-						{
+-							dprintf(MED,&quot;glPushName(%d)&quot;,j);
+ 							glPushName(j);
+-						}
+ 						obj_render(ap,j);
+ 						if (select_mode==1)
+-						{
+-							dprintf(MED,&quot;glPopName(%d)&quot;,j);
+ 							glPopName();
+-						}
+ 					}
+ 				}
+ 			}
+@@ -204,14 +198,14 @@
+ 							{
+ 							if (select_mode==1)
+ 							{
+-								dprintf(MED,&quot;object %d in culling frustrum!&quot;,i);
++								dprintf(VLOW,&quot;object %d in culling frustrum!&quot;,i);
+ 								glLoadName(i);
+ 							}
+ 							render_virtual_object(o);
+ 						} else {
+ 							if (select_mode==1)
+ 							{
+-								dprintf(MED,&quot;object %d not in culling frustrum!&quot;,i);
++								dprintf(VLOW,&quot;object %d not in culling frustrum!&quot;,i);
+ 							}
+ 						}
+ 					}
+@@ -228,7 +222,7 @@
+ 					{
+ 						if (select_mode==1)
+ 						{
+-							dprintf(HIGH,&quot;mcp object no. %d&quot;,i);
++							dprintf(VLOW,&quot;mcp object no. %d&quot;,i);
+ 							glLoadName(-1);
+ 							glPushName(i);
+ 						}
+@@ -258,7 +252,6 @@
+ 	t_mtrx m;
+ 
+ 	select_mode=1;
+-	dprintf(LOW,&quot;looking for some objects ...&quot;);
+ 	glSelectBuffer(SBSIZE,select_buf);
+ 	glRenderMode(GL_SELECT);
+ 	glMatrixMode(GL_PROJECTION);
+@@ -320,13 +313,13 @@
+ 			} else 
+ 				for (j=0;j&lt;names;j++)
+ 					ptr++;
+-		    dprintf(LOW,&quot;[HIT %d] names %d [z1:%f|z2:%f] mcp_o=%d, o=%d &quot;,i,names, z1, z2, mcp_o, o);
++		    dprintf(VLOW,&quot;[HIT %d] names %d [z1:%f|z2:%f] mcp_o=%d, o=%d &quot;,i,names, z1, z2, mcp_o, o);
+ 		}
+-		dprintf(MED,&quot;mcp_o= %d, o= %d&quot;,mcp_o,o);
++		dprintf(VLOW,&quot;mcp_o= %d, o= %d&quot;,mcp_o,o);
+ 		ptr=select_buf;
+ 		if (mcp_o==-1) /* it's an mcp object */
+ 		{
+-			dprintf(MED,&quot;clicked on mcp-object no. %d&quot;,o);
++			dprintf(LOW,&quot;clicked on mcp-object no. %d&quot;,o);
+ 			event_obj_click(p,o);
+ 		} else 
+ 		if ((names&gt;1) &amp;&amp; ((mcp_o&gt;=0)&amp;&amp;(mcp_o&lt;p-&gt;n_obj)))
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2006-05-06 12:47:15 UTC (rev 277)
++++ trunk/server/proto.c	2006-05-06 16:25:01 UTC (rev 278)
+@@ -185,7 +185,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(6*4);
+-					dprintf(HIGH,&quot;PEP_LINE_NORMAL[%d]: oid %d, %.1f lines&quot;,length,oid, (length-4)/(6.0*4.0));
++					dprintf(VLOW,&quot;PEP_LINE_NORMAL[%d]: oid %d, %.1f lines&quot;,length,oid, (length-4)/(6.0*4.0));
+ 					obj_pep_line_normal(p,oid, (float *)cptr, num);
+ 				}
+ 				break;
+@@ -222,7 +222,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(4);
+-					dprintf(LOW,&quot;PEP_MAT_TEX[%d]: %d materials for object oid...%d&quot;, length, num, oid);
++					dprintf(VLOW,&quot;PEP_MAT_TEX[%d]: %d materials for object oid...%d&quot;, length, num, oid);
+ 					obj_pep_mat_tex(p,oid, (uint32_t *)cptr, num);
+ 				}
+ 				break;
+@@ -244,7 +244,7 @@
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					toid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-8)/(6*4);
+-					dprintf(MED,&quot;LOAD_POLY_NORMAL[%d]: oid %d, %.2f lines&quot;,length,oid, (length-8)/(6.0*4.0));
++					dprintf(VLOW,&quot;LOAD_POLY_NORMAL[%d]: oid %d, %.2f lines&quot;,length,oid, (length-8)/(6.0*4.0));
+ 					obj_load_line_normal(p,oid, (float *)cptr, toid, num);
+ 				}
+ 				break;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000270.html">[S3d-svn] r277 - in trunk: . apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000272.html">[S3d-svn] r279 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#271">[ date ]</a>
+              <a href="thread.html#271">[ thread ]</a>
+              <a href="subject.html#271">[ subject ]</a>
+              <a href="author.html#271">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

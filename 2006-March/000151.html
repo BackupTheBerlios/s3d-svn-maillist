@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r155 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r155%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603131747.k2DHlb51032422%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000150.html">
+   <LINK REL="Next"  HREF="000152.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r155 - trunk/apps/olsrs3d</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r155%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603131747.k2DHlb51032422%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r155 - trunk/apps/olsrs3d">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Mon Mar 13 18:47:37 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000150.html">[S3d-svn] r154 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000152.html">[S3d-svn] r156 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#151">[ date ]</a>
+              <a href="thread.html#151">[ thread ]</a>
+              <a href="subject.html#151">[ subject ]</a>
+              <a href="author.html#151">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-03-13 18:47:36 +0100 (Mon, 13 Mar 2006)
+New Revision: 155
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+Log:
+fix color
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-03-13 17:38:41 UTC (rev 154)
++++ trunk/apps/olsrs3d/main.c	2006-03-13 17:47:36 UTC (rev 155)
+@@ -479,10 +479,13 @@
+ 			/* HNA */
+ 			if ( olsr_con-&gt;left_etx == -1000.00 ) {
+ 
+-				s3d_pep_material( olsr_con-&gt;obj_id,
+-							   0.0,0.0,1.0,
+-							   0.0,0.0,1.0,
+-							   0.0,0.0,1.0);
++				if(olsr_con-&gt;color != 1) {
++					s3d_pep_material( olsr_con-&gt;obj_id,
++								   0.0,0.0,1.0,
++								   0.0,0.0,1.0,
++								   0.0,0.0,1.0);
++					olsr_con-&gt;color = 1;
++				}
+ 
+ 			} else {
+ 
+@@ -491,10 +494,13 @@
+ 				/* very good link - bright blue */
+ 				if ( ( etx &gt;= 1.0 ) &amp;&amp; ( etx &lt; 1.5 ) ) {
+ 
+-					s3d_pep_material( olsr_con-&gt;obj_id,
+-							0.5,1.0,1.0,
+-							0.5,1.0,1.0,
+-							0.5,1.0,1.0);
++					if(olsr_con-&gt;color != 2) {
++						s3d_pep_material( olsr_con-&gt;obj_id,
++								0.5,1.0,1.0,
++								0.5,1.0,1.0,
++								0.5,1.0,1.0);
++						olsr_con-&gt;color = 2;
++					}
+ 
+ 				/* good link - bright yellow */
+ 				} else if ( ( etx &gt;= 1.5 ) &amp;&amp; ( etx &lt; 2.0 ) ) {
+@@ -548,10 +554,13 @@
+ 
+ 		} else {
+ 
+-			s3d_pep_material( olsr_con-&gt;obj_id,
+-						1.0,1.0,1.0,
+-						1.0,1.0,1.0,
+-						1.0,1.0,1.0);
++			if(olsr_con-&gt;color != 0) {
++				s3d_pep_material( olsr_con-&gt;obj_id,
++							1.0,1.0,1.0,
++							1.0,1.0,1.0,
++							1.0,1.0,1.0);
++				olsr_con-&gt;color = 0;
++			}
+ 
+ 		}
+ 
+@@ -642,7 +651,7 @@
+ 		case 15: /* strg + o */
+ 			lst_out(); /* output ob2ip list */
+ 			break;
+-		case 99: /* c -&gt; color on off*/
++		case 99: /* c -&gt; color on/off */
+ 			if(ColorSwitch) ColorSwitch = 0;
+ 			else ColorSwitch = 1;
+ 			break;
+@@ -658,23 +667,23 @@
+ 			if(RotateSwitch &amp;&amp; RotateSpeed &gt; 1)
+ 				RotateSpeed--;
+ 			break;
+-		case 16: /* strg + p / reset nodes ( zeroPoint to 0,0,0 ) */
++		case 16: /* strg + p -&gt; reset nodes ( zeroPoint to 0,0,0 ) */
+ 			s3d_translate(ZeroPoint,0.0,0.0,0.0);
+ 			ZeroPosition[0] = ZeroPosition[1] = ZeroPosition[2] = 0.0;
+ 			break;
+-		case 101: /* arrow up / move nodes up */
++		case 101: /* arrow up -&gt; move nodes up */
+ 			ZeroPosition[1]++;
+ 			s3d_translate(ZeroPoint,ZeroPosition[0],ZeroPosition[1],ZeroPosition[2]);
+ 			break;
+-		case 103: /* arrow down / move nodes down */
++		case 103: /* arrow down -&gt; move nodes down */
+ 			ZeroPosition[1]--;
+ 			s3d_translate(ZeroPoint,ZeroPosition[0],ZeroPosition[1],ZeroPosition[2]);
+ 			break;
+-		case 104: /* page up / change factor in calc_olsr_node_mov */
++		case 104: /* page up -&gt; change factor in calc_olsr_node_mov */
+ 			if(factor &lt; 0.9)
+ 				factor += 0.1;
+ 			break;
+-		case 105: /* page down / change factor in calc_olsr_node_mov */
++		case 105: /* page down -&gt; change factor in calc_olsr_node_mov */
+ 			if(factor &gt; 0.3)
+ 				factor -= 0.1;
+ 			break;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000150.html">[S3d-svn] r154 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000152.html">[S3d-svn] r156 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#151">[ date ]</a>
+              <a href="thread.html#151">[ thread ]</a>
+              <a href="subject.html#151">[ subject ]</a>
+              <a href="author.html#151">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

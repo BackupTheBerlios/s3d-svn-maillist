@@ -1,0 +1,428 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r696 - in trunk: . apps apps/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r696%20-%20in%20trunk%3A%20.%20apps%20apps/comptest&In-Reply-To=%3C200709232226.l8NMQYe7017029%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000687.html">
+   <LINK REL="Next"  HREF="000689.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r696 - in trunk: . apps apps/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r696%20-%20in%20trunk%3A%20.%20apps%20apps/comptest&In-Reply-To=%3C200709232226.l8NMQYe7017029%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r696 - in trunk: . apps apps/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 24 00:26:34 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000687.html">[S3d-svn] r695 - in trunk: . example server
+</A></li>
+        <LI>Next message: <A HREF="000689.html">[S3d-svn] r697 - trunk/apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#688">[ date ]</a>
+              <a href="thread.html#688">[ thread ]</a>
+              <a href="subject.html#688">[ subject ]</a>
+              <a href="author.html#688">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-09-24 00:26:33 +0200 (Mon, 24 Sep 2007)
+New Revision: 696
+
+Added:
+   trunk/apps/comptest/
+   trunk/apps/comptest/Makefile
+   trunk/apps/comptest/comptest
+   trunk/apps/comptest/comptest.c
+Modified:
+   trunk/
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r2452 at kero</A>:  dotslash | 2007-09-24 00:26:05 +0200
+ - add comptest, a proof-of-concept composite manager which actually manages nothing.
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2451
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2452
+
+Added: trunk/apps/comptest/Makefile
+===================================================================
+--- trunk/apps/comptest/Makefile	2007-09-23 22:26:27 UTC (rev 695)
++++ trunk/apps/comptest/Makefile	2007-09-23 22:26:33 UTC (rev 696)
+@@ -0,0 +1,18 @@
++LIBS=-lXcomposite -lXdamage -lXfixes -lXrender -lX11 -lXext -ls3d  -lm 
++CFLAGS= -I/usr/local/x.org/include -g -O2
++LDFLAGS=-g -O2 $(LIBS)
++SOURCES=comptest.c
++OBJS=$(SOURCES:.c=.o)
++CC=gcc
++LD=gcc
++BIN=comptest
++
++
++.SUFFIXES: .c .o
++all:	comptest
++comptest:	$(OBJS)
++	$(LD) $(LDFLAGS) $&lt; -o $@
++.c.o:  $(HEADERS)
++	   $(CC) $(CFLAGS) -c $&lt; -o $@
++clean:
++	rm -rf $(OBJS) $(BIN)
+
+Added: trunk/apps/comptest/comptest
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/apps/comptest/comptest
+___________________________________________________________________
+Name: svn:executable
+   + *
+Name: svn:mime-type
+   + application/x-executable-file
+
+Added: trunk/apps/comptest/comptest.c
+===================================================================
+--- trunk/apps/comptest/comptest.c	2007-09-23 22:26:27 UTC (rev 695)
++++ trunk/apps/comptest/comptest.c	2007-09-23 22:26:33 UTC (rev 696)
+@@ -0,0 +1,302 @@
++/*
++ * comptest.c
++ *
++ * Copyright (C) 2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of comptest, a one-day-proof-of-concept composite manager hack.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * olsrs3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * olsrs3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with olsrs3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#include &lt;stdio.h&gt;
++#include &lt;stdlib.h&gt;								/* malloc(), free() */
++#include &lt;time.h&gt; 								/* nanosleep() */
++#include &lt;s3d.h&gt;
++#include &lt;X11/Xlib.h&gt;							/* Ximage, Display, X*() */
++#include &lt;X11/Xutil.h&gt;							/* XDestroyImage() */
++#include &lt;X11/Xatom.h&gt;
++#include &lt;X11/extensions/Xcomposite.h&gt;
++#include &lt;X11/extensions/Xdamage.h&gt;
++#include &lt;X11/extensions/Xrender.h&gt;
++
++struct extension {
++	int event, error;
++};
++
++struct window {
++	Window 						 id;
++	XWindowAttributes			 attr;			/* position, size etc. */
++	XImage						*image;
++	Damage						 damage;		/* damage notification */
++	XRenderPictureAttributes	 pa;
++	XRenderPictFormat 			*format; 
++	Picture						 picture;
++	int							 oid;
++	int 						 no;
++
++	char						*bitmap;		/* bitmap to upload */
++	struct window 				*next;
++};
++
++struct extension 	  xrender, xcomposite, xdamage, xfixes;
++struct window		 *window_head = NULL;
++Display     		*dpy;
++char				*display = NULL;
++int					 scr;
++Window				 root;
++
++static int 			 win_no = 0;				/* XXX: REMOVE */
++static struct timespec t = {
++	0, 10*1000*1000
++}; /* 10 mili seconds */
++
++int xinit();
++void window_update(struct window *win, int x, int y, int width, int height);
++
++void mainloop()
++{
++	nanosleep(&amp;t, NULL);
++}
++
++int get_shift(unsigned long t)
++{
++	int i;
++	for (i = 0; t ; i++)
++		t &gt;&gt;= 1;
++	return(i);
++}
++
++static int error(Display *dpy, XErrorEvent *event)		
++{
++/*    printf (&quot;error %d request %d minor %d serial %d\n&quot;,
++        event-&gt;error_code, event-&gt;request_code, event-&gt;minor_code, event-&gt;serial);*/
++    return 0;
++}
++
++
++int xinit() 
++{
++	dpy = XOpenDisplay(display);
++	if (!dpy) {
++		fprintf(stderr, &quot;Can't open display\n&quot;);
++		return(1);
++	}
++    if (!XRenderQueryExtension (dpy, &amp;xrender.event, &amp;xrender.error)) {
++	    fprintf(stderr, &quot;No render extension\n&quot;);
++		return(1);
++    }
++/*    XCompositeQueryVersion (dpy, &amp;composite_major, &amp;composite_minor); */
++
++	if (!XCompositeQueryExtension (dpy, &amp;xcomposite.event, &amp;xcomposite.error)) {
++	    fprintf (stderr, &quot;No composite extension\n&quot;);
++		return(1);
++	}
++
++    if (!XDamageQueryExtension (dpy, &amp;xdamage.event, &amp;xdamage.error))
++    {
++	    fprintf (stderr, &quot;No damage extension\n&quot;);
++		return(1);
++    }
++    if (!XFixesQueryExtension (dpy, &amp;xfixes.event, &amp;xfixes.error))
++    {
++	    fprintf (stderr, &quot;No XFixes extension\n&quot;);
++	    return(1);
++    }
++	XSetErrorHandler(error);
++	return(0);
++}
++
++void deco_box(struct window *win) {
++	float vertices[8*3] = {
++		0, 0, 0,
++		1, 0, 0,
++		1, 1, 0,
++		0, 1, 0,
++		0, 0, 1,
++		1, 0, 1,
++		1, 1, 1,
++		0, 1, 1
++	};
++	float sver[8*3];
++	uint32_t polygon[12*4] = {
++		1, 5, 6, 1,
++		1, 6, 2, 1,
++		2, 6, 7, 1,
++		2, 7, 3, 1,
++		4, 0, 3, 1,
++		4, 3, 7, 1,
++		5, 4, 7, 1,
++		5, 7, 6, 1,
++		0, 4, 1, 1,
++		4, 5, 1, 1,
++		0, 1, 2, 0,
++		0, 2, 3, 0
++
++	};
++	float tbuf[] = { 0.0, 0.0,  1.0, 0.0,  1.0, 1.0,
++					 0.0, 0.0,  1.0, 1.0,  0.0, 1.0};
++	int i;
++
++	win-&gt;no = win_no++;		/* TODO: REMOVE */
++	win-&gt;oid = s3d_new_object();
++
++	for (i = 0;i &lt; 8;i++) {
++		sver[i*3 + 0] = vertices[i*3+0] * win-&gt;attr.width/20;
++		sver[i*3 + 1] = vertices[i*3+1] * -win-&gt;attr.height/20;
++		sver[i*3 + 2] = vertices[i*3+2] * -1;
++	}
++
++	s3d_push_material_a(win-&gt;oid,
++						0.8, 0.0, 0.0 , 1.0,
++						1.0, 1.0, 1.0 , 1.0,
++						0.8, 0.0, 0.0 , 1.0);
++	s3d_push_texture(win-&gt;oid, win-&gt;attr.width, win-&gt;attr.height);
++	s3d_pep_material_texture(win-&gt;oid, 0); /*  assign texture 0 to material 0 */
++	s3d_push_material_a(win-&gt;oid,
++						0.0, 0.8, 0.0 , 1.0,
++						1.0, 1.0, 1.0 , 1.0,
++						0.0, 0.8, 0.0 , 1.0);
++
++	s3d_push_vertices(win-&gt;oid, sver, 8);
++
++	s3d_push_polygons(win-&gt;oid, polygon, 12);
++	s3d_pep_polygon_tex_coords(win-&gt;oid, tbuf, 2);
++	s3d_translate(win-&gt;oid, win-&gt;attr.x/20, -win-&gt;attr.y/20, 5 * win-&gt;no);
++	/*  push data on texture 0 position (0,0) */
++	s3d_flags_on(win-&gt;oid, S3D_OF_VISIBLE);
++	
++}
++
++void window_add(Display *dpy, Window id) {
++	struct window *win;
++	win = malloc(sizeof(*win));
++	if (!win) 
++		return;
++	win-&gt;id = id;
++	XGetWindowAttributes(dpy, win-&gt;id, &amp;win-&gt;attr);
++	win-&gt;format = XRenderFindVisualFormat( dpy, win-&gt;attr.visual );
++/*	printf(&quot;add window: %d:%d size: %dx%d\n&quot;, win-&gt;attr.x, win-&gt;attr.y, win-&gt;attr.width, win-&gt;attr.height);*/
++	win-&gt;damage = XDamageCreate(dpy, win-&gt;id, XDamageReportNonEmpty );
++
++	win-&gt;pa.subwindow_mode = IncludeInferiors;
++	win-&gt;picture = XRenderCreatePicture(dpy, win-&gt;id, win-&gt;format, CPSubwindowMode, &amp;win-&gt;pa);
++
++	win-&gt;oid = 0;
++
++	win-&gt;bitmap = NULL;
++	window_update(win, 0, 0, win-&gt;attr.width, win-&gt;attr.height);
++
++	win-&gt;next = window_head;
++	window_head = win;
++	
++}
++
++void window_remove(struct window *win) {
++	/* TODO */
++	free(win);
++}
++
++void window_update(struct window *win, int x, int y, int width, int height) {
++	int xi, yi;
++	int rs, gs, bs;
++	int bpp;
++	unsigned char *img_ptr, *bmp_ptr;
++	unsigned long *s, *t;
++	XImage *image;
++
++/*	printf(&quot;[D]oing window update for window %d at position %d:%d with size %dx%d\n&quot;,win-&gt;id, x,y,width,height);*/
++	image = XGetImage(dpy, win-&gt;id, x, y, win-&gt;attr.width, win-&gt;attr.height, AllPlanes, ZPixmap);
++	if (!image) {
++/*		printf(&quot;[P]roblem with the image\n&quot;);*/
++		return;
++	}
++	if (!win-&gt;bitmap)
++		win-&gt;bitmap = malloc(win-&gt;attr.width * win-&gt;attr.height * 4);
++	if (!win-&gt;oid)
++		deco_box(win);
++	if (image-&gt;format == ZPixmap) {
++		printf(&quot;XImage: %dx%d, format %d (%d), bpp: %d, depth %d, pad %d\n&quot;, 
++				image-&gt;width, image-&gt;height, image-&gt;format, 
++				ZPixmap, image-&gt;bits_per_pixel, image-&gt;depth, image-&gt;bitmap_pad);
++		rs = get_shift(image-&gt;red_mask) - 8;
++		gs = get_shift(image-&gt;green_mask) - 8;
++		bs = get_shift(image-&gt;blue_mask) - 8;
++
++		bpp = (image-&gt;bits_per_pixel / 8);
++		/* rgb is not bgr */
++		rs = rs;
++		gs = gs - 8;
++		bs = bs - 16;
++		printf(&quot;Ximage: rgb: %d|%d|%d\n&quot;, rs, gs, bs);;
++		/*  printf(&quot;red: size %d, offset %d\n&quot;,rs,roff);
++		  printf(&quot;green: size %d, offset %d\n&quot;,gs,goff);
++		  printf(&quot;blue: size %d, offset %d\n&quot;,bs,boff);
++		  printf(&quot;bits per pixel:%d\n&quot;,bpp);*/
++		for (yi = 0; yi &lt; height ; yi++) {
++			img_ptr = image-&gt;data + (yi * width ) * bpp;
++			bmp_ptr = win-&gt;bitmap + ((y + yi) * win-&gt;attr.width + x) * 4;
++			for (xi = 0; xi &lt; width; xi++) {
++				s = (unsigned long *)img_ptr;
++				t = (unsigned long *)bmp_ptr;
++/*				bmp_ptr[0] = (rs &gt; 0 ? ((*d &amp; image-&gt;red_mask) &gt;&gt; rs) 	: ((*d  &amp; image-&gt;red_mask) &lt;&lt; -rs)) ;
++				bmp_ptr[1] = (gs &gt; 0 ? ((*d &amp; image-&gt;green_mask) &gt;&gt; gs) : ((*d  &amp; image-&gt;green_mask) &lt;&lt; -gs)) ;
++				bmp_ptr[2] = (bs &gt; 0 ? ((*d &amp; image-&gt;blue_mask) &gt;&gt; bs)  : ((*d  &amp; image-&gt;blue_mask) &lt;&lt; -bs));
++				bmp_ptr[3] = 255 ;*/
++				*t = (rs &gt; 0 ? ((*s &amp; image-&gt;red_mask) &gt;&gt; rs) 	: ((*s  &amp; image-&gt;red_mask) &lt;&lt; -rs)) |
++					 (gs &gt; 0 ? ((*s &amp; image-&gt;green_mask) &gt;&gt; gs) : ((*s  &amp; image-&gt;green_mask) &lt;&lt; -gs)) |
++				     (bs &gt; 0 ? ((*s &amp; image-&gt;blue_mask) &gt;&gt; bs)  : ((*s  &amp; image-&gt;blue_mask) &lt;&lt; -bs)) |
++				     255 &lt;&lt; 24;
++
++				bmp_ptr += 4;
++				img_ptr += bpp;
++			}
++			bmp_ptr = win-&gt;bitmap + ((y + yi) * win-&gt;attr.width + x) * 4;
++		}
++/*		s3d_load_texture(win-&gt;oid,0,x,y,width,height, ???); */
++		s3d_load_texture(win-&gt;oid,0,0,0,win-&gt;attr.width, win-&gt;attr.height, win-&gt;bitmap);
++		/*  swap images */
++	}
++	XDestroyImage(image);
++}
++
++void event() {
++/*	XNextEvent (dpy, &amp;ev);*/
++}
++
++
++int main(int argc, char **argv) {
++    Window      	 root_return, parent_return;
++    unsigned int     nchildren;
++    Window      	*children;
++	int 			 i, scr_no;
++
++
++	if (xinit())
++		return(1);
++	if (!s3d_init(&amp;argc, &amp;argv, &quot;compotest&quot;)) {
++		for (scr_no = 0; scr_no &lt; ScreenCount(dpy); scr_no++) {
++			XCompositeRedirectSubwindows(dpy, RootWindow(dpy, scr_no), CompositeRedirectAutomatic);
++		    XQueryTree (dpy, RootWindow(dpy, scr_no), &amp;root_return, &amp;parent_return, &amp;children, &amp;nchildren);
++		    for (i = 0; i &lt; nchildren; i++)
++		        window_add(dpy, children[i]);
++		    XFree(children);
++		}
++		s3d_mainloop(mainloop);
++	}
++
++
++	return(0);
++}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000687.html">[S3d-svn] r695 - in trunk: . example server
+</A></li>
+	<LI>Next message: <A HREF="000689.html">[S3d-svn] r697 - trunk/apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#688">[ date ]</a>
+              <a href="thread.html#688">[ thread ]</a>
+              <a href="subject.html#688">[ subject ]</a>
+              <a href="author.html#688">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

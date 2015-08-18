@@ -1,0 +1,322 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r782 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r782%20-%20trunk/server&In-Reply-To=%3C200710191231.l9JCVNK0013839%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000773.html">
+   <LINK REL="Next"  HREF="000775.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r782 - trunk/server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r782%20-%20trunk/server&In-Reply-To=%3C200710191231.l9JCVNK0013839%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r782 - trunk/server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 14:31:23 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000773.html">[S3d-svn] r781 - trunk/apps/s3d_x11gate
+</A></li>
+        <LI>Next message: <A HREF="000775.html">[S3d-svn] r783 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#774">[ date ]</a>
+              <a href="thread.html#774">[ thread ]</a>
+              <a href="subject.html#774">[ subject ]</a>
+              <a href="author.html#774">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 14:31:19 +0200 (Fri, 19 Oct 2007)
+New Revision: 782
+
+Modified:
+   trunk/server/event.c
+   trunk/server/global.h
+   trunk/server/graphics.c
+   trunk/server/main.c
+   trunk/server/mcp.c
+   trunk/server/navigation.c
+   trunk/server/object.c
+   trunk/server/proto.c
+   trunk/server/shm.c
+   trunk/server/tcp.c
+   trunk/server/user_glut.c
+   trunk/server/user_sdl.c
+Log:
+server: Move extern definitions of variables to global.h
+
+
+Modified: trunk/server/event.c
+===================================================================
+--- trunk/server/event.c	2007-10-19 00:00:59 UTC (rev 781)
++++ trunk/server/event.c	2007-10-19 12:31:19 UTC (rev 782)
+@@ -31,8 +31,7 @@
+ #include &lt;netinet/in.h&gt;  /*  htonl(),htons() */
+ #endif
+ #include &lt;string.h&gt;  /*  strlen(),strcpy() */
+-extern int focus_oid;
+-extern int winw, winh; /* to give aspect ratio to the program */
++
+ /*  I don't plan to keep this until the end, but it can show us how */
+ /*  to interact ... */
+ int event_obj_click(struct t_process *p, int32_t oid)
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2007-10-19 00:00:59 UTC (rev 781)
++++ trunk/server/global.h	2007-10-19 12:31:19 UTC (rev 782)
+@@ -210,6 +210,9 @@
+ void quit(void);
+ void one_time(void);
+ /*  network.c */
++extern uint8_t ibuf[MAXPLEN];
++extern uint8_t obuf[MAXPLEN];
++extern int turn;
+ void sigpipe_handler(int);
+ void sigio_handler(int);
+ int network_init(void);
+@@ -243,6 +246,7 @@
+ int shm_write(struct buf_t *rb, char *buf, int n);
+ int shm_read(struct buf_t *rb, char *buf, int n);
+ /*  proto.c */
++extern int focus_oid;
+ int prot_com_in(struct t_process *p, uint8_t *pbuf);
+ int prot_com_out(struct t_process *p, uint8_t opcode, uint8_t *buf, uint16_t length);
+ /* event.c */
+@@ -256,6 +260,7 @@
+ int event_quit(struct t_process *p);
+ int event_ping_in(struct t_process *p, uint32_t o);
+ /*   user.c */
++extern int but;
+ int user_init(void);
+ int user_quit(void);
+ int user_main(void);
+@@ -287,6 +292,7 @@
+                                  const char *msg __attribute__((unused)), ...) {}
+ #endif
+ /*  graphics.c */
++extern int winw, winh;
+ int graphics_quit(void);
+ void graphics_main(void);
+ int graphics_pick_obj(int x, int y);
+@@ -297,6 +303,8 @@
+ int graphics_quit_glut(void);
+ #endif
+ #ifdef G_SDL
++extern int aa_level;
++extern int SDLFlags;
+ int graphics_init_sdl(void);
+ int graphics_quit_sdl(void);
+ #endif
+@@ -315,6 +323,8 @@
+ void navi_rot(int xdif, int ydif);
+ void ptr_move(int x, int y);
+ /*  process.c */
++extern struct t_process  *procs_p;
++extern int procs_n;
+ struct t_process *process_add(void);
+ int process_del(int id);
+ int process_init(void);
+@@ -372,6 +382,7 @@
+ int mcp_init(void);
+ int mcp_focus(int oid);
+ /*  matrix.c */
++extern t_mtrx Identity;
+ void myMultMatrix(t_mtrx mat2);
+ void myGetMatrix(t_mtrx mat);
+ void mySetMatrix(t_mtrx mat);
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2007-10-19 00:00:59 UTC (rev 781)
++++ trunk/server/graphics.c	2007-10-19 12:31:19 UTC (rev 782)
+@@ -43,8 +43,7 @@
+ /*  ... and types/variables */
+ static int select_mode = 0;
+ int winw, winh;
+-extern struct t_process *procs_p;
+-extern int frame_mode;  /*  GLUT, SDL, ... ? */
++
+ /*  this detects and opens the SDL things */
+ 
+ int graphics_init(void)
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2007-10-19 00:00:59 UTC (rev 781)
++++ trunk/server/main.c	2007-10-19 12:31:19 UTC (rev 782)
+@@ -45,7 +45,6 @@
+ static char *homerc = &quot;~/.s3drc&quot;;
+ static char *etcrc = &quot;/etc/s3drc&quot;;
+ /*static int father_done=0;*/
+-extern int aa_level;
+ static char **s3drc[] = {&amp;rc, &amp;homerc, &amp;etcrc};
+ 
+ static void mainloop(void);
+
+Modified: trunk/server/mcp.c
+===================================================================
+--- trunk/server/mcp.c	2007-10-19 00:00:59 UTC (rev 781)
++++ trunk/server/mcp.c	2007-10-19 12:31:19 UTC (rev 782)
+@@ -32,8 +32,6 @@
+ #include &lt;string.h&gt;    /*  strncpy() */
+ 
+ 
+-extern int      focus_oid;   /*  the focused program */
+-
+ /*  this interacts with the actual mcp client */
+ struct mcp_object {
+ 	uint32_t object;
+
+Modified: trunk/server/navigation.c
+===================================================================
+--- trunk/server/navigation.c	2007-10-19 00:00:59 UTC (rev 781)
++++ trunk/server/navigation.c	2007-10-19 12:31:19 UTC (rev 782)
+@@ -25,7 +25,6 @@
+ #include &quot;global.h&quot;
+ #include &lt;math.h&gt; /* atan() */
+ 
+-extern int winw, winh;
+ void navi_right(void)
+ {
+ 	navi_pos(1, 0);
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2007-10-19 00:00:59 UTC (rev 781)
++++ trunk/server/object.c	2007-10-19 12:31:19 UTC (rev 782)
+@@ -34,10 +34,6 @@
+ #define MAXLOOP 10
+ /*  if oid is always unsigned, we don't have to check oid&gt;=0 */
+ 
+-extern t_mtrx Identity;
+-extern int focus_oid;
+-
+-
+ static void obj_update_tex(struct t_tex *tex, u_int16_t x, u_int16_t y, u_int16_t w, u_int16_t h, u_int8_t *pixbuf);
+ void obj_sys_update(struct t_process *p, int32_t oid);
+ 
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2007-10-19 00:00:59 UTC (rev 781)
++++ trunk/server/proto.c	2007-10-19 12:31:19 UTC (rev 782)
+@@ -34,7 +34,6 @@
+ #endif
+ /*  this code should do the protocol work .... */
+ /*  */
+-extern uint8_t obuf[MAXPLEN];
+ int focus_oid = -1;  /*  initially focus the pid */
+ /*  handle an incoming command from the client .. */
+ 
+
+Modified: trunk/server/shm.c
+===================================================================
+--- trunk/server/shm.c	2007-10-19 00:00:59 UTC (rev 781)
++++ trunk/server/shm.c	2007-10-19 12:31:19 UTC (rev 782)
+@@ -43,9 +43,6 @@
+ #include &lt;sys/shm.h&gt;
+ #include &lt;time.h&gt; /* nanosleep() */
+ 
+-extern uint8_t ibuf[MAXPLEN];
+-extern struct t_process *procs_p;
+-extern int procs_n;
+ static struct t_shmcb waiting_comblock;
+ 
+ static key_t *data = NULL;
+@@ -171,7 +168,7 @@
+ 	return(0);
+ }
+ 
+-extern int turn; /* set turn to 0 when timeslice is over */
++
+ int shm_main(void)
+ {
+ 	int      i/*,found*/;
+
+Modified: trunk/server/tcp.c
+===================================================================
+--- trunk/server/tcp.c	2007-10-19 00:00:59 UTC (rev 781)
++++ trunk/server/tcp.c	2007-10-19 12:31:19 UTC (rev 782)
+@@ -44,10 +44,6 @@
+ #include &lt;unistd.h&gt;   /*  read(),write(),getpid(),close() */
+ #include &lt;stdlib.h&gt;   /*  malloc(),free() */
+ 
+-extern struct t_con *con_list;
+-extern struct t_con mcp;
+-extern uint8_t ibuf[MAXPLEN];
+-extern int idc;
+ static int tcp_sockid;
+ int tcp_init(void)
+ {
+@@ -133,8 +129,6 @@
+ 		}
+ 	return(0);
+ }
+-extern struct t_process *procs_p;
+-extern int procs_n;
+ /*  this is about looking for new data on the sockets */
+ /*  returns 1 when there was new data. */
+ int tcp_pollproc(void)
+
+Modified: trunk/server/user_glut.c
+===================================================================
+--- trunk/server/user_glut.c	2007-10-19 00:00:59 UTC (rev 781)
++++ trunk/server/user_glut.c	2007-10-19 12:31:19 UTC (rev 782)
+@@ -30,7 +30,7 @@
+ void special(int skey, int x, int y);
+ void mouse_motion(int x, int y);
+ void passive_mouse_motion(int x, int y);
+-extern int but;
++
+ /*  init user input things for glut */
+ int user_init_glut(void)
+ {
+
+Modified: trunk/server/user_sdl.c
+===================================================================
+--- trunk/server/user_sdl.c	2007-10-19 00:00:59 UTC (rev 781)
++++ trunk/server/user_sdl.c	2007-10-19 12:31:19 UTC (rev 782)
+@@ -27,7 +27,6 @@
+ /*  this file reads user input */
+ /*  this is done right now by SDL-polling */
+ 
+-extern int SDLFlags;
+ int user_init_sdl(void)
+ {
+ 	SDL_EnableUNICODE(1);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000773.html">[S3d-svn] r781 - trunk/apps/s3d_x11gate
+</A></li>
+	<LI>Next message: <A HREF="000775.html">[S3d-svn] r783 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#774">[ date ]</a>
+              <a href="thread.html#774">[ thread ]</a>
+              <a href="subject.html#774">[ subject ]</a>
+              <a href="author.html#774">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

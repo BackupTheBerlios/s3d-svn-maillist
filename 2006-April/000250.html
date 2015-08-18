@@ -1,0 +1,522 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r257 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-April/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r257%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200604222052.k3MKqI8O014797%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000249.html">
+   <LINK REL="Next"  HREF="000251.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r257 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r257%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200604222052.k3MKqI8O014797%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r257 - in trunk: . server">dotslash at berlios.de
+       </A><BR>
+    <I>Sat Apr 22 22:52:18 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000249.html">[S3d-svn] r256 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000251.html">[S3d-svn] r258 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#250">[ date ]</a>
+              <a href="thread.html#250">[ thread ]</a>
+              <a href="subject.html#250">[ subject ]</a>
+              <a href="author.html#250">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-04-22 22:52:17 +0200 (Sat, 22 Apr 2006)
+New Revision: 257
+
+Modified:
+   trunk/
+   trunk/server/global.h
+   trunk/server/mcp.c
+   trunk/server/object.c
+   trunk/server/process.c
+   trunk/server/proto.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r415 at balthasar</A>:  dotslash | 2006-04-22 22:51:58 +0200
+ - less debug
+ - link_* for more efficient position updating
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:388
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:415
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2006-04-22 12:01:08 UTC (rev 256)
++++ trunk/server/global.h	2006-04-22 20:52:17 UTC (rev 257)
+@@ -136,6 +136,7 @@
+ 					 /*  I know this is dirty, but it would a waste of data if I don't do so ... */
+ 		uint32_t dplist;	 /*  opengl display list number */
+ 		uint32_t linkid;	 /*  linking target, -1 if there is none */
++		uint32_t lsub,lnext,lprev;
+ 		 /*  pointer to our objects; */
+ 		struct t_vertex *p_vertex;
+ 		struct t_mat	*p_mat;
+@@ -340,9 +341,11 @@
+ void into_position		(struct t_process *p, struct t_obj *obj, int depth);
+ void obj_recalc_tmat	(struct t_process *p, uint32_t oid);
+ void obj_size_update	(struct t_process *p, uint32_t oid);
+-void obj_pos_update		(struct t_process *p, uint32_t oid);
++void obj_pos_update(struct t_process *p, uint32_t oid, uint32_t first_oid);
+ void obj_check_biggest_object(struct t_process *p, uint32_t oid);
+ uint32_t get_pointer(struct t_process *p);
++void link_delete(struct t_process *p, uint32_t oid);
++void link_insert(struct t_process *p, uint32_t oid, uint32_t target);
+ /*  mcp.c */
+ int mcp_rep_object(uint32_t mcp_oid);
+ int mcp_del_object(uint32_t mcp_oid);
+
+Modified: trunk/server/mcp.c
+===================================================================
+--- trunk/server/mcp.c	2006-04-22 12:01:08 UTC (rev 256)
++++ trunk/server/mcp.c	2006-04-22 20:52:17 UTC (rev 257)
+@@ -108,7 +108,7 @@
+ 		if (o-&gt;oflags&amp;OF_VIRTUAL)
+ 		{
+ 			focus_oid=oid;
+-			obj_pos_update(p,0);
++			obj_pos_update(p,0,0);
+ 		}
+ 	return(0);
+ }
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2006-04-22 12:01:08 UTC (rev 256)
++++ trunk/server/object.c	2006-04-22 20:52:17 UTC (rev 257)
+@@ -464,7 +464,7 @@
+ 			glDeleteLists(obj-&gt;dplist,1);
+ 			obj-&gt;dplist=0;
+ 		}
+-		dprintf(MED,&quot;pepping mats %d to %d&quot;,(m-n),m);
++		dprintf(VLOW,&quot;pepping mats %d to %d&quot;,(m-n),m);
+ 		for (i=(m-n);i&lt;m;i++)
+ 		{
+ 			obj-&gt;p_mat[i].amb_r=*(px++);
+@@ -552,7 +552,7 @@
+ 			glDeleteLists(obj-&gt;dplist,1);
+ 			obj-&gt;dplist=0;
+ 		}
+-		dprintf(MED,&quot;pepping vertices %d to %d&quot;,(m-n),m-1);
++		dprintf(VLOW,&quot;pepping vertices %d to %d&quot;,(m-n),m-1);
+ 		for (i=(m-n);i&lt;m;i++)
+ 		{
+ 			obj-&gt;p_vertex[i].x=*(px++);
+@@ -1083,7 +1083,7 @@
+ 			obj-&gt;translate.x=*transv;
+ 			obj-&gt;translate.y=*(transv+1);
+ 			obj-&gt;translate.z=*(transv+2);
+-			obj_pos_update(p,oid);
++			obj_pos_update(p,oid,oid);
+ 		}
+ 
+ 	}
+@@ -1121,7 +1121,7 @@
+ 			if (f&lt;0.0)		f+=(float)((int)-f/360)*360;
+ 			if (f&gt;360.0)	f+=(float)((int)f/360)*-360;
+ 			obj-&gt;rotate.z=f;
+-			obj_pos_update(p,oid);
++			obj_pos_update(p,oid,oid);
+ 		}
+ 	}
+ 	return(0);
+@@ -1141,7 +1141,7 @@
+ 			obj-&gt;scale.y=*(scav+1);
+ 			obj-&gt;scale.z=*(scav+2);*/
+ 			obj_size_update(p,oid);
+-			obj_pos_update(p,oid);
++			obj_pos_update(p,oid,oid);
+ 		}
+ 	}
+ 	return(0);
+@@ -1346,18 +1346,16 @@
+ 	p-&gt;object[oid]-&gt;scale=ss/sa;
+ 
+ /*	obj_debug(p,oid);*/
+-	obj_pos_update(p,oid); /* now also update the matrix and the objects linking to our sys-object ... */
++	obj_pos_update(p,oid,oid); /* now also update the matrix and the objects linking to our sys-object ... */
+ }
+ /*  recalculate the position of an object. this assumes that oid is valid. */
+-void obj_pos_update(struct t_process *p, uint32_t oid)
++void obj_pos_update(struct t_process *p, uint32_t oid, uint32_t first_oid)
+ {
+ 	float v[3];
+-	uint32_t i;
+-	int is_lnksrc;
+ 	struct t_obj 		*ao,*o;
+ 	struct t_process	*ap;
+ 	o=p-&gt;object[oid];
+-	dprintf(VLOW,&quot;[obj_pos_upd|pid %d] %d&quot;,p-&gt;id, oid);
++	dprintf(VLOW,&quot;[obj_pos_upd|pid %d] %d&quot;,p-&gt;id, oid,first_oid);
+ 	o-&gt;m_uptodate=0;
+ 	obj_recalc_tmat(p,oid);
+ 	if (p-&gt;id!=MCP) 
+@@ -1384,11 +1382,11 @@
+ 							ao-&gt;translate.x=o-&gt;translate.x;
+ 							ao-&gt;translate.y=o-&gt;translate.y;
+ 							ao-&gt;translate.z=o-&gt;translate.z; /* just copy */
+-							obj_pos_update(ap,get_pointer(ap));
++							obj_pos_update(ap,get_pointer(ap),get_pointer(ap));
+ 						}
+-						
+-					} else 
++					} else {
+ 						obj_sys_update(ap,oid);	
++					}
+ 				}
+ 			switch (o-&gt;oflags&amp;0xF0000000)
+ 			{
+@@ -1404,23 +1402,10 @@
+ 			}
+ 
+ 		}
+-	if (o-&gt;oflags&amp;OF_LINK_SRC)
+-	{
+-		is_lnksrc=0;
+-		for (i=0;i&lt;p-&gt;n_obj;i++)  /*  update objects which reference on us. (recursive) */
+-			if (p-&gt;object[i]!=NULL)
+-				if ((p-&gt;object[i]-&gt;oflags&amp;OF_LINK) &amp;&amp; (p-&gt;object[i]-&gt;linkid==oid))
+-				{
+-					is_lnksrc=1;
+-					dprintf(VLOW,&quot;[obj_pos_upd|pid %d] % is pointing on %d -&gt; update&quot;,p-&gt;id,i, oid);
+-					obj_pos_update(p,i);
+-				}
+-		if (!is_lnksrc)	/* it's not! switch out the flag */
+-		{
+-			o-&gt;oflags&amp;=~OF_LINK_SRC;
+-			dprintf(VLOW,&quot;obj_pos_update(): %d in process %d is no longer a link-source&quot;,oid,p-&gt;id);
+-		}
+-	}
++	/* if it's the root (oid==first_oid), only go down */
++	
++	if (o-&gt;lsub!=-1)						obj_pos_update(p,o-&gt;lsub,first_oid);
++	if ((o-&gt;lnext!=-1) &amp;&amp; (oid!=first_oid))	obj_pos_update(p,o-&gt;lnext,first_oid); 
+ 	if (p-&gt;id!=MCP)
+ 		obj_check_biggest_object(p,oid);
+ }
+@@ -1676,6 +1661,51 @@
+ 	glPopMatrix();
+ 	return(0);
+ }
++
++/* remove the oid out of the link chain */
++void link_delete(struct t_process *p, uint32_t oid)
++{
++	struct t_obj *o,*o2;
++	if (obj_valid(p,oid,o))
++	{
++		dprintf(LOW,&quot;link_delete(): [%d] unlinking %d from %d&quot;,p-&gt;id, oid, o-&gt;linkid);
++		if (o-&gt;linkid!=-1) 
++		{
++			if (obj_valid(p,o-&gt;linkid,o2))
++				if (o2-&gt;lsub==oid)
++				{/* parent is having oid as it's first link in chain */
++					o2-&gt;lsub=o-&gt;lnext; 
++				}
++			if (o-&gt;lprev!=-1)
++				if (obj_valid(p,o-&gt;lprev,o2))
++				{ /* we have a previous pointer linking to us */
++					o2-&gt;lnext=o-&gt;lnext; /* might also be -1 */
++				}
++		}
++		o-&gt;lnext=-1;
++		o-&gt;lprev=-1;
++		o-&gt;linkid=-1;
++		o-&gt;oflags&amp;=~OF_LINK;
++	}
++}
++/* add an element into the link chain */
++void link_insert(struct t_process *p, uint32_t oid, uint32_t target)
++{
++	struct t_obj *o,*ot,*o2;
++	if (obj_valid(p,oid,o) &amp;&amp; obj_valid(p,target,ot))
++	{
++		dprintf(LOW,&quot;link_insert(): [%d] linking %d to %d&quot;,p-&gt;id, oid, target);
++		o-&gt;oflags|=OF_LINK;
++		o-&gt;linkid=target;
++		o-&gt;lnext=ot-&gt;lsub; /* we have a new &quot;first&quot; element */
++		if (o-&gt;lnext!=-1) if (obj_valid(p,o-&gt;lnext,o2))  /* if we already had an element
++														  in the chain, create the backlink */
++		{
++			o2-&gt;lprev=oid;
++		}
++		ot-&gt;lsub=oid;
++	}
++}
+ /*  creates a link from object from an object to another  */
+ /*  to have a translation or anything move with other things */
+ int obj_link(struct t_process *p, uint32_t oid_from, uint32_t oid_to)
+@@ -1708,11 +1738,15 @@
+ 			errds(VHIGH,&quot;obj_link()&quot;,&quot;can't link system-objects in non-mcp-apps!&quot;);
+ 			return(-1);
+ 		}
+- 		dprintf(LOW,&quot;[link|pid %d] %d -&gt; %d&quot;,p-&gt;id, oid_from,oid_to); 
+-		o-&gt;oflags|=OF_LINK;
+-		o-&gt;linkid=oid_to;
+-		p-&gt;object[oid_to]-&gt;oflags|=OF_LINK_SRC;
+-		obj_pos_update(p,oid_from);
++ 		dprintf(VLOW,&quot;[link|pid %d] %d -&gt; %d&quot;,p-&gt;id, oid_from,oid_to); 
++		if (oid_to!=o-&gt;linkid) /* only if something changed ... */
++		{
++			if (o-&gt;linkid!=-1)
++				link_delete(p,oid_from);
++			link_insert(p,oid_from,oid_to);
++			p-&gt;object[oid_to]-&gt;oflags|=OF_LINK_SRC;
++			obj_pos_update(p,oid_from,oid_from);
++		}
+ 		return(0);
+ 	}
+ 	return(-1);
+@@ -1728,9 +1762,10 @@
+ 			errds(VHIGH,&quot;obj_link()&quot;,&quot;may not change the link of a pointer&quot;);
+ 			return(-1);
+ 		}
+-		o-&gt;oflags&amp;=~OF_LINK;
++		link_delete(p,oid);
+ 		dprintf(VLOW,&quot;removing link of object %d from pid %d&quot;,oid,p-&gt;id);
+-		obj_pos_update(p,oid);
++
++		obj_pos_update(p,oid,oid);
+ 		return(0);
+ 	}
+ 	return(-1);
+@@ -1743,6 +1778,9 @@
+ 	obj=malloc(sizeof(struct t_obj));  /*  get an object and define it with our data */
+ 	memset(obj,0,sizeof(struct t_obj));
+ 	obj-&gt;linkid=-1;
++	obj-&gt;lsub=-1;
++	obj-&gt;lnext=-1;
++	obj-&gt;lprev=-1;
+ 	obj-&gt;rotate.x=obj-&gt;rotate.y=obj-&gt;rotate.z=0.0F;
+ 	obj-&gt;translate.x=obj-&gt;translate.y=obj-&gt;translate.z=0.0F;
+ 	obj-&gt;scale=1.0F;
+@@ -1855,6 +1893,13 @@
+ 	mcp_p=get_proc_by_pid(MCP);
+ 	if (obj_valid(p,oid,o))
+ 	{
++		if (o-&gt;oflags&amp;OF_SYSTEM)
++		{
++			dprintf(HIGH,&quot;can't delete system object!&quot;);
++			return(0);
++		}
++
++
+ 		if (p-&gt;id==MCP) 
+ 		{
+ 			if (o-&gt;oflags&amp;OF_VIRTUAL)  /*  only delete if virtual */
+@@ -1865,11 +1910,6 @@
+ 			}
+ 		} else 
+ 			mcp_oid=p-&gt;mcp_oid;
+-		if (o-&gt;oflags&amp;OF_SYSTEM)
+-		{
+-			dprintf(HIGH,&quot;can't delete system object!&quot;);
+-			return(0);
+-		}
+ 
+ 		if (obj_valid(p,oid,o))
+ 		{
+@@ -1905,16 +1945,6 @@
+ 							p-&gt;object[i]-&gt;r=0.0F;				 /*  empty object, so radius is zero! */
+ 							if (p-&gt;id!=MCP) obj_check_biggest_object(p,i);
+ 						}
+-			/* check if we were a link source for anyone ... */
+-			if (o-&gt;oflags&amp;OF_LINK_SRC)
+-				for (i=0;i&lt;p-&gt;n_obj;i++)
+-					if (p-&gt;object[i]!=NULL)
+-						if ((p-&gt;object[i]-&gt;oflags&amp;OF_LINK) &amp;&amp; (p-&gt;object[i]-&gt;linkid==oid))
+-						{
+-								p-&gt;object[i]-&gt;linkid=-1;			 /*  lost our link target! */
+-							if (mcp_oid&gt;-1)
+-								obj_pos_update(p,i);
+-						}
+ 			return(0);
+ 		}
+ 	}
+@@ -1927,42 +1957,57 @@
+ 	uint32_t i;
+ 	GLuint t;
+ 	struct t_obj *o=p-&gt;object[oid];
+-		dprintf(HIGH,&quot;deleting object %d of process %d&quot;,oid,p-&gt;id);
+-		if (!(o-&gt;oflags&amp;OF_NODATA))
++	dprintf(HIGH,&quot;deleting object %d of process %d&quot;,oid,p-&gt;id);
++
++	/* clearing links */
++	if (o-&gt;linkid!=-1)		link_delete(p,oid);
++	while (o-&gt;lsub!=-1)		
++	{
++		i=o-&gt;lsub;
++		link_delete(p,o-&gt;lsub);
++		if (i==o-&gt;lsub) 
+ 		{
+-			if (o-&gt;n_vertex&gt;0) free(o-&gt;p_vertex);
+-			if (o-&gt;n_poly&gt;0) free(o-&gt;p_poly);
+-			if (o-&gt;n_mat&gt;0) free(o-&gt;p_mat);
+-			for (i=0;i&lt;o-&gt;n_tex;i++)
+-			{
+-				if (o-&gt;p_tex[i].buf!=NULL)
+-					free(o-&gt;p_tex[i].buf);
+-				if (o-&gt;p_tex[i].gl_texnum)
+-				{
+-					t=o-&gt;p_tex[i].gl_texnum;
+-					glDeleteTextures(1,&amp;t);
+-				}
+-			}
+-			if (o-&gt;n_tex&gt;0) free(o-&gt;p_tex);
++			dprintf(HIGH,&quot;something is wrong!!&quot;);
++			o=NULL; /* segfault */
++			o-&gt;lsub=-1;
++		}
++	}
+ 
+-		}
+-		if (o-&gt;dplist)
++	if (!(o-&gt;oflags&amp;OF_NODATA))
++	{
++		if (o-&gt;n_vertex&gt;0) free(o-&gt;p_vertex);
++		if (o-&gt;n_poly&gt;0) free(o-&gt;p_poly);
++		if (o-&gt;n_mat&gt;0) free(o-&gt;p_mat);
++		for (i=0;i&lt;o-&gt;n_tex;i++)
+ 		{
+-			if (!(o-&gt;oflags&amp;(OF_CLONE|OF_SYSTEM))) 
++			if (o-&gt;p_tex[i].buf!=NULL)
++				free(o-&gt;p_tex[i].buf);
++			if (o-&gt;p_tex[i].gl_texnum)
+ 			{
+-				dprintf(VLOW,&quot;freeing display list %d&quot;,o-&gt;dplist);
+-				glDeleteLists(o-&gt;dplist,1);
++				t=o-&gt;p_tex[i].gl_texnum;
++				glDeleteTextures(1,&amp;t);
+ 			}
+ 		}
+-		free(o);
+-		p-&gt;object[oid]=NULL;
+-		if (oid==(p-&gt;n_obj-1))
++		if (o-&gt;n_tex&gt;0) free(o-&gt;p_tex);
++
++	}
++	if (o-&gt;dplist)
++	{
++		if (!(o-&gt;oflags&amp;(OF_CLONE|OF_SYSTEM))) 
+ 		{
+-			i=oid;
+-			while ((i!=-1) &amp;&amp; (p-&gt;object[i]==NULL)) i--;
+-			p-&gt;n_obj=i+1;
+-			p-&gt;object=realloc(p-&gt;object,sizeof(struct t_obj *)*(p-&gt;n_obj));
++			dprintf(VLOW,&quot;freeing display list %d&quot;,o-&gt;dplist);
++			glDeleteLists(o-&gt;dplist,1);
+ 		}
++	}
++	free(o);
++	p-&gt;object[oid]=NULL;
++	if (oid==(p-&gt;n_obj-1))
++	{
++		i=oid;
++		while ((i!=-1) &amp;&amp; (p-&gt;object[i]==NULL)) i--;
++		p-&gt;n_obj=i+1;
++		p-&gt;object=realloc(p-&gt;object,sizeof(struct t_obj *)*(p-&gt;n_obj));
++	}
+ 	return(0);
+ }
+ /* get the object of the pointer (that's 1, usually */
+
+Modified: trunk/server/process.c
+===================================================================
+--- trunk/server/process.c	2006-04-22 12:01:08 UTC (rev 256)
++++ trunk/server/process.c	2006-04-22 20:52:17 UTC (rev 257)
+@@ -105,8 +105,8 @@
+ 		p-&gt;object[cam]-&gt;translate.z=5;
+ 		p-&gt;object[cam]-&gt;oflags=OF_CAM;
+ 		p-&gt;object[ptr]-&gt;translate.z=-1;
+-		p-&gt;object[ptr]-&gt;oflags=OF_POINTER|OF_LINK;
+-		p-&gt;object[ptr]-&gt;linkid=cam;
++		p-&gt;object[ptr]-&gt;oflags=OF_POINTER;
++		link_insert(p,ptr,cam);
+ 	} else {
+ 		/* TODO: ... get the cam and ptr position of the mcp, somehow */
+ 		p-&gt;object[cam]-&gt;oflags=OF_CAM;
+@@ -120,13 +120,13 @@
+ 			p-&gt;object[ptr]-&gt;translate.y=o-&gt;translate.y;
+ 			p-&gt;object[ptr]-&gt;translate.z=o-&gt;translate.z;
+ 		}
+-		p-&gt;object[ptr]-&gt;oflags=OF_POINTER|OF_LINK;
+-		p-&gt;object[ptr]-&gt;linkid=cam;
++		p-&gt;object[ptr]-&gt;oflags=OF_POINTER;
++		link_insert(p,ptr,cam);
+ 	}
+ 	dprintf(MED,&quot;process_sys_init(): added object cam0 %d&quot;,cam);
+ 	dprintf(MED,&quot;process_sys_init(): added object ptr0 %d&quot;,ptr);
+-	obj_pos_update(get_proc_by_pid(MCP),cam);
+-	obj_pos_update(get_proc_by_pid(MCP),ptr);
++	obj_pos_update(get_proc_by_pid(MCP),cam,cam);
++	obj_pos_update(get_proc_by_pid(MCP),ptr,ptr);
+ /*	obj_recalc_tmat(p,0);*/
+ 	event_obj_info(p,0); /* tell the new program about the thing */
+ 
+@@ -211,8 +211,6 @@
+ 						mcp_p-&gt;object[j]-&gt;n_vertex=0; 			 /*  and &quot;clone reference&quot; to 0 */
+ 						mcp_p-&gt;object[j]-&gt;r=0.0F;				 /*  empty object, so radius is zero! */
+ 					}
+-					if ((mcp_p-&gt;object[j]-&gt;linkid==p-&gt;mcp_oid))
+-						mcp_p-&gt;object[j]-&gt;linkid=-1;			 /*  lost our link target! */
+ 				}
+ 			obj_free(mcp_p,p-&gt;mcp_oid); 	 /*  free the mcp-app-object. */
+ 			mcp_del_object(p-&gt;mcp_oid); 	 /*  tell MCP that it's object is beeing deleted. */
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2006-04-22 12:01:08 UTC (rev 256)
++++ trunk/server/proto.c	2006-04-22 20:52:17 UTC (rev 257)
+@@ -202,7 +202,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(4*3);
+- 					dprintf(LOW,&quot;pepping %d new vertices for object oid...%d&quot;, num, oid); 
++ 					dprintf(VLOW,&quot;pepping %d new vertices for object oid...%d&quot;, num, oid); 
+ 					obj_pep_vertex(p,oid, (float  *)cptr, num);
+ 				}
+ 				break;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000249.html">[S3d-svn] r256 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000251.html">[S3d-svn] r258 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#250">[ date ]</a>
+              <a href="thread.html#250">[ thread ]</a>
+              <a href="subject.html#250">[ subject ]</a>
+              <a href="author.html#250">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

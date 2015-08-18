@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r497 - in trunk: . libs3d server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r497%20-%20in%20trunk%3A%20.%20libs3d%20server&In-Reply-To=%3C200611302215.kAUMFotY005314%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000489.html">
+   <LINK REL="Next"  HREF="000491.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r497 - in trunk: . libs3d server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r497%20-%20in%20trunk%3A%20.%20libs3d%20server&In-Reply-To=%3C200611302215.kAUMFotY005314%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r497 - in trunk: . libs3d server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Thu Nov 30 23:15:51 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000489.html">[S3d-svn] r496 - in trunk: . apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000491.html">[S3d-svn] r498 - in trunk: . apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#490">[ date ]</a>
+              <a href="thread.html#490">[ thread ]</a>
+              <a href="subject.html#490">[ subject ]</a>
+              <a href="author.html#490">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-11-30 23:15:50 +0100 (Thu, 30 Nov 2006)
+New Revision: 497
+
+Modified:
+   trunk/
+   trunk/configure.ac
+   trunk/libs3d/config.h
+   trunk/server/config.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1186 at kero</A>:  dotslash | 2006-11-30 23:15:46 +0100
+ - disable debug by default, enable with --enable-debug
+ - remove default DEBUG constants from configs
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1184
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1186
+
+Modified: trunk/configure.ac
+===================================================================
+--- trunk/configure.ac	2006-11-30 21:07:27 UTC (rev 496)
++++ trunk/configure.ac	2006-11-30 22:15:50 UTC (rev 497)
+@@ -53,7 +53,7 @@
+ DEVEL_CFLAGS=
+ DEVEL_LDFLAGS=
+ # XXX: switch default and help string for releases.
+-AC_ARG_ENABLE([devel], AS_HELP_STRING([--disable-debug],[Disables debugging flags]), [enable_debug=$enableval], [enable_debug=yes])
++AC_ARG_ENABLE([debug], AS_HELP_STRING([--enable-debug],[Enables debugging flags]), [enable_debug=$enableval], [enable_debug=no])
+ if test x$enable_debug = xyes; then
+ 	DEVEL_CFLAGS=&quot;$DEVEL_CFLAGS -ggdb -DDEBUG=LOW&quot;
+ 	DEVEL_LDFLAGS=&quot;$DEVEL_LDFLAGS -ggdb&quot;
+
+Modified: trunk/libs3d/config.h
+===================================================================
+--- trunk/libs3d/config.h	2006-11-30 21:07:27 UTC (rev 496)
++++ trunk/libs3d/config.h	2006-11-30 22:15:50 UTC (rev 497)
+@@ -29,6 +29,6 @@
+ 
+ #define WITH_FONTCONFIG
+ /*  our level of debug messages */
+-#define DEBUG			LOW /*  standard debug level */
++/* #define DEBUG			LOW */ 	/*  standard debug level, should be set with compiler, e.g. -DDEBUG=LOW */
+ #define SHM_MAX_IDLE	200	/* maximum wait for server timeout */
+ #define	SEI_SS			200	/* seidel algorithm maximum point number */
+
+Modified: trunk/server/config.h
+===================================================================
+--- trunk/server/config.h	2006-11-30 21:07:27 UTC (rev 496)
++++ trunk/server/config.h	2006-11-30 22:15:50 UTC (rev 497)
+@@ -40,7 +40,7 @@
+ #define HIGH	4
+ #define	VHIGH	5
+ /*  which is the minimum level of debugmessage we want to see? */
+-#define DEBUG	LOW
++/* #define DEBUG	LOW */ 		/* should be set with compile, e.g. -DDEBUG=LOW */
+ #ifndef DEBUG
+ #define errds(...) /* nothing */
+ #define s3dprintf(...) /* nothing */
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000489.html">[S3d-svn] r496 - in trunk: . apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000491.html">[S3d-svn] r498 - in trunk: . apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#490">[ date ]</a>
+              <a href="thread.html#490">[ thread ]</a>
+              <a href="subject.html#490">[ subject ]</a>
+              <a href="author.html#490">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,221 @@
+From lazhur at mail.berlios.de  Sat Dec 11 11:39:26 2010
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 11 Dec 2010 11:39:26 +0100 (CET)
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	updated. v0.2.1.1-24-g725e9fe
+Message-ID: <20101211103927.41770480614@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been updated
+       via  725e9fe1ed8b8badb43a65d144f32ce2fa2d4b1a (commit)
+      from  8c5eebaa397d1036873adae0436a7a43faacd029 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 725e9fe1ed8b8badb43a65d144f32ce2fa2d4b1a
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Dec 11 11:40:32 2010 +0100
+
+    Update my mail address
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ README                        |    2 +-
+ apps/s3dosm/osm.c             |    2 +-
+ cmake/modules/FilterPIE.cmake |    2 +-
+ libs3d/s3d.h                  |    2 +-
+ server/object.c               |    2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Dec 11 11:42:54 2010
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 11 Dec 2010 11:42:54 +0100 (CET)
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	updated. v0.2.1.1-24-g397a8bf
+Message-ID: <20101211104255.20AE8480614@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been updated
+  discards  725e9fe1ed8b8badb43a65d144f32ce2fa2d4b1a (commit)
+       via  397a8bf664cfd1c2725b248db7c945b1d46b9f6b (commit)
+
+This update added new revisions after undoing existing revisions.  That is
+to say, the old revision is not a strict subset of the new revision.  This
+situation occurs when you --force push a change and generate a repository
+containing something like this:
+
+ * -- * -- B -- O -- O -- O (725e9fe1ed8b8badb43a65d144f32ce2fa2d4b1a)
+            \
+             N -- N -- N (397a8bf664cfd1c2725b248db7c945b1d46b9f6b)
+
+When this happens we assume that you've already had alert emails for all
+of the O revisions, and so we here report only the revisions in the N
+branch from the common base, B.
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 397a8bf664cfd1c2725b248db7c945b1d46b9f6b
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Dec 11 11:40:32 2010 +0100
+
+    Update my mail address
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ README                        |    2 +-
+ apps/s3dosm/osm.c             |    2 +-
+ cmake/modules/FilterPIE.cmake |    2 +-
+ libs3d/s3d.h                  |    2 +-
+ server/object.c               |    2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Dec 11 11:44:19 2010
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 11 Dec 2010 11:44:19 +0100 (CET)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-6-1-g8f7ede3
+Message-ID: <20101211104419.A0524480EAC@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  8f7ede3ef5426c7e8a5ea578b55764c9322ac9f4 (commit)
+      from  743e9607d14bea0e200e796f336431d36209f0fd (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 8f7ede3ef5426c7e8a5ea578b55764c9322ac9f4
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Dec 11 11:45:50 2010 +0100
+
+    Updated my maintainer e-mail address
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog                           |   46 ++++++++++++++++------------
+ debian/control                             |    2 +-
+ debian/copyright                           |   10 +++---
+ debian/patches/filter_pie.patch            |    4 +-
+ debian/patches/installable-examples.patch  |    2 +-
+ debian/patches/libgps_2_90.patch           |    2 +-
+ debian/patches/libs3d_small-infinity.patch |    2 +-
+ debian/patches/s3dfm_overflow.patch        |    2 +-
+ debian/patches/s3dvt_glibc-pty.patch       |    2 +-
+ debian/patches/version_number.patch        |    2 +-
+ 10 files changed, 40 insertions(+), 34 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Thu Dec 23 23:32:09 2010
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 23 Dec 2010 23:32:09 +0100 (CET)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-6-2-g173cfc8
+Message-ID: <20101223223209.B96E048026B@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  173cfc8d6b7892b63e77d88cbc662ec9e207144c (commit)
+      from  8f7ede3ef5426c7e8a5ea578b55764c9322ac9f4 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 173cfc8d6b7892b63e77d88cbc662ec9e207144c
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Thu Dec 23 22:52:19 2010 +0100
+
+    Keep dependencies on separate lines in debian/control
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    1 +
+ debian/control   |  124 +++++++++++++++++++++++++++++++++++++++---------------
+ 2 files changed, 91 insertions(+), 34 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Fri Dec 24 00:29:25 2010
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Fri, 24 Dec 2010 00:29:25 +0100 (CET)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-6-3-ga6f56f5
+Message-ID: <20101223232925.CD0F648003B@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  a6f56f54fa53fc4a05003db301db50e67f7b6d10 (commit)
+      from  173cfc8d6b7892b63e77d88cbc662ec9e207144c (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit a6f56f54fa53fc4a05003db301db50e67f7b6d10
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Fri Dec 24 00:28:35 2010 +0100
+
+    Enforce order in debian/control
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/control |   48 ++++++++++++++++++++++++------------------------
+ 1 files changed, 24 insertions(+), 24 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

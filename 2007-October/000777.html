@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r785 - trunk/apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r785%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200710191231.l9JCVrXO013979%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000776.html">
+   <LINK REL="Next"  HREF="000778.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r785 - trunk/apps/s3dosm</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r785%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200710191231.l9JCVrXO013979%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r785 - trunk/apps/s3dosm">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 14:31:53 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000776.html">[S3d-svn] r784 - trunk/libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000778.html">[S3d-svn] r786 - in trunk: . apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#777">[ date ]</a>
+              <a href="thread.html#777">[ thread ]</a>
+              <a href="subject.html#777">[ subject ]</a>
+              <a href="author.html#777">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 14:31:52 +0200 (Fri, 19 Oct 2007)
+New Revision: 785
+
+Modified:
+   trunk/apps/s3dosm/http_error_codes.c
+   trunk/apps/s3dosm/http_error_codes.h
+   trunk/apps/s3dosm/http_fetcher.c
+Log:
+s3dosm: Move extern definitions of error_codes to http_error_codes.h
+
+
+Modified: trunk/apps/s3dosm/http_error_codes.c
+===================================================================
+--- trunk/apps/s3dosm/http_error_codes.c	2007-10-19 12:31:43 UTC (rev 784)
++++ trunk/apps/s3dosm/http_error_codes.c	2007-10-19 12:31:52 UTC (rev 785)
+@@ -21,6 +21,7 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#include &quot;http_error_codes.h&quot;
+ 
+ /* Note that '%d' cannot be escaped at this time */
+ const char *http_errlist[] = {
+
+Modified: trunk/apps/s3dosm/http_error_codes.h
+===================================================================
+--- trunk/apps/s3dosm/http_error_codes.h	2007-10-19 12:31:43 UTC (rev 784)
++++ trunk/apps/s3dosm/http_error_codes.h	2007-10-19 12:31:52 UTC (rev 785)
+@@ -39,4 +39,7 @@
+ #define HF_STATUSCODE 7
+ #define HF_CONTENTLEN 8
+ 
++extern const char *http_errlist[];
++extern char convertedError[128];
++
+ #endif
+
+Modified: trunk/apps/s3dosm/http_fetcher.c
+===================================================================
+--- trunk/apps/s3dosm/http_fetcher.c	2007-10-19 12:31:43 UTC (rev 784)
++++ trunk/apps/s3dosm/http_fetcher.c	2007-10-19 12:31:52 UTC (rev 785)
+@@ -43,8 +43,6 @@
+ static char *auth = NULL;
+ static int hideUserAgent = 0;
+ static int hideReferer = 1;
+-extern const char *http_errlist[]; /* Array of HTTP Fetcher error messages */
+-extern char convertedError[128]; /* Buffer to used when errors contain %d */
+ static int errorSource = 0;
+ static int http_errno = 0;
+ static int errorInt = 0;   /* When the error message has a %d in it,
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000776.html">[S3d-svn] r784 - trunk/libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000778.html">[S3d-svn] r786 - in trunk: . apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#777">[ date ]</a>
+              <a href="thread.html#777">[ thread ]</a>
+              <a href="subject.html#777">[ subject ]</a>
+              <a href="author.html#777">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r847 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r847%20-%20trunk/server&In-Reply-To=%3C200711082040.lA8KefVO013120%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000839.html">
+   <LINK REL="Next"  HREF="000841.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r847 - trunk/server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r847%20-%20trunk/server&In-Reply-To=%3C200711082040.lA8KefVO013120%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r847 - trunk/server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Thu Nov  8 21:40:41 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000839.html">[S3d-svn] r846 - trunk/server
+</A></li>
+        <LI>Next message: <A HREF="000841.html">[S3d-svn] r848 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#840">[ date ]</a>
+              <a href="thread.html#840">[ thread ]</a>
+              <a href="subject.html#840">[ subject ]</a>
+              <a href="author.html#840">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-08 21:40:41 +0100 (Thu, 08 Nov 2007)
+New Revision: 847
+
+Modified:
+   trunk/server/object.c
+Log:
+- don't use ugly log() to get the next power of 2 for the texture size
+
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2007-11-08 20:31:03 UTC (rev 846)
++++ trunk/server/object.c	2007-11-08 20:40:41 UTC (rev 847)
+@@ -255,7 +255,6 @@
+ int obj_push_tex(struct t_process *p, int32_t oid, uint16_t *x, int32_t n)
+ {
+ 	int32_t i, m;
+-	double d;
+ 	struct t_tex *p_tex;
+ 	struct t_obj *obj;
+ 	uint16_t *px, hm;
+@@ -280,26 +279,27 @@
+ 				obj-&gt;p_tex[m+i].th = *(px++);
+ 				if ((obj-&gt;p_tex[m+i].tw &lt;= TEXTURE_MAX_W) &amp;&amp; (obj-&gt;p_tex[m+i].th &lt;= TEXTURE_MAX_H) &amp;&amp;
+ 				                (obj-&gt;p_tex[m+i].tw &gt; 0) &amp;&amp; (obj-&gt;p_tex[m+i].th &gt; 0)) {
+-					d = log((double)obj-&gt;p_tex[m+i].tw) / log(2.0);
+-					hm = pow(2, floor(d));
++					/* find the next power of 2 that can hold the width of the texture */
++					for (hm = 1; hm &lt; obj-&gt;p_tex[m+i].tw; hm *= 2);
+ 					s3dprintf(MED, &quot;hm %d, tw %d&quot;, hm, obj-&gt;p_tex[m+i].tw);
+-					if (hm != obj-&gt;p_tex[m+i].tw)  {
+-						obj-&gt;p_tex[m+i].w = hm * 2;
++					if (hm == obj-&gt;p_tex[m+i].tw)  {
++						obj-&gt;p_tex[m+i].xs = 1.0;
++						obj-&gt;p_tex[m+i].w = hm;
++
++					} else {
++						obj-&gt;p_tex[m+i].w = hm;
+ 						obj-&gt;p_tex[m+i].xs = (float)((double)obj-&gt;p_tex[m+i].tw) / ((double)obj-&gt;p_tex[m+i].w);
+-					} else {
+-						obj-&gt;p_tex[m+i].xs = 1.0;
+-						obj-&gt;p_tex[m+i].w = obj-&gt;p_tex[m+i].tw;
+ 					}
+-					d = log((double)obj-&gt;p_tex[m+i].th) / log(2.0);
+-					hm = pow(2, floor(d));
++					/* find the next power of 2 that can hold the height of the texture */
++					for (hm = 1; hm &lt; obj-&gt;p_tex[m+i].th; hm *= 2);
+ 					s3dprintf(MED, &quot;hm %d, th %d&quot;, hm, obj-&gt;p_tex[m+i].th);
+ 
+-					if (hm != obj-&gt;p_tex[m+i].th)  {
+-						obj-&gt;p_tex[m+i].h = hm * 2;
+-						obj-&gt;p_tex[m+i].ys = (float)((double)obj-&gt;p_tex[m+i].th) / ((double)obj-&gt;p_tex[m+i].h);
+-					} else  {
++					if (hm == obj-&gt;p_tex[m+i].th)  {
+ 						obj-&gt;p_tex[m+i].ys = 1.0;
+ 						obj-&gt;p_tex[m+i].h = obj-&gt;p_tex[m+i].th;
++					} else  {
++						obj-&gt;p_tex[m+i].h = hm;
++						obj-&gt;p_tex[m+i].ys = (float)((double)obj-&gt;p_tex[m+i].th) / ((double)obj-&gt;p_tex[m+i].h);
+ 					}
+ 					obj-&gt;p_tex[m+i].buf = malloc(obj-&gt;p_tex[m+i].h * obj-&gt;p_tex[m+i].w * 4);
+ 					memset(obj-&gt;p_tex[m+i].buf, 0, obj-&gt;p_tex[m+i].h*obj-&gt;p_tex[m+i].w*4);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000839.html">[S3d-svn] r846 - trunk/server
+</A></li>
+	<LI>Next message: <A HREF="000841.html">[S3d-svn] r848 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#840">[ date ]</a>
+              <a href="thread.html#840">[ thread ]</a>
+              <a href="subject.html#840">[ subject ]</a>
+              <a href="author.html#840">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

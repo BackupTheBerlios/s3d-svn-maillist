@@ -1,0 +1,417 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r379 - in trunk: . apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r379%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200609112004.k8BK4cud006635%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000371.html">
+   <LINK REL="Next"  HREF="000373.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r379 - in trunk: . apps/s3dfm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r379%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200609112004.k8BK4cud006635%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r379 - in trunk: . apps/s3dfm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 11 22:04:38 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000371.html">[S3d-svn] r378 - in trunk: . apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000373.html">[S3d-svn] r380 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#372">[ date ]</a>
+              <a href="thread.html#372">[ thread ]</a>
+              <a href="subject.html#372">[ subject ]</a>
+              <a href="author.html#372">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-11 22:04:38 +0200 (Mon, 11 Sep 2006)
+New Revision: 379
+
+Modified:
+   trunk/
+   trunk/apps/s3dfm/dialog.c
+   trunk/apps/s3dfm/main.c
+   trunk/apps/s3dfm/s3dfm.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r898 at balthasar</A>:  dotslash | 2006-09-11 22:04:32 +0200
+ - mkdir works ... somehow ^^ (F7)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:896
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:898
+
+Modified: trunk/apps/s3dfm/dialog.c
+===================================================================
+--- trunk/apps/s3dfm/dialog.c	2006-09-03 16:57:33 UTC (rev 378)
++++ trunk/apps/s3dfm/dialog.c	2006-09-11 20:04:38 UTC (rev 379)
+@@ -26,19 +26,30 @@
+ #include &lt;s3dw.h&gt;
+ #include &lt;stdio.h&gt; 	/* NULL, printf() */
+ #include &lt;string.h&gt; /* strlen() */
++#include &lt;stdlib.h&gt; /* realloc(),malloc() */
++#include &lt;errno.h&gt;  /* errno */
++#include &lt;sys/stat.h&gt; /* mkdir() */
++#include &lt;sys/types.h&gt; /* mkdir() */
+ extern t_item *focus;
++filelist fp={NULL,0};
++int typeinput=0;
+ /* keyevent handler */
+ void key_handler(struct s3d_evt *evt)
+ {
+ 	struct s3d_key_event *keys=(struct s3d_key_event *)evt-&gt;buf;
++	char path[M_DIR];
++	if (typeinput) {	/* we have some inputfield now and want the s3dw to handle our input */	
++			printf(&quot;inputting text ...\n&quot;);
++			s3dw_handle_key(evt); 
++			return; 
++	}
++	get_path(focus,path);
+ 	switch (keys-&gt;keysym)
+ 	{
+ 		case 'i':
+ 		case 'I':
+ 				{
+-				char path[M_DIR];
+-				get_path(focus,path);
+-				info_window(path);
++				window_info(path);
+ 				}
+ 				break;
+ 		case 'r':
+@@ -48,6 +59,20 @@
+ 					parse_again(focus);
+ 				}
+ 				break;
++		case S3DK_F1:
++				window_help();
++				break;
++		case S3DK_F5:
++				window_copy(path);
++				break;
++		case S3DK_F6:
++				window_move(path);
++				break;
++		case S3DK_F7:
++				window_mkdir(path);
++				break;
++
++
+ 	}
+ 	s3dw_handle_key(evt);
+ }
+@@ -118,8 +143,196 @@
+ 		s[i]=st[p-i];
+ 	s[p+1]=0;
+ }
++/* add all selected dirs in the new filelist */
++int get_selected(filelist *fp, t_item *dir)
++{
++	int i;
++	char *s;
++	for (i=0;i&lt;dir-&gt;n_item;i++)
++	{
++		if (dir-&gt;list[i].list!=NULL)	get_selected(fp,&amp;(dir-&gt;list[i])); /* scan subdir */
++		if (dir-&gt;list[i].detached)
++		{
++			fp-&gt;n++;
++			fp-&gt;p=realloc(fp-&gt;p,sizeof(char *) * fp-&gt;n);
++			s=malloc(M_DIR);
++			get_path(&amp;(dir-&gt;list[i]),s);
++			fp-&gt;p[fp-&gt;n - 1]=s;
++		}
++	}
++	return(0);
++}
++void window_help()
++{
++	s3dw_surface *infwin;
++	s3dw_button  *button;
++	char string1[M_DIR];
++	infwin=s3dw_surface_new(&quot;Help Window&quot;,12,12);
++	snprintf(string1,M_DIR,&quot;F1 - This Help Window&quot;);
++	s3dw_label_new(infwin,string1,1,2);
++	snprintf(string1,M_DIR,&quot;F5 - Copy&quot;);
++	s3dw_label_new(infwin,string1,1,3);
++	snprintf(string1,M_DIR,&quot;F6 - Move&quot;);
++	s3dw_label_new(infwin,string1,1,4);
++	snprintf(string1,M_DIR,&quot;R - Refresh&quot;);
++	s3dw_label_new(infwin,string1,1,5);
++	snprintf(string1,M_DIR,&quot;I - Info&quot;);
++	s3dw_label_new(infwin,string1,1,6);
++
++	button=s3dw_button_new(infwin,&quot;OK&quot;,4,10);
++	button-&gt;onclick=close_win;
++	s3dw_show(S3DWIDGET(infwin));
++
++}
++void window_fs_another()
++{
++	s3dw_surface *infwin;
++	s3dw_button  *button;
++	infwin=s3dw_surface_new(&quot;Error&quot;,12,8);
++	s3dw_label_new(infwin,&quot;Sorry, another FS Action is in Progress&quot;,1,2);
++	button=s3dw_button_new(infwin,&quot;OK&quot;,5,5);
++	button-&gt;onclick=close_win;
++	s3dw_show(S3DWIDGET(infwin));
++}
++void window_fs_nothing()
++{
++	s3dw_surface *infwin;
++	s3dw_button  *button;
++	infwin=s3dw_surface_new(&quot;Error&quot;,12,8);
++	s3dw_label_new(infwin,&quot;Nothing selected :(&quot;,1,2);
++	button=s3dw_button_new(infwin,&quot;OK&quot;,5,5);
++	button-&gt;onclick=close_win;
++	s3dw_show(S3DWIDGET(infwin));
++
++}
++void window_fs_errno(char *errmsg)
++{
++	s3dw_surface *infwin;
++	s3dw_button  *button;
++	char string[M_DIR];
++	float l;
++	snprintf(string,M_DIR,&quot;%s: %s&quot;,errmsg,strerror(errno));
++	l=strlen(string)*0.7;
++	infwin=s3dw_surface_new(&quot;Error&quot;,l,8);
++	s3dw_label_new(infwin,string,1,2);
++	button=s3dw_button_new(infwin,&quot;OK&quot;,l/2-1,5);
++	button-&gt;onclick=close_win;
++	s3dw_show(S3DWIDGET(infwin));
++}
++
++void window_fs_abort(s3dw_widget *button)
++{
++	int i;
++	for (i=0;i&lt;fp.n;i++)
++		free(fp.p[i]);
++	if (fp.p!=NULL) free(fp.p);
++	fp.n=0;
++	fp.p=NULL;
++	typeinput=0;
++	s3dw_delete(button-&gt;parent); /* parent =surface. this means close containing window */
++}
++void window_copy(char *path)
++{
++	s3dw_surface *infwin;
++	s3dw_button  *okbutton,*abortbutton;
++	float l;
++	char destdir[M_DIR];
++
++	int i,m;
++
++	if (fp.n!=0) 	{	window_fs_another(); 	return; }
++	fp.n=0;
++	fp.p=NULL;
++	get_selected(&amp;fp,&amp;root);
++	printf(&quot;selected %d nodes\n&quot;,fp.n);
++	if (fp.n == 0)	{	window_fs_nothing();	return;	}
++	m=10;
++	for (i=0;i&lt;fp.n;i++)
++	{
++		if (strlen(fp.p[i])&gt;m) m=strlen(fp.p[i]);
++		printf(&quot;%d: %s\n&quot;,i,fp.p[i]);
++	}
++
++	l=(m+3)*0.7;
++	infwin=s3dw_surface_new(&quot;Copy Window&quot;,l,fp.n+8);
++	s3dw_label_new(infwin,&quot;Copy: &quot;,1,1);
++	for (i=0;i&lt;fp.n;i++)
++		s3dw_label_new(infwin,fp.p[i],3,2+i);
++	s3dw_label_new(infwin,&quot;to:&quot;,1,fp.n+3);
++	get_path(focus,destdir);
++	s3dw_label_new(infwin,destdir,3,fp.n+4);
++
++	okbutton=s3dw_button_new(infwin,&quot;OK&quot;,l/2-3,fp.n+5);
++	okbutton-&gt;onclick=window_fs_abort;
++	abortbutton=s3dw_button_new(infwin,&quot;abort&quot;,l/2,fp.n+5);
++	abortbutton-&gt;onclick=window_fs_abort;
++
++	s3dw_show(S3DWIDGET(infwin));
++
++}
++s3dw_input	 *input;
++void window_fs_mkdir(s3dw_widget *button)
++{
++	char *dir;
++	t_item *item;
++	dir=s3dw_input_gettext(input);
++	printf(&quot;creating Directory ...%s\n&quot;,dir);
++	if (-1==mkdir(dir,0777)) /* umask ?! */
++		window_fs_errno(&quot;could not create directory&quot;);
++	else {
++		/* success, now refresh it */
++		item=get_item(dir);
++		if (item==NULL)
++		{
++			printf(&quot;cannot refresh\n&quot;);
++		} else {
++			printf(&quot;refreshing %s\n&quot;,item-&gt;name);
++			parse_again(item);
++
++		}
++				
++	}
++	window_fs_abort(button); /* finish */
++
++}
++void window_mkdir(char *path)
++{
++	s3dw_surface *infwin;
++	s3dw_button  *okbutton,*abortbutton;
++	char string1[M_DIR];
++	float l;
++	if (fp.n!=0) {window_fs_another(); return; }
++	snprintf(string1,M_DIR,&quot;Create Directory in %s&quot;,path);
++	l=strlen(string1)*0.7;
++	infwin=s3dw_surface_new(&quot;Create Directory&quot;,l,8);
++	s3dw_label_new(infwin,string1,1,2);
++	input=s3dw_input_new(infwin,10,1,3);
++	s3dw_input_change_text(input, path);
++	s3dw_focus(S3DWIDGET(input));
++	s3dw_focus(S3DWIDGET(infwin));
++	typeinput=1;
++	okbutton=s3dw_button_new(infwin,&quot;OK&quot;,l/2-3,fp.n+5);
++	okbutton-&gt;onclick=window_fs_mkdir;
++	abortbutton=s3dw_button_new(infwin,&quot;abort&quot;,l/2,fp.n+5);
++	abortbutton-&gt;onclick=window_fs_abort;
++	s3dw_show(S3DWIDGET(infwin));
++
++}
++
++void window_move(char *path)
++{
++	s3dw_surface *infwin;
++	s3dw_button  *button;
++	if (fp.n!=0) {window_fs_another(); return; }
++	infwin=s3dw_surface_new(&quot;Info Window&quot;,20,8);
++	s3dw_label_new(infwin,&quot;Sorry, moving is not implemented yet.. :(&quot;,1,2);
++	button=s3dw_button_new(infwin,&quot;Too bad&quot;,7,5);
++	button-&gt;onclick=close_win;
++	s3dw_show(S3DWIDGET(infwin));
++
++}
+ /* a small window which counts directories/files and displays the result */
+-void info_window(char *path)
++void window_info(char *path)
+ {
+ 	s3dw_surface *infwin;
+ 	s3dw_button  *button;
+@@ -145,5 +358,4 @@
+ 	button-&gt;onclick=close_win;
+ 	/* of couse, show it */
+ 	s3dw_show(S3DWIDGET(infwin));
+-
+ }
+
+Modified: trunk/apps/s3dfm/main.c
+===================================================================
+--- trunk/apps/s3dfm/main.c	2006-09-03 16:57:33 UTC (rev 378)
++++ trunk/apps/s3dfm/main.c	2006-09-11 20:04:38 UTC (rev 379)
+@@ -68,6 +68,42 @@
+ 	} else
+ 		mstrncpy(path,dir-&gt;name,M_DIR);
+ }
++/* find the item to a path, return NULL if not parsed yet */
++t_item *get_item(char *path)
++{
++	char p[M_DIR];
++	char *s,*match;
++	t_item *cur;
++	int i;
++	
++	if (path==NULL) return NULL;
++	if (path[0]=='/')
++	{
++		strncpy(p,path,M_DIR);
++		s=p+1;
++		cur=&root;
++	} else return NULL; /* TODO: also process local paths. right now, we are to lazy */
++	printf(&quot;processing rest of string %s\n&quot;,s);
++	match=s;
++	while ((s=index(s,'/'))!=NULL) { /* while we have slashes inside */
++		s[0]=0; /* mark the slash with space */
++		s++;	/* move to the next */
++		/* parse ... */
++		printf(&quot;looking for a match for %s\n&quot;,match);
++		for (i=0;i&lt;cur-&gt;n_item;i++)
++			if (0==strcmp(cur-&gt;list[i].name,match))
++			{ /* found !! */
++				cur=&amp;(cur-&gt;list[i]); /* forward */
++				match=s; /* select next */
++				break;
++			}
++		if (i==cur-&gt;n_item) {
++			printf(&quot;found no match for %s :(\n&quot;,match);
++			return NULL; /* not found */
++		}
++	}
++	return(cur);
++}
+ /* finds an item in the tree by oid */
+ t_item *finditem(t_item *t, int oid)
+ {
+
+Modified: trunk/apps/s3dfm/s3dfm.h
+===================================================================
+--- trunk/apps/s3dfm/s3dfm.h	2006-09-03 16:57:33 UTC (rev 378)
++++ trunk/apps/s3dfm/s3dfm.h	2006-09-11 20:04:38 UTC (rev 379)
+@@ -73,6 +73,7 @@
+ extern t_item root;
+ /* main.c */
+ void get_path(t_item *dir, char *path);
++t_item *get_item(char *path);
+ t_item *finditem(t_item *t, int oid);
+ void mainloop();
+ /* parse.c */
+@@ -118,4 +119,8 @@
+ /* dialog.c */
+ void key_handler(struct s3d_evt *evt);
+ void object_click(struct s3d_evt *evt);
+-void info_window(char *path);
++void window_info(char *path);
++void window_help();
++void window_copy(char *path);
++void window_move(char *path);
++void window_mkdir(char *path);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000371.html">[S3d-svn] r378 - in trunk: . apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000373.html">[S3d-svn] r380 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#372">[ date ]</a>
+              <a href="thread.html#372">[ thread ]</a>
+              <a href="subject.html#372">[ subject ]</a>
+              <a href="author.html#372">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

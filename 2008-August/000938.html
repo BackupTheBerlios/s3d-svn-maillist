@@ -1,0 +1,713 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r954 - in trunk/Documentation: libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r954%20-%20in%20trunk/Documentation%3A%20libs3d%20libs3dw&In-Reply-To=%3C200808182149.m7ILn29o008410%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000937.html">
+   <LINK REL="Next"  HREF="000939.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r954 - in trunk/Documentation: libs3d libs3dw</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r954%20-%20in%20trunk/Documentation%3A%20libs3d%20libs3dw&In-Reply-To=%3C200808182149.m7ILn29o008410%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r954 - in trunk/Documentation: libs3d libs3dw">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Aug 18 23:49:02 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000937.html">[S3d-svn] r953 - trunk/experimental/testvis
+</A></li>
+        <LI>Next message: <A HREF="000939.html">[S3d-svn] r955 - in trunk/Documentation: libs3d libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#938">[ date ]</a>
+              <a href="thread.html#938">[ thread ]</a>
+              <a href="subject.html#938">[ subject ]</a>
+              <a href="author.html#938">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-08-18 23:49:02 +0200 (Mon, 18 Aug 2008)
+New Revision: 954
+
+Modified:
+   trunk/Documentation/libs3d/libs3d.docbook
+   trunk/Documentation/libs3dw/libs3dw.docbook
+Log:
+Update functions definitions in Documentation
+
+Modified: trunk/Documentation/libs3d/libs3d.docbook
+===================================================================
+--- trunk/Documentation/libs3d/libs3d.docbook	2008-08-18 21:48:56 UTC (rev 953)
++++ trunk/Documentation/libs3d/libs3d.docbook	2008-08-18 21:49:02 UTC (rev 954)
+@@ -48,9 +48,9 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;int &lt;function&gt;s3d_init&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-int *&lt;parameter&gt;argc&lt;/parameter&gt;.
+-char ***&lt;parameter&gt;argv&lt;/parameter&gt;
+-char *&lt;parameter&gt;name&lt;/parameter&gt;
++int *&lt;parameter&gt;argc&lt;/parameter&gt;,
++char ***&lt;parameter&gt;argv&lt;/parameter&gt;,
++const char *&lt;parameter&gt;name&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -153,7 +153,7 @@
+ &lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;int &lt;function&gt;s3d_push_vertices&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, float *&lt;parameter&gt;vbuf&lt;/parameter&gt;, unsigned short &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;
++&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, const float *&lt;parameter&gt;vbuf&lt;/parameter&gt;, uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+ &lt;para&gt;
+@@ -185,7 +185,7 @@
+ float &lt;parameter&gt;spec_b&lt;/parameter&gt;,
+ float &lt;parameter&gt;diff_r&lt;/parameter&gt;,
+ float &lt;parameter&gt;diff_g&lt;/parameter&gt;,
+-float &lt;parameter&gt;diff_b&lt;/parameter&gt;,
++float &lt;parameter&gt;diff_b&lt;/parameter&gt;
+ 
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+@@ -240,8 +240,8 @@
+ &lt;funcdef&gt;int &lt;function&gt;s3d_push_materials_a&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;mbuf&lt;/parameter&gt;, 
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++const float *&lt;parameter&gt;mbuf&lt;/parameter&gt;, 
++uint16_t &lt;parameter&gt;n&lt;/parameter&gt;
+ 
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+@@ -280,10 +280,10 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;int &lt;function&gt;s3d_push_polygon&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-int &lt;parameter&gt;v1&lt;/parameter&gt;,
+-int &lt;parameter&gt;v2&lt;/parameter&gt;,
+-int &lt;parameter&gt;v3&lt;/parameter&gt;,
+-int &lt;parameter&gt;material&lt;/parameter&gt;
++uint32_t &lt;parameter&gt;v1&lt;/parameter&gt;,
++uint32_t &lt;parameter&gt;v2&lt;/parameter&gt;,
++uint32_t &lt;parameter&gt;v3&lt;/parameter&gt;,
++uint32_t &lt;parameter&gt;material&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -310,8 +310,8 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;int &lt;function&gt;s3d_push_polygons&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned long &lt;parameter&gt;*pbuf&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++const uint32_t *&lt;parameter&gt;*pbuf&lt;/parameter&gt;,
++unsigned uint16_t &lt;parameter&gt;n&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -340,9 +340,9 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;int &lt;function&gt;s3d_push_line&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-int &lt;parameter&gt;v1&lt;/parameter&gt;,
+-int &lt;parameter&gt;v2&lt;/parameter&gt;,
+-int &lt;parameter&gt;material&lt;/parameter&gt;
++uint32_t &lt;parameter&gt;v1&lt;/parameter&gt;,
++uint32_t &lt;parameter&gt;v2&lt;/parameter&gt;,
++uint32_t &lt;parameter&gt;material&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -360,8 +360,8 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;int &lt;function&gt;s3d_push_line&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned  long *&lt;parameter&gt;*lbuf&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++const uint32_t *&lt;parameter&gt;*lbuf&lt;/parameter&gt;,
++uint16_t &lt;parameter&gt;n&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -378,9 +378,9 @@
+ &lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;int &lt;function&gt;s3d_push_texture&lt;/function&gt;&lt;/funcdef&gt;
+-&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-int &lt;parameter&gt;w&lt;/parameter&gt;,
+-int &lt;parameter&gt;h&lt;/parameter&gt;
++&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;,
++uint16_t &lt;parameter&gt;w&lt;/parameter&gt;,
++uint16_t &lt;parameter&gt;h&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -397,7 +397,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;int &lt;function&gt;s3d_pop_vertex&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++uint32_t &lt;parameter&gt;n&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -414,7 +414,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;int &lt;function&gt;s3d_pop_polygon&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++uint32_t &lt;parameter&gt;n&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -432,7 +432,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;int &lt;function&gt;s3d_pop_material&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++uint32_t &lt;parameter&gt;n&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -449,7 +449,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;int &lt;function&gt;s3d_pop_texture&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++uint32_t &lt;parameter&gt;n&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -466,7 +466,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;int &lt;function&gt;s3d_pop_line&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++uint32_t &lt;parameter&gt;n&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -483,8 +483,8 @@
+ &lt;funcdef&gt;int &lt;function&gt;s3d_pep_polygon_normals&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;nbuf&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++const float *&lt;parameter&gt;nbuf&lt;/parameter&gt;,
++uint16_t &lt;parameter&gt;n&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -533,8 +533,8 @@
+ &lt;funcdef&gt;int &lt;function&gt;s3d_pep_polygon_tex_coords&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;tbuf&lt;/parameter&gt;, 
+-int &lt;parameter&gt;n&lt;/parameter&gt;
++const float *&lt;parameter&gt;tbuf&lt;/parameter&gt;, 
++uint16_t &lt;parameter&gt;n&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -552,7 +552,7 @@
+ &lt;funcdef&gt;int &lt;function&gt;s3d_pep_material_texture&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned long &lt;parameter&gt;tex&lt;/parameter&gt;
++uint32_t &lt;parameter&gt;tex&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -590,8 +590,8 @@
+ &lt;funcdef&gt;int &lt;function&gt;s3d_pep_vertices&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;vbuf&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++const float *&lt;parameter&gt;vbuf&lt;/parameter&gt;,
++uint16_t &lt;parameter&gt;n&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -629,8 +629,8 @@
+ &lt;funcdef&gt;int &lt;function&gt;s3d_pep_lines&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned long *&lt;parameter&gt;lbuf&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++const uint32_t *&lt;parameter&gt;lbuf&lt;/parameter&gt;,
++uint16_t &lt;parameter&gt;n&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -649,8 +649,8 @@
+ &lt;funcdef&gt;int &lt;function&gt;s3d_pep_line_normals&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;nbuf&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++const float *&lt;parameter&gt;nbuf&lt;/parameter&gt;,
++uint16_t &lt;parameter&gt;n&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -672,9 +672,9 @@
+ &lt;funcdef&gt;int &lt;function&gt;s3d_load_line_normals&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;nbuf&lt;/parameter&gt;,
+-int &lt;parameter&gt;start&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;,
++const float *&lt;parameter&gt;nbuf&lt;/parameter&gt;,
++uint32_t &lt;parameter&gt;start&lt;/parameter&gt;,
++uint16_t &lt;parameter&gt;n&lt;/parameter&gt;,
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -701,7 +701,7 @@
+ float &lt;parameter&gt;spec_b&lt;/parameter&gt;,
+ float &lt;parameter&gt;diff_r&lt;/parameter&gt;,
+ float &lt;parameter&gt;diff_g&lt;/parameter&gt;,
+-float &lt;parameter&gt;diff_b&lt;/parameter&gt;,
++float &lt;parameter&gt;diff_b&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -751,8 +751,8 @@
+ &lt;funcdef&gt;int &lt;function&gt;s3d_pep_materials_a&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;mbuf&lt;/parameter&gt;, 
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++const float *&lt;parameter&gt;mbuf&lt;/parameter&gt;, 
++uint16_t &lt;parameter&gt;n&lt;/parameter&gt;
+ 
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+@@ -772,9 +772,9 @@
+ &lt;funcdef&gt;int &lt;function&gt;s3d_load_materials_a&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;mbuf&lt;/parameter&gt;, 
+-unsigned longs &lt;parameter&gt;start&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
++const float *&lt;parameter&gt;mbuf&lt;/parameter&gt;,
++uint32_t &lt;parameter&gt;start&lt;/parameter&gt;,
++uint16_t &lt;parameter&gt;n&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -794,9 +794,9 @@
+ &lt;funcdef&gt;int &lt;function&gt;s3d_load_polygon_normals&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-float *&lt;parameter&gt;nbuf&lt;/parameter&gt;,
+-int &lt;parameter&gt;start&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;,
++const float *&lt;parameter&gt;nbuf&lt;/parameter&gt;,
++uint32_t &lt;parameter&gt;start&lt;/parameter&gt;,
++uint16_t &lt;parameter&gt;n&lt;/parameter&gt;,
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -835,12 +835,12 @@
+ &lt;funcdef&gt;int &lt;function&gt;s3d_load_texture&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;object&lt;/parameter&gt;, 
+-unsigned long &lt;parameter&gt;tex&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;xpos&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;ypos&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;w&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;h&lt;/parameter&gt;,
+-unsigned char *&lt;parameter&gt;data&lt;/parameter&gt;
++uint32_t &lt;parameter&gt;tex&lt;/parameter&gt;,
++uint16_t &lt;parameter&gt;xpos&lt;/parameter&gt;,
++uint16_t &lt;parameter&gt;ypos&lt;/parameter&gt;,
++uint16_t &lt;parameter&gt;w&lt;/parameter&gt;,
++uint16_t &lt;parameter&gt;h&lt;/parameter&gt;,
++const uint8_t *&lt;parameter&gt;data&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -890,12 +890,12 @@
+ &lt;/sect2&gt;
+ 
+ 
+-&lt;sect2 id=&quot;s3d_clone_object&quot;&gt;
+-&lt;title&gt;s3d_clone_object&lt;/title&gt;
++&lt;sect2 id=&quot;s3d_clone&quot;&gt;
++&lt;title&gt;s3d_clone&lt;/title&gt;
+ &lt;funcsynopsis&gt;
+ &lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+ &lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_clone_object&lt;/function&gt;&lt;/funcdef&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_clone&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;oid&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+@@ -912,11 +912,11 @@
+ 
+ 
+ &lt;sect2&gt;
+-&lt;title&gt;s3d_clone_object_target&lt;/title&gt;
++&lt;title&gt;s3d_clone_target&lt;/title&gt;
+ &lt;funcsynopsis&gt;
+ &lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+ &lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_clone_object_target&lt;/function&gt;&lt;/funcdef&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_clone_target&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;oid&lt;/parameter&gt;,
+ int &lt;parameter&gt;toid&lt;/parameter&gt;
+@@ -925,7 +925,7 @@
+ &lt;/funcsynopsis&gt;
+ &lt;para&gt;
+ Changes the clone target of oid to another object (toid). This assumes you've got
+-oid from &lt;link linkend=&quot;s3d_clone_object&quot;&gt;s3d_clone_object&lt;/link&gt; before.
++oid from &lt;link linkend=&quot;s3d_clone&quot;&gt;s3d_clone&lt;/link&gt; before.
+ &lt;/para&gt;
+ &lt;/sect2&gt;
+ 
+@@ -974,7 +974,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;int &lt;function&gt;s3d_import_model_file&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-		char *&lt;parameter&gt;fname&lt;/parameter&gt;
++		const char *&lt;parameter&gt;fname&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -993,7 +993,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;int &lt;function&gt;s3d_select_font&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-char *&lt;parameter&gt;mask&lt;/parameter&gt;
++const char *&lt;parameter&gt;mask&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -1014,7 +1014,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;int &lt;function&gt;s3d_draw_string&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-char *&lt;parameter&gt;str&lt;/parameter&gt;,
++const char *&lt;parameter&gt;str&lt;/parameter&gt;,
+ float *&lt;parameter&gt;len&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+@@ -1042,7 +1042,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;float &lt;function&gt;s3d_strlen&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-char *&lt;parameter&gt;str&lt;/parameter&gt;,
++const char *&lt;parameter&gt;str&lt;/parameter&gt;,
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -1060,7 +1060,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;int &lt;function&gt;s3d_open_file&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-char *&lt;parameter&gt;fname&lt;/parameter&gt;,
++const char *&lt;parameter&gt;fname&lt;/parameter&gt;,
+ char **&lt;parameter&gt;pointer&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+@@ -1082,7 +1082,7 @@
+ &lt;funcdef&gt;int &lt;function&gt;s3d_flags_on&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;object&lt;/parameter&gt;,
+-unsigned long &lt;parameter&gt;flags&lt;/parameter&gt;
++uint32_t &lt;parameter&gt;flags&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -1101,7 +1101,7 @@
+ &lt;funcdef&gt;int &lt;function&gt;s3d_flags_off&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;object&lt;/parameter&gt;,
+-unsigned long &lt;parameter&gt;flags&lt;/parameter&gt;
++uint32_t &lt;parameter&gt;flags&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -1229,7 +1229,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;struct s3d_evt *&lt;function&gt;s3d_find_event&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-unsigned char &lt;parameter&gt;event&lt;/parameter&gt;
++uint8_t &lt;parameter&gt;event&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -1246,7 +1246,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;int &lt;function&gt;s3d_delete_event&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-struct s3d_evt *&lt;parameter&gt;devt&lt;/parameter&gt;
++const struct s3d_evt *&lt;parameter&gt;devt&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -1263,7 +1263,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;int &lt;function&gt;s3d_set_callback&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-unsigned char &lt;parameter&gt;event&lt;/parameter&gt;
++uint8_t &lt;parameter&gt;event&lt;/parameter&gt;
+ s3d_cb &lt;parameter&gt;func&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+@@ -1293,7 +1293,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;void &lt;function&gt;s3d_ignore_callback&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-unsigned char &lt;parameter&gt;event&lt;/parameter&gt;
++uint8_t &lt;parameter&gt;event&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -1312,7 +1312,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;void &lt;function&gt;s3d_clear_callback&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-unsigned char &lt;parameter&gt;event&lt;/parameter&gt;
++uint8_t &lt;parameter&gt;event&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -1329,7 +1329,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;s3d_cb &lt;function&gt;s3d_get_callback&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-unsigned char &lt;parameter&gt;event&lt;/parameter&gt;
++uint8_t &lt;parameter&gt;event&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -1371,7 +1371,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;float &lt;function&gt;s3d_vector_length&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-float &lt;parameter&gt;vector&lt;/parameter&gt;[]
++const float &lt;parameter&gt;vector&lt;/parameter&gt;[]
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -1382,20 +1382,20 @@
+ &lt;/sect2&gt;
+ 
+ &lt;sect2&gt;
+-&lt;title&gt;s3d_vector_substract&lt;/title&gt;
++&lt;title&gt;s3d_vector_subtract&lt;/title&gt;
+ &lt;funcsynopsis&gt;
+ &lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+ &lt;funcprototype&gt;
+-&lt;funcdef&gt;void &lt;function&gt;s3d_vector_substract&lt;/function&gt;&lt;/funcdef&gt;
++&lt;funcdef&gt;void &lt;function&gt;s3d_vector_subtract&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-float &lt;parameter&gt;vector1&lt;/parameter&gt;[],
+-float &lt;parameter&gt;vector2&lt;/parameter&gt;[],
++const float &lt;parameter&gt;vector1&lt;/parameter&gt;[],
++const float &lt;parameter&gt;vector2&lt;/parameter&gt;[],
+ float &lt;parameter&gt;result_vector&lt;/parameter&gt;[]
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+ &lt;para&gt;
+-Substracts vector1 from vector2, writing result into result_vector.
++Subtracts vector1 from vector2, writing result into result_vector.
+ All vectors should have the format  float[3].
+ More info &lt;ulink url=&quot;<A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Vector_addition_and_subtraction">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Vector_addition_and_subtraction</A>&quot;&gt;on wikipedia&lt;/ulink&gt;.
+ &lt;/para&gt;
+@@ -1408,8 +1408,8 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;float &lt;function&gt;s3d_vector_dot_product&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-float &lt;parameter&gt;vector1&lt;/parameter&gt;[],
+-float &lt;parameter&gt;vector2&lt;/parameter&gt;[]
++const float &lt;parameter&gt;vector1&lt;/parameter&gt;[],
++const float &lt;parameter&gt;vector2&lt;/parameter&gt;[]
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -1427,8 +1427,8 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;float &lt;function&gt;s3d_vector_cross_product&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-float &lt;parameter&gt;vector1&lt;/parameter&gt;[],
+-float &lt;parameter&gt;vector2&lt;/parameter&gt;[]
++const float &lt;parameter&gt;vector1&lt;/parameter&gt;[],
++const float &lt;parameter&gt;vector2&lt;/parameter&gt;[]
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -1447,8 +1447,8 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;float &lt;function&gt;s3d_vector_angle&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-float &lt;parameter&gt;vector1&lt;/parameter&gt;[],
+-float &lt;parameter&gt;vector2&lt;/parameter&gt;[]
++const float &lt;parameter&gt;vector1&lt;/parameter&gt;[],
++const float &lt;parameter&gt;vector2&lt;/parameter&gt;[]
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -1467,8 +1467,8 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;float &lt;function&gt;s3d_angle_to_cam&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-float &lt;parameter&gt;obj_pos&lt;/parameter&gt;[],
+-float &lt;parameter&gt;cam_pos&lt;/parameter&gt;[]
++const float &lt;parameter&gt;obj_pos&lt;/parameter&gt;[],
++const float &lt;parameter&gt;cam_pos&lt;/parameter&gt;[]
+ float *&lt;parameter&gt;angle_rad&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+
+Modified: trunk/Documentation/libs3dw/libs3dw.docbook
+===================================================================
+--- trunk/Documentation/libs3dw/libs3dw.docbook	2008-08-18 21:48:56 UTC (rev 953)
++++ trunk/Documentation/libs3dw/libs3dw.docbook	2008-08-18 21:49:02 UTC (rev 954)
+@@ -35,7 +35,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;s3dw_surface *&lt;function&gt;s3dw_surface_new&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-char         *&lt;parameter&gt;title&lt;/parameter&gt;,
++const char         *&lt;parameter&gt;title&lt;/parameter&gt;,
+ float		  &lt;parameter&gt;width&lt;/parameter&gt;,
+ float		  &lt;parameter&gt;height&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+@@ -57,8 +57,8 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;s3dw_button *&lt;function&gt;s3dw_button_new&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;,
+-char         *&lt;parameter&gt;text&lt;/parameter&gt;,
++const s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;,
++const char         *&lt;parameter&gt;text&lt;/parameter&gt;,
+ float		  &lt;parameter&gt;posx&lt;/parameter&gt;,
+ float		  &lt;parameter&gt;posy&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+@@ -81,7 +81,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;s3dw_input *&lt;function&gt;s3dw_input_new&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;,
++const s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;,
+ float		  &lt;parameter&gt;width&lt;/parameter&gt;,
+ float		  &lt;parameter&gt;posx&lt;/parameter&gt;,
+ float		  &lt;parameter&gt;posy&lt;/parameter&gt;
+@@ -106,8 +106,8 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;s3dw_label *&lt;function&gt;s3dw_label_new&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;,
+-char         *&lt;parameter&gt;text&lt;/parameter&gt;,
++const s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;,
++const char         *&lt;parameter&gt;text&lt;/parameter&gt;,
+ float		  &lt;parameter&gt;posx&lt;/parameter&gt;,
+ float		  &lt;parameter&gt;posy&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+@@ -130,8 +130,8 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;s3dw_textbox *&lt;function&gt;s3dw_textbox_new&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;,
+-char         *&lt;parameter&gt;text&lt;/parameter&gt;,
++const s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;,
++const char         *&lt;parameter&gt;text&lt;/parameter&gt;,
+ float		  &lt;parameter&gt;posx&lt;/parameter&gt;,
+ float		  &lt;parameter&gt;posy&lt;/parameter&gt;,
+ float		  &lt;parameter&gt;width&lt;/parameter&gt;,
+@@ -287,7 +287,7 @@
+ &lt;funcdef&gt;void &lt;function&gt;s3dw_input_change_text&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ 		s3dw_input *&lt;parameter&gt;input&lt;/parameter&gt;,
+-		char *&lt;parameter&gt;text&lt;/parameter&gt;
++const 		char *&lt;parameter&gt;text&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -304,7 +304,7 @@
+ &lt;funcdef&gt;void &lt;function&gt;s3dw_label_change_text&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ 		s3dw_label *&lt;parameter&gt;label&lt;/parameter&gt;,
+-		char *&lt;parameter&gt;text&lt;/parameter&gt;
++const 		char *&lt;parameter&gt;text&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -321,7 +321,7 @@
+ &lt;funcdef&gt;void &lt;function&gt;s3dw_textbox_change_text&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ 		s3dw_textbox *&lt;parameter&gt;textbox&lt;/parameter&gt;,
+-		char *&lt;parameter&gt;text&lt;/parameter&gt;
++const 		char *&lt;parameter&gt;text&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -406,7 +406,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;void &lt;function&gt;s3dw_handle_click&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-		struct s3d_evt *&lt;parameter&gt;event&lt;/parameter&gt;
++const		struct s3d_evt *&lt;parameter&gt;event&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -440,7 +440,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;void &lt;function&gt;s3dw_handle_key&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-		struct s3d_evt *&lt;parameter&gt;event&lt;/parameter&gt;
++const		struct s3d_evt *&lt;parameter&gt;event&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+@@ -473,7 +473,7 @@
+ &lt;funcprototype&gt;
+ &lt;funcdef&gt;void &lt;function&gt;s3dw_object_info&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+-		struct s3d_evt *&lt;parameter&gt;event&lt;/parameter&gt;
++const		struct s3d_evt *&lt;parameter&gt;event&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000937.html">[S3d-svn] r953 - trunk/experimental/testvis
+</A></li>
+	<LI>Next message: <A HREF="000939.html">[S3d-svn] r955 - in trunk/Documentation: libs3d libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#938">[ date ]</a>
+              <a href="thread.html#938">[ thread ]</a>
+              <a href="subject.html#938">[ subject ]</a>
+              <a href="author.html#938">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

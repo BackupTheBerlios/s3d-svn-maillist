@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r190 - in trunk: . Documentation example server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r190%20-%20in%20trunk%3A%20.%20Documentation%20example%20server&In-Reply-To=%3C200603152058.k2FKwJWR023111%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000185.html">
+   <LINK REL="Next"  HREF="000187.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r190 - in trunk: . Documentation example server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r190%20-%20in%20trunk%3A%20.%20Documentation%20example%20server&In-Reply-To=%3C200603152058.k2FKwJWR023111%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r190 - in trunk: . Documentation example server">dotslash at berlios.de
+       </A><BR>
+    <I>Wed Mar 15 21:58:19 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000185.html">[S3d-svn] r189 - in trunk: . apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000187.html">[S3d-svn] r191 - in trunk: . client server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#186">[ date ]</a>
+              <a href="thread.html#186">[ thread ]</a>
+              <a href="subject.html#186">[ subject ]</a>
+              <a href="author.html#186">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-03-15 21:58:13 +0100 (Wed, 15 Mar 2006)
+New Revision: 190
+
+Modified:
+   trunk/
+   trunk/Documentation/s3dlib.txt
+   trunk/example/texturetest.c
+   trunk/server/object.c
+   trunk/server/proto.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r280 at balthasar</A>:  dotslash | 2006-03-15 21:57:52 +0100
+ - less debug output about lines - seems to work now ;)
+ - texturetest bug - used locally initialized oid -&gt; fixed
+ - doc update
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:276
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:280
+
+Modified: trunk/Documentation/s3dlib.txt
+===================================================================
+--- trunk/Documentation/s3dlib.txt	2006-03-15 20:57:01 UTC (rev 189)
++++ trunk/Documentation/s3dlib.txt	2006-03-15 20:58:13 UTC (rev 190)
+@@ -314,7 +314,8 @@
+ 
+ int s3d_rotate(int object, float x, float y, float z);
+ 
+-rotate an object around the x, y and z-axis respectively. 
++rotate an object around the x, y and z-axis respectively. x,y,z may have values
++between [0,360].
+ 
+ _______________________________________________________________________________
+ 
+
+Modified: trunk/example/texturetest.c
+===================================================================
+--- trunk/example/texturetest.c	2006-03-15 20:57:01 UTC (rev 189)
++++ trunk/example/texturetest.c	2006-03-15 20:58:13 UTC (rev 190)
+@@ -39,7 +39,6 @@
+ #define MAXY	300
+ int main (int argc, char **argv)
+ {
+-	int oid;
+ 	unsigned int x,y;
+ 	unsigned char *data;
+ 						
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2006-03-15 20:57:01 UTC (rev 189)
++++ trunk/server/object.c	2006-03-15 20:58:13 UTC (rev 190)
+@@ -510,7 +510,7 @@
+ 			glDeleteLists(obj-&gt;dplist,1);
+ 			obj-&gt;dplist=0;
+ 		}
+-		dprintf(MED,&quot;pepping lines %d to %d&quot;,(m-n),m);
++		dprintf(VLOW,&quot;pepping lines %d to %d&quot;,(m-n),m);
+ 		for (i=(m-n);i&lt;m;i++)
+ 		{
+ 			obj-&gt;p_line[i].v[0]=*(px++);
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2006-03-15 20:57:01 UTC (rev 189)
++++ trunk/server/proto.c	2006-03-15 20:58:13 UTC (rev 190)
+@@ -149,7 +149,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(4*3);
+- 					dprintf(LOW,&quot;received %d new lines for object oid...%d&quot;, num, oid); 
++ 					dprintf(VLOW,&quot;received %d new lines for object oid...%d&quot;, num, oid); 
+ 					for (i=0;i&lt;(num*3);i++)
+ 						*((uint32_t *)cptr+i)=
+ 								ntohl(*((uint32_t *)cptr+i));
+@@ -221,7 +221,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(4*3);
+- 					dprintf(LOW,&quot;pepping %d new lines for object oid...%d&quot;, num, oid); 
++ 					dprintf(VLOW,&quot;pepping %d new lines for object oid...%d&quot;, num, oid); 
+ 					for (i=0;i&lt;(num*3);i++)
+ 						*((uint32_t *)cptr+i)=
+ 								ntohl(*((uint32_t *)cptr+i));
+@@ -297,7 +297,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=ntohl(*((uint32_t *)cptr));		cptr+=4;
+- 					dprintf(LOW,&quot;deleting %d lines for object oid...%d&quot;, num, oid); 
++ 					dprintf(VLOW,&quot;deleting %d lines for object oid...%d&quot;, num, oid); 
+ 					obj_del_line(p,oid,num);
+ 				}	
+ 				break;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000185.html">[S3d-svn] r189 - in trunk: . apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000187.html">[S3d-svn] r191 - in trunk: . client server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#186">[ date ]</a>
+              <a href="thread.html#186">[ thread ]</a>
+              <a href="subject.html#186">[ subject ]</a>
+              <a href="author.html#186">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

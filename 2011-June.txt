@@ -1,0 +1,466 @@
+From lazhur at mail.berlios.de  Tue Jun  7 01:33:12 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue,  7 Jun 2011 01:33:12 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian-multiarch,
+	deleted. debian/0.2.1.1-7-3-g41bcf09
+Message-ID: <20110606233312.2DAC1480EDA@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian-multiarch has been deleted
+       was  41bcf09e3e63758b42da8bb317703e53062ce9e5
+
+-----------------------------------------------------------------------
+41bcf09e3e63758b42da8bb317703e53062ce9e5 Add multiarch support
+-----------------------------------------------------------------------
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Tue Jun  7 01:33:15 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue,  7 Jun 2011 01:33:15 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian-multiarch,
+	created. debian/0.2.2-3-2-g367013d
+Message-ID: <20110606233315.EAA8C480EDA@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian-multiarch has been created
+        at  367013dbddd90a8bb26f9e7516e11c5e60b4ab0a (commit)
+
+- Log -----------------------------------------------------------------
+commit 367013dbddd90a8bb26f9e7516e11c5e60b4ab0a
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Apr 23 00:55:48 2011 +0200
+
+    Add multiarch support
+
+-----------------------------------------------------------------------
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Tue Jun  7 22:47:06 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue,  7 Jun 2011 22:47:06 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.2-3-2-g81a091a
+Message-ID: <20110607204706.CA21448084F@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  81a091a6b52a002b3958d59356ce6cafab88158e (commit)
+      from  46a9e9d0372bc71c363667b07659f1da7f10b25a (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 81a091a6b52a002b3958d59356ce6cafab88158e
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Apr 23 00:55:48 2011 +0200
+
+    Add multiarch support
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog           |    1 +
+ debian/control             |   10 +++++++++-
+ debian/libs3d-dev.install  |    4 ++--
+ debian/libs3d2.install     |    2 +-
+ debian/libs3dw-dev.install |    4 ++--
+ debian/libs3dw2.install    |    2 +-
+ debian/rules               |    4 ++++
+ 7 files changed, 20 insertions(+), 7 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Tue Jun  7 22:47:43 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue,  7 Jun 2011 22:47:43 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian-multiarch,
+	deleted. debian/0.2.2-3-2-g367013d
+Message-ID: <20110607204743.829C3481127@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian-multiarch has been deleted
+       was  367013dbddd90a8bb26f9e7516e11c5e60b4ab0a
+
+-----------------------------------------------------------------------
+367013dbddd90a8bb26f9e7516e11c5e60b4ab0a Add multiarch support
+-----------------------------------------------------------------------
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Wed Jun  8 08:51:52 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Wed,  8 Jun 2011 08:51:52 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.2-3-3-gf81aab9
+Message-ID: <20110608065152.5ADC2481127@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  f81aab9d73fac230f2ce4088f5d29a0d6c136cb6 (commit)
+      from  81a091a6b52a002b3958d59356ce6cafab88158e (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit f81aab9d73fac230f2ce4088f5d29a0d6c136cb6
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Wed Jun 8 08:50:08 2011 +0200
+
+    Depend on cmake 2.8.4+dfsg.1-3 for multiarch aware find_library
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/control |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Wed Jun  8 09:01:04 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Wed,  8 Jun 2011 09:01:04 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.2-3-4-gab19545
+Message-ID: <20110608070105.33825481127@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  ab19545be62f26b6bf3c19debe90929c5be7a85b (commit)
+      from  f81aab9d73fac230f2ce4088f5d29a0d6c136cb6 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit ab19545be62f26b6bf3c19debe90929c5be7a85b
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Wed Jun 8 09:00:28 2011 +0200
+
+    Depend on dpkg-dev >= 1.16.0 for multiarch aware dpkg-architecture
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/control |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Wed Jun  8 16:08:18 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Wed,  8 Jun 2011 16:08:18 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.2-3-2-g4628d4a
+Message-ID: <20110608140818.C35B7480B51@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  4628d4acc113dbdc1eb1598611ca13416615b464 (commit)
+      from  46a9e9d0372bc71c363667b07659f1da7f10b25a (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 4628d4acc113dbdc1eb1598611ca13416615b464
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Apr 23 00:55:48 2011 +0200
+
+    Add multiarch support
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog           |    1 +
+ debian/control             |   13 +++++++++++--
+ debian/libs3d-dev.install  |    4 ++--
+ debian/libs3d2.install     |    2 +-
+ debian/libs3dw-dev.install |    4 ++--
+ debian/libs3dw2.install    |    2 +-
+ debian/rules               |    4 ++++
+ 7 files changed, 22 insertions(+), 8 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Wed Jun  8 17:01:10 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Wed,  8 Jun 2011 17:01:10 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	updated. v0.2.2-2-g3b75831
+Message-ID: <20110608150110.E01E74807EC@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been updated
+       via  3b75831af915892c2508fb12ca5b9b417d9cea4c (commit)
+      from  041ec411a66ba46a4e21f35feb3e537836009275 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 3b75831af915892c2508fb12ca5b9b417d9cea4c
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Wed Jun 8 17:00:55 2011 +0200
+
+    Documentation: Rename childs to children
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/libs3d/functions.docbook  |    2 +-
+ Documentation/manpages/man3/s3d_clone.3 |    2 +-
+ libs3d/proto_out.c                      |    2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Jun 11 17:45:02 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 11 Jun 2011 17:45:02 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.2-3-3-g5d76ad6
+Message-ID: <20110611154502.E0F974804A1@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  5d76ad606b9717a2c574ef552460fa3bee6843ca (commit)
+      from  4628d4acc113dbdc1eb1598611ca13416615b464 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 5d76ad606b9717a2c574ef552460fa3bee6843ca
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Jun 11 16:54:57 2011 +0200
+
+    Release s3d 0.2.2-4
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Jun 11 17:45:04 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 11 Jun 2011 17:45:04 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS annotated tag, debian/0.2.2-4,
+	created. debian/0.2.2-4
+Message-ID: <20110611154504.A8ED3480CBB@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The annotated tag, debian/0.2.2-4 has been created
+        at  4e6e7eb9a41f57977fa0630c3e71dc8519a7f068 (tag)
+   tagging  5d76ad606b9717a2c574ef552460fa3bee6843ca (commit)
+  replaces  debian/0.2.2-3
+ tagged by  Sven Eckelmann
+        on  Sat Jun 11 17:10:56 2011 +0200
+
+- Log -----------------------------------------------------------------
+Debian release 0.2.2-4
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAABCgAGBQJN84WAAAoJEF2HCgfBJntGF78QAMX+foE92BtUuRFkKYhRCH54
+yFsDCuTwPbqjJWNSjOEHHO0qdZvudUX0sQrIqivfwRM4kCdGr3USSzxaykM/1rLd
+ch+6Z91MUQkFm33VXA7gBw5JQKqSAcULmQnMROnGYLWJVOhyI19McidUbGBn3dhf
+HzZaNRr6LGB0E4tP1byoj1noG83JMt5Upl6mJy6fPke+u85C7j7OED6yT2vA8j23
+YqwXtgOeD3HxalF08KnrSRSzfokAMsNaMeeIP+hU2RA6nhhuinlFIRBlrUKBYW38
+Xv5vOGQcfGKDdz4zAVyYUUeu7LBIvj/CQYp3mYdZ6rCgFrYDTcQtLV16zQpOHVYr
+Mrq0Gu9tiNUlzcmHZ1WIvHxhc+u0r4HcchfqGR5Pv5rrGAWIhLrmn84/HzrWKJ5l
+o6T0UczIYwhXMZnc5CeVfSsq1WvefobbF6l4I0MzacCz7yxUJOSB4zhfwrE45hj2
+iF3zAzik7H3At+cG9cV4EcWDHV/avqSOvfmqRCNg9NpTquPK3sNaJPID7ReaP2hR
+t4cFgVq3JAdOImoVUMZQaNJwXpZguCkyEjorLjCVtMC31VIEurwgrB44q76UKzLs
+TfGJVE/eKM5+chhVJsnOzl7SCWsQKCRChyYkZPyv1Z5TbMNQB9cQOWX2asM3PLjw
+6CEFL1tBTYejbVS4xAFO
+=K5B2
+-----END PGP SIGNATURE-----
+
+Sven Eckelmann (3):
+      Add support for TT instead of HNA
+      Add multiarch support
+      Release s3d 0.2.2-4
+
+-----------------------------------------------------------------------
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Jun 11 23:32:42 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 11 Jun 2011 23:32:42 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.2-4-2-gecde9be
+Message-ID: <20110611213242.6033C480E74@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  ecde9be1abc649661e73026433ec8f14bafea878 (commit)
+       via  c3ce9cccbde3064f8f9f5d90ef623b18af2160e1 (commit)
+      from  5d76ad606b9717a2c574ef552460fa3bee6843ca (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit ecde9be1abc649661e73026433ec8f14bafea878
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Jun 11 22:56:03 2011 +0200
+
+    Release s3d 0.2.2-5
+
+commit c3ce9cccbde3064f8f9f5d90ef623b18af2160e1
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sat Jun 11 22:55:44 2011 +0200
+
+    Build-Depend on cmake >= 2.8.4+dfsg.1-5 to fix FTBFS on armel and kfreebsd-*
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    6 ++++++
+ debian/control   |    2 +-
+ 2 files changed, 7 insertions(+), 1 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Jun 11 23:32:43 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 11 Jun 2011 23:32:43 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS annotated tag, debian/0.2.2-5,
+	created. debian/0.2.2-5
+Message-ID: <20110611213243.87459480E74@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The annotated tag, debian/0.2.2-5 has been created
+        at  b4e5512eb7d44d8c524f699a5990e25e11992a2d (tag)
+   tagging  ecde9be1abc649661e73026433ec8f14bafea878 (commit)
+  replaces  debian/0.2.2-4
+ tagged by  Sven Eckelmann
+        on  Sat Jun 11 23:31:03 2011 +0200
+
+- Log -----------------------------------------------------------------
+Debian release 0.2.2-5
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAABCgAGBQJN896XAAoJEF2HCgfBJntG6hEP/2co0XNdT7vY2ZOmep2Ymliu
+pvjC2reSgKSd9/CgG6nYVxR1YBGDkrnKrYgRUXCog8z6S/p/Eq2nkhCkj94b6l4c
+rJy21HyShYRbEZGfa5SYHbefC3Dns9BsYIa0E11wGLtBoLQpVDzsidUaIc0YZr6/
+pAYsh8t9BRV2dF81kwrp3q9dxuxpVtezyihf+r+LJUexpKOHSl/3Gc/2X2hn2kWe
+Xy4jxowd48iVgb42XlHFV+y6ZoAab/bo9AI2kDQ2l75UgYBgKqquaiW1NvlH50pF
+2Ju507GfHBnWvxgobDyLc0d8P2KBsb+yehm7LCY/PX0pwllkZ+IcDeKQlpzZpOVJ
+7fGuZapvPj3JBdScqpdh2c9bkCgKbKfar3t0EIv36Q7SO4l2VqACxVGz08UQT0yg
+jtJjg3J5Bhb/B6RkrJe7u74D0RD31yU5TXyccc6JZZtESK1QNDS5trwGcyHy5BOp
+U9mbjxMOF6nbXEFLreOW3rTMdmlhXzQU0CFAh/Cf2pD9xEnbJN6oUCBcBsTROScn
+xNmI8bE3Bz7JWXI5ctmP+lwimiC5FgYZ4Iovs513dlYz16MtHHoefWkuQIv+71EA
+4tWdEbEwY1M0Ki2mQRKGlzwaNjfhJnOFzHbnnOYEFChf4OjurSwT+ZL9PfBmMjpH
+ui83qXaNC7wjj97W9Wzb
+=0hI7
+-----END PGP SIGNATURE-----
+
+Sven Eckelmann (2):
+      Build-Depend on cmake >= 2.8.4+dfsg.1-5 to fix FTBFS on armel and kfreebsd-*
+      Release s3d 0.2.2-5
+
+-----------------------------------------------------------------------
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

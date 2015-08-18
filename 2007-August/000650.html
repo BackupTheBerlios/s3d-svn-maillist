@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r658 - in trunk: . libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r658%20-%20in%20trunk%3A%20.%20libs3d%20libs3dw&In-Reply-To=%3C200708281657.l7SGvMQj012016%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000648.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r658 - in trunk: . libs3d libs3dw</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r658%20-%20in%20trunk%3A%20.%20libs3d%20libs3dw&In-Reply-To=%3C200708281657.l7SGvMQj012016%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r658 - in trunk: . libs3d libs3dw">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Aug 28 18:57:22 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000648.html">[S3d-svn] r657 - trunk/server
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#650">[ date ]</a>
+              <a href="thread.html#650">[ thread ]</a>
+              <a href="subject.html#650">[ subject ]</a>
+              <a href="author.html#650">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-08-28 18:57:21 +0200 (Tue, 28 Aug 2007)
+New Revision: 658
+
+Added:
+   trunk/libs3d/libs3d.pc.cmake
+   trunk/libs3dw/libs3dw.pc.cmake
+Modified:
+   trunk/CMakeLists.txt
+   trunk/libs3d/CMakeLists.txt
+   trunk/libs3dw/CMakeLists.txt
+Log:
+Added pkg-config modules
+
+
+Modified: trunk/CMakeLists.txt
+===================================================================
+--- trunk/CMakeLists.txt	2007-08-28 16:21:47 UTC (rev 657)
++++ trunk/CMakeLists.txt	2007-08-28 16:57:21 UTC (rev 658)
+@@ -1,4 +1,5 @@
+ project(s3d)
++set(VERSION 0.1.1)
+ 
+ # we require cmake 2.4.4 or higher
+ cmake_minimum_required(VERSION 2.4.4)
+
+Modified: trunk/libs3d/CMakeLists.txt
+===================================================================
+--- trunk/libs3d/CMakeLists.txt	2007-08-28 16:21:47 UTC (rev 657)
++++ trunk/libs3d/CMakeLists.txt	2007-08-28 16:57:21 UTC (rev 658)
+@@ -13,3 +13,7 @@
+ )
+ 
+ install(FILES s3d.h s3d_keysym.h DESTINATION include/)
++
++#pkg config
++configure_file(libs3d.pc.cmake ${s3d_BINARY_DIR}/libs3d/libs3d.pc @ONLY)
++install(FILES ${s3d_BINARY_DIR}/libs3d/libs3d.pc DESTINATION lib/pkgconfig/)
+
+Added: trunk/libs3d/libs3d.pc.cmake
+===================================================================
+--- trunk/libs3d/libs3d.pc.cmake	2007-08-28 16:21:47 UTC (rev 657)
++++ trunk/libs3d/libs3d.pc.cmake	2007-08-28 16:57:21 UTC (rev 658)
+@@ -0,0 +1,11 @@
++prefix=@CMAKE_INSTALL_PREFIX@
++exec_prefix=@CMAKE_INSTALL_PREFIX@/bin
++libdir=@CMAKE_INSTALL_PREFIX@/lib
++includedir=@CMAKE_INSTALL_PREFIX@/include
++
++Name: libs3d
++Version: @VERSION@
++Description: Client library for the s3d server
++Requires: libg3d
++Libs: -L${libdir} -ls3d
++Cflags: -I${includedir}
+
+Modified: trunk/libs3dw/CMakeLists.txt
+===================================================================
+--- trunk/libs3dw/CMakeLists.txt	2007-08-28 16:21:47 UTC (rev 657)
++++ trunk/libs3dw/CMakeLists.txt	2007-08-28 16:57:21 UTC (rev 658)
+@@ -10,3 +10,7 @@
+ )
+ 
+ install(FILES s3dw.h DESTINATION include/)
++
++#pkg config
++configure_file(libs3dw.pc.cmake ${s3d_BINARY_DIR}/libs3dw/libs3dw.pc @ONLY)
++install(FILES ${s3d_BINARY_DIR}/libs3dw/libs3dw.pc DESTINATION lib/pkgconfig/)
+
+Added: trunk/libs3dw/libs3dw.pc.cmake
+===================================================================
+--- trunk/libs3dw/libs3dw.pc.cmake	2007-08-28 16:21:47 UTC (rev 657)
++++ trunk/libs3dw/libs3dw.pc.cmake	2007-08-28 16:57:21 UTC (rev 658)
+@@ -0,0 +1,11 @@
++prefix=@CMAKE_INSTALL_PREFIX@
++exec_prefix=@CMAKE_INSTALL_PREFIX@/bin
++libdir=@CMAKE_INSTALL_PREFIX@/lib
++includedir=@CMAKE_INSTALL_PREFIX@/include
++
++Name: libs3dw
++Version: @VERSION@
++Description: Widget library based on libs3d
++Requires: libs3d
++Libs: -L${libdir} -ls3dw
++Cflags: -I${includedir}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000648.html">[S3d-svn] r657 - trunk/server
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#650">[ date ]</a>
+              <a href="thread.html#650">[ thread ]</a>
+              <a href="subject.html#650">[ subject ]</a>
+              <a href="author.html#650">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

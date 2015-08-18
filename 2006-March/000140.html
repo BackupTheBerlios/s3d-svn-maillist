@@ -1,0 +1,445 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r144 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r144%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603092006.k29K6gCF030006%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000139.html">
+   <LINK REL="Next"  HREF="000141.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r144 - trunk/apps/olsrs3d</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r144%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603092006.k29K6gCF030006%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r144 - trunk/apps/olsrs3d">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Thu Mar  9 21:06:42 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000139.html">[S3d-svn] r143 - in trunk: . server
+</A></li>
+        <LI>Next message: <A HREF="000141.html">[S3d-svn] r145 - in trunk: . client
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#140">[ date ]</a>
+              <a href="thread.html#140">[ thread ]</a>
+              <a href="subject.html#140">[ subject ]</a>
+              <a href="author.html#140">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-03-09 21:06:37 +0100 (Thu, 09 Mar 2006)
+New Revision: 144
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/olsrs3d.h
+   trunk/apps/olsrs3d/process.c
+Log:
+move Obj2Ip functions to process.c
+change memmove call in process_main
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-03-09 19:00:38 UTC (rev 143)
++++ trunk/apps/olsrs3d/main.c	2006-03-09 20:06:37 UTC (rev 144)
+@@ -384,7 +384,7 @@
+ 		if ( ( olsr_con-&gt;left_etx != 0.0 ) &amp;&amp; ( olsr_con-&gt;right_etx != 0.0  ) ) {
+ 
+ 			distance = dirt( olsr_con-&gt;left_olsr_node-&gt;pos_vec, olsr_con-&gt;right_olsr_node-&gt;pos_vec, tmp_mov_vec );
+-			f = ( ( olsr_con-&gt;left_etx + olsr_con-&gt;right_etx ) / 4.0 ) / distance;
++			f = (( olsr_con-&gt;left_etx + olsr_con-&gt;right_etx ) / 4.0 ) / distance;
+ 			if ( f &lt; 0.3 ) f = 0.3;
+ 
+ 			mov_add( olsr_con-&gt;left_olsr_node-&gt;mov_vec, tmp_mov_vec, 1 / f - 1 );
+@@ -440,12 +440,12 @@
+ 
+ 				mov_add( tmp_mov_vec, olsr_con-&gt;left_olsr_node-&gt;mov_vec, 1.0 );
+ 
+-				if ( ( dist( tmp_mov_vec, olsr_con-&gt;left_olsr_node-&gt;pos_vec ) &gt; 0.75 ) || ( dist( tmp_mov_vec, null_vec ) &lt; 2.0 ) ) {
++				/*if ( ( dist( tmp_mov_vec, olsr_con-&gt;left_olsr_node-&gt;pos_vec ) &gt; 0.75 ) || ( dist( tmp_mov_vec, null_vec ) &lt; 2.0 ) ) {*/
+ 
+ 				mov_add( olsr_con-&gt;left_olsr_node-&gt;pos_vec, olsr_con-&gt;left_olsr_node-&gt;mov_vec, 1.0 );
+ 				s3d_translate( olsr_con-&gt;left_olsr_node-&gt;obj_id, olsr_con-&gt;left_olsr_node-&gt;pos_vec[0], olsr_con-&gt;left_olsr_node-&gt;pos_vec[1], olsr_con-&gt;left_olsr_node-&gt;pos_vec[2] );
+ 
+-			}
++			/*}*/
+ 
+ 			/* reset movement vector */
+ 			olsr_con-&gt;left_olsr_node-&gt;mov_vec[0] = olsr_con-&gt;left_olsr_node-&gt;mov_vec[1] = olsr_con-&gt;left_olsr_node-&gt;mov_vec[2] = 0.0;
+@@ -477,12 +477,12 @@
+ 
+ 				mov_add( tmp_mov_vec, olsr_con-&gt;right_olsr_node-&gt;mov_vec, 1.0 );
+ 
+-				if ( ( dist( tmp_mov_vec, olsr_con-&gt;right_olsr_node-&gt;pos_vec )&gt; 0.75 ) || ( dist( tmp_mov_vec, null_vec ) &lt; 2.0 ) ) {
++				/*if ( ( dist( tmp_mov_vec, olsr_con-&gt;right_olsr_node-&gt;pos_vec )&gt; 0.75 ) || ( dist( tmp_mov_vec, null_vec ) &lt; 2.0 ) ) {*/
+ 
+ 					mov_add( olsr_con-&gt;right_olsr_node-&gt;pos_vec, olsr_con-&gt;right_olsr_node-&gt;mov_vec, 1.0 );
+ 					s3d_translate( olsr_con-&gt;right_olsr_node-&gt;obj_id, olsr_con-&gt;right_olsr_node-&gt;pos_vec[0], olsr_con-&gt;right_olsr_node-&gt;pos_vec[1], olsr_con-&gt;right_olsr_node-&gt;pos_vec[2] );
+ 
+-				}
++				/*}*/
+ 
+ 			/* reset movement vector */
+ 			olsr_con-&gt;right_olsr_node-&gt;mov_vec[0] = olsr_con-&gt;right_olsr_node-&gt;mov_vec[1] = olsr_con-&gt;right_olsr_node-&gt;mov_vec[2] = 0.0;
+@@ -720,143 +720,6 @@
+ 	/* printf(&quot;%f %f %f\n&quot;,inf-&gt;trans_x,inf-&gt;trans_y,inf-&gt;trans_z); */
+ }
+ 
+-/***
+- *
+- * initialize the struct for a linked list obj2ip
+- *
+- ***/
+-
+-void lst_initialize() {
+-	Obj_to_ip_head = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
+-	Obj_to_ip_end = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
+-	if(Obj_to_ip_head == NULL || Obj_to_ip_end == NULL)
+-		out_of_mem();
+-	Obj_to_ip_head-&gt;id = 0;
+-	Obj_to_ip_end-&gt;id = 0;
+-	Obj_to_ip_head-&gt;prev = Obj_to_ip_end-&gt;prev = Obj_to_ip_head;
+-	Obj_to_ip_head-&gt;next = Obj_to_ip_end-&gt;next = Obj_to_ip_end;
+-	List_ptr = Obj_to_ip_head;
+-}
+-
+-/***
+- *
+- * add a link object_id to olsr_node, to get ip adress and coordinates per object_id
+- *                 id =&gt; object_id, returned from s3d_clone or s3d_new_object
+- *  **olsr_node =&gt; pointer to pointer of current olsr_node
+- *
+- ***/
+-
+-void lst_add(int id,struct olsr_node **olsr_node) {
+-	struct Obj_to_ip *new;
+-	new = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
+-	if(new == NULL)
+-		out_of_mem();
+-	new-&gt;id = id;
+-	new-&gt;olsr_node = *olsr_node;
+-	move_lst_ptr(&amp;id);
+-	new-&gt;prev = List_ptr;
+-	new-&gt;next = List_ptr-&gt;next;
+-	List_ptr-&gt;next-&gt;prev = new;
+-	List_ptr-&gt;next = new;
+-	/* printf(&quot;obj2ip: add object %d between %d .. %d ip %s to list\n&quot;,new-&gt;id,new-&gt;prev-&gt;id,new-&gt;next-&gt;id,new-&gt;olsr_node-&gt;ip); */
+-}
+-
+-/***
+- *void move_lst_ptr(int *id)
+- * remove element from obj2ip linked list
+- * id =&gt; object_id, returned from s3d_clone or s3d_new_object
+- *
+- ***/
+-
+-void lst_del(int id) {
+-	struct Obj_to_ip *del;
+-	move_lst_ptr(&amp;id);
+-	if(id != List_ptr-&gt;id)
+-	{
+-		/* printf(&quot;obj2ip: remove id %d failed move_lst_ptr return id %d\n&quot;,id,List_ptr-&gt;next-&gt;id); */
+-	} else {
+-		del = List_ptr;
+-		List_ptr-&gt;next-&gt;prev = List_ptr-&gt;prev;
+-		List_ptr-&gt;prev-&gt;next = List_ptr-&gt;next;
+-		/* printf(&quot;obj2ip: remove object %d --&gt; %d &lt;-- %d ip %s from list\n&quot;,List_ptr-&gt;prev-&gt;id,del-&gt;id,List_ptr-&gt;next-&gt;id,del-&gt;olsr_node-&gt;ip); */
+-		free(del);
+-	}
+-}
+-
+-/***
+- *
+- * move the List_ptr one positon ahead the searched element
+- *	*id =&gt; pointer of object_id , returned from s3d_clone or s3d_new_object
+- *
+- ***/
+-
+-void move_lst_ptr(int *id) {
+-	/* printf(&quot;obj2ip: move for %d\n&quot;,*id); */
+-	/* head to point at end or id lass then first element in linked list*/
+-	if(Obj_to_ip_head-&gt;next == Obj_to_ip_head || *id &lt; Obj_to_ip_head-&gt;next-&gt;id)
+-		List_ptr = Obj_to_ip_head;
+- 	/* id is greather then last element in linked list */
+-	else if(*id &gt; Obj_to_ip_end-&gt;prev-&gt;id)
+-		List_ptr = Obj_to_ip_end-&gt;prev;
+-	else {
+-		/* printf(&quot;obj2ip: ok i search deeper ;-) for id=%d\n&quot;,*id); */
+-		if((*id - (int) Obj_to_ip_head-&gt;next-&gt;id) &lt;= ((int)(Obj_to_ip_end-&gt;prev-&gt;id)-*id)) {
+-			List_ptr = Obj_to_ip_head;
+-			/* printf(&quot;obj2ip: start at head id %d - %d &lt;= %d - %d \n&quot;,*id,Obj_to_ip_head-&gt;next-&gt;id,Obj_to_ip_end-&gt;prev-&gt;id,*id); */
+-			while(*id &gt;= List_ptr-&gt;next-&gt;id) {
+-				/* printf(&quot;obj2ip: %d &gt; %d move to &quot;,*id,List_ptr-&gt;id); */
+-				List_ptr = List_ptr-&gt;next;
+-				/* printf(&quot;%d\n&quot;,List_ptr-&gt;id); */
+-			}
+-		} else {
+-			List_ptr = Obj_to_ip_end;
+-			/* printf(&quot;obj2ip: start at end id %d - %d &gt; %d - %d \n&quot;,*id,Obj_to_ip_head-&gt;next-&gt;id,Obj_to_ip_end-&gt;prev-&gt;id,*id);  */
+-			/*  do List_ptr = List_ptr-&gt;prev; while(*id &gt; List_ptr-&gt;prev-&gt;id); */
+-			while(*id &lt; List_ptr-&gt;prev-&gt;id) {
+-				/* printf(&quot;obj2ip: %d &lt; %d move to &quot;,*id,List_ptr-&gt;id); */
+-				List_ptr = List_ptr-&gt;prev;
+-				/* printf(&quot;%d\n&quot;,List_ptr-&gt;id); */
+-			}
+-			List_ptr = List_ptr-&gt;prev;
+-		}
+-		/* printf(&quot;obj2ip: found id to insert between %d--&gt; .. &lt;--%d to search/delete %d--&gt; .. &lt;--%d\n&quot;,List_ptr-&gt;id,List_ptr-&gt;next-&gt;next-&gt;id,List_ptr-&gt;prev-&gt;id,List_ptr-&gt;next-&gt;id); */
+-	}
+-}
+-
+-/***
+- *
+- * search a object_id in linked list and return pointer on struct olsr_node
+- *	id =&gt; object_id , returned from s3d_clone or s3d_new_object
+- *
+- * &lt;example&gt;
+- *     struct olsr_node *olsr_node;
+- *     olsr_node = *lst_search(oid);
+- *     printf(&quot;obj2ip: search return %s\n&quot;,olsr_node-&gt;ip);
+- * &lt;/example&gt;
+- *
+- ***/
+-
+-struct olsr_node **lst_search(int id) {
+-	move_lst_ptr(&amp;id);
+-	/* TODO: return NULL when no node found */
+-	/* if(id != List_ptr-&gt;id) */
+-		/* printf(&quot;obj2ip: search id....id not found\n&quot;); */
+-	/* else */
+-		/* printf(&quot;obj2ip: search found objekt_id=%d objekt_ip=%s\n&quot;,List_ptr-&gt;id,List_ptr-&gt;olsr_node-&gt;ip); */
+-	return(&amp;List_ptr-&gt;olsr_node);
+-}
+-
+-void lst_out() {
+-	struct Obj_to_ip *ptr;
+-	ptr = Obj_to_ip_head;
+-	while(ptr != ptr-&gt;next) {
+-		/* printf(&quot;List--------------------------\n&quot;); */
+-		printf(&quot;id-&gt; %d\n&quot;,ptr-&gt;id);
+-		ptr = ptr-&gt;next;
+-	}
+-	/* printf(&quot;List--------------------------\n&quot;); */
+-}
+-
+ int main( int argc, char *argv[] ) {
+ 
+ 	int optchar;
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-03-09 19:00:38 UTC (rev 143)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-03-09 20:06:37 UTC (rev 144)
+@@ -104,15 +104,17 @@
+ 
+ extern char lbuf[MAXLINESIZE];
+ /* process */
++void lst_initialize();
++void lst_add(int id,struct olsr_node **olsr_node);
++void lst_del(int id);
++struct olsr_node **lst_search(int id);
++void lst_out();
++void move_lst_ptr(int *id);
+ int process_main();
+ /* net */
+ int net_init(char *host);
+ int net_main();
+ int net_quit();
+-/* main obj2ip list*/
++/* main */
+ void out_of_mem( void );
+-void lst_add(int id,struct olsr_node **olsr_node);
+-void lst_del(int id);
+-void lst_out();
+-void move_lst_ptr(int *id);
+ struct olsr_node **lst_search(int id);
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-03-09 19:00:38 UTC (rev 143)
++++ trunk/apps/olsrs3d/process.c	2006-03-09 20:06:37 UTC (rev 144)
+@@ -220,8 +220,141 @@
+ 	return(0);
+ }
+ 
++/*
++ *
++ * initialize the struct for a linked list obj2ip
++ *
++ */
+ 
++void lst_initialize() {
++	Obj_to_ip_head = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
++	Obj_to_ip_end = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
++	if(Obj_to_ip_head == NULL || Obj_to_ip_end == NULL)
++		out_of_mem();
++	Obj_to_ip_head-&gt;id = 0;
++	Obj_to_ip_end-&gt;id = 0;
++	Obj_to_ip_head-&gt;prev = Obj_to_ip_end-&gt;prev = Obj_to_ip_head;
++	Obj_to_ip_head-&gt;next = Obj_to_ip_end-&gt;next = Obj_to_ip_end;
++	List_ptr = Obj_to_ip_head;
++}
+ 
++/*
++ *
++ * add a link object_id to olsr_node, to get ip adress and coordinates per object_id
++ *                 id =&gt; object_id, returned from s3d_clone or s3d_new_object
++ *  **olsr_node =&gt; pointer to pointer of current olsr_node
++ *
++ */
++
++void lst_add(int id,struct olsr_node **olsr_node) {
++	struct Obj_to_ip *new;
++	new = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
++	if(new == NULL)
++		out_of_mem();
++	new-&gt;id = id;
++	new-&gt;olsr_node = *olsr_node;
++	move_lst_ptr(&amp;id);
++	new-&gt;prev = List_ptr;
++	new-&gt;next = List_ptr-&gt;next;
++	List_ptr-&gt;next-&gt;prev = new;
++	List_ptr-&gt;next = new;
++	/* printf(&quot;obj2ip: add object %d between %d .. %d ip %s to list\n&quot;,new-&gt;id,new-&gt;prev-&gt;id,new-&gt;next-&gt;id,new-&gt;olsr_node-&gt;ip); */
++}
++
++/*
++ *void move_lst_ptr(int *id)
++ * remove element from obj2ip linked list
++ * id =&gt; object_id, returned from s3d_clone or s3d_new_object
++ *
++ */
++
++void lst_del(int id) {
++	struct Obj_to_ip *del;
++	move_lst_ptr(&amp;id);
++	if(id != List_ptr-&gt;id)
++	{
++		printf(&quot;obj2ip: remove id %d failed move_lst_ptr return id %d\n&quot;,id,List_ptr-&gt;next-&gt;id);
++	} else {
++		del = List_ptr;
++		List_ptr-&gt;next-&gt;prev = List_ptr-&gt;prev;
++		List_ptr-&gt;prev-&gt;next = List_ptr-&gt;next;
++		/* printf(&quot;obj2ip: remove object %d --&gt; %d &lt;-- %d ip %s from list\n&quot;,List_ptr-&gt;prev-&gt;id,del-&gt;id,List_ptr-&gt;next-&gt;id,del-&gt;olsr_node-&gt;ip); */
++		free(del);
++	}
++}
++
++/*
++ *
++ * move the List_ptr one positon ahead the searched element
++ *	*id =&gt; pointer of object_id , returned from s3d_clone or s3d_new_object
++ *
++ */
++
++void move_lst_ptr(int *id) {
++	/* printf(&quot;obj2ip: move for %d\n&quot;,*id); */
++	/* head to point at end or id lass then first element in linked list*/
++	if(Obj_to_ip_head-&gt;next == Obj_to_ip_head || *id &lt; Obj_to_ip_head-&gt;next-&gt;id)
++		List_ptr = Obj_to_ip_head;
++ 	/* id is greather then last element in linked list */
++	else if(*id &gt; Obj_to_ip_end-&gt;prev-&gt;id)
++		List_ptr = Obj_to_ip_end-&gt;prev;
++	else {
++		/* printf(&quot;obj2ip: ok i search deeper ;-) for id=%d\n&quot;,*id); */
++		if((*id - (int) Obj_to_ip_head-&gt;next-&gt;id) &lt;= ((int)(Obj_to_ip_end-&gt;prev-&gt;id)-*id)) {
++			List_ptr = Obj_to_ip_head;
++			/* printf(&quot;obj2ip: start at head id %d - %d &lt;= %d - %d \n&quot;,*id,Obj_to_ip_head-&gt;next-&gt;id,Obj_to_ip_end-&gt;prev-&gt;id,*id); */
++			while(*id &gt;= List_ptr-&gt;next-&gt;id) {
++				/* printf(&quot;obj2ip: %d &gt; %d move to &quot;,*id,List_ptr-&gt;id); */
++				List_ptr = List_ptr-&gt;next;
++				/* printf(&quot;%d\n&quot;,List_ptr-&gt;id); */
++			}
++		} else {
++			List_ptr = Obj_to_ip_end;
++			/* printf(&quot;obj2ip: start at end id %d - %d &gt; %d - %d \n&quot;,*id,Obj_to_ip_head-&gt;next-&gt;id,Obj_to_ip_end-&gt;prev-&gt;id,*id);  */
++			/*  do List_ptr = List_ptr-&gt;prev; while(*id &gt; List_ptr-&gt;prev-&gt;id); */
++			while(*id &lt; List_ptr-&gt;prev-&gt;id) {
++				/* printf(&quot;obj2ip: %d &lt; %d move to &quot;,*id,List_ptr-&gt;id); */
++				List_ptr = List_ptr-&gt;prev;
++				/* printf(&quot;%d\n&quot;,List_ptr-&gt;id); */
++			}
++			List_ptr = List_ptr-&gt;prev;
++		}
++		/* printf(&quot;obj2ip: found id to insert between %d--&gt; .. &lt;--%d to search/delete %d--&gt; .. &lt;--%d\n&quot;,List_ptr-&gt;id,List_ptr-&gt;next-&gt;next-&gt;id,List_ptr-&gt;prev-&gt;id,List_ptr-&gt;next-&gt;id); */
++	}
++}
++
++/*
++ *
++ * search a object_id in linked list and return pointer on struct olsr_node
++ *	id =&gt; object_id , returned from s3d_clone or s3d_new_object
++ *
++ * &lt;example&gt;
++ *     struct olsr_node *olsr_node;
++ *     olsr_node = *lst_search(oid);
++ *     printf(&quot;obj2ip: search return %s\n&quot;,olsr_node-&gt;ip);
++ * &lt;/example&gt;
++ *
++ */
++
++struct olsr_node **lst_search(int id) {
++	move_lst_ptr(&amp;id);
++	/* TODO: return NULL when no node found */
++	/* if(id != List_ptr-&gt;id) */
++		/* printf(&quot;obj2ip: search id....id not found\n&quot;); */
++	/* else */
++		/* printf(&quot;obj2ip: search found objekt_id=%d objekt_ip=%s\n&quot;,List_ptr-&gt;id,List_ptr-&gt;olsr_node-&gt;ip); */
++	return(&amp;List_ptr-&gt;olsr_node);
++}
++
++void lst_out() {
++	struct Obj_to_ip *ptr;
++	ptr = Obj_to_ip_head;
++	while(ptr != ptr-&gt;next) {
++		printf(&quot;id-&gt; %d\n&quot;,ptr-&gt;id);
++		ptr = ptr-&gt;next;
++	}
++}
++
+ int process_main() {
+ 
+ 	int dn;
+@@ -336,7 +469,7 @@
+ 
+ 	}
+ 
+-	if ( last_cr_ptr != NULL ) memmove( lbuf, ++last_cr_ptr, strlen( last_cr_ptr) );
++	if ( last_cr_ptr != NULL ) memmove( lbuf, last_cr_ptr + 1, strlen( last_cr_ptr));
+ 
+ 	/* TODO: check this changes as they crash olsrs3d
+ 	if ( last_cr_ptr != NULL )
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000139.html">[S3d-svn] r143 - in trunk: . server
+</A></li>
+	<LI>Next message: <A HREF="000141.html">[S3d-svn] r145 - in trunk: . client
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#140">[ date ]</a>
+              <a href="thread.html#140">[ thread ]</a>
+              <a href="subject.html#140">[ subject ]</a>
+              <a href="author.html#140">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

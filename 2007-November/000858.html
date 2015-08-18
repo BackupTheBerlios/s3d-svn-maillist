@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r865 - trunk/svnonly/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r865%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711202201.lAKM1qlS022631%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000857.html">
+   <LINK REL="Next"  HREF="000859.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r865 - trunk/svnonly/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r865%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711202201.lAKM1qlS022631%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r865 - trunk/svnonly/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Tue Nov 20 23:01:52 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000857.html">[S3d-svn] r864 - trunk/svnonly/comptest
+</A></li>
+        <LI>Next message: <A HREF="000859.html">[S3d-svn] r866 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#858">[ date ]</a>
+              <a href="thread.html#858">[ thread ]</a>
+              <a href="subject.html#858">[ subject ]</a>
+              <a href="author.html#858">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-20 23:01:51 +0100 (Tue, 20 Nov 2007)
+New Revision: 865
+
+Modified:
+   trunk/svnonly/comptest/window.c
+Log:
+- only update pixmap on configure events (update_geometry -&gt; remove, update_content -&gt; create)
+- have some reasonable stacking in the beginning
+
+
+Modified: trunk/svnonly/comptest/window.c
+===================================================================
+--- trunk/svnonly/comptest/window.c	2007-11-20 21:46:15 UTC (rev 864)
++++ trunk/svnonly/comptest/window.c	2007-11-20 22:01:51 UTC (rev 865)
+@@ -93,19 +93,19 @@
+ 	XSelectInput(dpy, win-&gt;id, 0);
+ 
+ 	win-&gt;damage = XDamageCreate(dpy, win-&gt;id, XDamageReportNonEmpty);
+-/*	win-&gt;format = XRenderFindVisualFormat(dpy, win-&gt;attr.visual);
+-
+-	if (win-&gt;format != NULL) {
+-		/ * printf(&quot;add window: %d:%d size: %dx%d\n&quot;, win-&gt;attr.x, win-&gt;attr.y, win-&gt;attr.width, win-&gt;attr.height);* /
+-		win-&gt;pa.subwindow_mode = IncludeInferiors;
+-		win-&gt;picture = XRenderCreatePicture(dpy, win-&gt;id, win-&gt;format, CPSubwindowMode, &amp;win-&gt;pa);
+-	}*/
+ 	win-&gt;pix = None;
+ 	win-&gt;no = 0;
+ 	win-&gt;oid = -1;
+ 	win-&gt;next = window_head;
+ 	window_head = win;
+ 	win-&gt;already_updated = 0;
++	if (win-&gt;next == NULL) 
++		window_restack(win, None);
++	else
++		window_restack(win, win-&gt;next-&gt;id);
++	
++
++
+ 	window_update_content(win, 0, 0, win-&gt;attr.width, win-&gt;attr.height);
+ /*	printf(&quot;window (%d) added\n&quot;, (int)id);*/
+ }
+@@ -128,10 +128,10 @@
+ 	printf(&quot;window (%d) removed\n&quot;, (int)id);
+ 
+ 	/* TODO: properly cleanup */
++	if (window-&gt;pix != None)
++		XFreePixmap(dpy, window-&gt;pix);
+ 	if (window-&gt;oid != -1)
+ 		s3d_del_object(window-&gt;oid);
+-	if (window-&gt;picture)
+-		XRenderFreePicture(dpy, window-&gt;picture);
+ 	if (window-&gt;damage)
+ 		XDamageDestroy(dpy, window-&gt;damage);
+ 
+@@ -146,12 +146,15 @@
+ 		win-&gt;attr.y = y;
+ 		win-&gt;attr.width = width;
+ 		win-&gt;attr.height = height;
+-		printf(&quot;new XCompositeNameWindowPixmap\n&quot;);
+ 
+-
+ 		window_update_content(win, 0, 0, width, height);
+ 		return;
+ 	}
++	if (win-&gt;pix != None) {
++		XFreePixmap(dpy, win-&gt;pix);
++		win-&gt;pix = None;
++	}
++
+ 	if ((win-&gt;attr.width == width) &amp;&amp; (win-&gt;attr.height == height)) {
+ 		if ((win-&gt;attr.x == x) &amp;&amp; (win-&gt;attr.y == y)) {
+ 			printf(&quot;position did not change\n&quot;);
+@@ -167,10 +170,6 @@
+ 		win-&gt;attr.width = width;
+ 		win-&gt;attr.height = height;
+ 
+-		printf(&quot;new XCompositeNameWindowPixmap\n&quot;);
+-		XFreePixmap(dpy, win-&gt;pix);
+-		win-&gt;pix = XCompositeNameWindowPixmap(dpy, win-&gt;id);
+-
+ 		s3d_del_object(win-&gt;oid); /* delete the window and redraw */
+ 		win-&gt;oid = -1;
+ 		window_update_content(win, 0, 0, width, height);
+@@ -274,9 +273,8 @@
+ 		printf(&quot;request image: xleft = %d, xright = %d, width = %d, x:y = %d:%d, width:height = %d:%d, ~TEXW = %08x\n&quot;,
+ 		       xleft, xright, width, x, y, width, height, ~TEXW);*/
+ 		/* image = XGetImage(dpy, win-&gt;id, xleft, y, chunk_width, height, AllPlanes, ZPixmap); */
+-		if (win-&gt;pix != None)
+-			XFreePixmap(dpy, win-&gt;pix);
+-		win-&gt;pix = XCompositeNameWindowPixmap(dpy, win-&gt;id);
++		if (win-&gt;pix == None)
++			win-&gt;pix = XCompositeNameWindowPixmap(dpy, win-&gt;id);
+ 
+ 		image = XGetImage(dpy, win-&gt;pix, xleft, y, chunk_width, height, AllPlanes, ZPixmap);
+ 		if (!image) {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000857.html">[S3d-svn] r864 - trunk/svnonly/comptest
+</A></li>
+	<LI>Next message: <A HREF="000859.html">[S3d-svn] r866 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#858">[ date ]</a>
+              <a href="thread.html#858">[ thread ]</a>
+              <a href="subject.html#858">[ subject ]</a>
+              <a href="author.html#858">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

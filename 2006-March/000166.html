@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r170 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r170%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200603141939.k2EJdxe7012716%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000165.html">
+   <LINK REL="Next"  HREF="000167.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r170 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r170%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200603141939.k2EJdxe7012716%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r170 - in trunk: . server">dotslash at berlios.de
+       </A><BR>
+    <I>Tue Mar 14 20:39:59 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000165.html">[S3d-svn] r169 - in trunk: . example
+</A></li>
+        <LI>Next message: <A HREF="000167.html">[S3d-svn] r171 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#166">[ date ]</a>
+              <a href="thread.html#166">[ thread ]</a>
+              <a href="subject.html#166">[ subject ]</a>
+              <a href="author.html#166">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-03-14 20:39:56 +0100 (Tue, 14 Mar 2006)
+New Revision: 170
+
+Modified:
+   trunk/
+   trunk/server/graphics.c
+   trunk/server/object.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r245 at balthasar</A>:  dotslash | 2006-03-14 20:39:16 +0100
+ - line support (fixed)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:243
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:245
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2006-03-14 19:38:12 UTC (rev 169)
++++ trunk/server/graphics.c	2006-03-14 19:39:56 UTC (rev 170)
+@@ -360,6 +360,7 @@
+ #ifdef G_GLUT
+ 		glPushMatrix();
+ 			glRotatef(90,1.0,0.0,0.0);	
++			/* set some evilish green color */
+ 			glMaterialfv(GL_FRONT,GL_AMBIENT,wire_amb);
+ 			glMaterialfv(GL_FRONT,GL_SPECULAR,wire_spec);
+ 			glMaterialfv(GL_FRONT,GL_DIFFUSE,wire_diff);
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2006-03-14 19:38:12 UTC (rev 169)
++++ trunk/server/object.c	2006-03-14 19:39:56 UTC (rev 170)
+@@ -552,13 +552,13 @@
+ 			glDeleteLists(obj-&gt;dplist,1);
+ 			obj-&gt;dplist=0;
+ 		}
+-		dprintf(MED,&quot;pepping vertices %d to %d&quot;,(m-n),m);
++		dprintf(MED,&quot;pepping vertices %d to %d&quot;,(m-n),m-1);
+ 		for (i=(m-n);i&lt;m;i++)
+ 		{
+-			obj-&gt;p_vertex[m+i].x=*(px++);
+-			obj-&gt;p_vertex[m+i].y=*(px++);
+-			obj-&gt;p_vertex[m+i].z=*(px++);
+-			a=&amp;obj-&gt;p_vertex[m+i];
++			obj-&gt;p_vertex[i].x=*(px++);
++			obj-&gt;p_vertex[i].y=*(px++);
++			obj-&gt;p_vertex[i].z=*(px++);
++			a=&amp;obj-&gt;p_vertex[i];
+ 			r=obj-&gt;scale * sqrt(	
+ 					(a-&gt;x * a-&gt;x ) + 
+ 					(a-&gt;y * a-&gt;y ) +
+@@ -1570,6 +1570,51 @@
+ 		}
+ 		if (tex!=NULL)
+ 			glBindTexture( GL_TEXTURE_2D, 0);  /*  switch back to standard texture */
++
++		for (pn=0;pn&lt;obj-&gt;n_line; pn++)
++		{
++			mat= obj-&gt;p_line[pn].mat;
++			if (mat!=omat) {
++				tex=NULL;
++				if (mat&lt; obj-&gt;n_mat) {
++					m=&amp;obj-&gt;p_mat[mat];
++					/* dont need to care about textures ...  it's rather impossible
++					 * to get some textures on a line. at least it would look ugly ;)*/
++					matgl[0]=m-&gt;amb_r/2;		
++					matgl[1]=m-&gt;amb_g/2;		
++					matgl[2]=m-&gt;amb_b/2;
++					matgl[3]=m-&gt;amb_a;
++		 /* 			glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,matgl); */
++					glMaterialfv(GL_FRONT,GL_AMBIENT,matgl);
++					matgl[0]=m-&gt;diff_r/2;
++					matgl[1]=m-&gt;diff_g/2;
++					matgl[2]=m-&gt;diff_b/2;
++					matgl[3]=m-&gt;diff_a;
++		 /* 			glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,matgl); */
++					glMaterialfv(GL_FRONT,GL_DIFFUSE,matgl);
++					matgl[0]=m-&gt;spec_r/2;
++					matgl[1]=m-&gt;spec_g/2;
++					matgl[2]=m-&gt;spec_b/2;
++					matgl[3]=m-&gt;spec_a;
++		 /* 			glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,matgl); */
++					glMaterialfv(GL_FRONT,GL_SPECULAR,matgl);
++				} else {
++					dprintf(MED,&quot;something is wrong with line %d! material: [%d,%d]&quot;,pn, mat,obj-&gt;n_mat);
++					if (obj-&gt;dplist) glEndList();
++					glEnd();
++					glPopMatrix();
++					return(-1);
++				}
++			}
++			omat=mat;		 /*  saving old material */
++			glBegin(GL_LINES);
++			for (i=0; i&lt;2; i++)
++				{
++					v= obj-&gt;p_line[pn].v[i];  /*  ... get the vertices ... */
++					glVertex3f(obj-&gt;p_vertex[v].x, obj-&gt;p_vertex[v].y, obj-&gt;p_vertex[v].z);  /*  ...and draw them */
++				}
++			glEnd();
++		}
+ 		if (obj-&gt;dplist) glEndList();
+ 	}
+ 	glPopMatrix();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000165.html">[S3d-svn] r169 - in trunk: . example
+</A></li>
+	<LI>Next message: <A HREF="000167.html">[S3d-svn] r171 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#166">[ date ]</a>
+              <a href="thread.html#166">[ thread ]</a>
+              <a href="subject.html#166">[ subject ]</a>
+              <a href="author.html#166">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

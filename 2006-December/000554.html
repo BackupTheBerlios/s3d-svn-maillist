@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r561 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r561%20-%20trunk&In-Reply-To=%3C200612262312.kBQNCZ5A004280%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000553.html">
+   <LINK REL="Next"  HREF="000555.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r561 - trunk</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r561%20-%20trunk&In-Reply-To=%3C200612262312.kBQNCZ5A004280%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r561 - trunk">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Wed Dec 27 00:12:35 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000553.html">[S3d-svn] r560 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000555.html">[S3d-svn] r563 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#554">[ date ]</a>
+              <a href="thread.html#554">[ thread ]</a>
+              <a href="subject.html#554">[ subject ]</a>
+              <a href="author.html#554">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-12-27 00:12:35 +0100 (Wed, 27 Dec 2006)
+New Revision: 561
+
+Modified:
+   trunk/configure.ac
+Log:
+- remove (comment out) MDL_HAVE_OPENGL - not properly parsed by auto* anyways
+
+Modified: trunk/configure.ac
+===================================================================
+--- trunk/configure.ac	2006-12-26 22:48:07 UTC (rev 560)
++++ trunk/configure.ac	2006-12-26 23:12:35 UTC (rev 561)
+@@ -75,7 +75,7 @@
+ AC_CHECK_LIBM
+ AC_SUBST(LIBM)
+ 
+-MDL_HAVE_OPENGL
++# MDL_HAVE_OPENGL
+ AC_SEARCH_LIBS(glutInit, glut, [
+ HAVE_glut=&quot;yes&quot;
+ GLUT_CFLAGS=
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000553.html">[S3d-svn] r560 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000555.html">[S3d-svn] r563 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#554">[ date ]</a>
+              <a href="thread.html#554">[ thread ]</a>
+              <a href="subject.html#554">[ subject ]</a>
+              <a href="author.html#554">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

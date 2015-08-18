@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r881 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r881%20-%20trunk/server&In-Reply-To=%3C200711252043.lAPKhLWa031713%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000873.html">
+   <LINK REL="Next"  HREF="000875.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r881 - trunk/server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r881%20-%20trunk/server&In-Reply-To=%3C200711252043.lAPKhLWa031713%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r881 - trunk/server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 25 21:43:21 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000873.html">[S3d-svn] r880 - trunk/libs3d
+</A></li>
+        <LI>Next message: <A HREF="000875.html">[S3d-svn] r882 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#874">[ date ]</a>
+              <a href="thread.html#874">[ thread ]</a>
+              <a href="subject.html#874">[ subject ]</a>
+              <a href="author.html#874">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-25 21:43:20 +0100 (Sun, 25 Nov 2007)
+New Revision: 881
+
+Modified:
+   trunk/server/object.c
+Log:
+- shm-errors are not fatal in texture_shm_register()
+
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2007-11-25 20:08:35 UTC (rev 880)
++++ trunk/server/object.c	2007-11-25 20:43:20 UTC (rev 881)
+@@ -268,12 +268,12 @@
+ 	int key;
+ 	key = shm_next_key();
+ 	if ((tex-&gt;shmid = shmget(key, bufsize, 0644 | IPC_CREAT)) == -1) {
+-		errnf(&quot;texture_shm_register():shmget()&quot;, errno);
++		errn(&quot;texture_shm_register():shmget()&quot;, errno);
+ 		return(-1);
+ 	}
+ 	tex-&gt;buf = shmat(tex-&gt;shmid, (void *)0, 0);
+ 	if ((key_t *)tex-&gt;buf == (key_t *)(-1)) {
+-		errnf(&quot;shm_init():shmat()&quot;, errno);
++		errn(&quot;shm_init():shmat()&quot;, errno);
+ 		shmctl(tex-&gt;shmid, IPC_RMID, NULL);
+ 		tex-&gt;shmid = -1;
+ 		return(-1);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000873.html">[S3d-svn] r880 - trunk/libs3d
+</A></li>
+	<LI>Next message: <A HREF="000875.html">[S3d-svn] r882 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#874">[ date ]</a>
+              <a href="thread.html#874">[ thread ]</a>
+              <a href="subject.html#874">[ subject ]</a>
+              <a href="author.html#874">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

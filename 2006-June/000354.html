@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r361 - trunk/example
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r361%20-%20trunk/example&In-Reply-To=%3C200606270001.k5R01Sii022894%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000353.html">
+   <LINK REL="Next"  HREF="000355.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r361 - trunk/example</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r361%20-%20trunk/example&In-Reply-To=%3C200606270001.k5R01Sii022894%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r361 - trunk/example">marec at berlios.de
+       </A><BR>
+    <I>Tue Jun 27 02:01:28 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000353.html">[S3d-svn] r360 - in trunk: . libs3d/libg3d
+</A></li>
+        <LI>Next message: <A HREF="000355.html">[S3d-svn] r362 - in trunk: . Documentation/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#354">[ date ]</a>
+              <a href="thread.html#354">[ thread ]</a>
+              <a href="subject.html#354">[ subject ]</a>
+              <a href="author.html#354">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-06-27 02:01:05 +0200 (Tue, 27 Jun 2006)
+New Revision: 361
+
+Modified:
+   trunk/example/3dsloader_g3d.c
+Log:
+- s3d import vertices fixed
+- s3d import texture coordinates fixed
+- s3d import pixeldata fixed
+=&gt; it is quite usable now - ready for 0.2  ;-)
+
+
+Modified: trunk/example/3dsloader_g3d.c
+===================================================================
+--- trunk/example/3dsloader_g3d.c	2006-06-25 12:11:51 UTC (rev 360)
++++ trunk/example/3dsloader_g3d.c	2006-06-27 00:01:05 UTC (rev 361)
+@@ -1,7 +1,8 @@
+ /*
+- * 3dsloader.c
++ * 3dsloader_g3d.c
+  *
+  * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *                         Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
+  *
+  * This file is part of s3d, a 3d network display server.
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+@@ -103,7 +104,8 @@
+ 	G3DFace *face;
+ 	GSList *oitem, *oface;
+ 	struct material2texture *mat2tex;
+-	int j, material_count, texture_count;
++	int j, k, material_count, texture_count;
++	unsigned char *s3d_pixeldata = NULL;
+ 
+ 	if (argc&lt;2) {
+ 		printf(&quot;usage: %s [somefile.3ds]\n&quot;,argv[0]);
+@@ -130,7 +132,8 @@
+ 
+ 				/* push vertices */
+ 				for ( j = 0; j &lt; object-&gt;vertex_count; j++ ) {
+-					s3d_push_vertex( obj_id, object-&gt;vertex_data[j * 3], object-&gt;vertex_data[j * 3 + 1], object-&gt;vertex_data[j * 3 + 2] );
++					/* 3. and 4. param have to change places otherwise the object will be turned */
++					s3d_push_vertex( obj_id, object-&gt;vertex_data[j * 3], object-&gt;vertex_data[j * 3 + 2], object-&gt;vertex_data[j * 3 + 1] );
+ 				}
+ 
+ 
+@@ -144,7 +147,7 @@
+ 
+ 					if ( mat2tex-&gt;material_id == -1 ) {
+ 
+-						printf( &quot;push material: %i\n&quot;, material_count );
++						/* printf( &quot;push material: %i\n&quot;, material_count ); */
+ 
+ 						s3d_push_material_a( obj_id, face-&gt;material-&gt;r, face-&gt;material-&gt;g, face-&gt;material-&gt;b, face-&gt;material-&gt;a, face-&gt;material-&gt;specular[0], face-&gt;material-&gt;specular[1], face-&gt;material-&gt;specular[2], face-&gt;material-&gt;specular[3], face-&gt;material-&gt;r, face-&gt;material-&gt;g, face-&gt;material-&gt;b, face-&gt;material-&gt;a );
+ 
+@@ -153,9 +156,32 @@
+ 
+ 						if ( face-&gt;tex_image != NULL ) {
+ 
++							/* reorder pixeldata - s3d wants rgba */
++							if ( s3d_pixeldata != NULL ) free( s3d_pixeldata );
++
++							s3d_pixeldata = malloc( sizeof( unsigned char ) * face-&gt;tex_image-&gt;width * face-&gt;tex_image-&gt;height * 32 );
++
++							if ( s3d_pixeldata == NULL ) {
++								printf( &quot;Sorry - you ran out of memory !\n&quot; );
++								exit(8);
++							}
++
++							for ( j = ( face-&gt;tex_image-&gt;height - 1 ); j &gt;= 0; j-- ) {
++
++								for ( k = 0; k &lt; face-&gt;tex_image-&gt;width; k++ ) {
++
++									s3d_pixeldata[ ( j * face-&gt;tex_image-&gt;width + k ) * 4 + 0 ] = face-&gt;tex_image-&gt;pixeldata[ ( j * face-&gt;tex_image-&gt;width + k ) * 4 + 2 ];
++									s3d_pixeldata[ ( j * face-&gt;tex_image-&gt;width + k ) * 4 + 1 ] = face-&gt;tex_image-&gt;pixeldata[ ( j * face-&gt;tex_image-&gt;width + k ) * 4 + 1 ];
++									s3d_pixeldata[ ( j * face-&gt;tex_image-&gt;width + k ) * 4 + 2 ] = face-&gt;tex_image-&gt;pixeldata[ ( j * face-&gt;tex_image-&gt;width + k ) * 4 + 0 ];
++									s3d_pixeldata[ ( j * face-&gt;tex_image-&gt;width + k ) * 4 + 3 ] = face-&gt;tex_image-&gt;pixeldata[ ( j * face-&gt;tex_image-&gt;width + k ) * 4 + 3 ];
++
++								}
++
++							}
++
+ 							s3d_push_texture( obj_id, face-&gt;tex_image-&gt;width, face-&gt;tex_image-&gt;height );
+ 							s3d_pep_material_texture( obj_id, texture_count );
+-							s3d_load_texture( obj_id, texture_count, 0, 0, face-&gt;tex_image-&gt;width, face-&gt;tex_image-&gt;height, face-&gt;tex_image-&gt;pixeldata );
++							s3d_load_texture( obj_id, texture_count, 0, 0, face-&gt;tex_image-&gt;width, face-&gt;tex_image-&gt;height, s3d_pixeldata );
+ 
+ 							mat2tex-&gt;texture_id = texture_count;
+ 							texture_count++;
+@@ -164,7 +190,7 @@
+ 
+ 					}
+ 
+-					printf( &quot;push polygone with material: %i\n&quot;, mat2tex-&gt;material_id );
++					/* printf( &quot;push polygone with material: %i\n&quot;, mat2tex-&gt;material_id ); */
+ 
+ 					/* push polygones */
+ 					s3d_push_polygon( obj_id, face-&gt;vertex_indices[0], face-&gt;vertex_indices[1], face-&gt;vertex_indices[2], mat2tex-&gt;material_id );
+@@ -175,11 +201,8 @@
+ 					/* face with texture */
+ 					if ( ( mat2tex-&gt;texture_id != -1 ) &amp;&amp; ( face-&gt;flags &amp; G3D_FLAG_FAC_TEXMAP ) ) {
+ 
+-						printf( &quot;neues face: %i\n&quot;, face-&gt;tex_vertex_count );
+-/* 						for ( j = 0; j &lt; face-&gt;tex_vertex_count; j++ ) {
+- 							printf( &quot;%i -&gt; %f\n&quot;, j, face-&gt;tex_vertex_data[j] ); */
+-							s3d_pep_polygon_tex_coord( obj_id, face-&gt;tex_vertex_data[0], face-&gt;tex_vertex_data[1], face-&gt;tex_vertex_data[2], face-&gt;tex_vertex_data[3], face-&gt;tex_vertex_data[4], face-&gt;tex_vertex_data[5] );
+-/* 						} */
++						/* printf( &quot;neues face: %i\n&quot;, face-&gt;tex_vertex_count ); */
++						s3d_pep_polygon_tex_coord( obj_id, face-&gt;tex_vertex_data[5], face-&gt;tex_vertex_data[4], face-&gt;tex_vertex_data[3], face-&gt;tex_vertex_data[2], face-&gt;tex_vertex_data[1], face-&gt;tex_vertex_data[0] );
+ 
+ 					}
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000353.html">[S3d-svn] r360 - in trunk: . libs3d/libg3d
+</A></li>
+	<LI>Next message: <A HREF="000355.html">[S3d-svn] r362 - in trunk: . Documentation/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#354">[ date ]</a>
+              <a href="thread.html#354">[ thread ]</a>
+              <a href="subject.html#354">[ subject ]</a>
+              <a href="author.html#354">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

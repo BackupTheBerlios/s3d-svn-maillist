@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r884 - trunk/libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r884%20-%20trunk/libs3d&In-Reply-To=%3C200711252153.lAPLrA5n003201%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000876.html">
+   <LINK REL="Next"  HREF="000878.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r884 - trunk/libs3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r884%20-%20trunk/libs3d&In-Reply-To=%3C200711252153.lAPLrA5n003201%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r884 - trunk/libs3d">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 25 22:53:10 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000876.html">[S3d-svn] r883 - trunk/libs3d
+</A></li>
+        <LI>Next message: <A HREF="000878.html">[S3d-svn] r885 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#877">[ date ]</a>
+              <a href="thread.html#877">[ thread ]</a>
+              <a href="subject.html#877">[ subject ]</a>
+              <a href="author.html#877">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-25 22:53:09 +0100 (Sun, 25 Nov 2007)
+New Revision: 884
+
+Modified:
+   trunk/libs3d/proto_out.c
+   trunk/libs3d/s3dlib.h
+   trunk/libs3d/texture.c
+Log:
+- don't shm-update if not found in hash
+- inform server about updates
+
+
+Modified: trunk/libs3d/proto_out.c
+===================================================================
+--- trunk/libs3d/proto_out.c	2007-11-25 21:17:12 UTC (rev 883)
++++ trunk/libs3d/proto_out.c	2007-11-25 21:53:09 UTC (rev 884)
+@@ -782,6 +782,25 @@
+ 	net_send(S3D_P_C_PEP_MAT_TEX, buf, 8);
+ 	return(0);
+ }
++int _s3d_update_texture(int object, uint32_t tex, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h) {
++	char    buf[16], *ptr;
++	ptr = buf;
++	*((uint32_t *)ptr) = htonl(object);
++	ptr += sizeof(uint32_t);  /*  object id */
++	*((uint32_t *)ptr) = htonl(tex);
++	ptr += sizeof(uint32_t);  /*  texture number */
++	*((uint16_t *)ptr) = htons(xpos);
++	ptr += sizeof(uint16_t);  /*  xpos */
++	*((uint16_t *)ptr) = htons(ypos);
++	ptr += sizeof(uint16_t);  /*  ypos */
++	*((uint16_t *)ptr) = htons(w);
++	ptr += sizeof(uint16_t);  /*  width */
++	*((uint16_t *)ptr) = htons(h);
++	ptr += sizeof(uint16_t);  /*  height */
++	net_send(S3D_P_C_UPDATE_TEX, buf, 16);
++	return(0);
++
++}
+ /*  load data (which has width w and height h) into object, texture tex at position (xpos,ypos) */
+ int s3d_load_texture(int object, uint32_t tex, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h, uint8_t *data)
+ {
+@@ -789,6 +808,7 @@
+ 	int     linestep, lines, i;
+ 	if (_s3d_load_texture_shm(object, tex, xpos, ypos, w, h, data) == 0) {
+ 		/* TODO: send update event to server */
++		_s3d_update_texture(object, tex, xpos, ypos, w, h);
+ 		return(0);	/* did it over shm */
+ 	}
+ 	linestep = (MF_LEN - 16) / (w * 4);
+
+Modified: trunk/libs3d/s3dlib.h
+===================================================================
+--- trunk/libs3d/s3dlib.h	2007-11-25 21:17:12 UTC (rev 883)
++++ trunk/libs3d/s3dlib.h	2007-11-25 21:53:09 UTC (rev 884)
+@@ -130,6 +130,8 @@
+ extern int con_type;
+ int net_send(uint8_t opcode, char *buf, uint16_t length);
+ int s3d_net_init(char *urlc);
++/* proto_out.c */
++int _s3d_update_texture(int object, uint32_t tex, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h);
+ #ifdef TCP
+ /* tcp.c */
+ int _tcp_init(char *sv, int pn);
+
+Modified: trunk/libs3d/texture.c
+===================================================================
+--- trunk/libs3d/texture.c	2007-11-25 21:17:12 UTC (rev 883)
++++ trunk/libs3d/texture.c	2007-11-25 21:53:09 UTC (rev 884)
+@@ -70,6 +70,7 @@
+ void _s3d_handle_texshm(struct s3d_texshm *tshm) 
+ {
+ 	struct s3d_tex *tex = NULL;
++	s3dprintf(HIGH, &quot;handling new texture ...&quot;);
+ 	if (tex_hash == NULL)
+ 		return;
+ #ifdef SHM
+@@ -87,6 +88,7 @@
+ 		  free(tex);
+           return;
+ 	}
++	s3dprintf(HIGH, &quot;adding new texture ...&quot;);
+ 	_s3d_hash_add(tex_hash, tex);
+ #endif
+ 	return;
+@@ -103,7 +105,10 @@
+ 	check.oid = object;
+ 	check.tex = tid;
+ 	tex = _s3d_hash_find(tex_hash, (void *)&amp;check);
+-
++	if (tex == NULL)
++		return(-1); /* coudn't find */
++	s3dprintf(VLOW, &quot;texture: oid %d, tex %d, shmid %d, tw %d, th %d, w %d, h %d ...&quot;,
++					tex-&gt;tshm.oid, tex-&gt;tshm.tex, tex-&gt;tshm.shmid, tex-&gt;tshm.tw, tex-&gt;tshm.th, tex-&gt;tshm.w, tex-&gt;tshm.th);
+ 	/* found it, assume that it's properly attached. */
+ 	m = tex-&gt;tshm.w * tex-&gt;tshm.th + tex-&gt;tshm.tw;     /*  maximum: position of the last pixel in the buffer */
+ 	if ((xpos + w) &gt; tex-&gt;tshm.tw)	mw = (tex-&gt;tshm.tw - xpos);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000876.html">[S3d-svn] r883 - trunk/libs3d
+</A></li>
+	<LI>Next message: <A HREF="000878.html">[S3d-svn] r885 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#877">[ date ]</a>
+              <a href="thread.html#877">[ thread ]</a>
+              <a href="subject.html#877">[ subject ]</a>
+              <a href="author.html#877">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

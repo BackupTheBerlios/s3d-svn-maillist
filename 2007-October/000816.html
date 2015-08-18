@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r824 - trunk/svnonly
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r824%20-%20trunk/svnonly&In-Reply-To=%3C200710252203.l9PM3c6B005838%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000815.html">
+   <LINK REL="Next"  HREF="000817.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r824 - trunk/svnonly</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r824%20-%20trunk/svnonly&In-Reply-To=%3C200710252203.l9PM3c6B005838%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r824 - trunk/svnonly">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 26 00:03:38 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000815.html">[S3d-svn] r823 - trunk/svnonly
+</A></li>
+        <LI>Next message: <A HREF="000817.html">[S3d-svn] r825 - trunk/svnonly
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#816">[ date ]</a>
+              <a href="thread.html#816">[ thread ]</a>
+              <a href="subject.html#816">[ subject ]</a>
+              <a href="author.html#816">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-10-26 00:03:38 +0200 (Fri, 26 Oct 2007)
+New Revision: 824
+
+Modified:
+   trunk/svnonly/ROADMAP
+Log:
+- update ROADMAP
+
+
+Modified: trunk/svnonly/ROADMAP
+===================================================================
+--- trunk/svnonly/ROADMAP	2007-10-25 21:46:35 UTC (rev 823)
++++ trunk/svnonly/ROADMAP	2007-10-25 22:03:38 UTC (rev 824)
+@@ -18,10 +18,10 @@
+ um Kompatibilitaet zu schaffen und auf dieser Basis aufbauen zu koennen.
+ 
+ Daher ist das Hauptziel fuer 0.3 eine transparente (im Sinne von nicht 
+-spuerbare) Schicht zwischen X11-Desktop und S3D zu ziehen. Der Desktop soll
+-wie gewohnt bedienbar sein, in Wirklichkeit ist er aber nur einen Teil der 
+-3D-Welt in die (bei Bedarf) umgeschalten werden kann. Das eroeffnet natuerlich
+-auch neue GUI-Moeglichkeiten (z.B. Expose etc).
++spuerbare) Schicht zwischen Graphikausgabe und X11-Desktop in Form von S3D zu 
++ziehen. Der Desktop soll wie gewohnt bedienbar sein, in Wirklichkeit ist er 
++aber nur einen Teil der 3D-Welt in die (bei Bedarf) umgeschalten werden kann. 
++Das eroeffnet natuerlich auch neue GUI-Moeglichkeiten (z.B. Expose etc).
+ 
+ Um das ganze durchzufuehren wuerde ich 3 grosesere Schritte vorschlagen, die 
+ einigermassen unabhaengig voneinander sind:
+@@ -42,7 +42,10 @@
+    Strukturen irgendwie gelockt werden muessen, ohne dass Deadlocks auftreten
+    koennen. Idealerweise haette dann jeder Client seinen eigenen Thread
+    in dem er auch blockierend auf Eingabedaten warten kann, und der Graphik-
+-   thread wird nur aufgeweckt wenn es etwas zu zeichnen gibt.
++   thread wird nur aufgeweckt wenn es etwas zu zeichnen gibt. Usereingaben
++   koennten einen weiteren Thread erhalten, evtl. auch ein Thread der
++   regelmaessig Shared-Memory-Updates checkt und Threads weckt (die 
++   SHM-Verbindungen muessen nach wie vor gepolled werden).
+ 
+ 2. Shared Memory Zugriff auf Texturen
+    -------------------------------------
+@@ -59,7 +62,7 @@
+    concept-Implementation comptest zu einem vollstaendigen MCP/Composite 
+    Manager umwandeln. Dafuer muessen alle moeglichen X11-Window-Events 
+    (Window create/resize/destroy) verarbeitet werden und die Fenster 
+-   entsprechend dargestellt werden und die Kamera an der richtigen Position
++   entsprechend dargestellt werden, sowie die Kamera an der richtigen Position
+    gehalten werden. Man koennte vorerst einen 2D-Desktop-Modus und einen
+    3D-Modus haben, zwischen denen gewechselt werden kann.
+ 
+@@ -72,8 +75,8 @@
+ -----------------------------------
+ - fuer Transparenz-Effekte muss sich eigentlich selbst um Tiefensortierung 
+   gekuemmert werden,  d.h. das Bild muss von hinten nach vorn aufgebaut werden.
+-  S3D ignoriert diese Tatsache derzeit einfach und malt die Objekte einfach
+-  irgendwie. :)
++  S3D ignoriert diese Tatsache derzeit und malt die Objekte einfach irgendwie. 
++  :)
+   Ein erster Ansatz waere vor dem Zeichnen die Objekte (mal abgesehen von den
+   Polygonen die sie enthalten) nach ihrer Entfernung von der Kamera zu 
+   sortieren.
+@@ -85,7 +88,7 @@
+   und scheinbar ganz gut funktioniert. In S3D gibt es virtuelle 
+   Devices (z.B. Pointer), die man darueber steuern koennte.
+ 
+- <A HREF="http://abstrakraft.org/cwiid/wiki/libcwiid">http://abstrakraft.org/cwiid/wiki/libcwiid</A>
++<A HREF="http://abstrakraft.org/cwiid/wiki/libcwiid">http://abstrakraft.org/cwiid/wiki/libcwiid</A>
+ 
+ Mehrere Displays
+ ------------------
+@@ -96,4 +99,4 @@
+   alle Seiten ein Bild projiziert bekommt, oder 3D-Stereo-Brillen, bei denen
+   man 2 leicht voneinander verschobene Bilder fuer beide Augen haben moechte.
+ 
+-- <A HREF="http://en.wikipedia.org/wiki/Cave_Automatic_Virtual_Environment">http://en.wikipedia.org/wiki/Cave_Automatic_Virtual_Environment</A>
++<A HREF="http://en.wikipedia.org/wiki/Cave_Automatic_Virtual_Environment">http://en.wikipedia.org/wiki/Cave_Automatic_Virtual_Environment</A>
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000815.html">[S3d-svn] r823 - trunk/svnonly
+</A></li>
+	<LI>Next message: <A HREF="000817.html">[S3d-svn] r825 - trunk/svnonly
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#816">[ date ]</a>
+              <a href="thread.html#816">[ thread ]</a>
+              <a href="subject.html#816">[ subject ]</a>
+              <a href="author.html#816">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r413 - in trunk: . libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r413%20-%20in%20trunk%3A%20.%20libs3dw&In-Reply-To=%3C200609181802.k8II2vKR024058%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000405.html">
+   <LINK REL="Next"  HREF="000407.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r413 - in trunk: . libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r413%20-%20in%20trunk%3A%20.%20libs3dw&In-Reply-To=%3C200609181802.k8II2vKR024058%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r413 - in trunk: . libs3dw">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 18 20:02:57 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000405.html">[S3d-svn] r412 - in trunk: . libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000407.html">[S3d-svn] r414 - in trunk: . Documentation apps/s3d_x11gate libs3d	libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#406">[ date ]</a>
+              <a href="thread.html#406">[ thread ]</a>
+              <a href="subject.html#406">[ subject ]</a>
+              <a href="author.html#406">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-18 20:02:57 +0200 (Mon, 18 Sep 2006)
+New Revision: 413
+
+Modified:
+   trunk/
+   trunk/libs3dw/arrange.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1005 at balthasar</A>:  dotslash | 2006-09-18 20:02:49 +0200
+ - correcting rotation to user
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1003
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1005
+
+Modified: trunk/libs3dw/arrange.c
+===================================================================
+--- trunk/libs3dw/arrange.c	2006-09-18 17:32:28 UTC (rev 412)
++++ trunk/libs3dw/arrange.c	2006-09-18 18:02:57 UTC (rev 413)
+@@ -85,21 +85,29 @@
+ 			b[1]=0;
+ 			b[2]=w-&gt;z + op[2]  - _s3dw_cam-&gt;z;
+ 			ry=180*s3d_vector_angle(a,b)/M_PI;
++			if ((b[0]==0) &amp;&amp; (b[1]==0) &amp;&amp; (b[2]==0)) ry=0;
+ 			/* correct acos incompletness */
+ 			if (b[0]&lt;0) ry=180-ry;
+ 			else 		ry=180+ry;
++
++			b[2]=sqrt(b[0]*b[0] + b[2]*b[2]);
++			b[1]=w-&gt;y + op[1]   - _s3dw_cam-&gt;y;
+ 			b[0]=0;
+-			b[1]=w-&gt;y + op[1]   - _s3dw_cam-&gt;y;
+-			b[2]=w-&gt;z + op[2]   - _s3dw_cam-&gt;z;
+ 			rx=180*s3d_vector_angle(a,b)/M_PI;
++			if ((b[0]==0) &amp;&amp; (b[1]==0) &amp;&amp; (b[2]==0)) rx=0;
+ 			if (b[1]&gt;0) rx=180-rx;
+ 			else 		rx=180+rx;
+-			if ((rx&gt;90) &amp;&amp; (rx&lt;=180)) 
+-				rx=180 - rx;
++			if 		((rx&gt;90) &amp;&amp; (rx&lt;=180)) 	 rx=180 - rx;
+ 			else if ((rx&gt;=180) &amp;&amp; (rx&lt;270))  rx=540 - rx ;
+ 
+ 			w-&gt;rx=rx;
+ 			w-&gt;ry=ry;
++			if ((w-&gt;arx - w-&gt;rx)&gt;180)  w-&gt;arx-=360;
++			if ((w-&gt;arx - w-&gt;rx)&lt;-180) w-&gt;arx+=360;
++			if ((w-&gt;ary - w-&gt;ry)&gt;180)  w-&gt;ary-=360;
++			if ((w-&gt;ary - w-&gt;ry)&lt;-180) w-&gt;ary+=360;
++
++
+ 			s3dw_arr_widgetcenter(w,np);
+ 			w-&gt;x-=np[0] - op[0];
+ 			w-&gt;y-=np[1] - op[1];
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000405.html">[S3d-svn] r412 - in trunk: . libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000407.html">[S3d-svn] r414 - in trunk: . Documentation apps/s3d_x11gate libs3d	libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#406">[ date ]</a>
+              <a href="thread.html#406">[ thread ]</a>
+              <a href="subject.html#406">[ subject ]</a>
+              <a href="author.html#406">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

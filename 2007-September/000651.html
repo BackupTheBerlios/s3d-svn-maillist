@@ -1,0 +1,2365 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r659 - in trunk: . apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r659%20-%20in%20trunk%3A%20.%20apps/s3dosm&In-Reply-To=%3C200709011249.l81CnNdD019677%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000652.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r659 - in trunk: . apps/s3dosm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r659%20-%20in%20trunk%3A%20.%20apps/s3dosm&In-Reply-To=%3C200709011249.l81CnNdD019677%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r659 - in trunk: . apps/s3dosm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sat Sep  1 14:49:23 CEST 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000652.html">[S3d-svn] r660 - in trunk: . apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#651">[ date ]</a>
+              <a href="thread.html#651">[ thread ]</a>
+              <a href="subject.html#651">[ subject ]</a>
+              <a href="author.html#651">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-09-01 14:49:22 +0200 (Sat, 01 Sep 2007)
+New Revision: 659
+
+Removed:
+   trunk/apps/s3dosm/net.c
+   trunk/apps/s3dosm/olsrs3d.c
+   trunk/apps/s3dosm/process.c
+   trunk/apps/s3dosm/search.c
+Modified:
+   trunk/
+   trunk/apps/s3dosm/CMakeLists.txt
+   trunk/apps/s3dosm/main.c
+   trunk/apps/s3dosm/ui.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r2272 at kero</A>:  dotslash | 2007-09-01 14:26:44 +0200
+ - remove olsr part out of s3dosm. it's not needed anyway, the olsrs3d 
+   program alone makes much more sense
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2265
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2272
+
+Modified: trunk/apps/s3dosm/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3dosm/CMakeLists.txt	2007-08-28 16:57:21 UTC (rev 658)
++++ trunk/apps/s3dosm/CMakeLists.txt	2007-09-01 12:49:22 UTC (rev 659)
+@@ -5,8 +5,8 @@
+ 	include_directories(${s3d_SOURCE_DIR}/libs3d ${s3d_SOURCE_DIR}/libs3dw)
+ 
+ 	add_executable(s3dosm db.c draw.c gps.c http_error_codes.c http_fetcher.c#
+-		io.c kismet.c main.c nav.c net.c object.c olsrs3d.c osm.c
+-		process.c search.c tag.c ui.c)
++		io.c kismet.c main.c nav.c object.c osm.c
++		tag.c ui.c)
+ 
+ 	target_link_libraries(s3dosm s3d s3dw ${LIBXML2_LIBRARIES} ${SQLITE3_LIBRARIES})
+ 
+
+Modified: trunk/apps/s3dosm/main.c
+===================================================================
+--- trunk/apps/s3dosm/main.c	2007-08-28 16:57:21 UTC (rev 658)
++++ trunk/apps/s3dosm/main.c	2007-09-01 12:49:22 UTC (rev 659)
+@@ -36,7 +36,6 @@
+ 		nanosleep(&amp;t,NULL); 
+ 		gps_main();
+ 		nav_main();
+-		olsr_main();
+ 		s3dw_ani_mate();
+ 	} /* else {
+ 		s3d_net_check(); / * we are not yet in the mainloop of 
+@@ -56,20 +55,17 @@
+ 	ui_init();
+ 	if (db_init(&quot;:memory:&quot;)) return(-1);
+ 	if (db_create()) return(-1);
+-	olsr_parse_args(argc, argv); /* if it returns !=0, it was -h and should also be handled by process_args itself */
+ 	if (process_args(argc,argv)) return(-1);
+ 	nav_init();
+ 	nav_autocenter();
+ 	draw_all_layers();
+ 	gps_init(&quot;localhost&quot;);
+-	olsr_init();
+ 	ready=1;
+ 	return(0);
+ }
+ int quit() 
+ {
+ 	ready=0;
+-	olsr_quit();
+ 	gps_quit();
+ 	s3d_quit();
+ 	db_quit();
+
+Deleted: trunk/apps/s3dosm/net.c
+===================================================================
+--- trunk/apps/s3dosm/net.c	2007-08-28 16:57:21 UTC (rev 658)
++++ trunk/apps/s3dosm/net.c	2007-09-01 12:49:22 UTC (rev 659)
+@@ -1,132 +0,0 @@
+-/*
+- * net.c
+- *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+- *                         Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
+- *                         Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
+- *
+- * This file is part of olsrs3d, an olsr topology visualizer for s3d.
+- * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+- *
+- * olsrs3d is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- *
+- * olsrs3d is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with olsrs3d; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- */
+-
+-
+-
+-#include &lt;stdio.h&gt;
+-#include &lt;stdlib.h&gt;
+-#include &lt;unistd.h&gt;	/* close() */
+-#include &lt;errno.h&gt;
+-#include &lt;string.h&gt; 	/* strlen(), memmove(), strncpy(), strncat() */
+-#include &lt;netdb.h&gt;
+-#include &lt;sys/types.h&gt;
+-#include &lt;netinet/in.h&gt;
+-#include &lt;sys/socket.h&gt;
+-#include &lt;fcntl.h&gt;		/* fnctl() */
+-#include &quot;olsrs3d.h&quot;
+-
+-#define PORT 2004 		/* the port client will be connecting to  */
+-char buf[MAXDATASIZE];
+-
+-
+-int sockfd, numbytes;
+-int net_init(char *host)
+-{
+-    struct hostent *he;
+-    struct sockaddr_in their_addr; /* connector's address information  */
+-
+-    if ((he=gethostbyname(host)) == NULL) {  /* get the host info  */
+-		fprintf(stderr,&quot;Can't connect to host %s\n&quot;,host);
+-        herror(&quot;olsr_net:gethostbyname&quot;);
+-        return(1);
+-    }
+-
+-    if ((sockfd = socket(PF_INET, SOCK_STREAM, 0)) == -1) {
+-		fprintf(stderr,&quot;Can't connect to host %s\n&quot;,host);
+-        perror(&quot;olsr_net:socket&quot;);
+-        return(1);
+-    }
+-
+-    their_addr.sin_family = AF_INET;    /* host byte order  */
+-    their_addr.sin_port = htons(PORT);  /* short, network byte order  */
+-    their_addr.sin_addr = *((struct in_addr *)he-&gt;h_addr);
+-    memset(&amp;(their_addr.sin_zero), '\0', 8);  /* zero the rest of the struct */
+-
+-    if (connect(sockfd, (struct sockaddr *)&amp;their_addr,
+-                                          sizeof(struct sockaddr)) == -1) {
+-		fprintf(stderr,&quot;Can't connect to host %s\n&quot;,host);
+-        perror(&quot;olsr_net:connect&quot;);
+-        return(1);
+-    }
+-	fcntl(sockfd,F_SETFL, O_NONBLOCK);
+-	return(0);
+-}
+-
+-int net_main() {
+-
+-	if ((numbytes=recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
+-		if (errno==EAGAIN)
+-			return(0); /* well, that's okay ... */
+-		perror(&quot;recv&quot;);
+-		return(-1);
+-	}
+-
+-	if (numbytes==0) {
+-		printf(&quot;connection reset\n&quot;);
+-		return(-1);
+-	}
+-
+-	buf[numbytes] = '\0';
+-
+-	/* check for potential buffer overflow */
+-	if ( ( strlen( lbuf ) + strlen( buf ) ) &lt; MAXLINESIZE ) {
+-
+-		strncat( lbuf, buf, MAXLINESIZE );
+-
+-	} else {
+-
+-		/* hope that carriage return is now in buf */
+-		if ( strlen( lbuf ) &lt; MAXLINESIZE ) {
+-
+-			if ( Debug ) printf( &quot;WARNING: lbuf almost filled without *any* carriage return within that data !\nAppending truncated buf to lbuf to prevent buffer overflow.\n&quot; );
+-			strncat( lbuf, buf, MAXLINESIZE - strlen( lbuf ) );
+-
+-		} else {
+-
+-			if ( Debug ) printf( &quot;ERROR: lbuf filled without *any* carriage return within that data !\nClearing lbuf to prevent buffer overflow.\n&quot; );
+-			strncpy( lbuf, buf, MAXLINESIZE );
+-
+-		}
+-
+-	}
+-
+-	process_main();
+-
+-	if ( ++Net_read_count &gt; 5 ) {
+-		return(0);   /* continue mainloop */
+-	} else {
+-		return(1);   /* continue reading data from socket */
+-	}
+-
+-}
+-
+-int net_quit()
+-{
+-    close(sockfd);
+-
+-    return 0;
+-}
+-
+-
+
+Deleted: trunk/apps/s3dosm/olsrs3d.c
+===================================================================
+--- trunk/apps/s3dosm/olsrs3d.c	2007-08-28 16:57:21 UTC (rev 658)
++++ trunk/apps/s3dosm/olsrs3d.c	2007-09-01 12:49:22 UTC (rev 659)
+@@ -1,1130 +0,0 @@
+-/*
+- * olsrs3d.c
+- *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+- *                         Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
+- *                         Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
+- *
+- * This file is part of olsrs3d, an olsr topology visualizer for s3d.
+- * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+- *
+- * olsrs3d is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- *
+- * olsrs3d is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with olsrs3d; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- */
+-
+-
+-
+-#include &lt;stdio.h&gt;
+-#include &lt;s3d.h&gt;
+-#include &lt;s3d_keysym.h&gt;
+-#include &lt;s3dw.h&gt;
+-#include &lt;sys/time.h&gt;	 /* gettimeofday() */
+-#include &lt;time.h&gt;	     /* nanosleep() */
+-#include &lt;string.h&gt;		 /* strncpy() */
+-#include &lt;math.h&gt;		 /* sqrt() */
+-#include &lt;getopt.h&gt;		 /* getopt() */
+-#include &lt;stdlib.h&gt;		 /* exit() */
+-#include &lt;stdint.h&gt;		 /* uintXX_t */
+-#include &quot;olsrs3d.h&quot;
+-#include &quot;s3dosm.h&quot;
+-#include &quot;search.h&quot;
+-
+-#define SPEED		10.0
+-
+-int Debug = 0;
+-
+-extern float olsr_node_init[6];
+-extern int oidy; /* zeropoint of s3dosm to link to */
+-static int olsr_ready=0; /* olsr is not initialized yet */
+-
+-char Olsr_host[256];   /* ip or hostname of olsr node with running dot_draw plugin */
+-
+-struct olsr_con *Con_begin = NULL;   /* begin of connection list */
+-struct olsr_node *Olsr_root = NULL;   /* top of olsr node tree */
+-struct Obj_to_ip *Obj_to_ip_head, *Obj_to_ip_end, *List_ptr;   /* needed pointer for linked list */
+-
+-int Olsr_node_count = 0, Last_olsr_node_count = -1;
+-int Olsr_node_count_obj = -1;
+-int Olsr_ip_label_obj = -1;
+-int Output_border[4];
+-int *Olsr_neighbour_label_obj = NULL;
+-int Size;
+-
+-
+-int Net_read_count;
+-int Output_block_counter = 0;
+-int Output_block_completed = 0;
+-
+-int Olsr_node_obj, Olsr_node_inet_obj, Olsr_node_hna_net, S3d_obj;
+-
+-float Asp = 1.0;
+-float Bottom = -1.0;
+-float Left = -1.0;
+-
+-float CamPosition[2][3];	/* CamPosition[trans|rot][x-z] */
+-float CamPosition2[2][3];	/* CamPosition[trans|rot][x-z] */
+-
+-/* needed ? */
+-/* float ZeroPosition[3] = {0,0,0};	 current position zero position */
+-
+-int ZeroPoint;   /* object zeropoint */
+-int ColorSwitch = 0;   /* enable/disable colored olsr connections */
+-float Factor = 0.6;	/* Factor in calc_olsr_node_mov */
+-struct olsr_node *Olsr_node_pEtx;
+-
+-int Btn_close_id = -1;
+-
+-int Btn_close_obj;
+-int Last_Click_Time = 0;
+-int Last_Click_Oid = 0;
+-float Title_len;
+-
+-/***
+- *
+- * print usage info
+- *
+- ***/
+-
+-void print_usage( void ) {
+-
+-	printf( &quot;Usage is olsrs3d [options] [-- [s3d options]]\n&quot; );
+-	printf( &quot;olsrs3d options:\n&quot; );
+-	printf( &quot;   -h\tprint this short help\n&quot; );
+-	printf( &quot;   -d\tenable debug mode\n&quot; );
+-	printf( &quot;   -H\tconnect to olsr node [default: localhost]\n&quot; );
+-	s3d_usage();
+-
+-}
+-
+-
+-void close_win(s3dw_widget *button) {
+-	s3dw_delete(button-&gt;parent); /* parent =surface. this means close containing window */
+-}
+-
+-
+-
+-void window_help() {
+-
+-	s3dw_surface *infwin;
+-	s3dw_button  *button;
+-
+-	infwin = s3dw_surface_new( &quot;Help Window&quot;, 20, 19 );
+-
+-	/*s3dw_label_new(infwin,&quot;C        - Colour On/Off&quot;,1,2);*/
+-	s3dw_label_new(infwin,&quot;c&quot;,1,2);
+-	s3dw_label_new(infwin,&quot;- Colour On/Off&quot;,6,2);
+-	/*s3dw_label_new(infwin,&quot;r        - Rotation On/Off&quot;,1,4);*/
+-	s3dw_label_new(infwin,&quot;r&quot;,1,4);
+-	s3dw_label_new(infwin,&quot;- Rotation On/Off&quot;,6,4);
+-	s3dw_label_new(infwin,&quot;+&quot;,1,5);
+-	s3dw_label_new(infwin,&quot;- Increase Rotation Speed&quot;,6,5);
+-	s3dw_label_new(infwin,&quot;-&quot;,1,6);
+-	s3dw_label_new(infwin,&quot;- Decrease Rotation Speed&quot;,6,6);
+-	s3dw_label_new(infwin,&quot;F3&quot;,1,8);
+-	s3dw_label_new(infwin,&quot;- Search IP&quot;,6,8);
+-	s3dw_label_new(infwin,&quot;ESC&quot;,1,9);
+-	s3dw_label_new(infwin,&quot;- Disable FollowMode&quot;,6,9);
+-	s3dw_label_new(infwin,&quot;PGUP&quot;,1,11);
+-	s3dw_label_new(infwin,&quot;- Increase Drift Factor&quot;,6,11);
+-	s3dw_label_new(infwin,&quot;PGDOWN&quot;,1,12);
+-	s3dw_label_new(infwin,&quot;- Decrease Drift Factor&quot;,6,12);
+-	s3dw_label_new(infwin,&quot;STRG + p&quot;,1,14);
+-	s3dw_label_new(infwin,&quot;- Reset Nodes&quot;,6,14);
+-
+-	button=s3dw_button_new(infwin,&quot;OK&quot;,9,16);
+-	button-&gt;onclick = close_win;
+-	s3dw_show(S3DWIDGET(infwin));
+-
+-}
+-
+-
+-void window_error(char *msg) {
+-
+-	s3dw_surface *infwin;
+-	s3dw_button  *button;
+-
+-	infwin = s3dw_surface_new( &quot;Error&quot;, 12, 6 );
+-	s3dw_label_new(infwin,msg,1,2);
+-
+-	button=s3dw_button_new(infwin,&quot;OK&quot;,4,4);
+-	button-&gt;onclick = close_win;
+-	s3dw_show(S3DWIDGET(infwin));
+-
+-}
+-
+-
+-/***
+- *
+- * print error and exit
+- *
+- ***/
+-
+-void out_of_mem( void ) {
+-
+-	printf( &quot;Sorry - you ran out of memory !\n&quot; );
+-	exit(8);
+-
+-}
+-
+-
+-
+-unsigned int get_time(void) {
+-
+-	struct timeval tv;
+-
+-	gettimeofday(&amp;tv, NULL);
+-
+-	return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+-
+-}
+-
+-
+-
+-/***
+- *
+- * calculate distance between 2 vectors =&gt; <A HREF="http://en.wikipedia.org/wiki/Euclidean_distance">http://en.wikipedia.org/wiki/Euclidean_distance</A>
+- *
+- *   p1   =&gt;   vector of node 1
+- *   p2   =&gt;   vector of node 2
+- *
+- *   return distance
+- *
+- ***/
+-
+-float dist(float p1[], float p2[])
+-{
+-	float p[3];
+-	p[0]=p1[0]-p2[0];
+-	p[1]=p1[1]-p2[1];
+-	p[2]=p1[2]-p2[2];
+-	return (sqrt(p[0]*p[0]   +  p[1]*p[1]  +  p[2]*p[2]));
+-
+-}
+-
+-
+-
+-/***
+- *
+- * calculate distance between 2 vectors and subtract vector1 from vector2
+- *  =&gt; <A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Vector_addition_and_subtraction">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Vector_addition_and_subtraction</A>
+- *
+- *   p1   =&gt;   vector of node 1
+- *   p2   =&gt;   vector of node 2
+- *
+- *   return distance
+- *
+- ***/
+-
+-float dirt(float p1[], float p2[], float p3[])
+-{
+-	float d;
+-	d=dist(p1,p2);
+-	if (d==0) {
+-		p3[0]=(( float ) 0.2 * rand() ) / RAND_MAX - 0.1;
+-		p3[1]=(( float ) 0.2 * rand() ) / RAND_MAX - 0.1;
+-		p3[2]=(( float ) 0.2 * rand() ) / RAND_MAX - 0.1;
+-		d=s3d_vector_length(p3);
+-	} else {
+-		p3[0]=p2[0]-p1[0];
+-		p3[1]=p2[1]-p1[1];
+-		p3[2]=p2[2]-p1[2];
+-	}
+-	return(d);
+-}
+-
+-
+-
+-/***
+- *
+- * calculate new movement of node by adding the product of the factor and the vector to the movement vector
+- *  =&gt; <A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Scalar_multiplication">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Scalar_multiplication</A>
+- *
+- *   mov  =&gt;   current mov vector
+- *   p    =&gt;   vector of node
+- *   fac  =&gt;   factor which is
+- *
+- ***/
+-
+-void mov_add(float mov[], float p[], float fac)
+-{
+-/*	if (fac&gt;1000)
+-		return;
+-	fac=1000; */
+-	mov[0]+=fac*p[0];
+-	mov[1]+=fac*p[1];
+-	mov[2]+=fac*p[2];
+-}
+-
+-
+-
+-/***
+- *
+- * check whether is a new / modified / vanished node and handle it accordingly
+- *
+- *   *olsr_node =&gt;   pointer to current olsr_node
+- *
+- ***/
+-
+-void handle_olsr_node( struct olsr_node *olsr_node ) {
+-
+-	float distance, angle, angle_rad;
+-	float tmp_mov_vec[3], desc_norm_vec[3] = {0,0,-1};
+-	struct olsr_node *other_node;
+-	struct Obj_to_ip *Obj_to_ip_curr;
+-	struct olsr_neigh_list *olsr_neigh_list, *prev_olsr_neigh_list, *other_node_neigh_list, *tmp_olsr_neigh_list;
+-
+-	/* no more nodes left */
+-	if ( olsr_node == NULL ) return;
+-
+-	/* olsr node vanished */
+-	if ( ( olsr_node-&gt;last_seen &lt; Output_block_counter - 1 ) &amp;&amp; ( olsr_node-&gt;visible ) ) {
+-
+-		if ( Debug )
+-			printf( &quot;olsr node vanished: %s\n&quot;, olsr_node-&gt;ip );
+-
+-		Olsr_node_count--;
+-
+-		olsr_node-&gt;visible = 0;
+-
+-		/* delete shape */
+-		if ( olsr_node-&gt;obj_id != -1 ) {
+-
+-			/* remove element from ob2ip list */
+-			lst_del( olsr_node-&gt;obj_id );
+-			/* remove object from s3d server */
+-			s3d_del_object( olsr_node-&gt;obj_id );
+-
+-			olsr_node-&gt;obj_id = -1;
+-
+-		}
+-
+-		if ( olsr_node-&gt;desc_id != -1 ) {
+-
+-			s3d_del_object( olsr_node-&gt;desc_id );
+-			olsr_node-&gt;desc_id = -1;
+-
+-		}
+-
+-		/* delete olsr connections of this node */
+-		olsr_neigh_list = olsr_node-&gt;olsr_neigh_list;
+-
+-		while ( olsr_neigh_list != NULL ) {
+-
+-			/* get connection list of 'other' node */
+-			if ( olsr_neigh_list-&gt;olsr_con-&gt;left_olsr_node == olsr_node ) {
+-				other_node = olsr_neigh_list-&gt;olsr_con-&gt;right_olsr_node;
+-			} else {
+-				other_node = olsr_neigh_list-&gt;olsr_con-&gt;left_olsr_node;
+-			}
+-
+-			/* find this connection in 'other' nodes connection list ... */
+-			prev_olsr_neigh_list = NULL;
+-			other_node_neigh_list = other_node-&gt;olsr_neigh_list;
+-
+-			while ( other_node_neigh_list != NULL ) {
+-
+-				if ( other_node_neigh_list-&gt;olsr_con == olsr_neigh_list-&gt;olsr_con ) {
+-
+-					/* and delete it ! */
+-					if ( prev_olsr_neigh_list != NULL ) {
+-						/* is first, any or last element in the list */
+-						prev_olsr_neigh_list-&gt;next_olsr_neigh_list = other_node_neigh_list-&gt;next_olsr_neigh_list;
+-					} else {
+-						/* the only element in the list */
+-						other_node-&gt;olsr_neigh_list = NULL;
+-					}
+-
+-					free( other_node_neigh_list );
+-
+-					break;
+-
+-				}
+-
+-				prev_olsr_neigh_list = other_node_neigh_list;
+-				other_node_neigh_list = other_node_neigh_list-&gt;next_olsr_neigh_list;
+-
+-			}
+-
+-			s3d_del_object( olsr_neigh_list-&gt;olsr_con-&gt;obj_id );
+-
+-			/* delete connection */
+-			if ( olsr_neigh_list-&gt;olsr_con-&gt;prev_olsr_con != NULL ) olsr_neigh_list-&gt;olsr_con-&gt;prev_olsr_con-&gt;next_olsr_con = olsr_neigh_list-&gt;olsr_con-&gt;next_olsr_con;
+-			if ( olsr_neigh_list-&gt;olsr_con-&gt;next_olsr_con != NULL ) olsr_neigh_list-&gt;olsr_con-&gt;next_olsr_con-&gt;prev_olsr_con = olsr_neigh_list-&gt;olsr_con-&gt;prev_olsr_con;
+-
+-			tmp_olsr_neigh_list = olsr_neigh_list;
+-
+-			olsr_neigh_list = olsr_neigh_list-&gt;next_olsr_neigh_list;
+-
+-			free( tmp_olsr_neigh_list-&gt;olsr_con );
+-			free( tmp_olsr_neigh_list );
+-
+-		}
+-
+-		olsr_node-&gt;olsr_neigh_list = NULL;
+-
+-	} else if ( olsr_node-&gt;visible ) {
+-
+-		/* olsr node shape has been modified */
+-		if ( olsr_node-&gt;node_type_modified ) {
+-			float lo, la;
+-
+-			/* delete old shape */
+-			if ( olsr_node-&gt;obj_id != -1 ) {
+-				/* remove element from ob2ip list */
+-				lst_del( olsr_node-&gt;obj_id );
+-				s3d_del_object( olsr_node-&gt;obj_id );
+-			}
+-
+-			if ( olsr_node-&gt;desc_id != -1 ) s3d_del_object( olsr_node-&gt;desc_id );
+-
+-			/* create new shape */
+-			if ( olsr_node-&gt;node_type == 1 ) {
+-				/* olsr node offers internet access */
+-				olsr_node-&gt;obj_id = s3d_clone( Olsr_node_inet_obj );
+-			} else if ( olsr_node-&gt;node_type == 2 ) {
+-				/* via hna announced network */
+-				olsr_node-&gt;obj_id = s3d_clone( Olsr_node_hna_net );
+-			} else {
+-				/* normal olsr node */
+-				olsr_node-&gt;obj_id = s3d_clone( Olsr_node_obj );
+-			}
+-			la=olsr_node_init[3];
+-			lo=olsr_node_init[4];
+-			s3d_rotate(olsr_node-&gt;obj_id,(90-la),lo,0);
+-
+-			s3d_flags_on( olsr_node-&gt;obj_id, S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-
+-			/* link newly created object to ZeroPoint */
+-			s3d_link( olsr_node-&gt;obj_id, ZeroPoint );
+-			/* add object_id and olsr_node to linked list */
+-			lst_add(olsr_node-&gt;obj_id,&amp;olsr_node);
+-
+-			/* create olsr node text and attach (link) it to the node */
+-			olsr_node-&gt;desc_id = s3d_draw_string( olsr_node-&gt;ip, &amp;olsr_node-&gt;desc_length );
+-			s3d_link( olsr_node-&gt;desc_id, olsr_node-&gt;obj_id );
+-			s3d_translate( olsr_node-&gt;desc_id, - olsr_node-&gt;desc_length / 2, -2, 0 );
+-			s3d_flags_on( olsr_node-&gt;desc_id, S3D_OF_VISIBLE );
+-
+-			olsr_node-&gt;node_type_modified = 0;
+-
+-		}
+-
+-
+-		/* rotate node description so that they are always readable */
+-		tmp_mov_vec[0] = CamPosition2[0][0] - olsr_node-&gt;pos_vec[0];
+-		tmp_mov_vec[1] = 0;   /* we are not interested in the y value */
+-		tmp_mov_vec[2] = CamPosition2[0][2] - olsr_node-&gt;pos_vec[2];
+-
+-		angle = s3d_vector_angle( desc_norm_vec, tmp_mov_vec );
+-
+-		/* take care of inverse cosinus */
+-		if ( tmp_mov_vec[0] &gt; 0 ) {
+-			angle_rad = 90.0/M_PI - angle;
+-			angle = 180 - ( 180.0/M_PI * angle );
+-		} else {
+-			angle_rad = 90.0/M_PI + angle;
+-			angle = 180 + ( 180.0/M_PI * angle );
+-		}
+-
+-		s3d_rotate( olsr_node-&gt;desc_id, 0, angle , 0 );
+-		s3d_translate( olsr_node-&gt;desc_id, -cos(angle_rad)*olsr_node-&gt;desc_length/2 ,-1.5, sin(angle_rad)*olsr_node-&gt;desc_length/2 );
+-
+-
+-		/* drift away from unrelated nodes */
+-		Obj_to_ip_curr = Obj_to_ip_head-&gt;next;
+-		while ( Obj_to_ip_curr != Obj_to_ip_end ) {
+-
+-			/* myself ... */
+-			if ( olsr_node != Obj_to_ip_curr-&gt;olsr_node ) {
+-
+-				olsr_neigh_list = olsr_node-&gt;olsr_neigh_list;
+-				while ( olsr_neigh_list != NULL ) {
+-
+-					/* nodes are related */
+-					if ( ( olsr_neigh_list-&gt;olsr_con-&gt;left_olsr_node-&gt;visible == 1 ) &amp;&amp; ( olsr_neigh_list-&gt;olsr_con-&gt;right_olsr_node-&gt;visible == 1 ) ) {
+-
+-						if ( ( olsr_neigh_list-&gt;olsr_con-&gt;left_olsr_node == Obj_to_ip_curr-&gt;olsr_node ) || (  olsr_neigh_list-&gt;olsr_con-&gt;right_olsr_node == Obj_to_ip_curr-&gt;olsr_node ) ) break;
+-
+-					}
+-
+-					olsr_neigh_list = olsr_neigh_list-&gt;next_olsr_neigh_list;
+-
+-				}
+-
+-				/* nodes are not related - so drift */
+-				if ( olsr_neigh_list == NULL ) {
+-
+-					distance = dirt( olsr_node-&gt;pos_vec, Obj_to_ip_curr-&gt;olsr_node-&gt;pos_vec, tmp_mov_vec );
+-					if ( distance &lt; 0.1 ) distance = 0.1;
+-					mov_add( olsr_node-&gt;mov_vec, tmp_mov_vec,-10 / ( distance * distance ) );
+-					mov_add( Obj_to_ip_curr-&gt;olsr_node-&gt;mov_vec, tmp_mov_vec, 10 / ( distance * distance ) );
+-
+-				}
+-
+-			}
+-
+-			Obj_to_ip_curr = Obj_to_ip_curr-&gt;next;
+-
+-		}
+-
+-	}
+-
+-	handle_olsr_node( olsr_node-&gt;left );
+-	handle_olsr_node( olsr_node-&gt;right );
+-
+-}
+-
+-
+-
+-/***
+- *
+- * calculate movement vector of all olsr nodes
+- *
+- ***/
+-
+-void calc_olsr_node_mov( void ) {
+-
+-	float distance;
+-	float tmp_mov_vec[3];
+-	float f;
+-	struct olsr_con *olsr_con = Con_begin;
+-
+-	while ( olsr_con != NULL ) {
+-
+-		distance = dirt( olsr_con-&gt;left_olsr_node-&gt;pos_vec, olsr_con-&gt;right_olsr_node-&gt;pos_vec, tmp_mov_vec );
+-		f = ( ( olsr_con-&gt;left_etx_sqrt + olsr_con-&gt;left_etx_sqrt ) / 4.0 ) / distance;
+-
+-		/***
+-		 * drift factor - 0.0 &lt; factor &lt; 1.0 ( best results: 0.3 &lt; factor &lt; 0.9
+-		 * small factor: fast and strong drift to neighbours
+-		 ***/
+-		if ( f &lt; Factor ) f = Factor;
+-
+-		mov_add( olsr_con-&gt;left_olsr_node-&gt;mov_vec, tmp_mov_vec, 1 / f - 1 );
+-		mov_add( olsr_con-&gt;right_olsr_node-&gt;mov_vec, tmp_mov_vec, - ( 1 / f - 1 ) );
+-
+-		olsr_con = olsr_con-&gt;next_olsr_con;
+-
+-	}
+-
+-}
+-
+-
+-
+-/***
+- *
+- * move all olsr nodes and their connections
+- *
+- ***/
+-
+-void move_olsr_nodes( void ) {
+-
+-	float null_vec[3] = {0,0,0}, vertex_buf[6];
+-	float target_vec[3];
+-	float tmp_mov_vec[3];
+-	float distance, etx, rgb;
+-	struct olsr_con *olsr_con = Con_begin;
+-	int n=0;
+-	
+-	while ( olsr_con != NULL ) {
+-		n++;
+-		/* move left olsr node if it has not been moved yet */
+-		if ( !( ( olsr_con-&gt;left_olsr_node-&gt;mov_vec[0] == 0 ) &amp;&amp; ( olsr_con-&gt;left_olsr_node-&gt;mov_vec[1] == 0 ) &amp;&amp; ( olsr_con-&gt;left_olsr_node-&gt;mov_vec[2] == 0 ) ) &amp;&amp; olsr_con-&gt;left_olsr_node-&gt;visible ) {
+-			distance = dirt( olsr_con-&gt;left_olsr_node-&gt;pos_vec, olsr_node_init, tmp_mov_vec );
+-			if (distance&gt;5000)		printf(&quot;distance = %3.3f %s | %3.3f %3.3f %3.3f\n&quot;,distance,olsr_con-&gt;left_olsr_node-&gt;ip,
+-							olsr_con-&gt;left_olsr_node-&gt;pos_vec[0],
+-							olsr_con-&gt;left_olsr_node-&gt;pos_vec[1],
+-							olsr_con-&gt;left_olsr_node-&gt;pos_vec[2]);
+-
+-
+-			distance = dirt( olsr_con-&gt;left_olsr_node-&gt;pos_vec, null_vec, tmp_mov_vec );
+-			target_vec[0]=olsr_con-&gt;left_olsr_node-&gt;pos_vec[0]/distance * (ESIZE+10);
+-			target_vec[1]=olsr_con-&gt;left_olsr_node-&gt;pos_vec[1]/distance * (ESIZE+10);
+-			target_vec[2]=olsr_con-&gt;left_olsr_node-&gt;pos_vec[2]/distance * (ESIZE+10);
+-			distance = dirt( olsr_con-&gt;left_olsr_node-&gt;pos_vec, target_vec, tmp_mov_vec );
+-			mov_add( olsr_con-&gt;left_olsr_node-&gt;mov_vec, tmp_mov_vec, distance );  /* move a little bit to earth height */
+-
+-			if ( ! olsr_con-&gt;left_olsr_node-&gt;static_node) {
+-				if ( ( distance = dist( olsr_con-&gt;left_olsr_node-&gt;mov_vec, null_vec ) ) &gt; 10.0 ) {
+-					mov_add( olsr_con-&gt;left_olsr_node-&gt;pos_vec, olsr_con-&gt;left_olsr_node-&gt;mov_vec, 1.0/ ( ( float ) distance) );
+-				} else {
+-					mov_add( olsr_con-&gt;left_olsr_node-&gt;pos_vec, olsr_con-&gt;left_olsr_node-&gt;mov_vec, 0.1 );
+-				}
+-			}
+-
+-			s3d_translate( olsr_con-&gt;left_olsr_node-&gt;obj_id, olsr_con-&gt;left_olsr_node-&gt;pos_vec[0], olsr_con-&gt;left_olsr_node-&gt;pos_vec[1], olsr_con-&gt;left_olsr_node-&gt;pos_vec[2] );
+-
+-			/* reset movement vector */
+-			olsr_con-&gt;left_olsr_node-&gt;mov_vec[0] = olsr_con-&gt;left_olsr_node-&gt;mov_vec[1] = olsr_con-&gt;left_olsr_node-&gt;mov_vec[2] = 0.0;
+-
+-		}
+-
+-		/* move right olsr node if it has not been moved yet */
+-		if ( !( ( olsr_con-&gt;right_olsr_node-&gt;mov_vec[0] == 0 ) &amp;&amp; ( olsr_con-&gt;right_olsr_node-&gt;mov_vec[1] == 0 ) &amp;&amp; ( olsr_con-&gt;right_olsr_node-&gt;mov_vec[2] == 0 ) ) &amp;&amp; olsr_con-&gt;right_olsr_node-&gt;visible ) {
+-
+-			distance = dirt( olsr_con-&gt;right_olsr_node-&gt;pos_vec, olsr_node_init, tmp_mov_vec );
+-			if (distance&gt;5000)		printf(&quot;distance = %3.3f %s| %3.3f %3.3f %3.3f\n&quot;,distance,olsr_con-&gt;right_olsr_node-&gt;ip,
+-							olsr_con-&gt;right_olsr_node-&gt;pos_vec[0],
+-							olsr_con-&gt;right_olsr_node-&gt;pos_vec[1],
+-							olsr_con-&gt;right_olsr_node-&gt;pos_vec[2]);
+-
+-			distance = dirt( olsr_con-&gt;right_olsr_node-&gt;pos_vec, null_vec, tmp_mov_vec );
+-			target_vec[0]=olsr_con-&gt;right_olsr_node-&gt;pos_vec[0]/distance * (ESIZE+10);
+-			target_vec[1]=olsr_con-&gt;right_olsr_node-&gt;pos_vec[1]/distance * (ESIZE+10);
+-			target_vec[2]=olsr_con-&gt;right_olsr_node-&gt;pos_vec[2]/distance * (ESIZE+10);
+-			distance = dirt( olsr_con-&gt;right_olsr_node-&gt;pos_vec, target_vec, tmp_mov_vec );
+-
+-			mov_add( olsr_con-&gt;right_olsr_node-&gt;mov_vec, tmp_mov_vec, distance ); /* move a little bit to earth height */
+-					
+-			if ( ! olsr_con-&gt;right_olsr_node-&gt;static_node) {
+-				distance = dist( olsr_con-&gt;right_olsr_node-&gt;mov_vec, null_vec );
+-				if ( distance &gt; 10.0 ) {
+-					mov_add( olsr_con-&gt;right_olsr_node-&gt;pos_vec, olsr_con-&gt;right_olsr_node-&gt;mov_vec, 1.0/ ( ( float ) distance) );
+-				} else {
+-					mov_add( olsr_con-&gt;right_olsr_node-&gt;pos_vec, olsr_con-&gt;right_olsr_node-&gt;mov_vec, 0.1 );
+-				}
+-			}
+-			s3d_translate( olsr_con-&gt;right_olsr_node-&gt;obj_id, olsr_con-&gt;right_olsr_node-&gt;pos_vec[0], olsr_con-&gt;right_olsr_node-&gt;pos_vec[1], olsr_con-&gt;right_olsr_node-&gt;pos_vec[2] );
+-
+-			/* reset movement vector */
+-			olsr_con-&gt;right_olsr_node-&gt;mov_vec[0] = olsr_con-&gt;right_olsr_node-&gt;mov_vec[1] = olsr_con-&gt;right_olsr_node-&gt;mov_vec[2] = 0.0;
+-
+-		}
+-
+-
+-		/* move connection between left and right olsr node */
+-		vertex_buf[0] = olsr_con-&gt;left_olsr_node-&gt;pos_vec[0];
+-		vertex_buf[1] = olsr_con-&gt;left_olsr_node-&gt;pos_vec[1];
+-		vertex_buf[2] = olsr_con-&gt;left_olsr_node-&gt;pos_vec[2];
+-		vertex_buf[3] = olsr_con-&gt;right_olsr_node-&gt;pos_vec[0];
+-		vertex_buf[4] = olsr_con-&gt;right_olsr_node-&gt;pos_vec[1];
+-		vertex_buf[5] = olsr_con-&gt;right_olsr_node-&gt;pos_vec[2];
+-
+-		s3d_pep_vertices( olsr_con-&gt;obj_id, vertex_buf, 2 );
+-
+-
+-		if ( ColorSwitch ) {
+-
+-			/* HNA */
+-			if ( olsr_con-&gt;left_etx == -1000.00 ) {
+-
+-				if(olsr_con-&gt;color != 1) {
+-					s3d_pep_material( olsr_con-&gt;obj_id,
+-								   0.0,0.0,1.0,
+-								   0.0,0.0,1.0,
+-								   0.0,0.0,1.0);
+-					olsr_con-&gt;color = 1;
+-				}
+-
+-			} else {
+-
+-				etx = ( olsr_con-&gt;left_etx + olsr_con-&gt;right_etx ) / 2.0;
+-
+-				/* very good link - bright blue */
+-				if ( ( etx &gt;= 1.0 ) &amp;&amp; ( etx &lt; 1.5 ) ) {
+-
+-					if(olsr_con-&gt;color != 2) {
+-						s3d_pep_material( olsr_con-&gt;obj_id,
+-								0.5,1.0,1.0,
+-								0.5,1.0,1.0,
+-								0.5,1.0,1.0);
+-						olsr_con-&gt;color = 2;
+-					}
+-
+-				/* good link - bright yellow */
+-				} else if ( ( etx &gt;= 1.5 ) &amp;&amp; ( etx &lt; 2.0 ) ) {
+-
+-					rgb = 2.0 - etx;
+-					if( olsr_con-&gt;color != 3 || (olsr_con-&gt;color == 3 &amp;&amp; (int) rintf(olsr_con-&gt;rgb * 10) !=  (int) rintf(rgb * 10))) {
+-						s3d_pep_material( olsr_con-&gt;obj_id,
+-								1.0,1.0,rgb,
+-								1.0,1.0,rgb,
+-								1.0,1.0,rgb);
+-						olsr_con-&gt;color = 3;
+-
+-						olsr_con-&gt;rgb =  rgb;
+-					}
+-
+-				/* not so good link - orange */
+-				} else if ( ( etx &gt;= 2.0 ) &amp;&amp; ( etx &lt; 3.0 ) ) {
+-
+-					rgb = 1.5 - ( etx / 2.0 );
+-					if( olsr_con-&gt;color != 4 || (olsr_con-&gt;color == 4 &amp;&amp; (int) rintf(olsr_con-&gt;rgb * 10) !=  (int) rintf(rgb * 10))) {
+-						s3d_pep_material( olsr_con-&gt;obj_id,
+-								1.0,rgb,0.0,
+-								1.0,rgb,0.0,
+-								1.0,rgb,0.0);
+-						olsr_con-&gt;color = 4;
+-
+-						olsr_con-&gt;rgb = rgb;
+-					}
+-
+-				/* bad link (almost dead) - brown */
+-				} else if ( ( etx &gt;= 3.0 ) &amp;&amp; ( etx &lt; 5.0 ) ) {
+-
+-					rgb = 1.75 - ( etx / 4.0 );
+-
+-					if( olsr_con-&gt;color != 5 || (olsr_con-&gt;color == 5 &amp;&amp; (int) rintf(olsr_con-&gt;rgb * 10) !=  (int) rintf(rgb * 10)) ) {
+-
+-						s3d_pep_material( olsr_con-&gt;obj_id,
+-								rgb,rgb - 0.5,0.0,
+-								rgb,rgb - 0.5,0.0,
+-								rgb,rgb - 0.5,0.0);
+-						olsr_con-&gt;color = 5;
+-
+-						olsr_con-&gt;rgb = rgb;
+-					}
+-
+-				/* zombie link - grey */
+-				} else if ( ( etx &gt;= 5.0 ) &amp;&amp; ( etx &lt; 1000.0 ) ) {
+-
+-					rgb = 1000.0 / ( 1500.0 + etx );
+-
+-					if( olsr_con-&gt;color != 6 || (olsr_con-&gt;color == 6 &amp;&amp; (int) rintf(olsr_con-&gt;rgb * 10) !=  (int) rintf(rgb * 10)) ) {
+-
+-						s3d_pep_material( olsr_con-&gt;obj_id,
+-								rgb,rgb,rgb,
+-								rgb,rgb,rgb,
+-								rgb,rgb,rgb);
+-						olsr_con-&gt;color = 6;
+-
+-						olsr_con-&gt;rgb = rgb;
+-					}
+-
+-				/* wtf - dark grey */
+-				} else {
+-
+-					if(olsr_con-&gt;color != 7) {
+-						s3d_pep_material( olsr_con-&gt;obj_id,
+-								0.3,0.3,0.3,
+-								0.3,0.3,0.3,
+-								0.3,0.3,0.3);
+-						olsr_con-&gt;color = 7;
+-					}
+-
+-				}
+-
+-			}
+-
+-		} else {
+-
+-			if(olsr_con-&gt;color != 0) {
+-				s3d_pep_material( olsr_con-&gt;obj_id,
+-							1.0,1.0,1.0,
+-							1.0,1.0,1.0,
+-							1.0,1.0,1.0);
+-				olsr_con-&gt;color = 0;
+-			}
+-
+-		}
+-
+-
+-		olsr_con = olsr_con-&gt;next_olsr_con;
+-
+-	}
+-
+-}
+-
+-
+-
+-void olsr_main() {
+-
+-	int net_result;   /* result of function net_main */
+-	char nc_str[20];
+-	float strLen;
+-	if (!olsr_ready) return;
+-
+-	/* calculate new movement vector */
+-	calc_olsr_node_mov();
+-
+-	/* prepare nodes */
+-	handle_olsr_node( Olsr_root );
+-
+-	/* move it */
+-	move_olsr_nodes();
+-
+-	/* if we have more or less nodes now - redraw node count */
+-	if ( Olsr_node_count != Last_olsr_node_count ) {
+-
+-		if ( Olsr_node_count_obj != -1 ) s3d_del_object( Olsr_node_count_obj );
+-		snprintf( nc_str, 20, &quot;node count: %d&quot;, Olsr_node_count );
+-		Olsr_node_count_obj = s3d_draw_string( nc_str, &amp;strLen );
+-		s3d_link( Olsr_node_count_obj, 0 );
+-		s3d_flags_on( Olsr_node_count_obj, S3D_OF_VISIBLE );
+-		s3d_scale( Olsr_node_count_obj, 0.2 );
+-		s3d_translate( Olsr_node_count_obj, -Left*3.0-(strLen * 0.2), -Bottom*3.0-0.5, -3.0 );
+-		Last_olsr_node_count = Olsr_node_count;
+-
+-	}
+-
+-	if ( Output_block_completed ) {
+-
+-		Output_block_counter++;
+-		Output_block_completed = 0;
+-
+-	}
+-
+-	/* read data from socket */
+-	Net_read_count = 0;
+-	while ( ( net_result = net_main() ) != 0 ) {
+-		if ( net_result == -1 ) {
+-			s3d_quit();
+-			break;
+-		}
+-	}
+-	nav_campos(CamPosition[0], CamPosition2[0]);
+-	
+-	/* calc for node description */
+-
+-	/* check search status */
+-/*	if( get_search_status() == WIDGET )
+-		move_to_search_widget( CamPosition[0], CamPosition[1] );*/
+-	if( get_search_status() == FOLLOW )
+-		follow_node( CamPosition[0], CamPosition[1], 0 );
+-/*	if( get_search_status() == ABORT )
+-		move_to_return_point( CamPosition[0], CamPosition[1] );*/
+-
+-
+-	if( Olsr_ip_label_obj != -1 )
+-	{
+-		print_etx();
+-	}
+-
+-
+-	return;
+-
+-}
+-
+-/***
+- *
+- * eventhandler when key pressed
+- *
+- ***/
+-
+-int olsr_keypress(struct s3d_evt *event) {
+-
+-	struct s3d_key_event *key=(struct s3d_key_event *)event-&gt;buf;
+-	if (!olsr_ready) return(0);
+-	if( get_search_status() != WIDGET )
+-	{
+-		switch(key-&gt;keysym)
+-		{
+-			case S3DK_F1: /* help */
+-
+-				window_help();
+-				break;
+-
+-			case S3DK_ESCAPE: /* abort action */
+-
+-				set_search_status( get_search_status() == WIDGET ? ABORT : NOTHING );
+-				break;
+-
+-			case S3DK_F3: /* move to search widget, give widget focus */
+-
+-				set_search_status(WIDGET);							/* set status for mainloop */
+-				set_node_root( Olsr_root );
+-				show_search_window();
+-/*				set_return_point(CamPosition[0],CamPosition[1]);	/ * save the return position * /
+-				set_node_root( Olsr_root );*/
+-
+-				break;
+-
+-			case S3DK_c: /* color on/off */
+-
+-				ColorSwitch =  ColorSwitch ? 0 : 1;
+-				break;
+-
+-
+-			case S3DK_PAGEUP: /* change factor in calc_olsr_node_mov */
+-
+-				if(Factor &lt; 0.9)
+-					Factor += 0.1;
+-				break;
+-
+-			case S3DK_PAGEDOWN: /* change factor in calc_olsr_node_mov */
+-
+-				if(Factor &gt; 0.3)
+-					Factor -= 0.1;
+-				break;
+-
+-		}
+-	} else {
+-		if( (key-&gt;keysym &gt;= S3DK_PERIOD &amp;&amp; key-&gt;keysym &lt;= S3DK_9) || key-&gt;keysym == S3DK_COMMA || key-&gt;keysym == S3DK_RETURN || key-&gt;keysym == S3DK_BACKSPACE )
+-			search_widget_write( key-&gt;keysym );
+-	}
+-	return(0);
+-}
+-
+-/***
+- *
+- * eventhandler when object clicked
+- *
+- ***/
+-
+-int olsr_object_click(struct s3d_evt *evt)
+-{
+-/*	int i
+-	char ip_str[50];
+-	struct timeval tv;*/
+-	struct olsr_node *olsr_node;
+-	int oid;
+-	if (!olsr_ready) return(0);
+-
+-
+-	oid=(int)*((uint32_t *)evt-&gt;buf);
+-
+-
+-	if ( ( get_search_status() != FOLLOW ) &amp;&amp; ( Last_Click_Oid == oid ) &amp;&amp; ( Last_Click_Time + 250 &gt; get_time() ) ) {
+-
+-		olsr_node = lst_search(oid);
+-
+-		if ( olsr_node != NULL ) 
+-			follow_node_by_click( olsr_node );
+-
+-	}
+-
+-	Last_Click_Oid = oid;
+-	Last_Click_Time = get_time();
+-
+-	return(0);
+-}
+-
+-void print_etx()
+-{
+-	struct olsr_neigh_list *tmpNeighbour;
+-	float p = 1.4;
+-	int i;
+-	float len = 0.0, max_len=0.0;
+-
+-	if( Olsr_neighbour_label_obj != NULL )
+-	{
+-		/* int n = sizeof(Olsr_neighbour_label_obj) / sizeof(int);*/
+-		for(i=0; i &lt; Size; i++)
+-			s3d_del_object( Olsr_neighbour_label_obj[i] );
+-		free(Olsr_neighbour_label_obj);
+-		Olsr_neighbour_label_obj = NULL;
+-	}
+-
+-	tmpNeighbour = Olsr_node_pEtx-&gt;olsr_neigh_list;
+-
+-	Size = 0;
+-	while(tmpNeighbour != NULL)
+-	{
+-		Size++;
+-		tmpNeighbour = tmpNeighbour-&gt;next_olsr_neigh_list;
+-	}
+-
+-	Olsr_neighbour_label_obj = malloc(Size*sizeof(int));
+-	tmpNeighbour = Olsr_node_pEtx-&gt;olsr_neigh_list;
+-
+-	for(i = 0; i &lt; Size ;i++)
+-	{
+-		char nIpStr[60];
+-		float mEtx = ( tmpNeighbour-&gt;olsr_con-&gt;left_etx + tmpNeighbour-&gt;olsr_con-&gt;right_etx ) / 2;
+-
+-		if( mEtx != -1000 )
+-			snprintf(nIpStr, 60, &quot;%15s --&gt; %.2f&quot;,(strcmp(Olsr_node_pEtx-&gt;ip,tmpNeighbour-&gt;olsr_con-&gt;right_olsr_node-&gt;ip)?tmpNeighbour-&gt;olsr_con-&gt;right_olsr_node-&gt;ip:tmpNeighbour-&gt;olsr_con-&gt;left_olsr_node-&gt;ip),mEtx);
+-		else
+-			snprintf(nIpStr, 60, &quot;%15s --&gt; HNA&quot;,(strcmp(Olsr_node_pEtx-&gt;ip,tmpNeighbour-&gt;olsr_con-&gt;right_olsr_node-&gt;ip)?tmpNeighbour-&gt;olsr_con-&gt;right_olsr_node-&gt;ip:tmpNeighbour-&gt;olsr_con-&gt;left_olsr_node-&gt;ip));
+-
+-		Olsr_neighbour_label_obj[i] = s3d_draw_string( nIpStr, &amp;len );
+-		s3d_link(Olsr_neighbour_label_obj[i], 0);
+-		s3d_flags_on(Olsr_neighbour_label_obj[i], S3D_OF_VISIBLE );
+-		s3d_scale(Olsr_neighbour_label_obj[i], 0.2 );
+-		s3d_translate(Olsr_neighbour_label_obj[i], -Left*3.0-(len * 0.2)-0.15, -Bottom*3.0-p, -3.0 );
+-		tmpNeighbour = tmpNeighbour-&gt;next_olsr_neigh_list;
+-		p += 0.2;
+-		max_len = (len &gt; max_len - 0.2)?len+0.2:max_len;
+-		max_len = (Title_len &gt; max_len - 0.2)?len+0.2:max_len;
+-		/* printf(&quot;title: %f len: %f maxlen: %f %s\n&quot;,Title_len,len,max_len-0.2,nIpStr);*/
+-	}
+-
+-	if( Btn_close_id != -1)
+-	{
+-		if( Output_border[0] == -1 )
+-		{
+-			for(i = 0; i &lt; 4; i++)
+-			{
+-				Output_border[i] = s3d_new_object();
+-				s3d_push_material( Output_border[i],
+-					1.0,1.0,1.0,
+-					1.0,1.0,1.0,
+-					1.0,1.0,1.0);
+-			}
+-			s3d_push_vertex(Output_border[0], -Left*3.0-0.2,			-Bottom*3.0-0.9, -3.0);
+-			s3d_push_vertex(Output_border[0], -Left*3.0-(max_len*0.2),	-Bottom*3.0-0.9, -3.0);
+-
+-			s3d_push_vertex(Output_border[1], -Left*3.0-0.1,			-Bottom*3.0-1.0, -3.0);
+-			s3d_push_vertex(Output_border[1], -Left*3.0-0.1,			-Bottom*3.0-p, 	-3.0);
+-
+-			s3d_push_vertex(Output_border[2], -Left*3.0-0.1,			-Bottom*3.0-p, 	-3.0);
+-			s3d_push_vertex(Output_border[2], -Left*3.0-(max_len*0.2),	-Bottom*3.0-p, 	-3.0);
+-
+-			s3d_push_vertex(Output_border[3], -Left*3.0-(max_len*0.2),	-Bottom*3.0-0.9, -3.0);
+-			s3d_push_vertex(Output_border[3], -Left*3.0-(max_len*0.2),	-Bottom*3.0-p, 	-3.0);
+-
+-			s3d_push_line( Output_border[0], 0,1,0);
+-			s3d_push_line( Output_border[1], 0,1,0);
+-			s3d_push_line( Output_border[2], 0,1,0);
+-			s3d_push_line( Output_border[3], 0,1,0);
+-
+-			s3d_flags_on( Output_border[0], S3D_OF_VISIBLE);
+-			s3d_flags_on( Output_border[1], S3D_OF_VISIBLE);
+-			s3d_flags_on( Output_border[2], S3D_OF_VISIBLE);
+-			s3d_flags_on( Output_border[3], S3D_OF_VISIBLE);
+-
+-			s3d_link( Output_border[0], 0);
+-			s3d_link( Output_border[1], 0);
+-			s3d_link( Output_border[2], 0);
+-			s3d_link( Output_border[3], 0);
+-		} else {
+-			s3d_pop_vertex(Output_border[0], 2);
+-			s3d_pop_vertex(Output_border[1], 2);
+-			s3d_pop_vertex(Output_border[2], 2);
+-			s3d_pop_vertex(Output_border[3], 2);
+-			s3d_push_vertex(Output_border[0], -Left*3.0-0.2,				-Bottom*3.0-0.9, -3.0);
+-			s3d_push_vertex(Output_border[0], -Left*3.0-(max_len*0.2),	-Bottom*3.0-0.9, -3.0);
+-
+-			s3d_push_vertex(Output_border[1], -Left*3.0-0.1,				-Bottom*3.0-1.0, -3.0);
+-			s3d_push_vertex(Output_border[1], -Left*3.0-0.1,				-Bottom*3.0-p,	 -3.0);
+-
+-			s3d_push_vertex(Output_border[2], -Left*3.0-0.1,				-Bottom*3.0-p,	 -3.0);
+-			s3d_push_vertex(Output_border[2], -Left*3.0-(max_len*0.2),	-Bottom*3.0-p,	 -3.0);
+-
+-			s3d_push_vertex(Output_border[3], -Left*3.0-(max_len*0.2),	-Bottom*3.0-0.9, -3.0);
+-			s3d_push_vertex(Output_border[3], -Left*3.0-(max_len*0.2),	-Bottom*3.0-p, 	 -3.0);
+-		}
+-	}
+-}
+-
+-
+-
+-/***
+- *
+- * eventhandler when object change by user
+- * such as Cam
+- *
+- ***/
+-
+-int olsr_object_info(struct s3d_evt *hrmz)
+-{
+-	struct s3d_obj_info *inf;
+-	inf=(struct s3d_obj_info *)hrmz-&gt;buf;
+-	if (!olsr_ready) return(0);
+-	s3dw_object_info(hrmz);
+-	if (inf-&gt;object==0)
+-	{
+-		CamPosition[0][0] = inf-&gt;trans_x;
+-		CamPosition[0][1] = inf-&gt;trans_y;
+-		CamPosition[0][2] = inf-&gt;trans_z;
+-		CamPosition[1][0] = inf-&gt;rot_x;
+-		CamPosition[1][1] = inf-&gt;rot_y;
+-		CamPosition[1][2] = inf-&gt;rot_z;
+-		Asp=inf-&gt;scale;
+-		if (Asp&gt;1.0) /* wide screen */
+-		{
+-			Bottom=-1.0;
+-			Left=-Asp;
+-		} else {  /* high screen */
+-			Bottom=(-1.0/Asp);
+-			Left=-1.0;
+-
+-		}
+-
+-	}
+-	/* printf(&quot;%f %f %f\n&quot;,inf-&gt;trans_x,inf-&gt;trans_y,inf-&gt;trans_z); */
+-	return(0);
+-}
+-
+-int mbutton_press(struct s3d_evt *hrmz)
+-{
+-	struct s3d_but_info *inf;
+-	inf=(struct s3d_but_info *)hrmz-&gt;buf;
+-	printf(&quot;button %d, state %d\n&quot;, inf-&gt;button,inf-&gt;state);
+-	return(0);
+-}
+-
+-int olsr_parse_args(int argc, char **argv) {
+-	int optchar;
+-	strncpy( Olsr_host, &quot;127.0.0.1&quot;, 256 );
+-	lbuf[0] = '\0';   /* init lbuf */
+-	opterr=0;
+-
+-	while ( ( optchar = getopt ( argc, argv, &quot;dhH:&quot; ) ) != -1 ) {
+-
+-		switch ( optchar ) {
+-
+-			case 'd':
+-				Debug = 1;
+-				break;
+-
+-			case 'H':
+-				strncpy( Olsr_host, optarg, 256 );
+-				break;
+-
+-			case 'h':
+-			default:
+-				print_usage();
+-				return (1);
+-			case '?':
+-				/* not handled by olsr-part */
+-				break;
+-		}
+-
+-	}
+-	return(0);
+-}
+-int olsr_init()
+-{
+-	if ( Debug )
+-		printf( &quot;debug mode enabled ...\n&quot; );
+-
+-	if (net_init(Olsr_host)) return(1);
+-	/* initialize obj2ip linked list */
+-	lst_initialize();
+-
+-	/* set extern int optind = 0 for parse_args in io.c */
+-	optind = 0;
+-	
+-	Olsr_node_obj = s3d_import_model_file( &quot;objs/accesspoint.3ds&quot; );
+-	Olsr_node_inet_obj = s3d_import_model_file( &quot;objs/accesspoint_inet.3ds&quot; );
+-	Olsr_node_hna_net = s3d_import_model_file( &quot;objs/internet.3ds&quot; );
+-	Btn_close_obj = s3d_import_model_file( &quot;objs/btn_close.3ds&quot; );
+-
+-	S3d_obj = s3d_import_model_file( &quot;objs/s3d_berlios_de.3ds&quot; );
+-	s3d_translate( S3d_obj, 0.75, -0.75, -1 );
+-	s3d_scale( S3d_obj, 0.07 );
+-	s3d_link( S3d_obj, 0 );
+-	s3d_flags_on( S3d_obj, S3D_OF_VISIBLE );
+-
+-	ZeroPoint = s3d_new_object();
+-	Output_border[0] = Output_border[1] = Output_border[2] = Output_border[3] = -1;
+-	db_olsr_node_init(olsr_node_init);
+-
+-	s3d_link(ZeroPoint, oidy);
+-
+-	/* create_search_widget( 0, 0, 300 ); */
+-	olsr_ready=1;
+-	return(0);
+-
+-}
+-int olsr_quit()
+-{
+-	if (!olsr_ready) return(0);
+-	olsr_ready=0;
+-	/* TODO: remove nodes and objects here */
+-	net_quit();
+-	return(0);
+-}
+-
+
+Deleted: trunk/apps/s3dosm/process.c
+===================================================================
+--- trunk/apps/s3dosm/process.c	2007-08-28 16:57:21 UTC (rev 658)
++++ trunk/apps/s3dosm/process.c	2007-09-01 12:49:22 UTC (rev 659)
+@@ -1,529 +0,0 @@
+-/*
+- * process.c
+- *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+- *                         Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
+- *                         Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
+- *
+- * This file is part of olsrs3d, an olsr topology visualizer for s3d.
+- * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+- *
+- * olsrs3d is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- *
+- * olsrs3d is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with olsrs3d; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- */
+-
+-
+-#include &lt;stdio.h&gt; 	/* NULL */
+-#include &lt;string.h&gt; 	/* strlen(), memmove() */
+-#include &lt;stdlib.h&gt; 	/* rand(), malloc(), realloc(), free() */
+-#include &lt;s3d.h&gt;
+-#include &lt;math.h&gt;       /* sqrt() */
+-#include &quot;olsrs3d.h&quot;
+-#include &quot;s3dosm.h&quot;	/* db_check_olsr() */
+-#include &lt;sys/socket.h&gt;
+-#include &lt;netinet/in.h&gt;
+-#include &lt;arpa/inet.h&gt;
+-
+-
+-char lbuf[MAXLINESIZE];
+-float olsr_node_init[6]={0,0,0,0,0,0};
+-
+-
+-
+-/***
+- *
+- * create new or alter connection between 2 nodes
+- *
+- *   con_from =&gt;   current node
+- *   con_to   =&gt;   node to connect to
+- *   etx      =&gt;   ETX
+- *
+- ***/
+-
+-int add_olsr_con( struct olsr_node *con_from, struct olsr_node *con_to, float etx ) {
+-
+-	struct olsr_con **olsr_con = &amp;Con_begin;
+-	struct olsr_con *prev_olsr_con = NULL;   /* previous olsr connection */
+-	struct olsr_neigh_list **olsr_neigh_list;
+-
+-	while ( (*olsr_con) != NULL ) {
+-
+-		/* connection already exists */
+-		if ( ( strncmp( (*olsr_con)-&gt;left_olsr_node-&gt;ip, con_from-&gt;ip, NAMEMAX ) == 0 ) &amp;&amp; ( strncmp( (*olsr_con)-&gt;right_olsr_node-&gt;ip, con_to-&gt;ip, NAMEMAX ) == 0 ) ) {
+-			(*olsr_con)-&gt;left_etx = etx;
+-			(*olsr_con)-&gt;left_etx_sqrt = (etx==-1000.00)? 10.0 : sqrt( etx ) ;
+-			break;
+-
+-		} else if ( ( strncmp( (*olsr_con)-&gt;right_olsr_node-&gt;ip, con_from-&gt;ip, NAMEMAX ) == 0 ) &amp;&amp; ( strncmp( (*olsr_con)-&gt;left_olsr_node-&gt;ip, con_to-&gt;ip, NAMEMAX ) == 0 ) ) {
+-
+-			(*olsr_con)-&gt;right_etx = etx;
+-			(*olsr_con)-&gt;right_etx_sqrt = (etx==-1000.00)? 10.0 : sqrt( etx ) ;
+-			break;
+-
+-		}
+-
+-		/* save previous olsr connection for later use */
+-		prev_olsr_con = (*olsr_con);
+-
+-		olsr_con = &amp;(*olsr_con)-&gt;next_olsr_con;
+-
+-	}
+-
+-	/* new connection */
+-	if ( (*olsr_con) == NULL ) {
+-
+-		(*olsr_con) = malloc( sizeof( struct olsr_con ) );
+-		if ( (*olsr_con) == NULL ) out_of_mem();
+-
+-		/* create connection object */
+-		(*olsr_con)-&gt;obj_id = s3d_new_object();
+-
+-		/* add olsr node to new olsr connection in order to access the nodes from the connection list */
+-		(*olsr_con)-&gt;left_olsr_node = con_from;
+-		(*olsr_con)-&gt;right_olsr_node = con_to;
+-
+-		/* add connection color */
+-		(*olsr_con)-&gt;color = 0;
+-		s3d_push_material( (*olsr_con)-&gt;obj_id,
+-				  1.0,1.0,1.0,
+-				  1.0,1.0,1.0,
+-				  1.0,1.0,1.0);
+-
+-		/* add connection endpoints */
+-		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[0], (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[1], (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[2] );
+-		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[0], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[1], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[2] );
+-
+-		s3d_push_line( (*olsr_con)-&gt;obj_id, 0,1,0 );
+-
+-		s3d_flags_on( (*olsr_con)-&gt;obj_id, S3D_OF_VISIBLE );
+-
+-		s3d_link( (*olsr_con)-&gt;obj_id,  ZeroPoint );
+-
+-		/* HNA */
+-		if ( etx == -1000.00 ) {
+-
+-			(*olsr_con)-&gt;left_etx = etx;
+-			(*olsr_con)-&gt;left_etx_sqrt = 10.0;
+-			(*olsr_con)-&gt;right_etx = etx;
+-			(*olsr_con)-&gt;right_etx_sqrt = 10.0;
+-
+-		} else {
+-
+-			(*olsr_con)-&gt;left_etx = etx;
+-			(*olsr_con)-&gt;left_etx_sqrt = sqrt( etx );
+-			(*olsr_con)-&gt;right_etx = 999.0;
+-			(*olsr_con)-&gt;right_etx_sqrt = sqrt( 999.0 );
+-
+-		}
+-
+-		(*olsr_con)-&gt;next_olsr_con = NULL;
+-		(*olsr_con)-&gt;prev_olsr_con = prev_olsr_con;
+-
+-		/* add new olsr connection to olsr nodes in order to access the connection from the olsr node */
+-		olsr_neigh_list = &amp;(*olsr_con)-&gt;left_olsr_node-&gt;olsr_neigh_list;
+-		while ( (*olsr_neigh_list) != NULL ) olsr_neigh_list = &amp;(*olsr_neigh_list)-&gt;next_olsr_neigh_list;
+-		(*olsr_neigh_list) = malloc( sizeof( struct olsr_neigh_list ) );
+-		if ( (*olsr_neigh_list) == NULL ) out_of_mem();
+-		(*olsr_neigh_list)-&gt;olsr_con = (*olsr_con);
+-		(*olsr_neigh_list)-&gt;next_olsr_neigh_list = NULL;
+-
+-		olsr_neigh_list = &amp;(*olsr_con)-&gt;right_olsr_node-&gt;olsr_neigh_list;
+-		while ( (*olsr_neigh_list) != NULL ) olsr_neigh_list = &amp;(*olsr_neigh_list)-&gt;next_olsr_neigh_list;
+-		(*olsr_neigh_list) = malloc( sizeof( struct olsr_neigh_list ) );
+-		if ( (*olsr_neigh_list) == NULL ) out_of_mem();
+-		(*olsr_neigh_list)-&gt;olsr_con = (*olsr_con);
+-		(*olsr_neigh_list)-&gt;next_olsr_neigh_list = NULL;
+-
+-	}
+-
+-	return(0);
+-
+-}
+-
+-
+-
+-/***
+- *
+- * get pointer to olsr node or create new node if node string could not be found
+- *
+- *   **node =&gt;   pointer to current olsr_node
+- *   *ip    =&gt;   node ip
+- *
+- *   return olsr node pointer
+- *
+- ***/
+-void *get_olsr_node( struct olsr_node **olsr_node, char *ip ) {
+-
+-	int result;   /* result of strcmp */
+-
+-	while ( (*olsr_node) != NULL ) {
+-
+-		result = strncmp( (*olsr_node)-&gt;ip, ip, NAMEMAX );
+-
+-		/* we found the node */
+-		if ( result == 0 ) {
+-
+-			(*olsr_node)-&gt;last_seen = Output_block_counter;
+-
+-			/* former invisble (deleted) node */
+-			if ( (*olsr_node)-&gt;visible == 0 ) {
+-				(*olsr_node)-&gt;node_type = 0;
+-				(*olsr_node)-&gt;node_type_modified = 1;
+-
+-				(*olsr_node)-&gt;visible = 1;
+-
+-				(*olsr_node)-&gt;mov_vec[0] = (*olsr_node)-&gt;mov_vec[1] = (*olsr_node)-&gt;mov_vec[2] = 0.0;
+-
+-				if ( Debug ) printf( &quot;new olsr node: %s\n&quot;, (*olsr_node)-&gt;ip );
+-
+-				Olsr_node_count++;
+-
+-			}
+-
+-			return (*olsr_node);
+-
+-		}
+-
+-		/* the searched node must be in the subtree */
+-		if ( result &lt; 0 ) {
+-			olsr_node = &amp;(*olsr_node)-&gt;right;
+-		} else {
+-			olsr_node = &amp;(*olsr_node)-&gt;left;
+-		}
+-
+-	}
+-
+-	/* if node is NULL we reached the end of the tree and must create a new olsr_node */
+-	if ( (*olsr_node) == NULL ) {
+-
+-		(*olsr_node) = malloc( sizeof( struct olsr_node ) );
+-		if ( (*olsr_node) == NULL ) out_of_mem();
+-
+-		(*olsr_node)-&gt;left = NULL;
+-		(*olsr_node)-&gt;right = NULL;
+-
+-		strncpy( (*olsr_node)-&gt;ip, ip, NAMEMAX );
+-
+-		(*olsr_node)-&gt;node_type = 0;
+-		(*olsr_node)-&gt;node_type_modified = 1;
+-
+-		(*olsr_node)-&gt;last_seen = Output_block_counter;
+-		(*olsr_node)-&gt;visible = 1;
+-
+-		if ( Debug ) printf( &quot;new olsr node: %s\n&quot;, (*olsr_node)-&gt;ip );
+-
+-		Olsr_node_count++;
+-
+-		(*olsr_node)-&gt;pos_vec[0] = olsr_node_init[0]+ ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
+-		(*olsr_node)-&gt;pos_vec[1] = olsr_node_init[1]+ ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
+-		(*olsr_node)-&gt;pos_vec[2] = olsr_node_init[2]+ ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
+-		(*olsr_node)-&gt;static_node=0;
+-
+-		if (db_olsr_check((*olsr_node)-&gt;ip,(*olsr_node)-&gt;pos_vec)) {
+-			/* pos_vec will be overwritten if there is a database hit */
+-			(*olsr_node)-&gt;static_node=1;
+-			/* little elevation over the earth */
+-		} 
+-
+-
+-		(*olsr_node)-&gt;mov_vec[0] = (*olsr_node)-&gt;mov_vec[1] = (*olsr_node)-&gt;mov_vec[2] = 0.0;
+-
+-		(*olsr_node)-&gt;obj_id = -1;
+-		(*olsr_node)-&gt;desc_id = -1;
+-		(*olsr_node)-&gt;olsr_neigh_list = NULL;
+-
+-		return (*olsr_node);
+-
+-	}
+-	return(0);
+-}
+-
+-/*
+- *
+- * initialize the struct for a linked list obj2ip
+- *
+- */
+-
+-void lst_initialize() {
+-	Obj_to_ip_head = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
+-	Obj_to_ip_end = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
+-	if(Obj_to_ip_head == NULL || Obj_to_ip_end == NULL)
+-		out_of_mem();
+-	Obj_to_ip_head-&gt;id = 0;
+-	Obj_to_ip_end-&gt;id = 0;
+-	Obj_to_ip_head-&gt;prev = Obj_to_ip_end-&gt;prev = Obj_to_ip_head;
+-	Obj_to_ip_head-&gt;next = Obj_to_ip_end-&gt;next = Obj_to_ip_end;
+-	List_ptr = Obj_to_ip_head;
+-}
+-
+-/*
+- *
+- * add a link object_id to olsr_node, to get ip adress and coordinates per object_id
+- *                 id =&gt; object_id, returned from s3d_clone or s3d_new_object
+- *  **olsr_node =&gt; pointer to pointer of current olsr_node
+- *
+- */
+-
+-void lst_add(int id,struct olsr_node **olsr_node) {
+-	struct Obj_to_ip *new;
+-	new = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
+-	if(new == NULL)
+-		out_of_mem();
+-	new-&gt;id = id;
+-	new-&gt;olsr_node = *olsr_node;
+-	move_lst_ptr(&amp;id);
+-	new-&gt;prev = List_ptr;
+-	new-&gt;next = List_ptr-&gt;next;
+-	List_ptr-&gt;next-&gt;prev = new;
+-	List_ptr-&gt;next = new;
+-	/* printf(&quot;obj2ip: add object %d between %d .. %d ip %s to list\n&quot;,new-&gt;id,new-&gt;prev-&gt;id,new-&gt;next-&gt;id,new-&gt;olsr_node-&gt;ip); */
+-}
+-
+-/*
+- *void move_lst_ptr(int *id)
+- * remove element from obj2ip linked list
+- * id =&gt; object_id, returned from s3d_clone or s3d_new_object
+- *
+- */
+-
+-void lst_del(int id) {
+-	struct Obj_to_ip *del;
+-	move_lst_ptr(&amp;id);
+-	if(id != List_ptr-&gt;id)
+-	{
+-		printf(&quot;obj2ip: remove id %d failed move_lst_ptr return id %d\n&quot;,id,List_ptr-&gt;next-&gt;id);
+-	} else {
+-		del = List_ptr;
+-		List_ptr-&gt;next-&gt;prev = List_ptr-&gt;prev;
+-		List_ptr-&gt;prev-&gt;next = List_ptr-&gt;next;
+-		/* printf(&quot;obj2ip: remove object %d --&gt; %d &lt;-- %d ip %s from list\n&quot;,List_ptr-&gt;prev-&gt;id,del-&gt;id,List_ptr-&gt;next-&gt;id,del-&gt;olsr_node-&gt;ip); */
+-		free(del);
+-	}
+-}
+-
+-/*
+- *
+- * move the List_ptr one positon ahead the searched element
+- *	*id =&gt; pointer of object_id , returned from s3d_clone or s3d_new_object
+- *
+- */
+-
+-struct olsr_node *move_lst_ptr(int *id) {
+-	/* printf(&quot;obj2ip: move for %d\n&quot;,*id); */
+-	/* head to point at end or id lass then first element in linked list*/
+-	if(Obj_to_ip_head-&gt;next == Obj_to_ip_head || *id &lt; Obj_to_ip_head-&gt;next-&gt;id) {
+-		List_ptr = Obj_to_ip_head;
+-		return NULL;
+- 	/* id is greather then last element in linked list */
+-	} else if(*id &gt; Obj_to_ip_end-&gt;prev-&gt;id) {
+-		List_ptr = Obj_to_ip_end-&gt;prev;
+-		return NULL;
+-	} else {
+-		/* printf(&quot;obj2ip: ok i search deeper ;-) for id=%d\n&quot;,*id); */
+-		if((*id - (int) Obj_to_ip_head-&gt;next-&gt;id) &lt;= ((int)(Obj_to_ip_end-&gt;prev-&gt;id)-*id)) {
+-			List_ptr = Obj_to_ip_head;
+-			/* printf(&quot;obj2ip: start at head id %d - %d &lt;= %d - %d \n&quot;,*id,Obj_to_ip_head-&gt;next-&gt;id,Obj_to_ip_end-&gt;prev-&gt;id,*id); */
+-			while(*id &gt;= List_ptr-&gt;next-&gt;id) {
+-				/* printf(&quot;obj2ip: %d &gt; %d move to &quot;,*id,List_ptr-&gt;id); */
+-				List_ptr = List_ptr-&gt;next;
+-				/* printf(&quot;%d\n&quot;,List_ptr-&gt;id); */
+-			}
+-		} else {
+-			List_ptr = Obj_to_ip_end;
+-			/* printf(&quot;obj2ip: start at end id %d - %d &gt; %d - %d \n&quot;,*id,Obj_to_ip_head-&gt;next-&gt;id,Obj_to_ip_end-&gt;prev-&gt;id,*id);  */
+-			/*  do List_ptr = List_ptr-&gt;prev; while(*id &gt; List_ptr-&gt;prev-&gt;id); */
+-			while(*id &lt; List_ptr-&gt;prev-&gt;id) {
+-				/* printf(&quot;obj2ip: %d &lt; %d move to &quot;,*id,List_ptr-&gt;id); */
+-				List_ptr = List_ptr-&gt;prev;
+-				/* printf(&quot;%d\n&quot;,List_ptr-&gt;id); */
+-			}
+-			List_ptr = List_ptr-&gt;prev;
+-		}
+-
+-		if ( List_ptr-&gt;id == *id )
+-			return List_ptr-&gt;olsr_node;
+-		else
+-			return NULL;
+-
+-		/* printf(&quot;obj2ip: found id to insert between %d--&gt; .. &lt;--%d to search/delete %d--&gt; .. &lt;--%d\n&quot;,List_ptr-&gt;id,List_ptr-&gt;next-&gt;next-&gt;id,List_ptr-&gt;prev-&gt;id,List_ptr-&gt;next-&gt;id); */
+-	}
+-}
+-
+-/*
+- *
+- * search a object_id in linked list and return pointer on struct olsr_node
+- *	id =&gt; object_id , returned from s3d_clone or s3d_new_object
+- *
+- * &lt;example&gt;
+- *     struct olsr_node *olsr_node;
+- *     olsr_node = *lst_search(oid);
+- *     printf(&quot;obj2ip: search return %s\n&quot;,olsr_node-&gt;ip);
+- * &lt;/example&gt;
+- *
+- */
+-
+-struct olsr_node *lst_search(int id) {
+-
+-	return( move_lst_ptr(&amp;id) );
+-
+-}
+-
+-void lst_out() {
+-	struct Obj_to_ip *ptr;
+-	ptr = Obj_to_ip_head;
+-	while(ptr != ptr-&gt;next) {
+-		printf(&quot;id-&gt; %d\n&quot;,ptr-&gt;id);
+-		ptr = ptr-&gt;next;
+-	}
+-}
+-
+-int process_main() {
+-
+-	int dn;
+-	float f;
+-	char *lbuf_ptr, *last_cr_ptr, *con_from, *con_from_end, *con_to, *con_to_end, *etx, *etx_end, *tmpChar;
+-	struct olsr_node *olsr_node1;   /* pointer to olsr nodes */
+-	struct olsr_node *olsr_node2;
+-	int address;
+-	char hna_name[NAMEMAX];
+-	char hna_node[NAMEMAX];
+-
+-	lbuf_ptr = lbuf;
+-	last_cr_ptr = NULL;
+-
+-	con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
+-	dn = 0;
+-
+-	/*printf(&quot;---lbuf-start---\n%s\n---lbuf-end---\n&quot;,lbuf);*/
+-
+-	while ( (*lbuf_ptr) != '\0' ) {
+-
+-		/* printf( &quot;%c&quot;,(*lbuf_ptr) ); */
+-
+-		if ( (*lbuf_ptr) == '\n' ) {
+-
+-			last_cr_ptr = lbuf_ptr;
+-			con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
+-			dn = 0;
+-
+-		}
+-
+-		if ( (*lbuf_ptr) == '&quot;' ) {
+-
+-			switch ( dn ) {
+-
+-				case 0:
+-					con_from = lbuf_ptr + 1;
+-					break;
+-				case 1:
+-					con_from_end = lbuf_ptr;
+-					break;
+-				case 2:
+-					con_to = lbuf_ptr + 1;
+-					break;
+-				case 3:
+-					con_to_end = lbuf_ptr;
+-					break;
+-				case 4:
+-					etx = lbuf_ptr + 1;
+-					break;
+-				case 5:
+-					etx_end = lbuf_ptr;
+-					break;
+-
+-			}
+-
+-			if ( ++dn == 6 ) {
+-
+-				/* terminate strings - but not before 6 times '&quot;' */
+-				(*con_from_end) = (*con_to_end) = (*etx_end) = '\0';
+-
+-				/* printf( &quot;con_from: %s, con_to: %s, etx: %s\n&quot;, con_from, con_to, etx ); */
+-
+-				/* announced network via HNA */
+-				if ( strncmp( etx, &quot;HNA&quot;, NAMEMAX ) == 0 ) {
+-
+-					/* connection to internet */
+-					if ( strncmp( con_to, &quot;0.0.0.0/0.0.0.0&quot;, NAMEMAX ) == 0 ) {
+-
+-						olsr_node1 = get_olsr_node( &amp;Olsr_root, con_from );
+-
+-						if ( olsr_node1-&gt;node_type != 1 ) {
+-
+-							olsr_node1-&gt;node_type = 1;
+-							olsr_node1-&gt;node_type_modified = 1;
+-							if ( Debug ) printf( &quot;new internet: %s\n&quot;, olsr_node1-&gt;ip );
+-
+-						}
+-
+-					/* normal HNA */
+-					} else {
+-						memmove(hna_node,con_to,NAMEMAX);
+-						if( (tmpChar = strchr(hna_node, (int)'/')))
+-						{
+-							tmpChar++;
+-							address = (int)-inet_network(tmpChar);
+-							sprintf(hna_name,&quot;%d&quot;,(int)(32 - ceil(log(address)/log(2))));
+-							strcpy(tmpChar,hna_name);
+-						}
+-
+-						olsr_node1 = get_olsr_node( &amp;Olsr_root, con_from );
+-						olsr_node2 = get_olsr_node( &amp;Olsr_root, hna_node );
+-
+-						if ( olsr_node2-&gt;node_type != 2 ) {
+-
+-							olsr_node2-&gt;node_type = 2;
+-							olsr_node2-&gt;node_type_modified = 1;
+-							if ( Debug ) printf( &quot;new hna network: %s\n&quot;, olsr_node2-&gt;ip );
+-
+-						}
+-						if ( olsr_node1-&gt;visible &amp;&amp; olsr_node2-&gt;visible )
+-							add_olsr_con( olsr_node1, olsr_node2, -1000.00 );
+-
+-					}
+-
+-				/* normal node */
+-				} else {
+-
+-					olsr_node1 = get_olsr_node( &amp;Olsr_root, con_from );
+-					olsr_node2 = get_olsr_node( &amp;Olsr_root, con_to );
+-					f = strtod(etx,NULL);
+-					if ( f &lt; 1.0 )
+-						f = 999.0;
+-					add_olsr_con( olsr_node1, olsr_node2, f );
+-				}
+-				/* remove zerobyte */
+-				(*con_from_end) = (*con_to_end) = (*etx_end) = '&quot;';
+-
+-				con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
+-				dn = 0;
+-				last_cr_ptr = lbuf_ptr;
+-
+-			}
+-
+-		} else if ( ( (*lbuf_ptr) == '}' ) &amp;&amp; ( (*(lbuf_ptr + 1)) == '\n' ) ) {
+-
+-			Output_block_completed = 1;
+-
+-		}
+-
+-		lbuf_ptr++;
+-
+-	}
+-
+-	if ( last_cr_ptr != NULL ) memmove( lbuf, last_cr_ptr + 1, strlen( last_cr_ptr ) );
+-	/*printf(&quot;---memmove-lbuf-start---\n%s\n---memmove-lbuf-end---\n&quot;,lbuf);*/
+-	return(0);
+-
+-}
+
+Deleted: trunk/apps/s3dosm/search.c
+===================================================================
+--- trunk/apps/s3dosm/search.c	2007-08-28 16:57:21 UTC (rev 658)
++++ trunk/apps/s3dosm/search.c	2007-09-01 12:49:22 UTC (rev 659)
+@@ -1,387 +0,0 @@
+-/*
+- * search.c
+- *
+- * Copyright (C) 2006 Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
+- *
+- * This file is part of the olsrs3d, an olsr topology visualizer for s3d.
+- * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+- *
+- * olsrs3d is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- *
+- * olsrs3d is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with olsrs3d; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- */
+-
+-#include &lt;s3d.h&gt;
+-#include &lt;s3dw.h&gt;
+-#include &lt;s3d_keysym.h&gt;
+-#include &lt;math.h&gt;
+-#include &lt;stdio.h&gt;	/* TODO can remove then no more printf needed */
+-#include &lt;string.h&gt;
+-#include &quot;olsrs3d.h&quot;	/* for window_error(), structs */
+-/* #include &quot;structs.h&quot;  already included by olsrs3d.h */
+-#include &quot;search.h&quot;
+-
+-s3dw_surface	*_search_surface;
+-s3dw_input		*_search_input;
+-s3dw_widget		*_search_widget;
+-
+-struct olsr_node *_node_root = NULL;
+-struct olsr_node **search_node = NULL;
+-
+-float	_return_point[2][3];				/* cam position before move to the widget */
+-int		_search_status = NOTHING;			/* status of search */
+-
+-void _search_node(s3dw_widget *dummy);
+-void _new_search_node(s3dw_widget *dummy);
+-void _abort_search(s3dw_widget *dummy);
+-
+-
+-/* public */
+-void follow_node(float cam_position_t[], float cam_position_r[],float rotate)
+-{
+-	float real_node_pos[3],
+-		  cam_target[3],
+-		  tmp_vec[3],
+-		  diff_vec[3],
+-		  angle;
+-
+-	real_node_pos[0] =  (*search_node)-&gt;pos_vec[0] * cos( rotate * M_PI / 180.0 ) - (*search_node)-&gt;pos_vec[2] * -sin ( rotate * M_PI / 180.0 );
+-	real_node_pos[1] =  (*search_node)-&gt;pos_vec[1];
+-	real_node_pos[2] =  (*search_node)-&gt;pos_vec[0] * -sin( rotate * M_PI / 180.0) + (*search_node)-&gt;pos_vec[2] * cos ( rotate * M_PI / 180.0 );
+-
+-	cam_target[0] = ( real_node_pos[0] + 7);
+-	cam_target[1] =   real_node_pos[1];
+-	cam_target[2] = ( real_node_pos[2] + 7);
+-
+-	cam_position_t[0]=( cam_position_t[0] * 4 + cam_target[0] ) / 5;
+-	cam_position_t[1]=( cam_position_t[1] * 4 + cam_target[1] ) / 5;
+-	cam_position_t[2]=( cam_position_t[2] * 4 + cam_target[2] ) / 5;
+-
+-	tmp_vec[0] =  0.0;
+-	tmp_vec[1] =  0.0;
+-	tmp_vec[2] = -1.0;
+-
+-	diff_vec[0] = cam_position_t[0] - real_node_pos[0];
+-	diff_vec[1] = 0.0;
+-	diff_vec[2] = cam_position_t[2] - real_node_pos[2];
+-	angle = s3d_vector_angle( diff_vec, tmp_vec );
+-	/* angle = ( real_node_pos[0] &gt; 0) ? ( 180 - ( 180 / M_PI * angle ) ) : ( 180 + ( 180 / M_PI * angle ) ); */
+-	angle = 180 - ( 180 / M_PI * angle );
+-	cam_position_r[1] = ( cam_position_r[1] * 4 + angle ) / 5;
+-
+-	s3d_translate( 0, cam_position_t[0], cam_position_t[1], cam_position_t[2] );
+-	s3d_rotate( 0, cam_position_r[0], cam_position_r[1], cam_position_r[2] );
+-}
+-void _abort_search_window(s3dw_widget *bwidget)
+-{
+-	s3dw_delete(bwidget-&gt;parent); /* remove the window cointaining the button */
+-	_search_surface=NULL;
+-	_search_input=NULL;
+-	_search_widget=NULL;
+-	set_search_status(NOTHING);
+-}
+-void show_search_window()
+-{
+-	s3dw_button *search_button, *abort_button;
+-
+-	_search_surface	= s3dw_surface_new( &quot;Node Search&quot;, 17, 10 );
+-	_search_input	= s3dw_input_new( _search_surface, 15, 1, 4 );
+-
+-	s3dw_label_new( _search_surface, &quot;Enter the IP of the node.&quot;, 1, 2);
+-	s3dw_focus( S3DWIDGET( _search_input ) );
+-
+-	search_button = s3dw_button_new( _search_surface, &quot;Search&quot;, 11.5, 7 );
+-	abort_button  = s3dw_button_new( _search_surface, &quot;Abort&quot;, 1, 7 );
+-	search_button-&gt;onclick = _new_search_node;
+-	abort_button-&gt;onclick = _abort_search_window;
+-
+-	/* TODO calc position for ok button */
+-
+-	s3dw_focus	( S3DWIDGET( _search_input ) );
+-	s3dw_focus	( S3DWIDGET( _search_surface ) );
+-	s3dw_show	( S3DWIDGET( _search_surface ) );
+-
+-	_search_widget	= S3DWIDGET(search_button);
+-}
+-
+-/* public */
+-void create_search_widget(float x, float y, float z)
+-{
+-	s3dw_button *search_button, *abort_button;
+-
+-	_search_surface	= s3dw_surface_new( &quot;Node Search&quot;, 17, 10 );
+-	_search_input	= s3dw_input_new( _search_surface, 15, 1, 4 );
+-
+-	s3dw_label_new( _search_surface, &quot;Enter the IP of the node.&quot;, 1, 2);
+-	s3dw_focus( S3DWIDGET( _search_input ) );
+-
+-	search_button = s3dw_button_new( _search_surface, &quot;Search&quot;, 11.5, 7 );
+-	abort_button  = s3dw_button_new( _search_surface, &quot;Abort&quot;, 1, 7 );
+-	search_button-&gt;onclick = _search_node;
+-	abort_button-&gt;onclick = _abort_search;
+-
+-	/* TODO calc position for ok button */
+-
+-	s3dw_focus	( S3DWIDGET( _search_input ) );
+-	s3dw_focus	( S3DWIDGET( _search_surface ) );
+-	s3dw_show	( S3DWIDGET( _search_surface ) );
+-
+-	/* disabled for autofollowing mode */
+-	/*_search_widget	= s3dw_getroot();
+-	move_search_widget( x, y, z );
+-
+-	_search_widget-&gt;ary = 180;
+-	s3d_rotate( _search_widget-&gt;oid, _search_widget-&gt;arx, _search_widget-&gt;ary, _search_widget-&gt;arz );*/
+-}
+-
+-/* public */
+-void move_search_widget(float x, float y, float z)
+-{
+-	_search_widget-&gt;x = x; _search_widget-&gt;y = y; _search_widget-&gt;z = z;
+-	s3dw_moveit( _search_widget );
+-}
+-
+-/* public */
+-void move_to_search_widget(float cam_position_t[], float cam_position_r[])
+-{
+-	float target, current;
+-
+-	set_search_status(WIDGET);
+-	cam_position_t[0] = ( cam_position_t[0] * 4 + _search_widget-&gt;x ) / 5;
+-	cam_position_t[1] = ( cam_position_t[1] * 4 + _search_widget-&gt;y ) / 5;
+-	cam_position_t[2] = ( cam_position_t[2] * 4 + ( _search_widget-&gt;z - 10 ) ) / 5;
+-
+-	target = _search_widget-&gt;arx;
+-	current = cam_position_r[0];
+-
+-	if( _search_widget-&gt;arx - cam_position_r[0] &gt; 180 )
+-		target -= 360;
+-	if( _search_widget-&gt;arx - cam_position_r[0] &lt; -180 )
+-		current -= 360;
+-	cam_position_r[0] = ( cam_position_r[0] * 4 + target ) / 5;
+-
+-	target = _search_widget-&gt;ary;
+-	current = cam_position_r[1];
+-
+-	if( _search_widget-&gt;ary - cam_position_r[1] &gt; 180 )
+-		target -= 360;
+-	if( _search_widget-&gt;ary - cam_position_r[1] &lt; -180 )
+-		current -= 360;
+-	cam_position_r[1] = ( cam_position_r[1] * 4 + target ) / 5;
+-
+-	target = _search_widget-&gt;arz;
+-	current = cam_position_r[2];
+-
+-	if( _search_widget-&gt;arz - cam_position_r[2] &gt; 180 )
+-		target -= 360;
+-	if( _search_widget-&gt;arz - cam_position_r[2] &lt; -180 )
+-		current -= 360;
+-	cam_position_r[2] = ( cam_position_r[2] * 4 + target ) / 5;
+-
+-	s3d_translate(0,cam_position_t[0],cam_position_t[1],cam_position_t[2]);
+-	s3d_rotate(0,cam_position_r[0],cam_position_r[1],cam_position_r[2]);
+-
+-	if ( sqrt(  (( cam_position_t[0] - _search_widget-&gt;x)*( cam_position_t[0] - _search_widget-&gt;x)) +
+-				(( cam_position_t[1] - _search_widget-&gt;y)*( cam_position_t[1] - _search_widget-&gt;y)) +
+-				(( cam_position_t[2] - _search_widget-&gt;z)*( cam_position_t[2] - _search_widget-&gt;z)) ) &lt; 0.2 )
+-	{
+-		s3d_translate( 0, _search_widget-&gt;x, _search_widget-&gt;y, ( _search_widget-&gt;z - 10 ) );
+-		s3d_rotate( 0, _search_widget-&gt;arx, _search_widget-&gt;ary, _search_widget-&gt;arz );
+-	}
+-}
+-
+-/* public */
+-void move_to_return_point(float cam_position_t[], float cam_position_r[])
+-{
+-	float target, current;
+-
+-	cam_position_t[0] = ( cam_position_t[0] * 4 + _return_point[0][0] ) / 5;
+-	cam_position_t[1] = ( cam_position_t[1] * 4 + _return_point[0][1] ) / 5;
+-	cam_position_t[2] = ( cam_position_t[2] * 4 + _return_point[0][2] ) / 5;
+-
+-	target = _return_point[1][0];
+-	current = cam_position_r[0];
+-
+-	if( _return_point[1][0] - cam_position_r[0] &gt; 180 )
+-		target -= 360;
+-	if( _return_point[1][0] - cam_position_r[0] &lt; -180 )
+-		current -= 360;
+-	cam_position_r[0] = ( cam_position_r[0] * 4 + target ) / 5;
+-
+-	target = _return_point[1][1];
+-	current = cam_position_r[1];
+-
+-	if( _return_point[1][1] - cam_position_r[1] &gt; 180 )
+-		target -= 360;
+-	if( _return_point[1][1] - cam_position_r[1] &lt; -180 )
+-		current -= 360;
+-	cam_position_r[1] = ( cam_position_r[1] * 4 + target ) / 5;
+-
+-	target = _return_point[1][2];
+-	current = cam_position_r[2];
+-
+-	if( _return_point[1][2] - cam_position_r[2] &gt; 180 )
+-		target -= 360;
+-	if( _return_point[1][2] - cam_position_r[2] &lt; -180 )
+-		current -= 360;
+-	cam_position_r[2] = ( cam_position_r[2] * 4 + target ) / 5;
+-
+-	s3d_translate(0,cam_position_t[0],cam_position_t[1],cam_position_t[2]);
+-	s3d_rotate(0,cam_position_r[0],cam_position_r[1],cam_position_r[2]);
+-
+-	if ( sqrt(  (( cam_position_t[0] - _return_point[0][0])*( cam_position_t[0] - _return_point[0][0])) +
+-				(( cam_position_t[1] - _return_point[0][1])*( cam_position_t[1] - _return_point[0][1])) +
+-				(( cam_position_t[2] - _return_point[0][2])*( cam_position_t[2] - _return_point[0][2])) ) &lt; 0.2 )
+-	{
+-		s3d_translate( 0, _return_point[0][0], _return_point[0][1], _return_point[0][2] );
+-		s3d_rotate( 0, _return_point[1][0], _return_point[1][1], _return_point[1][2] );
+-		set_search_status(NOTHING);
+-	}
+-}
+-
+-/* public */
+-/* TODO: WTF?!
+- * please fix:
+- *  - s is not initialized but still strlen() is used?!
+- *  - s will vanish after the function is processed. global variable would be better
+- *  - don't forget the terminating \0 after writing a key */
+-void search_widget_write(int key)
+-{
+-	static char s[20];
+-	int ln = strlen(s);
+-
+-	if( key == S3DK_COMMA ) key = S3DK_PERIOD;
+-
+-	if( key != S3DK_RETURN )
+-	{
+-		if( key == S3DK_BACKSPACE )
+-		{
+-			if( ln &gt; 0 )
+-				s[ln-1] = '\0';
+-		} else {
+-			if( ln &lt; 20 )
+-				s[ln] = key;
+-		}
+-		s3dw_input_change_text( _search_input, s );
+-	} else {
+-		_new_search_node( _search_widget );
+-	}
+-}
+-
+-/* public */
+-void set_return_point(float cam_position_t[], float cam_position_r[])
+-{
+-	int i;
+-	for( i = 0; i &lt; 3; i++ )
+-		_return_point[0][i] = cam_position_t[i];
+-	for( i = 0; i &lt; 3; i++ )
+-		_return_point[1][i] = cam_position_r[i];
+-}
+-
+-/* public */
+-int get_search_status(void)
+-{
+-	return _search_status;
+-}
+-
+-/* public */
+-void set_search_status(int stat)
+-{
+-	/* TODO check if stat between 0-3 else debug printf */
+-	_search_status = stat;
+-}
+-
+-/* public */
+-void set_node_root(struct olsr_node *root)
+-{
+-	_node_root = root;
+-}
+-/* private */
+-void _new_search_node(s3dw_widget *dummy)
+-{
+-	char *ip;
+-	int result;
+-
+-	search_node = &amp;_node_root;
+-
+-	ip = s3dw_input_gettext( _search_input );
+-
+-	while ( (*search_node) != NULL )
+-	{
+-
+-		result = strncmp( (*search_node)-&gt;ip, ip, NAMEMAX );
+-
+-		if ( result == 0 )
+-			break;
+-
+-		if ( result &lt; 0 )
+-			(*search_node) = (*search_node)-&gt;right;
+-		else
+-			(*search_node) = (*search_node)-&gt;left;
+-	}
+-	s3dw_delete(dummy-&gt;parent); /* remove the window cointaining the button */
+-	_search_surface=NULL;
+-	_search_input=NULL;
+-	_search_widget=NULL;
+-
+-
+-	if( (*search_node) != NULL )
+-	{
+-		set_search_status( FOLLOW );
+-	}
+-	else
+-	{
+-		window_error(&quot;Sorry, could not find...&quot;);
+-		set_search_status( NOTHING );
+-	}
+-}
+-/* public */
+-void follow_node_by_click(struct olsr_node *olsr_node) {
+-	search_node = &amp;_node_root;
+-	(*search_node) = olsr_node;
+-	set_search_status( FOLLOW );
+-}
+-
+-/* private */
+-void _search_node(s3dw_widget *dummy)
+-{
+-	char *ip;
+-	int result;
+-
+-	search_node = &amp;_node_root;
+-
+-	ip = s3dw_input_gettext( _search_input );
+-
+-	while ( (*search_node) != NULL )
+-	{
+-
+-		result = strncmp( (*search_node)-&gt;ip, ip, NAMEMAX );
+-
+-		if ( result == 0 )
+-			break;
+-
+-		if ( result &lt; 0 )
+-			(*search_node) = (*search_node)-&gt;right;
+-		else
+-			(*search_node) = (*search_node)-&gt;left;
+-	}
+-
+-	if( (*search_node) != NULL )
+-		set_search_status( FOLLOW );
+-}
+-
+-/* private */
+-void _abort_search(s3dw_widget *dummy)
+-{
+-	set_search_status(ABORT);
+-}
+
+Modified: trunk/apps/s3dosm/ui.c
+===================================================================
+--- trunk/apps/s3dosm/ui.c	2007-08-28 16:57:21 UTC (rev 658)
++++ trunk/apps/s3dosm/ui.c	2007-09-01 12:49:22 UTC (rev 659)
+@@ -108,7 +108,6 @@
+ 	int oid=(int)*((uint32_t *)evt-&gt;buf);
+ 	char query[MAXQ];
+ 	if (s3dw_handle_click(evt)) return(0);
+-	if (olsr_object_click(evt)) return(0);
+ 	snprintf(query,MAXQ,&quot;SELECT * FROM node WHERE s3doid=%d;&quot;,oid);
+ 	db_exec(query, ui_getinfo_node, 0);
+ 	snprintf(query,MAXQ,&quot;SELECT * FROM way WHERE s3doid=%d;&quot;,oid);
+@@ -120,13 +119,11 @@
+ {
+ /*	struct s3d_key_event *key=(struct s3d_key_event *)evt-&gt;buf;*/
+ 	if (s3dw_handle_key(evt)) return(0);
+-	if (olsr_keypress(evt)) return(0);
+ 	return(0);
+ }
+ int ui_oinfo(struct s3d_evt *evt)
+ {
+ 	s3dw_object_info(evt);	
+-	olsr_object_info(evt);
+ 	return(0);
+ }
+ int ui_init()
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000652.html">[S3d-svn] r660 - in trunk: . apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#651">[ date ]</a>
+              <a href="thread.html#651">[ thread ]</a>
+              <a href="subject.html#651">[ subject ]</a>
+              <a href="author.html#651">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

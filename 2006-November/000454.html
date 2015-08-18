@@ -1,0 +1,1924 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r461 - in trunk: . apps apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r461%20-%20in%20trunk%3A%20.%20apps%20apps/s3dosm&In-Reply-To=%3C200611052248.kA5MmJ6w027904%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000455.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r461 - in trunk: . apps apps/s3dosm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r461%20-%20in%20trunk%3A%20.%20apps%20apps/s3dosm&In-Reply-To=%3C200611052248.kA5MmJ6w027904%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r461 - in trunk: . apps apps/s3dosm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov  5 23:48:19 CET 2006</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000455.html">[S3d-svn] r462 - in trunk/apps: s3dfm s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#454">[ date ]</a>
+              <a href="thread.html#454">[ thread ]</a>
+              <a href="subject.html#454">[ subject ]</a>
+              <a href="author.html#454">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-11-05 23:48:17 +0100 (Sun, 05 Nov 2006)
+New Revision: 461
+
+Added:
+   trunk/apps/s3dosm/
+   trunk/apps/s3dosm/.draw.c.swp
+   trunk/apps/s3dosm/.http_fetcher.c.swp
+   trunk/apps/s3dosm/Makefile
+   trunk/apps/s3dosm/TODO
+   trunk/apps/s3dosm/avl.c
+   trunk/apps/s3dosm/draw.c
+   trunk/apps/s3dosm/http_error_codes.c
+   trunk/apps/s3dosm/http_error_codes.h
+   trunk/apps/s3dosm/http_fetcher.c
+   trunk/apps/s3dosm/http_fetcher.h
+   trunk/apps/s3dosm/layer.c
+   trunk/apps/s3dosm/main.c
+   trunk/apps/s3dosm/object.c
+   trunk/apps/s3dosm/osm.c
+   trunk/apps/s3dosm/s3dosm.h
+Modified:
+   trunk/
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1114 at kero</A>:  dotslash | 2006-11-05 23:48:13 +0100
+ - s3dosm initial add
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1112
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1114
+
+Added: trunk/apps/s3dosm/.draw.c.swp
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/apps/s3dosm/.draw.c.swp
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/apps/s3dosm/.http_fetcher.c.swp
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/apps/s3dosm/.http_fetcher.c.swp
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: trunk/apps/s3dosm/Makefile
+===================================================================
+--- trunk/apps/s3dosm/Makefile	2006-10-31 16:09:09 UTC (rev 460)
++++ trunk/apps/s3dosm/Makefile	2006-11-05 22:48:17 UTC (rev 461)
+@@ -0,0 +1,24 @@
++BIN=s3dosm
++VERS=0.0.1
++SOURCES=main.c http_fetcher.c http_error_codes.c osm.c avl.c object.c draw.c
++HEADERS=s3dosm.h http_fetcher.h
++OBJS=$(SOURCES:.c=.o)
++CFLAGS=-Wall -ggdb -pedantic `xml2-config --cflags`
++LDFLAGS=-lm -ls3d  `xml2-config --libs`
++CC=gcc
++LD=gcc
++
++
++
++.SUFFIXES: .c .o
++	
++default: 	all
++all:		$(BIN)
++clean:
++	rm -rf $(OBJS) $(BIN)
++$(BIN):    $(OBJS)
++	$(LD) $(LDFLAGS) $(OBJS) $(LIBS) -o $(BIN)
++.c.o:  $(HEADERS)
++	$(CC) $(CFLAGS) -c $&lt; -o $@
++
++
+
+Added: trunk/apps/s3dosm/TODO
+===================================================================
+--- trunk/apps/s3dosm/TODO	2006-10-31 16:09:09 UTC (rev 460)
++++ trunk/apps/s3dosm/TODO	2006-11-05 22:48:17 UTC (rev 461)
+@@ -0,0 +1 @@
++do something about malloc()s
+
+Added: trunk/apps/s3dosm/avl.c
+===================================================================
+--- trunk/apps/s3dosm/avl.c	2006-10-31 16:09:09 UTC (rev 460)
++++ trunk/apps/s3dosm/avl.c	2006-11-05 22:48:17 UTC (rev 461)
+@@ -0,0 +1,313 @@
++#include &quot;s3dosm.h&quot;
++#include &lt;stdio.h&gt;  /* printf(), NULL */
++#include &lt;stdlib.h&gt; /* malloc(), free() */
++		
++void avl_tree_trav(object_t *t, avl_func func, void *data)
++{
++	if (t!=NULL)
++	{
++		avl_tree_trav(t-&gt;left,func,data);
++		func(t,data);
++		avl_tree_trav(t-&gt;right,func,data);
++	}
++}
++/* avl_find a certain value */
++object_t *avl_find(object_t *t, int val)
++{
++	object_t *ret=NULL;
++	while (t!=NULL) 
++	{
++		if (t-&gt;id == val)
++		{
++			ret=t;
++			t=NULL;
++		}
++		else if (val &gt; t-&gt;id) t=t-&gt;right;
++		else if (val &lt; t-&gt;id) t=t-&gt;left;
++	}
++	return(ret);
++}
++static int s;
++object_t *avl_rotate_right(object_t *t)
++{
++	object_t *b;
++	b=t-&gt;right;
++/*	printf(&quot;&gt;&gt; right rotate at %d [%d] with %d [%d]\n&quot;,t-&gt;id,t-&gt;bal,b-&gt;id,b-&gt;bal);*/
++	t-&gt;right=b-&gt;left;
++	b-&gt;left=t;
++	return b;
++}
++object_t *avl_rotate_left(object_t *t)
++{
++	object_t *b;
++	b=t-&gt;left;
++/*	printf(&quot;&lt;&lt; left rotate at %d [%d] with %d [%d]\n&quot;,t-&gt;id,t-&gt;bal,b-&gt;id,b-&gt;bal);*/
++	t-&gt;left=b-&gt;right;
++	b-&gt;right=t;
++	return b;
++}
++
++object_t *avl_insert(object_t *t, object_t *nn)
++{
++	int i;
++
++	if (t == NULL) { 
++		s=1;
++		t=nn;
++	} else  {
++	    if (nn-&gt;id &gt; t-&gt;id) 
++		{ 
++			i = t-&gt;bal; /* might be -1 */
++			t-&gt;right=avl_insert(t-&gt;right,nn);
++			if ( s == 1) /* we can still move */
++			{ 
++						if (i == -1) 	{	t-&gt;bal=0;	s=0;}
++				else	if (i == 0)  		t-&gt;bal=1;
++				else 	if (i == 1) 
++				{
++					if (t-&gt;right-&gt;bal == -1)
++					{ /* Doppelrotation */
++						t-&gt;right=avl_rotate_left(t-&gt;right);
++						t=avl_rotate_right(t);
++						t-&gt;left-&gt;bal=0;
++						t-&gt;right-&gt;bal=0;
++						if (t-&gt;bal == -1)  t-&gt;right-&gt;bal=1;
++						if (t-&gt;bal == 1)   t-&gt;left-&gt;bal=-1;
++						t-&gt;bal=0;
++					} else {
++						t-&gt;bal=0;
++						t=avl_rotate_right(t);
++						t-&gt;bal=t-&gt;bal - 1 ;
++					}
++
++					s=0;
++				}
++			}
++		}
++		else if (nn-&gt;id &lt; t-&gt;id) 
++		{
++			i = t-&gt;bal; /* might be 1 */
++			t-&gt;left=avl_insert(t-&gt;left,nn);
++
++			if ( s == 1) /* we can still move */
++			{ 
++				if (i == 1) {
++					t-&gt;bal=0;
++					s=0;
++				} else if (i == 0) 
++					t-&gt;bal=-1;
++				else if (i == -1) 
++				{
++					if (t-&gt;left-&gt;bal == 1)
++					{  /* Doppelrotation */
++						t-&gt;left=avl_rotate_right(t-&gt;left);
++						t=avl_rotate_left(t);
++						t-&gt;left-&gt;bal=0;
++						t-&gt;right-&gt;bal=0;
++						if (t-&gt;bal == -1) t-&gt;left-&gt;bal=-1;
++						if (t-&gt;bal == 1)  t-&gt;right-&gt;bal=1;
++						t-&gt;bal=0;
++					} else {
++						t-&gt;bal=0;
++						t=avl_rotate_left(t);
++						t-&gt;bal=t-&gt;bal + 1 ;
++					}
++					s=0;
++				}
++			}
++		}
++	}
++	return(t);
++}
++object_t *avl_leftmost(object_t *t)
++{
++	while (t-&gt;left!=NULL) 
++	{
++		if (t-&gt;left!=NULL)			t=t-&gt;left;
++	} 
++	
++	return(t);
++}
++object_t *avl_rightmost(object_t *t)
++{
++	while (t-&gt;right!=NULL) 
++	{
++		if (t-&gt;right!=NULL)		t=t-&gt;right;
++	}
++	return(t);
++}
++object_t *avl_remove(object_t *t, object_t *nn)
++{
++	int i;
++	s=0;
++	if (t == NULL) { 
++/*		printf(&quot;object %d not found\n&quot;,nn-&gt;id);*/
++		t=nn;
++	} else {
++	    if (nn-&gt;id &gt; t-&gt;id) 
++		{ 
++/*			printf(&quot;go right at %d\n&quot;,t-&gt;id);*/
++			i = t-&gt;bal; /* might be -1 */
++			t-&gt;right=avl_remove(t-&gt;right,nn);
++			if ( s == 1)  /* we can still move */
++			{ 
++					 if (i == 1) {	t-&gt;bal=0;	}
++				else if (i == 0) {	t-&gt;bal=-1;  s=0;	}
++				else if (i == -1) { 
++/*					printf(&quot;[T]rouble left at object_t *%d\n&quot;,t-&gt;id);*/
++
++					if (t-&gt;left-&gt;bal == 1)
++					{  /* Doppelrotation */
++						t-&gt;left=avl_rotate_right(t-&gt;left);
++						t=avl_rotate_left(t);
++						t-&gt;left-&gt;bal=0;
++						t-&gt;right-&gt;bal=0;
++						if (t-&gt;bal == -1)  t-&gt;left-&gt;bal=-1;
++						if (t-&gt;bal == 1)   t-&gt;right-&gt;bal=1;
++						t-&gt;bal=0;
++					} else {
++						t-&gt;bal=0;
++						t=avl_rotate_left(t);
++						t-&gt;bal=t-&gt;bal + 1 ;
++					}
++				}
++
++			}
++		} else if (nn-&gt;id &lt; t-&gt;id) 
++		{
++/*			printf(&quot;go left at %d\n&quot;,t-&gt;id);*/
++
++			i = t-&gt;bal; /* might be 1 */
++			t-&gt;left=avl_remove(t-&gt;left,nn);
++
++			if ( s == 1) /* we can still move */
++			{ 
++					 if (i == -1) 	{ 	t-&gt;bal=0;}
++				else if (i == 0) 	{	t-&gt;bal=1;	s=0;}
++				else if (i == 1) { 
++/*					printf(&quot;[T]rouble right at object_t *%d\n&quot;,t-&gt;id);*/
++
++					if (t-&gt;right-&gt;bal == -1)
++					{ /* Doppelrotation */
++						t-&gt;right=avl_rotate_left(t-&gt;right);
++						t=avl_rotate_right(t);
++						t-&gt;left-&gt;bal=0;
++						t-&gt;right-&gt;bal=0;
++						if (t-&gt;bal == -1)   t-&gt;right-&gt;bal=1;
++						if (t-&gt;bal == 1)    t-&gt;left-&gt;bal=-1;
++						t-&gt;bal=0;
++					} else {
++						t-&gt;bal=0;
++						t=avl_rotate_right(t);
++						t-&gt;bal=t-&gt;bal - 1 ;
++					}
++
++				}
++			}
++		} if (nn-&gt;id == t-&gt;id)
++		{
++/*			printf(&quot;found, removing ...\n&quot;);*/
++			if (t-&gt;left==NULL &amp;&amp; t-&gt;right==NULL)
++			{ /* leaf */
++				s=1;
++				t=NULL;
++			} else {
++				object_t *xchg=NULL;
++				if (t-&gt;right!=NULL) xchg=avl_leftmost(t-&gt;right);
++				else 				xchg=avl_rightmost(t-&gt;left);
++/*				printf(&quot;using %d as exchange node\n&quot;,xchg-&gt;id);*/
++				avl_remove(t, xchg);	/* remove the leaf */
++				xchg-&gt;left=t-&gt;left;
++				xchg-&gt;right=t-&gt;right;
++				xchg-&gt;bal=t-&gt;bal;
++				t=xchg; /* don't set s, keep the value from avl_remove() */
++			}
++		}
++	}
++/*	if (t!=NULL) printf(&quot;balance of %d is now %d\n&quot;,t-&gt;id, t-&gt;bal);*/
++	return t;
++}
++
++int avl_height(object_t *t)
++{
++	int h1,h2;
++	if (t == NULL) 	return(0);
++	else {
++		h1=avl_height(t-&gt;left);
++		h2=avl_height(t-&gt;right);
++		if (h1&gt;h2)	if (h1 == 0) return(0); else return(h1+1);
++		else 		if (h2 == 0) return(0); else return(h2+1);
++	}
++}
++/*
++void avl_test()
++{
++	object_t *tree;
++
++	tree=NULL;
++	tree=avl_insert(tree,object_new(5));
++	avl_print_tree(tree);
++	printf(&quot;\n&quot;);
++
++	tree=avl_insert(tree,object_new(1));
++	avl_print_tree(tree);
++	printf(&quot;\n&quot;);
++
++	tree=avl_insert(tree,object_new(2));
++	avl_print_tree(tree);
++	printf(&quot;\n&quot;);
++	tree=avl_insert(tree,object_new(7));
++	avl_print_tree(tree);
++	printf(&quot;\n&quot;);
++
++	tree=avl_insert(tree,object_new(9));
++	avl_print_tree(tree);
++	printf(&quot;\n&quot;);
++
++	tree=avl_insert(tree,object_new(3));
++	avl_print_tree(tree);
++	printf(&quot;\n&quot;);
++
++	tree=avl_insert(tree,object_new(10));
++	avl_print_tree(tree);
++	printf(&quot;\n&quot;);
++
++	tree=avl_insert(tree,object_new(12));
++	avl_print_tree(tree);
++	printf(&quot;\n&quot;);
++
++
++	tree=avl_remove(tree,avl_find(tree,3));
++	tree=avl_remove(tree,avl_find(tree,1));
++	tree=avl_remove(tree,avl_find(tree,9));
++	tree=avl_remove(tree,avl_find(tree,5));
++	tree=avl_remove(tree,avl_find(tree,7));
++
++	printf(&quot;my tree:\n&quot;);
++	avl_print_tree(tree);
++	printf(&quot;\n&quot;);
++}
++void avl_print_tree(object_t *n)
++{ 
++	if (n != NULL) 
++	{ 
++		printf(&quot; (&quot;);
++		avl_print_tree(n-&gt;left);
++		printf(&quot;%d [%d]&quot;,n-&gt;id, n-&gt;bal);
++		avl_print_tree(n-&gt;right);
++		printf(&quot;) &quot;);
++	}
++}
++object_t *avl_findbest(object_t *t,int n)
++{
++	object_t *ret=NULL;
++	while (t != NULL) 
++	{
++		ret=t;
++		if (n &gt;= t-&gt;id) t=t-&gt;right;
++		else if (n &lt; t-&gt;id) t=t-&gt;left;
++	}
++	return(ret);
++}
++*/
++
+
+Added: trunk/apps/s3dosm/draw.c
+===================================================================
+--- trunk/apps/s3dosm/draw.c	2006-10-31 16:09:09 UTC (rev 460)
++++ trunk/apps/s3dosm/draw.c	2006-11-05 22:48:17 UTC (rev 461)
+@@ -0,0 +1,85 @@
++#include &quot;s3dosm.h&quot;
++#include &lt;s3d.h&gt;
++#include &lt;math.h&gt;	/* sin(), cos() */
++#include &lt;stdio.h&gt;	/* printf() */
++#define	ESIZE	6378
++
++struct vdata{
++	layer_t *layer;
++	double lonsum,latsum;
++	int n;
++	int oid;
++	int vnum;
++};
++
++void calc_earth_to_eukl(double lon, double lat, double *x)
++{
++	double la,lo;
++	la=lat*M_PI/180.0;
++	lo=lon*M_PI/180.0;
++	x[0]=ESIZE*sin(lo) *cos(la);
++	x[1]=ESIZE*			sin(la);
++	x[2]=ESIZE*cos(lo) *cos(la);
++}
++void draw_add_vertices(object_t *t, void *data)
++{
++	struct vdata *v=data;
++	
++	if (t-&gt;type==T_NODE)
++	{
++		double x[3];
++		node_t *node=NODE_T(t);
++		node-&gt;vid=v-&gt;vnum;
++		calc_earth_to_eukl(node-&gt;lon,node-&gt;lat,x);
++		s3d_push_vertex(v-&gt;oid,x[0],x[1],x[2]);
++		printf(&quot;vertex  %d: %f %f %f\n&quot;,node-&gt;vid,x[0],x[1],x[2]);
++		v-&gt;vnum++;
++		v-&gt;lonsum+=node-&gt;lon;
++		v-&gt;latsum+=node-&gt;lat;
++		v-&gt;n++;
++	}
++}
++
++void draw_add_segments(object_t *t, void *data)
++{
++	struct vdata *v=data;
++	if (t-&gt;type==T_SEGMENT)
++	{
++		node_t *from, *to;
++		segment_t *seg=SEGMENT_T(t);
++		from=NODE_T(avl_find(v-&gt;layer-&gt;tree,seg-&gt;from));
++		to=NODE_T(avl_find(v-&gt;layer-&gt;tree,seg-&gt;to));
++		if (from!=NULL &amp;&amp; to!=NULL)
++			s3d_push_line(v-&gt;oid,from-&gt;vid,to-&gt;vid,0);
++	}
++}
++int oidx, oidy;
++int draw_layer(layer_t *layer)
++{
++	struct vdata v;
++	int oid;
++	double lo,la,x[3];
++	oid=s3d_new_object();
++	oidx=s3d_new_object();
++	oidy=s3d_new_object();
++	s3d_link(oid,oidy);
++	s3d_link(oidy,oidx);
++	v.layer=layer;
++	v.oid=oid;
++	v.vnum=0;
++	v.n=0;
++	v.lonsum=v.latsum=0;
++	s3d_push_material(oid,1,1,1,	1,1,1,	1,1,1);
++	avl_tree_trav(layer-&gt;tree,draw_add_vertices,(void *)&amp;v);
++	avl_tree_trav(layer-&gt;tree,draw_add_segments,(void *)&amp;v);
++	lo=(v.lonsum)/v.n;
++	la=(v.latsum)/v.n;
++	s3d_rotate(oidy,0,-lo,0);
++	s3d_rotate(oidx,-(90-la),0,0);
++	calc_earth_to_eukl(lo,la,x);
++	s3d_translate(oidx,0,-ESIZE*10,0);
++	s3d_scale(oidx,10);
++	s3d_flags_on(oid,S3D_OF_VISIBLE);
++	return(0);
++
++}
+
+Added: trunk/apps/s3dosm/http_error_codes.c
+===================================================================
+--- trunk/apps/s3dosm/http_error_codes.c	2006-10-31 16:09:09 UTC (rev 460)
++++ trunk/apps/s3dosm/http_error_codes.c	2006-11-05 22:48:17 UTC (rev 461)
+@@ -0,0 +1,36 @@
++/* http_error_codes.c - Error code declarations
++
++	HTTP Fetcher 
++ 	Copyright (C) 2001 Lyle Hanson (<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lhanson at cs.nmu.edu</A>)
++
++	This library is free software; you can redistribute it and/or
++	modify it under the terms of the GNU Library General Public
++	License as published by the Free Software Foundation; either
++	version 2 of the License, or (at your option) any later version.
++
++	This library is distributed in the hope that it will be useful,
++	but WITHOUT ANY WARRANTY; without even the implied warranty of
++	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++	Library General Public License for more details.
++
++	See LICENSE file for details
++ */
++
++
++	/* Note that '%d' cannot be escaped at this time */
++const char *http_errlist[] =
++	{
++	&quot;Success&quot;,										/* HF_SUCCESS		*/
++	&quot;Internal Error. What the hell?!&quot;,				/* HF_METAERROR		*/
++	&quot;Got NULL url&quot;,									/* HF_NULLURL		*/
++	&quot;Timed out, no metadata for %d seconds&quot;,		/* HF_HEADTIMEOUT 	*/
++	&quot;Timed out, no data for %d seconds&quot;,			/* HF_DATATIMEOUT	*/
++	&quot;Couldn't find return code in HTTP response&quot;,	/* HF_FRETURNCODE	*/
++	&quot;Couldn't convert return code in HTTP response&quot;,/* HF_CRETURNCODE	*/
++	&quot;Request returned a status code of %d&quot;,			/* HF_STATUSCODE	*/
++	&quot;Couldn't convert Content-Length to integer&quot;	/* HF_CONTENTLEN	*/
++	};
++
++	/* Used to copy in messages from http_errlist[] and replace %d's with
++	 *	the value of errorInt.  Then we can pass the pointer to THIS */
++char convertedError[128];
+
+Added: trunk/apps/s3dosm/http_error_codes.h
+===================================================================
+--- trunk/apps/s3dosm/http_error_codes.h	2006-10-31 16:09:09 UTC (rev 460)
++++ trunk/apps/s3dosm/http_error_codes.h	2006-11-05 22:48:17 UTC (rev 461)
+@@ -0,0 +1,38 @@
++/* http_error_codes.h - Error code definitions
++
++	Copyright (C) 2001 Lyle Hanson (<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lhanson at cs.nmu.edu</A>)
++
++	This library is free software; you can redistribute it and/or
++	modify it under the terms of the GNU Library General Public
++	License as published by the Free Software Foundation; either
++	version 2 of the License, or (at your option) any later version.
++
++	This library is distributed in the hope that it will be useful,
++	but WITHOUT ANY WARRANTY; without even the implied warranty of
++	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++	Library General Public License for more details.
++
++	See LICENSE file for details
++
++ */
++
++#ifndef HTTP_ERROR_CODES_H
++#define HTTP_ERROR_CODES_H
++
++/* Error sources */
++#define FETCHER_ERROR	0
++#define ERRNO			1
++#define H_ERRNO			2
++
++/* HTTP Fetcher error codes */
++#define HF_SUCCESS		0
++#define HF_METAERROR	1
++#define HF_NULLURL		2
++#define HF_HEADTIMEOUT	3
++#define HF_DATATIMEOUT	4
++#define HF_FRETURNCODE	5
++#define HF_CRETURNCODE	6
++#define HF_STATUSCODE	7
++#define HF_CONTENTLEN	8
++
++#endif
+
+Added: trunk/apps/s3dosm/http_fetcher.c
+===================================================================
+--- trunk/apps/s3dosm/http_fetcher.c	2006-10-31 16:09:09 UTC (rev 460)
++++ trunk/apps/s3dosm/http_fetcher.c	2006-11-05 22:48:17 UTC (rev 461)
+@@ -0,0 +1,621 @@
++/* http_fetcher.c - HTTP handling functions
++
++	Copyright (C) 2001 Lyle Hanson (<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lhanson at cs.nmu.edu</A>)
++
++	This library is free software; you can redistribute it and/or
++	modify it under the terms of the GNU Library General Public
++	License as published by the Free Software Foundation; either
++	version 2 of the License, or (at your option) any later version.
++
++	This library is distributed in the hope that it will be useful,
++	but WITHOUT ANY WARRANTY; without even the implied warranty of
++	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++	Library General Public License for more details.
++
++	See included LICENSE file for details
++
++ */
++
++#include &lt;stdlib.h&gt;
++#include &lt;stdio.h&gt;
++#include &lt;string.h&gt;
++#include &lt;netdb.h&gt;
++#include &lt;unistd.h&gt;
++#include &lt;netinet/in.h&gt;
++#include &lt;errno.h&gt;
++#include &lt;sys/types.h&gt;
++#include &lt;sys/time.h&gt;
++#include &quot;http_fetcher.h&quot;
++
++/* Globals */
++int timeout = DEFAULT_READ_TIMEOUT;
++char *userAgent = NULL;
++char *referer = NULL;
++char *auth = NULL;
++int hideUserAgent = 0;
++int hideReferer = 1;
++extern const char *http_errlist[];	/* Array of HTTP Fetcher error messages */
++extern char convertedError[128];	/* Buffer to used when errors contain %d */
++static int errorSource = 0;
++static int http_errno = 0;
++static int errorInt = 0;			/* When the error message has a %d in it,
++									 *	this variable is inserted */
++static int freeOldAgent = 0; /* Indicates previous malloc's */
++static int freeOldReferer = 0; /* Indicated previous malloc's */
++
++
++	/* 
++	 * Actually downloads the page, registering a hit (donation)
++	 *	If the fileBuf passed in is NULL, the url is downloaded and then
++	 *	freed; otherwise the necessary space is allocated for fileBuf.
++	 *	Returns size of download on success, -1 on error is set, 
++	 */
++int http_fetch(const char *url_tmp, char **fileBuf)
++	{
++	fd_set rfds;
++	struct timeval tv;
++	char requestBuf[REQUEST_BUF_SIZE];
++	char headerBuf[HEADER_BUF_SIZE];
++	char *url, *pageBuf, *host, *charIndex;
++	int sock, bytesRead = 0, contentLength = -1;
++	int ret = -1, i, selectRet;
++
++
++	if(url_tmp == NULL)
++		{
++		errorSource = FETCHER_ERROR;
++		http_errno = HF_NULLURL;
++		return -1;
++		}
++
++	/* Copy the url passed in into a buffer we can work with, change, etc. */
++	url = malloc(strlen(url_tmp)+1);
++	if(url == NULL)
++		{
++		errorSource = ERRNO;
++		return -1;
++		}
++	strncpy(url, url_tmp, strlen(url_tmp) + 1);
++	
++	/* Seek to the file path portion of the url */
++	charIndex = strstr(url, &quot;://&quot;);
++	if(charIndex != NULL)
++		{
++		/* url contains a protocol field */
++		charIndex += strlen(&quot;://&quot;);
++		host = charIndex;
++		charIndex = strchr(charIndex, '/');
++		}
++	else
++		{
++		host = (char *)url;
++		charIndex = strchr(url, '/');
++		}
++
++	/* Compose a request string */
++	if(charIndex == NULL)
++		/* The url has no '/' in it, assume the user is making a root-level
++		 *	request */ 
++		sprintf(requestBuf, &quot;GET / %s\r\n&quot;, HTTP_VERSION);
++	else
++		sprintf(requestBuf, &quot;GET %s %s\r\n&quot;, charIndex, HTTP_VERSION);
++	/* Null out the end of the hostname if need be */
++	if(charIndex != NULL)
++		*charIndex = 0;
++
++	strcat(requestBuf, &quot;Host: &quot;);
++	strcat(requestBuf, host);
++	strcat(requestBuf, &quot;\r\n&quot;);
++
++
++	if(!hideReferer &amp;&amp; referer != NULL)	/* NO default referer */
++		{
++		strcat(requestBuf, &quot;Referer: &quot;);
++		strcat(requestBuf, referer);
++		strcat(requestBuf, &quot;\r\n&quot;);
++		}
++
++	if(!hideUserAgent &amp;&amp; userAgent == NULL)
++		{
++		strcat(requestBuf, &quot;User-Agent: &quot;);
++		strcat(requestBuf, DEFAULT_USER_AGENT);
++		strcat(requestBuf, &quot;/&quot;);
++		strcat(requestBuf, VERSION);
++		strcat(requestBuf, &quot;\r\n&quot;);
++		}
++	else if(!hideUserAgent)
++		{
++		strcat(requestBuf, &quot;User-Agent: &quot;);
++		strcat(requestBuf, userAgent);
++		strcat(requestBuf, &quot;\r\n&quot;);
++		}
++	if (auth!=NULL)
++	{
++		strcat(requestBuf, &quot;Authorization: Basic &quot;);
++		strcat(requestBuf, auth);
++		strcat(requestBuf, &quot;\r\n&quot;);
++	}
++	strcat(requestBuf, &quot;\r\n&quot;);
++
++
++
++	sock = makeSocket(host);			/* errorSource set within makeSocket */
++	if(sock == -1) { free(url); return -1;}
++
++	if(write(sock, requestBuf, strlen(requestBuf)) == -1)
++		{ close(sock); free(url); errorSource = ERRNO; return -1; }
++
++	/* Grab enough of the response to get the metadata */
++	ret = _http_read_header(sock, headerBuf);	/* errorSource set within */
++	if(ret &lt; 0) { close(sock); free(url); return -1; }
++
++	/* Get the return code */
++	charIndex = strstr(headerBuf, &quot;HTTP/&quot;);
++	if(charIndex == NULL)
++		{
++		close(sock);
++		free(url);
++		errorSource = FETCHER_ERROR;
++		http_errno = HF_FRETURNCODE;
++		return -1;
++		}
++	while(*charIndex != ' ')
++		charIndex++;
++	charIndex++;
++
++	ret = sscanf(charIndex, &quot;%i&quot;, &amp;i);
++	if(ret != 1)
++		{
++		close(sock);
++		free(url);
++		errorSource = FETCHER_ERROR;
++		http_errno = HF_CRETURNCODE;
++		return -1;
++		}
++	if(i&lt;200 || i&gt;299)
++		{
++		close(sock);
++		free(url);
++		errorInt = i;	/* Status code, to be inserted in error string */
++		errorSource = FETCHER_ERROR;
++		http_errno = HF_STATUSCODE;
++		return -1;
++		}
++	
++	/*
++	 * Parse out about how big the data segment is.
++	 *	Note that under current HTTP standards (1.1 and prior), the
++	 *	Content-Length field is not guaranteed to be accurate or even present. 
++	 *	I just use it here so I can allocate a ballpark amount of memory.
++	 *
++	 * Note that some servers use different capitalization
++	 */
++	charIndex = strstr(headerBuf, &quot;Content-Length:&quot;);
++	if(charIndex == NULL)
++		charIndex = strstr(headerBuf, &quot;Content-length:&quot;);
++
++	if(charIndex != NULL)
++		{
++		ret = sscanf(charIndex + strlen(&quot;content-length: &quot;), &quot;%i&quot;,
++			&amp;contentLength);
++		if(ret &lt; 1)
++			{
++			close(sock);
++			free(url);
++			errorSource = FETCHER_ERROR;
++			http_errno = HF_CONTENTLEN;
++			return -1;
++			}
++		}
++	
++	/* Allocate enough memory to hold the page */
++	if(contentLength == -1)
++		contentLength = DEFAULT_PAGE_BUF_SIZE;
++
++	pageBuf = (char *)malloc(contentLength+1);
++	if(pageBuf == NULL)
++		{
++		close(sock);
++		free(url);
++		errorSource = ERRNO;
++		return -1;
++		}
++
++	/* Begin reading the body of the file */
++	while(ret &gt; 0)
++		{
++		FD_ZERO(&amp;rfds);
++		FD_SET(sock, &amp;rfds);
++		tv.tv_sec = timeout; 
++		tv.tv_usec = 0;
++
++		if(timeout &gt;= 0)
++			selectRet = select(sock+1, &amp;rfds, NULL, NULL, &amp;tv);
++		else		/* No timeout, can block indefinately */
++			selectRet = select(sock+1, &amp;rfds, NULL, NULL, NULL);
++
++		if(selectRet == 0 &amp;&amp; timeout &lt; 0)
++			{
++			errorSource = FETCHER_ERROR;
++			http_errno = HF_DATATIMEOUT;
++			errorInt = timeout;
++			close(sock);
++			free(url);
++			free(pageBuf);
++			return -1;
++			}
++		else if(selectRet == -1)
++			{
++			close(sock);
++			free(url);
++			free(pageBuf);
++			errorSource = ERRNO;
++			return -1;
++			}
++
++		ret = read(sock, pageBuf + bytesRead, contentLength);
++		if(ret == -1)
++			{
++			close(sock);
++			free(url);
++			free(pageBuf);
++			errorSource = ERRNO;
++			return -1;
++			}
++
++		bytesRead += ret;
++
++		if(ret &gt; 0)
++			{
++			/* To be tolerant of inaccurate Content-Length fields, we'll
++			 *	allocate another read-sized chunk to make sure we have
++			 *	enough room.
++			 */
++			pageBuf = (char *)realloc(pageBuf, bytesRead + contentLength);
++			if(pageBuf == NULL)
++				{
++				close(sock);
++				free(url);
++				free(pageBuf);
++				errorSource = ERRNO;
++				return -1;
++				}
++			}
++		}
++	
++	/*
++	 * The download buffer is too large.  Trim off the safety padding.
++	 */
++	pageBuf = (char *)realloc(pageBuf, bytesRead);
++		/* pageBuf shouldn't be null, since we're _shrinking_ the buffer,
++		 *	and if it DID fail, we could go on with the too-large buffer,
++		 *	but something would DEFINATELY be wrong, so we'll just give
++		 *	an error message */
++	if(pageBuf == NULL)
++		{
++		close(sock);
++		free(url);
++		free(pageBuf);
++		errorSource = ERRNO;
++		return -1;
++		}
++
++	if(fileBuf == NULL)	/* They just wanted us to &quot;hit&quot; the url */
++		free(pageBuf);
++	else
++		*fileBuf = pageBuf;
++
++	close(sock);
++	free(url);
++	return bytesRead;
++	}
++
++
++
++	/*
++	 * Changes the User Agent.  Returns 0 on success, -1 on error. 
++	 */
++int http_setUserAgent(const char *newAgent)
++	{
++	char *tmp;
++
++	if(newAgent == NULL)
++		{
++		if(freeOldAgent) free(userAgent);
++		userAgent = NULL;
++		hideUserAgent = 1;
++		}
++	else
++		{
++		tmp = (char *)malloc(strlen(newAgent));
++		if(tmp == NULL) { errorSource = ERRNO; return -1; }
++		if(freeOldAgent) free(userAgent);
++		userAgent = tmp;
++		strcpy(userAgent, newAgent);
++		freeOldAgent = 1;
++		hideUserAgent = 0;
++		}
++
++	return 0;
++	}
++
++
++
++	/*
++	 * Changes the Referer.  Returns 0 on success, -1 on error
++	 */
++int http_setReferer(const char *newReferer)
++	{
++	char *tmp;
++
++	if(newReferer == NULL)
++		{
++		if(freeOldReferer) free(referer);
++		referer = NULL;
++		hideReferer = 1;
++		}
++	else
++		{
++		tmp = (char *)malloc(strlen(newReferer));
++		if(tmp == NULL) { errorSource = ERRNO; return -1; }
++		if(freeOldReferer) free(referer);
++		referer = tmp;
++		strcpy(referer, newReferer);
++		freeOldReferer = 1;
++		hideReferer = 0;
++		}
++	
++	return 0;
++	}
++void http_setAuth(const char *user, const char *pass)
++{
++	unsigned char plain[1024];
++	char ec64[]=&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&quot;;
++	char *b64;
++	int i,j,c,len,n;
++	char o;
++	 /* base64 encode user and pass */
++	
++	snprintf((char *)plain,1024,&quot;%s:%s&quot;,user,pass);
++	len=strlen((char *)plain);
++	b64=malloc(len*4+1);
++	i=j=c=0;
++	while (i&lt;len || c!=0)
++	{
++		switch (c)
++		{
++			case 0:	o=ec64[ n=plain[i] &gt;&gt; 2 ]; i++; break;
++			case 1: o=ec64[ n=((plain[i-1]&amp;0x3)&lt;&lt;4) | (plain[i]&gt;&gt;4) ]; i++; break;
++			case 2: o=(i&gt;=len)?'=':ec64[ n=((plain[i-1]&amp;0xf)&lt;&lt;2) | (plain[i]&gt;&gt;6) ]; break;
++			case 3: o=(i&gt;=len)?'=':ec64[ n=(plain[i]&amp;0x3f) ];i++;break;
++		}
++		b64[j]=o;
++		c=(c+1)%4;
++		j++;
++	}
++	b64[j]=0;
++	if (auth!=NULL)	free(auth); /* free old auth */
++	auth=b64;
++	
++
++	
++}
++
++
++
++
++	/*
++	 * Changes the amount of time that HTTP Fetcher will wait for data
++	 *	before timing out on reads
++	 */
++void http_setTimeout(int seconds) { timeout = seconds; }
++
++
++
++	/*
++	 * Puts the filename portion of the url into 'filename'.
++	 * Returns:
++	 *	0 on success
++	 *	1 when url contains no end filename (i.e., 'www.foo.com/'),
++	 *		and **filename should not be assumed to be valid
++	 *	-1 on error
++	 */
++int http_parseFilename(const char *url, char **filename)
++	{
++	char *ptr;
++
++	if(url == NULL)
++		{
++		errorSource = FETCHER_ERROR;
++		http_errno = HF_NULLURL;
++		return -1;
++		}
++
++	ptr = (char *)rindex(url, '/');
++	if(ptr == NULL)
++		/* Root level request, apparently */
++		return 1;
++
++	ptr++;
++	if(*ptr == '\0') return 1;
++
++	*filename = (char *)malloc(strlen(ptr));
++	if(*filename == NULL) { errorSource = ERRNO; return -1; }
++	strcpy(*filename, ptr);
++
++	return 0;
++	}
++
++	
++	
++	/* Depending on the source of error, calls either perror() or prints
++	 *	an HTTP Fetcher error message to stdout */
++void http_perror(const char *string)
++	{
++	if(errorSource == ERRNO)
++		perror(string);
++	else if(errorSource == H_ERRNO)
++		herror(string);
++	else if(errorSource == FETCHER_ERROR)
++		{
++		char *stringIndex;
++
++		if(strstr(http_errlist[http_errno], &quot;%d&quot;) == NULL)
++			{
++			fputs(string, stderr);
++			fputs(&quot;: &quot;, stderr);
++			fputs(http_errlist[http_errno], stderr);
++			fputs(&quot;\n&quot;, stderr);
++			}
++		else
++			{
++			/* The error string has a %d in it, we need to insert errorInt */
++			stringIndex = (char *)http_errlist[http_errno];
++			while(*stringIndex != '%')			/* Print up to the %d */
++				{
++				fputc(*stringIndex, stderr);
++				stringIndex++;
++				}
++			fprintf(stderr, &quot;%d&quot;, errorInt);	/* Print the number */
++			stringIndex += 2;					/* Skip past the %d */
++			while(*stringIndex != 0)			/* Print up to the end NULL */
++				{
++				fputc(*stringIndex, stderr);
++				stringIndex++;
++				}
++			fputs(&quot;\n&quot;, stderr);
++			}
++		}
++	}
++
++
++
++	/* 
++	 * Returns a pointer to the current error description message. The
++	 *	message pointed to is only good until the next call to http_strerror(),
++	 *	so if you need to hold on to the message for a while you should make
++	 *	a copy of it
++	 */
++const char *http_strerror()
++	{
++	if(errorSource == ERRNO)
++		return strerror(errno);
++	else if(errorSource == H_ERRNO)
++		return hstrerror(h_errno);
++	else if(errorSource == FETCHER_ERROR)
++		{
++		if(strstr(http_errlist[http_errno], &quot;%d&quot;) == NULL)
++			return http_errlist[http_errno];
++		else
++			{
++			/* The error string has a %d in it, we need to insert errorInt.
++			 *	convertedError[128] has been declared for that purpose */
++			char *stringIndex, *originalError;
++		
++			originalError = (char *)http_errlist[http_errno];
++			convertedError[0] = 0;		/* Start off with NULL */
++			stringIndex = strstr(originalError, &quot;%d&quot;);
++			strncat(convertedError, originalError,		/* Copy up to %d */
++				abs(stringIndex - originalError));
++			sprintf(&amp;convertedError[strlen(convertedError)],&quot;%d&quot;,errorInt);
++			stringIndex += 2;		/* Skip past the %d */
++			strcat(convertedError, stringIndex);
++
++			return convertedError;
++			}
++		}
++		
++	return http_errlist[HF_METAERROR];	/* Should NEVER happen */
++	}
++
++	
++	/*
++	 * Reads the metadata of an HTTP response.
++	 * Perhaps a little inefficient, as it reads 1 byte at a time, but
++	 *	I don't think it's that much of a loss (most headers aren't HUGE).
++	 * Returns:
++	 *	# of bytes read on success, or
++	 *	-1 on error
++	 */
++int _http_read_header(int sock, char *headerPtr)
++	{
++	fd_set rfds;
++	struct timeval tv;
++	int bytesRead = 0, newlines = 0, ret, selectRet;
++
++	while(newlines != 2 &amp;&amp; bytesRead != HEADER_BUF_SIZE)
++		{
++		FD_ZERO(&amp;rfds);
++		FD_SET(sock, &amp;rfds);
++		tv.tv_sec = timeout; 
++		tv.tv_usec = 0;
++
++		if(timeout &gt;= 0)
++			selectRet = select(sock+1, &amp;rfds, NULL, NULL, &amp;tv);
++		else		/* No timeout, can block indefinately */
++			selectRet = select(sock+1, &amp;rfds, NULL, NULL, NULL);
++		
++		if(selectRet == 0 &amp;&amp; timeout &lt; 0)
++			{
++			errorSource = FETCHER_ERROR;
++			http_errno = HF_HEADTIMEOUT;
++			errorInt = timeout;
++			return -1;
++			}
++		else if(selectRet == -1) { errorSource = ERRNO; return -1; }
++
++		ret = read(sock, headerPtr, 1);
++		if(ret == -1) { errorSource = ERRNO; return -1; }
++		bytesRead++;
++
++		if(*headerPtr == '\r')			/* Ignore CR */
++			{
++			/* Basically do nothing special, just don't set newlines
++			 *	to 0 */
++			headerPtr++;
++			continue;
++			}
++		else if(*headerPtr == '\n')		/* LF is the separator */
++			newlines++;
++		else
++			newlines = 0;
++
++		headerPtr++;
++		}
++
++	headerPtr -= 3;		/* Snip the trailing LF's */
++	*headerPtr = '\0';
++	return bytesRead;
++	}
++
++	
++	
++	/*
++	 * Opens a TCP socket and returns the descriptor
++	 * Returns:
++	 *	socket descriptor, or
++	 *	-1 on error
++	 */
++int makeSocket(const char *host)
++	{
++	int sock;										/* Socket descriptor */
++	struct sockaddr_in sa;							/* Socket address */
++	struct hostent *hp;								/* Host entity */
++	int ret;
++	
++	hp = gethostbyname(host);
++	if(hp == NULL) { errorSource = H_ERRNO; return -1; }
++		
++	/* Copy host address from hostent to (server) socket address */
++	memcpy((char *)&amp;sa.sin_addr, (char *)hp-&gt;h_addr, hp-&gt;h_length);
++	sa.sin_family = hp-&gt;h_addrtype;		/* Set service sin_family to PF_INET */
++	sa.sin_port = htons(PORT_NUMBER);	/* Put portnum into sockaddr */
++
++	sock = socket(hp-&gt;h_addrtype, SOCK_STREAM, 0);
++	if(sock == -1) { errorSource = ERRNO; return -1; }
++
++	ret = connect(sock, (struct sockaddr *)&amp;sa, sizeof(sa));
++	if(ret == -1) { errorSource = ERRNO; return -1; }
++
++	return sock;
++	}
+
+Added: trunk/apps/s3dosm/http_fetcher.h
+===================================================================
+--- trunk/apps/s3dosm/http_fetcher.h	2006-10-31 16:09:09 UTC (rev 460)
++++ trunk/apps/s3dosm/http_fetcher.h	2006-11-05 22:48:17 UTC (rev 461)
+@@ -0,0 +1,136 @@
++/* http_fetcher.h - HTTP handling functions
++
++	HTTP Fetcher
++	Copyright (C) 2001 Lyle Hanson (<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lhanson at cs.nmu.edu</A>)
++
++	This library is free software; you can redistribute it and/or
++	modify it under the terms of the GNU Library General Public
++	License as published by the Free Software Foundation; either
++	version 2 of the License, or (at your option) any later version.
++
++	This library is distributed in the hope that it will be useful,
++	but WITHOUT ANY WARRANTY; without even the implied warranty of
++	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++	Library General Public License for more details.
++
++	See LICENSE file for details
++									
++ */
++
++#ifndef HTTP_FETCHER_H
++#define HTTP_FETCHER_H
++
++#include &quot;http_error_codes.h&quot;
++
++#define PORT_NUMBER 			80
++#define HTTP_VERSION 			&quot;HTTP/1.1&quot;
++#define DEFAULT_USER_AGENT		&quot;HTTP Fetcher&quot;
++#define	VERSION					&quot;1.0&quot;
++#define DEFAULT_READ_TIMEOUT	30		/* Seconds to wait before giving up
++										 *	when no data is arriving */
++	 
++#define REQUEST_BUF_SIZE 		1024
++#define HEADER_BUF_SIZE 		1024
++#define DEFAULT_PAGE_BUF_SIZE 	1024 * 200	/* 200K should hold most things */
++
++
++
++/******************************************************************************/
++/**************** Function declarations and descriptions **********************/
++/******************************************************************************/
++
++/* 
++ * [!!! NOTE !!!]  All HTTP Fetcher functions return -1 on error.  You can
++ *	then either call http_perror to print the error message or call
++ *	http_strerror to get a pointer to it
++ */
++
++
++	/*
++	 * Download the page, registering a hit. If you pass it a NULL for fileBuf,
++	 *	'url' will be requested but will not remain in memory (useful for
++	 *	simply registering a hit).  Otherwise necessary space will be allocated
++	 *	and will be pointed to by fileBuf.
++	 * Returns:
++	 *	# of bytes downloaded, or
++	 *	-1 on error
++	 */
++int http_fetch(const char *url, char **fileBuf);
++
++	/*
++	 * Changes the User Agent (shown to the web server with each request)
++	 *	Send it NULL to avoid telling the server a User Agent
++	 *	By default, the User Agent is sent (The default one unless changed)
++	 * Returns:
++	 *	0 on success, or
++	 *	-1 on error (previous value for agent remains unchanged)
++	 */
++int http_setUserAgent(const char *newAgent);
++
++	/*
++	 * Changes the Referer (shown to the web server with each request)
++	 *	Send it NULL to avoid thelling the server a Referer
++	 *	By default, no Referer is sent
++	 * Returns:
++	 *	0 on success, or
++	 *	-1 on error
++	 */
++int http_setReferer(const char *newReferer);
++
++	/*
++	 * Changes the maximum amount of time that HTTP Fetcher will wait on
++	 *	data.  If this many seconds elapses without more data from the
++	 *	server, http_fetch will return with an error.
++	 * If you pass a value less than 0, reads will not time out, potentially
++	 *	waiting forever (or until data shows up, whichever comes first)
++	 */
++void http_setTimeout(int seconds);
++void http_setAuth(const char *user, const char *pass);
++
++	/*
++	 * Takes a url and puts the filename portion of it into 'filename'.
++	 * Returns:
++	 *	0 on success, or
++	 *	1 when url contains no end filename (i.e., &quot;www.foo.com/&quot;)
++	 *		and **filename should not be assumed to point to anything), or
++	 *	-1 on error
++	 */
++int http_parseFilename(const char *url, char **filename);
++
++	/*
++	 * Works like perror.  If an HTTP Fetcher function ever returns an
++	 *	error (-1), this will print a descriptive message to standard output
++	 */
++void http_perror(const char *string);
++
++	/*
++	 * Returns a pointer to the current error description message.  The
++	 *	message pointed to is only good until the next call to http_strerror(),
++	 *	so if you need to hold on to the message for a while you should make
++	 *	a copy of it.
++	 */
++const char *http_strerror();
++
++
++
++/******************************************************************************/
++/**** The following functions are used INTERNALLY by http_fetcher *************/
++/******************************************************************************/
++
++	/*
++	 * Reads the metadata of an HTTP response.  On success returns the number
++	 * Returns:
++	 *	# of bytes read on success, or
++	 *	-1 on error
++	 */
++int _http_read_header(int sock, char *headerPtr);
++
++	/*
++	 * Opens a TCP socket and returns the descriptor
++	 * Returns:
++	 *	socket descriptor, or
++	 *	-1 on error
++	 */
++int makeSocket(const char *host);
++
++#endif
+
+Added: trunk/apps/s3dosm/layer.c
+===================================================================
+
+Added: trunk/apps/s3dosm/main.c
+===================================================================
+--- trunk/apps/s3dosm/main.c	2006-10-31 16:09:09 UTC (rev 460)
++++ trunk/apps/s3dosm/main.c	2006-11-05 22:48:17 UTC (rev 461)
+@@ -0,0 +1,66 @@
++#include &lt;stdio.h&gt;		 /*  snprintf(), printf(), NULL */
++#include &lt;stdlib.h&gt;		 /*  malloc(),free() */
++#include &lt;sys/stat.h&gt;	 /*  fstat() */
++#include &lt;s3d.h&gt;
++#include &quot;http_fetcher.h&quot;
++#include &quot;s3dosm.h&quot;
++#include &lt;time.h&gt;	 /*  nanosleep(), struct tm, time_t...  */
++
++void mainloop()
++{
++	struct timespec t={0,100*1000*1000}; /* 100 mili seconds */
++	nanosleep(&amp;t,NULL); 
++}
++char *read_osm(float minlon, float minlat, float maxlon, float maxlat,int *length)
++{
++	int ret;
++	char *user = &quot;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">foo at packetmixer.de</A>&quot;;
++	char *pass = &quot;foobar&quot;;
++	char url[1024];
++	char *fileBuf;						/* Pointer to downloaded data */
++	snprintf(url,1024,&quot;www.openstreetmap.org/api/0.3/map?bbox=%f,%f,%f,%f&quot;,minlon,minlat,maxlon,maxlat);
++
++	http_setAuth(user,pass);
++	ret = http_fetch(url, &amp;fileBuf);	/* Downloads page */
++	if(ret == -1)
++	{	
++		http_perror(&quot;http_fetch&quot;);	
++		return(NULL);
++	}
++	if (length!=NULL) *length=ret;
++	return(fileBuf);
++	
++}
++char *read_file(char *fname, int *fsize)
++{
++	FILE *fp;
++	char *buf=NULL;
++	int filesize;
++	struct stat bf;
++
++	if ((fp = fopen(fname, &quot;rt&quot;)) == NULL)	{ 	perror(&quot;read_file():fopen()&quot;); 		return(NULL);	}
++	if (fstat(fileno(fp),&amp;bf))				{ 	perror(&quot;read_file():fstat()&quot;);		return(NULL);	}
++	filesize=bf.st_size;
++	if ((buf=malloc(filesize))==NULL)		{	perror(&quot;read_file():malloc()&quot;);		return(NULL);	}
++	fread(buf, filesize, 1, fp);
++	fclose(fp);
++	if (fsize!=NULL) *fsize=filesize;
++	return(buf);
++}
++
++int main(int argc, char **argv)
++{
++	char *file=NULL;
++	layer_t *layer;
++	int length;
++/*	file=read_file(&quot;file.osm&quot;,&amp;length);*/
++	file=read_osm(11.610952060700235,49.409270464751515,14.453271808922661,52.338403146460365,&amp;length);
++	layer=parse_osm(file,length);
++	if (!s3d_init(&amp;argc,&amp;argv,&quot;s3dosm&quot;))
++	{
++		draw_layer(layer);
++		s3d_mainloop(mainloop);
++		s3d_quit();
++	}
++	return(0);
++}
+
+Added: trunk/apps/s3dosm/object.c
+===================================================================
+--- trunk/apps/s3dosm/object.c	2006-10-31 16:09:09 UTC (rev 460)
++++ trunk/apps/s3dosm/object.c	2006-11-05 22:48:17 UTC (rev 461)
+@@ -0,0 +1,93 @@
++#include &quot;s3dosm.h&quot;
++#include &lt;stdlib.h&gt; /* malloc() */
++
++/* ########### object ############### */
++void object_init(object_t *nobj)
++{
++	nobj-&gt;bal=0;
++	nobj-&gt;left=NULL;
++	nobj-&gt;right=NULL;
++	nobj-&gt;id=0;
++	nobj-&gt;oid=-1;
++	nobj-&gt;tag_n=0;
++	nobj-&gt;tag_p=NULL;
++	nobj-&gt;type=T_OBJECT;
++}
++
++object_t *object_new(int key)
++{
++	object_t *nobj=malloc(sizeof(object_t));
++	object_init(nobj);
++	nobj-&gt;id=key;
++	return (nobj);
++}
++/* ########### node ############### */
++void node_init(node_t *nnode)
++{
++	object_init((object_t *)nnode);
++	OBJECT_T(nnode)-&gt;type=T_NODE;
++	nnode-&gt;lat=0;
++	nnode-&gt;lon=0;
++	nnode-&gt;alt=0;
++	nnode-&gt;visible=1;
++	nnode-&gt;vid=-1;
++	nnode-&gt;adj_n=0;
++	nnode-&gt;adj_p=NULL;
++}
++node_t *node_new()
++{
++	node_t *nnode=malloc(sizeof(node_t));
++	node_init(nnode);
++	return(nnode);
++}
++void node_free(node_t *node)
++{
++	free(node);
++}
++
++/* ########### segment ############### */
++void segment_init(segment_t *nsegment)
++{
++	object_init((object_t *)nsegment);
++	OBJECT_T(nsegment)-&gt;type=T_SEGMENT;
++	nsegment-&gt;from=0;
++	nsegment-&gt;to=0;
++}
++segment_t *segment_new()
++{
++	segment_t *nsegment=malloc(sizeof(segment_t));
++	segment_init(nsegment);
++	return(nsegment);
++}
++void segment_free(segment_t *segment)
++{
++	free(segment);
++}
++
++/* ########### way  ############### */
++void way_init(way_t *nway)
++{
++	object_init((object_t *)nway);
++	OBJECT_T(nway)-&gt;type=T_WAY;
++	nway-&gt;seg_n=0;
++	nway-&gt;seg_p=NULL;
++}
++way_t *way_new()
++{
++	way_t *nway=malloc(sizeof(way_t));
++	way_init(nway);
++	return(nway);
++}
++void way_free(way_t *way)
++{
++	if (way-&gt;seg_n&gt;0) 
++		free(way-&gt;seg_p);
++	free(way);
++}
++/* ########### layer  ############### */
++layer_t *layer_new()
++{
++	layer_t *nlayer=malloc(sizeof(layer_t));
++	nlayer-&gt;tree=NULL;
++	return(nlayer);
++}
+
+Added: trunk/apps/s3dosm/osm.c
+===================================================================
+--- trunk/apps/s3dosm/osm.c	2006-10-31 16:09:09 UTC (rev 460)
++++ trunk/apps/s3dosm/osm.c	2006-11-05 22:48:17 UTC (rev 461)
+@@ -0,0 +1,216 @@
++#include &quot;s3dosm.h&quot;
++#include &lt;string.h&gt;			/* strcmp() */
++#include &lt;stdlib.h&gt;			/* strtof(),strtod(),strtol() */
++#include &lt;libxml/parser.h&gt;
++#include &lt;libxml/tree.h&gt;
++int parse_osm_tags(object_t *obj, xmlNodePtr cur)
++{
++	
++	xmlNodePtr c;
++	xmlAttrPtr attr;
++	char *v,*k;
++	tag_t *t;
++	int n;
++	
++	n=0;
++	for (c=cur-&gt;children;c!=NULL; c=c-&gt;next)
++	{
++		if (0==strcmp((char *)c-&gt;name,&quot;tag&quot;))	{
++			for (attr=c-&gt;properties;attr;attr=attr-&gt;next)
++			{
++				if (0==strcmp((char *)attr-&gt;name,&quot;k&quot;)) 				k=(char *)attr-&gt;children-&gt;content;
++				else if (0==strcmp((char *)attr-&gt;name,&quot;v&quot;)) 		v=(char *)attr-&gt;children-&gt;content;
++			}
++			if (k==NULL || v==NULL)			printf(&quot;bad tag!!\n&quot;);
++			else 							n++;
++		}
++	}
++	obj-&gt;tag_n=n;
++	obj-&gt;tag_p=malloc(obj-&gt;tag_n*sizeof(tag_t));
++	n=0;
++	for (c=cur-&gt;children;c!=NULL; c=c-&gt;next)
++	{
++		if (0==strcmp((char *)c-&gt;name,&quot;tag&quot;))	{
++			for (attr=c-&gt;properties;attr;attr=attr-&gt;next)
++			{
++				if (0==strcmp((char *)attr-&gt;name,&quot;k&quot;)) 				k=(char *)attr-&gt;children-&gt;content;
++				else if (0==strcmp((char *)attr-&gt;name,&quot;v&quot;)) 		v=(char *)attr-&gt;children-&gt;content;
++			}
++			if (k!=NULL &amp;&amp; v!=NULL)
++			{
++				t=&amp;(obj-&gt;tag_p[n]);
++				t-&gt;ttype=TAG_UNKNOWN;
++				t-&gt;k=strdup(k);
++				t-&gt;v=strdup(v);
++				t-&gt;d.s=v;
++				if 		(0==strcmp(k,&quot;name&quot;))	t-&gt;ttype=TAG_NAME;
++
++				n++;
++			}
++		}
++	}
++
++
++	
++	return(0);
++
++}
++object_t *parse_osm_way(xmlNodePtr cur)
++{
++	way_t *way;
++	xmlNodePtr kids;
++	xmlAttrPtr attr,kattr;
++	int n=0;
++
++	way=way_new();
++	
++	for (attr=cur-&gt;properties;attr;attr=attr-&gt;next)
++		if (0==strcmp((char *)attr-&gt;name,&quot;id&quot;)) 			way-&gt;base.id=	strtol((char *)attr-&gt;children-&gt;content,NULL,10);
++	/* count segments */
++	for (kids=cur-&gt;children;kids!=NULL;kids=kids-&gt;next)
++	{
++		if (0==strcmp((char *)kids-&gt;name,&quot;seg&quot;))			n++;
++	}
++	/* add segments in segment buffer */
++	if (n&gt;0)
++	{
++		way-&gt;seg_n=n;
++		way-&gt;seg_p=malloc(sizeof(ID_T)*n);
++		n=0;
++		for (kids=cur-&gt;children;kids!=NULL;kids=kids-&gt;next)
++		{
++			if (0==strcmp((char *)kids-&gt;name,&quot;seg&quot;))	{
++				for (kattr=kids-&gt;properties;kattr;kattr=kattr-&gt;next)
++					if (0==strcmp((char *)kattr-&gt;name,&quot;id&quot;)) 			way-&gt;seg_p[n]=	strtol((char *)kattr-&gt;children-&gt;content,NULL,10);
++				n++;
++			}
++		}
++	}
++
++	parse_osm_tags(OBJECT_T(way),cur);
++	if (way-&gt;base.id&gt;0)
++		return(OBJECT_T(way));
++	else {
++		way_free(way);
++		return(NULL);
++	}
++}
++object_t *parse_osm_segment(xmlNodePtr cur)
++{
++	segment_t *segment;
++	xmlAttrPtr attr;
++
++	segment=segment_new();
++	
++	for (attr=cur-&gt;properties;attr;attr=attr-&gt;next)
++	{
++		
++		if (0==strcmp((char *)attr-&gt;name,&quot;id&quot;)) 			segment-&gt;base.id=	strtol((char *)attr-&gt;children-&gt;content,NULL,10);
++		else if (0==strcmp((char *)attr-&gt;name,&quot;from&quot;)) 		segment-&gt;from=		strtod((char *)attr-&gt;children-&gt;content,NULL);
++		else if (0==strcmp((char *)attr-&gt;name,&quot;to&quot;)) 		segment-&gt;to=		strtod((char *)attr-&gt;children-&gt;content,NULL);
++	}
++	parse_osm_tags(OBJECT_T(segment),cur);
++	if ((segment-&gt;base.id&gt;0) &amp;&amp; (segment-&gt;from&gt;0) &amp;&amp; (segment-&gt;to&gt;0))
++		return(OBJECT_T(segment));
++	else {
++		segment_free(segment);
++		return(NULL);
++	}
++}
++object_t *parse_osm_node(xmlNodePtr cur)
++{
++	node_t *node;
++	xmlAttrPtr attr;
++
++	node=node_new();
++	attr=cur-&gt;properties;
++	
++	for (attr=cur-&gt;properties;attr;attr=attr-&gt;next)
++	{
++		if (0==strcmp((char *)attr-&gt;name,&quot;id&quot;)) 			node-&gt;base.id=		strtol((char *)attr-&gt;children-&gt;content,NULL,10);
++		else if (0==strcmp((char *)attr-&gt;name,&quot;lat&quot;)) 		node-&gt;lat=			strtod((char *)attr-&gt;children-&gt;content,NULL);
++		else if (0==strcmp((char *)attr-&gt;name,&quot;lon&quot;)) 		node-&gt;lon=			strtod((char *)attr-&gt;children-&gt;content,NULL);
++		else if (0==strcmp((char *)attr-&gt;name,&quot;visible&quot;)) 	node-&gt;visible=		(0==strcmp((char *)attr-&gt;children-&gt;content,&quot;true&quot;))?1:0;
++		else if (0==strcmp((char *)attr-&gt;name,&quot;time&quot;)) {}	/* TODO */
++	}
++	parse_osm_tags(OBJECT_T(node),cur);
++	if (node-&gt;base.id&gt;0)
++		return(OBJECT_T(node));
++	else {
++		node_free(node);
++		return(NULL);
++	}
++}
++
++void debug_obj(object_t *obj, void *dummy)
++{
++	int i;
++	way_t *way=WAY_T(obj);
++	node_t *node=NODE_T(obj);
++	segment_t *seg=SEGMENT_T(obj);
++	switch (obj-&gt;type)
++	{
++		case T_OBJECT:
++				printf(&quot;object %d\n&quot;,(int)obj-&gt;id);
++				break;
++		case T_NODE:
++				 printf(&quot;node %d [%f,%f,%f]\n&quot;,(int)obj-&gt;id,node-&gt;lon,node-&gt;lat,node-&gt;alt);
++				 break;
++		case T_SEGMENT:
++				 printf(&quot;segment %d [%d-&gt;%d]\n&quot;,(int)obj-&gt;id,(int)seg-&gt;from,(int)seg-&gt;to);
++				 break;
++		case T_WAY:
++				 printf(&quot;way %d [ &quot;,(int)obj-&gt;id);
++				 for (i=0;i&lt;way-&gt;seg_n;i++)
++					printf(&quot;%d &quot;,(int)way-&gt;seg_p[i]);
++				 printf(&quot;]\n&quot;);
++				 break;
++				 
++	}
++}
++/* parse the osm input file */
++layer_t *parse_osm(char *buf, int length)
++{
++	xmlDocPtr doc;
++	xmlNodePtr cur;
++	layer_t *layer=layer_new();
++	object_t *obj;
++	
++
++	doc = xmlReadMemory(buf, length, &quot;noname.xml&quot;, NULL, 0);
++	if (doc == NULL) {
++		fprintf(stderr,&quot;Document not parsed successfully.\n&quot;);
++		return(NULL);
++	}
++	cur = xmlDocGetRootElement(doc);
++	if (cur == NULL) {
++		fprintf(stderr,&quot;empty document\n&quot;);
++		xmlFreeDoc(doc);
++		return(NULL);
++	}
++	for (cur=cur-&gt;children;cur!=NULL; cur=cur-&gt;next)
++	{
++		if (cur-&gt;type==XML_ELEMENT_NODE)
++		{
++			if (0==strcmp((char *)cur-&gt;name,&quot;node&quot;))
++			{
++				if (NULL!=(obj=parse_osm_node(cur)))
++					layer-&gt;tree=avl_insert(layer-&gt;tree, obj);
++				else fprintf(stderr,&quot;bad node\n&quot;); 
++			} else if (0==strcmp((char *)cur-&gt;name,&quot;segment&quot;))
++			{
++				if (NULL!=(obj=parse_osm_segment(cur)))
++					layer-&gt;tree=avl_insert(layer-&gt;tree, obj);
++				else fprintf(stderr,&quot;bad segment\n&quot;);
++			} else if (0==strcmp((char *)cur-&gt;name,&quot;way&quot;))
++			{
++				if (NULL!=(obj=parse_osm_way(cur)))
++					layer-&gt;tree=avl_insert(layer-&gt;tree, obj);
++				else fprintf(stderr,&quot;bad way\n&quot;);
++			}
++		}
++	}
++	xmlFreeDoc(doc);
++
++	return(layer);
++}
+
+Added: trunk/apps/s3dosm/s3dosm.h
+===================================================================
+--- trunk/apps/s3dosm/s3dosm.h	2006-10-31 16:09:09 UTC (rev 460)
++++ trunk/apps/s3dosm/s3dosm.h	2006-11-05 22:48:17 UTC (rev 461)
+@@ -0,0 +1,106 @@
++typedef struct _layer_t layer_t;
++typedef struct _adj_t adj_t;
++typedef struct _object_t object_t;
++typedef struct _node_t node_t;
++typedef struct _segment_t segment_t;
++typedef struct _way_t way_t;
++typedef struct _tag_t tag_t;
++typedef unsigned long ID_T;
++#define OBJECT_T(x)		((object_t *)x)
++#define NODE_T(x)		((node_t *)x)
++#define SEGMENT_T(x)	((segment_t *)x)
++#define WAY_T(x)		((way_t *)x)
++struct _layer_t {
++	object_t *tree;
++};
++
++enum {
++	T_OBJECT,
++	T_NODE,
++	T_SEGMENT,
++	T_WAY
++};
++enum {
++	TAG_UNKNOWN,
++	TAG_NAME,
++	TAG_N
++};
++typedef void (*avl_func)(object_t *, void *);
++struct _tag_t {
++	char *k, *v;
++	char ttype;
++	union {
++		char *s;
++		int num;
++		int b;
++		float f;
++	} d;
++};
++
++struct _object_t {
++	ID_T 		 id;		/* id of this object */
++	int 		 oid;		/* s3d oid */
++	int 		 type;		/* type of this object */
++	/* avl stuff */
++	char 		 bal;
++	int			 tag_n;
++	tag_t		*tag_p;
++	object_t 	*left,*right;
++};
++
++struct _adj_t {
++	ID_T 		 to,seg;	/* destination and segment to use */
++};
++
++struct _node_t {
++	object_t	 base;
++	double 		 lon;		/* longitude */
++	double 		 lat;		/* latitude */
++	double 		 alt;		/* altitude */
++	char 		 visible;	/* node visible? */
++	int 		 vid;		/* vertex id */
++/*	time_t time;*/
++	int 		 adj_n;		/* adjacence list */
++	adj_t 		*adj_p;
++};
++struct _segment_t {
++	object_t	 base;
++	ID_T		 from;
++	ID_T		 to;
++};
++struct _way_t {
++	object_t	 base;
++	int 		 seg_n;
++	ID_T		*seg_p;
++};
++
++
++
++/* object.c */
++void 		 object_init(object_t *nobj);
++void 		 node_init(node_t *nnode);
++void 		 segment_init(segment_t *nsegment);
++void 		 way_init(way_t *nway);
++object_t 	*object_new(int key);
++node_t 		*node_new();
++segment_t 	*segment_new();
++layer_t 	*layer_new();
++way_t 		*way_new();
++void 		 node_free(node_t *node);
++void 		 segment_free(segment_t *segment);
++void 		 way_free(way_t *way);
++/* osm.c */
++layer_t *parse_osm(char *buf, int length);
++/* void xml_parse(xmlNode *a_node); */
++void 		 avl_tree_trav(object_t *t, avl_func func, void *data);
++object_t 	*avl_find(object_t *t, int val);
++object_t 	*avl_rotate_right(object_t *t);
++object_t	*avl_rotate_left(object_t *t);
++object_t	*avl_insert(object_t *t, object_t *nn);
++object_t 	*avl_leftmost(object_t *t);
++object_t 	*avl_rightmost(object_t *t);
++object_t 	*avl_remove(object_t *t, object_t *nn);
++int 		 avl_height(object_t *t);
++int 		 draw_layer(layer_t *layer);
++/* draw.c */
++int draw_layer(layer_t *layer);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000455.html">[S3d-svn] r462 - in trunk/apps: s3dfm s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#454">[ date ]</a>
+              <a href="thread.html#454">[ thread ]</a>
+              <a href="subject.html#454">[ subject ]</a>
+              <a href="author.html#454">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

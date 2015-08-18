@@ -1,0 +1,258 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r261 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r261%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200605021735.k42HZNA1005234%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000255.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r261 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r261%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200605021735.k42HZNA1005234%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r261 - in trunk: . server">dotslash at berlios.de
+       </A><BR>
+    <I>Tue May  2 19:35:23 CEST 2006</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000255.html">[S3d-svn] r262 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#254">[ date ]</a>
+              <a href="thread.html#254">[ thread ]</a>
+              <a href="subject.html#254">[ subject ]</a>
+              <a href="author.html#254">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-02 19:35:19 +0200 (Tue, 02 May 2006)
+New Revision: 261
+
+Modified:
+   trunk/
+   trunk/server/event.c
+   trunk/server/main.c
+   trunk/server/network.c
+   trunk/server/process.c
+   trunk/server/proto.c
+   trunk/server/user_sdl.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r485 at balthasar</A>:  dotslash | 2006-05-02 19:34:36 +0200
+ - wrong process pointer in proto.c
+ - properly quit on SDL_QUIT
+ - use SDL by default, not glut (gonna drop glut soon ...)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:460
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:485
+
+Modified: trunk/server/event.c
+===================================================================
+--- trunk/server/event.c	2006-04-25 17:46:25 UTC (rev 260)
++++ trunk/server/event.c	2006-05-02 17:35:19 UTC (rev 261)
+@@ -78,7 +78,7 @@
+ int event_quit(struct t_process *p)
+ {
+ 	prot_com_out(p, S3D_P_S_QUIT, NULL,0);
+-	dprintf(HIGH,&quot;sending pid %d  QUIT signal&quot;,p-&gt;id); 
++	dprintf(HIGH,&quot;sending pid %d QUIT signal&quot;,p-&gt;id); 
+ 	process_del(p-&gt;id);
+ 	return(0);
+ }
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2006-04-25 17:46:25 UTC (rev 260)
++++ trunk/server/main.c	2006-05-02 17:35:19 UTC (rev 261)
+@@ -144,11 +144,11 @@
+ #endif
+ 	if (!frame_mode)  /*  turn default frame_mode on */
+ 	{
++#ifdef G_SDL
++		frame_mode=FRAME_SDL;
++#else
+ #ifdef G_GLUT
+ 		frame_mode=FRAME_GLUT;
+-#else
+-#ifdef G_SDL
+-		frame_mode=FRAME_SDL;
+ #endif
+ #endif
+ 	}
+@@ -258,7 +258,9 @@
+ 	switch (frame_mode)
+ 	{
+ #ifdef G_GLUT
+-		case FRAME_GLUT:glutMainLoop();break;
++		case FRAME_GLUT:glutMainLoop();
++				dprintf(VHIGH,&quot;glutMainLoop(); is done ...&quot;);
++				break;
+ #endif
+ 		default:mainloop();
+ 	}
+
+Modified: trunk/server/network.c
+===================================================================
+--- trunk/server/network.c	2006-04-25 17:46:25 UTC (rev 260)
++++ trunk/server/network.c	2006-05-02 17:35:19 UTC (rev 261)
+@@ -84,8 +84,8 @@
+ #ifdef TCP
+ #ifdef SIGS
+ 	if (sigio==1)  /*  as long as there is no locking/threadsafety, do like this ... */
++	{
+ #endif
+-	{
+ 		tcp_pollport();	/*  this polls for new processes */
+ 		while (tcp_pollproc());  /*  if there is new data, loop please. this is for testing now, and should be combined with timing later .. */
+ #ifdef SIGS
+
+Modified: trunk/server/process.c
+===================================================================
+--- trunk/server/process.c	2006-04-25 17:46:25 UTC (rev 260)
++++ trunk/server/process.c	2006-05-02 17:35:19 UTC (rev 261)
+@@ -35,14 +35,14 @@
+ int process_sys_init(struct t_process *p);
+ 
+ /* protocol request for process initialization */
+-int process_protinit(struct t_process *p, char *name)
++struct t_process *process_protinit(struct t_process *p, char *name)
+ {
+ 	int con_type;
+ 	uint32_t mcp_oid;
+ 	if ((strncmp(name,&quot;sys_&quot;,4)==0))
+ 	{ /* we don't like &quot;sys_&quot;-apps, kicking this */
+ 		errds(VHIGH,&quot;process_protinit()&quot;,&quot;appnames starting with 'sys_' not allowed.&quot;);
+-		return(-1);
++		return(NULL);
+ 	}
+ 	if ((p-&gt;id!=MCP) &amp;&amp; (strncmp(name,&quot;mcp&quot;,3)==0))
+ 	{
+@@ -62,10 +62,10 @@
+ 			procs_p[MCP].con_type=con_type;
+ 			mcp_init();
+ 			process_list_rm(p-&gt;id); /* remove old process, but don't kill connection */
+-			return(0);
++			return(&amp;procs_p[MCP]);
+ 		} else {
+ 			dprintf(LOW,&quot;the place for the mcp is already taken ...&quot;);
+-			return(-1);
++			return(NULL);
+ 		}
+ 	} else {
+ 		strncpy(p-&gt;name, name, NAME_MAX);
+@@ -90,7 +90,7 @@
+ 			dprintf(LOW,&quot;couldn't add object to mcp ...&quot;);
+ 		}
+ 	}
+-	return(0);
++	return(p);
+ }
+ /* adds system objects to the app, like camera, pointers etc ... */
+ int process_sys_init(struct t_process *p)
+@@ -146,6 +146,7 @@
+ 		mcp_p=&amp;procs_p[0];*/
+ 	new_p-&gt;object = NULL;
+ 	new_p-&gt;n_obj  = 0;
++	new_p-&gt;netin  = 0;
+ 	new_p-&gt;mcp_oid = -1;
+ 	new_p-&gt;biggest_obj=-1;
+ 	new_p-&gt;con_type=CON_NULL;	/* this is to be changed by the caller */
+@@ -251,9 +252,12 @@
+ int process_quit()
+ {
+ 	int i;
++	dprintf(HIGH,&quot;telling %d processes to go away&quot;,procs_n);
+ 	for (i=(procs_n-1);i&gt;=0;i--)
+-	{
+-		process_del(procs_p[i].id);
++	{ 
++		dprintf(HIGH,&quot;[QUIT] for %d&quot;,i);
++		event_quit(&amp;procs_p[i]);
++/*		process_del(procs_p[i].id);*/
+ 	}
+ 	free(procs_p);
+ 	return(0);
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2006-04-25 17:46:25 UTC (rev 260)
++++ trunk/server/proto.c	2006-05-02 17:35:19 UTC (rev 261)
+@@ -71,7 +71,7 @@
+ 				if (length&gt;NAME_MAX) i=NAME_MAX; else i=length;
+ 				strncpy(name,(char *)buf,i);
+ 				dprintf(LOW,&quot;[%d]\&quot;%s\&quot; logged in&quot;, p-&gt;id,name);
+-				if (process_protinit(p,name))
++				if (NULL==(p=process_protinit(p,name)))
+ 					event_quit(p);  /*  couldn't get process */
+ 				else
+ 					event_init(p);
+@@ -175,7 +175,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(9*4);
+-					dprintf(MED,&quot;PEP_POLY_NORMAL[%d]: oid %d, %f polys&quot;,length,oid, (length-4)/(9.0*4.0));
++					dprintf(VLOW,&quot;PEP_POLY_NORMAL[%d]: oid %d, %f polys&quot;,length,oid, (length-4)/(9.0*4.0));
+ 					obj_pep_poly_normal(p,oid, (float *)cptr, num);
+ 				}
+ 				break;
+@@ -184,7 +184,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(6*4);
+-					dprintf(MED,&quot;PEP_POLY_TEXC[%d]: oid %d, %f polys&quot;,length,oid, (length-4)/(6.0*4.0));
++					dprintf(VLOW,&quot;PEP_POLY_TEXC[%d]: oid %d, %f polys&quot;,length,oid, (length-4)/(6.0*4.0));
+ 					obj_pep_poly_texc(p,oid, (float *)cptr, num);
+ 				}
+ 				break;
+
+Modified: trunk/server/user_sdl.c
+===================================================================
+--- trunk/server/user_sdl.c	2006-04-25 17:46:25 UTC (rev 260)
++++ trunk/server/user_sdl.c	2006-05-02 17:35:19 UTC (rev 261)
+@@ -88,7 +88,7 @@
+ 			break;
+ 		case SDL_QUIT:
+ 			dprintf(HIGH,&quot;SDL_QUIT&quot;);
+-			running=0;
++			quit();
+ 			break;
+ 		 /*  these events are not processed right now ... */
+ 		case SDL_ACTIVEEVENT:		dprintf(VLOW,&quot;SDL_ACTIVEEVENT&quot;);break;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000255.html">[S3d-svn] r262 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#254">[ date ]</a>
+              <a href="thread.html#254">[ thread ]</a>
+              <a href="subject.html#254">[ subject ]</a>
+              <a href="author.html#254">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

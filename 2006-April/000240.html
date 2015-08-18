@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r247 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-April/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r247%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200604091906.k39J6tvm005539%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000239.html">
+   <LINK REL="Next"  HREF="000241.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r247 - trunk/apps/olsrs3d</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r247%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200604091906.k39J6tvm005539%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r247 - trunk/apps/olsrs3d">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Sun Apr  9 21:06:55 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000239.html">[S3d-svn] r246 - in trunk: . apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000241.html">[S3d-svn] r248 - in trunk: . client
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#240">[ date ]</a>
+              <a href="thread.html#240">[ thread ]</a>
+              <a href="subject.html#240">[ subject ]</a>
+              <a href="author.html#240">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-04-09 21:06:17 +0200 (Sun, 09 Apr 2006)
+New Revision: 247
+
+Modified:
+   trunk/apps/olsrs3d/process.c
+Log:
+fix olsr parsing
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-04-08 23:28:10 UTC (rev 246)
++++ trunk/apps/olsrs3d/process.c	2006-04-09 19:06:17 UTC (rev 247)
+@@ -392,6 +392,8 @@
+ 	con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
+ 	dn = 0;
+ 
++	/*printf(&quot;---lbuf-start---\n%s\n---lbuf-end---\n&quot;,lbuf);*/
++
+ 	while ( (*lbuf_ptr) != '\0' ) {
+ 
+ 		/* printf( &quot;%c&quot;,(*lbuf_ptr) ); */
+@@ -454,15 +456,16 @@
+ 
+ 					/* normal HNA */
+ 					} else {
+-
++						/* printf(&quot;before: %s\n&quot;,con_to); */
+ 						if( (tmpChar = strchr((char*)con_to, (int)'/')))
+ 						{
+ 							tmpChar++;
+ 							address = (int)-inet_network(tmpChar);
+ 							sprintf(hna_name,&quot;%d&quot;,(int)(32 - ceil(log(address)/log(2))));
+-							strncpy(tmpChar,hna_name,NAMEMAX);
++							strcpy(tmpChar,hna_name);
+ 						}
+-
++						/* printf(&quot;after: %s\n&quot;,con_to); */
++						/* fflush(NULL); */
+ 						olsr_node1 = get_olsr_node( &amp;Olsr_root, con_from );
+ 						olsr_node2 = get_olsr_node( &amp;Olsr_root, con_to );
+ 
+@@ -488,11 +491,11 @@
+ 						f = 999.0;
+ 					add_olsr_con( olsr_node1, olsr_node2, f );
+ 				}
+-
++/*
+ 				con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
+ 				dn = 0;
+ 				last_cr_ptr = lbuf_ptr;
+-
++*/
+ 			}
+ 
+ 		} else if ( ( (*lbuf_ptr) == '}' ) &amp;&amp; ( (*(lbuf_ptr + 1)) == '\n' ) ) {
+@@ -506,7 +509,7 @@
+ 	}
+ 
+ 	if ( last_cr_ptr != NULL ) memmove( lbuf, last_cr_ptr + 1, strlen( last_cr_ptr ) );
+-
++	/*printf(&quot;---memmove-lbuf-start---\n%s\n---memmove-lbuf-end---\n&quot;,lbuf);*/
+ 	return(0);
+ 
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000239.html">[S3d-svn] r246 - in trunk: . apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000241.html">[S3d-svn] r248 - in trunk: . client
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#240">[ date ]</a>
+              <a href="thread.html#240">[ thread ]</a>
+              <a href="subject.html#240">[ subject ]</a>
+              <a href="author.html#240">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r105 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r105%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602241744.k1OHiFUq002029%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000100.html">
+   <LINK REL="Next"  HREF="000102.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r105 - trunk/apps/olsrs3d</H1>
+    <B>nichtsnutz at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r105%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602241744.k1OHiFUq002029%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r105 - trunk/apps/olsrs3d">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Fri Feb 24 18:44:15 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000100.html">[S3d-svn] r104 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000102.html">[S3d-svn] r106 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#101">[ date ]</a>
+              <a href="thread.html#101">[ thread ]</a>
+              <a href="subject.html#101">[ subject ]</a>
+              <a href="author.html#101">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-02-24 18:44:10 +0100 (Fri, 24 Feb 2006)
+New Revision: 105
+
+Modified:
+   trunk/apps/olsrs3d/net.c
+   trunk/apps/olsrs3d/process.c
+Log:
+undo changes
+
+Modified: trunk/apps/olsrs3d/net.c
+===================================================================
+--- trunk/apps/olsrs3d/net.c	2006-02-24 15:51:03 UTC (rev 104)
++++ trunk/apps/olsrs3d/net.c	2006-02-24 17:44:10 UTC (rev 105)
+@@ -59,6 +59,7 @@
+ 	buf[numbytes] = '\0';
+  	/*strncat(lbuf,buf,MAXLINESIZE);*/
+ 	strncpy(lbuf,buf,MAXLINESIZE);
++	printf(&quot;nach strncpy\n&quot;);
+ 	process_main();
+ 	return(1);
+ }
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-02-24 15:51:03 UTC (rev 104)
++++ trunk/apps/olsrs3d/process.c	2006-02-24 17:44:10 UTC (rev 105)
+@@ -500,9 +500,7 @@
+  }
+ */
+ int process_main() {
+-	static int cnt = 0;
+-	cnt++;
+-	printf(&quot;%d. call process_main\n&quot;,cnt);
++
+ 	int dn;
+ 	float f;
+ 	char *lbuf_ptr, *con_from, *con_to, *etx;
+@@ -583,9 +581,7 @@
+ 				} else {
+ 
+ 					olsr_node1 = get_olsr_node( &amp;Olsr_root, con_from );
+-					printf(&quot;before %s Line %d\n&quot;,__FILE__,__LINE__);
+ 					olsr_node2 = get_olsr_node( &amp;Olsr_root, con_to );
+-					printf(&quot;behind %s Line %d\n&quot;,__FILE__,__LINE__);
+ 					f=10.0+strtod(etx,NULL)/10.0;
+ 					if (f&gt;=5) add_olsr_con( olsr_node1, olsr_node2, f );   /* just to prevent ascii to float converting inconsistency ... */
+ 
+@@ -601,7 +597,7 @@
+ 		lbuf_ptr++;
+ 
+ 	}
+-	printf(&quot;exit %d. call process_main\n&quot;,cnt);
++
+ 	return(0);
+ 
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000100.html">[S3d-svn] r104 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000102.html">[S3d-svn] r106 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#101">[ date ]</a>
+              <a href="thread.html#101">[ thread ]</a>
+              <a href="subject.html#101">[ subject ]</a>
+              <a href="author.html#101">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

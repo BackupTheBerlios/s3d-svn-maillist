@@ -1,0 +1,699 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r741 - trunk/apps/meshs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r741%20-%20trunk/apps/meshs3d&In-Reply-To=%3C200710182353.l9INrmLE029260%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000732.html">
+   <LINK REL="Next"  HREF="000734.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r741 - trunk/apps/meshs3d</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r741%20-%20trunk/apps/meshs3d&In-Reply-To=%3C200710182353.l9INrmLE029260%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r741 - trunk/apps/meshs3d">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 01:53:48 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000732.html">[S3d-svn] r740 - trunk/apps/kism3d
+</A></li>
+        <LI>Next message: <A HREF="000734.html">[S3d-svn] r742 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#733">[ date ]</a>
+              <a href="thread.html#733">[ thread ]</a>
+              <a href="subject.html#733">[ subject ]</a>
+              <a href="author.html#733">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 01:53:47 +0200 (Fri, 19 Oct 2007)
+New Revision: 741
+
+Modified:
+   trunk/apps/meshs3d/main.c
+   trunk/apps/meshs3d/net.c
+   trunk/apps/meshs3d/process.c
+   trunk/apps/meshs3d/testvis.c
+Log:
+meshs3d: Convert to ANSI function declarations
+
+
+Modified: trunk/apps/meshs3d/main.c
+===================================================================
+--- trunk/apps/meshs3d/main.c	2007-10-18 23:53:38 UTC (rev 740)
++++ trunk/apps/meshs3d/main.c	2007-10-18 23:53:47 UTC (rev 741)
+@@ -105,15 +105,15 @@
+ 	return(d);
+ }
+ 
+-void handle_node()
++void handle_node(void)
+ {
+-	struct node *node,*tmp_node;
++	struct node *node, *tmp_node;
+ 	struct node_con *con;
+-	struct hash_it_t *hashit,*tmp_hashit=NULL;
++	struct hash_it_t *hashit, *tmp_hashit = NULL;
+ 	int ip[2];
+ 	float angle, angle_rad;
+ 	float tmp_mov_vec[3], desc_norm_vec[3] = {0, 0, -1};
+-	
++
+ 	if (node_hash-&gt;elements == 0)
+ 		return;
+ 	hashit = NULL;
+@@ -154,7 +154,7 @@
+ 			Global.node_count--;
+ 			while (NULL != (tmp_hashit = hash_iterate(node_hash, tmp_hashit))) {
+ 				tmp_node = (struct node *) tmp_hashit-&gt;bucket-&gt;data;
+-				if ( node != tmp_node &amp;&amp; (max(node-&gt;ip, tmp_node-&gt;ip) == node-&gt;ip)) {
++				if (node != tmp_node &amp;&amp; (max(node-&gt;ip, tmp_node-&gt;ip) == node-&gt;ip)) {
+ 					ip[0] = node-&gt;ip;
+ 					ip[1] = tmp_node-&gt;ip;
+ 					if (NULL != (con = hash_find(con_hash, ip))) {
+@@ -166,7 +166,7 @@
+ 
+ 		}
+ 
+-		if(node-&gt;visible) {
++		if (node-&gt;visible) {
+ 
+ 			/* rotate node description so that they are always readable */
+ 			tmp_mov_vec[0] = Global.cam_position[0][0] - node-&gt;pos_vec[0];
+@@ -225,8 +225,8 @@
+ 
+ void color_handler(struct node_con *con)
+ {
+-	float rgb=0.0, r=0.0, g=0.0, b=0.0, etx;
+-	int c, c1=0;
++	float rgb = 0.0, r = 0.0, g = 0.0, b = 0.0, etx;
++	int c, c1 = 0;
+ 
+ 	if (con-&gt;etx1 == -1000.00 || con-&gt;etx2 == -1000) {
+ 
+@@ -241,38 +241,44 @@
+ 		if ((etx &gt;= 1.0) &amp;&amp; (etx &lt; 1.5)) {
+ 
+ 			c = 2;
+-			r = 0.5; g = 1.0; b = 1.0;
++			r = 0.5;
++			g = 1.0;
++			b = 1.0;
+ 
+-		/* good link - bright yellow */
++			/* good link - bright yellow */
+ 		} else if ((etx &gt;= 1.5) &amp;&amp; (etx &lt; 2.0)) {
+ 
+ 			rgb = 2.0 - etx;
+ 
+ 			c = 3;
+ 			c1 = con-&gt;color == 3 &amp;&amp; (int) rintf(con-&gt;rgb * 10) != (int) rintf(rgb * 10) ? 1 : 0;
+-			r = 1.0; g = 1.0; b = rgb;
++			r = 1.0;
++			g = 1.0;
++			b = rgb;
+ 
+-		/* not so good link - orange */
++			/* not so good link - orange */
+ 		} else if ((etx &gt;= 2.0) &amp;&amp; (etx &lt; 3.0)) {
+ 
+ 			rgb = 1.5 - (etx / 2.0);
+-			
++
+ 			c = 4;
+ 			c1 = con-&gt;color == 4 &amp;&amp; (int) rintf(con-&gt;rgb * 10) != (int) rintf(rgb * 10) ? 1 : 0;
+-			r = 1.0; g = rgb;
++			r = 1.0;
++			g = rgb;
+ 
+-		/* bad link (almost dead) - brown */
++			/* bad link (almost dead) - brown */
+ 		} else if ((etx &gt;= 3.0) &amp;&amp; (etx &lt; 5.0)) {
+ 
+ 			rgb = 1.75 - (etx / 4.0);
+ 
+ 			c = 5;
+ 			c1 = con-&gt;color == 5 &amp;&amp; (int) rintf(con-&gt;rgb * 10) != (int) rintf(rgb * 10) ? 1 : 0;
+-			
+-			r = rgb; g = rgb - 0.5; 
+ 
++			r = rgb;
++			g = rgb - 0.5;
+ 
+-		/* zombie link - grey */
++
++			/* zombie link - grey */
+ 		} else if ((etx &gt;= 5.0) &amp;&amp; (etx &lt; 1000.0)) {
+ 
+ 			rgb = 1000.0 / (1500.0 + etx);
+@@ -282,7 +288,7 @@
+ 
+ 			r = g = b = rgb;
+ 
+-		/* wtf - dark grey */
++			/* wtf - dark grey */
+ 		} else {
+ 
+ 			c = 7;
+@@ -291,16 +297,16 @@
+ 		}
+ 
+ 	}
+-	
++
+ 	if (con-&gt;color != c || c1) {
+ 		s3d_pep_material(con-&gt;obj_id,
+-			r, g, b,
+-			r, g, b,
+-			r, g, b);
++		                 r, g, b,
++		                 r, g, b,
++		                 r, g, b);
+ 
+ 		con-&gt;color = c;
+ 
+-		if(rgb != 0.0)
++		if (rgb != 0.0)
+ 			con-&gt;rgb = rgb;
+ 	}
+ 
+@@ -356,10 +362,10 @@
+ 					else {
+ 
+ 						s3d_pep_material(con-&gt;obj_id,
+-					                 1.0, 1.0, 1.0,
+-					                 1.0, 1.0, 1.0,
+-					                 1.0, 1.0, 1.0
+-					                );
++						                 1.0, 1.0, 1.0,
++						                 1.0, 1.0, 1.0,
++						                 1.0, 1.0, 1.0
++						                );
+ 						con-&gt;color = 0;
+ 
+ 					}
+@@ -384,7 +390,7 @@
+ 
+ }
+ 
+-void mainloop()
++void mainloop(void)
+ {
+ 	static int last_count = 0;
+ 	int net_result;   /* result of function net_main */
+@@ -394,19 +400,19 @@
+ 	calc_node_mov();
+ 	handle_node();
+ 
+-	
++
+ 	if (Global.node_count &amp;&amp; Global.node_count != last_count) {
+ 
+ 		if (Global.obj_node_count) s3d_del_object(Global.obj_node_count);
+-		
+-		snprintf(nc_str, 20, &quot;node count: %d&quot;, Global.node_count );
+-		Global.obj_node_count = s3d_draw_string( nc_str, &amp;str_len );
+-		
+-		s3d_link( Global.obj_node_count, 0 );
+-		s3d_flags_on( Global.obj_node_count, S3D_OF_VISIBLE );
+-		s3d_scale( Global.obj_node_count, 0.2 );
+-		s3d_translate( Global.obj_node_count, -Global.left * 3.0 - (str_len * 0.2), -Global.bottom * 3.0 - 0.7, -3.0 );
+-		
++
++		snprintf(nc_str, 20, &quot;node count: %d&quot;, Global.node_count);
++		Global.obj_node_count = s3d_draw_string(nc_str, &amp;str_len);
++
++		s3d_link(Global.obj_node_count, 0);
++		s3d_flags_on(Global.obj_node_count, S3D_OF_VISIBLE);
++		s3d_scale(Global.obj_node_count, 0.2);
++		s3d_translate(Global.obj_node_count, -Global.left * 3.0 - (str_len * 0.2), -Global.bottom * 3.0 - 0.7, -3.0);
++
+ 		last_count = Global.node_count;
+ 
+ 	}
+@@ -417,7 +423,7 @@
+ 		Global.output_block_completed = 0;
+ 
+ 	}
+-	
++
+ 	while ((net_result = net_main()) != 0) {
+ 		if (net_result == -1) {
+ 			printf(&quot;that's it folks\n&quot;);
+@@ -442,10 +448,10 @@
+ 		Global.cam_position[1][0] = inf-&gt;rot_x;
+ 		Global.cam_position[1][1] = inf-&gt;rot_y;
+ 		Global.cam_position[1][2] = inf-&gt;rot_z;
+-		
++
+ 		Global.asp = inf-&gt;scale;
+ 
+-		if ( Global.asp &gt; 1.0) {
++		if (Global.asp &gt; 1.0) {
+ 
+ 			Global.bottom = -1.0;
+ 			Global.left = -Global.asp;
+@@ -529,11 +535,11 @@
+ 	process_init();
+ 
+ 	if (!net_init(olsr_host)) {
+-		
+-		s3d_set_callback( S3D_EVENT_OBJ_INFO, object_info );
+-		s3d_set_callback(S3D_EVENT_KEY,keypress);
+-		
+ 
++		s3d_set_callback(S3D_EVENT_OBJ_INFO, object_info);
++		s3d_set_callback(S3D_EVENT_KEY, keypress);
++
++
+ 		/*s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
+ 		s3d_set_callback(S3D_EVENT_QUIT,stop); */
+ 
+
+Modified: trunk/apps/meshs3d/net.c
+===================================================================
+--- trunk/apps/meshs3d/net.c	2007-10-18 23:53:38 UTC (rev 740)
++++ trunk/apps/meshs3d/net.c	2007-10-18 23:53:47 UTC (rev 741)
+@@ -70,7 +70,7 @@
+ 	return(0);
+ }
+ 
+-int net_main()
++int net_main(void)
+ {
+ 	static int net_read_count = 0;
+ 
+@@ -121,7 +121,7 @@
+ 
+ }
+ 
+-int net_quit()
++int net_quit(void)
+ {
+ 	close(sockfd);
+ 
+
+Modified: trunk/apps/meshs3d/process.c
+===================================================================
+--- trunk/apps/meshs3d/process.c	2007-10-18 23:53:38 UTC (rev 740)
++++ trunk/apps/meshs3d/process.c	2007-10-18 23:53:47 UTC (rev 741)
+@@ -102,7 +102,7 @@
+ 	exit(EXIT_FAILURE);
+ }
+ 
+-void process_init()
++void process_init(void)
+ {
+ 	/* initialize hashtable */
+ 	if (NULL == (node_hash = hash_new(1600, orig_comp, orig_choose)))
+@@ -147,12 +147,12 @@
+ 		hash_add(con_hash, con);
+ 	}
+ 
+-	if(con-&gt;obj_id == -1) {
++	if (con-&gt;obj_id == -1) {
+ 		con-&gt;obj_id = s3d_new_object();
+ 		s3d_push_material(con-&gt;obj_id,
+-			1.0, 1.0, 1.0,
+-      			1.0, 1.0, 1.0,
+-      			1.0, 1.0, 1.0);
++		                  1.0, 1.0, 1.0,
++		                  1.0, 1.0, 1.0,
++		                  1.0, 1.0, 1.0);
+ 		s3d_push_vertex(con-&gt;obj_id, 0, 0, 0);
+ 		s3d_push_vertex(con-&gt;obj_id, 0, 0, 0);
+ 		s3d_push_line(con-&gt;obj_id, 0, 1, 0);
+@@ -161,13 +161,13 @@
+ 
+ 	if (con-&gt;ip[0] == ip1) {
+ 		con-&gt;etx1 = etx;
+-		if(etx != -1000.00)
++		if (etx != -1000.00)
+ 			con-&gt;etx1_sqrt = sqrt(etx);
+ 		else
+ 			con-&gt;etx1_sqrt = sqrt(2.0);
+ 	} else {
+ 		con-&gt;etx2 = etx;
+-		if(etx != -1000.00)
++		if (etx != -1000.00)
+ 			con-&gt;etx2_sqrt = sqrt(etx);
+ 		else
+ 			con-&gt;etx2_sqrt = sqrt(2.0);
+@@ -183,8 +183,7 @@
+ 
+ }
+ 
+-struct node *handle_mesh_node(unsigned int ip, char *ip_string)
+-{
++struct node *handle_mesh_node(unsigned int ip, char *ip_string) {
+ 	struct node *orig_node;
+ 	struct hashtable_t *swaphash;
+ 
+@@ -217,7 +216,7 @@
+ 		Global.node_count++;
+ 	}
+ 
+-	if(!orig_node-&gt;visible) {
++	if (!orig_node-&gt;visible) {
+ 		orig_node-&gt;visible = 1;
+ 		orig_node-&gt;node_type_modified = 1;
+ 		Global.node_count++;
+@@ -226,7 +225,7 @@
+ 	return(orig_node);
+ }
+ 
+-int process_main()
++int process_main(void)
+ {
+ 
+ 	int dn;
+@@ -234,7 +233,7 @@
+ 	char *lbuf_ptr, *last_cr_ptr, *con_from, *con_from_end, *con_to, *con_to_end, *etx, *etx_end, *tmp_char;
+ 	char hna_name[NAMEMAX];
+ 	char hna_node[NAMEMAX];
+-	
++
+ 	struct node *tmp_node;
+ 	unsigned int int_con_from = 0, int_con_to = 0, address;
+ 
+@@ -282,7 +281,7 @@
+ 
+ 				/* announced network via HNA */
+ 				if (strncmp(etx, &quot;HNA&quot;, NAMEMAX) == 0) {
+-				
++
+ 					if (strncmp(con_to, &quot;0.0.0.0/0.0.0.0&quot;, NAMEMAX) == 0) {
+ 
+ 						if (inet_pton(AF_INET, con_from, &amp;int_con_from) &lt; 1) {
+@@ -299,7 +298,7 @@
+ 							if (Global.debug) printf(&quot;new internet: %s\n&quot;, tmp_node-&gt;ip_string);
+ 
+ 						}
+-					
++
+ 					} else {
+ 
+ 						memmove(hna_node, con_to, NAMEMAX);
+@@ -332,9 +331,9 @@
+ 							if (Global.debug) printf(&quot;new hna network: %s\n&quot;, tmp_node-&gt;ip_string);
+ 
+ 						}
+-						
++
+ 						handle_con(int_con_from, int_con_to, -1000);
+-					
++
+ 					}
+ 
+ 				} else {
+
+Modified: trunk/apps/meshs3d/testvis.c
+===================================================================
+--- trunk/apps/meshs3d/testvis.c	2007-10-18 23:53:38 UTC (rev 740)
++++ trunk/apps/meshs3d/testvis.c	2007-10-18 23:53:47 UTC (rev 741)
+@@ -25,27 +25,29 @@
+ };
+ 
+ 
+-void list_data(struct data *head, struct data *end) {
++void list_data(struct data *head, struct data *end)
++{
+ 	struct data *tmp;
+-	
+-	for(tmp=head-&gt;next;tmp != end;tmp=tmp-&gt;next) {
+-		printf(&quot;%d: %s | %d\n&quot;,tmp-&gt;index, tmp-&gt;line,tmp-&gt;active);
++
++	for (tmp = head-&gt;next;tmp != end;tmp = tmp-&gt;next) {
++		printf(&quot;%d: %s | %d\n&quot;, tmp-&gt;index, tmp-&gt;line, tmp-&gt;active);
+ 	}
+ }
+ 
+-void rem_data( int index,struct data *head, struct data *end ) {
+-	struct data *tmp, *prev=head;
+-	
+-	for(tmp=head-&gt;next;tmp != end;prev = tmp, tmp=tmp-&gt;next) {
+-		if(tmp-&gt;index == index)
++void rem_data(int index, struct data *head, struct data *end)
++{
++	struct data *tmp, *prev = head;
++
++	for (tmp = head-&gt;next;tmp != end;prev = tmp, tmp = tmp-&gt;next) {
++		if (tmp-&gt;index == index)
+ 			break;
+ 	}
+ 
+-	if(tmp != end) {
++	if (tmp != end) {
+ 
+ 		prev-&gt;next = tmp-&gt;next;
+-		
+-		printf(&quot;remove index %d\n&quot;,tmp-&gt;index);
++
++		printf(&quot;remove index %d\n&quot;, tmp-&gt;index);
+ 		free(tmp);
+ 	} else {
+ 		printf(&quot;index not found\n&quot;);
+@@ -53,54 +55,58 @@
+ 	return;
+ }
+ 
+-void dea_data( int index,struct data *head, struct data *end ) {
++void dea_data(int index, struct data *head, struct data *end)
++{
+ 	struct data *tmp;
+-	
+-	for(tmp=head-&gt;next;tmp != end; tmp=tmp-&gt;next) {
+-		if(tmp-&gt;index == index)
++
++	for (tmp = head-&gt;next;tmp != end; tmp = tmp-&gt;next) {
++		if (tmp-&gt;index == index)
+ 			break;
+ 	}
+ 
+-	if(tmp != end &amp;&amp; tmp != head) {
++	if (tmp != end &amp;&amp; tmp != head) {
+ 		tmp-&gt;active = 0;
+ 	}
+ 	return;
+ }
+ 
+-void act_data( int index,struct data *head, struct data *end ) {
++void act_data(int index, struct data *head, struct data *end)
++{
+ 	struct data *tmp;
+-	
+-	for(tmp=head-&gt;next;tmp != end; tmp=tmp-&gt;next) {
+-		if(tmp-&gt;index == index)
++
++	for (tmp = head-&gt;next;tmp != end; tmp = tmp-&gt;next) {
++		if (tmp-&gt;index == index)
+ 			break;
+ 	}
+ 
+-	if(tmp != end &amp;&amp; tmp != head) {
++	if (tmp != end &amp;&amp; tmp != head) {
+ 		tmp-&gt;active = 1;
+ 	}
+ 	return;
+ }
+ 
+-static void sig(int signr) {
++static void sig(int signr)
++{
+ 	return;
+ }
+ 
+-void *server(void *args) {
++void *server(void *args)
++{
+ 	struct t_data *t = (struct t_data*)args;
+-	int listen_fd,yes=1;
+-	struct sockaddr_in sock,client;
++	int listen_fd, yes = 1;
++	struct sockaddr_in sock, client;
+ 	struct data *tmp;
+-	
++
+ 	int sock2;
+ 	socklen_t len;
+-	
++
+ 	char buffer[2000];
+-	char start[] =&quot;digraph topology\n{\n&quot;;
++	char start[] = &quot;digraph topology\n{\n&quot;;
+ 	char end[] = &quot;}\n&quot;;
+ 	int index;
+ 
+ 	signal(SIGPIPE, sig);
+-	
++
+ 	listen_fd = socket(PF_INET, SOCK_STREAM, 0);
+ 	setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &amp;yes, sizeof(int));
+ 
+@@ -111,24 +117,24 @@
+ 
+ 	bind(listen_fd, (struct sockaddr *) &amp;sock, sizeof(sock));
+ 	listen(listen_fd, 1);
+-	
+-	len = sizeof( client );
+-		
+-	while(1) {
+ 
+-		sock2 =	accept( listen_fd, (struct sockaddr*)&amp;client, &amp;len);
++	len = sizeof(client);
+ 
+-		while(1) {
+-		
+-			memset(buffer,0,2000);
+-			strcat(buffer,start);
++	while (1) {
++
++		sock2 = accept(listen_fd, (struct sockaddr*) &amp; client, &amp;len);
++
++		while (1) {
++
++			memset(buffer, 0, 2000);
++			strcat(buffer, start);
+ 			index = strlen(start);
+ 
+-			for(tmp=t-&gt;head-&gt;next;tmp != t-&gt;end;tmp=tmp-&gt;next) {
++			for (tmp = t-&gt;head-&gt;next;tmp != t-&gt;end;tmp = tmp-&gt;next) {
+ 
+-				if(!tmp-&gt;active)
++				if (!tmp-&gt;active)
+ 					continue;
+-				strcat(&amp;buffer[index],tmp-&gt;line );
++				strcat(&amp;buffer[index], tmp-&gt;line);
+ 				index += strlen(tmp-&gt;line);
+ 				strcat(&amp;buffer[index], &quot;\n&quot;);
+ 				index++;
+@@ -137,25 +143,26 @@
+ 
+ 			strcat(&amp;buffer[index], end);
+ 			buffer[index+2] = 0;
+-			if( send ( sock2, buffer, strlen(buffer), 0 ) &lt; 1 )
++			if (send(sock2, buffer, strlen(buffer), 0) &lt; 1)
+ 				break;
+ 
+ 			sleep(3);
+ 
+ 		}
+ 	}
+-	
++
+ 	return NULL;
+ }
+ 
+-int main() {
++int main()
++{
+ 	char buffer[BUFFER_SIZE];
+ 	char *tmp_buffer;
+ 	struct data *head, *z, *t;
+ 	static int index = 0;
+ 	struct t_data t_dat;
+ 	pthread_t thread;
+-	
++
+ 	head = malloc(sizeof(*head));
+ 	z = malloc(sizeof(*z));
+ 
+@@ -163,13 +170,13 @@
+ 
+ 	t_dat.head = head;
+ 	t_dat.end = z;
+-	pthread_create (&amp;thread, NULL, server, &amp;t_dat);
++	pthread_create(&amp;thread, NULL, server, &amp;t_dat);
+ 	pthread_detach(thread);
+ 	printf(&quot;\ntestivs: &quot;);
+ 
+-	while(fgets(buffer, BUFFER_SIZE, stdin)) {
++	while (fgets(buffer, BUFFER_SIZE, stdin)) {
+ 
+-		if( (tmp_buffer = strstr(buffer, &quot;add&quot;)) != NULL ) {
++		if ((tmp_buffer = strstr(buffer, &quot;add&quot;)) != NULL) {
+ 			tmp_buffer[strlen(tmp_buffer) - 1] = 0;
+ 			tmp_buffer += 4;
+ 			t = malloc(sizeof(*t));
+@@ -178,29 +185,29 @@
+ 			t-&gt;active = 1;
+ 			t-&gt;next = head-&gt;next;
+ 			head-&gt;next = t;
+-		} else if( (tmp_buffer = strstr(buffer, &quot;list&quot;)) != NULL ) {
++		} else if ((tmp_buffer = strstr(buffer, &quot;list&quot;)) != NULL) {
+ 
+-			list_data(head,z);
++			list_data(head, z);
+ 
+-		} else if( (tmp_buffer = strstr(buffer, &quot;rem&quot;)) != NULL ) {
++		} else if ((tmp_buffer = strstr(buffer, &quot;rem&quot;)) != NULL) {
+ 
+ 			tmp_buffer[strlen(tmp_buffer) - 1] = 0;
+ 			tmp_buffer += 4;
+-			rem_data( atoi(tmp_buffer),head,z);
++			rem_data(atoi(tmp_buffer), head, z);
+ 
+-		} else if( (tmp_buffer = strstr(buffer, &quot;dea&quot;)) != NULL ) {
++		} else if ((tmp_buffer = strstr(buffer, &quot;dea&quot;)) != NULL) {
+ 
+ 			tmp_buffer[strlen(tmp_buffer) - 1] = 0;
+ 			tmp_buffer += 4;
+-			dea_data( atoi(tmp_buffer),head,z);
++			dea_data(atoi(tmp_buffer), head, z);
+ 
+-		} else if( (tmp_buffer = strstr(buffer, &quot;act&quot;)) != NULL ) {
++		} else if ((tmp_buffer = strstr(buffer, &quot;act&quot;)) != NULL) {
+ 
+ 			tmp_buffer[strlen(tmp_buffer) - 1] = 0;
+ 			tmp_buffer += 4;
+-			act_data( atoi(tmp_buffer),head,z);
++			act_data(atoi(tmp_buffer), head, z);
+ 
+-		} else if( (tmp_buffer = strstr(buffer, &quot;quit&quot;)) != NULL ) {
++		} else if ((tmp_buffer = strstr(buffer, &quot;quit&quot;)) != NULL) {
+ 
+ 			break;
+ 
+@@ -211,6 +218,6 @@
+ 		printf(&quot;testivs: &quot;);
+ 
+ 	}
+-	
++
+ 	return 0;
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000732.html">[S3d-svn] r740 - trunk/apps/kism3d
+</A></li>
+	<LI>Next message: <A HREF="000734.html">[S3d-svn] r742 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#733">[ date ]</a>
+              <a href="thread.html#733">[ thread ]</a>
+              <a href="subject.html#733">[ subject ]</a>
+              <a href="author.html#733">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

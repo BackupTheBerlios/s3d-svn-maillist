@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1057 - trunk/libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2009-April/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1057%20-%20trunk/libs3d&In-Reply-To=%3C200904181311.n3IDBKDX009816%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001036.html">
+   <LINK REL="Next"  HREF="001038.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1057 - trunk/libs3d</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1057%20-%20trunk/libs3d&In-Reply-To=%3C200904181311.n3IDBKDX009816%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1057 - trunk/libs3d">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sat Apr 18 15:11:20 CEST 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001036.html">[S3d-svn] r1056 - trunk/apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="001038.html">[S3d-svn] r1058 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1037">[ date ]</a>
+              <a href="thread.html#1037">[ thread ]</a>
+              <a href="subject.html#1037">[ subject ]</a>
+              <a href="author.html#1037">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2009-04-18 15:11:19 +0200 (Sat, 18 Apr 2009)
+New Revision: 1057
+
+Modified:
+   trunk/libs3d/io.c
+Log:
+Only strip out libs3d options from argv
+
+The idea of parse_args of libs3d was to parse all known opts and than
+stop before the parameter for the program starts. argv and argc is than
+modified to start at the first option not recognised by libs3d.
+This implementation was faulty and stripped of all valid options
+beginning with a dash in different versions of getopt. A better idea is
+to parse all parameters regardless of their first character and move
+them to the left to override libs3d options. The order in which libs3d
+and application specific option occurred isn't important anymore.
+
+Modified: trunk/libs3d/io.c
+===================================================================
+--- trunk/libs3d/io.c	2009-04-18 13:11:16 UTC (rev 1056)
++++ trunk/libs3d/io.c	2009-04-18 13:11:19 UTC (rev 1057)
+@@ -81,16 +81,22 @@
+ {
+ 	int     c;
+ 	int      lopt_idx;
++	int     old_argc, curopt;
+ 	struct option long_options[] = {
+-		{&quot;s3d-url&quot;, 1, NULL, 0
+-		}, {&quot;help&quot;, 0, NULL, 'h'}, {&quot;s3d-help&quot;, 0, NULL, 'h'}, {NULL, 0, NULL, 0}
++		{&quot;s3d-url&quot;, 1, NULL, 'u'},
++		{&quot;help&quot;, 0, NULL, 'h'},
++		{&quot;s3d-help&quot;, 0, NULL, 'h'},
++		{NULL, 0, NULL, 0}
+ 	};
+ 	if ((argc == NULL) || (argv == NULL)) return(0); /* nothing to parse */
++	old_argc = *argc;
+ 	optind = 0;
+ 	opterr = 0; /* we don't want to be bothered if there is some error */
+-	while (-1 != (c = getopt_long(*argc, *argv, &quot;?h&quot;, long_options, &amp;lopt_idx))) {
++	*argc = 1;
++	curopt = 1;
++	while (-1 != (c = getopt_long(old_argc, *argv, &quot;-h&quot;, long_options, &amp;lopt_idx))) {
+ 		switch (c) {
+-		case 0:
++		case 'u':
+ 			if (0 == strcmp(long_options[lopt_idx].name, &quot;s3d-url&quot;)) {
+ 				if (optarg) {
+ 					url = optarg;
+@@ -104,13 +110,15 @@
+ 			return(-1);
+ 		default:
+ 			/* ignore args which are not for us, but maybe the app which builds on us */
++			(*argv)[(*argc)] = (*argv)[curopt];
++			(*argc)++;
+ 			break;
+ 		}
++		curopt = optind;
+ 	}
+-	if (*argc &gt; 0) {
+-		*argc -= (optind - 1);  /*  hide s3d-options */
+-		(*argv)[optind-1] = (*argv)[0]; /*  restore program path */
+-		*argv += (optind - 1);  /*  set the string pointer at the right position */
++	for (c = optind; c &lt; old_argc; c++) {
++		(*argv)[(*argc)] = (*argv)[c];
++		(*argc)++;
+ 	}
+ 	optind = 0;
+ 	return(0);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001036.html">[S3d-svn] r1056 - trunk/apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="001038.html">[S3d-svn] r1058 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1037">[ date ]</a>
+              <a href="thread.html#1037">[ thread ]</a>
+              <a href="subject.html#1037">[ subject ]</a>
+              <a href="author.html#1037">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

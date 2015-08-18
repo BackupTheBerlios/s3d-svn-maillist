@@ -1,0 +1,319 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r443 - in trunk: . apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r443%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200609281707.k8SH78Vm030989%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000435.html">
+   <LINK REL="Next"  HREF="000437.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r443 - in trunk: . apps/s3dfm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r443%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200609281707.k8SH78Vm030989%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r443 - in trunk: . apps/s3dfm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Thu Sep 28 19:07:08 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000435.html">[S3d-svn] r442 - in trunk: . apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000437.html">[S3d-svn] r444 - in trunk: . libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#436">[ date ]</a>
+              <a href="thread.html#436">[ thread ]</a>
+              <a href="subject.html#436">[ subject ]</a>
+              <a href="author.html#436">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-28 19:07:07 +0200 (Thu, 28 Sep 2006)
+New Revision: 443
+
+Modified:
+   trunk/
+   trunk/apps/s3dfm/animation.c
+   trunk/apps/s3dfm/box.c
+   trunk/apps/s3dfm/dialog.c
+   trunk/apps/s3dfm/event.c
+   trunk/apps/s3dfm/node.c
+   trunk/apps/s3dfm/parse.c
+   trunk/apps/s3dfm/s3dfm.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1075 at balthasar</A>:  dotslash | 2006-09-28 19:06:58 +0200
+ - directory parse errors in windows
+ - refreshing now works preoperly
+ - implemented node_delete
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1073
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1075
+
+Modified: trunk/apps/s3dfm/animation.c
+===================================================================
+--- trunk/apps/s3dfm/animation.c	2006-09-28 16:22:56 UTC (rev 442)
++++ trunk/apps/s3dfm/animation.c	2006-09-28 17:07:07 UTC (rev 443)
+@@ -36,8 +36,8 @@
+ 	int i;
+ 	for (i=0;i&lt;ani_n;i++)
+ 		if (ani_s[i]==f)
+-			return(1);		/* already in list */
+-	return(0);
++			return(i);		/* already in list */
++	return(-1);
+ 
+ }
+ /* add an node on the animation stack */
+@@ -45,7 +45,7 @@
+ {
+ 	if (ani_n&lt;MAXANI)
+ 	{
+-		if (ani_onstack(f))
++		if (-1!=ani_onstack(f))
+ 			return;		/* already in list */
+ 		ani_s[ani_n]=f;
+ 		ani_iterate(f);
+
+Modified: trunk/apps/s3dfm/box.c
+===================================================================
+--- trunk/apps/s3dfm/box.c	2006-09-28 16:22:56 UTC (rev 442)
++++ trunk/apps/s3dfm/box.c	2006-09-28 17:07:07 UTC (rev 443)
+@@ -277,6 +277,7 @@
+ 	printf(&quot;box_unexpand( %s )\n&quot;,dir-&gt;name);
+ 	if (dir-&gt;parent==NULL) /* we can't do this on root.... */
+ 		return(-1);
++	dir-&gt;detached=0;
+ 	box_undisplay(dir);
+ 	icon_draw(dir);
+ 	dir-&gt;parent-&gt;dirs_opened--;
+@@ -319,6 +320,7 @@
+ 			if (dir-&gt;sub[i]-&gt;disp==D_ICON)
+ 			{
+ 				icon_undisplay(dir-&gt;sub[i]);
++				dir-&gt;detached=0;
+ 				if (focus==dir-&gt;sub[i])
+ 					focus_set(dir-&gt;parent);
+ 			}
+@@ -391,7 +393,7 @@
+ 		{
+ 			dir-&gt;sub[i]-&gt;px = -1 +2*  ((float)((int)i%dps)+0.5)/((float)dps);
+ 			dir-&gt;sub[i]-&gt;py = 0.5+((float)((int)i/dps)+0.5)/((float)dps)-0.5;
+-			dir-&gt;sub[i]-&gt;pz = 1.0;
++			dir-&gt;sub[i]-&gt;pz=dir-&gt;sub[i]-&gt;detached*0.2+1.0;
+ 			dir-&gt;sub[i]-&gt;scale = (float)1.0/((float)dps);
+ 			s3d_link(dir-&gt;sub[i]-&gt;oid,dir-&gt;oid);	 /* if it's already displayed, make sure it linked properly ... */
+ 			ani_finish(dir-&gt;sub[i], -1);			 /* copy to the current animation state */
+
+Modified: trunk/apps/s3dfm/dialog.c
+===================================================================
+--- trunk/apps/s3dfm/dialog.c	2006-09-28 16:22:56 UTC (rev 442)
++++ trunk/apps/s3dfm/dialog.c	2006-09-28 17:07:07 UTC (rev 443)
+@@ -117,8 +117,12 @@
+ 
+ void window_fs_abort(s3dw_widget *button)
+ {
+-	fl_del(fp);
+-	fp=NULL;
++	/* delete a filelist, if there was any */
++	if (fp!=NULL)
++	{
++		fl_del(fp);
++		fp=NULL;
++	}
+ 	typeinput=0;
+ 	s3dw_delete(button-&gt;parent); /* parent =surface. this means close containing window */
+ }
+@@ -179,9 +183,7 @@
+ 		} else {
+ 			printf(&quot;refreshing %s\n&quot;,item-&gt;name);
+ /*			parse_again(item);*/
+-
+ 		}
+-				
+ 	}
+ 	window_fs_abort(button); /* finish */
+ 
+@@ -202,9 +204,9 @@
+ 	s3dw_focus(S3DWIDGET(input));
+ 	s3dw_focus(S3DWIDGET(infwin));
+ 	typeinput=1;
+-	okbutton=s3dw_button_new(infwin,&quot;OK&quot;,l/2-3,fp-&gt;n+5);
++	okbutton=s3dw_button_new(infwin,&quot;OK&quot;,l/2-3,5);
+ 	okbutton-&gt;onclick=window_fs_mkdir;
+-	abortbutton=s3dw_button_new(infwin,&quot;abort&quot;,l/2,fp-&gt;n+5);
++	abortbutton=s3dw_button_new(infwin,&quot;abort&quot;,l/2,5);
+ 	abortbutton-&gt;onclick=window_fs_abort;
+ 	s3dw_show(S3DWIDGET(infwin));
+ 
+
+Modified: trunk/apps/s3dfm/event.c
+===================================================================
+--- trunk/apps/s3dfm/event.c	2006-09-28 16:22:56 UTC (rev 442)
++++ trunk/apps/s3dfm/event.c	2006-09-28 17:07:07 UTC (rev 443)
+@@ -54,7 +54,7 @@
+ 			s3dw_handle_key(evt); 
+ 			return(0); 
+ 	}
+-	node_path(focus,path);
++	node_path(node_getdir(focus),path);
+ 	switch (keys-&gt;keysym)
+ 	{
+ 		case 'i':
+@@ -66,9 +66,14 @@
+ 		case 'r':
+ 		case 'R':
+ 				{/* refresh this window ... */
+-					printf(&quot;[R]efreshing %s\n&quot;,focus-&gt;name);
+-/*					parse_again(focus);*/
+-					focus_set(focus);
++					t_node *node;
++					node=node_getdir(focus);
++					printf(&quot;[R]efreshing %s\n&quot;,node-&gt;name);
++					parse_dir(node);
++					box_draw_icons(node);
++					box_order_icons(node);
++					box_order_subdirs(node);
++					
+ 				}
+ 				break;
+ 		case S3DK_F1:
+
+Modified: trunk/apps/s3dfm/node.c
+===================================================================
+--- trunk/apps/s3dfm/node.c	2006-09-28 16:22:56 UTC (rev 442)
++++ trunk/apps/s3dfm/node.c	2006-09-28 17:07:07 UTC (rev 443)
+@@ -24,6 +24,7 @@
+ #include &quot;s3dfm.h&quot;
+ #include &lt;string.h&gt;	/* strncpy(), index() */
+ #include &lt;stdio.h&gt;	/* printf() */
++#include &lt;stdlib.h&gt; /* free() */
+ /* find the node to a path, return NULL if not parsed yet */
+ t_node *node_getbypath(char *path)
+ {
+@@ -133,22 +134,28 @@
+ /* delete a node and all its kids internally, remove the graphics, reorder the parents etc ... */
+ int node_delete(t_node *dir)
+ {
+-	/* TODO: IMPLEMENT IT, DAMNIT */
+-	/*
+ 	int i;
+-	printf(&quot;node_free( %s )\n&quot;,t-&gt;name);
+-	switch (t-&gt;disp)
++	if (dir-&gt;parent==NULL) 
+ 	{
+-			case D_DIR:  box_collapse(t,1); / * collapse this and its kids * /
+-			case D_ICON: icon_undisplay(t);
++		printf(&quot;won't delete root window!\n&quot;);
++		return(-1);
+ 	}
+-	if (t-&gt;n_item&gt;0) {
+-		for (i=0;i&lt;t-&gt;n_item;i++)
+-			node_free(&amp;(t-&gt;sub[i]));
+-		free(t-&gt;sub);
++	/* delete all the kids */
++	if (dir-&gt;n_sub&gt;0) {
++		for (i=0;i&lt;dir-&gt;n_sub;i++)
++			node_delete(dir-&gt;sub[i]);
++		free(dir-&gt;sub);
+ 	}
+-	t-&gt;n_item=0;
+-	*/
++	/* move focus upward, this should go up with the recursion */
++	if (focus==dir)	focus_set(dir-&gt;parent); /* do this before deleting the contents, its better ... */
++	switch (dir-&gt;disp)
++	{
++			case D_DIR:  box_undisplay(dir);
++			case D_ICON: icon_undisplay(dir);
++	}
++
++	if (-1!=(i=ani_onstack(dir))) ani_del(i); /* tell animation stack too */
++	free(dir);
+ 	return(0);
+ }
+ /* node select handles click on the detach button. selected items can be moved, copied etc.*/
+@@ -171,8 +178,8 @@
+ 			if (dir-&gt;type==T_FOLDER)
+ 			{
+ 				dir-&gt;detached=0;
+-				parse_dir(dir);
+-				box_expand(dir);
++				if (!parse_dir(dir))
++					box_expand(dir);
+ 			} else {
+ 				dir-&gt;pz=dir-&gt;detached*0.2+1.0;
+ 				ani_add(dir);
+@@ -190,3 +197,9 @@
+ 		case D_ICON: icon_focus_color(node,on); break;
+ 	}
+ }
++/* get the directory of a node */
++t_node *node_getdir(t_node *node)
++{
++	if (node-&gt;type==T_FOLDER) return(node);
++	else return(node-&gt;parent);
++}
+
+Modified: trunk/apps/s3dfm/parse.c
+===================================================================
+--- trunk/apps/s3dfm/parse.c	2006-09-28 16:22:56 UTC (rev 442)
++++ trunk/apps/s3dfm/parse.c	2006-09-28 17:07:07 UTC (rev 443)
+@@ -48,7 +48,7 @@
+     n = i = scandir(path, &amp;namelist, 0, alphasort);
+     if (n &lt; 0)
+ 	{
+-        perror(&quot;scandir&quot;);
++		window_fs_errno(path);
+ 		return(-1);
+ 	} else {
+ 		oldn=dir-&gt;n_sub;
+
+Modified: trunk/apps/s3dfm/s3dfm.h
+===================================================================
+--- trunk/apps/s3dfm/s3dfm.h	2006-09-28 16:22:56 UTC (rev 442)
++++ trunk/apps/s3dfm/s3dfm.h	2006-09-28 17:07:07 UTC (rev 443)
+@@ -151,6 +151,7 @@
+ int 		 node_undisplay(t_node *dir);
+ void		 node_select(t_node *dir);
+ void 		 node_focus_color(t_node *node, int on);
++t_node		*node_getdir(t_node *node);
+ /* parse.c */
+ int 		 parse_dir(t_node *dir);
+ /* string.c */
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000435.html">[S3d-svn] r442 - in trunk: . apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000437.html">[S3d-svn] r444 - in trunk: . libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#436">[ date ]</a>
+              <a href="thread.html#436">[ thread ]</a>
+              <a href="subject.html#436">[ subject ]</a>
+              <a href="author.html#436">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r797 - trunk/apps/meshs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r797%20-%20trunk/apps/meshs3d&In-Reply-To=%3C200710221138.l9MBcDVt028704%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000788.html">
+   <LINK REL="Next"  HREF="000790.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r797 - trunk/apps/meshs3d</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r797%20-%20trunk/apps/meshs3d&In-Reply-To=%3C200710221138.l9MBcDVt028704%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r797 - trunk/apps/meshs3d">nichtsnutz at mail.berlios.de
+       </A><BR>
+    <I>Mon Oct 22 13:38:13 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000788.html">[S3d-svn] r796 - in trunk: . apps/comptest
+</A></li>
+        <LI>Next message: <A HREF="000790.html">[S3d-svn] r798 - trunk/apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#789">[ date ]</a>
+              <a href="thread.html#789">[ thread ]</a>
+              <a href="subject.html#789">[ subject ]</a>
+              <a href="author.html#789">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2007-10-22 13:38:13 +0200 (Mon, 22 Oct 2007)
+New Revision: 797
+
+Modified:
+   trunk/apps/meshs3d/main.c
+Log:
+fix removing of connections
+
+
+Modified: trunk/apps/meshs3d/main.c
+===================================================================
+--- trunk/apps/meshs3d/main.c	2007-10-22 11:07:03 UTC (rev 796)
++++ trunk/apps/meshs3d/main.c	2007-10-22 11:38:13 UTC (rev 797)
+@@ -145,7 +145,6 @@
+ 		}
+ 
+ 		if ((node-&gt;last_seen &lt; Global.output_block_counter - 1) &amp;&amp; (node-&gt;visible)) {
+-
+ 			s3d_del_object(node-&gt;desc_id);
+ 			s3d_del_object(node-&gt;obj_id);
+ 			node-&gt;desc_id = -1;
+@@ -154,9 +153,12 @@
+ 			Global.node_count--;
+ 			while (NULL != (tmp_hashit = hash_iterate(node_hash, tmp_hashit))) {
+ 				tmp_node = (struct node *) tmp_hashit-&gt;bucket-&gt;data;
+-				if (node != tmp_node &amp;&amp; (max(node-&gt;ip, tmp_node-&gt;ip) == node-&gt;ip)) {
+-					ip[0] = node-&gt;ip;
+-					ip[1] = tmp_node-&gt;ip;
++
++				
++				if ( node != tmp_node ) {
++					ip[0] = max(node-&gt;ip,tmp_node-&gt;ip);
++					ip[1] = min(node-&gt;ip,tmp_node-&gt;ip);
++
+ 					if (NULL != (con = hash_find(con_hash, ip))) {
+ 						s3d_del_object(con-&gt;obj_id);
+ 						con-&gt;obj_id = -1;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000788.html">[S3d-svn] r796 - in trunk: . apps/comptest
+</A></li>
+	<LI>Next message: <A HREF="000790.html">[S3d-svn] r798 - trunk/apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#789">[ date ]</a>
+              <a href="thread.html#789">[ thread ]</a>
+              <a href="subject.html#789">[ subject ]</a>
+              <a href="author.html#789">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

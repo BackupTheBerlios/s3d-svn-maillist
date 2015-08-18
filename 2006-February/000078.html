@@ -1,0 +1,331 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r82 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r82%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602172248.k1HMmIHM004617%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000077.html">
+   <LINK REL="Next"  HREF="000079.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r82 - trunk/apps/olsrs3d</H1>
+    <B>marec at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r82%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602172248.k1HMmIHM004617%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r82 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Fri Feb 17 23:48:18 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000077.html">[S3d-svn] r81 - in trunk: . client
+</A></li>
+        <LI>Next message: <A HREF="000079.html">[S3d-svn] r83 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#78">[ date ]</a>
+              <a href="thread.html#78">[ thread ]</a>
+              <a href="subject.html#78">[ subject ]</a>
+              <a href="author.html#78">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-02-17 23:48:14 +0100 (Fri, 17 Feb 2006)
+New Revision: 82
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/net.c
+   trunk/apps/olsrs3d/process.c
+Log:
+parse line redone fixed
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-02-17 20:46:45 UTC (rev 81)
++++ trunk/apps/olsrs3d/main.c	2006-02-17 22:48:14 UTC (rev 82)
+@@ -4,6 +4,7 @@
+ #include &lt;string.h&gt;	/* strncpy() */
+ #include &lt;math.h&gt;		/* sqrt() */
+ #include &lt;getopt.h&gt;	/* getopt() */
++#include &lt;stdlib.h&gt;	/* exit() */
+ #include &quot;olsrs3d.h&quot;
+ #define SPEED		10.0
+ 
+@@ -553,7 +554,7 @@
+ 	ZeroPosition[2] = 40;*/
+ 	struct olsr_node *olsr_node;
+ 	olsr_node = *lst_search(oid);
+-	printf(&quot;obj2ip: search return %s\n&quot;,olsr_node-&gt;ip);
++	/* printf(&quot;obj2ip: search return %s\n&quot;,olsr_node-&gt;ip); */
+ }
+ 
+ /***
+@@ -588,7 +589,7 @@
+ 		s3d_translate(mesh,(-left)*3.0-1.8,bottom*3.0+0.8,-3.0);
+ 		s3d_flags_on(mesh,S3D_OF_VISIBLE);
+ 	}
+-	printf(&quot;%f %f %f\n&quot;,inf-&gt;trans_x,inf-&gt;trans_y,inf-&gt;trans_z);
++	/* printf(&quot;%f %f %f\n&quot;,inf-&gt;trans_x,inf-&gt;trans_y,inf-&gt;trans_z); */
+ }
+ 
+ /***
+@@ -643,7 +644,7 @@
+ 	struct Obj_to_ip *del;
+ 	move_lst_ptr(&amp;id);
+ 	if(id != List_ptr-&gt;id)
+-		printf(&quot;obj2ip: remove id %d failed move_lst_ptr return id %d\n&quot;,id,List_ptr-&gt;next-&gt;id);
++		/* printf(&quot;obj2ip: remove id %d failed move_lst_ptr return id %d\n&quot;,id,List_ptr-&gt;next-&gt;id); */
+ 	else {
+ 		del = List_ptr;
+ 		List_ptr-&gt;next-&gt;prev = List_ptr-&gt;prev;
+@@ -720,11 +721,11 @@
+ 	struct Obj_to_ip *ptr;
+ 	ptr = Obj_to_ip_head;
+ 	while(ptr != ptr-&gt;next) {
+-		printf(&quot;List--------------------------\n&quot;);
++		/* printf(&quot;List--------------------------\n&quot;); */
+ 		printf(&quot;id-&gt; %d\n&quot;,ptr-&gt;id);
+ 		ptr = ptr-&gt;next;
+ 	}
+-	printf(&quot;List--------------------------\n&quot;);
++	/* printf(&quot;List--------------------------\n&quot;); */
+ }
+ 
+ int main( int argc, char *argv[] ) {
+
+Modified: trunk/apps/olsrs3d/net.c
+===================================================================
+--- trunk/apps/olsrs3d/net.c	2006-02-17 20:46:45 UTC (rev 81)
++++ trunk/apps/olsrs3d/net.c	2006-02-17 22:48:14 UTC (rev 82)
+@@ -14,7 +14,7 @@
+ char buf[MAXDATASIZE];
+ 
+ 
+-int sockfd, numbytes;  
++int sockfd, numbytes;
+ int net_init(char *host)
+ {
+     struct hostent *he;
+@@ -46,7 +46,7 @@
+ int net_main()
+ {
+     if ((numbytes=recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
+-		if (errno==EAGAIN) 
++		if (errno==EAGAIN)
+ 			return(0); /* well, that's okay ... */
+         perror(&quot;recv&quot;);
+         return(-1);
+@@ -57,7 +57,8 @@
+ 		return(-1);
+ 	}
+     buf[numbytes] = '\0';
+-	strncat(lbuf,buf,MAXLINESIZE);
++// 	strncat(lbuf,buf,MAXLINESIZE);
++	strncpy(lbuf,buf,MAXLINESIZE);
+ 	process_main();
+ 	return(1);
+ }
+@@ -66,6 +67,6 @@
+     close(sockfd);
+ 
+     return 0;
+-} 
++}
+ 
+ 
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-02-17 20:46:45 UTC (rev 81)
++++ trunk/apps/olsrs3d/process.c	2006-02-17 22:48:14 UTC (rev 82)
+@@ -476,102 +476,103 @@
+ 
+ int process_main() {
+ 
+-	int index = 0, dn = 0;
+-	int buf_len = strlen( lbuf );
++	int dn;
+ 	float f;
+ 	char *lbuf_ptr, *con_from, *con_to, *etx;
+ 	struct olsr_node *olsr_node1;   // pointer to olsr nodes
+ 	struct olsr_node *olsr_node2;
+ 
+-	while ( ( index &lt; buf_len ) &amp;&amp; ( index &lt; MAXLINESIZE ) ) {
++	lbuf_ptr = lbuf;
+ 
+-		if ( ( lbuf[index] != '{' ) &amp;&amp; ( lbuf[index] != '}' )  &amp;&amp; ( lbuf[index] != '\n' ) ) {
++	while ( (*lbuf_ptr) != '\0' ) {
+ 
+-			lbuf_ptr = &amp;lbuf[index];
+-			dn = 0;
++// 		printf( &quot;%c&quot;,(*lbuf_ptr) );
+ 
+-			while ( (*lbuf_ptr) != '\0' ) {
++		if ( (*lbuf_ptr) == '\n' ) {
+ 
+-				if ( (*lbuf_ptr) == '&quot;' ) {
++			con_from = con_to = etx = NULL;
++			dn = 0;
+ 
+-					switch ( dn ) {
++		}
+ 
+-						case 0:
+-							con_from = lbuf_ptr;
+-							break;
+-						case 2:
+-							con_to = lbuf_ptr;
+-							break;
+-						case 4:
+-							etx = lbuf_ptr;
+-							break;
+-						default:   /* ends */
+-							(*lbuf_ptr) = '\0';   /* string terminator!! */
+-					}
++		if ( (*lbuf_ptr) == '&quot;' ) {
+ 
+-					if ( ++dn &gt;= 6 ) break;
++			switch ( dn ) {
+ 
+-				}
++				case 0:
++					con_from = ++lbuf_ptr;
++					break;
++				case 2:
++					con_to = ++lbuf_ptr;
++					break;
++				case 4:
++					etx = ++lbuf_ptr;
++					break;
++				default:
++					(*lbuf_ptr) = '\0';   /* string terminator!! */
++					break;
+ 
+-				lbuf_ptr++;
++			}
+ 
+-				if ( dn &gt;= 6 ) {
++			if ( ++dn == 6 ) {
+ 
+-					/* announced network via HNA */
+-					if ( strncmp( etx, &quot;HNA&quot;, NAMEMAX ) == 0 ) {
++// 				printf( &quot;con_from: %s, con_to: %s, etx: %s\n&quot;, con_from, con_to, etx );
+ 
+-						/* connection to internet */
+-						if ( strncmp( con_to, &quot;0.0.0.0/0.0.0.0&quot;, NAMEMAX ) == 0 ) {
++				/* announced network via HNA */
++				if ( strncmp( etx, &quot;HNA&quot;, NAMEMAX ) == 0 ) {
+ 
+-							olsr_node1 = get_olsr_node( &amp;Olsr_root, con_from );
++					/* connection to internet */
++					if ( strncmp( con_to, &quot;0.0.0.0/0.0.0.0&quot;, NAMEMAX ) == 0 ) {
+ 
+-							if ( olsr_node1-&gt;node_type != 1 ) {
++						olsr_node1 = get_olsr_node( &amp;Olsr_root, con_from );
+ 
+-								olsr_node1-&gt;node_type = 1;
+-								olsr_node1-&gt;node_type_modified = 1;
+-								if ( Debug ) printf( &quot;new internet: %s\n&quot;, olsr_node1-&gt;ip );
++						if ( olsr_node1-&gt;node_type != 1 ) {
+ 
+-							}
++							olsr_node1-&gt;node_type = 1;
++							olsr_node1-&gt;node_type_modified = 1;
++							if ( Debug ) printf( &quot;new internet: %s\n&quot;, olsr_node1-&gt;ip );
+ 
+-							/* normal HNA */
+-						} else {
++						}
+ 
+-							olsr_node1 = get_olsr_node( &amp;Olsr_root, con_from );
+-							olsr_node2 = get_olsr_node( &amp;Olsr_root, con_to );
++					/* normal HNA */
++					} else {
+ 
+-							if ( olsr_node2-&gt;node_type != 2 ) {
++						olsr_node1 = get_olsr_node( &amp;Olsr_root, con_from );
++						olsr_node2 = get_olsr_node( &amp;Olsr_root, con_to );
+ 
+-								olsr_node2-&gt;node_type = 2;
+-								olsr_node2-&gt;node_type_modified = 1;
+-								if ( Debug ) printf( &quot;new hna network: %s\n&quot;, olsr_node2-&gt;ip );
++						if ( olsr_node2-&gt;node_type != 2 ) {
+ 
+-							}
++							olsr_node2-&gt;node_type = 2;
++							olsr_node2-&gt;node_type_modified = 1;
++							if ( Debug ) printf( &quot;new hna network: %s\n&quot;, olsr_node2-&gt;ip );
+ 
+-							add_olsr_con( olsr_node1, olsr_node2, -1000.00 );
+-
+ 						}
+ 
+-					/* normal node */
+-					} else {
++						add_olsr_con( olsr_node1, olsr_node2, -1000.00 );
+ 
+-						olsr_node1 = get_olsr_node( &amp;Olsr_root, con_from );
+-						olsr_node2 = get_olsr_node( &amp;Olsr_root, con_to );
+-						f=10.0+strtod(etx,NULL)/10.0;
+-						if (f&gt;=5) add_olsr_con( olsr_node1, olsr_node2, f );   /* just to prevent ascii to float converting inconsistency ... */
+-
+ 					}
+ 
++				/* normal node */
++				} else {
++
++					olsr_node1 = get_olsr_node( &amp;Olsr_root, con_from );
++					olsr_node2 = get_olsr_node( &amp;Olsr_root, con_to );
++					f=10.0+strtod(etx,NULL)/10.0;
++					if (f&gt;=5) add_olsr_con( olsr_node1, olsr_node2, f );   /* just to prevent ascii to float converting inconsistency ... */
++
+ 				}
+ 
++				con_from = con_to = etx = NULL;
++				dn = 0;
++
+ 			}
+ 
+ 		}
+ 
+-		index++;
++		lbuf_ptr++;
+ 
+ 	}
+ 
+-	memmove( lbuf, lbuf + index + 1, index + 1 );
+ 	return(0);
+ 
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000077.html">[S3d-svn] r81 - in trunk: . client
+</A></li>
+	<LI>Next message: <A HREF="000079.html">[S3d-svn] r83 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#78">[ date ]</a>
+              <a href="thread.html#78">[ thread ]</a>
+              <a href="subject.html#78">[ subject ]</a>
+              <a href="author.html#78">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

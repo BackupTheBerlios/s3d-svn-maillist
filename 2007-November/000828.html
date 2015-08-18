@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r835 - in trunk: . cmake/modules
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r835%20-%20in%20trunk%3A%20.%20cmake/modules&In-Reply-To=%3C200711021700.lA2H0INA029688%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000827.html">
+   <LINK REL="Next"  HREF="000829.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r835 - in trunk: . cmake/modules</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r835%20-%20in%20trunk%3A%20.%20cmake/modules&In-Reply-To=%3C200711021700.lA2H0INA029688%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r835 - in trunk: . cmake/modules">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Nov  2 18:00:18 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000827.html">[S3d-svn] r834 - trunk/extras/distro/gentoo/media-gfx/s3d-svn
+</A></li>
+        <LI>Next message: <A HREF="000829.html">[S3d-svn] r836 - trunk/cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#828">[ date ]</a>
+              <a href="thread.html#828">[ thread ]</a>
+              <a href="subject.html#828">[ subject ]</a>
+              <a href="author.html#828">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-11-02 18:00:18 +0100 (Fri, 02 Nov 2007)
+New Revision: 835
+
+Added:
+   trunk/cmake/modules/FindGLIB.cmake
+Modified:
+   trunk/ConfigureChecks.cmake
+Log:
+Revert &quot;Remove direct dependency to glib-2.0&quot;
+
+Dependency is needed for g3d header files
+
+
+Modified: trunk/ConfigureChecks.cmake
+===================================================================
+--- trunk/ConfigureChecks.cmake	2007-11-02 16:56:27 UTC (rev 834)
++++ trunk/ConfigureChecks.cmake	2007-11-02 17:00:18 UTC (rev 835)
+@@ -20,6 +20,16 @@
+ endif (FONTCONFIG_FOUND)
+ 
+ 
++# find required lib and add include dir for GLIB
++find_package(GLIB)
++if (GLIB2_FOUND)
++	include_directories(${GLIB2_INCLUDE_DIR})
++	add_definitions(${GLIB2_DEFINITIONS})
++else (GLIB2_FOUND)
++	PkgError_Later(&quot;Could not find GLIB2 (pkg name: libglib2.0-dev)&quot;)
++endif (GLIB2_FOUND)
++
++
+ # find required lib and add include dir for G3D
+ find_package(G3D)
+ if (G3D_FOUND)
+
+Added: trunk/cmake/modules/FindGLIB.cmake
+===================================================================
+--- trunk/cmake/modules/FindGLIB.cmake	2007-11-02 16:56:27 UTC (rev 834)
++++ trunk/cmake/modules/FindGLIB.cmake	2007-11-02 17:00:18 UTC (rev 835)
+@@ -0,0 +1,69 @@
++# Try to find GLIB2
++#  GLIB2_FOUND - If false, do not try to use GLIB2.
++#  GLIB2_INCLUDE_DIR - where to find glib.h and glibconfig.h, etc.
++#  GLIB2_LIBRARIES - the libraries to link against
++#  GLIB2_DEFINITIONS - switches required for GLIB2
++
++
++if (GLIB2_LIBRARIES AND GLIB2_INCLUDE_DIR)
++	# path set by user or was found in the past
++	set(GLIB2_FOUND TRUE)
++else (GLIB2_LIBRARIES AND GLIB2_INCLUDE_DIR)
++	include(UsePkgConfig)
++
++	pkgconfig(glib-2.0 _IncDir _LinkDir _LinkFlags _CFlags)
++	set(GLIB2_DEFINITIONS ${_CFlags})
++
++	find_path(GLIB2_INCLUDE_DIR
++		NAMES glib.h
++		PATHS
++			${_IncDir}
++			${_IncDir}/glib-2.0
++			${_IncDir}/glib-2.0/include
++	)
++
++	find_path(GLIBCONFIG_INCLUDE_DIR
++		NAMES glibconfig.h
++		PATHS
++			${_IncDir}
++			${_IncDir}/glib-2.0
++			${_IncDir}/glib-2.0/include
++			${_LinkDir}/glib-2.0
++			${_LinkDir}/glib-2.0/include
++	)
++
++	find_library(GLIB2_LIBRARIES
++		NAMES glib-2.0
++		PATHS ${_LinkDir}
++	)
++
++	if (GLIB2_INCLUDE_DIR AND GLIBCONFIG_INCLUDE_DIR)
++		list(APPEND GLIB2_INCLUDE_DIR ${GLIBCONFIG_INCLUDE_DIR})
++	else (GLIB2_INCLUDE_DIR AND GLIBCONFIG_INCLUDE_DIR)
++		set(GLIB2_INCLUDE_DIR)
++	endif (GLIB2_INCLUDE_DIR AND GLIBCONFIG_INCLUDE_DIR)
++
++	if (GLIB2_INCLUDE_DIR AND GLIB2_LIBRARIES)
++		set(GLIB2_FOUND TRUE)
++	endif (GLIB2_INCLUDE_DIR AND GLIB2_LIBRARIES)
++
++	if (GLIB2_FOUND)
++		if (NOT GLIB2_FIND_QUIETLY)
++			message(STATUS &quot;Found GLIB2: ${GLIB2_LIBRARIES}&quot;)
++		endif (NOT GLIB2_FIND_QUIETLY)
++	else (GLIB2_FOUND)
++		if (GLIB2_FIND_REQUIRED)
++			message(FATAL_ERROR &quot;Could not find GLIB2&quot;)
++		endif (GLIB2_FIND_REQUIRED)
++	endif (GLIB2_FOUND)
++
++	# set visibility in cache
++	set(GLIB2_INCLUDE_DIR ${GLIB2_INCLUDE_DIR} CACHE PATH &quot;Path to a file.&quot; FORCE)
++	set(GLIB2_LIBRARIES ${GLIB2_LIBRARIES} CACHE FILEPATH &quot;Path to a library.&quot; FORCE)
++	set(GLIB2_DEFINITIONS ${GLIB2_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
++	mark_as_advanced(GLIB2_INCLUDE_DIR GLIB2_LIBRARIES GLIB2_DEFINITIONS)
++
++	# mark as internal
++	set(GLIBCONFIG_INCLUDE_DIR ${GLIBCONFIG_INCLUDE_DIR} CACHE INTERNAL &quot;Path to a config file.&quot; FORCE)
++
++endif (GLIB2_LIBRARIES AND GLIB2_INCLUDE_DIR)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000827.html">[S3d-svn] r834 - trunk/extras/distro/gentoo/media-gfx/s3d-svn
+</A></li>
+	<LI>Next message: <A HREF="000829.html">[S3d-svn] r836 - trunk/cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#828">[ date ]</a>
+              <a href="thread.html#828">[ thread ]</a>
+              <a href="subject.html#828">[ subject ]</a>
+              <a href="author.html#828">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

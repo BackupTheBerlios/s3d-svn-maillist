@@ -1,0 +1,191 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r117 - in trunk: . client example
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r117%20-%20in%20trunk%3A%20.%20client%20example&In-Reply-To=%3C200602271858.k1RIwtWq030964%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000112.html">
+   <LINK REL="Next"  HREF="000114.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r117 - in trunk: . client example</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r117%20-%20in%20trunk%3A%20.%20client%20example&In-Reply-To=%3C200602271858.k1RIwtWq030964%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r117 - in trunk: . client example">dotslash at berlios.de
+       </A><BR>
+    <I>Mon Feb 27 19:58:55 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000112.html">[S3d-svn] r116 - in trunk: . client server
+</A></li>
+        <LI>Next message: <A HREF="000114.html">[S3d-svn] r118 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#113">[ date ]</a>
+              <a href="thread.html#113">[ thread ]</a>
+              <a href="subject.html#113">[ subject ]</a>
+              <a href="author.html#113">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-02-27 19:58:49 +0100 (Mon, 27 Feb 2006)
+New Revision: 117
+
+Modified:
+   trunk/
+   trunk/ChangeLog
+   trunk/client/3dsread.c
+   trunk/client/freetype.c
+   trunk/example/filebrowser.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r160 at balthasar</A>:  dotslash | 2006-02-27 19:58:41 +0100
+ - implemented object search path as : delimited list
+ - more strncat fixing	
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:155
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:160
+
+Modified: trunk/ChangeLog
+===================================================================
+--- trunk/ChangeLog	2006-02-27 18:01:26 UTC (rev 116)
++++ trunk/ChangeLog	2006-02-27 18:58:49 UTC (rev 117)
+@@ -1,4 +1,5 @@
+ 2006-02-27  Simon Wunderlich - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++	- implemented object search path as : delimited list
+ 	- INFINITY define into #ifndef
+ 	- splitting README and INSTALL
+ 	- security check for strncat and strncpy functions
+
+Modified: trunk/client/3dsread.c
+===================================================================
+--- trunk/client/3dsread.c	2006-02-27 18:01:26 UTC (rev 116)
++++ trunk/client/3dsread.c	2006-02-27 18:58:49 UTC (rev 117)
+@@ -9,22 +9,35 @@
+ /*  just a helper function for reading from file instead of memory. */
+ int s3d_import_3ds_file(char *fname)
+ {
+-	char *buf;
++	char *buf,*ptr,*next;
++	char searchpath[1024];
+ 	char path[1024];
+-	int i;
+-	char *searchpath[4]=
+-		{&quot;./&quot;,
+-		 &quot;&quot;,
+-		 &quot;../&quot;,
+-		 &quot;../../&quot;
+-		 };
+-	for (i=0;i&lt;4;i++)
++#ifndef OBJSDIR
++#define OBJSDIR 	&quot;./:../:../../&quot;
++#endif
++	
++	strncpy(searchpath,OBJSDIR,1023);
++	searchpath[1023]=0;							/* just in case */
++	next=ptr=searchpath;
++	while (next!=NULL)
+ 	{
+-		strncpy(path,searchpath[i],1024);
+-		strncat(path,fname,1024);
+-		if (s3d_open_file(path,&amp;buf)!=-1)  /* found something */
+-			return(s3d_import_3ds(buf));
++		next=NULL;
++		if (next=strchr(ptr,':'))
++		{
++			*next=0; 							/* clear the delimiter */
++			next+=1;							/* move to the beginner of the next dir */
++		}
++		if ((strlen(ptr)+strlen(fname))&lt;1024) 	/* only try if this fits */
++		{
++			strcpy(path,ptr); 					/* can use &quot;unsafe&quot; functions because size was verified above */
++			strcat(path,fname);
++			if (s3d_open_file(path,&amp;buf)!=-1)  /* found something */
++				return(s3d_import_3ds(buf));
++		}
++		if (next!=NULL)
++			ptr=next;							/* move pointer to the next position */
+ 	}
++	errds(LOW,&quot;s3d_import_3ds_file()&quot;,&quot;Could not open %s&quot;, fname);
+ 	return(-1); /* nothing in search path ... */
+ }
+ static void normal(float *p0, float *p1, float *p2, float *r)
+
+Modified: trunk/client/freetype.c
+===================================================================
+--- trunk/client/freetype.c	2006-02-27 18:01:26 UTC (rev 116)
++++ trunk/client/freetype.c	2006-02-27 18:58:49 UTC (rev 117)
+@@ -72,8 +72,8 @@
+ 	int i;
+ 	for (i=0; i&lt;256;i++)
+ 	{
+-		if (tess_buf[i].vbuf) free(tess_buf[i].vbuf);
+-		if (tess_buf[i].pbuf) free(tess_buf[i].pbuf);
++		if (tess_buf[i].vbuf!=NULL) free(tess_buf[i].vbuf);
++		if (tess_buf[i].pbuf!=NULL) free(tess_buf[i].pbuf);
+ 	}
+ 	return(0);
+ }
+
+Modified: trunk/example/filebrowser.c
+===================================================================
+--- trunk/example/filebrowser.c	2006-02-27 18:01:26 UTC (rev 116)
++++ trunk/example/filebrowser.c	2006-02-27 18:58:49 UTC (rev 117)
+@@ -30,7 +30,7 @@
+ 	char *ext;
+ 	char *nstr;
+ 	float alpha,al,radius,f;
+-	char ndir[M_DIR];  /* unsafe, I know ... */
++	char ndir[M_DIR+1];
+ 	if (n_item)
+ 	{
+ 		printf(&quot;freeing %d old items\n&quot;,n_item);
+@@ -64,8 +64,9 @@
+ 			else {
+ 				ext=strrchr(nstr,'.');
+ 			    strncpy(ndir,dir,M_DIR);
+-			    strncat(ndir,&quot;/&quot;,M_DIR);
+-		    	strncat(ndir,namelist[n]-&gt;d_name,M_DIR);
++				ndir[M_DIR]=0;		/* just in case */
++			    strncat(ndir,&quot;/&quot;,M_DIR-strlen(ndir));
++		    	strncat(ndir,namelist[n]-&gt;d_name,M_DIR-strlen(ndir));
+ /* 				printf(&quot;displaying %s\n&quot;,ndir); */
+ 			    if ((namelist[n]-&gt;d_type==DT_DIR) ||
+ 					((namelist[n]-&gt;d_type==DT_UNKNOWN) &amp;&amp; (opendir(ndir)!=NULL)))
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000112.html">[S3d-svn] r116 - in trunk: . client server
+</A></li>
+	<LI>Next message: <A HREF="000114.html">[S3d-svn] r118 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#113">[ date ]</a>
+              <a href="thread.html#113">[ thread ]</a>
+              <a href="subject.html#113">[ subject ]</a>
+              <a href="author.html#113">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

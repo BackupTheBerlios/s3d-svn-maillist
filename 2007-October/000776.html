@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r784 - trunk/libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r784%20-%20trunk/libs3dw&In-Reply-To=%3C200710191231.l9JCViDP013939%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000775.html">
+   <LINK REL="Next"  HREF="000777.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r784 - trunk/libs3dw</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r784%20-%20trunk/libs3dw&In-Reply-To=%3C200710191231.l9JCViDP013939%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r784 - trunk/libs3dw">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 14:31:44 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000775.html">[S3d-svn] r783 - trunk/libs3d
+</A></li>
+        <LI>Next message: <A HREF="000777.html">[S3d-svn] r785 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#776">[ date ]</a>
+              <a href="thread.html#776">[ thread ]</a>
+              <a href="subject.html#776">[ subject ]</a>
+              <a href="author.html#776">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 14:31:43 +0200 (Fri, 19 Oct 2007)
+New Revision: 784
+
+Modified:
+   trunk/libs3dw/arrange.c
+   trunk/libs3dw/event.c
+   trunk/libs3dw/root.c
+   trunk/libs3dw/s3dw_int.h
+   trunk/libs3dw/surface.c
+Log:
+libs3dw: Move extern definitions of variables to s3dw_int.h
+
+
+Modified: trunk/libs3dw/arrange.c
+===================================================================
+--- trunk/libs3dw/arrange.c	2007-10-19 12:31:31 UTC (rev 783)
++++ trunk/libs3dw/arrange.c	2007-10-19 12:31:43 UTC (rev 784)
+@@ -28,7 +28,6 @@
+ #include &lt;math.h&gt; /* M_PI */
+ #define R2D  (180/M_PI)
+ s3dw_widget *_s3dw_cam = NULL;
+-extern int ani_need_arr;
+ 
+ void s3dw_arr_widgetcenter(s3dw_widget *widget, float *center)
+ {
+
+Modified: trunk/libs3dw/event.c
+===================================================================
+--- trunk/libs3dw/event.c	2007-10-19 12:31:31 UTC (rev 783)
++++ trunk/libs3dw/event.c	2007-10-19 12:31:43 UTC (rev 784)
+@@ -24,7 +24,7 @@
+ #include &lt;s3d.h&gt;
+ #include &lt;s3dw.h&gt;
+ #include &lt;s3dw_int.h&gt;
+-extern s3dw_widget *_s3dw_cam;
++
+ int s3dw_handle_click(struct s3d_evt *evt)
+ {
+ 	uint32_t oid = *((uint32_t *)evt-&gt;buf);
+
+Modified: trunk/libs3dw/root.c
+===================================================================
+--- trunk/libs3dw/root.c	2007-10-19 12:31:31 UTC (rev 783)
++++ trunk/libs3dw/root.c	2007-10-19 12:31:43 UTC (rev 784)
+@@ -34,7 +34,6 @@
+ 
+ 
+ static s3dw_widget *root = NULL;
+-extern s3dw_widget *_s3dw_cam;
+ 
+ /* just destroy the widget */
+ void s3dw_root_destroy(s3dw_widget *widget)
+
+Modified: trunk/libs3dw/s3dw_int.h
+===================================================================
+--- trunk/libs3dw/s3dw_int.h	2007-10-19 12:31:31 UTC (rev 783)
++++ trunk/libs3dw/s3dw_int.h	2007-10-19 12:31:43 UTC (rev 784)
+@@ -106,6 +106,7 @@
+ /* style.c */
+ extern s3dw_style def_style;
+ /* animate.c */
++extern int ani_need_arr;
+ int  s3dw_ani_stackpos(s3dw_widget *f);
+ void s3dw_ani_add(s3dw_widget *f);
+ void s3dw_ani_del(int i);
+@@ -115,6 +116,7 @@
+ void s3dw_ani_needarr(void);
+ int  s3dw_ani_check(s3dw_widget *f);
+ /* arrange.c */
++extern s3dw_widget *_s3dw_cam;
+ void s3dw_arrange(void);
+ void s3dw_arr_widgetcenter(s3dw_widget *widget, float *center);
+ void s3dw_arr_normdir(float *dir);
+
+Modified: trunk/libs3dw/surface.c
+===================================================================
+--- trunk/libs3dw/surface.c	2007-10-19 12:31:31 UTC (rev 783)
++++ trunk/libs3dw/surface.c	2007-10-19 12:31:43 UTC (rev 784)
+@@ -28,7 +28,6 @@
+ #include &lt;string.h&gt; /* strdup() */
+ #include &lt;math.h&gt; /* cos(), sin() */
+ #define POPUPDIST 20
+-extern s3dw_widget *_s3dw_cam; /* for correct popup position */
+ 
+ void s3dw_surface_draw(s3dw_widget *widget)
+ {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000775.html">[S3d-svn] r783 - trunk/libs3d
+</A></li>
+	<LI>Next message: <A HREF="000777.html">[S3d-svn] r785 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#776">[ date ]</a>
+              <a href="thread.html#776">[ thread ]</a>
+              <a href="subject.html#776">[ subject ]</a>
+              <a href="author.html#776">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

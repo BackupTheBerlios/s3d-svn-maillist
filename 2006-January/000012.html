@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r16 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-January/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r16%20-%20trunk&In-Reply-To=%3C200601311003.k0VA37eX002463%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000011.html">
+   <LINK REL="Next"  HREF="000013.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r16 - trunk</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r16%20-%20trunk&In-Reply-To=%3C200601311003.k0VA37eX002463%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r16 - trunk">dotslash at berlios.de
+       </A><BR>
+    <I>Tue Jan 31 11:03:07 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000011.html">[S3d-svn] r15 - trunk/server
+</A></li>
+        <LI>Next message: <A HREF="000013.html">[S3d-svn] r17 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#12">[ date ]</a>
+              <a href="thread.html#12">[ thread ]</a>
+              <a href="subject.html#12">[ subject ]</a>
+              <a href="author.html#12">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-01-31 11:03:07 +0100 (Tue, 31 Jan 2006)
+New Revision: 16
+
+Modified:
+   trunk/
+   trunk/configure.in
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r23 at balthasar</A>:  dotslash | 2006-01-31 11:02:48 +0100
+ fixing typo -lgpl -&gt; -lgps
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:18
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:23
+
+Modified: trunk/configure.in
+===================================================================
+--- trunk/configure.in	2006-01-30 23:48:51 UTC (rev 15)
++++ trunk/configure.in	2006-01-31 10:03:07 UTC (rev 16)
+@@ -94,7 +94,7 @@
+ AM_CONDITIONAL([BUILD_S3DGPS], [test x$HAVE_GPS = xyes])
+ if test x$HAVE_GPS = xyes; then
+ 	GPS_CFLAGS=
+-	GPS_LIBS=-lgpl	
++	GPS_LIBS=-lgps	
+ 	AC_SUBST(GPS_CFLAGS)
+ 	AC_SUBST(GPS_LIBS)
+ else
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000011.html">[S3d-svn] r15 - trunk/server
+</A></li>
+	<LI>Next message: <A HREF="000013.html">[S3d-svn] r17 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#12">[ date ]</a>
+              <a href="thread.html#12">[ thread ]</a>
+              <a href="subject.html#12">[ subject ]</a>
+              <a href="author.html#12">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

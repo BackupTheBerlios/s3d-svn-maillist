@@ -1,0 +1,215 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r63 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r63%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602122047.k1CKlW3Z004340%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000058.html">
+   <LINK REL="Next"  HREF="000060.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r63 - trunk/apps/olsrs3d</H1>
+    <B>nichtsnutz at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r63%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602122047.k1CKlW3Z004340%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r63 - trunk/apps/olsrs3d">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Sun Feb 12 21:47:32 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000058.html">[S3d-svn] r62 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000060.html">[S3d-svn] r64 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#59">[ date ]</a>
+              <a href="thread.html#59">[ thread ]</a>
+              <a href="subject.html#59">[ subject ]</a>
+              <a href="author.html#59">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-02-12 21:47:23 +0100 (Sun, 12 Feb 2006)
+New Revision: 63
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+Log:
+and again fix objectId2ip list methods
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-02-12 20:45:35 UTC (rev 62)
++++ trunk/apps/olsrs3d/main.c	2006-02-12 20:47:23 UTC (rev 63)
+@@ -368,7 +368,7 @@
+ /*				s3d_pop_polygon(o,2);*/
+ // 				s3d_push_vertex(o,node[i].pos[0],	 node[i].pos[1],node[i].pos[2]);
+ // 				s3d_push_vertex(o,node[i].pos[0]+0.2,node[i].pos[1],node[i].pos[2]);
+-// 				s3d_push_vertex(o,node[i].pos[0]-0.2,node[i].pos[1],node[i].pos[2]);
++// 				s3d_push_vertex(o,node[i].pos[0]--&gt;id0.2,node[i].pos[1],node[i].pos[2]);
+ 
+ // 				s3d_push_vertex(o,node[j].pos[0],	 node[j].pos[1],node[j].pos[2]);
+ // 				s3d_push_vertex(o,node[j].pos[0],node[j].pos[1]+0.2,node[j].pos[2]);
+@@ -408,8 +408,10 @@
+ 	int key;
+ 	key=*((unsigned short *)event-&gt;buf);
+ 	/* ESC */
+-	if(key = 27)
++	if(key == 27)
+ 		stop();
++	if(key == 49)
++		lst_out();
+ }
+ 
+ /***
+@@ -426,6 +428,9 @@
+ 	ZeroPosition[0] = 0;
+ 	ZeroPosition[1] = 50;
+ 	ZeroPosition[2] = 40;*/
++	struct olsr_node *olsr_node;
++	olsr_node = *lst_search(oid);
++	printf(&quot;obj2ip: search return %s\n&quot;,olsr_node-&gt;ip);
+ }
+ 
+ /***
+@@ -475,7 +480,7 @@
+ 	if(Obj_to_ip_head == NULL || Obj_to_ip_end == NULL)
+ 		out_of_mem();
+ 	Obj_to_ip_head-&gt;id = 0;
+-	Obj_to_ip_end-&gt;id = (int) NULL;
++	Obj_to_ip_end-&gt;id = 0;
+ 	Obj_to_ip_head-&gt;prev = Obj_to_ip_end-&gt;prev = Obj_to_ip_head;
+ 	Obj_to_ip_head-&gt;next = Obj_to_ip_end-&gt;next = Obj_to_ip_end;
+ 	List_ptr = Obj_to_ip_head;
+@@ -497,11 +502,11 @@
+ 	new-&gt;id = id;
+ 	new-&gt;olsr_node = *olsr_node;
+ 	move_lst_ptr(&amp;id);
+-	printf(&quot;obj2ip: add object %d between %d .. %d ip %s to list\n&quot;,new-&gt;id,List_ptr-&gt;id,List_ptr-&gt;next-&gt;id,new-&gt;olsr_node-&gt;ip);
+ 	new-&gt;prev = List_ptr;
+ 	new-&gt;next = List_ptr-&gt;next;
+ 	List_ptr-&gt;next-&gt;prev = new;
+ 	List_ptr-&gt;next = new;
++	printf(&quot;obj2ip: add object %d between %d .. %d ip %s to list\n&quot;,new-&gt;id,new-&gt;prev-&gt;id,new-&gt;next-&gt;id,new-&gt;olsr_node-&gt;ip);
+ }
+ 
+ /***
+@@ -514,13 +519,13 @@
+ void lst_del(int id) {
+ 	struct Obj_to_ip *del;
+ 	move_lst_ptr(&amp;id);
+-	if(id != List_ptr-&gt;next-&gt;id)
++	if(id != List_ptr-&gt;id)
+ 		printf(&quot;obj2ip: remove id %d failed move_lst_ptr return id %d\n&quot;,id,List_ptr-&gt;next-&gt;id);
+ 	else {
+-		printf(&quot;obj2ip: remove object %d ip %s from list\n&quot;,List_ptr-&gt;next-&gt;id,List_ptr-&gt;next-&gt;olsr_node-&gt;ip);
+ 		del = List_ptr-&gt;next;
+ 		List_ptr-&gt;next = List_ptr-&gt;next-&gt;next;
+ 		List_ptr-&gt;next-&gt;prev = List_ptr;
++		printf(&quot;obj2ip: remove object %d --&gt; %d &lt;-- %d ip %s from list\n&quot;,List_ptr-&gt;prev-&gt;id,del-&gt;id,List_ptr-&gt;next-&gt;id,del-&gt;olsr_node-&gt;ip);
+ 		free(del);
+ 	}
+ }
+@@ -535,7 +540,7 @@
+ void move_lst_ptr(int *id) {
+ 	/* printf(&quot;obj2ip: move for %d\n&quot;,*id); */
+ 	/* head to point at end or id lass then first element in linked list*/
+- 	if(Obj_to_ip_head-&gt;next-&gt;id == NULL || *id &lt; Obj_to_ip_head-&gt;next-&gt;id)
++	if(Obj_to_ip_head-&gt;next == Obj_to_ip_head || *id &lt; Obj_to_ip_head-&gt;next-&gt;id)
+ 		List_ptr = Obj_to_ip_head;
+  	/* id is greather then last element in linked list */
+ 	else if(*id &gt; Obj_to_ip_end-&gt;prev-&gt;id)
+@@ -543,25 +548,25 @@
+ 	else {
+ 		printf(&quot;obj2ip: ok i search deeper ;-) for id=%d\n&quot;,*id);
+ 		if((*id - (int) Obj_to_ip_head-&gt;next-&gt;id) &lt;= ((int)(Obj_to_ip_end-&gt;prev-&gt;id)-*id)) {
+-			List_ptr = Obj_to_ip_head-&gt;next;
+-			printf(&quot;obj2ip: start at head id %d - %d &lt;= %d - %d \n&quot;,*id,Obj_to_ip_head-&gt;next-&gt;id,*id,Obj_to_ip_end-&gt;prev-&gt;id);
+-			while(*id &gt; List_ptr-&gt;next-&gt;id) {
+-				printf(&quot;obj2ip: %d &gt; %d move to &quot;,*id,List_ptr-&gt;next-&gt;id);
++			List_ptr = Obj_to_ip_head;
++			printf(&quot;obj2ip: start at head id %d - %d &lt;= %d - %d \n&quot;,*id,Obj_to_ip_head-&gt;next-&gt;id,Obj_to_ip_end-&gt;prev-&gt;id,*id);
++			while(*id &gt;= List_ptr-&gt;next-&gt;id) {
++				printf(&quot;obj2ip: %d &gt; %d move to &quot;,*id,List_ptr-&gt;id);
+ 				List_ptr = List_ptr-&gt;next;
+ 				printf(&quot;%d\n&quot;,List_ptr-&gt;id);
+ 			}
+ 		} else {
+-			List_ptr = Obj_to_ip_end-&gt;prev;
++			List_ptr = Obj_to_ip_end;
+ 			printf(&quot;obj2ip: start at end id %d - %d &gt; %d - %d \n&quot;,*id,Obj_to_ip_head-&gt;next-&gt;id,Obj_to_ip_end-&gt;prev-&gt;id,*id);
+ 			//do List_ptr = List_ptr-&gt;prev; while(*id &gt; List_ptr-&gt;prev-&gt;id);
+ 			while(*id &lt; List_ptr-&gt;prev-&gt;id) {
+-				printf(&quot;obj2ip: %d &lt; %d move to &quot;,*id,List_ptr-&gt;prev-&gt;id);
++				printf(&quot;obj2ip: %d &lt; %d move to &quot;,*id,List_ptr-&gt;id);
+ 				List_ptr = List_ptr-&gt;prev;
+ 				printf(&quot;%d\n&quot;,List_ptr-&gt;id);
+ 			}
+-			List_ptr = List_ptr-&gt;prev-&gt;prev;
++			List_ptr = List_ptr-&gt;prev;
+ 		}
+-		printf(&quot;obj2ip: found id to insert/delete between %d--&gt; .. &lt;--%d\n&quot;,List_ptr-&gt;id,List_ptr-&gt;next-&gt;next-&gt;id);
++		printf(&quot;obj2ip: found id to insert between %d--&gt; .. &lt;--%d to search/delete %d--&gt; .. &lt;--%d\n&quot;,List_ptr-&gt;id,List_ptr-&gt;next-&gt;id,List_ptr-&gt;prev-&gt;id,List_ptr-&gt;next-&gt;next-&gt;id);
+ 	}
+ }
+ 
+@@ -580,13 +585,24 @@
+ 
+ struct olsr_node **lst_search(int id) {
+ 	move_lst_ptr(&amp;id);
+-	if(id != List_ptr-&gt;next-&gt;id)
++	if(id != List_ptr-&gt;id)
+ 		printf(&quot;obj2ip: search id....id not found\n&quot;);
+ 	else
+-		printf(&quot;obj2ip: search found objekt_id=%d objekt_ip=%s\n&quot;,id,List_ptr-&gt;next-&gt;olsr_node-&gt;ip);
+-	return(&amp;List_ptr-&gt;next-&gt;olsr_node);
++		printf(&quot;obj2ip: search found objekt_id=%d objekt_ip=%s\n&quot;,List_ptr-&gt;id,List_ptr-&gt;olsr_node-&gt;ip);
++	return(&amp;List_ptr-&gt;olsr_node);
+ }
+ 
++void lst_out() {
++	struct Obj_to_ip *ptr;
++	ptr = Obj_to_ip_head;
++	while(ptr != ptr-&gt;next) {
++		printf(&quot;List--------------------------\n&quot;);
++		printf(&quot;id-&gt; %d\n&quot;,ptr-&gt;id);
++		ptr = ptr-&gt;next;
++	}
++	printf(&quot;List--------------------------\n&quot;);
++}
++
+ int main( int argc, char *argv[] ) {
+ 
+ 	int optchar;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000058.html">[S3d-svn] r62 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000060.html">[S3d-svn] r64 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#59">[ date ]</a>
+              <a href="thread.html#59">[ thread ]</a>
+              <a href="subject.html#59">[ subject ]</a>
+              <a href="author.html#59">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,818 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r996 - in trunk: Documentation/libs3d	Documentation/libs3dw Documentation/manpages/man3	Documentation/manpages/man9 Documentation/server libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r996%20-%20in%20trunk%3A%20Documentation/libs3d%0A%09Documentation/libs3dw%20Documentation/manpages/man3%0A%09Documentation/manpages/man9%20Documentation/server%20libs3d%20libs3dw&In-Reply-To=%3C200809080942.m889gQcj028298%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000975.html">
+   <LINK REL="Next"  HREF="000977.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r996 - in trunk: Documentation/libs3d	Documentation/libs3dw Documentation/manpages/man3	Documentation/manpages/man9 Documentation/server libs3d libs3dw</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r996%20-%20in%20trunk%3A%20Documentation/libs3d%0A%09Documentation/libs3dw%20Documentation/manpages/man3%0A%09Documentation/manpages/man9%20Documentation/server%20libs3d%20libs3dw&In-Reply-To=%3C200809080942.m889gQcj028298%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r996 - in trunk: Documentation/libs3d	Documentation/libs3dw Documentation/manpages/man3	Documentation/manpages/man9 Documentation/server libs3d libs3dw">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep  8 11:42:26 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000975.html">[S3d-svn] r995 - in trunk/Documentation: . libs3d libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000977.html">[S3d-svn] r997 - in trunk: Documentation/libs3dw	Documentation/manpages/man9 libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#976">[ date ]</a>
+              <a href="thread.html#976">[ thread ]</a>
+              <a href="subject.html#976">[ subject ]</a>
+              <a href="author.html#976">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-08 11:42:24 +0200 (Mon, 08 Sep 2008)
+New Revision: 996
+
+Modified:
+   trunk/Documentation/libs3d/functions.docbook
+   trunk/Documentation/libs3d/libs3d.docbook
+   trunk/Documentation/libs3dw/libs3dw.docbook
+   trunk/Documentation/libs3dw/structs.docbook
+   trunk/Documentation/manpages/man3/s3d_clone.3
+   trunk/Documentation/manpages/man3/s3d_find_event.3
+   trunk/Documentation/manpages/man3/s3d_init.3
+   trunk/Documentation/manpages/man3/s3d_load_materials_a.3
+   trunk/Documentation/manpages/man3/s3d_pep_line_normals.3
+   trunk/Documentation/manpages/man3/s3d_pep_material.3
+   trunk/Documentation/manpages/man3/s3d_pep_material_a.3
+   trunk/Documentation/manpages/man3/s3d_pep_materials_a.3
+   trunk/Documentation/manpages/man3/s3d_pep_polygon_normals.3
+   trunk/Documentation/manpages/man3/s3d_push_line.3
+   trunk/Documentation/manpages/man3/s3d_push_lines.3
+   trunk/Documentation/manpages/man3/s3d_push_material.3
+   trunk/Documentation/manpages/man3/s3d_push_materials_a.3
+   trunk/Documentation/manpages/man3/s3d_push_polygon.3
+   trunk/Documentation/manpages/man3/s3d_push_texture.3
+   trunk/Documentation/manpages/man3/s3d_push_vertex.3
+   trunk/Documentation/manpages/man3/s3d_quit.3
+   trunk/Documentation/manpages/man9/s3dw_style.9
+   trunk/Documentation/manpages/man9/s3dw_surface.9
+   trunk/Documentation/manpages/man9/s3dw_widget.9
+   trunk/Documentation/server/server.docbook
+   trunk/libs3d/event.c
+   trunk/libs3d/io.c
+   trunk/libs3d/proto_out.c
+   trunk/libs3dw/s3dw.h
+Log:
+Fix smaller spelling mistakes in documentation
+
+Modified: trunk/Documentation/libs3d/functions.docbook
+===================================================================
+--- trunk/Documentation/libs3d/functions.docbook	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/libs3d/functions.docbook	2008-09-08 09:42:24 UTC (rev 996)
+@@ -1,5 +1,5 @@
+ &lt;sect2 id=&quot;s3d_usage&quot;&gt;&lt;title&gt;s3d_usage&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3d_usage&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Prints the possible parameter for the client library (which can be passed in &lt;link linkend=&quot;s3d_init&quot;&gt;s3d_init&lt;/link&gt;())         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_init&quot;&gt;&lt;title&gt;s3d_init&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_init&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int *&lt;parameter&gt;argc&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;char ***&lt;parameter&gt;argv&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const char *&lt;parameter&gt;name&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;This will initialize the s3d-library and the connection to the Server. It will return 0 on success in Server initializion. name specifies the your programs name.&lt;/para&gt;&lt;programlisting&gt; int main(char argc, char **argv)
++&lt;sect2 id=&quot;s3d_init&quot;&gt;&lt;title&gt;s3d_init&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_init&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int *&lt;parameter&gt;argc&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;char ***&lt;parameter&gt;argv&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const char *&lt;parameter&gt;name&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;This will initialize the s3d-library and the connection to the Server. It will return 0 on success in server initialization. name specifies the your programs name.&lt;/para&gt;&lt;programlisting&gt; int main(char argc, char **argv)
+  {
+          if (!&lt;link linkend=&quot;s3d_init&quot;&gt;s3d_init&lt;/link&gt;(&amp;argc, &amp;argv, &quot;Hello world&quot;))
+          {
+@@ -9,7 +9,7 @@
+          return(0);
+  }
+ &lt;/programlisting&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_quit&quot;&gt;&lt;title&gt;s3d_quit&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_quit&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Closes the connection and cleares the event-stack. It can also be used to leave the &lt;link linkend=&quot;s3d_mainloop&quot;&gt;s3d_mainloop&lt;/link&gt;().         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_quit&quot;&gt;&lt;title&gt;s3d_quit&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_quit&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Closes the connection and clears the event-stack. It can also be used to leave the &lt;link linkend=&quot;s3d_mainloop&quot;&gt;s3d_mainloop&lt;/link&gt;().         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_mainloop&quot;&gt;&lt;title&gt;s3d_mainloop&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_mainloop&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void(*)(void) &lt;parameter&gt;f&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Takes a function as argument. It will loop this function until a quit-event is received. You can pass NULL if you have no function to be looped, but its better to sleep some time if you have nothing to do anyway to save cpu-time.&lt;/para&gt;&lt;programlisting&gt; void mainloop(void)
+  {
+          usleep(1000); // sleep 1 ms in every cycle
+@@ -18,16 +18,16 @@
+ 
+  &lt;link linkend=&quot;s3d_mainloop&quot;&gt;s3d_mainloop&lt;/link&gt;(mainloop());
+ &lt;/programlisting&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_push_vertex&quot;&gt;&lt;title&gt;s3d_push_vertex&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_push_vertex&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;x&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;y&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;z&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Pushes a vertex onto the vertex stack. make sure that you count how many vertices you've pushed because you'll need that for referencing when you push your polygons.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_push_vertex&quot;&gt;&lt;title&gt;s3d_push_vertex&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_push_vertex&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;x&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;y&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;z&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Pushes a vertex onto the vertex stack. Make sure that you count how many vertices you've pushed because you'll need that for referencing when you push your polygons.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_push_vertices&quot;&gt;&lt;title&gt;s3d_push_vertices&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_push_vertices&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const float *&lt;parameter&gt;vbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Push some vertices from an array. that's much better for performing than using &lt;link linkend=&quot;s3d_push_vertex&quot;&gt;s3d_push_vertex&lt;/link&gt;() if you have a lot of vertices (and that's probably the usual case). &lt;/para&gt;&lt;programlisting&gt; float vertices[] = { 0.0, 0.0, 0.0,
+                       1.0, 2.0, 3.0,
+                       3.0, 2.0, 1.0};
+  &lt;link linkend=&quot;s3d_push_vertices&quot;&gt;s3d_push_vertices&lt;/link&gt;(object, vertices, 3); // pushing 3 vertices
+ &lt;/programlisting&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_push_material&quot;&gt;&lt;title&gt;s3d_push_material&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_push_material&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Pushes a material for an object. you will have to count them yourself too, as polygons will ask for the material index number. the material properties are given in rgb (red/green/blue) !
+ color codes, in float. 0.0 is the minimum, 1.0 is the maximum a color value can be. The specular color is the color which is directly reflected from the light source. the diffuse color is the color which can be seen in the bright side of the object, and the ambience color is the color of the shadow side of the object.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_pep_material&quot;&gt;&lt;title&gt;s3d_pep_material&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_pep_material&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Overwriting the latest pushed Material, overwriting the current value with the specified one. See &lt;link linkend=&quot;s3d_pep_materials_a&quot;&gt;s3d_pep_materials_a&lt;/link&gt; if you want to pep more mat!
+ erials.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_push_material&quot;&gt;&lt;title&gt;s3d_push_material&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_push_material&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Pushes a material for an object. you will have to count them yourself too, as polygons will ask for the material index number. The material properties are given in rgb (red/green/blue) !
+ color codes, in float. 0.0 is the minimum, 1.0 is the maximum a color value can be. The specular color is the color which is directly reflected from the light source. The diffuse color is the color which can be seen in the bright side of the object, and the ambience color is the color of the shadow side of the object.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_pep_material&quot;&gt;&lt;title&gt;s3d_pep_material&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_pep_material&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Overwriting the latest pushed material, overwriting the current value with the specified one. See &lt;link linkend=&quot;s3d_pep_materials_a&quot;&gt;s3d_pep_materials_a&lt;/link&gt; if you want to pep more mat!
+ erials.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_push_material_a&quot;&gt;&lt;title&gt;s3d_push_material_a&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_push_material_a&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_a&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_a&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_a&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Same as &lt;lin!
+ k linkend=&quot;s3d_push_material&quot;&gt;s3d_push_material&lt;/link&gt;, but color has alpha value added. Use &lt;link linkend=&quot;s3d_push_materials_a&quot;&gt;s3d_push_materials_a&lt;/link&gt;() if you have a lot of materials to push.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_push_materials_a&quot;&gt;&lt;title&gt;s3d_push_materials_a&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_push_materials_a&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const float *&lt;parameter&gt;mbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Pushes a buffer of Materials. Those Materials are in the format float[n*12], with
++&lt;sect2 id=&quot;s3d_push_materials_a&quot;&gt;&lt;title&gt;s3d_push_materials_a&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_push_materials_a&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const float *&lt;parameter&gt;mbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Pushes a buffer of materials. Those materials are in the format float[n*12], with
+ &lt;/para&gt;&lt;para&gt;mbuf[n*12 + 0-3] - ambience&lt;/para&gt;&lt;para&gt;mbuf[n*12 + 4-7] - specular&lt;/para&gt;&lt;para&gt;mbuf[n *12 + 8-11] - diffusion values
+ &lt;/para&gt;&lt;para&gt;of each entry. n is the number of materials pushed. The values are in the order r,g,b,a. If you only want to push one material, use the more easy &lt;link linkend=&quot;s3d_push_material_a&quot;&gt;s3d_push_material_a&lt;/link&gt;() function.&lt;/para&gt;&lt;programlisting&gt; // each line has r,g,b,a value
+  float bla[24]=
+@@ -38,12 +38,12 @@
+           0, 1, 1, 1,
+           0, 1, 1, 1};
+ 
+- &lt;link linkend=&quot;s3d_push_materials_a&quot;&gt;s3d_push_materials_a&lt;/link&gt;(object, mbuf, 2); // push a red and a cyan material
++ &lt;link linkend=&quot;s3d_push_materials_a&quot;&gt;s3d_push_materials_a&lt;/link&gt;(object, bla, 2); // push a red and a cyan material
+ &lt;/programlisting&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_pep_material_a&quot;&gt;&lt;title&gt;s3d_pep_material_a&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_pep_material_a&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_a&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_a&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_a&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Overwriting the!
+  latest pushed Material, overwriting the current value with the specified one, with alpha value in contrast to &lt;link linkend=&quot;s3d_pep_material&quot;&gt;s3d_pep_material&lt;/link&gt; See &lt;link linkend=&quot;s3d_push_materials_a&quot;&gt;s3d_push_materials_a&lt;/link&gt; if you want to pep more materials.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_pep_materials_a&quot;&gt;&lt;title&gt;s3d_pep_materials_a&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_pep_materials_a&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const float *&lt;parameter&gt;mbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Alters the last n pushed Materials. See &lt;link linkend=&quot;s3d_push_materials_a&quot;&gt;s3d_push_materials_a&lt;/link&gt;() for more information how mbuf should look like. Use &lt;link linkend=&quot;s3d_pep_material_a&quot;&gt;s3d_pep_material_a&lt;/link&gt;() if you only want to alter the latest material.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_load_materials_a&quot;&gt;&lt;title&gt;s3d_load_materials_a&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_load_materials_a&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const float *&lt;parameter&gt;mbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;start&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Loads n materials starting from index position start into the Material stack. See &lt;link linkend=&quot;s3d_push_materials_a&quot;&gt;s3d_push_materials_a&lt;/link&gt; for more informatino about the values in mbuf.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_push_polygon&quot;&gt;&lt;title&gt;s3d_push_polygon&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_push_polygon&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;v1&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;v2&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;v3&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;material&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Push one polygon on the polygonstack of the object. it takes 3 vertex-index numbers and one material material-index-nr. as argument.&lt;/para&gt;&lt;programlisting&gt; int oid = &lt;link linkend=&quot;s3d_new_object&quot;&gt;s3d_new_object&lt;/link&gt;();   // create a new object
++&lt;sect2 id=&quot;s3d_pep_material_a&quot;&gt;&lt;title&gt;s3d_pep_material_a&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_pep_material_a&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;amb_a&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;spec_a&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_r&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_g&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_b&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;diff_a&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Overwriting the!
+  latest pushed material, overwriting the current value with the specified one, with alpha value in contrast to &lt;link linkend=&quot;s3d_pep_material&quot;&gt;s3d_pep_material&lt;/link&gt; See &lt;link linkend=&quot;s3d_push_materials_a&quot;&gt;s3d_push_materials_a&lt;/link&gt; if you want to pep more materials.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_pep_materials_a&quot;&gt;&lt;title&gt;s3d_pep_materials_a&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_pep_materials_a&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const float *&lt;parameter&gt;mbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Alters the last n pushed materials. See &lt;link linkend=&quot;s3d_push_materials_a&quot;&gt;s3d_push_materials_a&lt;/link&gt;() for more information how mbuf should look like. Use &lt;link linkend=&quot;s3d_pep_material_a&quot;&gt;s3d_pep_material_a&lt;/link&gt;() if you only want to alter the latest material.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_load_materials_a&quot;&gt;&lt;title&gt;s3d_load_materials_a&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_load_materials_a&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const float *&lt;parameter&gt;mbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;start&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Loads n materials starting from index position start into the material stack. See &lt;link linkend=&quot;s3d_push_materials_a&quot;&gt;s3d_push_materials_a&lt;/link&gt; for more informations about the values in mbuf.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_push_polygon&quot;&gt;&lt;title&gt;s3d_push_polygon&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_push_polygon&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;v1&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;v2&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;v3&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;material&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Push one polygon on the polygon stack of the object. It takes 3 vertex-index numbers and one material material-index-no. as argument.&lt;/para&gt;&lt;programlisting&gt; int oid = &lt;link linkend=&quot;s3d_new_object&quot;&gt;s3d_new_object&lt;/link&gt;();   // create a new object
+  &lt;link linkend=&quot;s3d_push_vertex&quot;&gt;s3d_push_vertex&lt;/link&gt;(oid, 0.0, 0.0, 0.0);
+  &lt;link linkend=&quot;s3d_push_vertex&quot;&gt;s3d_push_vertex&lt;/link&gt;(oid, 0.0, 1.0, 0.0);
+  &lt;link linkend=&quot;s3d_push_vertex&quot;&gt;s3d_push_vertex&lt;/link&gt;(oid, 1.0, 0.0, 0.0);
+@@ -60,17 +60,17 @@
+  &lt;link linkend=&quot;s3d_push_polygons&quot;&gt;s3d_push_polygons&lt;/link&gt;(oid, pbuf, 1);
+  // push one polygon with the pbuf data
+ &lt;/programlisting&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_push_line&quot;&gt;&lt;title&gt;s3d_push_line&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_push_line&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;v1&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;v2&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;material&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Push one line on the linestack of the object. It takes 2 vertex-index- numbers and one material material-index-nr. as argument. If you have a lot of lines to push, use &lt;link linkend=&quot;s3d_push_lines&quot;&gt;s3d_push_lines&lt;/link&gt;()         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_push_lines&quot;&gt;&lt;title&gt;s3d_push_lines&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_push_lines&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const uint32_t *&lt;parameter&gt;lbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Pushing n lines on the linestack of the object, each lbuf has a size of n*3, each entry has the index number of the first vertex, second vertex and material number just as in &lt;link linkend=&quot;s3d_push_line&quot;&gt;s3d_push_line&lt;/link&gt;().         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_push_texture&quot;&gt;&lt;title&gt;s3d_push_texture&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_push_texture&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;w&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;h&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Adds a new texture with height w and height h on the texturestack.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_push_line&quot;&gt;&lt;title&gt;s3d_push_line&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_push_line&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;v1&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;v2&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;material&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Push one line on the line stack of the object. It takes 2 vertex-index-no, and one material material-index-no. as argument. If you have a lot of lines to push, use &lt;link linkend=&quot;s3d_push_lines&quot;&gt;s3d_push_lines&lt;/link&gt;()         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_push_lines&quot;&gt;&lt;title&gt;s3d_push_lines&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_push_lines&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const uint32_t *&lt;parameter&gt;lbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Pushing n lines on the line stack of the object, each lbuf has a size of n*3, each entry has the index number of the first vertex, second vertex and material number just as in &lt;link linkend=&quot;s3d_push_line&quot;&gt;s3d_push_line&lt;/link&gt;().         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_push_texture&quot;&gt;&lt;title&gt;s3d_push_texture&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_push_texture&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;w&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;h&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Adds a new texture with height w and height h on the texture stack.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_push_textures&quot;&gt;&lt;title&gt;s3d_push_textures&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_push_textures&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const uint16_t *&lt;parameter&gt;tbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;As for vertices, you can push arrays of textures on the texture stack to have greater performance. The tbuf should contain n texture sizes which consist of 2 uint16_t values for width and height for each texture.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_pop_vertex&quot;&gt;&lt;title&gt;s3d_pop_vertex&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_pop_vertex&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Deletes the latest n vertices from the vertex stack of the object.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_pop_polygon&quot;&gt;&lt;title&gt;s3d_pop_polygon&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_pop_polygon&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Deletes the latest n polygon from the polygon stack of the object.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_pop_material&quot;&gt;&lt;title&gt;s3d_pop_material&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_pop_material&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Deletes the latest n material from the material stack of the object.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_pop_texture&quot;&gt;&lt;title&gt;s3d_pop_texture&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_pop_texture&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Deletes the latest n textures from the texture stack of the object.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_pop_line&quot;&gt;&lt;title&gt;s3d_pop_line&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_pop_line&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Deletes the latest n lines from the line stack of the object.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_pep_line_normals&quot;&gt;&lt;title&gt;s3d_pep_line_normals&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_pep_line_normals&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const float *&lt;parameter&gt;nbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Adds normal information to lines, giving each vertex of a line a normal information. This makes lines somewhat nicer, you'll need that especially when you're going to build wireframe models.&lt;/para&gt;&lt;para&gt;nbuf should contain n * 6 float values, for each vertex a normal vector (x,y,z), and you have 2 Vertices for each line so that makes 6 float values per line in total.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_pep_polygon_normals&quot;&gt;&lt;title&gt;s3d_pep_polygon_normals&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_pep_polygon_normals&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const float *&lt;parameter&gt;nbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Adds normal information to polygons, giving each vertex of a polygon a normal information. With this, you can achieve smoothed edge effects.&lt;/para&gt;&lt;para&gt;nbuf should contain n * 9 float values, for each vertex a normal vector (x,y,z), and you have 3 Vertices for each Polygon so that makes 9 float values per Polygon in Total. Don't worry if you don't use this, it's kind of hard to calculate and the server will always use some proper normal values (same for every vertex, calculated by the plane which is defined by the 3 points of the polygon.        !
+  &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_pep_line_normals&quot;&gt;&lt;title&gt;s3d_pep_line_normals&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_pep_line_normals&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const float *&lt;parameter&gt;nbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Adds normal information to lines, giving each vertex of a line a normal information. This makes lines somewhat nicer, you'll need that especially when you're going to build wireframe models.&lt;/para&gt;&lt;para&gt;nbuf should contain n * 6 float values, for each vertex a normal vector (x,y,z), and you have 2 vertices for each line so that makes 6 float values per line in total.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_pep_polygon_normals&quot;&gt;&lt;title&gt;s3d_pep_polygon_normals&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_pep_polygon_normals&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const float *&lt;parameter&gt;nbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Adds normal information to polygons, giving each vertex of a polygon a normal information. With this, you can achieve smoothed edge effects.&lt;/para&gt;&lt;para&gt;nbuf should contain n * 9 float values, for each vertex a normal vector (x,y,z), and you have 3 vertices for each Polygon so that makes 9 float values per Polygon in total. Don't worry if you don't use this, it's kind of hard to calculate and the server will always use some proper normal values (same for every vertex, calculated by the plane which is defined by the 3 points of the polygon.        !
+  &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_pep_polygon_tex_coord&quot;&gt;&lt;title&gt;s3d_pep_polygon_tex_coord&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_pep_polygon_tex_coord&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;x1&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;y1&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;x2&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;y2&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;x3&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;y3&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Pimp the last polygon pushed with some textures coordinates, x and y values for each vertex point respectively. Those values may be between 0 and 1 and are vertex points on the texture defined in the material of the polygon. If you have more polygons which should get a texture, use &lt;link linkend=&quot;s3d_pep_polygon_tex_coords&quot;&gt;s3d_pep_polygon_tex_coor!
+ ds&lt;/link&gt;()         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_pep_polygon_tex_coords&quot;&gt;&lt;title&gt;s3d_pep_polygon_tex_coords&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_pep_polygon_tex_coords&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const float *&lt;parameter&gt;tbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Pimp the latest n polygons with texture coordinates. tbuf has 6*n float values for its entries, which are supplied in the order as in &lt;link linkend=&quot;s3d_pep_polygon_tex_coord&quot;&gt;s3d_pep_polygon_tex_coord&lt;/link&gt;()         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_pep_material_texture&quot;&gt;&lt;title&gt;s3d_pep_material_texture&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_pep_material_texture&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;tex&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Assign the latest material a texture referenced by the index tex. Of course, you will have pushed this texture with &lt;link linkend=&quot;s3d_push_texture&quot;&gt;s3d_push_texture&lt;/link&gt;()         &lt;/para&gt;&lt;/sect2&gt;
+@@ -86,7 +86,7 @@
+ &lt;sect2 id=&quot;s3d_new_object&quot;&gt;&lt;title&gt;s3d_new_object&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_new_object&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Creates a new object, returning the object id.&lt;/para&gt;&lt;warning&gt;&lt;para&gt;Of course, you won't forget to toggle it visible, won't you? 
+         &lt;/para&gt;&lt;/warning&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_del_object&quot;&gt;&lt;title&gt;s3d_del_object&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_del_object&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;oid&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Deletes the object referenced by oid.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_clone&quot;&gt;&lt;title&gt;s3d_clone&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_clone&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;oid&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Clones an already exisiting object. They get just look the same as the parent-object and will change when the parent-object changes. Cloning especially makes sense if you want to use the same object a lot of times. Move and transform is independent from the parent. The function returns the childs object id.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_clone&quot;&gt;&lt;title&gt;s3d_clone&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_clone&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;oid&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Clones an already existing object. They get just look the same as the parent-object and will change when the parent-object changes. Cloning especially makes sense if you want to use the same object a lot of times. Move and transform is independent from the parent. The function returns the childs object id.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_clone_target&quot;&gt;&lt;title&gt;s3d_clone_target&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_clone_target&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;oid&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;toid&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Changes the clone target of oid to another object (toid). This assumes you've got oid from &lt;link linkend=&quot;s3d_clone&quot;&gt;s3d_clone&lt;/link&gt; before.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_link&quot;&gt;&lt;title&gt;s3d_link&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_link&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;oid_from&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;oid_to&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;A linked object will move along with it's link parent. For example if you have a book on a table, you can link the book to the table so the book will &quot;keep on the table&quot; if you move the table around in space. It will also rotate with the table etc.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_unlink&quot;&gt;&lt;title&gt;s3d_unlink&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_unlink&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;oid&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Remove the link of object oid to its target.         &lt;/para&gt;&lt;/sect2&gt;
+@@ -127,7 +127,7 @@
+ &lt;sect2 id=&quot;s3d_vector_cross_product&quot;&gt;&lt;title&gt;s3d_vector_cross_product&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3d_vector_cross_product&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const float &lt;parameter&gt;vector1&lt;/parameter&gt;[]&lt;/paramdef&gt;&lt;paramdef&gt;const float &lt;parameter&gt;vector2&lt;/parameter&gt;[]&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;result_vector&lt;/parameter&gt;[]&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Calculates and returns the cross product of vector1 and vector2. All vectors should have the format float[3]. More info on wikipedia. <A HREF="http://en.wikipedia.org/wiki/Vector_(spatial">http://en.wikipedia.org/wiki/Vector_(spatial</A>)         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_push_event&quot;&gt;&lt;title&gt;s3d_push_event&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3d_push_event&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;struct s3d_evt *&lt;parameter&gt;newevt&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Pushes an event onto the event-stack. Usually you don't need to do this manually.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_pop_event&quot;&gt;&lt;title&gt;s3d_pop_event&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;struct s3d_evt * &lt;function&gt;s3d_pop_event&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Pops the latest event from the stack. Don't forget to free() both the event and its buffer! Returns a pointer to struct &lt;link linkend=&quot;structs3d_evt&quot;&gt;s3d_evt&lt;/link&gt;.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_find_event&quot;&gt;&lt;title&gt;s3d_find_event&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;struct s3d_evt * &lt;function&gt;s3d_find_event&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;uint8_t &lt;parameter&gt;event&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Finds the latest occurence of an event, giving the event type as argument. Returns a pointer to struct &lt;link linkend=&quot;structs3d_evt&quot;&gt;s3d_evt&lt;/link&gt;.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_find_event&quot;&gt;&lt;title&gt;s3d_find_event&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;struct s3d_evt * &lt;function&gt;s3d_find_event&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;uint8_t &lt;parameter&gt;event&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Finds the latest occurrence of an event, giving the event type as argument. Returns a pointer to struct &lt;link linkend=&quot;structs3d_evt&quot;&gt;s3d_evt&lt;/link&gt;.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_delete_event&quot;&gt;&lt;title&gt;s3d_delete_event&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_delete_event&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const struct s3d_evt *&lt;parameter&gt;devt&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Deletes an event, the argument is the pointer to the event which is to be deleted (maybe obtained from &lt;link linkend=&quot;s3d_find_event&quot;&gt;s3d_find_event&lt;/link&gt;).         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_set_callback&quot;&gt;&lt;title&gt;s3d_set_callback&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3d_set_callback&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;uint8_t &lt;parameter&gt;event&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;s3d_cb &lt;parameter&gt;func&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Sets a callback for a certain event. this is very useful for event-oriented applications. event callbacks will not interrupt each other or the mainloop.&lt;/para&gt;&lt;warning&gt;&lt;para&gt;Defining callbacks will only work after calling &lt;link linkend=&quot;s3d_init&quot;&gt;s3d_init&lt;/link&gt;()
+ &lt;/para&gt;&lt;/warning&gt;&lt;programlisting&gt; #include &lt;inttypes.h&gt;
+
+Modified: trunk/Documentation/libs3d/libs3d.docbook
+===================================================================
+--- trunk/Documentation/libs3d/libs3d.docbook	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/libs3d/libs3d.docbook	2008-09-08 09:42:24 UTC (rev 996)
+@@ -150,7 +150,7 @@
+ &lt;sect2 id=&quot;s3d_object_flags&quot;&gt;
+ &lt;title&gt;S3D Object Flags&lt;/title&gt;
+ &lt;para&gt;
+-Objects can have several flags to change their behaviour in the server and can be set with 
++Objects can have several flags to change their behavior in the server and can be set with
+ &lt;link linkend=&quot;s3d_flags_on&quot;&gt;s3d_flags_on()&lt;/link&gt; and
+ &lt;link linkend=&quot;s3d_flags_off&quot;&gt;s3d_flags_off()&lt;/link&gt;
+ &lt;variablelist&gt;
+@@ -160,7 +160,7 @@
+ Obviously, if this flag is toggled the user can see it, if not it will be hidden. ;)
+ &lt;/para&gt;&lt;para&gt;
+ When an object is created it's turned off, so you will be able push your geometry data and
+-turn it on after you're done. That avaoids flickering and stuff.
++turn it on after you're done. That avoids flickering and stuff.
+ &lt;/para&gt;&lt;/listitem&gt;
+ &lt;/varlistentry&gt;
+ 
+@@ -191,7 +191,7 @@
+ &lt;title&gt;About alpha transparency&lt;/title&gt;
+ &lt;para&gt;
+ Alpha transparency works, but polygons don't get ordered in view direction on the server yet. So please don't
+-use this feature yet. If you have an easy idea how to do that with opengl please drop me a line.
++use this feature yet. If you have an easy idea how to do that with OpenGL please drop me a line.
+ &lt;/para&gt;
+ &lt;/sect2&gt;
+ &lt;/sect1&gt;
+
+Modified: trunk/Documentation/libs3dw/libs3dw.docbook
+===================================================================
+--- trunk/Documentation/libs3dw/libs3dw.docbook	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/libs3dw/libs3dw.docbook	2008-09-08 09:42:24 UTC (rev 996)
+@@ -6,7 +6,7 @@
+ &lt;sect2 id=&quot;gettingstarted_s3dw&quot;&gt;
+ &lt;title&gt;Getting started&lt;/title&gt;
+ &lt;para&gt;
+-	Assuming you have already read about the lowlevel &lt;link linkend=&quot;libs3d&quot;&gt;libs3d s3d api&lt;/link&gt;, the s3d widget library is 
++	Assuming you have already read about the low level &lt;link linkend=&quot;libs3d&quot;&gt;libs3d s3d api&lt;/link&gt;, the s3d widget library is 
+ 	build on top of it and should be (hopefully) easy to use as any other widget library.
+ 	Just include
+ 	
+
+Modified: trunk/Documentation/libs3dw/structs.docbook
+===================================================================
+--- trunk/Documentation/libs3dw/structs.docbook	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/libs3dw/structs.docbook	2008-09-08 09:42:24 UTC (rev 996)
+@@ -7,7 +7,7 @@
+ 	float text_mat;
+ 	float title_mat;
+ 	float title_text_mat;
+-}&lt;/programlisting&gt;&lt;para&gt;With &lt;link linkend=&quot;s3dw_style&quot;&gt;s3dw_style&lt;/link&gt; you can change the colors/materials of your widgets. materials are in the same as in &lt;link linkend=&quot;s3d_push_materials_a&quot;&gt;s3d_push_materials_a&lt;/link&gt;, that means red,green,blue and alpha float values (between 0.0 and 1.0) for Ambience, Specular and Diffuse Color.     &lt;/para&gt;&lt;variablelist&gt;&lt;varlistentry&gt;&lt;term&gt;name&lt;/term&gt;&lt;listitem&gt;&lt;para&gt;name of the style ... kind of redundant         &lt;/para&gt;&lt;/listitem&gt;&lt;/varlistentry&gt;&lt;varlistentry&gt;&lt;term&gt;fontface&lt;/term&gt;&lt;listitem&gt;&lt;para&gt;font face for all used fonts         &lt;/para&gt;&lt;/listitem&gt;&lt;/varlistentry&gt;&lt;varlistentry&gt;&lt;term&gt;surface_mat&lt;/term&gt;&lt;listitem&gt;&lt;para&gt;material for the surface background         &lt;/para&gt;&lt;/listitem&gt;&lt;/varlistentry&gt;&lt;varlistentry&gt;&lt;term&gt;input_mat&lt;/term&gt;&lt;listitem&gt;&lt;para&gt;material for buttonboxes and other widgets         &lt;/para&gt;&lt;/listitem&gt;&lt;/varlistentry&gt;&lt;varlistentry&gt;&lt;term&gt;inputback_mat&lt;/term&gt;&lt;listitem&gt;&lt;para&gt;material for inputfield background         &lt;/para&gt;&lt;/l!
+ istitem&gt;&lt;/varlistentry&gt;&lt;varlistentry&gt;&lt;term&gt;text_mat&lt;/term&gt;&lt;listitem&gt;&lt;para&gt;material for the text on buttons and inputs         &lt;/para&gt;&lt;/listitem&gt;&lt;/varlistentry&gt;&lt;varlistentry&gt;&lt;term&gt;title_mat&lt;/term&gt;&lt;listitem&gt;&lt;para&gt;material for the title bar         &lt;/para&gt;&lt;/listitem&gt;&lt;/varlistentry&gt;&lt;varlistentry&gt;&lt;term&gt;title_text_mat&lt;/term&gt;&lt;listitem&gt;&lt;para&gt;material for the text on the title bar         &lt;/para&gt;&lt;/listitem&gt;&lt;/varlistentry&gt;&lt;/variablelist&gt;&lt;/sect2&gt;
++}&lt;/programlisting&gt;&lt;para&gt;With &lt;link linkend=&quot;s3dw_style&quot;&gt;s3dw_style&lt;/link&gt; you can change the colors/materials of your widgets. materials are in the same as in &lt;link linkend=&quot;s3d_push_materials_a&quot;&gt;s3d_push_materials_a&lt;/link&gt;, that means red,green,blue and alpha float values (between 0.0 and 1.0) for ambience, specular and diffuse color.     &lt;/para&gt;&lt;variablelist&gt;&lt;varlistentry&gt;&lt;term&gt;name&lt;/term&gt;&lt;listitem&gt;&lt;para&gt;name of the style ... kind of redundant         &lt;/para&gt;&lt;/listitem&gt;&lt;/varlistentry&gt;&lt;varlistentry&gt;&lt;term&gt;fontface&lt;/term&gt;&lt;listitem&gt;&lt;para&gt;font face for all used fonts         &lt;/para&gt;&lt;/listitem&gt;&lt;/varlistentry&gt;&lt;varlistentry&gt;&lt;term&gt;surface_mat&lt;/term&gt;&lt;listitem&gt;&lt;para&gt;material for the surface background         &lt;/para&gt;&lt;/listitem&gt;&lt;/varlistentry&gt;&lt;varlistentry&gt;&lt;term&gt;input_mat&lt;/term&gt;&lt;listitem&gt;&lt;para&gt;material for button boxes and other widgets         &lt;/para&gt;&lt;/listitem&gt;&lt;/varlistentry&gt;&lt;varlistentry&gt;&lt;term&gt;inputback_mat&lt;/term&gt;&lt;listitem&gt;&lt;para&gt;material for input field background         &lt;/para&gt;&lt;!
+ /listitem&gt;&lt;/varlistentry&gt;&lt;varlistentry&gt;&lt;term&gt;text_mat&lt;/term&gt;&lt;listitem&gt;&lt;para&gt;material for the text on buttons and inputs         &lt;/para&gt;&lt;/listitem&gt;&lt;/varlistentry&gt;&lt;varlistentry&gt;&lt;term&gt;title_mat&lt;/term&gt;&lt;listitem&gt;&lt;para&gt;material for the title bar         &lt;/para&gt;&lt;/listitem&gt;&lt;/varlistentry&gt;&lt;varlistentry&gt;&lt;term&gt;title_text_mat&lt;/term&gt;&lt;listitem&gt;&lt;para&gt;material for the text on the title bar         &lt;/para&gt;&lt;/listitem&gt;&lt;/varlistentry&gt;&lt;/variablelist&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;struct_s3dw_widget&quot;&gt;&lt;title&gt;struct _s3dw_widget&lt;/title&gt;&lt;programlisting&gt;struct &lt;link linkend=&quot;struct_s3dw_widget&quot;&gt;_s3dw_widget&lt;/link&gt; {
+ 	int type;
+ 	s3dw_widget *parent;
+@@ -34,7 +34,7 @@
+ 	float rx;
+ 	float ry;
+ 	float rz;
+-}&lt;/programlisting&gt;&lt;para&gt;This is the most basic widget type, it contains all the &quot;general&quot; widget information. If you want to move a widget, you'd change x,y,z,s and rx,ry,rz and call &lt;link linkend=&quot;s3dw_moveit&quot;&gt;s3dw_moveit&lt;/link&gt; to turn your action reality. Every other widget has this type as first entry, so a simple typecast to &lt;link linkend=&quot;s3dw_widget&quot;&gt;s3dw_widget&lt;/link&gt; will give you the widgets &quot;general&quot; information. For typecast, you may use S3DWIDGET().&lt;/para&gt;&lt;para&gt;The pointer ptr allows linking to user-specific datastructures. That comes in handy if the widget is called back by an event, and the program must now find out on which data the user reacted.     &lt;/para&gt;&lt;/sect2&gt;
++}&lt;/programlisting&gt;&lt;para&gt;This is the most basic widget type, it contains all the &quot;general&quot; widget information. If you want to move a widget, you'd change x,y,z,s and rx,ry,rz and call &lt;link linkend=&quot;s3dw_moveit&quot;&gt;s3dw_moveit&lt;/link&gt; to turn your action reality. Every other widget has this type as first entry, so a simple typecast to &lt;link linkend=&quot;s3dw_widget&quot;&gt;s3dw_widget&lt;/link&gt; will give you the widgets &quot;general&quot; information. For typecast, you may use S3DWIDGET().&lt;/para&gt;&lt;para&gt;The pointer ptr allows linking to user-specific data structures. That comes in handy if the widget is called back by an event, and the program must now find out on which data the user reacted.     &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;struct_s3dw_button&quot;&gt;&lt;title&gt;struct _s3dw_button&lt;/title&gt;&lt;programlisting&gt;struct &lt;link linkend=&quot;struct_s3dw_button&quot;&gt;_s3dw_button&lt;/link&gt; {
+ 	s3dw_widget widget;
+ 	char *text;
+@@ -80,4 +80,4 @@
+ 	uint32_t oid_title;
+ 	uint32_t oid_tbar;
+ 	char *title;
+-}&lt;/programlisting&gt;&lt;para&gt;A surface is the window of this widget library, holding all of our elements like buttons, inputfields etc ...     &lt;/para&gt;&lt;/sect2&gt;
++}&lt;/programlisting&gt;&lt;para&gt;A surface is the window of this widget library, holding all of our elements like buttons, input fields etc ...     &lt;/para&gt;&lt;/sect2&gt;
+
+Modified: trunk/Documentation/manpages/man3/s3d_clone.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_clone.3	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man3/s3d_clone.3	2008-09-08 09:42:24 UTC (rev 996)
+@@ -11,5 +11,5 @@
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+-Clones an already exisiting object. They get just look the same as the parent-object and will change when the parent-object changes. Cloning especially makes sense if you want to use the same object a lot of times. Move and transform is independent from the parent. The function returns the childs object id.          
++Clones an already existing object. They get just look the same as the parent-object and will change when the parent-object changes. Cloning especially makes sense if you want to use the same object a lot of times. Move and transform is independent from the parent. The function returns the childs object id.          
+ .\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_find_event.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_find_event.3	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man3/s3d_find_event.3	2008-09-08 09:42:24 UTC (rev 996)
+@@ -11,5 +11,5 @@
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+-Finds the latest occurence of an event, giving the event type as argument. Returns a pointer to struct s3d_evt.          
++Finds the latest occurrence of an event, giving the event type as argument. Returns a pointer to struct s3d_evt.          
+ .\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_init.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_init.3	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man3/s3d_init.3	2008-09-08 09:42:24 UTC (rev 996)
+@@ -13,7 +13,7 @@
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+-This will initialize the s3d-library and the connection to the Server. It will return 0 on success in Server initializion. name specifies the your programs name. 
++This will initialize the s3d-library and the connection to the Server. It will return 0 on success in server initialization. name specifies the your programs name. 
+ .PP 
+ .nf 
+ int main(char argc, char **argv) 
+
+Modified: trunk/Documentation/manpages/man3/s3d_load_materials_a.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_load_materials_a.3	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man3/s3d_load_materials_a.3	2008-09-08 09:42:24 UTC (rev 996)
+@@ -14,5 +14,5 @@
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+-Loads n materials starting from index position start into the Material stack. See s3d_push_materials_a for more informatino about the values in mbuf.          
++Loads n materials starting from index position start into the material stack. See s3d_push_materials_a for more informations about the values in mbuf.          
+ .\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_line_normals.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_line_normals.3	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man3/s3d_pep_line_normals.3	2008-09-08 09:42:24 UTC (rev 996)
+@@ -15,5 +15,5 @@
+ .PP 
+ Adds normal information to lines, giving each vertex of a line a normal information. This makes lines somewhat nicer, you'll need that especially when you're going to build wireframe models. 
+ .PP 
+-nbuf should contain n * 6 float values, for each vertex a normal vector (x,y,z), and you have 2 Vertices for each line so that makes 6 float values per line in total.          
++nbuf should contain n * 6 float values, for each vertex a normal vector (x,y,z), and you have 2 vertices for each line so that makes 6 float values per line in total.          
+ .\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_material.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_material.3	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man3/s3d_pep_material.3	2008-09-08 09:42:24 UTC (rev 996)
+@@ -20,5 +20,5 @@
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+-Overwriting the latest pushed Material, overwriting the current value with the specified one. See s3d_pep_materials_a if you want to pep more materials.          
++Overwriting the latest pushed material, overwriting the current value with the specified one. See s3d_pep_materials_a if you want to pep more materials.          
+ .\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_material_a.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_material_a.3	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man3/s3d_pep_material_a.3	2008-09-08 09:42:24 UTC (rev 996)
+@@ -23,5 +23,5 @@
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+-Overwriting the latest pushed Material, overwriting the current value with the specified one, with alpha value in contrast to s3d_pep_material See s3d_push_materials_a if you want to pep more materials.          
++Overwriting the latest pushed material, overwriting the current value with the specified one, with alpha value in contrast to s3d_pep_material See s3d_push_materials_a if you want to pep more materials.          
+ .\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_materials_a.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_materials_a.3	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man3/s3d_pep_materials_a.3	2008-09-08 09:42:24 UTC (rev 996)
+@@ -13,5 +13,5 @@
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+-Alters the last n pushed Materials. See s3d_push_materials_a() for more information how mbuf should look like. Use s3d_pep_material_a() if you only want to alter the latest material.          
++Alters the last n pushed materials. See s3d_push_materials_a() for more information how mbuf should look like. Use s3d_pep_material_a() if you only want to alter the latest material.          
+ .\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_polygon_normals.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_polygon_normals.3	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man3/s3d_pep_polygon_normals.3	2008-09-08 09:42:24 UTC (rev 996)
+@@ -15,5 +15,5 @@
+ .PP 
+ Adds normal information to polygons, giving each vertex of a polygon a normal information. With this, you can achieve smoothed edge effects. 
+ .PP 
+-nbuf should contain n * 9 float values, for each vertex a normal vector (x,y,z), and you have 3 Vertices for each Polygon so that makes 9 float values per Polygon in Total. Don't worry if you don't use this, it's kind of hard to calculate and the server will always use some proper normal values (same for every vertex, calculated by the plane which is defined by the 3 points of the polygon.          
++nbuf should contain n * 9 float values, for each vertex a normal vector (x,y,z), and you have 3 vertices for each Polygon so that makes 9 float values per Polygon in total. Don't worry if you don't use this, it's kind of hard to calculate and the server will always use some proper normal values (same for every vertex, calculated by the plane which is defined by the 3 points of the polygon.          
+ .\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_line.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_line.3	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man3/s3d_push_line.3	2008-09-08 09:42:24 UTC (rev 996)
+@@ -14,5 +14,5 @@
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+-Push one line on the linestack of the object. It takes 2 vertex-index- numbers and one material material-index-nr. as argument. If you have a lot of lines to push, use s3d_push_lines()          
++Push one line on the line stack of the object. It takes 2 vertex-index-no, and one material material-index-no. as argument. If you have a lot of lines to push, use s3d_push_lines()          
+ .\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_lines.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_lines.3	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man3/s3d_push_lines.3	2008-09-08 09:42:24 UTC (rev 996)
+@@ -13,5 +13,5 @@
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+-Pushing n lines on the linestack of the object, each lbuf has a size of n*3, each entry has the index number of the first vertex, second vertex and material number just as in s3d_push_line().          
++Pushing n lines on the line stack of the object, each lbuf has a size of n*3, each entry has the index number of the first vertex, second vertex and material number just as in s3d_push_line().          
+ .\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_material.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_material.3	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man3/s3d_push_material.3	2008-09-08 09:42:24 UTC (rev 996)
+@@ -20,5 +20,5 @@
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+-Pushes a material for an object. you will have to count them yourself too, as polygons will ask for the material index number. the material properties are given in rgb (red/green/blue) color codes, in float. 0.0 is the minimum, 1.0 is the maximum a color value can be. The specular color is the color which is directly reflected from the light source. the diffuse color is the color which can be seen in the bright side of the object, and the ambience color is the color of the shadow side of the object.          
++Pushes a material for an object. you will have to count them yourself too, as polygons will ask for the material index number. The material properties are given in rgb (red/green/blue) color codes, in float. 0.0 is the minimum, 1.0 is the maximum a color value can be. The specular color is the color which is directly reflected from the light source. The diffuse color is the color which can be seen in the bright side of the object, and the ambience color is the color of the shadow side of the object.          
+ .\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_materials_a.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_materials_a.3	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man3/s3d_push_materials_a.3	2008-09-08 09:42:24 UTC (rev 996)
+@@ -13,7 +13,7 @@
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+-Pushes a buffer of Materials. Those Materials are in the format float[n*12], with 
++Pushes a buffer of materials. Those materials are in the format float[n*12], with 
+ .PP 
+ mbuf[n*12 + 0-3] \- ambience 
+ .PP 
+@@ -33,7 +33,7 @@
+ 0, 1, 1, 1, 
+ 0, 1, 1, 1}; 
+  
+-s3d_push_materials_a(object, mbuf, 2); // push a red and a cyan material 
++s3d_push_materials_a(object, bla, 2); // push a red and a cyan material 
+ .fi 
+ .PP 
+ .\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_polygon.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_polygon.3	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man3/s3d_push_polygon.3	2008-09-08 09:42:24 UTC (rev 996)
+@@ -15,7 +15,7 @@
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+-Push one polygon on the polygonstack of the object. it takes 3 vertex-index numbers and one material material-index-nr. as argument. 
++Push one polygon on the polygon stack of the object. It takes 3 vertex-index numbers and one material material-index-no. as argument. 
+ .PP 
+ .nf 
+ int oid = s3d_new_object();   // create a new object 
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_texture.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_texture.3	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man3/s3d_push_texture.3	2008-09-08 09:42:24 UTC (rev 996)
+@@ -13,5 +13,5 @@
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+-Adds a new texture with height w and height h on the texturestack.          
++Adds a new texture with height w and height h on the texture stack.          
+ .\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_vertex.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_vertex.3	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man3/s3d_push_vertex.3	2008-09-08 09:42:24 UTC (rev 996)
+@@ -14,5 +14,5 @@
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+-Pushes a vertex onto the vertex stack. make sure that you count how many vertices you've pushed because you'll need that for referencing when you push your polygons.          
++Pushes a vertex onto the vertex stack. Make sure that you count how many vertices you've pushed because you'll need that for referencing when you push your polygons.          
+ .\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_quit.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_quit.3	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man3/s3d_quit.3	2008-09-08 09:42:24 UTC (rev 996)
+@@ -10,5 +10,5 @@
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+-Closes the connection and cleares the event-stack. It can also be used to leave the s3d_mainloop().          
++Closes the connection and clears the event-stack. It can also be used to leave the s3d_mainloop().          
+ .\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man9/s3dw_style.9
+===================================================================
+--- trunk/Documentation/manpages/man9/s3dw_style.9	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man9/s3dw_style.9	2008-09-08 09:42:24 UTC (rev 996)
+@@ -23,7 +23,7 @@
+ .PP 
+ .SH &quot;Description&quot; 
+ .PP 
+-With s3dw_style you can change the colors/materials of your widgets. materials are in the same as in s3d_push_materials_a, that means red,green,blue and alpha float values (between 0.0 and 1.0) for Ambience, Specular and Diffuse Color.      
++With s3dw_style you can change the colors/materials of your widgets. materials are in the same as in s3d_push_materials_a, that means red,green,blue and alpha float values (between 0.0 and 1.0) for ambience, specular and diffuse color.      
+ .IP &quot;name&quot; 10 
+ name of the style ... kind of redundant          
+ .IP &quot;fontface&quot; 10 
+@@ -31,9 +31,9 @@
+ .IP &quot;surface_mat&quot; 10 
+ material for the surface background          
+ .IP &quot;input_mat&quot; 10 
+-material for buttonboxes and other widgets          
++material for button boxes and other widgets          
+ .IP &quot;inputback_mat&quot; 10 
+-material for inputfield background          
++material for input field background          
+ .IP &quot;text_mat&quot; 10 
+ material for the text on buttons and inputs          
+ .IP &quot;title_mat&quot; 10 
+
+Modified: trunk/Documentation/manpages/man9/s3dw_surface.9
+===================================================================
+--- trunk/Documentation/manpages/man9/s3dw_surface.9	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man9/s3dw_surface.9	2008-09-08 09:42:24 UTC (rev 996)
+@@ -19,5 +19,5 @@
+ .PP 
+ .SH &quot;Description&quot; 
+ .PP 
+-A surface is the window of this widget library, holding all of our elements like buttons, inputfields etc ...      
++A surface is the window of this widget library, holding all of our elements like buttons, input fields etc ...      
+ .\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man9/s3dw_widget.9
+===================================================================
+--- trunk/Documentation/manpages/man9/s3dw_widget.9	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/manpages/man9/s3dw_widget.9	2008-09-08 09:42:24 UTC (rev 996)
+@@ -42,5 +42,5 @@
+ .PP 
+ This is the most basic widget type, it contains all the &quot;general&quot; widget information. If you want to move a widget, you'd change x,y,z,s and rx,ry,rz and call s3dw_moveit to turn your action reality. Every other widget has this type as first entry, so a simple typecast to s3dw_widget will give you the widgets &quot;general&quot; information. For typecast, you may use S3DWIDGET(). 
+ .PP 
+-The pointer ptr allows linking to user-specific datastructures. That comes in handy if the widget is called back by an event, and the program must now find out on which data the user reacted.      
++The pointer ptr allows linking to user-specific data structures. That comes in handy if the widget is called back by an event, and the program must now find out on which data the user reacted.      
+ .\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/server/server.docbook
+===================================================================
+--- trunk/Documentation/server/server.docbook	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/Documentation/server/server.docbook	2008-09-08 09:42:24 UTC (rev 996)
+@@ -38,7 +38,7 @@
+ left mouse button is for clicking :)
+ &lt;/para&gt;&lt;/listitem&gt;
+ &lt;listitem&gt;&lt;para&gt;
+-presse f2 to get in ego-shooter mode :D you can use w,a,s,d for movement now. f2 again to deactivate.
++press f2 to get in ego-shooter mode :D you can use w,a,s,d for movement now. f2 again to deactivate.
+ this only works with dot_mcp, the others above work out-of-the box within the server.
+ &lt;/para&gt;&lt;/listitem&gt;
+ &lt;/itemizedlist&gt;
+
+Modified: trunk/libs3d/event.c
+===================================================================
+--- trunk/libs3d/event.c	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/libs3d/event.c	2008-09-08 09:42:24 UTC (rev 996)
+@@ -77,7 +77,7 @@
+ 
+ /** \brief find eevnt on stack
+  *
+- * Finds the latest occurence of an event, giving the event type as argument.
++ * Finds the latest occurrence of an event, giving the event type as argument.
+  * Returns a pointer to struct s3d_evt.
+  */
+ struct s3d_evt *s3d_find_event(uint8_t event) {
+
+Modified: trunk/libs3d/io.c
+===================================================================
+--- trunk/libs3d/io.c	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/libs3d/io.c	2008-09-08 09:42:24 UTC (rev 996)
+@@ -119,7 +119,7 @@
+ /** \brief initialize s3d library
+  *
+  * This will initialize the s3d-library and the connection to the Server. It
+- * will return 0 on success in Server initializion. name specifies the your
++ * will return 0 on success in server initialization. name specifies the your
+  * programs name.
+  *
+  * \code
+@@ -192,7 +192,7 @@
+ 
+ /** \brief shutdown s3d library
+  *
+- * Closes the connection and cleares the event-stack. It can also be used to
++ * Closes the connection and clears the event-stack. It can also be used to
+  * leave the s3d_mainloop().
+  */
+ int s3d_quit(void)
+
+Modified: trunk/libs3d/proto_out.c
+===================================================================
+--- trunk/libs3d/proto_out.c	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/libs3d/proto_out.c	2008-09-08 09:42:24 UTC (rev 996)
+@@ -56,7 +56,7 @@
+ 
+ /** \brief clone object
+  *
+- * Clones an already exisiting object. They get just look the same as the
++ * Clones an already existing object. They get just look the same as the
+  * parent-object and will change when the parent-object changes. Cloning
+  * especially makes sense if you want to use the same object a lot of times.
+  * Move and transform is independent from the parent. The function returns the
+@@ -127,7 +127,7 @@
+ 
+ /** \brief push vertex
+  *
+- * Pushes a vertex onto the vertex stack. make sure that you count how many
++ * Pushes a vertex onto the vertex stack. Make sure that you count how many
+  * vertices you've pushed because you'll need that for referencing when you push
+  * your polygons.
+  */
+@@ -189,10 +189,10 @@
+ /** \brief push material
+  *
+  * Pushes a material for an object. you will have to count them yourself too,
+- * as polygons will ask for the material index number. the material properties
++ * as polygons will ask for the material index number. The material properties
+  * are given in rgb (red/green/blue) color codes, in float. 0.0 is the minimum,
+  * 1.0 is the maximum a color value can be. The specular color is the color
+- * which is directly reflected from the light source. the diffuse color is the
++ * which is directly reflected from the light source. The diffuse color is the
+  * color which can be seen in the bright side of the object, and the ambience
+  * color is the color of the shadow side of the object.
+  */
+@@ -287,7 +287,7 @@
+ 
+ /** \brief push many materials
+  *
+- * Pushes a buffer of Materials. Those Materials are in the format float[n*12],
++ * Pushes a buffer of materials. Those materials are in the format float[n*12],
+  * with
+  * - mbuf[n*12 + 0-3] - ambience
+  * - mbuf[n*12 + 4-7] - specular
+@@ -307,7 +307,7 @@
+  *          0, 1, 1, 1,
+  *          0, 1, 1, 1};
+  *
+- * s3d_push_materials_a(object, mbuf, 2); // push a red and a cyan material
++ * s3d_push_materials_a(object, bla, 2); // push a red and a cyan material
+  * \endcode
+  */
+ int s3d_push_materials_a(int object, const float *mbuf, uint16_t n)
+@@ -337,8 +337,8 @@
+ 
+ /** \brief push polygon
+  *
+- * Push one polygon on the polygonstack of the object. it takes 3 vertex-index
+- * numbers and one material material-index-nr. as argument.
++ * Push one polygon on the polygon stack of the object. It takes 3 vertex-index
++ * numbers and one material material-index-no. as argument.
+  *
+  * \code
+  * int oid = s3d_new_object();   // create a new object
+@@ -372,9 +372,9 @@
+ 
+ /** \brief push line
+  *
+- * Push one line on the linestack of the object. It takes 2 vertex-index-
+- * numbers and one material material-index-nr. as argument. If you have a lot of
+- * lines to push, use s3d_push_lines()
++ * Push one line on the line stack of the object. It takes 2 vertex-index-no,
++ * and one material material-index-no. as argument. If you have a lot of lines
++ * to push, use s3d_push_lines()
+  */
+ int s3d_push_line(int object, uint32_t v1, uint32_t v2, uint32_t material)
+ {
+@@ -396,7 +396,9 @@
+ 
+ /** \brief push many polygons
+  *
+- * As for vertices, you can push arrays of polygons to have greater performance. The pbuf should contain n polygons which consist of 4 uint32_t values of 3 vertices indices and 1 material index.
++ * As for vertices, you can push arrays of polygons to have greater performance.
++ * The pbuf should contain n polygons which consist of 4 uint32_t values of 3
++ * vertices indices and 1 material index.
+  *
+  * \code
+  * uint32_t pbuf[] = { 0, 1, 2, 0};
+@@ -437,7 +439,7 @@
+ 
+ /** \brief push many lines
+  *
+- * Pushing n lines on the linestack of the object, each lbuf has a size of n*3,
++ * Pushing n lines on the line stack of the object, each lbuf has a size of n*3,
+  * each entry has the index number of the first vertex, second vertex and
+  * material number just as in s3d_push_line().
+  */
+@@ -471,7 +473,7 @@
+ 
+ /** \brief push texture
+  *
+- * Adds a new texture with height w and height h on the texturestack.
++ * Adds a new texture with height w and height h on the texture stack.
+  */
+ int s3d_push_texture(int object, uint16_t w, uint16_t h)
+ {
+@@ -596,7 +598,7 @@
+ 
+ /** \brief rewrite material
+  *
+- * Overwriting the latest pushed Material, overwriting the current value with
++ * Overwriting the latest pushed material, overwriting the current value with
+  * the specified one. See s3d_pep_materials_a if you want to pep more materials.
+  */
+ int s3d_pep_material(int object,
+@@ -643,7 +645,7 @@
+ 
+ /** \brief rewrite material with alpha
+  *
+- * Overwriting the latest pushed Material, overwriting the current value with
++ * Overwriting the latest pushed material, overwriting the current value with
+  * the specified one, with alpha value in contrast to s3d_pep_material See
+  * s3d_push_materials_a if you want to pep more materials.
+  */
+@@ -691,7 +693,7 @@
+ 
+ /** \brief rewrite materials with alpha
+  *
+- * Alters the last n pushed Materials. See s3d_push_materials_a() for more
++ * Alters the last n pushed materials. See s3d_push_materials_a() for more
+  * information how mbuf should look like. Use s3d_pep_material_a() if you only
+  * want to alter the latest material.
+  */
+@@ -714,8 +716,8 @@
+  * information. With this, you can achieve smoothed edge effects.
+  *
+  * nbuf should contain n * 9 float values, for each vertex a normal vector
+- * (x,y,z), and you have 3 Vertices for each Polygon so that makes 9 float
+- * values per Polygon in Total. Don't worry if you don't use this, it's kind of
++ * (x,y,z), and you have 3 vertices for each Polygon so that makes 9 float
++ * values per Polygon in total. Don't worry if you don't use this, it's kind of
+  * hard to calculate and the server will always use some proper normal values
+  * (same for every vertex, calculated by the plane which is defined by the 3
+  * points of the polygon.
+@@ -741,7 +743,7 @@
+  * when you're going to build wireframe models.
+  *
+  * nbuf should contain n * 6 float values, for each vertex a normal vector
+- * (x,y,z), and you have 2 Vertices for each line so that makes 6 float values
++ * (x,y,z), and you have 2 vertices for each line so that makes 6 float values
+  * per line in total.
+  */
+ int s3d_pep_line_normals(int object, const float *nbuf, uint16_t n)
+@@ -995,8 +997,8 @@
+ 
+ /** \brief add materials with alpha to polygons
+  *
+- * Loads n materials starting from index position start into the Material stack.
+- * See s3d_push_materials_a for more informatino about the values in mbuf.
++ * Loads n materials starting from index position start into the material stack.
++ * See s3d_push_materials_a for more informations about the values in mbuf.
+  */
+ int s3d_load_materials_a(int object, const float *mbuf, uint32_t start, uint16_t n)
+ {
+
+Modified: trunk/libs3dw/s3dw.h
+===================================================================
+--- trunk/libs3dw/s3dw.h	2008-09-08 09:42:17 UTC (rev 995)
++++ trunk/libs3dw/s3dw.h	2008-09-08 09:42:24 UTC (rev 996)
+@@ -74,15 +74,15 @@
+ /**
+  * With s3dw_style you can change the colors/materials of your widgets.
+  * materials are in the same as in s3d_push_materials_a, that means
+- * red,green,blue and alpha float values (between 0.0 and 1.0) for Ambience,
+- * Specular and Diffuse Color.
++ * red,green,blue and alpha float values (between 0.0 and 1.0) for ambience,
++ * specular and diffuse color.
+  */
+ struct _s3dw_style {
+ 	char *name;     /**&lt; name of the style ... kind of redundant */
+ 	char *fontface;    /**&lt; font face for all used fonts */
+ 	float surface_mat[12];  /**&lt; material for the surface background */
+-	float input_mat[12];  /**&lt; material for buttonboxes and other widgets */
+-	float inputback_mat[12]; /**&lt; material for inputfield background */
++	float input_mat[12];  /**&lt; material for button boxes and other widgets */
++	float inputback_mat[12]; /**&lt; material for input field background */
+ 	float text_mat[12];   /**&lt; material for the text on buttons and inputs */
+ 	float title_mat[12];  /**&lt; material for the title bar */
+ 	float title_text_mat[12]; /**&lt; material for the text on the title bar */
+@@ -95,9 +95,9 @@
+  * type as first entry, so a simple typecast to s3dw_widget will give you the
+  * widgets &quot;general&quot; information. For typecast, you may use S3DWIDGET().
+  *
+- * The pointer ptr allows linking to user-specific datastructures. That comes in
+- * handy if the widget is called back by an event, and the program must now find
+- * out on which data the user reacted.
++ * The pointer ptr allows linking to user-specific data structures. That comes
++ * in handy if the widget is called back by an event, and the program must now
++ * find out on which data the user reacted.
+  */
+  struct _s3dw_widget {
+ 	/* private .. */
+@@ -210,7 +210,7 @@
+ 
+ /**
+  * A surface is the window of this widget library, holding all of our elements
+- * like buttons, inputfields etc ...
++ * like buttons, input fields etc ...
+  */
+ struct _s3dw_surface {
+ 	/* private */
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000975.html">[S3d-svn] r995 - in trunk/Documentation: . libs3d libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000977.html">[S3d-svn] r997 - in trunk: Documentation/libs3dw	Documentation/manpages/man9 libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#976">[ date ]</a>
+              <a href="thread.html#976">[ thread ]</a>
+              <a href="subject.html#976">[ subject ]</a>
+              <a href="author.html#976">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

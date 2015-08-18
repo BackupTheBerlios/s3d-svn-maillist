@@ -1,0 +1,527 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r102 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r102%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602241308.k1OD8AWq014200%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000097.html">
+   <LINK REL="Next"  HREF="000099.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r102 - trunk/apps/olsrs3d</H1>
+    <B>marec at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r102%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602241308.k1OD8AWq014200%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r102 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Fri Feb 24 14:08:10 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000097.html">[S3d-svn] r101 - in trunk: . apps/dot_mcp client
+</A></li>
+        <LI>Next message: <A HREF="000099.html">[S3d-svn] r103 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#98">[ date ]</a>
+              <a href="thread.html#98">[ thread ]</a>
+              <a href="subject.html#98">[ subject ]</a>
+              <a href="author.html#98">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-02-24 14:07:52 +0100 (Fri, 24 Feb 2006)
+New Revision: 102
+
+Modified:
+   trunk/apps/olsrs3d/TODO
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/net.c
+   trunk/apps/olsrs3d/olsrs3d.h
+   trunk/apps/olsrs3d/process.c
+Log:
+delete old/not needed vertices and olsr nodes
+
+Modified: trunk/apps/olsrs3d/TODO
+===================================================================
+--- trunk/apps/olsrs3d/TODO	2006-02-22 23:51:49 UTC (rev 101)
++++ trunk/apps/olsrs3d/TODO	2006-02-24 13:07:52 UTC (rev 102)
+@@ -1,4 +1,3 @@
+-	delete old/not needed vertices
+ 	rotate text in cam-direction
+ 	search for vertices (text input?)
+ 	show link times
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-02-22 23:51:49 UTC (rev 101)
++++ trunk/apps/olsrs3d/main.c	2006-02-24 13:07:52 UTC (rev 102)
+@@ -151,92 +151,208 @@
+ 
+ void handle_olsr_node( struct olsr_node *olsr_node ) {
+ 
++	int result;   /* result of strcmp */
+ 	float f, distance;
+ 	float tmp_mov_vec[3];
++	struct olsr_node *top_olsr_node = NULL;   /* parent olsr node */
++	struct olsr_node **tmp_olsr_node;
+ 	struct olsr_con **olsr_con;
+ 	struct Obj_to_ip *Obj_to_ip_curr;
+-	struct olsr_con_list *olsr_con_list;
++	struct olsr_con_list *olsr_con_list, *prev_olsr_con_list = NULL;
+ 
+ 	/* no more nodes left */
+ 	if ( olsr_node == NULL ) return;
+ 
+-	/* olsr node shape has been modified */
+-	if ( olsr_node-&gt;node_type_modified ) {
++	/* olsr node vanished */
++	olsr_node-&gt;last_seen--;
++	if ( olsr_node-&gt;last_seen == 0 ) {
+ 
+-		/* delete old shape */
+-		if ( olsr_node-&gt;obj_id != -1 ) {
+-			/* remove element from ob2ip list */
+-			lst_del( olsr_node-&gt;obj_id );
+-			s3d_del_object( olsr_node-&gt;obj_id );
++		if ( Debug ) printf( &quot;olsr node vanished: %s\n&quot;, olsr_node-&gt;ip );
++
++		/* reassign olsr childnodes if available */
++		if ( ( ( olsr_node-&gt;left != NULL ) || ( olsr_node-&gt;right != NULL ) ) &amp;&amp; ( olsr_node-&gt;top != NULL ) ) {
++
++			/* find out to which side to attach to */
++			result = strncmp( olsr_node-&gt;ip, olsr_node-&gt;top-&gt;ip, NAMEMAX );
++
++			if ( result &lt; 0 ) {
++
++				if ( olsr_node-&gt;left != NULL ) {
++					olsr_node-&gt;top-&gt;right = olsr_node-&gt;left;
++					olsr_node-&gt;left-&gt;top = olsr_node-&gt;top;
++				} else {
++					olsr_node-&gt;top-&gt;right = olsr_node-&gt;right;
++					olsr_node-&gt;right-&gt;top = olsr_node-&gt;top;
++				}
++
++			} else {
++
++				if ( olsr_node-&gt;left != NULL ) {
++					olsr_node-&gt;top-&gt;left = olsr_node-&gt;left;
++					olsr_node-&gt;left-&gt;top = olsr_node-&gt;top;
++				} else {
++					olsr_node-&gt;top-&gt;left = olsr_node-&gt;right;
++					olsr_node-&gt;right-&gt;top = olsr_node-&gt;top;
++				}
++
++			}
++
++			/* olsr node has two childnodes and we have to reassign both */
++			if ( ( olsr_node-&gt;left != NULL ) &amp;&amp; ( olsr_node-&gt;right != NULL ) ) {
++
++				tmp_olsr_node = &amp;olsr_node-&gt;left;
++
++				while ( (*tmp_olsr_node) != NULL ) {
++
++					result = strncmp( (*tmp_olsr_node)-&gt;ip, olsr_node-&gt;right-&gt;ip, NAMEMAX );
++
++					/* we found the node - should not happen ! */
++					if ( result == 0 ) break;
++
++					/* save parent olsr node for later use */
++					top_olsr_node = (*tmp_olsr_node);
++
++					/* the searched node must be in the subtree */
++					if ( result &lt; 0 ) {
++						tmp_olsr_node = &amp;(*tmp_olsr_node)-&gt;right;
++					} else {
++						tmp_olsr_node = &amp;(*tmp_olsr_node)-&gt;left;
++					}
++
++				}
++
++				tmp_olsr_node = &amp;olsr_node-&gt;right;
++				olsr_node-&gt;right-&gt;top = top_olsr_node;
++
++			}
++
+ 		}
+ 
+-		if ( olsr_node-&gt;desc_id != -1 ) s3d_del_object( olsr_node-&gt;desc_id );
++		if ( olsr_node-&gt;top != NULL ) {
+ 
+-		/* create new shape */
+-		if ( olsr_node-&gt;node_type == 1 ) {
+-			/* olsr node offers internet access */
+-			olsr_node-&gt;obj_id = s3d_clone( Olsr_node_inet_obj );
+-		} else if ( olsr_node-&gt;node_type == 2 ) {
+-			/* olsr node offers internet access */
+-			olsr_node-&gt;obj_id = s3d_clone( Olsr_node_hna_net );
++			/* delete shape */
++			if ( olsr_node-&gt;obj_id != -1 ) {
++				/* remove element from ob2ip list */
++				lst_del( olsr_node-&gt;obj_id );
++				s3d_del_object( olsr_node-&gt;obj_id );
++			}
++
++			if ( olsr_node-&gt;desc_id != -1 ) s3d_del_object( olsr_node-&gt;desc_id );
++
++			/* free memory space */
++			free( olsr_node );
++			olsr_node = NULL;
++
+ 		} else {
+-			/* normal olsr node */
+-			olsr_node-&gt;obj_id = s3d_clone( Olsr_node_obj );
++
++			if ( Debug ) printf( &quot;root olsr node can't be deleted: %s\n&quot;, olsr_node-&gt;ip );
++
+ 		}
+ 
+-		s3d_flags_on( olsr_node-&gt;obj_id, S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++	} else {
+ 
+-		/* link newly created object to ZeroPoint */
+-		s3d_link( olsr_node-&gt;obj_id, ZeroPoint );
+-		/* add object_id and olsr_node to linked list */
+-		lst_add(olsr_node-&gt;obj_id,&amp;olsr_node);
++		/* olsr node shape has been modified */
++		if ( olsr_node-&gt;node_type_modified ) {
+ 
+-		/* create olsr node text and attach (link) it to the node */
+-		olsr_node-&gt;desc_id = s3d_draw_string( olsr_node-&gt;ip, &amp;f );
+-		s3d_link( olsr_node-&gt;desc_id, olsr_node-&gt;obj_id );
+-		s3d_translate( olsr_node-&gt;desc_id, -f/2,-2,0 );
+-		s3d_flags_on( olsr_node-&gt;desc_id, S3D_OF_VISIBLE );
++			/* delete old shape */
++			if ( olsr_node-&gt;obj_id != -1 ) {
++				/* remove element from ob2ip list */
++				lst_del( olsr_node-&gt;obj_id );
++				s3d_del_object( olsr_node-&gt;obj_id );
++			}
+ 
+-		olsr_node-&gt;node_type_modified = 0;
++			if ( olsr_node-&gt;desc_id != -1 ) s3d_del_object( olsr_node-&gt;desc_id );
+ 
+-	}
++			/* create new shape */
++			if ( olsr_node-&gt;node_type == 1 ) {
++				/* olsr node offers internet access */
++				olsr_node-&gt;obj_id = s3d_clone( Olsr_node_inet_obj );
++			} else if ( olsr_node-&gt;node_type == 2 ) {
++				/* via hna announced network */
++				olsr_node-&gt;obj_id = s3d_clone( Olsr_node_hna_net );
++			} else {
++				/* normal olsr node */
++				olsr_node-&gt;obj_id = s3d_clone( Olsr_node_obj );
++			}
+ 
+-	/* drift away from unrelated nodes */
+-	Obj_to_ip_curr = Obj_to_ip_head-&gt;next;
+-	while ( Obj_to_ip_curr != Obj_to_ip_end ) {
++			s3d_flags_on( olsr_node-&gt;obj_id, S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 
+-		/* myself ... */
+-/* 		if ( strncmp( Obj_to_ip_curr-&gt;olsr_node-&gt;ip, olsr_node-&gt;ip, NAMEMAX ) != 0 ) {*/
++			/* link newly created object to ZeroPoint */
++			s3d_link( olsr_node-&gt;obj_id, ZeroPoint );
++			/* add object_id and olsr_node to linked list */
++			lst_add(olsr_node-&gt;obj_id,&amp;olsr_node);
+ 
+-			olsr_con_list = olsr_node-&gt;olsr_con_list;
+-			while ( olsr_con_list != NULL ) {
++			/* create olsr node text and attach (link) it to the node */
++			olsr_node-&gt;desc_id = s3d_draw_string( olsr_node-&gt;ip, &amp;f );
++			s3d_link( olsr_node-&gt;desc_id, olsr_node-&gt;obj_id );
++			s3d_translate( olsr_node-&gt;desc_id, -f/2,-2,0 );
++			s3d_flags_on( olsr_node-&gt;desc_id, S3D_OF_VISIBLE );
+ 
+-				/* nodes are related */
+-				if ( ( strncmp( olsr_con_list-&gt;olsr_con-&gt;left_olsr_node-&gt;ip, Obj_to_ip_curr-&gt;olsr_node-&gt;ip, NAMEMAX ) == 0 ) || ( strncmp( olsr_con_list-&gt;olsr_con-&gt;right_olsr_node-&gt;ip, Obj_to_ip_curr-&gt;olsr_node-&gt;ip, NAMEMAX ) == 0 ) ) break;
++			olsr_node-&gt;node_type_modified = 0;
+ 
+-				olsr_con_list = olsr_con_list-&gt;next_olsr_con_list;
++		}
+ 
+-			}
++		/* drift away from unrelated nodes */
++		Obj_to_ip_curr = Obj_to_ip_head-&gt;next;
++		while ( Obj_to_ip_curr != Obj_to_ip_end ) {
+ 
+-			/* nodes are not related - so drift */
+-			if ( olsr_con_list == NULL ) {
++			/* myself ... */
++/* 			if ( strncmp( Obj_to_ip_curr-&gt;olsr_node-&gt;ip, olsr_node-&gt;ip, NAMEMAX ) != 0 ) {*/
+ 
+-				distance = dirt( olsr_node-&gt;pos_vec, Obj_to_ip_curr-&gt;olsr_node-&gt;pos_vec, tmp_mov_vec );
+-				if ( distance &lt; 0.1 ) distance = 0.1;
+-				mov_add( olsr_node-&gt;mov_vec, tmp_mov_vec,-100 / ( distance * distance ) );
+-				mov_add( Obj_to_ip_curr-&gt;olsr_node-&gt;mov_vec, tmp_mov_vec, 100 / ( distance * distance ) );
++				olsr_con_list = olsr_node-&gt;olsr_con_list;
++				while ( olsr_con_list != NULL ) {
+ 
+-			}
++					/* nodes are related */
++					if ( ( olsr_con_list-&gt;olsr_con-&gt;left_olsr_node != NULL ) &amp;&amp; ( olsr_con_list-&gt;olsr_con-&gt;right_olsr_node != NULL ) ) {
+ 
+-			Obj_to_ip_curr = Obj_to_ip_curr-&gt;next;
++						if ( ( strncmp( olsr_con_list-&gt;olsr_con-&gt;left_olsr_node-&gt;ip, Obj_to_ip_curr-&gt;olsr_node-&gt;ip, NAMEMAX ) == 0 ) || ( strncmp( olsr_con_list-&gt;olsr_con-&gt;right_olsr_node-&gt;ip, Obj_to_ip_curr-&gt;olsr_node-&gt;ip, NAMEMAX ) == 0 ) ) break;
+ 
+-/* 		} */
++						prev_olsr_con_list = olsr_con_list;
+ 
++					/* deleted node */
++					} else {
++
++						s3d_pop_vertex( olsr_con_list-&gt;olsr_con-&gt;obj_id, 6 );
++						s3d_pop_polygon( olsr_con_list-&gt;olsr_con-&gt;obj_id, 2 );
++						s3d_pop_material( olsr_con_list-&gt;olsr_con-&gt;obj_id, 1 );
++
++						/* delete connection list entry */
++						prev_olsr_con_list-&gt;next_olsr_con_list = olsr_con_list-&gt;next_olsr_con_list;
++
++						/* delete connection */
++						if ( olsr_con_list-&gt;olsr_con-&gt;prev_olsr_con != NULL ) olsr_con_list-&gt;olsr_con-&gt;prev_olsr_con-&gt;next_olsr_con = olsr_con_list-&gt;olsr_con-&gt;next_olsr_con;
++						if ( olsr_con_list-&gt;olsr_con-&gt;next_olsr_con != NULL ) olsr_con_list-&gt;olsr_con-&gt;next_olsr_con-&gt;prev_olsr_con = olsr_con_list-&gt;olsr_con-&gt;prev_olsr_con;
++
++						free( olsr_con_list-&gt;olsr_con );
++						free( olsr_con_list );
++
++					}
++
++					olsr_con_list = olsr_con_list-&gt;next_olsr_con_list;
++
++				}
++
++				/* nodes are not related - so drift */
++				if ( olsr_con_list == NULL ) {
++
++					distance = dirt( olsr_node-&gt;pos_vec, Obj_to_ip_curr-&gt;olsr_node-&gt;pos_vec, tmp_mov_vec );
++					if ( distance &lt; 0.1 ) distance = 0.1;
++					mov_add( olsr_node-&gt;mov_vec, tmp_mov_vec,-100 / ( distance * distance ) );
++					mov_add( Obj_to_ip_curr-&gt;olsr_node-&gt;mov_vec, tmp_mov_vec, 100 / ( distance * distance ) );
++
++				}
++
++				Obj_to_ip_curr = Obj_to_ip_curr-&gt;next;
++
++/* 			} */
++
++		}
++
++		handle_olsr_node( olsr_node-&gt;left );
++		handle_olsr_node( olsr_node-&gt;right );
++
+ 	}
+ 
+-	handle_olsr_node( olsr_node-&gt;left );
+-	handle_olsr_node( olsr_node-&gt;right );
+-
+ }
+ 
+ 
+@@ -432,7 +548,7 @@
+ 				{
+ 					gd=adj[i*max+j];
+ 					d=dirt(node[i].pos,node[j].pos,m);
+-					if (gd==0.0)*/	/* points are not connected 
++					if (gd==0.0)*/	/* points are not connected
+ 					{
+ 					printf(&quot;distance between i and j: %f\n&quot;,d);
+ 						if (d&lt;0.1) d=0.1;
+@@ -449,8 +565,8 @@
+ 				}
+ 			}
+ 			d=dirt(node[i].pos,z,m);
+-		mov_add(node[i].mov,m,d/100); * move a little bit to point zero 
+-		mov_add(node[i].mov,m,1); * move a little bit to point zero 
++		mov_add(node[i].mov,m,d/100); * move a little bit to point zero
++		mov_add(node[i].mov,m,1); * move a little bit to point zero
+ 	}
+ 	/ * move it!! * /
+  	for (i=0;i&lt;max;i++)
+@@ -469,7 +585,7 @@
+  				s3d_push_vertex(o,node[i].pos[0],	 node[i].pos[1],node[i].pos[2]);
+  				s3d_push_vertex(o,node[i].pos[0]+0.2,node[i].pos[1],node[i].pos[2]);
+  				s3d_push_vertex(o,node[i].pos[0]--&gt;id0.2,node[i].pos[1],node[i].pos[2]);
+-				
++
+  				s3d_push_vertex(o,node[j].pos[0],	 node[j].pos[1],node[j].pos[2]);
+  				s3d_push_vertex(o,node[j].pos[0],node[j].pos[1]+0.2,node[j].pos[2]);
+  				s3d_push_vertex(o,node[j].pos[0],node[j].pos[1]-0.2,node[j].pos[2]);
+@@ -478,12 +594,15 @@
+ 				s3d_push_polygon(o,3,1,2,0);* /
+  			}
+  	} */
+-	while (0!=(r=net_main()))
++
++	while (0!=(r=net_main())) {
+ 		if (r==-1)
+ 		{
+ 			s3d_quit();
+ 			break;
+ 		}
++	}
++
+ 	alpha=(alpha+5)%360;
+ 	s3d_rotate(mesh,0,alpha,0);
+ 	if(RotateSwitch) {
+
+Modified: trunk/apps/olsrs3d/net.c
+===================================================================
+--- trunk/apps/olsrs3d/net.c	2006-02-22 23:51:49 UTC (rev 101)
++++ trunk/apps/olsrs3d/net.c	2006-02-24 13:07:52 UTC (rev 102)
+@@ -59,6 +59,7 @@
+     buf[numbytes] = '\0';
+ /* 	strncat(lbuf,buf,MAXLINESIZE); */
+ 	strncpy(lbuf,buf,MAXLINESIZE);
++	printf(&quot;nach strncpy\n&quot;);
+ 	process_main();
+ 	return(1);
+ }
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-02-22 23:51:49 UTC (rev 101)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-02-24 13:07:52 UTC (rev 102)
+@@ -10,6 +10,7 @@
+ struct olsr_con {
+ 
+ 	struct olsr_con *next_olsr_con;   /* pointer to next connection */
++	struct olsr_con *prev_olsr_con;   /* pointer to previous connection */
+ 	struct olsr_node *left_olsr_node;   /* pointer to left end point of the connection */
+ 	struct olsr_node *right_olsr_node;   /* pointer to right end point of the connection */
+ 	float left_etx;   /* etx of left olsr node */
+@@ -31,11 +32,13 @@
+ /* we contruct a binary tree to handle the nodes */
+ struct olsr_node {
+ 
++	struct olsr_node *top;
+ 	struct olsr_node *left;
+ 	struct olsr_node *right;
+ 	char ip[NAMEMAX];   /* host ip */
+ 	int node_type;   /* normal = 0, internet gateway = 1, via hna announced network = 2 */
+ 	int node_type_modified;   /* node_type modified flag */
++	int last_seen;   /* last seen counter */
+ 	float pos_vec[3];   /* position vector in 3d &quot;space&quot; */
+ 	float mov_vec[3];   /* move vector */
+ 	int obj_id;   /* id of node object in s3d */
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-02-22 23:51:49 UTC (rev 101)
++++ trunk/apps/olsrs3d/process.c	2006-02-24 13:07:52 UTC (rev 102)
+@@ -22,6 +22,7 @@
+ int add_olsr_con( struct olsr_node *con_from, struct olsr_node *con_to, float etx ) {
+ 
+ 	struct olsr_con **olsr_con = &amp;Con_begin;
++	struct olsr_con *prev_olsr_con = NULL;   /* previous olsr connection */
+ 
+ 	while ( (*olsr_con) != NULL ) {
+ 
+@@ -37,6 +38,9 @@
+ 
+ 		}
+ 
++		/* save previous olsr connection for later use */
++		prev_olsr_con = (*olsr_con);
++
+ 		olsr_con = &amp;(*olsr_con)-&gt;next_olsr_con;
+ 
+ 	}
+@@ -78,6 +82,7 @@
+ 		}
+ 
+ 		(*olsr_con)-&gt;next_olsr_con = NULL;
++		(*olsr_con)-&gt;prev_olsr_con = prev_olsr_con;
+ 
+ 		/* add new olsr connection to olsr nodes in order to access the connection from the olsr node */
+ 		struct olsr_con_list **olsr_con_list = &amp;(*olsr_con)-&gt;left_olsr_node-&gt;olsr_con_list;
+@@ -188,14 +193,21 @@
+ void *get_olsr_node( struct olsr_node **olsr_node, char *ip ) {
+ 
+ 	int result;   /* result of strcmp */
++	struct olsr_node *top_olsr_node = NULL;   /* parent olsr node */
+ 
+ 	while ( (*olsr_node) != NULL ) {
+ 
+ 		result = strncmp( (*olsr_node)-&gt;ip, ip, NAMEMAX );
+ 
+ 		/* we found the node */
+-		if ( result == 0 ) return (*olsr_node);
++		if ( result == 0 ) {
++			(*olsr_node)-&gt;last_seen = 20;
++			return (*olsr_node);
++		}
+ 
++		/* save parent olsr node for later use */
++		top_olsr_node = (*olsr_node);
++
+ 		/* the searched node must be in the subtree */
+ 		if ( result &lt; 0 ) {
+ 			olsr_node = &amp;(*olsr_node)-&gt;right;
+@@ -211,12 +223,17 @@
+ 		(*olsr_node) = malloc( sizeof( struct olsr_node ) );
+ 		if ( (*olsr_node) == NULL ) out_of_mem();
+ 
++		(*olsr_node)-&gt;top = top_olsr_node;
+ 		(*olsr_node)-&gt;left = NULL;
+ 		(*olsr_node)-&gt;right = NULL;
++
+ 		strncpy( (*olsr_node)-&gt;ip, ip, NAMEMAX );
++
+ 		(*olsr_node)-&gt;node_type = 0;
+ 		(*olsr_node)-&gt;node_type_modified = 1;
+ 
++		(*olsr_node)-&gt;last_seen = 20;
++
+ 		if ( Debug ) printf( &quot;new olsr node: %s\n&quot;, (*olsr_node)-&gt;ip );
+ 
+ 		(*olsr_node)-&gt;pos_vec[0] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
+@@ -433,7 +450,7 @@
+  				olsr_node2 = get_olsr_node( &amp;Olsr_root, con_to );
+ 
+  				if ( olsr_node2-&gt;node_type != 2 ) {
+-						
++
+  					olsr_node2-&gt;node_type = 2;
+  					olsr_node2-&gt;node_type_modified = 1;
+  					if ( Debug ) printf( &quot;new hna network: %s\n&quot;, olsr_node2-&gt;ip );
+@@ -494,7 +511,7 @@
+ 
+ 	while ( (*lbuf_ptr) != '\0' ) {
+ 
+-/* 		printf( &quot;%c&quot;,(*lbuf_ptr) ); */
++		/* printf( &quot;%c&quot;,(*lbuf_ptr) ); */
+ 
+ 		if ( (*lbuf_ptr) == '\n' ) {
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000097.html">[S3d-svn] r101 - in trunk: . apps/dot_mcp client
+</A></li>
+	<LI>Next message: <A HREF="000099.html">[S3d-svn] r103 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#98">[ date ]</a>
+              <a href="thread.html#98">[ thread ]</a>
+              <a href="subject.html#98">[ subject ]</a>
+              <a href="author.html#98">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

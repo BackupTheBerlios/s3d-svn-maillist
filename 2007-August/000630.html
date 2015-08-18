@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r638 - in trunk: . libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r638%20-%20in%20trunk%3A%20.%20libs3dw&In-Reply-To=%3C200708221025.l7MAPQfH027805%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000629.html">
+   <LINK REL="Next"  HREF="000631.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r638 - in trunk: . libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r638%20-%20in%20trunk%3A%20.%20libs3dw&In-Reply-To=%3C200708221025.l7MAPQfH027805%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r638 - in trunk: . libs3dw">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Wed Aug 22 12:25:26 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000629.html">[S3d-svn] r637 - in trunk: . cmake/modules
+</A></li>
+        <LI>Next message: <A HREF="000631.html">[S3d-svn] r640 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#630">[ date ]</a>
+              <a href="thread.html#630">[ thread ]</a>
+              <a href="subject.html#630">[ subject ]</a>
+              <a href="author.html#630">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-08-22 12:25:25 +0200 (Wed, 22 Aug 2007)
+New Revision: 638
+
+Modified:
+   trunk/
+   trunk/libs3dw/s3dw.h
+   trunk/libs3dw/widget.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r2265 at kero</A>:  dotslash | 2007-08-22 12:24:39 +0200
+ - add a pointer for user data so we can fast access to
+   custom structures in a callback
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1496
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2265
+
+Modified: trunk/libs3dw/s3dw.h
+===================================================================
+--- trunk/libs3dw/s3dw.h	2007-08-19 10:16:26 UTC (rev 637)
++++ trunk/libs3dw/s3dw.h	2007-08-22 10:25:25 UTC (rev 638)
+@@ -82,6 +82,7 @@
+ 	float 		 width,height;	/* width and height of the widget, outer size */
+ 	uint32_t	 oid;			/* the main object which is used for transformations etc ...*/
+ 	/* public */
++	void		*ptr;			/* a pointer to a user structure, to use in callbacks etc */
+ 	float 		 x,y,z;			/* position, relative to the surface usually */
+ 	float 		 s;				/* scale factor */
+ 	float 		 rx,ry,rz;		/* rotation around the axis */
+
+Modified: trunk/libs3dw/widget.c
+===================================================================
+--- trunk/libs3dw/widget.c	2007-08-19 10:16:26 UTC (rev 637)
++++ trunk/libs3dw/widget.c	2007-08-22 10:25:25 UTC (rev 638)
+@@ -41,6 +41,7 @@
+ 	widget-&gt;nobj=0;
+ 	widget-&gt;pobj=NULL;
+ 	widget-&gt;parent=NULL;
++	widget-&gt;ptr=NULL;
+ 	widget-&gt;focus=-1;
+ 	widget-&gt;flags=S3DW_ACTIVE;
+ 	widget-&gt;oid=-1;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000629.html">[S3d-svn] r637 - in trunk: . cmake/modules
+</A></li>
+	<LI>Next message: <A HREF="000631.html">[S3d-svn] r640 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#630">[ date ]</a>
+              <a href="thread.html#630">[ thread ]</a>
+              <a href="subject.html#630">[ subject ]</a>
+              <a href="author.html#630">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,293 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r280 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r280%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200605070203.k4723V2l023491%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000272.html">
+   <LINK REL="Next"  HREF="000274.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r280 - trunk/apps/olsrs3d</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r280%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200605070203.k4723V2l023491%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r280 - trunk/apps/olsrs3d">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Sun May  7 04:03:31 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000272.html">[S3d-svn] r279 - in trunk: . apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000274.html">[S3d-svn] r281 - in trunk: . Documentation/s3dapi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#273">[ date ]</a>
+              <a href="thread.html#273">[ thread ]</a>
+              <a href="subject.html#273">[ subject ]</a>
+              <a href="author.html#273">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-05-07 04:03:14 +0200 (Sun, 07 May 2006)
+New Revision: 280
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/terminal.c
+Log:
+- add very ugly icons and effects for node search
+- remove key handle for search
+- add numpad integration and comma to dot translation on numpad
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-05-06 16:55:25 UTC (rev 279)
++++ trunk/apps/olsrs3d/main.c	2006-05-07 02:03:14 UTC (rev 280)
+@@ -79,18 +79,20 @@
+ float Factor = 0.6;	/* Factor in calc_olsr_node_mov */
+ struct olsr_node *Olsr_node_pEtx;
+ 
+-
+ int Btn_close_id = -1;
+ int Btn_close_obj;
+-
+ int Btn_move_terminal_obj;
+ int Btn_move_terminal_id = -1;
++int Btn_follow_mode_obj;
++int Btn_follow_mode_id = -1;
+ 
++int Rotate_follow_button = 0;
++
+ float Title_len;
+ int cam_go=0;
+ 
+ int move_cam_to = -1;
+-int oid_focus = -1;
++int Oid_focus = -1;
+ 
+ 
+ /***
+@@ -689,9 +691,9 @@
+ 	}
+ 
+ 	/* move to terminal */
+-	if(move_cam_to != -1 &amp;&amp; move_cam_to == obj[obj_term]-&gt;oid)
++	if( move_cam_to == obj[obj_term]-&gt;oid )
+ 	{
+-		oid_focus = obj[obj_term]-&gt;oid;
++		Oid_focus = obj[obj_term]-&gt;oid;
+ 		for( i=0; i&lt;3; i++)
+ 		{
+ 			CamPosition[0][i]=(CamPosition[0][i]*4+obj[obj_term]-&gt;poi[i])/5;
+@@ -715,7 +717,7 @@
+ 			move_cam_to = -1;
+ 		}
+ 	} else if ( move_cam_to != -2 &amp;&amp; move_cam_to != -1 ) {
+-		oid_focus = -1;
++		Oid_focus = -1;
+ 		for( i=0; i&lt;3; i++)
+ 		{
+ 			if( i==2 )
+@@ -736,6 +738,17 @@
+ 		s3d_translate(0,CamPosition[0][0],CamPosition[0][1],CamPosition[0][2]);
+ 		s3d_rotate(0,CamPosition[1][0],CamPosition[1][1],CamPosition[1][2]);
+ 
++		if(Btn_follow_mode_id == -1)
++		{
++			Btn_follow_mode_id = s3d_clone( Btn_follow_mode_obj );
++			s3d_link(Btn_follow_mode_id,0);
++			s3d_flags_on(Btn_follow_mode_id,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++			s3d_scale( Btn_follow_mode_id, 0.5 );
++			s3d_translate( Btn_follow_mode_id,-Left*3.0-1.0, -Bottom*3.0-0.7, -3.0 );
++		}
++		
++		Rotate_follow_button = (Rotate_follow_button + 50)%360;
++		s3d_rotate(Btn_follow_mode_id,0,Rotate_follow_button,0);
+ /*		if (dist(CamPosition[0],search_node-&gt;pos_vec) &lt; 6)
+ 		{
+ 			s3d_translate(0,search_node-&gt;pos_vec[0],search_node-&gt;pos_vec[1],(search_node-&gt;pos_vec[2]+5));
+@@ -747,7 +760,7 @@
+ 	/* move back to returnPoint */
+ 	if(move_cam_to == -2)
+ 	{
+-		oid_focus = -1;
++		Oid_focus = -1;
+ 		for( i=0; i&lt;3; i++)
+ 		{
+ 			CamPosition[0][i]=(CamPosition[0][i]*4+ReturnPoint[0][i])/5;
+@@ -820,7 +833,7 @@
+ 	int key;
+ 	key=*((unsigned short *)event-&gt;buf);
+ 
+-	if(oid_focus != obj[obj_term]-&gt;oid)
++	if(Oid_focus != obj[obj_term]-&gt;oid)
+ 	{
+ 		switch(key) {
+ 			case S3DK_ESCAPE: /* esc -&gt; close olsr */
+@@ -864,7 +877,7 @@
+ 				break;
+ 		}
+ 	} else {
+-		if( (key &gt;= 48 &amp;&amp; key &lt;= 57) || key == 46 || key == 13 || key == 8 )
++		if( (key &gt;= 48 &amp;&amp; key &lt;= 57) || key == 46 || key == 13 || key == 8 || (key &gt;= 256 &amp;&amp; key &lt;= 265) || key == 266 || key == 271 )
+ 			write_terminal(key);
+ 	}
+ }
+@@ -885,7 +898,6 @@
+ 
+ 	if( oid == Btn_close_id )
+ 	{
+-		int i;
+ 		s3d_del_object(Btn_close_id);
+ 		s3d_del_object(Olsr_ip_label_obj);
+ 		Btn_close_id = Olsr_ip_label_obj = -1;
+@@ -901,10 +913,10 @@
+ 		}
+ 		return;
+ 	}
+-	
++
+ 	if( oid == Btn_move_terminal_id )
+ 	{
+-		if(oid_focus != obj[obj_term]-&gt;oid)
++		if(Oid_focus != obj[obj_term]-&gt;oid)
+ 		{
+ 			for(i=0;i&lt;3;i++)
+ 			{
+@@ -913,21 +925,34 @@
+ 			}
+ 			move_cam_to = obj[obj_term]-&gt;oid;
+ 		} else {
+-			oid_focus = -1;
++			Oid_focus = -1;
+ 			move_cam_to = -2;	
+ 		}
+ 		return;
+ 	}
++	
++	if( oid == Btn_follow_mode_id )
++	{
++		s3d_del_object(Btn_follow_mode_id	);
++		Btn_follow_mode_id = -1;
++		Oid_focus = -1;
++		move_cam_to = -1;
++		return;
++	}
+ 
+ 	Olsr_node_pEtx = *lst_search(oid);
+ 
+-	if( Btn_close_id == -1 &amp;&amp; Olsr_node_pEtx != NULL )
++	if( Olsr_node_pEtx != NULL )
+ 	{
+-		Btn_close_id = s3d_clone( Btn_close_obj );
+-		s3d_link(Btn_close_id,0);
+-		s3d_flags_on(Btn_close_id,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-		s3d_scale( Btn_close_id, 0.05 );
+-		s3d_translate( Btn_close_id,-Left*3.0-0.125, -Bottom*3.0-0.7, -3.0 );
++		if( Btn_close_id == -1 )
++		{
++			Btn_close_id = s3d_clone( Btn_close_obj );
++			s3d_link(Btn_close_id,0);
++			s3d_flags_on(Btn_close_id,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++			s3d_scale( Btn_close_id, 0.05 );
++			s3d_translate( Btn_close_id,-Left*3.0-0.125, -Bottom*3.0-0.7, -3.0 );
++		}
++		
+ 		if ( Olsr_ip_label_obj != -1 ) s3d_del_object( Olsr_ip_label_obj );
+ 		snprintf( ip_str, 35, &quot;ip: %s&quot;, Olsr_node_pEtx-&gt;ip );
+ 		Olsr_ip_label_obj = s3d_draw_string( ip_str, &amp;Title_len );
+@@ -935,6 +960,7 @@
+ 		s3d_flags_on( Olsr_ip_label_obj, S3D_OF_VISIBLE );
+ 		s3d_scale( Olsr_ip_label_obj, 0.2 );
+ 		s3d_translate( Olsr_ip_label_obj,-Left*3.0-(Title_len * 0.2)-0.15, -Bottom*3.0-1.0, -3.0 );
++		/*
+ 		cam_go=1;
+ 		if ( Olsr_ip_label_obj != -1 ) s3d_del_object( Olsr_ip_label_obj );
+ 		snprintf( ip_str, 35, &quot;ip: %s&quot;, Olsr_node_pEtx-&gt;ip );
+@@ -943,9 +969,8 @@
+ 		s3d_flags_on( Olsr_ip_label_obj, S3D_OF_VISIBLE );
+ 		s3d_scale( Olsr_ip_label_obj, 0.2 );
+ 		s3d_translate( Olsr_ip_label_obj,-Left*3.0-(Title_len * 0.2)-0.15, -Bottom*3.0-1.0, -3.0 );
+-	} else {
+-		/* object_handler(oid); */
+-	}
++		*/
++	} 
+ }
+ 
+ void print_etx()
+@@ -1110,6 +1135,7 @@
+ 	s3d_flags_on(Btn_move_terminal_id,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 	s3d_scale( Btn_move_terminal_id, 0.5 );
+ 	s3d_translate( Btn_move_terminal_id,-Left*3.0-0.5, -Bottom*3.0-0.7, -3.0 );
++
+ }
+ 
+ int main( int argc, char *argv[] ) {
+@@ -1175,6 +1201,7 @@
+ 			/* terminal buttons */
+ 			Btn_close_obj = s3d_import_3ds_file(&quot;objs/btn_close.3ds&quot;);
+ 			Btn_move_terminal_obj = s3d_import_3ds_file(&quot;objs/dot.3ds&quot;);
++			Btn_follow_mode_obj = s3d_import_3ds_file(&quot;objs/dotdot.3ds&quot;);
+ 			
+ 			ZeroPoint = s3d_new_object();
+ 			Output_border[0] = Output_border[1] = Output_border[2] = Output_border[3] = -1;
+
+Modified: trunk/apps/olsrs3d/terminal.c
+===================================================================
+--- trunk/apps/olsrs3d/terminal.c	2006-05-06 16:55:25 UTC (rev 279)
++++ trunk/apps/olsrs3d/terminal.c	2006-05-07 02:03:14 UTC (rev 280)
+@@ -126,7 +126,10 @@
+ 	float tmp;
+ 	static int str_id = -1;
+ 
+-	if(key != 13)
++	if( key == 266) key = 46;
++	if( key &gt;= 256 &amp;&amp; key &lt;= 265) key = key - 208;
++	
++	if(key != 13 &amp;&amp; key != 271)
+ 	{
+ 		if(key == 8)
+ 		{
+@@ -152,7 +155,7 @@
+ 		{
+ 			printf(&quot;no node found\n&quot;);
+ 		} else {
+-			move_cam_to = search_node-&gt;obj_id;	
++			move_cam_to = search_node-&gt;obj_id;
+ 		}
+ 	}
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000272.html">[S3d-svn] r279 - in trunk: . apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000274.html">[S3d-svn] r281 - in trunk: . Documentation/s3dapi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#273">[ date ]</a>
+              <a href="thread.html#273">[ thread ]</a>
+              <a href="subject.html#273">[ subject ]</a>
+              <a href="author.html#273">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

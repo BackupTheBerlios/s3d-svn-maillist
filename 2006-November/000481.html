@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r488 - in trunk/extras/distro/gentoo/media-gfx/s3d-svn: .	files
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r488%20-%20in%20trunk/extras/distro/gentoo/media-gfx/s3d-svn%3A%20.%0A%09files&In-Reply-To=%3C200611261836.kAQIaYtL032677%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000480.html">
+   <LINK REL="Next"  HREF="000482.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r488 - in trunk/extras/distro/gentoo/media-gfx/s3d-svn: .	files</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r488%20-%20in%20trunk/extras/distro/gentoo/media-gfx/s3d-svn%3A%20.%0A%09files&In-Reply-To=%3C200611261836.kAQIaYtL032677%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r488 - in trunk/extras/distro/gentoo/media-gfx/s3d-svn: .	files">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 26 19:36:34 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000480.html">[S3d-svn] r487 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000482.html">[S3d-svn] r489 - in trunk/extras/distro/gentoo/media-gfx: s3d	s3d-svn
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#481">[ date ]</a>
+              <a href="thread.html#481">[ thread ]</a>
+              <a href="subject.html#481">[ subject ]</a>
+              <a href="author.html#481">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2006-11-26 19:36:34 +0100 (Sun, 26 Nov 2006)
+New Revision: 488
+
+Modified:
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/ChangeLog
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/files/digest-s3d-svn-9999
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild
+Log:
+- add sqlite3 as dependency in svn-ebuild
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/ChangeLog
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/ChangeLog	2006-11-26 17:37:49 UTC (rev 487)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/ChangeLog	2006-11-26 18:36:34 UTC (rev 488)
+@@ -1,5 +1,10 @@
+ # ChangeLog for media-gfx/s3d-svn
+ 
++*s3d-svn-9999 (26 Nov 2006)
++
++  26 Nov 2006; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; s3d-svn-9999.ebuild:
++  Added sqlite-3 as dependency.
++
+ *s3d-svn-9999 (25 Oct 2006)
+ 
+   25 Oct 2006; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; s3d-svn-9999.ebuild:
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest	2006-11-26 17:37:49 UTC (rev 487)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest	2006-11-26 18:36:34 UTC (rev 488)
+@@ -1,15 +1,15 @@
+-EBUILD s3d-svn-9999.ebuild 854 RMD160 71332ca7afce19258d03d30369f6fd40768f80bc SHA1 c18620febb279103d2e69dc4b5bfb99b8fca33d4 SHA256 bb3f63536f9266a033c880e4f00ef881e23928b89f7af8932f75607b5ee0286c
+-MD5 5d86860506b4fd6edd49cafd70af217f s3d-svn-9999.ebuild 854
+-RMD160 71332ca7afce19258d03d30369f6fd40768f80bc s3d-svn-9999.ebuild 854
+-SHA256 bb3f63536f9266a033c880e4f00ef881e23928b89f7af8932f75607b5ee0286c s3d-svn-9999.ebuild 854
+-MISC ChangeLog 158 RMD160 e817888af84d9f7ae286bbf1f23ada86c95e97f8 SHA1 df2ceb7d586962142785b91bdf915b4e7c02e04a SHA256 27a1ef992b0259bd3b203fb70e6c8e57f2cdeb39af98343069a2d1a0798eff17
+-MD5 39106091ba185d909931a2d120f05db4 ChangeLog 158
+-RMD160 e817888af84d9f7ae286bbf1f23ada86c95e97f8 ChangeLog 158
+-SHA256 27a1ef992b0259bd3b203fb70e6c8e57f2cdeb39af98343069a2d1a0798eff17 ChangeLog 158
++EBUILD s3d-svn-9999.ebuild 873 RMD160 c4e442fb6f0e09d42d9bfb55559268cac0c3c2c3 SHA1 df6b48857dfa7db86a7a48e30c674190657b2f0a SHA256 6df55733ec72ff628fc6069c2547064d02efa1475567f67250be4b6d95b481ca
++MD5 14d3ec19b0272d64318178980bc619c5 s3d-svn-9999.ebuild 873
++RMD160 c4e442fb6f0e09d42d9bfb55559268cac0c3c2c3 s3d-svn-9999.ebuild 873
++SHA256 6df55733ec72ff628fc6069c2547064d02efa1475567f67250be4b6d95b481ca s3d-svn-9999.ebuild 873
++MISC ChangeLog 295 RMD160 818b9134758d8a5d81be67d25ab990fe7cc71283 SHA1 529b5c00b3ad8067f06ce4bcc41d6a185fb2670d SHA256 cd5d36bee2dce3a94ce0f4f65ad7dc4ab8d299e48e57f48aa0a609eb06fe4885
++MD5 569601eaa0bbba92427ed05da0dfc050 ChangeLog 295
++RMD160 818b9134758d8a5d81be67d25ab990fe7cc71283 ChangeLog 295
++SHA256 cd5d36bee2dce3a94ce0f4f65ad7dc4ab8d299e48e57f48aa0a609eb06fe4885 ChangeLog 295
+ MISC metadata.xml 239 RMD160 236f28d8249f562b764e2d854580d8301b150418 SHA1 76f167e3abff81e9535c16a637fd1e7f91d4fda3 SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f
+ MD5 261031c8b7aca6f50babf7e44b35deb1 metadata.xml 239
+ RMD160 236f28d8249f562b764e2d854580d8301b150418 metadata.xml 239
+ SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f metadata.xml 239
+-MD5 d41d8cd98f00b204e9800998ecf8427e files/digest-s3d-svn-9999 0
+-RMD160 9c1185a5c5e9fc54612808977ee8f548b2258d31 files/digest-s3d-svn-9999 0
+-SHA256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 files/digest-s3d-svn-9999 0
++MD5 68b329da9893e34099c7d8ad5cb9c940 files/digest-s3d-svn-9999 1
++RMD160 c0da025038ed83c687ddc430da9846ecb97f3998 files/digest-s3d-svn-9999 1
++SHA256 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b files/digest-s3d-svn-9999 1
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/files/digest-s3d-svn-9999
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/files/digest-s3d-svn-9999	2006-11-26 17:37:49 UTC (rev 487)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/files/digest-s3d-svn-9999	2006-11-26 18:36:34 UTC (rev 488)
+@@ -0,0 +1 @@
++
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild	2006-11-26 17:37:49 UTC (rev 487)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild	2006-11-26 18:36:34 UTC (rev 488)
+@@ -17,6 +17,7 @@
+ 	&gt;=sys-devel/automake-1.9
+ 	sys-devel/flex
+ 	&gt;=sys-devel/libtool-1.5
++	&gt;=dev-db/sqlite-3
+ 	&quot;
+ RDEPEND=&quot;!media-gfx/s3d
+ 	&gt;=media-libs/libsdl-1.2.7
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000480.html">[S3d-svn] r487 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000482.html">[S3d-svn] r489 - in trunk/extras/distro/gentoo/media-gfx: s3d	s3d-svn
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#481">[ date ]</a>
+              <a href="thread.html#481">[ thread ]</a>
+              <a href="subject.html#481">[ subject ]</a>
+              <a href="author.html#481">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

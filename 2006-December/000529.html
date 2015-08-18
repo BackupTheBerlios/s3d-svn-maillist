@@ -1,0 +1,191 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r536 - in trunk: . libs3d libs3d/libg3d/src libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r536%20-%20in%20trunk%3A%20.%20libs3d%20libs3d/libg3d/src%20libs3dw&In-Reply-To=%3C200612171530.kBHFUO7h000722%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000528.html">
+   <LINK REL="Next"  HREF="000530.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r536 - in trunk: . libs3d libs3d/libg3d/src libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r536%20-%20in%20trunk%3A%20.%20libs3d%20libs3d/libg3d/src%20libs3dw&In-Reply-To=%3C200612171530.kBHFUO7h000722%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r536 - in trunk: . libs3d libs3d/libg3d/src libs3dw">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Dec 17 16:30:24 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000528.html">[S3d-svn] r535 - in trunk: . apps config
+</A></li>
+        <LI>Next message: <A HREF="000530.html">[S3d-svn] r537 - in trunk: . libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#529">[ date ]</a>
+              <a href="thread.html#529">[ thread ]</a>
+              <a href="subject.html#529">[ subject ]</a>
+              <a href="author.html#529">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-12-17 16:30:23 +0100 (Sun, 17 Dec 2006)
+New Revision: 536
+
+Modified:
+   trunk/
+   trunk/libs3d/libg3d/src/plugins.c
+   trunk/libs3d/s3d.h
+   trunk/libs3dw/label.c
+   trunk/libs3dw/s3dw.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1292 at kero</A>:  dotslash | 2006-12-17 16:30:12 +0100
+ - add s3dw_label_change_text()
+ - add s3d[w]_h defines so we can ignore multiple loadings
+   and include s3d.h in s3dw.h by default
+ - chdir() patch in plugins, don't change our path when loading an object!!
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1285
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1292
+
+Modified: trunk/libs3d/libg3d/src/plugins.c
+===================================================================
+--- trunk/libs3d/libg3d/src/plugins.c	2006-12-16 13:37:09 UTC (rev 535)
++++ trunk/libs3d/libg3d/src/plugins.c	2006-12-17 15:30:23 UTC (rev 536)
+@@ -243,6 +243,7 @@
+ 	G3DPlugin *plugin;
+ 	gchar *lcext, *basename, *dirname;
+ 	gboolean retval;
++	char olddir[4096];
+ 
+ 	lcext = g3d_plugins_get_filetype(filename);
+ 	if(lcext == NULL)
+@@ -266,6 +267,7 @@
+ 	basename = g_path_get_basename(filename);
+ 	dirname = g_path_get_dirname(filename);
+ 
++	getcwd(olddir,4096);
+ 	chdir(dirname);
+ 
+ 	retval = plugin-&gt;loadmodel_func(context, basename, model,
+@@ -273,6 +275,7 @@
+ 
+ 	g_free(basename);
+ 	g_free(dirname);
++	chdir(olddir);
+ 
+ 	return retval;
+ }
+
+Modified: trunk/libs3d/s3d.h
+===================================================================
+--- trunk/libs3d/s3d.h	2006-12-16 13:37:09 UTC (rev 535)
++++ trunk/libs3d/s3d.h	2006-12-17 15:30:23 UTC (rev 536)
+@@ -20,6 +20,8 @@
+  * along with the s3d API; if not, write to the Free Software
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
++#ifndef LIBS3D_H
++#define LIBS3D_H
+ 
+ #include &lt;stdint.h&gt;  /* [u]intXX_t type definitions*/
+ /* definitions */
+@@ -184,3 +186,4 @@
+ 
+ /* for apps which don't employ s3d_mainloop() */
+ int s3d_net_check();
++#endif
+
+Modified: trunk/libs3dw/label.c
+===================================================================
+--- trunk/libs3dw/label.c	2006-12-16 13:37:09 UTC (rev 535)
++++ trunk/libs3dw/label.c	2006-12-17 15:30:23 UTC (rev 536)
+@@ -49,7 +49,21 @@
+ {
+     s3d_flags_off(widget-&gt;oid,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ }
++/* change label text */
++void s3dw_label_change_text(s3dw_label *label, char *text)
++{
++	s3dw_widget *widget=(s3dw_widget *)label;
++	uint32_t oid_text;
++	/* redraw the text ... */
++	free(label-&gt;text);
++	label-&gt;text=strdup(text);
++	s3dw_label_erase(widget);
++	s3dw_label_draw(widget);
++	if (widget-&gt;flags&amp;S3DW_ONSCREEN)
++		s3dw_label_show(widget);
++}
+ 
++
+ /* create a new label in the surface */
+ s3dw_label *s3dw_label_new(s3dw_surface *surface, char *text, float posx, float posy)
+ {
+
+Modified: trunk/libs3dw/s3dw.h
+===================================================================
+--- trunk/libs3dw/s3dw.h	2006-12-16 13:37:09 UTC (rev 535)
++++ trunk/libs3dw/s3dw.h	2006-12-17 15:30:23 UTC (rev 536)
+@@ -21,6 +21,11 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++#ifndef LIBS3DW_H
++#define LIBS3DW_H
++#ifndef LIBS3D_H
++#include &lt;s3d.h&gt;
++#endif
+ #include &lt;stdint.h&gt;  /* [u]intXX_t type definitions*/
+ 
+ /* we want this widget visible, as long as the widgets below are also visible. 
+@@ -160,6 +165,7 @@
+ s3dw_textbox 		*s3dw_textbox_new(s3dw_surface *surface, char *text, float posx, float posy, float width, float height);
+ char 				*s3dw_input_gettext(s3dw_input *input);
+ void 				 s3dw_input_change_text(s3dw_input *input, char *text);
++void 				 s3dw_label_change_text(s3dw_label *label, char *text);
+ s3dw_surface 		*s3dw_surface_new(char *title, float width, float height);
+ 
+ s3dw_widget 		*s3dw_getroot();
+@@ -180,3 +186,4 @@
+ int 				 s3dw_object_info(struct s3d_evt *evt);
+ 
+ void 				 s3dw_ani_mate();
++#endif
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000528.html">[S3d-svn] r535 - in trunk: . apps config
+</A></li>
+	<LI>Next message: <A HREF="000530.html">[S3d-svn] r537 - in trunk: . libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#529">[ date ]</a>
+              <a href="thread.html#529">[ thread ]</a>
+              <a href="subject.html#529">[ subject ]</a>
+              <a href="author.html#529">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

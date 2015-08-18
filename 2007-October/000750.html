@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r758 - trunk/apps/s3dvt
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r758%20-%20trunk/apps/s3dvt&In-Reply-To=%3C200710182357.l9INvWSN030077%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000749.html">
+   <LINK REL="Next"  HREF="000751.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r758 - trunk/apps/s3dvt</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r758%20-%20trunk/apps/s3dvt&In-Reply-To=%3C200710182357.l9INvWSN030077%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r758 - trunk/apps/s3dvt">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 01:57:32 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000749.html">[S3d-svn] r757 - trunk/apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000751.html">[S3d-svn] r759 - trunk/apps/s3d_x11gate
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#750">[ date ]</a>
+              <a href="thread.html#750">[ thread ]</a>
+              <a href="subject.html#750">[ subject ]</a>
+              <a href="author.html#750">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 01:57:32 +0200 (Fri, 19 Oct 2007)
+New Revision: 758
+
+Modified:
+   trunk/apps/s3dvt/main.c
+Log:
+s3dvt: Send a string to write(..) instead of zero constant
+
+
+Modified: trunk/apps/s3dvt/main.c
+===================================================================
+--- trunk/apps/s3dvt/main.c	2007-10-18 23:57:14 UTC (rev 757)
++++ trunk/apps/s3dvt/main.c	2007-10-18 23:57:32 UTC (rev 758)
+@@ -248,7 +248,7 @@
+ 	printf(&quot;unloading tty!!\n&quot;);
+ 	switch (term_mode) {
+ 	case M_PTY:
+-		write(curpty, '\0', 1);  /*  send an EOF, just in case */
++		write(curpty, &quot;\0&quot;, 1);  /*  send an EOF, just in case */
+ 		close(curpty);
+ 		close(curtty);
+ 		/* kill(pid); */
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000749.html">[S3d-svn] r757 - trunk/apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000751.html">[S3d-svn] r759 - trunk/apps/s3d_x11gate
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#750">[ date ]</a>
+              <a href="thread.html#750">[ thread ]</a>
+              <a href="subject.html#750">[ subject ]</a>
+              <a href="author.html#750">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,295 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r400 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r400%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200609171452.k8HEqWUP008770%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000392.html">
+   <LINK REL="Next"  HREF="000394.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r400 - trunk/apps/olsrs3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r400%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200609171452.k8HEqWUP008770%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r400 - trunk/apps/olsrs3d">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Sep 17 16:52:32 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000392.html">[S3d-svn] r399 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000394.html">[S3d-svn] r401 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#393">[ date ]</a>
+              <a href="thread.html#393">[ thread ]</a>
+              <a href="subject.html#393">[ subject ]</a>
+              <a href="author.html#393">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-17 16:52:32 +0200 (Sun, 17 Sep 2006)
+New Revision: 400
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/olsrs3d.h
+   trunk/apps/olsrs3d/search.c
+   trunk/apps/olsrs3d/search.h
+Log:
+- popping search window
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-09-17 13:55:22 UTC (rev 399)
++++ trunk/apps/olsrs3d/main.c	2006-09-17 14:52:32 UTC (rev 400)
+@@ -133,7 +133,19 @@
+ }
+ 
+ 
++void window_error(char *msg) {
+ 
++	s3dw_surface *infwin;
++	s3dw_button  *button;
++
++	infwin = s3dw_surface_new( &quot;Error&quot;, 12, 6 );
++	s3dw_label_new(infwin,msg,1,2);
++
++	button=s3dw_button_new(infwin,&quot;OK&quot;,4,4);
++	button-&gt;onclick = close_win;
++	s3dw_show(S3DWIDGET(infwin));
++
++}
+ /***
+  *
+  * print error and exit
+@@ -721,12 +733,12 @@
+ 	CamPosition2[0][2]=  CamPosition[0][0]*sin(Zp_rotate*M_PI/180.0) + CamPosition[0][2] * cos (Zp_rotate*M_PI/180.0);
+ 
+ 	/* check search status */
+-	if( get_search_status() == WIDGET )
+-		move_to_search_widget( CamPosition[0], CamPosition[1] );
++/*	if( get_search_status() == WIDGET )
++		move_to_search_widget( CamPosition[0], CamPosition[1] );*/
+ 	if( get_search_status() == FOLLOW )
+ 		follow_node( CamPosition[0], CamPosition[1], Zp_rotate );
+-	if( get_search_status() == ABORT )
+-		move_to_return_point( CamPosition[0], CamPosition[1] );
++/*	if( get_search_status() == ABORT )
++		move_to_return_point( CamPosition[0], CamPosition[1] );*/
+ 
+ 
+ 	if( Olsr_ip_label_obj != -1 )
+@@ -774,8 +786,10 @@
+ 			case S3DK_s: /* move to search widget, give widget focus */
+ 
+ 				set_search_status(WIDGET);							/* set status for mainloop */
+-				set_return_point(CamPosition[0],CamPosition[1]);	/* save the return position */
+-				set_node_root( Olsr_root );
++				show_search_window();
++/*				set_return_point(CamPosition[0],CamPosition[1]);	/ * save the return position * /
++				set_node_root( Olsr_root );*/
++				
+ 				break;
+ 
+ 			case S3DK_c: /* color on/off */
+@@ -853,11 +867,12 @@
+ 	int oid,i;
+ 	char ip_str[50];
+ 
+-	if( get_search_status() == WIDGET )
++	s3dw_handle_click(evt);
++/*	if( get_search_status() == WIDGET )
+ 	{
+ 		s3dw_handle_click(evt);
+ 		return;
+-	}
++	}*/
+ 
+ 	oid=(int)*((unsigned long *)evt-&gt;buf);
+ 
+@@ -1125,7 +1140,7 @@
+ 			Olsr_node_inet_obj = s3d_import_model_file( &quot;objs/accesspoint_inet.3ds&quot; );
+ 			Olsr_node_hna_net = s3d_import_model_file( &quot;objs/internet.3ds&quot; );
+ 			Btn_close_obj = s3d_import_model_file( &quot;objs/btn_close.3ds&quot; );
+-			create_search_widget( 0, 0, 300 );
++/*			create_search_widget( 0, 0, 300 );*/
+ 
+ 			ZeroPoint = s3d_new_object();
+ 			Output_border[0] = Output_border[1] = Output_border[2] = Output_border[3] = -1;
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-09-17 13:55:22 UTC (rev 399)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-09-17 14:52:32 UTC (rev 400)
+@@ -72,3 +72,4 @@
+ struct olsr_node **lst_search(int id);
+ void print_etx( void );
+ float dist(float p1[], float p2[]);
++void window_error(char *msg); 
+
+Modified: trunk/apps/olsrs3d/search.c
+===================================================================
+--- trunk/apps/olsrs3d/search.c	2006-09-17 13:55:22 UTC (rev 399)
++++ trunk/apps/olsrs3d/search.c	2006-09-17 14:52:32 UTC (rev 400)
+@@ -27,7 +27,8 @@
+ #include &lt;math.h&gt;
+ #include &lt;stdio.h&gt;	/* TODO can remove then no more printf needed */
+ #include &lt;string.h&gt;
+-#include &quot;structs.h&quot;
++#include &quot;olsrs3d.h&quot;	/* for window_error(), structs */
++/* #include &quot;structs.h&quot;  already included by olsrs3d.h */
+ #include &quot;search.h&quot;
+ 
+ s3dw_surface	*_search_surface;
+@@ -41,8 +42,10 @@
+ int		_search_status = NOTHING;			/* status of search */
+ 											
+ void _search_node(s3dw_widget *dummy);
++void _new_search_node(s3dw_widget *dummy);
+ void _abort_search(s3dw_widget *dummy);
+ 
++
+ /* public */
+ void follow_node(float cam_position_t[], float cam_position_r[],float rotate)
+ {
+@@ -79,7 +82,37 @@
+ 	s3d_translate( 0, cam_position_t[0], cam_position_t[1], cam_position_t[2] );
+ 	s3d_rotate( 0, cam_position_r[0], cam_position_r[1], cam_position_r[2] );
+ }
++void _abort_search_window(s3dw_widget *bwidget)
++{
++	s3dw_delete(bwidget-&gt;parent); /* remove the window cointaining the button */
++	_search_surface=NULL;
++	_search_input=NULL;
++	_search_widget=NULL;
++	set_search_status(NOTHING);
++}
++void show_search_window()
++{
++	s3dw_button *search_button, *abort_button;
++	
++	_search_surface	= s3dw_surface_new( &quot;Node Search&quot;, 17, 10 );
++	_search_input	= s3dw_input_new( _search_surface, 15, 1, 4 );
++	
++	s3dw_label_new( _search_surface, &quot;Enter the IP of the node.&quot;, 1, 2);
++	s3dw_focus( S3DWIDGET( _search_input ) );
++	
++	search_button = s3dw_button_new( _search_surface, &quot;Search&quot;, 11.5, 7 );
++	abort_button  = s3dw_button_new( _search_surface, &quot;Abort&quot;, 1, 7 );
++	search_button-&gt;onclick = _new_search_node;
++	abort_button-&gt;onclick = _abort_search_window;
+ 
++	/* TODO calc position for ok button */
++	
++	s3dw_focus	( S3DWIDGET( _search_input ) );	
++	s3dw_focus	( S3DWIDGET( _search_surface ) );
++	s3dw_show	( S3DWIDGET( _search_surface ) );
++
++}
++
+ /* public */
+ void create_search_widget(float x, float y, float z)
+ {
+@@ -216,6 +249,11 @@
+ }
+ 
+ /* public */
++/* TODO: WTF?! 
++ * please fix: 
++ *  - s is not initialized but still strlen() is used?! 
++ *  - s will vanish after the function is processed. global variable would be better
++ *  - don't forget the terminating \0 after writing a key */
+ void search_widget_write(int key)
+ {
+ 	static char s[20];
+@@ -267,7 +305,46 @@
+ {
+ 	_node_root = root;
+ }
++/* private */
++void _new_search_node(s3dw_widget *dummy)
++{
++	char *ip;
++	int result;
++	
++	search_node = &amp;_node_root;
++	
++	ip = s3dw_input_gettext( _search_input );
++	
++	while ( (*search_node) != NULL )
++	{
+ 
++		result = strncmp( (*search_node)-&gt;ip, ip, NAMEMAX );
++
++		if ( result == 0 ) 
++			break;
++		
++		if ( result &lt; 0 )
++			(*search_node) = (*search_node)-&gt;right;
++		else
++			(*search_node) = (*search_node)-&gt;left;
++	}
++	s3dw_delete(dummy-&gt;parent); /* remove the window cointaining the button */
++	_search_surface=NULL;
++	_search_input=NULL;
++	_search_widget=NULL;
++
++
++	if( (*search_node) != NULL )
++	{
++		window_error(&quot;Okay, following&quot;);
++		set_search_status( FOLLOW );
++	}
++	else
++	{
++		window_error(&quot;Sorry, could not find...&quot;);
++		set_search_status( NOTHING );
++	}
++}
+ /* private */
+ void _search_node(s3dw_widget *dummy)
+ {
+
+Modified: trunk/apps/olsrs3d/search.h
+===================================================================
+--- trunk/apps/olsrs3d/search.h	2006-09-17 13:55:22 UTC (rev 399)
++++ trunk/apps/olsrs3d/search.h	2006-09-17 14:52:32 UTC (rev 400)
+@@ -37,3 +37,4 @@
+ void set_node_root(struct olsr_node *root);
+ void follow_node(float cam_position_t[], float cam_position_r[],float rotate);
+ 
++void show_search_window();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000392.html">[S3d-svn] r399 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000394.html">[S3d-svn] r401 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#393">[ date ]</a>
+              <a href="thread.html#393">[ thread ]</a>
+              <a href="subject.html#393">[ subject ]</a>
+              <a href="author.html#393">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

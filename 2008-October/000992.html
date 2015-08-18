@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1012 - in trunk: libs3d server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1012%20-%20in%20trunk%3A%20libs3d%20server&In-Reply-To=%3C200810232328.m9NNSPWv032536%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000993.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1012 - in trunk: libs3d server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1012%20-%20in%20trunk%3A%20libs3d%20server&In-Reply-To=%3C200810232328.m9NNSPWv032536%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1012 - in trunk: libs3d server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 24 01:28:25 CEST 2008</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000993.html">[S3d-svn] r1013 - in trunk: libs3d libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#992">[ date ]</a>
+              <a href="thread.html#992">[ thread ]</a>
+              <a href="subject.html#992">[ subject ]</a>
+              <a href="author.html#992">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-10-24 01:28:24 +0200 (Fri, 24 Oct 2008)
+New Revision: 1012
+
+Modified:
+   trunk/libs3d/s3dlib.h
+   trunk/server/global.h
+Log:
+Enable gcc format string checking for debug functions
+
+Modified: trunk/libs3d/s3dlib.h
+===================================================================
+--- trunk/libs3d/s3dlib.h	2008-09-27 18:30:19 UTC (rev 1011)
++++ trunk/libs3d/s3dlib.h	2008-10-23 23:28:24 UTC (rev 1012)
+@@ -47,6 +47,12 @@
+ #define S3DEXPORT
+ #endif
+ 
++#ifdef __GNUC_MINOR__
++#define S3D_FORMAT(type, fmt_pos, arg_pos)  __attribute__ ((format (type, fmt_pos, arg_pos)))
++#else
++#define S3D_FORMAT(type, fmt_pos, arg_pos)
++#endif
++
+ #define VLOW 1
+ #define LOW  2
+ #define MED  3
+@@ -96,10 +102,14 @@
+ } __attribute__((__packed__));
+ 
+ #ifdef DEBUG
+-S3DEXPORT void s3dprintf(int relevance, const char *fmt, ...);
++S3DEXPORT void s3dprintf(int relevance, const char *fmt, ...) S3D_FORMAT(printf, 2, 3);
+ S3DEXPORT void errdn(int relevance, const char *func, int en);
+-S3DEXPORT void errds(int relevance, const char *func, const char *fmt, ...);
++S3DEXPORT void errds(int relevance, const char *func, const char *fmt, ...) S3D_FORMAT(printf, 3, 4);
+ #else
++static void s3dprintf(int relevance, const char *fmt, ...) S3D_FORMAT(printf, 2, 3);
++static void errdn(int relevance, const char *func, int en);
++static void errds(int relevance, const char *func, const char *fmt, ...) S3D_FORMAT(printf, 3, 4);
++
+ static __inline__ void s3dprintf(int S3DUNUSED(relevance),
+                                  const char *S3DUNUSED(fmt), ...) {}
+ static __inline__ void errdn(int S3DUNUSED(relevance),
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2008-09-27 18:30:19 UTC (rev 1011)
++++ trunk/server/global.h	2008-10-23 23:28:24 UTC (rev 1012)
+@@ -46,6 +46,12 @@
+ #endif
+ #endif
+ 
++#ifdef __GNUC_MINOR__
++#define S3D_FORMAT(type, fmt_pos, arg_pos)  __attribute__ ((format (type, fmt_pos, arg_pos)))
++#else
++#define S3D_FORMAT(type, fmt_pos, arg_pos)
++#endif
++
+ #ifndef S3D_NAME_MAX
+ #define S3D_NAME_MAX 256   /*  limit for names [e.g. process names] */
+ #endif /* S3D_NAME_MAX */
+@@ -271,9 +277,12 @@
+ void errs(const char *func, const char *msg);
+ void errsf(const char *func, const char *msg);
+ #ifdef DEBUG
+-void errds(int relevance, const char *func, const char *fmt, ...);
+-void s3dprintf(int relevance, const char *msg, ...);
++void errds(int relevance, const char *func, const char *fmt, ...)  S3D_FORMAT(printf, 3, 4);
++void s3dprintf(int relevance, const char *msg, ...) S3D_FORMAT(printf, 2, 3);
+ #else
++static void errds(int relevance, const char *func, const char *fmt, ...)  S3D_FORMAT(printf, 3, 4);
++static void s3dprintf(int relevance, const char *msg, ...) S3D_FORMAT(printf, 2, 3);
++
+ static __inline__ void errds(int relevance __attribute__((unused)),
+                              const char *func __attribute__((unused)),
+                              const char *fmt __attribute__((unused)), ...) {}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000993.html">[S3d-svn] r1013 - in trunk: libs3d libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#992">[ date ]</a>
+              <a href="thread.html#992">[ thread ]</a>
+              <a href="subject.html#992">[ subject ]</a>
+              <a href="author.html#992">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

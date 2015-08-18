@@ -1,0 +1,857 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r941 - in trunk: . cmake/modules
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r941%20-%20in%20trunk%3A%20.%20cmake/modules&In-Reply-To=%3C200808151308.m7FD8lrD017103%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000931.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r941 - in trunk: . cmake/modules</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r941%20-%20in%20trunk%3A%20.%20cmake/modules&In-Reply-To=%3C200808151308.m7FD8lrD017103%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r941 - in trunk: . cmake/modules">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Aug 15 15:08:47 CEST 2008</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000931.html">[S3d-svn] r942 - in trunk: apps/dot_mcp apps/kism3d apps/meshs3d	apps/s3d_x11gate apps/s3dfm apps/s3dosm apps/s3dvt example	experimental/comptest experimental/olsrs3d	experimental/testvis experimental/wiitest libs3d libs3dw server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#926">[ date ]</a>
+              <a href="thread.html#926">[ thread ]</a>
+              <a href="subject.html#926">[ subject ]</a>
+              <a href="author.html#926">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-08-15 15:08:47 +0200 (Fri, 15 Aug 2008)
+New Revision: 941
+
+Modified:
+   trunk/CMakeLists.txt
+   trunk/ConfigureChecks.cmake
+   trunk/cmake/modules/FindBluetooth.cmake
+   trunk/cmake/modules/FindCWiid.cmake
+   trunk/cmake/modules/FindFREETYPE.cmake
+   trunk/cmake/modules/FindFontconfig.cmake
+   trunk/cmake/modules/FindG3D.cmake
+   trunk/cmake/modules/FindGLIB.cmake
+   trunk/cmake/modules/FindGPS.cmake
+   trunk/cmake/modules/FindPThreads.cmake
+   trunk/cmake/modules/FindSQLite3.cmake
+   trunk/cmake/modules/FindXcomposite.cmake
+   trunk/cmake/modules/FindXdamage.cmake
+   trunk/cmake/modules/FindXfixes.cmake
+   trunk/cmake/modules/FindXrender.cmake
+   trunk/cmake/modules/FindXtst.cmake
+Log:
+Find libraries with pkg_search_module in cmake modules
+
+Modified: trunk/CMakeLists.txt
+===================================================================
+--- trunk/CMakeLists.txt	2008-08-10 20:44:15 UTC (rev 940)
++++ trunk/CMakeLists.txt	2008-08-15 13:08:47 UTC (rev 941)
+@@ -2,8 +2,13 @@
+ set(VERSION 0.2.1)
+ 
+ # we require cmake 2.4.4 or higher
+-cmake_minimum_required(VERSION 2.4.4)
++cmake_minimum_required(VERSION 2.4.7)
+ 
++# set cmake policies
++if(COMMAND cmake_policy)
++	cmake_policy(SET CMP0003 NEW)
++endif(COMMAND cmake_policy)
++
+ # Add directory with library checks to search path
+ list(APPEND CMAKE_MODULE_PATH &quot;${s3d_SOURCE_DIR}/cmake/modules&quot;)
+ 
+
+Modified: trunk/ConfigureChecks.cmake
+===================================================================
+--- trunk/ConfigureChecks.cmake	2008-08-10 20:44:15 UTC (rev 940)
++++ trunk/ConfigureChecks.cmake	2008-08-15 13:08:47 UTC (rev 941)
+@@ -5,7 +5,7 @@
+ # find required lib and add include dir for FREETYPE
+ find_package(FREETYPE)
+ if (FREETYPE_FOUND)
+-	include_directories(${FREETYPE_INCLUDE_DIR})
++	include_directories(${FREETYPE_INCLUDE_DIRS})
+ else (FREETYPE_FOUND)
+ 	PkgError_Later(&quot;Could not find FreeType (pkg name: libfreetype6-dev)&quot;)
+ endif (FREETYPE_FOUND)
+@@ -14,7 +14,7 @@
+ # find required lib and add include dir for FONTCONFIG
+ find_package(Fontconfig)
+ if (FONTCONFIG_FOUND)
+-	include_directories(${FONTCONFIG_INCLUDE_DIR})
++	include_directories(${FONTCONFIG_INCLUDE_DIRS})
+ else (FONTCONFIG_FOUND)
+ 	PkgError_Later(&quot;Could not find Fontconfig (pkg name: libfontconfig-dev)&quot;)
+ endif (FONTCONFIG_FOUND)
+@@ -23,7 +23,7 @@
+ # find required lib and add include dir for GLIB
+ find_package(GLIB)
+ if (GLIB2_FOUND)
+-	include_directories(${GLIB2_INCLUDE_DIR})
++	include_directories(${GLIB2_INCLUDE_DIRS})
+ 	add_definitions(${GLIB2_DEFINITIONS})
+ else (GLIB2_FOUND)
+ 	PkgError_Later(&quot;Could not find GLIB2 (pkg name: libglib2.0-dev)&quot;)
+@@ -33,7 +33,7 @@
+ # find required lib and add include dir for G3D
+ find_package(G3D)
+ if (G3D_FOUND)
+-	include_directories(${G3D_INCLUDE_DIR})
++	include_directories(${G3D_INCLUDE_DIRS})
+ 	add_definitions(${G3D_DEFINITIONS})
+ else (G3D_FOUND)
+ 	PkgError_Later(&quot;Could not find G3D (pkg name: libg3d-dev)&quot;)
+@@ -51,7 +51,7 @@
+ # find required lib and add include dir for OPENGL
+ find_package(OpenGL)
+ if (OPENGL_FOUND)
+-	include_directories(${OPENGL_INCLUDE_DIR})
++	include_directories(${OPENGL_INCLUDE_DIRS})
+ else (OPENGL_FOUND)
+ 	PkgError_Later(&quot;Could not find OpenGL libs and headers&quot;)
+ endif (OPENGL_FOUND)
+@@ -70,7 +70,7 @@
+ # find lib and add include dir for CWiid
+ find_package(CWiid)
+ if (CWIID_FOUND)
+-	include_directories(${CWIID_INCLUDE_DIR})
++	include_directories(${CWIID_INCLUDE_DIRS})
+ endif (CWIID_FOUND)
+ 
+ 
+@@ -88,7 +88,7 @@
+ # try to find lib and add include dir for PThreads
+ find_package(PThreads)
+ if (PTHREADS_FOUND)
+-	include_directories(${PTHREADS_INCLUDE_DIR})
++	include_directories(${PTHREADS_INCLUDE_DIRS})
+ endif (PTHREADS_FOUND)
+ 
+ 
+@@ -102,7 +102,7 @@
+ # try to find lib and add include dir for LibXml2
+ find_package(LibXml2)
+ if (LIBXML2_FOUND)
+-	include_directories(${LIBXML2_INCLUDE_DIR})
++	include_directories(${LIBXML2_INCLUDE_DIRS})
+ 	add_definitions(${LIBXML2_DEFINITIONS})
+ endif (LIBXML2_FOUND)
+ 
+
+Modified: trunk/cmake/modules/FindBluetooth.cmake
+===================================================================
+--- trunk/cmake/modules/FindBluetooth.cmake	2008-08-10 20:44:15 UTC (rev 940)
++++ trunk/cmake/modules/FindBluetooth.cmake	2008-08-15 13:08:47 UTC (rev 941)
+@@ -1,14 +1,14 @@
+ # Try to find Bluetooth
+ #  BLUETOOTH_FOUND - If false, do not try to use Bluetooth.
+-#  BLUETOOTH_INCLUDE_DIR - where to find bluetooth/bluetooth.h
++#  BLUETOOTH_INCLUDE_DIRS - where to find bluetooth/bluetooth.h
+ #  BLUETOOTH_LIBRARIES - the libraries to link against
+ 
+ 
+-if (BLUETOOTH_LIBRARIES AND BLUETOOTH_INCLUDE_DIR)
++if (BLUETOOTH_LIBRARIES AND BLUETOOTH_INCLUDE_DIRS)
+ 	# path set by user or was found in the past
+ 	set(BLUETOOTH_FOUND TRUE)
+-else (BLUETOOTH_LIBRARIES AND BLUETOOTH_INCLUDE_DIR)
+-	find_path(BLUETOOTH_INCLUDE_DIR
++else (BLUETOOTH_LIBRARIES AND BLUETOOTH_INCLUDE_DIRS)
++	find_path(BLUETOOTH_INCLUDE_DIRS
+ 		NAMES bluetooth/bluetooth.h
+ 	)
+ 
+@@ -16,9 +16,9 @@
+ 		NAMES bluetooth
+ 	)
+ 
+-	if (BLUETOOTH_INCLUDE_DIR AND BLUETOOTH_LIBRARIES)
++	if (BLUETOOTH_INCLUDE_DIRS AND BLUETOOTH_LIBRARIES)
+ 		set(BLUETOOTH_FOUND TRUE)
+-	endif (BLUETOOTH_INCLUDE_DIR AND BLUETOOTH_LIBRARIES)
++	endif (BLUETOOTH_INCLUDE_DIRS AND BLUETOOTH_LIBRARIES)
+ 
+ 	if (BLUETOOTH_FOUND)
+ 		if (NOT BLUETOOTH_FIND_QUIETLY)
+@@ -31,6 +31,6 @@
+ 	endif (BLUETOOTH_FOUND)
+ 
+ 	# set visibility in cache
+-	mark_as_advanced(BLUETOOTH_INCLUDE_DIR BLUETOOTH_LIBRARIES)
++	mark_as_advanced(BLUETOOTH_INCLUDE_DIRS BLUETOOTH_LIBRARIES)
+ 
+-endif (BLUETOOTH_LIBRARIES AND BLUETOOTH_INCLUDE_DIR)
++endif (BLUETOOTH_LIBRARIES AND BLUETOOTH_INCLUDE_DIRS)
+
+Modified: trunk/cmake/modules/FindCWiid.cmake
+===================================================================
+--- trunk/cmake/modules/FindCWiid.cmake	2008-08-10 20:44:15 UTC (rev 940)
++++ trunk/cmake/modules/FindCWiid.cmake	2008-08-15 13:08:47 UTC (rev 941)
+@@ -1,15 +1,15 @@
+ # Try to find CWiid
+ #  CWIID_FOUND - If false, do not try to use CWiid.
+-#  CWIID_INCLUDE_DIR - where to find cwiid.h
++#  CWIID_INCLUDE_DIRS - where to find cwiid.h
+ #  CWIID_LIBRARIES - the libraries to link against
+ 
+ find_package(Bluetooth)
+ 
+-if (CWIID_LIBRARIES AND CWIID_INCLUDE_DIR AND BLUETOOTH_FOUND)
++if (CWIID_LIBRARIES AND CWIID_INCLUDE_DIRS AND BLUETOOTH_FOUND)
+ 	# path set by user or was found in the past
+ 	set(CWIID_FOUND TRUE)
+-else (CWIID_LIBRARIES AND CWIID_INCLUDE_DIR AND BLUETOOTH_FOUND)
+-	find_path(CWIID_INCLUDE_DIR
++else (CWIID_LIBRARIES AND CWIID_INCLUDE_DIRS AND BLUETOOTH_FOUND)
++	find_path(CWIID_INCLUDE_DIRS
+ 		NAMES cwiid.h
+ 	)
+ 
+@@ -19,9 +19,9 @@
+ 
+ 	set(CWIID_LIBRARIES ${BLUETOOTH_LIBRARIES} ${CWIID_LIBRARY})
+ 
+-	if (CWIID_INCLUDE_DIR AND CWIID_LIBRARIES AND BLUETOOTH_FOUND)
++	if (CWIID_INCLUDE_DIRS AND CWIID_LIBRARIES AND BLUETOOTH_FOUND)
+ 		set(CWIID_FOUND TRUE)
+-	endif (CWIID_INCLUDE_DIR AND CWIID_LIBRARIES AND BLUETOOTH_FOUND)
++	endif (CWIID_INCLUDE_DIRS AND CWIID_LIBRARIES AND BLUETOOTH_FOUND)
+ 
+ 	if (CWIID_FOUND)
+ 		if (NOT CWIID_FIND_QUIETLY)
+@@ -38,6 +38,6 @@
+ 	endif (CWIID_FOUND)
+ 
+ 	# set visibility in cache
+-	mark_as_advanced(CWIID_INCLUDE_DIR CWIID_LIBRARY CWIID_LIBRARIES)
++	mark_as_advanced(CWIID_INCLUDE_DIRS CWIID_LIBRARY CWIID_LIBRARIES)
+ 
+-endif (CWIID_LIBRARIES AND CWIID_INCLUDE_DIR AND BLUETOOTH_FOUND)
++endif (CWIID_LIBRARIES AND CWIID_INCLUDE_DIRS AND BLUETOOTH_FOUND)
+
+Modified: trunk/cmake/modules/FindFREETYPE.cmake
+===================================================================
+--- trunk/cmake/modules/FindFREETYPE.cmake	2008-08-10 20:44:15 UTC (rev 940)
++++ trunk/cmake/modules/FindFREETYPE.cmake	2008-08-15 13:08:47 UTC (rev 941)
+@@ -1,64 +1,15 @@
+-# Try to find FreeType
++# # Try to find FreeType
+ #  FREETYPE_FOUND - If false, do not try to use FREETYPE.
+-#  FREETYPE_INCLUDE_DIR - where to find freetype/config/ftheader.h and ft2build.h, etc.
++#  FREETYPE_INCLUDE_DIRS - where to find freetype/config/ftheader.h and ft2build.h, etc.
+ #  FREETYPE_LIBRARIES - the libraries to link against
+ #  FREETYPE_DEFINITIONS - switches required for FREETYPE
+ 
+ 
+-if (FREETYPE_LIBRARIES AND FREETYPE_INCLUDE_DIR)
++if (FREETYPE_LIBRARIES AND FREETYPE_INCLUDE_DIRS)
+ 	# path set by user or was found in the past
+ 	set(FREETYPE_FOUND TRUE)
+-else (FREETYPE_LIBRARIES AND FREETYPE_INCLUDE_DIR)
+-	include(UsePkgConfig)
++else (FREETYPE_LIBRARIES AND FREETYPE_INCLUDE_DIRS)
++	find_package(PkgConfig)
+ 
+-	pkgconfig(freetype2 _IncDir _LinkDir _LinkFlags _CFlags)
+-	set(FREETYPE_DEFINITIONS ${_CFlags})
+-
+-	find_path(FREETYPE_INCLUDE_DIR
+-		NAMES freetype/config/ftheader.h
+-		PATHS
+-			${_IncDir}
+-			${_IncDir}/freetype2
+-	)
+-
+-	find_path(FREETYPECONFIG_INCLUDE_DIR
+-		NAMES ft2build.h
+-		PATHS
+-			${_IncDir}
+-	)
+-
+-	find_library(FREETYPE_LIBRARIES
+-		NAMES freetype
+-		PATHS ${_LinkDir}
+-	)
+-
+-	if (FREETYPE_INCLUDE_DIR AND FREETYPECONFIG_INCLUDE_DIR)
+-		list(APPEND FREETYPE_INCLUDE_DIR ${FREETYPECONFIG_INCLUDE_DIR})
+-	else (FREETYPE_INCLUDE_DIR AND FREETYPECONFIG_INCLUDE_DIR)
+-		set(FREETYPE_INCLUDE_DIR)
+-	endif (FREETYPE_INCLUDE_DIR AND FREETYPECONFIG_INCLUDE_DIR)
+-
+-	if (FREETYPE_INCLUDE_DIR AND FREETYPE_LIBRARIES)
+-		set(FREETYPE_FOUND TRUE)
+-	endif (FREETYPE_INCLUDE_DIR AND FREETYPE_LIBRARIES)
+-
+-	if (FREETYPE_FOUND)
+-		if (NOT FREETYPE_FIND_QUIETLY)
+-			message(STATUS &quot;Found FREETYPE: ${FREETYPE_LIBRARIES}&quot;)
+-		endif (NOT FREETYPE_FIND_QUIETLY)
+-	else (FREETYPE_FOUND)
+-		if (FREETYPE_FIND_REQUIRED)
+-			message(FATAL_ERROR &quot;Could not find FREETYPE&quot;)
+-		endif (FREETYPE_FIND_REQUIRED)
+-	endif (FREETYPE_FOUND)
+-
+-	# set visibility in cache
+-	set(FREETYPE_INCLUDE_DIR ${FREETYPE_INCLUDE_DIR} CACHE PATH &quot;Path to a file.&quot; FORCE)
+-	set(FREETYPE_LIBRARIES ${FREETYPE_LIBRARIES} CACHE FILEPATH &quot;Path to a library.&quot; FORCE)
+-	set(FREETYPE_DEFINITIONS ${FREETYPE_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
+-	mark_as_advanced(FREETYPE_INCLUDE_DIR FREETYPE_LIBRARIES FREETYPE_DEFINITIONS)
+-
+-	# mark as internal
+-	set(FREETYPECONFIG_INCLUDE_DIR ${FREETYPECONFIG_INCLUDE_DIR} CACHE INTERNAL &quot;Path to a config file.&quot; FORCE)
+-
+-endif (FREETYPE_LIBRARIES AND FREETYPE_INCLUDE_DIR)
++	pkg_search_module(FREETYPE freetype2)
++endif (FREETYPE_LIBRARIES AND FREETYPE_INCLUDE_DIRS)
+
+Modified: trunk/cmake/modules/FindFontconfig.cmake
+===================================================================
+--- trunk/cmake/modules/FindFontconfig.cmake	2008-08-10 20:44:15 UTC (rev 940)
++++ trunk/cmake/modules/FindFontconfig.cmake	2008-08-15 13:08:47 UTC (rev 941)
+@@ -1,46 +1,15 @@
+ # Try to find Fontconfig
+ #  FONTCONFIG_FOUND - If false, do not try to use FONTCONFIG.
+-#  FONTCONFIG_INCLUDE_DIR - where to find fontconfig/fontconfig.h
++#  FONTCONFIG_INCLUDE_DIRS - where to find fontconfig/fontconfig.h
+ #  FONTCONFIG_LIBRARIES - the libraries to link against
+ #  FONTCONFIG_DEFINITIONS - switches required for FONTCONFIG
+ 
+ 
+-if (FONTCONFIG_LIBRARIES AND FONTCONFIG_INCLUDE_DIR)
++if (FONTCONFIG_LIBRARIES AND FONTCONFIG_INCLUDE_DIRS)
+ 	# path set by user or was found in the past
+ 	set(FONTCONFIG_FOUND TRUE)
+-else (FONTCONFIG_LIBRARIES AND FONTCONFIG_INCLUDE_DIR)
+-	include(UsePkgConfig)
++else (FONTCONFIG_LIBRARIES AND FONTCONFIG_INCLUDE_DIRS)
++	find_package(PkgConfig)
+ 
+-	pkgconfig(fontconfig _IncDir _LinkDir _LinkFlags _CFlags)
+-	set(FONTCONFIG_DEFINITIONS ${_CFlags})
+-
+-	find_path(FONTCONFIG_INCLUDE_DIR
+-		NAMES fontconfig/fontconfig.h
+-		PATHS
+-			${_IncDir}
+-	)
+-
+-	find_library(FONTCONFIG_LIBRARIES
+-		NAMES fontconfig
+-		PATHS ${_LinkDir}
+-	)
+-
+-	if (FONTCONFIG_INCLUDE_DIR AND FONTCONFIG_LIBRARIES)
+-		set(FONTCONFIG_FOUND TRUE)
+-	endif (FONTCONFIG_INCLUDE_DIR AND FONTCONFIG_LIBRARIES)
+-
+-	if (FONTCONFIG_FOUND)
+-		if (NOT FONTCONFIG_FIND_QUIETLY)
+-			message(STATUS &quot;Found FONTCONFIG: ${FONTCONFIG_LIBRARIES}&quot;)
+-		endif (NOT FONTCONFIG_FIND_QUIETLY)
+-	else (FONTCONFIG_FOUND)
+-		if (FONTCONFIG_FIND_REQUIRED)
+-			message(FATAL_ERROR &quot;Could not find FONTCONFIG&quot;)
+-		endif (FONTCONFIG_FIND_REQUIRED)
+-	endif (FONTCONFIG_FOUND)
+-
+-	# set visibility in cache
+-	set(FONTCONFIG_DEFINITIONS ${FONTCONFIG_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
+-	mark_as_advanced(FONTCONFIG_INCLUDE_DIR FONTCONFIG_LIBRARIES FONTCONFIG_DEFINITIONS)
+-
+-endif (FONTCONFIG_LIBRARIES AND FONTCONFIG_INCLUDE_DIR)
++	pkg_search_module(FONTCONFIG fontconfig)
++endif (FONTCONFIG_LIBRARIES AND FONTCONFIG_INCLUDE_DIRS)
+
+Modified: trunk/cmake/modules/FindG3D.cmake
+===================================================================
+--- trunk/cmake/modules/FindG3D.cmake	2008-08-10 20:44:15 UTC (rev 940)
++++ trunk/cmake/modules/FindG3D.cmake	2008-08-15 13:08:47 UTC (rev 941)
+@@ -1,46 +1,15 @@
+ # Try to find G3D
+ #  G3D_FOUND - If false, do not try to use G3D.
+-#  G3D_INCLUDE_DIR - where to find g3d/g3d.h
++#  G3D_INCLUDE_DIRS - where to find g3d/g3d.h
+ #  G3D_LIBRARIES - the libraries to link against
+ #  G3D_DEFINITIONS - switches required for G3D
+ 
+ 
+-if (G3D_LIBRARIES AND G3D_INCLUDE_DIR)
++if (G3D_LIBRARIES AND G3D_INCLUDE_DIRS)
+ 	# path set by user or was found in the past
+ 	set(G3D_FOUND TRUE)
+-else (G3D_LIBRARIES AND G3D_INCLUDE_DIR)
+-	include(UsePkgConfig)
++else (G3D_LIBRARIES AND G3D_INCLUDE_DIRS)
++	find_package(PkgConfig)
+ 
+-	pkgconfig(libg3d _IncDir _LinkDir _LinkFlags _CFlags)
+-	set(G3D_DEFINITIONS ${_CFlags})
+-
+-	find_path(G3D_INCLUDE_DIR
+-		NAMES g3d/g3d.h
+-		PATHS
+-			${_IncDir}
+-	)
+-
+-	find_library(G3D_LIBRARIES
+-		NAMES g3d
+-		PATHS ${_LinkDir}
+-	)
+-
+-	if (G3D_INCLUDE_DIR AND G3D_LIBRARIES)
+-		set(G3D_FOUND TRUE)
+-	endif (G3D_INCLUDE_DIR AND G3D_LIBRARIES)
+-
+-	if (G3D_FOUND)
+-		if (NOT G3D_FIND_QUIETLY)
+-			message(STATUS &quot;Found G3D: ${G3D_LIBRARIES}&quot;)
+-		endif (NOT G3D_FIND_QUIETLY)
+-	else (G3D_FOUND)
+-		if (G3D_FIND_REQUIRED)
+-			message(FATAL_ERROR &quot;Could not find G3D&quot;)
+-		endif (G3D_FIND_REQUIRED)
+-	endif (G3D_FOUND)
+-
+-	# set visibility in cache
+-	set(G3D_DEFINITIONS ${G3D_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
+-	mark_as_advanced(G3D_INCLUDE_DIR G3D_LIBRARIES G3D_DEFINITIONS)
+-
+-endif (G3D_LIBRARIES AND G3D_INCLUDE_DIR)
++	pkg_search_module(G3D libg3d&gt;=0.0.6)
++endif (G3D_LIBRARIES AND G3D_INCLUDE_DIRS)
+
+Modified: trunk/cmake/modules/FindGLIB.cmake
+===================================================================
+--- trunk/cmake/modules/FindGLIB.cmake	2008-08-10 20:44:15 UTC (rev 940)
++++ trunk/cmake/modules/FindGLIB.cmake	2008-08-15 13:08:47 UTC (rev 941)
+@@ -1,69 +1,15 @@
+ # Try to find GLIB2
+ #  GLIB2_FOUND - If false, do not try to use GLIB2.
+-#  GLIB2_INCLUDE_DIR - where to find glib.h and glibconfig.h, etc.
++#  GLIB2_INCLUDE_DIRS - where to find glib.h and glibconfig.h, etc.
+ #  GLIB2_LIBRARIES - the libraries to link against
+ #  GLIB2_DEFINITIONS - switches required for GLIB2
+ 
+ 
+-if (GLIB2_LIBRARIES AND GLIB2_INCLUDE_DIR)
++if (GLIB2_LIBRARIES AND GLIB2_INCLUDE_DIRS)
+ 	# path set by user or was found in the past
+ 	set(GLIB2_FOUND TRUE)
+-else (GLIB2_LIBRARIES AND GLIB2_INCLUDE_DIR)
+-	include(UsePkgConfig)
++else (GLIB2_LIBRARIES AND GLIB2_INCLUDE_DIRS)
++	find_package(PkgConfig)
+ 
+-	pkgconfig(glib-2.0 _IncDir _LinkDir _LinkFlags _CFlags)
+-	set(GLIB2_DEFINITIONS ${_CFlags})
+-
+-	find_path(GLIB2_INCLUDE_DIR
+-		NAMES glib.h
+-		PATHS
+-			${_IncDir}
+-			${_IncDir}/glib-2.0
+-			${_IncDir}/glib-2.0/include
+-	)
+-
+-	find_path(GLIBCONFIG_INCLUDE_DIR
+-		NAMES glibconfig.h
+-		PATHS
+-			${_IncDir}
+-			${_IncDir}/glib-2.0
+-			${_IncDir}/glib-2.0/include
+-			${_LinkDir}/glib-2.0
+-			${_LinkDir}/glib-2.0/include
+-	)
+-
+-	find_library(GLIB2_LIBRARIES
+-		NAMES glib-2.0
+-		PATHS ${_LinkDir}
+-	)
+-
+-	if (GLIB2_INCLUDE_DIR AND GLIBCONFIG_INCLUDE_DIR)
+-		list(APPEND GLIB2_INCLUDE_DIR ${GLIBCONFIG_INCLUDE_DIR})
+-	else (GLIB2_INCLUDE_DIR AND GLIBCONFIG_INCLUDE_DIR)
+-		set(GLIB2_INCLUDE_DIR)
+-	endif (GLIB2_INCLUDE_DIR AND GLIBCONFIG_INCLUDE_DIR)
+-
+-	if (GLIB2_INCLUDE_DIR AND GLIB2_LIBRARIES)
+-		set(GLIB2_FOUND TRUE)
+-	endif (GLIB2_INCLUDE_DIR AND GLIB2_LIBRARIES)
+-
+-	if (GLIB2_FOUND)
+-		if (NOT GLIB2_FIND_QUIETLY)
+-			message(STATUS &quot;Found GLIB2: ${GLIB2_LIBRARIES}&quot;)
+-		endif (NOT GLIB2_FIND_QUIETLY)
+-	else (GLIB2_FOUND)
+-		if (GLIB2_FIND_REQUIRED)
+-			message(FATAL_ERROR &quot;Could not find GLIB2&quot;)
+-		endif (GLIB2_FIND_REQUIRED)
+-	endif (GLIB2_FOUND)
+-
+-	# set visibility in cache
+-	set(GLIB2_INCLUDE_DIR ${GLIB2_INCLUDE_DIR} CACHE PATH &quot;Path to a file.&quot; FORCE)
+-	set(GLIB2_LIBRARIES ${GLIB2_LIBRARIES} CACHE FILEPATH &quot;Path to a library.&quot; FORCE)
+-	set(GLIB2_DEFINITIONS ${GLIB2_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
+-	mark_as_advanced(GLIB2_INCLUDE_DIR GLIB2_LIBRARIES GLIB2_DEFINITIONS)
+-
+-	# mark as internal
+-	set(GLIBCONFIG_INCLUDE_DIR ${GLIBCONFIG_INCLUDE_DIR} CACHE INTERNAL &quot;Path to a config file.&quot; FORCE)
+-
+-endif (GLIB2_LIBRARIES AND GLIB2_INCLUDE_DIR)
++	pkg_search_module(GLIB2 glib-2.0)
++endif (GLIB2_LIBRARIES AND GLIB2_INCLUDE_DIRS)
+
+Modified: trunk/cmake/modules/FindGPS.cmake
+===================================================================
+--- trunk/cmake/modules/FindGPS.cmake	2008-08-10 20:44:15 UTC (rev 940)
++++ trunk/cmake/modules/FindGPS.cmake	2008-08-15 13:08:47 UTC (rev 941)
+@@ -1,14 +1,14 @@
+ # Try to find GPS
+ #  GPS_FOUND - If false, do not try to use GPS.
+-#  GPS_INCLUDE_DIR - where to find gps.h
++#  GPS_INCLUDE_DIRS - where to find gps.h
+ #  GPS_LIBRARIES - the libraries to link against
+ 
+ 
+-if (GPS_LIBRARIES AND GPS_INCLUDE_DIR)
++if (GPS_LIBRARIES AND GPS_INCLUDE_DIRS)
+ 	# path set by user or was found in the past
+ 	set(GPS_FOUND TRUE)
+-else (GPS_LIBRARIES AND GPS_INCLUDE_DIR)
+-	find_path(GPS_INCLUDE_DIR
++else (GPS_LIBRARIES AND GPS_INCLUDE_DIRS)
++	find_path(GPS_INCLUDE_DIRS
+ 		NAMES gps.h
+ 	)
+ 
+@@ -16,9 +16,9 @@
+ 		NAMES gps
+ 	)
+ 
+-	if (GPS_INCLUDE_DIR AND GPS_LIBRARIES)
++	if (GPS_INCLUDE_DIRS AND GPS_LIBRARIES)
+ 		set(GPS_FOUND TRUE)
+-	endif (GPS_INCLUDE_DIR AND GPS_LIBRARIES)
++	endif (GPS_INCLUDE_DIRS AND GPS_LIBRARIES)
+ 
+ 	if (GPS_FOUND)
+ 		if (NOT GPS_FIND_QUIETLY)
+@@ -31,6 +31,6 @@
+ 	endif (GPS_FOUND)
+ 
+ 	# set visibility in cache
+-	mark_as_advanced(GPS_INCLUDE_DIR GPS_LIBRARIES)
++	mark_as_advanced(GPS_INCLUDE_DIRS GPS_LIBRARIES)
+ 
+-endif (GPS_LIBRARIES AND GPS_INCLUDE_DIR)
++endif (GPS_LIBRARIES AND GPS_INCLUDE_DIRS)
+
+Modified: trunk/cmake/modules/FindPThreads.cmake
+===================================================================
+--- trunk/cmake/modules/FindPThreads.cmake	2008-08-10 20:44:15 UTC (rev 940)
++++ trunk/cmake/modules/FindPThreads.cmake	2008-08-15 13:08:47 UTC (rev 941)
+@@ -1,14 +1,14 @@
+ # Try to find PThreads
+ #  PTHREADS_FOUND - If false, do not try to use PThreads.
+-#  PTHREADS_INCLUDE_DIR - where to find pthreads.h
++#  PTHREADS_INCLUDE_DIRS - where to find pthreads.h
+ #  PTHREADS_LIBRARIES - the libraries to link against
+ 
+ 
+-if (PTHREADS_LIBRARIES AND PTHREADS_INCLUDE_DIR)
++if (PTHREADS_LIBRARIES AND PTHREADS_INCLUDE_DIRS)
+ 	# path set by user or was found in the past
+ 	set(PTHREADS_FOUND TRUE)
+-else (PTHREADS_LIBRARIES AND PTHREADS_INCLUDE_DIR)
+-	find_path(PTHREADS_INCLUDE_DIR
++else (PTHREADS_LIBRARIES AND PTHREADS_INCLUDE_DIRS)
++	find_path(PTHREADS_INCLUDE_DIRS
+ 		NAMES pthread.h
+ 	)
+ 
+@@ -22,9 +22,9 @@
+ 		)
+ 	endif (NOT PTHREADS_LIBRARIES)
+ 
+-	if (PTHREADS_INCLUDE_DIR AND PTHREADS_LIBRARIES)
++	if (PTHREADS_INCLUDE_DIRS AND PTHREADS_LIBRARIES)
+ 		set(PTHREADS_FOUND TRUE)
+-	endif (PTHREADS_INCLUDE_DIR AND PTHREADS_LIBRARIES)
++	endif (PTHREADS_INCLUDE_DIRS AND PTHREADS_LIBRARIES)
+ 
+ 	if (PTHREADS_FOUND)
+ 		if (NOT PTHREADS_FIND_QUIETLY)
+@@ -37,6 +37,6 @@
+ 	endif (PTHREADS_FOUND)
+ 
+ 	# set visibility in cache
+-	mark_as_advanced(PTHREADS_INCLUDE_DIR PTHREADS_LIBRARIES)
++	mark_as_advanced(PTHREADS_INCLUDE_DIRS PTHREADS_LIBRARIES)
+ 
+-endif (PTHREADS_LIBRARIES AND PTHREADS_INCLUDE_DIR)
++endif (PTHREADS_LIBRARIES AND PTHREADS_INCLUDE_DIRS)
+
+Modified: trunk/cmake/modules/FindSQLite3.cmake
+===================================================================
+--- trunk/cmake/modules/FindSQLite3.cmake	2008-08-10 20:44:15 UTC (rev 940)
++++ trunk/cmake/modules/FindSQLite3.cmake	2008-08-15 13:08:47 UTC (rev 941)
+@@ -1,46 +1,15 @@
+ # Try to find Sqlite3
+ #  SQLITE3_FOUND - If false, do not try to use SQLITE3.
+-#  SQLITE3_INCLUDE_DIR - where to find sqlite3.h
++#  SQLITE3_INCLUDE_DIRS - where to find sqlite3.h
+ #  SQLITE3_LIBRARIES - the libraries to link against
+ #  SQLITE3_DEFINITIONS - switches required for SQLite3
+ 
+ 
+-if (SQLITE3_LIBRARIES AND SQLITE3_INCLUDE_DIR)
++if (SQLITE3_LIBRARIES AND SQLITE3_INCLUDE_DIRS)
+ 	# path set by user or was found in the past
+ 	set(SQLITE3_FOUND TRUE)
+-else (SQLITE3_LIBRARIES AND SQLITE3_INCLUDE_DIR)
+-	include(UsePkgConfig)
++else (SQLITE3_LIBRARIES AND SQLITE3_INCLUDE_DIRS)
++	find_package(PkgConfig)
+ 
+-	pkgconfig(sqlite3 _IncDir _LinkDir _LinkFlags _CFlags)
+-	set(SQLITE3_DEFINITIONS ${_CFlags})
+-
+-	find_path(SQLITE3_INCLUDE_DIR
+-		NAMES sqlite3.h
+-		PATHS
+-			${_IncDir}
+-	)
+-
+-	find_library(SQLITE3_LIBRARIES
+-		NAMES sqlite3
+-		PATHS ${_LinkDir}
+-	)
+-
+-	if (SQLITE3_INCLUDE_DIR AND SQLITE3_LIBRARIES)
+-		set(SQLITE3_FOUND TRUE)
+-	endif (SQLITE3_INCLUDE_DIR AND SQLITE3_LIBRARIES)
+-
+-	if (SQLITE3_FOUND)
+-		if (NOT SQLITE3_FIND_QUIETLY)
+-			message(STATUS &quot;Found SQLITE3: ${SQLITE3_LIBRARIES}&quot;)
+-		endif (NOT SQLITE3_FIND_QUIETLY)
+-	else (SQLITE3_FOUND)
+-		if (SQLITE3_FIND_REQUIRED)
+-			message(FATAL_ERROR &quot;Could not find SQLite3&quot;)
+-		endif (SQLITE3_FIND_REQUIRED)
+-	endif (SQLITE3_FOUND)
+-
+-	# set visibility in cache
+-	set(SQLITE3_DEFINITIONS ${SQLITE3_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
+-	mark_as_advanced(SQLITE3_INCLUDE_DIR SQLITE3_LIBRARIES SQLITE3_DEFINITIONS)
+-
+-endif (SQLITE3_LIBRARIES AND SQLITE3_INCLUDE_DIR)
++	pkg_search_module(SQLITE3 sqlite3)
++endif (SQLITE3_LIBRARIES AND SQLITE3_INCLUDE_DIRS)
+
+Modified: trunk/cmake/modules/FindXcomposite.cmake
+===================================================================
+--- trunk/cmake/modules/FindXcomposite.cmake	2008-08-10 20:44:15 UTC (rev 940)
++++ trunk/cmake/modules/FindXcomposite.cmake	2008-08-15 13:08:47 UTC (rev 941)
+@@ -8,32 +8,7 @@
+ 	# path set by user or was found in the past
+ 	set(XCOMPOSITE_FOUND TRUE)
+ else (XCOMPOSITE_LIBRARIES)
+-	include(UsePkgConfig)
++	find_package(PkgConfig)
+ 
+-	pkgconfig(xcomposite _IncDir _LinkDir _LinkFlags _CFlags)
+-	set(XCOMPOSITE_DEFINITIONS ${_CFlags})
+-
+-	find_library(XCOMPOSITE_LIBRARIES
+-		NAMES Xcomposite
+-		PATHS ${_LinkDir}
+-	)
+-
+-	if (XCOMPOSITE_LIBRARIES)
+-		set(XCOMPOSITE_FOUND TRUE)
+-	endif (XCOMPOSITE_LIBRARIES)
+-
+-	if (XCOMPOSITE_FOUND)
+-		if (NOT XCOMPOSITE_FIND_QUIETLY)
+-			message(STATUS &quot;Found Xcomposite: ${XCOMPOSITE_LIBRARIES}&quot;)
+-		endif (NOT XCOMPOSITE_FIND_QUIETLY)
+-	else (XCOMPOSITE_FOUND)
+-		if (XCOMPOSITE_FIND_REQUIRED)
+-			message(FATAL_ERROR &quot;Could not find Xcomposite&quot;)
+-		endif (XCOMPOSITE_FIND_REQUIRED)
+-	endif (XCOMPOSITE_FOUND)
+-
+-	# set visibility in cache
+-	set(XCOMPOSITE_DEFINITIONS ${XCOMPOSITE_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
+-	mark_as_advanced(XCOMPOSITE_LIBRARIES XCOMPOSITE_DEFINITIONS)
+-
++	pkg_search_module(XCOMPOSITE xcomposite)
+ endif (XCOMPOSITE_LIBRARIES)
+
+Modified: trunk/cmake/modules/FindXdamage.cmake
+===================================================================
+--- trunk/cmake/modules/FindXdamage.cmake	2008-08-10 20:44:15 UTC (rev 940)
++++ trunk/cmake/modules/FindXdamage.cmake	2008-08-15 13:08:47 UTC (rev 941)
+@@ -8,14 +8,11 @@
+ 	# path set by user or was found in the past
+ 	set(XDAMAGE_FOUND TRUE)
+ else (XDAMAGE_LIBRARIES)
+-	include(UsePkgConfig)
++	set(XDAMAGE_DEFINITIONS &quot;&quot;)
+ 
+-	pkgconfig(xdamage _IncDir _LinkDir _LinkFlags _CFlags)
+-	set(XDAMAGE_DEFINITIONS ${_CFlags})
+-
+ 	find_library(XDAMAGE_LIBRARIES
+ 		NAMES Xdamage
+-		PATHS ${_LinkDir}
++		PATHS
+ 	)
+ 
+ 	if (XDAMAGE_LIBRARIES)
+
+Modified: trunk/cmake/modules/FindXfixes.cmake
+===================================================================
+--- trunk/cmake/modules/FindXfixes.cmake	2008-08-10 20:44:15 UTC (rev 940)
++++ trunk/cmake/modules/FindXfixes.cmake	2008-08-15 13:08:47 UTC (rev 941)
+@@ -8,32 +8,7 @@
+ 	# path set by user or was found in the past
+ 	set(XFIXES_FOUND TRUE)
+ else (XFIXES_LIBRARIES)
+-	include(UsePkgConfig)
++	find_package(PkgConfig)
+ 
+-	pkgconfig(xfixes _IncDir _LinkDir _LinkFlags _CFlags)
+-	set(XFIXES_DEFINITIONS ${_CFlags})
+-
+-	find_library(XFIXES_LIBRARIES
+-		NAMES Xfixes
+-		PATHS ${_LinkDir}
+-	)
+-
+-	if (XFIXES_LIBRARIES)
+-		set(XFIXES_FOUND TRUE)
+-	endif (XFIXES_LIBRARIES)
+-
+-	if (XFIXES_FOUND)
+-		if (NOT XFIXES_FIND_QUIETLY)
+-			message(STATUS &quot;Found Xfixes: ${XFIXES_LIBRARIES}&quot;)
+-		endif (NOT XFIXES_FIND_QUIETLY)
+-	else (XFIXES_FOUND)
+-		if (XFIXES_FIND_REQUIRED)
+-			message(FATAL_ERROR &quot;Could not find Xfixes&quot;)
+-		endif (XFIXES_FIND_REQUIRED)
+-	endif (XFIXES_FOUND)
+-
+-	# set visibility in cache
+-	set(XFIXES_DEFINITIONS ${XFIXES_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
+-	mark_as_advanced(XFIXES_LIBRARIES XFIXES_DEFINITIONS)
+-
++	pkg_search_module(XFIXES xfixes)
+ endif (XFIXES_LIBRARIES)
+
+Modified: trunk/cmake/modules/FindXrender.cmake
+===================================================================
+--- trunk/cmake/modules/FindXrender.cmake	2008-08-10 20:44:15 UTC (rev 940)
++++ trunk/cmake/modules/FindXrender.cmake	2008-08-15 13:08:47 UTC (rev 941)
+@@ -8,32 +8,7 @@
+ 	# path set by user or was found in the past
+ 	set(XRENDER_FOUND TRUE)
+ else (XRENDER_LIBRARIES)
+-	include(UsePkgConfig)
++	find_package(PkgConfig)
+ 
+-	pkgconfig(xrender _IncDir _LinkDir _LinkFlags _CFlags)
+-	set(XRENDER_DEFINITIONS ${_CFlags})
+-
+-	find_library(XRENDER_LIBRARIES
+-		NAMES Xrender
+-		PATHS ${_LinkDir}
+-	)
+-
+-	if (XRENDER_LIBRARIES)
+-		set(XRENDER_FOUND TRUE)
+-	endif (XRENDER_LIBRARIES)
+-
+-	if (XRENDER_FOUND)
+-		if (NOT XRENDER_FIND_QUIETLY)
+-			message(STATUS &quot;Found Xrender: ${XRENDER_LIBRARIES}&quot;)
+-		endif (NOT XRENDER_FIND_QUIETLY)
+-	else (XRENDER_FOUND)
+-		if (XRENDER_FIND_REQUIRED)
+-			message(FATAL_ERROR &quot;Could not find Xrender&quot;)
+-		endif (XRENDER_FIND_REQUIRED)
+-	endif (XRENDER_FOUND)
+-
+-	# set visibility in cache
+-	set(XRENDER_DEFINITIONS ${XRENDER_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
+-	mark_as_advanced(XRENDER_LIBRARIES XRENDER_DEFINITIONS)
+-
++	pkg_search_module(XRENDER xrender)	
+ endif (XRENDER_LIBRARIES)
+
+Modified: trunk/cmake/modules/FindXtst.cmake
+===================================================================
+--- trunk/cmake/modules/FindXtst.cmake	2008-08-10 20:44:15 UTC (rev 940)
++++ trunk/cmake/modules/FindXtst.cmake	2008-08-15 13:08:47 UTC (rev 941)
+@@ -8,14 +8,11 @@
+ 	# path set by user or was found in the past
+ 	set(XTST_FOUND TRUE)
+ else (XTST_LIBRARIES)
+-	include(UsePkgConfig)
++	set(XTST_DEFINITIONS &quot;&quot;)
+ 
+-	pkgconfig(xtst _IncDir _LinkDir _LinkFlags _CFlags)
+-	set(XTST_DEFINITIONS ${_CFlags})
+-
+ 	find_library(XTST_LIBRARIES
+ 		NAMES Xtst
+-		PATHS ${_LinkDir}
++		PATHS
+ 	)
+ 
+ 	if (XTST_LIBRARIES)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000931.html">[S3d-svn] r942 - in trunk: apps/dot_mcp apps/kism3d apps/meshs3d	apps/s3d_x11gate apps/s3dfm apps/s3dosm apps/s3dvt example	experimental/comptest experimental/olsrs3d	experimental/testvis experimental/wiitest libs3d libs3dw server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#926">[ date ]</a>
+              <a href="thread.html#926">[ thread ]</a>
+              <a href="subject.html#926">[ subject ]</a>
+              <a href="author.html#926">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

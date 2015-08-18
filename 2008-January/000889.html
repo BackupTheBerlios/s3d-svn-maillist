@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r896 - trunk/apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-January/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r896%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200801072325.m07NPEMO029467%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000888.html">
+   <LINK REL="Next"  HREF="000890.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r896 - trunk/apps/s3dosm</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r896%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200801072325.m07NPEMO029467%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r896 - trunk/apps/s3dosm">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan  8 00:25:14 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000888.html">[S3d-svn] r895 - trunk/apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000890.html">[S3d-svn] r897 - trunk/apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#889">[ date ]</a>
+              <a href="thread.html#889">[ thread ]</a>
+              <a href="subject.html#889">[ subject ]</a>
+              <a href="author.html#889">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-01-08 00:25:13 +0100 (Tue, 08 Jan 2008)
+New Revision: 896
+
+Modified:
+   trunk/apps/s3dosm/draw.c
+   trunk/apps/s3dosm/http_fetcher.c
+   trunk/apps/s3dosm/osm.c
+Log:
+s3dosm: Remove nearly unused variables
+
+
+Modified: trunk/apps/s3dosm/draw.c
+===================================================================
+--- trunk/apps/s3dosm/draw.c	2008-01-07 23:25:07 UTC (rev 895)
++++ trunk/apps/s3dosm/draw.c	2008-01-07 23:25:13 UTC (rev 896)
+@@ -85,21 +85,17 @@
+ static int draw_icon(void *S3DOSMUNUSED(data), int argc, char **argv, char **S3DOSMUNUSED(azColName))
+ {
+ 	int i, tagid = -1, oid;
+-	int nodeid = -1, layerid = -1;
+ 	/* char query[MAXQ];*/
+ 	char s[MAXQ];
+-	float la, lo, alt;
++	float la, lo;
+ 	float x[3];
+-	la = lo = alt = 0.0;
++	la = lo = 0.0;
+ 	num_done++;
+ 	for (i = 0; i &lt; argc; i++) {
+ 		if (argv[i]) {
+ 			if (0 == strcmp(azColName[i], &quot;longitude&quot;))   lo = strtod(argv[i], NULL);
+ 			else if (0 == strcmp(azColName[i], &quot;latitude&quot;))  la = strtod(argv[i], NULL);
+-			else if (0 == strcmp(azColName[i], &quot;altitude&quot;))  alt = strtod(argv[i], NULL);
+ 			else if (0 == strcmp(azColName[i], &quot;tag_id&quot;))    tagid = atoi(argv[i]);
+-			else if (0 == strcmp(azColName[i], &quot;node_id&quot;))   nodeid = atoi(argv[i]);
+-			else if (0 == strcmp(azColName[i], &quot;layer_id&quot;))   layerid = atoi(argv[i]);
+ 		}
+ 	}
+ 	if (0 == db_gettag(tagid, &quot;amenity&quot;, s)) {
+@@ -121,8 +117,6 @@
+ 			s3d_link(oid, oidy);
+ 			s3d_flags_on(oid, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+ 			load_update_status((100.0*num_done) / (float)num_max);
+-			/*   snprintf(query,MAXQ,&quot;UPDATE node SET s3doid=%d WHERE node_id=%d AND layer_id=%d;&quot;,oid,nodeid,layerid);
+-			   db_exec(query, NULL, 0);*/
+ 		}
+ 
+ 	}
+
+Modified: trunk/apps/s3dosm/http_fetcher.c
+===================================================================
+--- trunk/apps/s3dosm/http_fetcher.c	2008-01-07 23:25:07 UTC (rev 895)
++++ trunk/apps/s3dosm/http_fetcher.c	2008-01-07 23:25:13 UTC (rev 896)
+@@ -368,7 +368,7 @@
+ 	unsigned char plain[1024];
+ 	char ec64[] = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&quot;;
+ 	char *b64;
+-	int i, j, c, len, n;
++	int i, j, c, len;
+ 	char o = 0;
+ 	/* base64 encode user and pass */
+ 	if ((user == NULL) || (pass == NULL)) { /* bad input or request to clean up */
+@@ -384,18 +384,18 @@
+ 	while (i &lt; len || c != 0) {
+ 		switch (c) {
+ 		case 0:
+-			o = ec64[ n=plain[i] &gt;&gt; 2 ];
++			o = ec64[ plain[i] &gt;&gt; 2 ];
+ 			i++;
+ 			break;
+ 		case 1:
+-			o = ec64[ n=((plain[i-1] &amp; 0x3) &lt;&lt; 4) | (plain[i] &gt;&gt; 4)];
++			o = ec64[ ((plain[i-1] &amp; 0x3) &lt;&lt; 4) | (plain[i] &gt;&gt; 4)];
+ 			i++;
+ 			break;
+ 		case 2:
+-			o = (i &gt;= len) ? '=' : ec64[ n=((plain[i-1] &amp; 0xf) &lt;&lt; 2) | (plain[i] &gt;&gt; 6)];
++			o = (i &gt;= len) ? '=' : ec64[ ((plain[i-1] &amp; 0xf) &lt;&lt; 2) | (plain[i] &gt;&gt; 6)];
+ 			break;
+ 		case 3:
+-			o = (i &gt;= len) ? '=' : ec64[ n=(plain[i] &amp; 0x3f)];
++			o = (i &gt;= len) ? '=' : ec64[ plain[i] &amp; 0x3f];
+ 			i++;
+ 			break;
+ 		}
+
+Modified: trunk/apps/s3dosm/osm.c
+===================================================================
+--- trunk/apps/s3dosm/osm.c	2008-01-07 23:25:07 UTC (rev 895)
++++ trunk/apps/s3dosm/osm.c	2008-01-07 23:25:13 UTC (rev 896)
+@@ -116,7 +116,6 @@
+ 	xmlDocPtr doc;
+ 	xmlNodePtr cur, c;
+ 	layer_t *layer = layer_new();
+-	object_t *obj;
+ 	float n = 0;
+ 	int i = 0;
+ 
+@@ -136,7 +135,6 @@
+ 	for (c = cur-&gt;children;  c != NULL;   c = c-&gt;next)   n++; /* count */
+ 	for (cur = cur-&gt;children;cur != NULL; cur = cur-&gt;next) {
+ 		if (cur-&gt;type == XML_ELEMENT_NODE) {
+-			obj = NULL;
+ 			if (0 == strcmp((char *)cur-&gt;name, &quot;node&quot;))    parse_osm_node(cur);
+ 			else if (0 == strcmp((char *)cur-&gt;name, &quot;segment&quot;))  parse_osm_segment(cur);
+ 			else if (0 == strcmp((char *)cur-&gt;name, &quot;way&quot;))   parse_osm_way(cur);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000888.html">[S3d-svn] r895 - trunk/apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000890.html">[S3d-svn] r897 - trunk/apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#889">[ date ]</a>
+              <a href="thread.html#889">[ thread ]</a>
+              <a href="subject.html#889">[ subject ]</a>
+              <a href="author.html#889">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

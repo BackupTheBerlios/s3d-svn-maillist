@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r258 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-April/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r258%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200604222334.k3MNYD6U022317%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000250.html">
+   <LINK REL="Next"  HREF="000252.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r258 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r258%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200604222334.k3MNYD6U022317%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r258 - in trunk: . server">dotslash at berlios.de
+       </A><BR>
+    <I>Sun Apr 23 01:34:13 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000250.html">[S3d-svn] r257 - in trunk: . server
+</A></li>
+        <LI>Next message: <A HREF="000252.html">[S3d-svn] r259 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#251">[ date ]</a>
+              <a href="thread.html#251">[ thread ]</a>
+              <a href="subject.html#251">[ subject ]</a>
+              <a href="author.html#251">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-04-23 01:33:57 +0200 (Sun, 23 Apr 2006)
+New Revision: 258
+
+Modified:
+   trunk/
+   trunk/server/object.c
+   trunk/server/proto.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r417 at balthasar</A>:  dotslash | 2006-04-23 01:33:40 +0200
+ - forgot to set next's prev-link (which confused the list a bit :/)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:415
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:417
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2006-04-22 20:52:17 UTC (rev 257)
++++ trunk/server/object.c	2006-04-22 23:33:57 UTC (rev 258)
+@@ -1668,18 +1668,25 @@
+ 	struct t_obj *o,*o2;
+ 	if (obj_valid(p,oid,o))
+ 	{
+-		dprintf(LOW,&quot;link_delete(): [%d] unlinking %d from %d&quot;,p-&gt;id, oid, o-&gt;linkid);
++		dprintf(VLOW,&quot;link_delete(): [%d] unlinking %d from %d&quot;,p-&gt;id, oid, o-&gt;linkid);
+ 		if (o-&gt;linkid!=-1) 
+ 		{
++			if (o-&gt;lprev!=-1)
++				if (obj_valid(p,o-&gt;lprev,o2))
++				{ /* we have a previous pointer linking to us */
++					o2-&gt;lnext=o-&gt;lnext; /* might also be -1 */
++				}
+ 			if (obj_valid(p,o-&gt;linkid,o2))
++			{
+ 				if (o2-&gt;lsub==oid)
+ 				{/* parent is having oid as it's first link in chain */
+ 					o2-&gt;lsub=o-&gt;lnext; 
+ 				}
+-			if (o-&gt;lprev!=-1)
+-				if (obj_valid(p,o-&gt;lprev,o2))
+-				{ /* we have a previous pointer linking to us */
+-					o2-&gt;lnext=o-&gt;lnext; /* might also be -1 */
++			}
++			if (o-&gt;lnext!=-1)
++				if (obj_valid(p,o-&gt;lnext,o2))
++				{ /* fixing next's previous pointer */
++					o2-&gt;lprev=o-&gt;lprev;
+ 				}
+ 		}
+ 		o-&gt;lnext=-1;
+@@ -1694,7 +1701,7 @@
+ 	struct t_obj *o,*ot,*o2;
+ 	if (obj_valid(p,oid,o) &amp;&amp; obj_valid(p,target,ot))
+ 	{
+-		dprintf(LOW,&quot;link_insert(): [%d] linking %d to %d&quot;,p-&gt;id, oid, target);
++		dprintf(VLOW,&quot;link_insert(): [%d] linking %d to %d&quot;,p-&gt;id, oid, target);
+ 		o-&gt;oflags|=OF_LINK;
+ 		o-&gt;linkid=target;
+ 		o-&gt;lnext=ot-&gt;lsub; /* we have a new &quot;first&quot; element */
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2006-04-22 20:52:17 UTC (rev 257)
++++ trunk/server/proto.c	2006-04-22 23:33:57 UTC (rev 258)
+@@ -193,7 +193,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(4*12);
+-					dprintf(LOW,&quot;PEP_MAT[%d]: %d materials for object oid...%d&quot;, length, num, oid);
++					dprintf(VLOW,&quot;PEP_MAT[%d]: %d materials for object oid...%d&quot;, length, num, oid);
+ 					obj_pep_mat(p,oid, (float *)cptr, num);
+ 				}
+ 				break;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000250.html">[S3d-svn] r257 - in trunk: . server
+</A></li>
+	<LI>Next message: <A HREF="000252.html">[S3d-svn] r259 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#251">[ date ]</a>
+              <a href="thread.html#251">[ thread ]</a>
+              <a href="subject.html#251">[ subject ]</a>
+              <a href="author.html#251">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

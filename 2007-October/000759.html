@@ -1,0 +1,324 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r767 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r767%20-%20trunk/server&In-Reply-To=%3C200710182358.l9INwtZc030621%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000758.html">
+   <LINK REL="Next"  HREF="000760.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r767 - trunk/server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r767%20-%20trunk/server&In-Reply-To=%3C200710182358.l9INwtZc030621%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r767 - trunk/server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 01:58:55 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000758.html">[S3d-svn] r766 - trunk/libs3d
+</A></li>
+        <LI>Next message: <A HREF="000760.html">[S3d-svn] r768 - trunk/example
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#759">[ date ]</a>
+              <a href="thread.html#759">[ thread ]</a>
+              <a href="subject.html#759">[ subject ]</a>
+              <a href="author.html#759">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 01:58:53 +0200 (Fri, 19 Oct 2007)
+New Revision: 767
+
+Modified:
+   trunk/server/allocate.c
+   trunk/server/graphics.c
+   trunk/server/main.c
+   trunk/server/matrix.c
+   trunk/server/navigation.c
+   trunk/server/network.c
+   trunk/server/object.c
+   trunk/server/process.c
+   trunk/server/shm.c
+   trunk/server/tcp.c
+Log:
+server: Mark local functions and variables as static
+
+
+Modified: trunk/server/allocate.c
+===================================================================
+--- trunk/server/allocate.c	2007-10-18 23:58:43 UTC (rev 766)
++++ trunk/server/allocate.c	2007-10-18 23:58:53 UTC (rev 767)
+@@ -42,7 +42,7 @@
+ 
+ #if defined DEBUG_MALLOC
+ 
+-struct chunkHeader *chunkList = NULL;
++static struct chunkHeader *chunkList = NULL;
+ 
+ struct chunkHeader {
+ 	struct chunkHeader *next;
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2007-10-18 23:58:43 UTC (rev 766)
++++ trunk/server/graphics.c	2007-10-18 23:58:53 UTC (rev 767)
+@@ -41,7 +41,7 @@
+ /*  local prototypes ... */
+ void render_virtual_object(struct t_obj *o);
+ /*  ... and types/variables */
+-int select_mode = 0;
++static int select_mode = 0;
+ int winw, winh;
+ extern struct t_process *procs_p;
+ extern int frame_mode;  /*  GLUT, SDL, ... ? */
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2007-10-18 23:58:43 UTC (rev 766)
++++ trunk/server/main.c	2007-10-18 23:58:53 UTC (rev 767)
+@@ -38,25 +38,25 @@
+ #endif
+ #include &lt;errno.h&gt;   /*  errno() */
+ int frame_mode = 0;
+-int kidpid = 0;
+-int norc = 0;
++static int kidpid = 0;
++static int norc = 0;
+ int running;
+ static char *rc = NULL;
+ static char *homerc = &quot;~/.s3drc&quot;;
+ static char *etcrc = &quot;/etc/s3drc&quot;;
+ /*static int father_done=0;*/
+ extern int aa_level;
+-char **s3drc[] = {&amp;rc, &amp;homerc, &amp;etcrc};
++static char **s3drc[] = {&amp;rc, &amp;homerc, &amp;etcrc};
+ 
+ static void mainloop(void);
+ #ifdef SIGS
+ /*  handles the SIGINT command. maybe put signals in a special file? */
+-void sigint_handler(int S3DUNUSED(sig))
++static void sigint_handler(int S3DUNUSED(sig))
+ {
+ 	s3dprintf(HIGH, &quot;oh my gosh there is a sigint/term signal! running away ...&quot;);
+ 	quit();
+ }
+-void sigchld_handler(int S3DUNUSED(sig))
++static void sigchld_handler(int S3DUNUSED(sig))
+ {
+ 	if (kidpid != 0) {
+ 		kidpid = 0;
+@@ -65,7 +65,7 @@
+ 	}
+ }
+ #endif
+-void sigusr_handler(int S3DUNUSED(sig))
++static void sigusr_handler(int S3DUNUSED(sig))
+ {
+ 	s3dprintf(HIGH, &quot;father told use he's done, so lets start to think about the rc file ...&quot;);
+ 	running = 1;
+@@ -131,7 +131,7 @@
+ /*  things which should be done each time in main loop go here! this is */
+ /*  just for the case we use a function for the mainloop like we do for glut... */
+ 
+-struct timespec t = {
++static struct timespec t = {
+ 	0, 10*1000*1000
+ }; /* 10 mili seconds */
+ void one_time(void)
+@@ -201,7 +201,7 @@
+ 	exit(0);
+ }
+ /*  processing arguments from the commandline */
+-int process_args(int argc, char **argv)
++static int process_args(int argc, char **argv)
+ {
+ 	int      lopt_idx;
+ 	char     c;
+
+Modified: trunk/server/matrix.c
+===================================================================
+--- trunk/server/matrix.c	2007-10-18 23:58:43 UTC (rev 766)
++++ trunk/server/matrix.c	2007-10-18 23:58:53 UTC (rev 767)
+@@ -40,7 +40,7 @@
+ }
+ #define I(x, y)  x*4+y
+ #define M(x, y)  MAT[I(x, y)]
+-void mat_debug(t_mtrx S)
++static void mat_debug(t_mtrx S)
+ {
+ 	s3dprintf(MED, &quot;MAT_0: %.2f %.2f %.2f %.2f&quot;, S[I(0,0)], S[I(1,0)], S[I(2,0)], S[I(3,0)]);
+ 	s3dprintf(MED, &quot;MAT_1: %.2f %.2f %.2f %.2f&quot;, S[I(0,1)], S[I(1,1)], S[I(2,1)], S[I(3,1)]);
+
+Modified: trunk/server/navigation.c
+===================================================================
+--- trunk/server/navigation.c	2007-10-18 23:58:43 UTC (rev 766)
++++ trunk/server/navigation.c	2007-10-18 23:58:53 UTC (rev 767)
+@@ -24,8 +24,7 @@
+ 
+ #include &quot;global.h&quot;
+ #include &lt;math.h&gt; /* atan() */
+-int alphax, alphay;
+-float view_x, view_y, view_z;
++
+ extern int winw, winh;
+ void navi_right(void)
+ {
+
+Modified: trunk/server/network.c
+===================================================================
+--- trunk/server/network.c	2007-10-18 23:58:43 UTC (rev 766)
++++ trunk/server/network.c	2007-10-18 23:58:53 UTC (rev 767)
+@@ -44,7 +44,7 @@
+ uint8_t ibuf[MAXPLEN]; /* input buffer for a packet */
+ uint8_t obuf[MAXPLEN]; /* output buffer */
+ #ifdef SIGS
+-int sigio = 0;
++static int sigio = 0;
+ #endif
+ 
+ #ifdef SIGS
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2007-10-18 23:58:43 UTC (rev 766)
++++ trunk/server/object.c	2007-10-18 23:58:53 UTC (rev 767)
+@@ -1388,7 +1388,7 @@
+ 		obj_check_biggest_object(p, oid);
+ }
+ /*  calculates the normal for one polygon, if not present. */
+-int calc_normal(struct t_obj *obj, uint32_t pn)
++static int calc_normal(struct t_obj *obj, uint32_t pn)
+ {
+ 	struct t_vertex a, b, n;
+ 	struct t_vertex *v[3];
+@@ -1433,7 +1433,7 @@
+ }
+ 
+ /* checks if a normal is set for a line object, or set some default if not */
+-int check_line_normal(struct t_obj *obj, uint32_t pn)
++static int check_line_normal(struct t_obj *obj, uint32_t pn)
+ {
+ 	struct t_vertex *v[2];
+ 	int i, vp;
+@@ -1456,7 +1456,7 @@
+ 
+ }
+ 
+-void tex_build_mipmaps(struct t_tex *tex)
++static void tex_build_mipmaps(struct t_tex *tex)
+ {
+ 	int     i, w, h, x, y, c;
+ 	unsigned char  *buf, *src;
+@@ -1500,7 +1500,7 @@
+ 	free(buf);
+ }
+ /* generate textures */
+-void texture_gen(struct t_obj *obj)
++static void texture_gen(struct t_obj *obj)
+ {
+ 	GLuint t;
+ 	int i;
+@@ -1531,7 +1531,7 @@
+ 	}
+ }
+ /* activate/bind texture for object */
+-struct t_tex *get_texture(struct t_obj *obj, struct t_mat *m) {
++static struct t_tex* get_texture(struct t_obj *obj, struct t_mat *m) {
+ 	struct t_tex *tex = NULL;
+ 	GLfloat matgl[4];
+ 	/*  int i,j; */
+
+Modified: trunk/server/process.c
+===================================================================
+--- trunk/server/process.c	2007-10-18 23:58:43 UTC (rev 766)
++++ trunk/server/process.c	2007-10-18 23:58:53 UTC (rev 767)
+@@ -161,7 +161,7 @@
+ 	return(-1);
+ }
+ /* just kick process out of the process list, no network/mcp-oid cleanup */
+-int process_list_rm(int pid)
++static int process_list_rm(int pid)
+ {
+ 	if (pid != (procs_n - 1)) { /* copy last block, swap pid */
+ 		memcpy(&amp;procs_p[pid], &amp;procs_p[procs_n-1], sizeof(struct t_process));
+
+Modified: trunk/server/shm.c
+===================================================================
+--- trunk/server/shm.c	2007-10-18 23:58:43 UTC (rev 766)
++++ trunk/server/shm.c	2007-10-18 23:58:53 UTC (rev 767)
+@@ -46,12 +46,12 @@
+ extern uint8_t ibuf[MAXPLEN];
+ extern struct t_process *procs_p;
+ extern int procs_n;
+-struct t_shmcb waiting_comblock;
++static struct t_shmcb waiting_comblock;
+ 
+-key_t *data = NULL;
+-char ftoken[] = &quot;/tmp/.s3d&quot;;
+-int shmid;
+-int mkey; /* increasing key */
++static key_t *data = NULL;
++static char ftoken[] = &quot;/tmp/.s3d&quot;;
++static int shmid;
++static int mkey; /* increasing key */
+ 
+ static int shm_new_comblock(key_t *data);
+ 
+@@ -89,7 +89,7 @@
+ 	shm_new_comblock(data);
+ 	return(0);
+ }
+-void comblock_init(struct t_shmcb *p_cb)
++static void comblock_init(struct t_shmcb *p_cb)
+ {
+ 	p_cb-&gt;shmid_ctos = -1;
+ 	p_cb-&gt;shmid_stoc = -1;
+
+Modified: trunk/server/tcp.c
+===================================================================
+--- trunk/server/tcp.c	2007-10-18 23:58:43 UTC (rev 766)
++++ trunk/server/tcp.c	2007-10-18 23:58:53 UTC (rev 767)
+@@ -48,7 +48,7 @@
+ extern struct t_con mcp;
+ extern uint8_t ibuf[MAXPLEN];
+ extern int idc;
+-int tcp_sockid;
++static int tcp_sockid;
+ int tcp_init(void)
+ {
+ 	int yes = 1;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000758.html">[S3d-svn] r766 - trunk/libs3d
+</A></li>
+	<LI>Next message: <A HREF="000760.html">[S3d-svn] r768 - trunk/example
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#759">[ date ]</a>
+              <a href="thread.html#759">[ thread ]</a>
+              <a href="subject.html#759">[ subject ]</a>
+              <a href="author.html#759">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

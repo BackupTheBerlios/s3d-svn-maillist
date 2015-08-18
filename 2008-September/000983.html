@@ -1,0 +1,506 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1003 - in trunk: libs3d server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1003%20-%20in%20trunk%3A%20libs3d%20server&In-Reply-To=%3C200809252221.m8PMLXeD006673%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000982.html">
+   <LINK REL="Next"  HREF="000984.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1003 - in trunk: libs3d server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1003%20-%20in%20trunk%3A%20libs3d%20server&In-Reply-To=%3C200809252221.m8PMLXeD006673%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1003 - in trunk: libs3d server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 26 00:21:33 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000982.html">[S3d-svn] r1002 - trunk/libs3d
+</A></li>
+        <LI>Next message: <A HREF="000984.html">[S3d-svn] r1004 - in trunk: libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#983">[ date ]</a>
+              <a href="thread.html#983">[ thread ]</a>
+              <a href="subject.html#983">[ subject ]</a>
+              <a href="author.html#983">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-26 00:21:32 +0200 (Fri, 26 Sep 2008)
+New Revision: 1003
+
+Modified:
+   trunk/libs3d/proto_in.c
+   trunk/libs3d/proto_out.c
+   trunk/server/event.c
+   trunk/server/mcp.c
+   trunk/server/proto.c
+Log:
+Use floats in network endian byte order
+
+Floats are also affected by the little and big endian byte order. Currently
+there is no function available to convert byte in a network safe byte order.
+To be sure that both ends can read and write ieee 32 bit floats we can use
+ntohl and htonl to convert the byte order of any 32 bit data type.
+
+Modified: trunk/libs3d/proto_in.c
+===================================================================
+--- trunk/libs3d/proto_in.c	2008-09-25 22:21:16 UTC (rev 1002)
++++ trunk/libs3d/proto_in.c	2008-09-25 22:21:32 UTC (rev 1003)
+@@ -28,6 +28,16 @@
+ #include &lt;netinet/in.h&gt;  /*  htons(),htonl() */
+ #include &lt;errno.h&gt;   /*  errno */
+ #include &lt;stdlib.h&gt;   /*  malloc(), free() */
++
++/* convert buffer with floats from network to host endianess */
++static void ntohfb(float* netfloat, int num)
++{
++	int i;
++	for (i = 0; i &lt; num; i++) {
++		*(uint32_t*)&amp;netfloat[i] = ntohl(*(uint32_t*)&amp;netfloat[i]);
++	}
++}
++
+ /*  this proccesses the commands and pushes s3d-events, or does other things ;) */
+ int net_prot_in(uint8_t opcode, uint16_t length, char *buf)
+ {
+@@ -108,6 +118,7 @@
+ 				s3devt-&gt;length = length;
+ 				mo = (struct mcp_object *)buf;
+ 				*((uint32_t *)buf) = ntohl(*((uint32_t *)buf));  /*  revert oid */
++				ntohfb(&amp;mo-&gt;trans_x, 4);
+ 
+ 				buf[length-1] = '\0';  /*  put a null byte at the end  */
+ 				/*  for the not so careful users */
+@@ -127,6 +138,7 @@
+ 				oi = (struct s3d_obj_info *)buf;
+ 				oi-&gt;object = ntohl(oi-&gt;object);
+ 				oi-&gt;flags = ntohl(oi-&gt;flags);
++				ntohfb(&amp;oi-&gt;trans_x, 8);
+ 
+ 				buf[length-1] = '\0';  /*  put a null byte at the end  */
+ 				/*  for the not so careful users */
+
+Modified: trunk/libs3d/proto_out.c
+===================================================================
+--- trunk/libs3d/proto_out.c	2008-09-25 22:21:16 UTC (rev 1002)
++++ trunk/libs3d/proto_out.c	2008-09-25 22:21:32 UTC (rev 1003)
+@@ -38,6 +38,15 @@
+ 
+ #define MF_LEN 65530  /*  maximum fragmentation length */
+ 
++/* convert buffer with floats from host to network endianess */
++static void htonfb(float* netfloat, int num)
++{
++	int i;
++	for (i = 0; i &lt; num; i++) {
++		*(uint32_t*)&amp;netfloat[i] = htonl(*(uint32_t*)&amp;netfloat[i]);
++	}
++}
++
+ /** \brief create new object
+  *
+  * Creates a new object, returning the object id.
+@@ -145,6 +154,8 @@
+ 	ptr += sizeof(float);
+ 	*((float *)ptr) = z;
+ 	ptr += sizeof(float);
++
++	htonfb((float*)(buf + sizeof(uint32_t)), 3);
+ 	net_send(S3D_P_C_PUSH_VERTEX, buf, len);
+ 	return(0);
+ }
+@@ -180,6 +191,7 @@
+ 		else
+ 			flen = (len - i * stepl);
+ 		memcpy(ptr, (char *)vbuf + i*stepl, flen);
++		htonfb((float*)(ptr), flen / 4);
+ 		net_send(S3D_P_C_PUSH_VERTEX, buf, flen + 4);
+ 	}
+ 	/*  free(buf); */
+@@ -234,6 +246,7 @@
+ 	*((float *)ptr) = 1.0;
+ 	ptr += sizeof(float);
+ 
++	htonfb((float*)(buf + sizeof(uint32_t)), 12);
+ 	net_send(S3D_P_C_PUSH_MAT, buf, len);
+ 	return(0);  /*  nothing yet */
+ }
+@@ -281,6 +294,7 @@
+ 	*((float *)ptr) = diff_a;
+ 	ptr += sizeof(float);
+ 
++	htonfb((float*)(buf + sizeof(uint32_t)), 12);
+ 	net_send(S3D_P_C_PUSH_MAT, buf, len);
+ 	return(0);  /*  nothing yet */
+ }
+@@ -329,6 +343,7 @@
+ 		else
+ 			flen = (len - i * stepl);
+ 		memcpy(ptr, (char *)mbuf + i*stepl, flen);
++		htonfb((float*)(ptr), flen / 4);
+ 		net_send(S3D_P_C_PUSH_MAT, buf, flen + 4);
+ 	}
+ 	/*  free(buf); */
+@@ -639,6 +654,7 @@
+ 	*((float *)ptr) = 1.0;
+ 	ptr += sizeof(float);
+ 
++	htonfb((float*)(buf + sizeof(uint32_t)), 12);
+ 	net_send(S3D_P_C_PEP_MAT, buf, len);
+ 	return(0);  /*  nothing yet */
+ }
+@@ -687,6 +703,7 @@
+ 	*((float *)ptr) = diff_a;
+ 	ptr += sizeof(float);
+ 
++	htonfb((float*)(buf + sizeof(uint32_t)), 12);
+ 	net_send(S3D_P_C_PEP_MAT, buf, len);
+ 	return(0);  /*  nothing yet */
+ }
+@@ -706,6 +723,7 @@
+ 	}
+ 	*((uint32_t *)buf) = htonl(object);  /*  object id */
+ 	memcpy(buf + 4, mbuf, 12*n*sizeof(float));
++	htonfb((float*)(buf + sizeof(uint32_t)), n*12);
+ 	net_send(S3D_P_C_PEP_MAT, buf, n*12*sizeof(float) + 4);
+ 	return(0);
+ }
+@@ -731,6 +749,7 @@
+ 	}
+ 	*((uint32_t *)buf) = htonl(object);
+ 	memcpy(buf + 4, nbuf, 9*n*sizeof(float));
++	htonfb((float*)(buf + sizeof(uint32_t)), 9*n);
+ 	net_send(S3D_P_C_PEP_POLY_NORMAL, (char *)buf, n*9*sizeof(float) + 4);
+ 	return(0);
+ 
+@@ -755,6 +774,7 @@
+ 	}
+ 	*((uint32_t *)buf) = htonl(object);
+ 	memcpy(buf + 4, nbuf, 6*n*sizeof(float));
++	htonfb((float*)(buf + sizeof(uint32_t)), 6*n);
+ 	net_send(S3D_P_C_PEP_LINE_NORMAL, (char *)buf, n*6*sizeof(float) + 4);
+ 	return(0);
+ 
+@@ -778,6 +798,8 @@
+ 	ptr += sizeof(float);
+ 	*((float *)ptr) = z;
+ 	ptr += sizeof(float);
++
++	htonfb((float*)(buf + sizeof(uint32_t)), 3);
+ 	net_send(S3D_P_C_PEP_VERTEX, buf, len);
+ 	return(0);
+ }
+@@ -842,6 +864,7 @@
+ 	}
+ 	*((uint32_t *)buf) = htonl(object);
+ 	memcpy(buf + 4, vbuf, 3*n*sizeof(float));
++	htonfb((float*)(buf + sizeof(uint32_t)), 3*n);
+ 	net_send(S3D_P_C_PEP_VERTEX, (char *)buf, n*3*sizeof(float) + 4);
+ 	return(0);
+ 
+@@ -873,6 +896,8 @@
+ 	ptr += 4;
+ 	*((float *)ptr) = y3;
+ 	ptr += 4;
++
++	htonfb((float*)(buf + sizeof(uint32_t)), 6);
+ 	net_send(S3D_P_C_PEP_POLY_TEXC, (char *)buf, 6*4 + 4);
+ 	return(0);
+ }
+@@ -892,6 +917,7 @@
+ 	}
+ 	*((uint32_t *)buf) = htonl(object);
+ 	memcpy(buf + 4, tbuf, 6*n*sizeof(float));
++	htonfb((float*)(buf + sizeof(uint32_t)), 6*n);
+ 	net_send(S3D_P_C_PEP_POLY_TEXC, (char *)buf, n*6*sizeof(float) + 4);
+ 	return(0);
+ }
+@@ -923,6 +949,7 @@
+ 		else
+ 			flen = (len - i * stepl);
+ 		memcpy(ptr, (char *)nbuf + i*stepl, flen);
++		htonfb((float*)(ptr), flen / 4);
+ 		net_send(S3D_P_C_LOAD_POLY_NORMAL, buf, flen + 8);
+ 		mstart += stepl;
+ 	}
+@@ -956,6 +983,7 @@
+ 		else
+ 			flen = (len - i * stepl);
+ 		memcpy(ptr, (char *)nbuf + i*stepl, flen);
++		htonfb((float*)(ptr), flen / 4);
+ 		net_send(S3D_P_C_LOAD_LINE_NORMAL, buf, flen + 8);
+ 		mstart += stepl;
+ 	}
+@@ -989,6 +1017,7 @@
+ 		else
+ 			flen = (len - i * stepl);
+ 		memcpy(ptr, (char *)tbuf + i*stepl, flen);
++		htonfb((float*)(ptr), flen / 4);
+ 		net_send(S3D_P_C_LOAD_POLY_TEXC, buf, flen + 8);
+ 		mstart += stepl;
+ 	}
+@@ -1022,6 +1051,7 @@
+ 		else
+ 			flen = (len - i * stepl);
+ 		memcpy(ptr, (char *)mbuf + i*stepl, flen);
++		htonfb((float*)(ptr), flen / 4);
+ 		net_send(S3D_P_C_LOAD_MAT, buf, flen + 8);
+ 		mstart += stepl;
+ 	}
+@@ -1178,6 +1208,8 @@
+ 	*((float *)ptr) = y;
+ 	ptr += 4;
+ 	*((float *)ptr) = z;
++
++	htonfb((float*)(buf + sizeof(uint32_t)), 3);
+ 	net_send(S3D_P_C_TRANSLATE, buf, len);
+ 	return(0);
+ 
+@@ -1216,6 +1248,8 @@
+ 	*((float *)ptr) = y;
+ 	ptr += 4;
+ 	*((float *)ptr) = z;
++
++	htonfb((float*)(buf + sizeof(uint32_t)), 3);
+ 	net_send(S3D_P_C_ROTATE, buf, len);
+ 	return(0);
+ }
+@@ -1236,6 +1270,8 @@
+ 	*((uint32_t *)ptr) = htonl(object);
+ 	ptr += 4;
+ 	*((float *)ptr) = s;
++
++	htonfb((float*)(buf + sizeof(uint32_t)), 3);
+ 	net_send(S3D_P_C_SCALE, buf, len);
+ 	return(0);
+ }
+
+Modified: trunk/server/event.c
+===================================================================
+--- trunk/server/event.c	2008-09-25 22:21:16 UTC (rev 1002)
++++ trunk/server/event.c	2008-09-25 22:21:32 UTC (rev 1003)
+@@ -32,6 +32,15 @@
+ #endif
+ #include &lt;string.h&gt;  /*  strlen(),strcpy() */
+ 
++/* convert buffer with floats from host to network endianess */
++static void htonfb(float* netfloat, int num)
++{
++	int i;
++	for (i = 0; i &lt; num; i++) {
++		*(uint32_t*)&amp;netfloat[i] = htonl(*(uint32_t*)&amp;netfloat[i]);
++	}
++}
++
+ /*  I don't plan to keep this until the end, but it can show us how */
+ /*  to interact ... */
+ int event_obj_click(struct t_process *p, int32_t oid)
+@@ -179,6 +188,7 @@
+ 			break;
+ 
+ 		}
++		htonfb(&amp;mo.trans_x, 8);
+ 		prot_com_out(p, S3D_P_S_OINFO, (uint8_t *)&amp;mo, sizeof(mo));
+ 	}
+ 	return(0);
+
+Modified: trunk/server/mcp.c
+===================================================================
+--- trunk/server/mcp.c	2008-09-25 22:21:16 UTC (rev 1002)
++++ trunk/server/mcp.c	2008-09-25 22:21:32 UTC (rev 1003)
+@@ -31,7 +31,16 @@
+ #endif
+ #include &lt;string.h&gt;    /*  strncpy() */
+ 
++/* convert buffer with floats from host to network endianess */
++static void htonfb(float* netfloat, int num)
++{
++	int i;
++	for (i = 0; i &lt; num; i++) {
++		*(uint32_t*)&amp;netfloat[i] = htonl(*(uint32_t*)&amp;netfloat[i]);
++	}
++}
+ 
++
+ /*  this interacts with the actual mcp client */
+ struct mcp_object {
+ 	uint32_t object;
+@@ -73,6 +82,8 @@
+ 	mo.trans_y = p-&gt;object[mcp_oid]-&gt;translate.y;
+ 	mo.trans_z = p-&gt;object[mcp_oid]-&gt;translate.z;
+ 	mo.r = p-&gt;object[mcp_oid]-&gt;r;
++
++	htonfb(&amp;mo.trans_x, 4);
+ 	/*  mo.event=MCP_NEW_OBJECT; */
+ 	ap = get_proc_by_pid(p-&gt;object[mcp_oid]-&gt;virtual_pid);
+ 	strncpy(mo.name, ap-&gt;name, S3D_NAME_MAX);
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2008-09-25 22:21:16 UTC (rev 1002)
++++ trunk/server/proto.c	2008-09-25 22:21:32 UTC (rev 1003)
+@@ -38,6 +38,16 @@
+ /*  handle an incoming command from the client .. */
+ 
+ 
++/* convert buffer with floats from network to host endianess */
++static void ntohfb(float* netfloat, int num)
++{
++	int i;
++	for (i = 0; i &lt; num; i++) {
++		*(uint32_t*)&amp;netfloat[i] = ntohl(*(uint32_t*)&amp;netfloat[i]);
++	}
++}
++
++
+ int prot_com_in(struct t_process *p, uint8_t *pbuf)
+ {
+ 	uint8_t  command;
+@@ -115,6 +125,7 @@
+ 			oid = ntohl(*((uint32_t *)cptr));
+ 			cptr += 4;
+ 			num = (length - 4) / (4 * 3);
++			ntohfb((float *)cptr, num * 3);
+ 			/*      s3dprintf(LOW,&quot;received %d new vertices for object oid...%d&quot;, num, oid); */
+ 			obj_push_vertex(p, oid, (float  *)cptr, num);
+ 		}
+@@ -124,6 +135,7 @@
+ 			oid = ntohl(*((uint32_t *)cptr));
+ 			cptr += 4;
+ 			num = (length - 4) / (4 * 12);
++			ntohfb((float *)cptr, num * 12);
+ 			/*      s3dprintf(LOW,&quot;received %d new materials for object oid...%d&quot;, num, oid); */
+ 			obj_push_mat(p, oid, (float *)cptr, num);
+ 		}
+@@ -172,6 +184,7 @@
+ 			oid = ntohl(*((uint32_t *)cptr));
+ 			cptr += 4;
+ 			num = (length - 4) / (9 * 4);
++			ntohfb((float *)cptr, num * 9);
+ 			s3dprintf(VLOW, &quot;PEP_POLY_NORMAL[%d]: oid %d, %f polys&quot;, length, oid, (length - 4) / (9.0*4.0));
+ 			obj_pep_poly_normal(p, oid, (float *)cptr, num);
+ 		}
+@@ -181,6 +194,7 @@
+ 			oid = ntohl(*((uint32_t *)cptr));
+ 			cptr += 4;
+ 			num = (length - 4) / (6 * 4);
++			ntohfb((float *)cptr, num * 6);
+ 			s3dprintf(VLOW, &quot;PEP_LINE_NORMAL[%d]: oid %d, %.1f lines&quot;, length, oid, (length - 4) / (6.0*4.0));
+ 			obj_pep_line_normal(p, oid, (float *)cptr, num);
+ 		}
+@@ -190,6 +204,7 @@
+ 			oid = ntohl(*((uint32_t *)cptr));
+ 			cptr += 4;
+ 			num = (length - 4) / (6 * 4);
++			ntohfb((float *)cptr, num * 6);
+ 			s3dprintf(VLOW, &quot;PEP_POLY_TEXC[%d]: oid %d, %f polys&quot;, length, oid, (length - 4) / (6.0*4.0));
+ 			obj_pep_poly_texc(p, oid, (float *)cptr, num);
+ 		}
+@@ -199,6 +214,7 @@
+ 			oid = ntohl(*((uint32_t *)cptr));
+ 			cptr += 4;
+ 			num = (length - 4) / (4 * 12);
++			ntohfb((float *)cptr, num * 12);
+ 			s3dprintf(VLOW, &quot;PEP_MAT[%d]: %d materials for object oid...%d&quot;, length, num, oid);
+ 			obj_pep_mat(p, oid, (float *)cptr, num);
+ 		}
+@@ -208,6 +224,7 @@
+ 			oid = ntohl(*((uint32_t *)cptr));
+ 			cptr += 4;
+ 			num = (length - 4) / (4 * 3);
++			ntohfb((float *)cptr, num * 3);
+ 			s3dprintf(VLOW, &quot;pepping %d new vertices for object oid...%d&quot;, num, oid);
+ 			obj_pep_vertex(p, oid, (float  *)cptr, num);
+ 		}
+@@ -244,6 +261,7 @@
+ 			toid = ntohl(*((uint32_t *)cptr));
+ 			cptr += 4;
+ 			num = (length - 8) / (6 * 4);
++			ntohfb((float *)cptr, num * 6);
+ 			s3dprintf(VLOW, &quot;LOAD_POLY_NORMAL[%d]: oid %d, %.2f lines&quot;, length, oid, (length - 8) / (6.0*4.0));
+ 			obj_load_line_normal(p, oid, (float *)cptr, toid, num);
+ 		}
+@@ -255,6 +273,7 @@
+ 			toid = ntohl(*((uint32_t *)cptr));
+ 			cptr += 4;
+ 			num = (length - 8) / (9 * 4);
++			ntohfb((float *)cptr, num * 9);
+ 			s3dprintf(MED, &quot;LOAD_POLY_NORMAL[%d]: oid %d, %f polys&quot;, length, oid, (length - 8) / (9.0*4.0));
+ 			obj_load_poly_normal(p, oid, (float *)cptr, toid, num);
+ 		}
+@@ -266,6 +285,7 @@
+ 			toid = ntohl(*((uint32_t *)cptr));
+ 			cptr += 4;
+ 			num = (length - 8) / (6 * 4);
++			ntohfb((float *)cptr, num * 6);
+ 			s3dprintf(MED, &quot;LOAD_POLY_TEXC[%d]: oid %d, %f polys&quot;, length, oid, (length - 8) / (6.0*4.0));
+ 			obj_load_poly_texc(p, oid, (float *)cptr, toid, num);
+ 		}
+@@ -277,6 +297,7 @@
+ 			toid = ntohl(*((uint32_t *)cptr));
+ 			cptr += 4;
+ 			num = (length - 8) / (4 * 12);
++			ntohfb((float *)cptr, num * 12);
+ 			s3dprintf(LOW, &quot;LOAD_MAT[%d]: %d materials for object oid...%d&quot;, length, num, oid);
+ 			obj_load_mat(p, oid, (float *)cptr, toid, num);
+ 		}
+@@ -386,6 +407,7 @@
+ 		if (length &gt;= 16) {
+ 			oid = ntohl(*((uint32_t *)cptr));
+ 			cptr += 4;
++			ntohfb((float *)cptr, 3);
+ 			obj_translate(p, oid, (float *)cptr);
+ 		}
+ 		break;
+@@ -393,6 +415,7 @@
+ 		if (length &gt;= 16) {
+ 			oid = ntohl(*((uint32_t *)cptr));
+ 			cptr += 4;
++			ntohfb((float *)cptr, 3);
+ 			obj_rotate(p, oid, (float *)cptr);
+ 		}
+ 		break;
+@@ -400,6 +423,7 @@
+ 		if (length &gt;= 8) {
+ 			oid = ntohl(*((uint32_t *)cptr));
+ 			cptr += 4;
++			ntohfb((float *)cptr, 3);
+ 			obj_scale(p, oid, *((float *)cptr));
+ 		}
+ 		break;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000982.html">[S3d-svn] r1002 - trunk/libs3d
+</A></li>
+	<LI>Next message: <A HREF="000984.html">[S3d-svn] r1004 - in trunk: libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#983">[ date ]</a>
+              <a href="thread.html#983">[ thread ]</a>
+              <a href="subject.html#983">[ subject ]</a>
+              <a href="author.html#983">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,189 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1008 - in trunk/Documentation: . libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1008%20-%20in%20trunk/Documentation%3A%20.%20libs3d%20libs3dw&In-Reply-To=%3C200809262107.m8QL74WV018256%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000987.html">
+   <LINK REL="Next"  HREF="000989.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1008 - in trunk/Documentation: . libs3d libs3dw</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1008%20-%20in%20trunk/Documentation%3A%20.%20libs3d%20libs3dw&In-Reply-To=%3C200809262107.m8QL74WV018256%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1008 - in trunk/Documentation: . libs3d libs3dw">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 26 23:07:04 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000987.html">[S3d-svn] r1007 - in trunk: Documentation cmake/modules
+</A></li>
+        <LI>Next message: <A HREF="000989.html">[S3d-svn] r1009 - in trunk: Documentation Documentation/libs3d	Documentation/manpages Documentation/manpages/man1	Documentation/manpages/man3 Documentation/manpages/man9 libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#988">[ date ]</a>
+              <a href="thread.html#988">[ thread ]</a>
+              <a href="subject.html#988">[ subject ]</a>
+              <a href="author.html#988">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-26 23:07:03 +0200 (Fri, 26 Sep 2008)
+New Revision: 1008
+
+Modified:
+   trunk/Documentation/extractdefinitions.py
+   trunk/Documentation/libs3d/functions.docbook
+   trunk/Documentation/libs3dw/functions.docbook
+Log:
+Mark xyz(void) functions correct as void in docbook
+
+Modified: trunk/Documentation/extractdefinitions.py
+===================================================================
+--- trunk/Documentation/extractdefinitions.py	2008-09-26 19:25:15 UTC (rev 1007)
++++ trunk/Documentation/extractdefinitions.py	2008-09-26 21:07:03 UTC (rev 1008)
+@@ -442,7 +442,7 @@
+ 		for func in functionlist:
+ 			sgml = docbook_functions.generate_sgml(func, synopsis)
+ 			link_refids(sgml, refidlist)
+-			cleanml = filter_xmldirectclosed(sgml.toxml()+'\n')
++			cleanml = sgml.toxml()+'\n'
+ 			func_file.write(cleanml)
+ 		func_file.close()
+ 
+@@ -476,8 +476,11 @@
+ 
+ 		# add parameter to function definition
+ 		param_num = len(function['param'])
+-		for i in range(0, param_num):
+-			function['param'][i].dom_append(funcprototype)
++		if param_num == 1 and function['param'][0].is_void():
++			void = create_append(funcprototype, 'void')
++		else:
++			for i in range(0, param_num):
++				function['param'][i].dom_append(funcprototype)
+ 
+ 		# add help to function
+ 		function['help'].dom_append(sect2)
+@@ -497,7 +500,7 @@
+ 		for struct in structlist:
+ 			sgml = docbook_structs.generate_sgml(struct)
+ 			link_refids(sgml, refidlist)
+-			cleanml = filter_xmldirectclosed(sgml.toxml()+'\n')
++			cleanml = sgml.toxml()+'\n'
+ 			struct_file.write(cleanml)
+ 		struct_file.close()
+ 
+@@ -546,7 +549,7 @@
+ 		for typedef in typedeflist:
+ 			sgml = docbook_typedefs.generate_sgml(typedef)
+ 			link_refids(sgml, refidlist)
+-			cleanml = filter_xmldirectclosed(sgml.toxml()+'\n')
++			cleanml = sgml.toxml()+'\n'
+ 			typedef_file.write(cleanml)
+ 		typedef_file.close()
+ 
+
+Modified: trunk/Documentation/libs3d/functions.docbook
+===================================================================
+--- trunk/Documentation/libs3d/functions.docbook	2008-09-26 19:25:15 UTC (rev 1007)
++++ trunk/Documentation/libs3d/functions.docbook	2008-09-26 21:07:03 UTC (rev 1008)
+@@ -1,4 +1,4 @@
+-&lt;sect2 id=&quot;s3d_usage&quot;&gt;&lt;title&gt;s3d_usage&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3d_usage&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Prints the possible parameter for the client library (which can be passed in &lt;link linkend=&quot;s3d_init&quot;&gt;s3d_init&lt;/link&gt;())         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_usage&quot;&gt;&lt;title&gt;s3d_usage&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3d_usage&lt;/function&gt;&lt;/funcdef&gt;&lt;void/&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Prints the possible parameter for the client library (which can be passed in &lt;link linkend=&quot;s3d_init&quot;&gt;s3d_init&lt;/link&gt;())         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_init&quot;&gt;&lt;title&gt;s3d_init&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_init&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int *&lt;parameter&gt;argc&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;char ***&lt;parameter&gt;argv&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const char *&lt;parameter&gt;name&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;This will initialize the s3d-library and the connection to the Server. It will return 0 on success in server initialization. name specifies the your programs name.&lt;/para&gt;&lt;programlisting&gt; int main(char argc, char **argv)
+  {
+          if (!&lt;link linkend=&quot;s3d_init&quot;&gt;s3d_init&lt;/link&gt;(&amp;argc, &amp;argv, &quot;Hello world&quot;))
+@@ -9,7 +9,7 @@
+          return(0);
+  }
+ &lt;/programlisting&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_quit&quot;&gt;&lt;title&gt;s3d_quit&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_quit&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Closes the connection and clears the event-stack. It can also be used to leave the &lt;link linkend=&quot;s3d_mainloop&quot;&gt;s3d_mainloop&lt;/link&gt;().         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_quit&quot;&gt;&lt;title&gt;s3d_quit&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_quit&lt;/function&gt;&lt;/funcdef&gt;&lt;void/&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Closes the connection and clears the event-stack. It can also be used to leave the &lt;link linkend=&quot;s3d_mainloop&quot;&gt;s3d_mainloop&lt;/link&gt;().         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_mainloop&quot;&gt;&lt;title&gt;s3d_mainloop&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_mainloop&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void(*)(void) &lt;parameter&gt;f&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Takes a function as argument. It will loop this function until a quit-event is received. You can pass NULL if you have no function to be looped, but its better to sleep some time if you have nothing to do anyway to save cpu-time.&lt;/para&gt;&lt;programlisting&gt; void mainloop(void)
+  {
+          usleep(1000); // sleep 1 ms in every cycle
+@@ -82,7 +82,7 @@
+ &lt;sect2 id=&quot;s3d_load_polygon_normals&quot;&gt;&lt;title&gt;s3d_load_polygon_normals&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_load_polygon_normals&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const float *&lt;parameter&gt;nbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;start&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Just as &lt;link linkend=&quot;s3d_pep_polygon_normals&quot;&gt;s3d_pep_polygon_normals&lt;/link&gt;(), with the difference you won't alter the latest n polygons but n polygons starting with index start.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_load_polygon_tex_coords&quot;&gt;&lt;title&gt;s3d_load_polygon_tex_coords&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_load_polygon_tex_coords&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const float *&lt;parameter&gt;tbuf&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;start&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Just as &lt;link linkend=&quot;s3d_pep_polygon_tex_coords&quot;&gt;s3d_pep_polygon_tex_coords&lt;/link&gt;(), with the difference you won't alter the latest n polygons but n polygons starting with index start.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_load_texture&quot;&gt;&lt;title&gt;s3d_load_texture&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_load_texture&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint32_t &lt;parameter&gt;tex&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;xpos&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;ypos&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;w&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;uint16_t &lt;parameter&gt;h&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const uint8_t *&lt;parameter&gt;data&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;This will load an 32bit rgba image supplied in data at position xpos,ypos of the texture tex. The image has the width w and height h. This can be used to update only parts of the texture. It's no problem to supply big textures, as the image will be sent to server in fragments. Of course, you will have created the texture with &lt;link linkend=&quot;s3d_p!
+ ush_texture&quot;&gt;s3d_push_texture&lt;/link&gt;, have an material assigned to the texture with &lt;link linkend=&quot;s3d_pep_material_texture&quot;&gt;s3d_pep_material_texture&lt;/link&gt;() and have your polygons set sane polygon texture coords using &lt;link linkend=&quot;s3d_pep_polygon_tex_coord&quot;&gt;s3d_pep_polygon_tex_coord&lt;/link&gt;().         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_new_object&quot;&gt;&lt;title&gt;s3d_new_object&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_new_object&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Creates a new object, returning the object id.&lt;/para&gt;&lt;warning&gt;&lt;para&gt;Of course, you won't forget to toggle it visible, won't you? 
++&lt;sect2 id=&quot;s3d_new_object&quot;&gt;&lt;title&gt;s3d_new_object&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_new_object&lt;/function&gt;&lt;/funcdef&gt;&lt;void/&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Creates a new object, returning the object id.&lt;/para&gt;&lt;warning&gt;&lt;para&gt;Of course, you won't forget to toggle it visible, won't you? 
+         &lt;/para&gt;&lt;/warning&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_del_object&quot;&gt;&lt;title&gt;s3d_del_object&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_del_object&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;oid&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Deletes the object referenced by oid.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_clone&quot;&gt;&lt;title&gt;s3d_clone&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_clone&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;oid&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Clones an already existing object. They get just look the same as the parent-object and will change when the parent-object changes. Cloning especially makes sense if you want to use the same object a lot of times. Move and transform is independent from the parent. The function returns the childs object id.         &lt;/para&gt;&lt;/sect2&gt;
+@@ -125,7 +125,7 @@
+ &lt;sect2 id=&quot;s3d_angle_to_cam&quot;&gt;&lt;title&gt;s3d_angle_to_cam&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;float &lt;function&gt;s3d_angle_to_cam&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const float &lt;parameter&gt;obj_pos&lt;/parameter&gt;[]&lt;/paramdef&gt;&lt;paramdef&gt;const float &lt;parameter&gt;cam_pos&lt;/parameter&gt;[]&lt;/paramdef&gt;&lt;paramdef&gt;float *&lt;parameter&gt;angle_rad&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Given obj_pos and cam_pos in the format float[3], angle_rad about which angle the object should be rotated around the y-axis so that it faces the camera. This might become handy if you have some text floating in space and want it to face the camera. <A HREF="http://en.wikipedia.org/wiki/Vector_(spatial">http://en.wikipedia.org/wiki/Vector_(spatial</A>)         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_vector_cross_product&quot;&gt;&lt;title&gt;s3d_vector_cross_product&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3d_vector_cross_product&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const float &lt;parameter&gt;vector1&lt;/parameter&gt;[]&lt;/paramdef&gt;&lt;paramdef&gt;const float &lt;parameter&gt;vector2&lt;/parameter&gt;[]&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;result_vector&lt;/parameter&gt;[]&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Calculates and returns the cross product of vector1 and vector2. All vectors should have the format float[3]. More info on wikipedia. <A HREF="http://en.wikipedia.org/wiki/Vector_(spatial">http://en.wikipedia.org/wiki/Vector_(spatial</A>)         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_push_event&quot;&gt;&lt;title&gt;s3d_push_event&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3d_push_event&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;struct s3d_evt *&lt;parameter&gt;newevt&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Pushes an event onto the event-stack. Usually you don't need to do this manually.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_pop_event&quot;&gt;&lt;title&gt;s3d_pop_event&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;struct s3d_evt *&lt;function&gt;s3d_pop_event&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Pops the latest event from the stack. Don't forget to free() both the event and its buffer! Returns a pointer to struct &lt;link linkend=&quot;structs3d_evt&quot;&gt;s3d_evt&lt;/link&gt;.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_pop_event&quot;&gt;&lt;title&gt;s3d_pop_event&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;struct s3d_evt *&lt;function&gt;s3d_pop_event&lt;/function&gt;&lt;/funcdef&gt;&lt;void/&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Pops the latest event from the stack. Don't forget to free() both the event and its buffer! Returns a pointer to struct &lt;link linkend=&quot;structs3d_evt&quot;&gt;s3d_evt&lt;/link&gt;.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_find_event&quot;&gt;&lt;title&gt;s3d_find_event&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;struct s3d_evt *&lt;function&gt;s3d_find_event&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;uint8_t &lt;parameter&gt;event&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Finds the latest occurrence of an event, giving the event type as argument. Returns a pointer to struct &lt;link linkend=&quot;structs3d_evt&quot;&gt;s3d_evt&lt;/link&gt;.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_delete_event&quot;&gt;&lt;title&gt;s3d_delete_event&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_delete_event&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const struct s3d_evt *&lt;parameter&gt;devt&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Deletes an event, the argument is the pointer to the event which is to be deleted (maybe obtained from &lt;link linkend=&quot;s3d_find_event&quot;&gt;s3d_find_event&lt;/link&gt;).         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_set_callback&quot;&gt;&lt;title&gt;s3d_set_callback&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3d_set_callback&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;uint8_t &lt;parameter&gt;event&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;s3d_cb &lt;parameter&gt;func&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Sets a callback for a certain event. this is very useful for event-oriented applications. event callbacks will not interrupt each other or the mainloop.&lt;/para&gt;&lt;warning&gt;&lt;para&gt;Defining callbacks will only work after calling &lt;link linkend=&quot;s3d_init&quot;&gt;s3d_init&lt;/link&gt;()
+@@ -146,6 +146,6 @@
+  &lt;link linkend=&quot;s3d_get_callback&quot;&gt;s3d_get_callback&lt;/link&gt;(S3D_EVENT_KEY)(e);
+  // will call the key-handling function with argument e.
+ &lt;/programlisting&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_process_stack&quot;&gt;&lt;title&gt;s3d_process_stack&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3d_process_stack&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;This function goes through all function of the event-stack and will call functions. this is useful when you define a new function but still have a lot of events of this type on the stack.&lt;/para&gt;&lt;para&gt;Deprecated&lt;/para&gt;&lt;para&gt;This is probably obsolete         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_process_stack&quot;&gt;&lt;title&gt;s3d_process_stack&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3d_process_stack&lt;/function&gt;&lt;/funcdef&gt;&lt;void/&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;This function goes through all function of the event-stack and will call functions. this is useful when you define a new function but still have a lot of events of this type on the stack.&lt;/para&gt;&lt;para&gt;Deprecated&lt;/para&gt;&lt;para&gt;This is probably obsolete         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_mcp_focus&quot;&gt;&lt;title&gt;s3d_mcp_focus&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_mcp_focus&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;This is an mcp-only function. It gives focus (for receiving key-strokes etc.) to an app referenced by it's mcp-object-id.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_net_check&quot;&gt;&lt;title&gt;s3d_net_check&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_net_check&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;This functions is for programs which do not employ a mainloop, hence they need to check for new events on their own. Programs like these must make sure to call this function from time to time to convince the server that they did not freeze or bail out.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_net_check&quot;&gt;&lt;title&gt;s3d_net_check&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_net_check&lt;/function&gt;&lt;/funcdef&gt;&lt;void/&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;This functions is for programs which do not employ a mainloop, hence they need to check for new events on their own. Programs like these must make sure to call this function from time to time to convince the server that they did not freeze or bail out.         &lt;/para&gt;&lt;/sect2&gt;
+
+Modified: trunk/Documentation/libs3dw/functions.docbook
+===================================================================
+--- trunk/Documentation/libs3dw/functions.docbook	2008-09-26 19:25:15 UTC (rev 1007)
++++ trunk/Documentation/libs3dw/functions.docbook	2008-09-26 21:07:03 UTC (rev 1008)
+@@ -6,7 +6,7 @@
+ &lt;sect2 id=&quot;s3dw_input_change_text&quot;&gt;&lt;title&gt;s3dw_input_change_text&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_input_change_text&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_input *&lt;parameter&gt;input&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const char *&lt;parameter&gt;text&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Change the text in the referenced input-box to the specified text.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3dw_label_change_text&quot;&gt;&lt;title&gt;s3dw_label_change_text&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_label_change_text&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_label *&lt;parameter&gt;label&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const char *&lt;parameter&gt;text&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Change the text in the referenced label to the specified text.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3dw_surface_new&quot;&gt;&lt;title&gt;s3dw_surface_new&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;s3dw_surface *&lt;function&gt;s3dw_surface_new&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const char *&lt;parameter&gt;title&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;width&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;height&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Creates a new surface (a new window) with title &quot;title&quot; and dimension &quot;width&quot; x &quot;height&quot;.&lt;/para&gt;&lt;para&gt;See &lt;link linkend=&quot;s3dw_surface&quot;&gt;s3dw_surface&lt;/link&gt; for information about callbacks which may be defined.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3dw_getroot&quot;&gt;&lt;title&gt;s3dw_getroot&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;s3dw_widget *&lt;function&gt;s3dw_getroot&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Returns the root-widget, which holds all the surfaces. E.g. if you want to move all widgets at once, adjust the root-widgets x,y,z and use &lt;link linkend=&quot;s3dw_moveit&quot;&gt;s3dw_moveit&lt;/link&gt;()&lt;/para&gt;&lt;programlisting&gt; &lt;link linkend=&quot;s3dw_widget&quot;&gt;s3dw_widget&lt;/link&gt; *root = &lt;link linkend=&quot;s3dw_getroot&quot;&gt;s3dw_getroot&lt;/link&gt;();
++&lt;sect2 id=&quot;s3dw_getroot&quot;&gt;&lt;title&gt;s3dw_getroot&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;s3dw_widget *&lt;function&gt;s3dw_getroot&lt;/function&gt;&lt;/funcdef&gt;&lt;void/&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Returns the root-widget, which holds all the surfaces. E.g. if you want to move all widgets at once, adjust the root-widgets x,y,z and use &lt;link linkend=&quot;s3dw_moveit&quot;&gt;s3dw_moveit&lt;/link&gt;()&lt;/para&gt;&lt;programlisting&gt; &lt;link linkend=&quot;s3dw_widget&quot;&gt;s3dw_widget&lt;/link&gt; *root = &lt;link linkend=&quot;s3dw_getroot&quot;&gt;s3dw_getroot&lt;/link&gt;();
+  // move widget center to (0,5,0). upon creation, it's centered at (0,0,0),
+  // so this might move it up
+  root-&gt;x=0;
+@@ -55,7 +55,7 @@
+  &lt;link linkend=&quot;s3d_set_callback&quot;&gt;s3d_set_callback&lt;/link&gt;(S3D_EVENT_KEY,key);
+ &lt;/programlisting&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3dw_object_info&quot;&gt;&lt;title&gt;s3dw_object_info&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3dw_object_info&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;struct s3d_evt *&lt;parameter&gt;event&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;This can be used to let s3dw handle S3D_EVENT_OBJ_INFO-events. With this, s3dw can consider the camera position and makes things like following the camera possible.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3dw_ani_mate&quot;&gt;&lt;title&gt;s3dw_ani_mate&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_ani_mate&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Just call this in your mainloop if you want some nice window sliding animations. it's somewhat bloating, but you don't want to miss it ;)&lt;/para&gt;&lt;programlisting&gt; #include &lt;time.h&gt;   // nanosleep()
++&lt;sect2 id=&quot;s3dw_ani_mate&quot;&gt;&lt;title&gt;s3dw_ani_mate&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_ani_mate&lt;/function&gt;&lt;/funcdef&gt;&lt;void/&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Just call this in your mainloop if you want some nice window sliding animations. it's somewhat bloating, but you don't want to miss it ;)&lt;/para&gt;&lt;programlisting&gt; #include &lt;time.h&gt;   // nanosleep()
+  static struct timespec t={0.33*1000*1000}; // 33 mili seconds
+  void mainloop()
+  {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000987.html">[S3d-svn] r1007 - in trunk: Documentation cmake/modules
+</A></li>
+	<LI>Next message: <A HREF="000989.html">[S3d-svn] r1009 - in trunk: Documentation Documentation/libs3d	Documentation/manpages Documentation/manpages/man1	Documentation/manpages/man3 Documentation/manpages/man9 libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#988">[ date ]</a>
+              <a href="thread.html#988">[ thread ]</a>
+              <a href="subject.html#988">[ subject ]</a>
+              <a href="author.html#988">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

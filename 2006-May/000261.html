@@ -1,0 +1,319 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r268 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r268%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200605030719.k437JJZG002933%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000260.html">
+   <LINK REL="Next"  HREF="000262.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r268 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r268%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200605030719.k437JJZG002933%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r268 - in trunk: . server">dotslash at berlios.de
+       </A><BR>
+    <I>Wed May  3 09:19:19 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000260.html">[S3d-svn] r267 - in trunk: . server
+</A></li>
+        <LI>Next message: <A HREF="000262.html">[S3d-svn] r269 - in trunk: . apps/dot_mcp client server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#261">[ date ]</a>
+              <a href="thread.html#261">[ thread ]</a>
+              <a href="subject.html#261">[ subject ]</a>
+              <a href="author.html#261">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-03 09:19:15 +0200 (Wed, 03 May 2006)
+New Revision: 268
+
+Modified:
+   trunk/
+   trunk/server/global.h
+   trunk/server/object.c
+   trunk/server/process.c
+   trunk/server/proto.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r499 at balthasar</A>:  dotslash | 2006-05-03 09:18:38 +0200
+ - internally using normals for lines
+ - setting some default normals for lines 
+ - fixing the proccess_protinit-function (again ...)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:497
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:499
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2006-05-02 20:03:25 UTC (rev 267)
++++ trunk/server/global.h	2006-05-03 07:19:15 UTC (rev 268)
+@@ -81,6 +81,7 @@
+ struct t_line
+ {
+ 	uint32_t v[2];
++	struct t_vertex n[2];		 /* normal vectors */
+ 	uint32_t mat;
+ };
+ /*  material of surfaces, as it's usual in the OpenGL standard */
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2006-05-02 20:03:25 UTC (rev 267)
++++ trunk/server/object.c	2006-05-03 07:19:15 UTC (rev 268)
+@@ -229,7 +229,11 @@
+ 				obj-&gt;p_poly[m+i].v[2]=*(px++);
+ 				obj-&gt;p_poly[m+i].mat=*(px++);
+ 				obj-&gt;p_poly[m+i].n[0].x=obj-&gt;p_poly[m+i].n[0].y=obj-&gt;p_poly[m+i].n[0].z=0;
++				obj-&gt;p_poly[m+i].n[1].x=obj-&gt;p_poly[m+i].n[1].y=obj-&gt;p_poly[m+i].n[1].z=0;
++				obj-&gt;p_poly[m+i].n[2].x=obj-&gt;p_poly[m+i].n[2].y=obj-&gt;p_poly[m+i].n[2].z=0;
+ 				obj-&gt;p_poly[m+i].tc[0].x=obj-&gt;p_poly[m+i].n[0].y=obj-&gt;p_poly[m+i].n[0].z=0;
++				obj-&gt;p_poly[m+i].tc[1].x=obj-&gt;p_poly[m+i].n[1].y=obj-&gt;p_poly[m+i].n[1].z=0;
++				obj-&gt;p_poly[m+i].tc[2].x=obj-&gt;p_poly[m+i].n[2].y=obj-&gt;p_poly[m+i].n[2].z=0;
+ 		 /* 		obj-&gt;p_poly[m+i].n=NULL;		/ *  no normals yet * / */
+ 			}
+ 			obj-&gt;n_poly+=n;
+@@ -271,6 +275,8 @@
+ 				obj-&gt;p_line[m+i].v[0]=*(px++);
+ 				obj-&gt;p_line[m+i].v[1]=*(px++);
+ 				obj-&gt;p_line[m+i].mat=*(px++);
++				obj-&gt;p_line[m+i].n[0].x=obj-&gt;p_line[m+i].n[0].y=obj-&gt;p_line[m+i].n[0].z=0;
++				obj-&gt;p_line[m+i].n[1].x=obj-&gt;p_line[m+i].n[1].y=obj-&gt;p_line[m+i].n[1].z=0;
+ 			}
+ 			obj-&gt;n_line+=n;
+ 		}
+@@ -1409,7 +1415,6 @@
+ 	if (p-&gt;id!=MCP)
+ 		obj_check_biggest_object(p,oid);
+ }
+-
+ /*  calculates the normal for one polygon, if not present. */
+ int calc_normal(struct t_obj *obj, uint32_t pn)
+ {
+@@ -1426,8 +1431,10 @@
+ 		else return(-1);
+ 	}
+ 	 /*  check for already set normal */
+-	if ((obj-&gt;p_poly[pn].n[0].x+obj-&gt;p_poly[pn].n[0].x+obj-&gt;p_poly[pn].n[0].x)==0)  /*  normal already defined? */
+-	{
++	if ((obj-&gt;p_poly[pn].n[0].x*obj-&gt;p_poly[pn].n[0].x+
++		 obj-&gt;p_poly[pn].n[0].y*obj-&gt;p_poly[pn].n[0].y+
++		 obj-&gt;p_poly[pn].n[0].z*obj-&gt;p_poly[pn].n[0].z)==0)  
++	{/*  normal already defined? */
+ 		a.x=v[1]-&gt;x-v[0]-&gt;x;
+ 		a.y=v[1]-&gt;y-v[0]-&gt;y;
+ 		a.z=v[1]-&gt;z-v[0]-&gt;z;
+@@ -1456,6 +1463,57 @@
+ 	}
+ 	return(0);
+ }
++
++/* checks if a normal is set for a line object, or set some default oif not */
++int check_line_normal(struct t_obj *obj, uint32_t pn)
++{
++	struct t_vertex *v[2],n;
++	float len;
++	int i,vp;
++	for (i=0;i&lt;2;i++)  /*  set and check */
++	{
++		vp= obj-&gt;p_line[pn].v[i];  /*  ... get the vertices ... */
++		if (vp&lt;obj-&gt;n_vertex)
++			v[i]=&amp;(obj-&gt;p_vertex[vp]);
++		else return(-1);
++	}
++	if ((obj-&gt;p_line[pn].n[0].x*obj-&gt;p_line[pn].n[0].x+
++		 obj-&gt;p_line[pn].n[0].y*obj-&gt;p_line[pn].n[0].y+
++		 obj-&gt;p_line[pn].n[0].z*obj-&gt;p_line[pn].n[0].z)==0)  
++	{ /* guess we have nothing set yet, so set something */
++			/*
++		n.x=v[1]-&gt;x-v[0]-&gt;x;
++		n.y=v[1]-&gt;y-v[0]-&gt;y;
++		n.z=v[1]-&gt;z-v[0]-&gt;z;
++		len=sqrt(n.x*n.x+n.y*n.y+n.z*n.z);
++		if (len==0.0F)
++		{  * no length? no good ...*
++			len=1.0;
++			n.z=1.0;
++			n.y=0.0;
++			n.x=0.0;
++		}
++		n.x=n.x/len;
++		n.y=n.y/len;
++		n.z=n.z/len;
++		obj-&gt;p_line[pn].n[0].x=n.x;
++		obj-&gt;p_line[pn].n[0].y=n.y;
++		obj-&gt;p_line[pn].n[0].z=n.z;
++		obj-&gt;p_line[pn].n[1].x=-n.x;
++		obj-&gt;p_line[pn].n[1].y=-n.y;
++		obj-&gt;p_line[pn].n[1].z=-n.z;*/
++		for (i=0;i&lt;2;i++)
++		{
++			obj-&gt;p_line[pn].n[0].x=0;
++			obj-&gt;p_line[pn].n[0].y=0;
++			obj-&gt;p_line[pn].n[0].z=1;
++		}
++	}
++	return(0);
++
++}
++
++/* activate/bind texture for object */
+ static struct t_tex *get_texture(struct t_obj *obj,struct t_mat *m)
+ {
+ 	GLuint t;
+@@ -1528,14 +1586,10 @@
+ 	glPushMatrix();
+ 	glMultMatrixf(obj-&gt;m);
+ /*	into_position(p,obj,0);*/
+-	if (obj-&gt;oflags&amp;OF_SYSTEM)
+-		return(-1); /* can't render system objects */
+-	if (obj-&gt;oflags&amp;OF_CLONE)
+-		obj=p-&gt;object[obj-&gt;n_vertex];
+-	if (obj-&gt;dplist)
+-	{
+-		glCallList(obj-&gt;dplist);
+-	} else {
++	if (obj-&gt;oflags&amp;OF_SYSTEM)		return(-1); 					/* can't render system objects */
++	if (obj-&gt;oflags&amp;OF_CLONE)		obj=p-&gt;object[obj-&gt;n_vertex]; 	/* it's a clone - draw the clone! */
++	if (obj-&gt;dplist)				glCallList(obj-&gt;dplist);		/* we have done that before, call the GLList */
++	else {
+ 		obj-&gt;dplist=glGenLists(1);
+ 		if (obj-&gt;dplist)	glNewList(obj-&gt;dplist,GL_COMPILE_AND_EXECUTE);
+ 		 else 				dprintf(LOW,&quot;couldn't get a new list :/&quot;);
+@@ -1545,8 +1599,7 @@
+ 			if (calc_normal(obj,pn))
+ 			{
+ 				dprintf(HIGH,&quot;something is wrong with polygon %d!&quot;,pn);
+-				if (obj-&gt;dplist) glEndList();
+-				glPopMatrix();
++				if (obj-&gt;dplist) glEndList();	glPopMatrix(); /* clean up GL-stuff */
+ 				return(-1);
+ 			}
+ 	 /* 		glNormal3f(-n.x,-n.y,-n.z); */
+@@ -1555,9 +1608,8 @@
+ 				tex=NULL;
+ 				if (mat&lt; obj-&gt;n_mat) {
+ 					m=&amp;obj-&gt;p_mat[mat];
+-					if (m-&gt;tex!=-1)
+-						tex=get_texture(obj,m);
+-					if (tex==NULL)
++					if (m-&gt;tex!=-1)		tex=get_texture(obj,m);
++					if (tex==NULL)		/* still NULL? then it couldn't get the texture. */
+ 					{
+ /*						dprintf(VLOW,&quot;no texture, using standard material...&quot;);*/
+ 						glBindTexture( GL_TEXTURE_2D,0);
+@@ -1582,9 +1634,7 @@
+ 					}
+ 				} else {
+ 					dprintf(MED,&quot;something is wrong with polygon %d! material: [%d,%d]&quot;,pn, mat,obj-&gt;n_mat);
+-					if (obj-&gt;dplist) glEndList();
+-					glEnd();
+-					glPopMatrix();
++					if (obj-&gt;dplist) glEndList();	glEnd();	glPopMatrix();
+ 					return(-1);
+ 				}
+ 			}
+@@ -1609,11 +1659,10 @@
+ 				}
+ 			glEnd();
+ 		}
+-		if (tex!=NULL)
+-			glBindTexture( GL_TEXTURE_2D, 0);  /*  switch back to standard texture */
+-
++		if (tex!=NULL)			glBindTexture( GL_TEXTURE_2D, 0);  /*  switch back to standard texture */
+ 		for (pn=0;pn&lt;obj-&gt;n_line; pn++)
+ 		{
++			check_line_normal(obj,pn);
+ 			mat= obj-&gt;p_line[pn].mat;
+ 			if (mat!=omat) {
+ 				tex=NULL;
+@@ -1651,6 +1700,9 @@
+ 			glBegin(GL_LINES);
+ 			for (i=0; i&lt;2; i++)
+ 				{
++					on=&amp;(obj-&gt;p_line[pn].n[i]);
++					glNormal3f(-on-&gt;x,-on-&gt;y,-on-&gt;z);
++
+ 					v= obj-&gt;p_line[pn].v[i];  /*  ... get the vertices ... */
+ 					glVertex3f(obj-&gt;p_vertex[v].x, obj-&gt;p_vertex[v].y, obj-&gt;p_vertex[v].z);  /*  ...and draw them */
+ 				}
+
+Modified: trunk/server/process.c
+===================================================================
+--- trunk/server/process.c	2006-05-02 20:03:25 UTC (rev 267)
++++ trunk/server/process.c	2006-05-03 07:19:15 UTC (rev 268)
+@@ -65,7 +65,7 @@
+ 			return(&amp;procs_p[MCP]);
+ 		} else {
+ 			dprintf(LOW,&quot;the place for the mcp is already taken ...&quot;);
+-			return(p);
++			return(NULL);
+ 		}
+ 	} else {
+ 		strncpy(p-&gt;name, name, NAME_MAX);
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2006-05-02 20:03:25 UTC (rev 267)
++++ trunk/server/proto.c	2006-05-03 07:19:15 UTC (rev 268)
+@@ -44,6 +44,7 @@
+ 	uint8_t 	command;
+ 	int 	i;
+ 	char 	name[NAME_MAX];
++	struct t_process *np;
+ 	uint8_t	*buf,*cptr=NULL;
+ 	uint16_t length;
+ 	uint16_t num;
+@@ -71,10 +72,10 @@
+ 				if (length&gt;NAME_MAX) i=NAME_MAX; else i=length;
+ 				strncpy(name,(char *)buf,i);
+ 				dprintf(LOW,&quot;[%d]\&quot;%s\&quot; logged in&quot;, p-&gt;id,name);
+-				if (p==process_protinit(p,name))
++				if (NULL==(np=process_protinit(p,name)))
+ 					event_quit(p);  /*  couldn't get process */
+ 				else
+-					event_init(p);
++					event_init(np);
+ 				break;
+ 			case S3D_P_C_NEW_OBJ:
+ 				oid=htonl(obj_new(p));
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000260.html">[S3d-svn] r267 - in trunk: . server
+</A></li>
+	<LI>Next message: <A HREF="000262.html">[S3d-svn] r269 - in trunk: . apps/dot_mcp client server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#261">[ date ]</a>
+              <a href="thread.html#261">[ thread ]</a>
+              <a href="subject.html#261">[ subject ]</a>
+              <a href="author.html#261">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

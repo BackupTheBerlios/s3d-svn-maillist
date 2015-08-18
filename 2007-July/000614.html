@@ -1,0 +1,458 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r622 - in branches/s3d-cmake: apps/dot_mcp apps/kism3d	apps/olsrs3d apps/s3dfm libs3d libs3dw server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r622%20-%20in%20branches/s3d-cmake%3A%20apps/dot_mcp%20apps/kism3d%0A%09apps/olsrs3d%20apps/s3dfm%20libs3d%20libs3dw%20server&In-Reply-To=%3C200707011315.l61DF92J032173%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000613.html">
+   <LINK REL="Next"  HREF="000615.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r622 - in branches/s3d-cmake: apps/dot_mcp apps/kism3d	apps/olsrs3d apps/s3dfm libs3d libs3dw server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r622%20-%20in%20branches/s3d-cmake%3A%20apps/dot_mcp%20apps/kism3d%0A%09apps/olsrs3d%20apps/s3dfm%20libs3d%20libs3dw%20server&In-Reply-To=%3C200707011315.l61DF92J032173%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r622 - in branches/s3d-cmake: apps/dot_mcp apps/kism3d	apps/olsrs3d apps/s3dfm libs3d libs3dw server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Jul  1 15:15:09 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000613.html">[S3d-svn] r621 - branches/s3d-cmake/apps/meshs3d
+</A></li>
+        <LI>Next message: <A HREF="000615.html">[S3d-svn] r623 - branches/s3d-cmake/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#614">[ date ]</a>
+              <a href="thread.html#614">[ thread ]</a>
+              <a href="subject.html#614">[ subject ]</a>
+              <a href="author.html#614">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-07-01 15:15:06 +0200 (Sun, 01 Jul 2007)
+New Revision: 622
+
+Modified:
+   branches/s3d-cmake/apps/dot_mcp/main.c
+   branches/s3d-cmake/apps/dot_mcp/menu.c
+   branches/s3d-cmake/apps/kism3d/gui.c
+   branches/s3d-cmake/apps/olsrs3d/main.c
+   branches/s3d-cmake/apps/s3dfm/dialog.c
+   branches/s3d-cmake/apps/s3dfm/string.c
+   branches/s3d-cmake/libs3d/modelread.c
+   branches/s3d-cmake/libs3d/object_queue.c
+   branches/s3d-cmake/libs3dw/s3dw.h
+   branches/s3d-cmake/libs3dw/textbox.c
+   branches/s3d-cmake/server/event.c
+   branches/s3d-cmake/server/global.h
+   branches/s3d-cmake/server/graphics.c
+   branches/s3d-cmake/server/main.c
+   branches/s3d-cmake/server/mcp.c
+   branches/s3d-cmake/server/object.c
+   branches/s3d-cmake/server/process.c
+   branches/s3d-cmake/server/proto.c
+Log:
+- Removed some comparisons between signed and unsigned
+
+
+Modified: branches/s3d-cmake/apps/dot_mcp/main.c
+===================================================================
+--- branches/s3d-cmake/apps/dot_mcp/main.c	2007-07-01 13:15:04 UTC (rev 621)
++++ branches/s3d-cmake/apps/dot_mcp/main.c	2007-07-01 13:15:06 UTC (rev 622)
+@@ -49,8 +49,8 @@
+ 	float trans_x,trans_y,trans_z;
+ 	float textw;
+ 	char name[256]; 
+-	int min_but,close_but,title;
+-	int sphere;
++	unsigned int min_but, title, close_but;
++	unsigned int sphere;
+ 	struct app *next;
+ };
+ int ego_mode=0;
+@@ -198,7 +198,7 @@
+ 	n_app+=1;
+ 	return(0);
+ }
+-void *find_app(int oid)
++void *find_app(unsigned int oid)
+ {
+ 	struct app *a=apps;
+ 	while (a!=NULL)
+@@ -209,7 +209,7 @@
+ 	}
+ 	return(a);
+ }
+-void *del_app(int oid)
++void *del_app(unsigned int oid)
+ {
+ 	struct app *prev=NULL,*a=apps;
+ 	while ((a!=NULL)  &amp;&amp; (a-&gt;oid!=oid))
+
+Modified: branches/s3d-cmake/apps/dot_mcp/menu.c
+===================================================================
+--- branches/s3d-cmake/apps/dot_mcp/menu.c	2007-07-01 13:15:04 UTC (rev 621)
++++ branches/s3d-cmake/apps/dot_mcp/menu.c	2007-07-01 13:15:06 UTC (rev 622)
+@@ -86,7 +86,8 @@
+ }
+ int menu_init ()
+ {
+-	int i,menu_o;
++	unsigned int i;
++	int menu_o;
+ 	menu_o=s3d_new_object();
+ 	act=0; /* menu deactived */
+ 	go=s3d_import_model_file(&quot;objs/s3dstart.3ds&quot;);
+
+Modified: branches/s3d-cmake/apps/kism3d/gui.c
+===================================================================
+--- branches/s3d-cmake/apps/kism3d/gui.c	2007-07-01 13:15:04 UTC (rev 621)
++++ branches/s3d-cmake/apps/kism3d/gui.c	2007-07-01 13:15:06 UTC (rev 622)
+@@ -37,7 +37,7 @@
+ float CamPosition[2][3];          /* CamPosition[trans|rot][x-z] */
+ 
+ int Last_Click_Oid = 0;
+-int Last_Click_Time = 0;
++unsigned int Last_Click_Time = 0;
+ 
+ void *Cam_target = NULL;
+ 
+
+Modified: branches/s3d-cmake/apps/olsrs3d/main.c
+===================================================================
+--- branches/s3d-cmake/apps/olsrs3d/main.c	2007-07-01 13:15:04 UTC (rev 621)
++++ branches/s3d-cmake/apps/olsrs3d/main.c	2007-07-01 13:15:06 UTC (rev 622)
+@@ -86,7 +86,7 @@
+ int Btn_close_id = -1;
+ 
+ int Btn_close_obj;
+-int Last_Click_Time = 0;
++unsigned int Last_Click_Time = 0;
+ int Last_Click_Oid = 0;
+ float Title_len;
+ 
+
+Modified: branches/s3d-cmake/apps/s3dfm/dialog.c
+===================================================================
+--- branches/s3d-cmake/apps/s3dfm/dialog.c	2007-07-01 13:15:04 UTC (rev 621)
++++ branches/s3d-cmake/apps/s3dfm/dialog.c	2007-07-01 13:15:06 UTC (rev 622)
+@@ -175,7 +175,8 @@
+ 	s3dw_button  *okbutton,*abortbutton;
+ 	float l;
+ 
+-	int i,m;
++	int i;
++	unsigned int m;
+ 
+ 	if (fs_lock) 	{	window_fs_another(); 	return; }
+ 	fs_lock=TYPE_COPY;
+@@ -218,7 +219,8 @@
+ 	s3dw_button  *okbutton,*abortbutton;
+ 	float l;
+ 
+-	int i,m;
++	int i;
++	unsigned int m;
+ 
+ 	if (fs_lock) 	{	window_fs_another(); 	return; }
+ 	fs_lock=TYPE_UNLINK;
+
+Modified: branches/s3d-cmake/apps/s3dfm/string.c
+===================================================================
+--- branches/s3d-cmake/apps/s3dfm/string.c	2007-07-01 13:15:04 UTC (rev 621)
++++ branches/s3d-cmake/apps/s3dfm/string.c	2007-07-01 13:15:06 UTC (rev 622)
+@@ -60,7 +60,7 @@
+ void dotted_int(char *s,unsigned int i)
+ {
+ 	char st[M_DIR];
+-	int p;
++	unsigned int p;
+ 	p=0;
+ 	st[0]=0;
+ 	while (i&gt;0)
+
+Modified: branches/s3d-cmake/libs3d/modelread.c
+===================================================================
+--- branches/s3d-cmake/libs3d/modelread.c	2007-07-01 13:15:04 UTC (rev 621)
++++ branches/s3d-cmake/libs3d/modelread.c	2007-07-01 13:15:06 UTC (rev 622)
+@@ -127,7 +127,8 @@
+ 	G3DFace 				*face;
+ 	GSList 					*oitem, *oface;
+ 	struct material2texture *mat2tex;
+-	int						 j, k, material_count, texture_count, voff,obj_id;
++	unsigned int					i, k;
++	int						j, material_count, texture_count, voff,obj_id;
+ #define 					PMAX	100
+ 	uint32_t 			 polybuf[PMAX * 4],npoly,oldflags;
+ 	float					 normalbuf[PMAX * 9],texcoordbuf[PMAX * 6];
+@@ -149,12 +150,12 @@
+ 			object = (G3DObject *)oitem-&gt;data;
+ 
+ 			/* push vertices */
+-			for ( j = 0; j &lt; object-&gt;vertex_count; j++ ) {
++			for ( i = 0; i &lt; object-&gt;vertex_count; i++ ) {
+ 				/* 2. and 3. coord have to change places otherwise the object will be turned */
+-				object-&gt;vertex_data[j * 3 + 0] =  object-&gt;vertex_data[j * 3 + 0];
+-				swaph=							  object-&gt;vertex_data[j * 3 + 2];
+-				object-&gt;vertex_data[j * 3 + 2] = -object-&gt;vertex_data[j * 3 + 1];
+-				object-&gt;vertex_data[j * 3 + 1] = swaph;
++				object-&gt;vertex_data[i * 3 + 0] =  object-&gt;vertex_data[i * 3 + 0];
++				swaph=							  object-&gt;vertex_data[i * 3 + 2];
++				object-&gt;vertex_data[i * 3 + 2] = -object-&gt;vertex_data[i * 3 + 1];
++				object-&gt;vertex_data[i * 3 + 1] = swaph;
+ 			}
+ 			s3d_push_vertices( obj_id, object-&gt;vertex_data, object-&gt;vertex_count);
+ 
+
+Modified: branches/s3d-cmake/libs3d/object_queue.c
+===================================================================
+--- branches/s3d-cmake/libs3d/object_queue.c	2007-07-01 13:15:04 UTC (rev 621)
++++ branches/s3d-cmake/libs3d/object_queue.c	2007-07-01 13:15:06 UTC (rev 622)
+@@ -36,7 +36,7 @@
+ 
+ #define Q_UNUSED	-1				 	/*  unused slot magic number */
+ #define MAX_REQ		100				 	/*  don't request more than that. */
+-static unsigned int *queue;			 	/*  the object id's */
++static int *queue;			 	/*  the object id's */
+ static int queue_size=0;			 	/*  the size of the object queue */
+ static int requested;				 	/*  counter of how many addtional */
+ 									 	/*  objects have been requested */
+
+Modified: branches/s3d-cmake/libs3dw/s3dw.h
+===================================================================
+--- branches/s3d-cmake/libs3dw/s3dw.h	2007-07-01 13:15:04 UTC (rev 621)
++++ branches/s3d-cmake/libs3dw/s3dw.h	2007-07-01 13:15:06 UTC (rev 622)
+@@ -109,7 +109,7 @@
+ 	s3dw_widget 	 widget;
+ 	float			 pos,max;
+ 	int				 type; /* 0 = horizontal, 1 = vertical */
+-	int				 loid,roid,baroid;
++	uint32_t			 loid, roid, baroid;
+ 	/* public */
+ 	s3dw_callback 	 lonclick;
+ 	s3dw_callback 	 ronclick;
+
+Modified: branches/s3d-cmake/libs3dw/textbox.c
+===================================================================
+--- branches/s3d-cmake/libs3dw/textbox.c	2007-07-01 13:15:04 UTC (rev 621)
++++ branches/s3d-cmake/libs3dw/textbox.c	2007-07-01 13:15:06 UTC (rev 622)
+@@ -88,7 +88,8 @@
+ 	char *text,*rest;
+ 	char *linefeedpos;
+ 	int i;
+-	int x,y;
++	unsigned int x;
++	int y;
+ 	float width;
+ 	textbox-&gt;n_lineoids=widget-&gt;height-2;
+ 	textbox-&gt;p_lineoids=malloc(textbox-&gt;n_lineoids*sizeof(int));
+
+Modified: branches/s3d-cmake/server/event.c
+===================================================================
+--- branches/s3d-cmake/server/event.c	2007-07-01 13:15:04 UTC (rev 621)
++++ branches/s3d-cmake/server/event.c	2007-07-01 13:15:06 UTC (rev 622)
+@@ -31,7 +31,7 @@
+ #include &lt;netinet/in.h&gt;  /*  htonl(),htons() */
+ #endif 
+ #include &lt;string.h&gt;  /*  strlen(),strcpy() */
+-extern int focus_oid;
++extern unsigned int focus_oid;
+ extern int winw,winh; /* to give aspect ratio to the program */
+ /*  I don't plan to keep this until the end, but it can show us how */
+ /*  to interact ... */
+
+Modified: branches/s3d-cmake/server/global.h
+===================================================================
+--- branches/s3d-cmake/server/global.h	2007-07-01 13:15:04 UTC (rev 621)
++++ branches/s3d-cmake/server/global.h	2007-07-01 13:15:06 UTC (rev 622)
+@@ -355,7 +355,7 @@
+ int obj_render			(struct t_process *p, uint32_t oid);
+ int obj_free			(struct t_process *p, uint32_t oid);
+ void obj_get_maximum	(struct t_process *p, struct t_obj *obj);
+-void into_position		(struct t_process *p, struct t_obj *obj, int depth);
++void into_position		(struct t_process *p, struct t_obj *obj, uint32_t depth);
+ void obj_recalc_tmat	(struct t_process *p, uint32_t oid);
+ void obj_size_update	(struct t_process *p, uint32_t oid);
+ void obj_pos_update(struct t_process *p, uint32_t oid, uint32_t first_oid);
+@@ -367,7 +367,7 @@
+ int mcp_rep_object(uint32_t mcp_oid);
+ int mcp_del_object(uint32_t mcp_oid);
+ int mcp_init(void);
+-int mcp_focus(int oid);
++int mcp_focus(uint32_t oid);
+ /*  matrix.c */
+ void myMultMatrix(t_mtrx mat2);
+ void myGetMatrix(t_mtrx mat);
+
+Modified: branches/s3d-cmake/server/graphics.c
+===================================================================
+--- branches/s3d-cmake/server/graphics.c	2007-07-01 13:15:04 UTC (rev 621)
++++ branches/s3d-cmake/server/graphics.c	2007-07-01 13:15:06 UTC (rev 622)
+@@ -243,13 +243,15 @@
+ #define SBSIZE	65536
+ int graphics_pick_obj(int x, int y)
+ {
+-	int i,j;
++	int i;
++	unsigned int j;
+ 	GLint viewport[4];
+ 	GLfloat xpos,ypos;
+ 	float big,z1,z2;
+ 	uint32_t mcp_o,o;
+ 	struct t_process *p=get_proc_by_pid(MCP);
+-	GLuint select_buf[SBSIZE],*ptr,names,hits;
++	GLuint select_buf[SBSIZE],*ptr,names;
++	GLint hits;
+ 	t_mtrx m;
+ 
+ 	select_mode=1;
+@@ -323,7 +325,7 @@
+ 			s3dprintf(LOW,&quot;clicked on mcp-object no. %d&quot;,o);
+ 			event_obj_click(p,o);
+ 		} else 
+-		if ((names&gt;1) &amp;&amp; ((mcp_o&gt;=0)&amp;&amp;(mcp_o&lt;p-&gt;n_obj)))
++		if ((names&gt;1) &amp;&amp; (mcp_o&lt;p-&gt;n_obj))
+ 		{ /* it's an usual object */
+ 			s3dprintf(LOW,&quot;clicked on mcp-object %d, object %d&quot;,mcp_o,o);
+ 			if (p-&gt;object[mcp_o]!=NULL)  /*  that shouldn't happen anyways ... */
+
+Modified: branches/s3d-cmake/server/main.c
+===================================================================
+--- branches/s3d-cmake/server/main.c	2007-07-01 13:15:04 UTC (rev 621)
++++ branches/s3d-cmake/server/main.c	2007-07-01 13:15:06 UTC (rev 622)
+@@ -75,7 +75,8 @@
+ int rc_init(void)
+ {
+ #ifdef SIGS
+-	int ret,i;
++	int ret;
++	unsigned int i;
+ 	struct timespec t={0,10*1000*1000}; /* 10 mili seconds */
+ 	kidpid=fork();
+ 	if (kidpid==-1)
+
+Modified: branches/s3d-cmake/server/mcp.c
+===================================================================
+--- branches/s3d-cmake/server/mcp.c	2007-07-01 13:15:04 UTC (rev 621)
++++ branches/s3d-cmake/server/mcp.c	2007-07-01 13:15:06 UTC (rev 622)
+@@ -32,7 +32,7 @@
+ #include &lt;string.h&gt;			 /*  strncpy() */
+ 
+ 
+-extern int 		   focus_oid;		 /*  the focused program */
++extern unsigned int 		   focus_oid;		 /*  the focused program */
+ 
+ /*  this interacts with the actual mcp client */
+ struct mcp_object 
+@@ -97,7 +97,7 @@
+ 	return(0);
+ }
+ /* sets a new focus */
+-int mcp_focus(int oid)
++int mcp_focus(uint32_t oid)
+ {
+ 	struct t_process *p;
+ 	struct t_obj *o;
+
+Modified: branches/s3d-cmake/server/object.c
+===================================================================
+--- branches/s3d-cmake/server/object.c	2007-07-01 13:15:04 UTC (rev 621)
++++ branches/s3d-cmake/server/object.c	2007-07-01 13:15:06 UTC (rev 622)
+@@ -35,7 +35,7 @@
+ 		 /*  if oid is always unsigned, we don't have to check oid&gt;=0 */
+ 
+ extern t_mtrx Identity;
+-extern int focus_oid;
++extern unsigned int focus_oid;
+ 
+ 
+ static void obj_update_tex(struct t_tex *tex,u_int16_t x,u_int16_t y,u_int16_t w,u_int16_t h,u_int8_t *pixbuf);
+@@ -1278,7 +1278,7 @@
+ 	return(0);
+ }
+ /*  a recursive function to move/scale the object before rendering. */
+-void into_position(struct t_process *p, struct t_obj *obj, int depth)
++void into_position(struct t_process *p, struct t_obj *obj, uint32_t depth)
+ {
+ 	struct t_obj *on;
+ 	if ((obj-&gt;oflags&amp;OF_LINK) &amp;&amp; (depth&lt;p-&gt;n_obj))
+@@ -1308,7 +1308,8 @@
+ 	struct t_obj *o,*o2;
+ 	struct t_vertex *a,*vp;
+ 	float r;
+-	int vn,is_clnsrc;
++	uint32_t vn;
++	int is_clnsrc;
+ 	uint32_t i;
+ 	if (p-&gt;id==MCP) return; /*  mcp does not need that. */
+ 	if (obj_valid(p,oid,o))
+@@ -1593,7 +1594,8 @@
+ int check_line_normal(struct t_obj *obj, uint32_t pn)
+ {
+ 	struct t_vertex *v[2];
+-	int i,vp;
++	uint32_t vp;
++	int i;
+ 	for (i=0;i&lt;2;i++)  /*  set and check */
+ 	{
+ 		vp= obj-&gt;p_line[pn].v[i];  /*  ... get the vertices ... */
+
+Modified: branches/s3d-cmake/server/process.c
+===================================================================
+--- branches/s3d-cmake/server/process.c	2007-07-01 13:15:04 UTC (rev 621)
++++ branches/s3d-cmake/server/process.c	2007-07-01 13:15:06 UTC (rev 622)
+@@ -198,7 +198,7 @@
+ /* it's quite the same as the original version, but without free() */
+ static int p_del(struct t_process *p)
+ {
+-	int j,i=p-&gt;n_obj;
++	unsigned int j,i=p-&gt;n_obj;
+ 	if (p-&gt;id!=MCP)
+ 	{
+ 		if (p-&gt;mcp_oid!=-1)
+
+Modified: branches/s3d-cmake/server/proto.c
+===================================================================
+--- branches/s3d-cmake/server/proto.c	2007-07-01 13:15:04 UTC (rev 621)
++++ branches/s3d-cmake/server/proto.c	2007-07-01 13:15:06 UTC (rev 622)
+@@ -35,7 +35,7 @@
+ /*  this code should do the protocol work .... */
+ /*  */
+ extern uint8_t obuf[MAXPLEN];
+-int focus_oid=-1;  /*  initially focus the pid */
++unsigned int focus_oid=-1;  /*  initially focus the pid */
+ /*  handle an incoming command from the client .. */
+ 
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000613.html">[S3d-svn] r621 - branches/s3d-cmake/apps/meshs3d
+</A></li>
+	<LI>Next message: <A HREF="000615.html">[S3d-svn] r623 - branches/s3d-cmake/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#614">[ date ]</a>
+              <a href="thread.html#614">[ thread ]</a>
+              <a href="subject.html#614">[ subject ]</a>
+              <a href="author.html#614">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r187 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r187%20-%20trunk&In-Reply-To=%3C200603152029.k2FKTpus019906%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000182.html">
+   <LINK REL="Next"  HREF="000184.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r187 - trunk</H1>
+    <B>ankon at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r187%20-%20trunk&In-Reply-To=%3C200603152029.k2FKTpus019906%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r187 - trunk">ankon at berlios.de
+       </A><BR>
+    <I>Wed Mar 15 21:29:51 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000182.html">[S3d-svn] r186 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000184.html">[S3d-svn] r188 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#183">[ date ]</a>
+              <a href="thread.html#183">[ thread ]</a>
+              <a href="subject.html#183">[ subject ]</a>
+              <a href="author.html#183">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: ankon
+Date: 2006-03-15 21:29:46 +0100 (Wed, 15 Mar 2006)
+New Revision: 187
+
+Modified:
+   trunk/ChangeLog
+   trunk/TODO
+Log:
+Update TODO (document needed autotools versions, remove fortran item)
+Update ChangeLog (why isn't that automagic?)
+
+
+
+Modified: trunk/ChangeLog
+===================================================================
+--- trunk/ChangeLog	2006-03-15 20:19:59 UTC (rev 186)
++++ trunk/ChangeLog	2006-03-15 20:29:46 UTC (rev 187)
+@@ -1,3 +1,7 @@
++2006-03-15  Andreas Kohn - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas at syndrom23.de</A>&gt;
++	- some configure.ac changes to fix glut/sdl detection code
++	- some autoconf magic to fix pthread detection for esoteric arch's.
++	- a big hammer to prevent fortran checks
+ 2006-03-14  Simon Wunderlich - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+ 	- added push/pep/pop-line and pep-vertex
+ 	- dot_mcp now has egoshooter-mode (w,a,s,d)
+
+Modified: trunk/TODO
+===================================================================
+--- trunk/TODO	2006-03-15 20:19:59 UTC (rev 186)
++++ trunk/TODO	2006-03-15 20:29:46 UTC (rev 187)
+@@ -10,21 +10,10 @@
+ 	* endless loop in proccess_args() (getopts) on linux ppc
+ 
+ autotools:
+-    * checking g77 is useless
+ 	* Apple todo: won't find -lX11 (for s3d_x11gate) while compiling
+ 	* OBJECTPATH for finding the object?
+-	* check for automake&gt;1.9, to prevent weird errors
+-    * weird:
+-	...
+-	checking for cos in -lm... yes
+-	./configure: line 22348: MDL_HAVE_OPENGL: command not found
+-	checking for library containing glutInit... -lglut
+-	...
++	* We should perhaps check for the correct versions of
++	  autotools to avoid some confusion about some warnings.
++	  At the time of writing, supported are:
++	   automake 1.9, autoconf 2.59, libtool 1.5
+ 
+-	...
+-	checking for main in -lXtst... yes
+-	./configure: line 23397: HAVE_PTHREAD: command not found
+-	configure: creating ./config.status
+-	...
+-
+-
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000182.html">[S3d-svn] r186 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000184.html">[S3d-svn] r188 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#183">[ date ]</a>
+              <a href="thread.html#183">[ thread ]</a>
+              <a href="subject.html#183">[ subject ]</a>
+              <a href="author.html#183">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

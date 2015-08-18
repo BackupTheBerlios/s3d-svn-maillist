@@ -1,0 +1,357 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r775 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r775%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200710190000.l9J007Pi031158%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000766.html">
+   <LINK REL="Next"  HREF="000768.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r775 - trunk/apps/olsrs3d</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r775%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200710190000.l9J007Pi031158%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r775 - trunk/apps/olsrs3d">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 02:00:07 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000766.html">[S3d-svn] r774 - trunk/apps/meshs3d
+</A></li>
+        <LI>Next message: <A HREF="000768.html">[S3d-svn] r776 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#767">[ date ]</a>
+              <a href="thread.html#767">[ thread ]</a>
+              <a href="subject.html#767">[ subject ]</a>
+              <a href="author.html#767">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 02:00:06 +0200 (Fri, 19 Oct 2007)
+New Revision: 775
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/net.c
+   trunk/apps/olsrs3d/process.c
+   trunk/apps/olsrs3d/search.c
+Log:
+olsrs3d: Mark local functions and variables as static
+
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2007-10-18 23:59:57 UTC (rev 774)
++++ trunk/apps/olsrs3d/main.c	2007-10-19 00:00:06 UTC (rev 775)
+@@ -47,7 +47,7 @@
+ 
+ int Debug = 0;
+ 
+-char Olsr_host[256];   /* ip or hostname of olsr node with running dot_draw plugin */
++static char Olsr_host[256];   /* ip or hostname of olsr node with running dot_draw plugin */
+ 
+ struct olsr_con *Con_begin = NULL;   /* begin of connection list */
+ struct olsr_node *Olsr_root = NULL;   /* top of olsr node tree */
+@@ -55,10 +55,10 @@
+ 
+ int Olsr_node_count = 0, Last_olsr_node_count = -1;
+ int Olsr_node_count_obj = -1;
+-int Olsr_ip_label_obj = -1;
+-int Output_border[4];
+-int *Olsr_neighbour_label_obj = NULL;
+-int Size;
++static int Olsr_ip_label_obj = -1;
++static int Output_border[4];
++static int *Olsr_neighbour_label_obj = NULL;
++static int Size;
+ 
+ 
+ int Net_read_count;
+@@ -67,30 +67,30 @@
+ 
+ int Olsr_node_obj, Olsr_node_inet_obj, Olsr_node_hna_net, S3d_obj;
+ 
+-float Asp = 1.0;
++static float Asp = 1.0;
+ float Bottom = -1.0;
+ float Left = -1.0;
+ 
+ float CamPosition[2][3]; /* CamPosition[trans|rot][x-z] */
+-float CamPosition2[2][3]; /* CamPosition[trans|rot][x-z] */
++static float CamPosition2[2][3]; /* CamPosition[trans|rot][x-z] */
+ 
+ /* needed ? */
+ /* float ZeroPosition[3] = {0,0,0};  current position zero position */
+ 
+ int ZeroPoint;   /* object zeropoint */
+-float Zp_rotate = 0.0;
+-int ColorSwitch = 0;   /* enable/disable colored olsr connections */
+-int RotateSwitch = 0;
+-float RotateSpeed = 0.5;
+-float Factor = 0.6; /* Factor in calc_olsr_node_mov */
+-struct olsr_node *Olsr_node_pEtx;
++static float Zp_rotate = 0.0;
++static int ColorSwitch = 0;   /* enable/disable colored olsr connections */
++static int RotateSwitch = 0;
++static float RotateSpeed = 0.5;
++static float Factor = 0.6; /* Factor in calc_olsr_node_mov */
++static struct olsr_node *Olsr_node_pEtx;
+ 
+ int Btn_close_id = -1;
+ 
+ int Btn_close_obj;
+-unsigned int Last_Click_Time = 0;
+-int Last_Click_Oid = 0;
+-float Title_len;
++static unsigned int Last_Click_Time = 0;
++static int Last_Click_Oid = 0;
++static float Title_len;
+ 
+ /***
+  *
+@@ -98,7 +98,7 @@
+  *
+  ***/
+ 
+-void print_usage(void)
++static void print_usage(void)
+ {
+ 
+ 	printf(&quot;Usage is olsrs3d [options] [-- [s3d options]]\n&quot;);
+@@ -111,14 +111,14 @@
+ }
+ 
+ 
+-void close_win(s3dw_widget *button)
++static void close_win(s3dw_widget *button)
+ {
+ 	s3dw_delete(button-&gt;parent); /* parent =surface. this means close containing window */
+ }
+ 
+ 
+ 
+-void window_help(void)
++static void window_help(void)
+ {
+ 
+ 	s3dw_surface *infwin;
+@@ -186,7 +186,7 @@
+ 
+ 
+ 
+-unsigned int get_time(void)
++static unsigned int get_time(void)
+ {
+ 
+ 	struct timeval tv;
+@@ -234,7 +234,7 @@
+  *
+  ***/
+ 
+-float dirt(float p1[], float p2[], float p3[])
++static float dirt(float p1[], float p2[], float p3[])
+ {
+ 	float d;
+ 	d = dist(p1, p2);
+@@ -264,7 +264,7 @@
+  *
+  ***/
+ 
+-void mov_add(float mov[], float p[], float fac)
++static void mov_add(float mov[], float p[], float fac)
+ {
+ 	/* if (fac&gt;1000)
+ 	  return;
+@@ -284,7 +284,7 @@
+  *
+  ***/
+ 
+-void handle_olsr_node(struct olsr_node *olsr_node)
++static void handle_olsr_node(struct olsr_node *olsr_node)
+ {
+ 
+ 	float distance, angle, angle_rad;
+@@ -498,7 +498,7 @@
+  *
+  ***/
+ 
+-void calc_olsr_node_mov(void)
++static void calc_olsr_node_mov(void)
+ {
+ 
+ 	float distance;
+@@ -534,7 +534,7 @@
+  *
+  ***/
+ 
+-void move_olsr_nodes(void)
++static void move_olsr_nodes(void)
+ {
+ 
+ 	float null_vec[3] = {0, 0, 0}, vertex_buf[6];
+@@ -720,7 +720,7 @@
+ 
+ 
+ 
+-void mainloop(void)
++static void mainloop(void)
+ {
+ 
+ 	int net_result;   /* result of function net_main */
+@@ -797,7 +797,7 @@
+ 
+ }
+ 
+-int stop(struct s3d_evt* OLSRS3DUNUSED(evt))
++static int stop(struct s3d_evt* OLSRS3DUNUSED(evt))
+ {
+ 	s3d_quit();
+ 	net_quit();
+@@ -810,7 +810,7 @@
+  *
+  ***/
+ 
+-int keypress(struct s3d_evt *event)
++static int keypress(struct s3d_evt *event)
+ {
+ 
+ 	struct s3d_key_event *key = (struct s3d_key_event *)event-&gt;buf;
+@@ -901,7 +901,7 @@
+  *
+  ***/
+ 
+-int object_click(struct s3d_evt *evt)
++static int object_click(struct s3d_evt *evt)
+ {
+ 	/* int i
+ 	 char ip_str[50];
+@@ -1095,7 +1095,7 @@
+  *
+  ***/
+ 
+-int object_info(struct s3d_evt *hrmz)
++static int object_info(struct s3d_evt *hrmz)
+ {
+ 	struct s3d_obj_info *inf;
+ 	inf = (struct s3d_obj_info *)hrmz-&gt;buf;
+@@ -1122,7 +1122,7 @@
+ 	return(0);
+ }
+ 
+-int mbutton_press(struct s3d_evt *hrmz)
++static int mbutton_press(struct s3d_evt *hrmz)
+ {
+ 	struct s3d_but_info *inf;
+ 	inf = (struct s3d_but_info *)hrmz-&gt;buf;
+
+Modified: trunk/apps/olsrs3d/net.c
+===================================================================
+--- trunk/apps/olsrs3d/net.c	2007-10-18 23:59:57 UTC (rev 774)
++++ trunk/apps/olsrs3d/net.c	2007-10-19 00:00:06 UTC (rev 775)
+@@ -38,10 +38,10 @@
+ #include &quot;olsrs3d.h&quot;
+ 
+ #define PORT 2004   /* the port client will be connecting to  */
+-char buf[MAXDATASIZE];
++static char buf[MAXDATASIZE];
+ 
+ 
+-int sockfd, numbytes;
++static int sockfd, numbytes;
+ int net_init(char *host)
+ {
+ 	struct hostent *he;
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2007-10-18 23:59:57 UTC (rev 774)
++++ trunk/apps/olsrs3d/process.c	2007-10-19 00:00:06 UTC (rev 775)
+@@ -50,7 +50,7 @@
+  *
+  ***/
+ 
+-int add_olsr_con(struct olsr_node *con_from, struct olsr_node *con_to, float etx)
++static int add_olsr_con(struct olsr_node *con_from, struct olsr_node *con_to, float etx)
+ {
+ 
+ 	struct olsr_con **olsr_con = &amp;Con_begin;
+@@ -164,7 +164,7 @@
+  *
+  ***/
+ 
+-void *get_olsr_node(struct olsr_node **olsr_node, char *ip)
++static void* get_olsr_node(struct olsr_node **olsr_node, char *ip)
+ {
+ 
+ 	int result;   /* result of strcmp */
+
+Modified: trunk/apps/olsrs3d/search.c
+===================================================================
+--- trunk/apps/olsrs3d/search.c	2007-10-18 23:59:57 UTC (rev 774)
++++ trunk/apps/olsrs3d/search.c	2007-10-19 00:00:06 UTC (rev 775)
+@@ -31,15 +31,15 @@
+ /* #include &quot;structs.h&quot;  already included by olsrs3d.h */
+ #include &quot;search.h&quot;
+ 
+-s3dw_surface *_search_surface;
+-s3dw_input  *_search_input;
+-s3dw_widget  *_search_widget;
++static s3dw_surface *_search_surface;
++static s3dw_input  *_search_input;
++static s3dw_widget  *_search_widget;
+ 
+-struct olsr_node *_node_root = NULL;
+-struct olsr_node **search_node = NULL;
++static struct olsr_node *_node_root = NULL;
++static struct olsr_node **search_node = NULL;
+ 
+-float _return_point[2][3];    /* cam position before move to the widget */
+-int  _search_status = NOTHING;   /* status of search */
++static float _return_point[2][3];    /* cam position before move to the widget */
++static int  _search_status = NOTHING;   /* status of search */
+ 
+ void _search_node(s3dw_widget *dummy);
+ void _new_search_node(s3dw_widget *dummy);
+@@ -82,7 +82,7 @@
+ 	s3d_translate(0, cam_position_t[0], cam_position_t[1], cam_position_t[2]);
+ 	s3d_rotate(0, cam_position_r[0], cam_position_r[1], cam_position_r[2]);
+ }
+-void _abort_search_window(s3dw_widget *bwidget)
++static void _abort_search_window(s3dw_widget *bwidget)
+ {
+ 	s3dw_delete(bwidget-&gt;parent); /* remove the window cointaining the button */
+ 	_search_surface = NULL;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000766.html">[S3d-svn] r774 - trunk/apps/meshs3d
+</A></li>
+	<LI>Next message: <A HREF="000768.html">[S3d-svn] r776 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#767">[ date ]</a>
+              <a href="thread.html#767">[ thread ]</a>
+              <a href="subject.html#767">[ subject ]</a>
+              <a href="author.html#767">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

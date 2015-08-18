@@ -1,0 +1,283 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r858 - trunk/svnonly/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r858%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711191828.lAJISVAv002148%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000850.html">
+   <LINK REL="Next"  HREF="000852.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r858 - trunk/svnonly/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r858%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711191828.lAJISVAv002148%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r858 - trunk/svnonly/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Nov 19 19:28:31 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000850.html">[S3d-svn] r857 - trunk/svnonly/comptest
+</A></li>
+        <LI>Next message: <A HREF="000852.html">[S3d-svn] r859 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#851">[ date ]</a>
+              <a href="thread.html#851">[ thread ]</a>
+              <a href="subject.html#851">[ subject ]</a>
+              <a href="author.html#851">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-19 19:28:31 +0100 (Mon, 19 Nov 2007)
+New Revision: 858
+
+Modified:
+   trunk/svnonly/comptest/comptest.c
+   trunk/svnonly/comptest/comptest.h
+   trunk/svnonly/comptest/window.c
+Log:
+- pressing return puts camera into fullscreen position
+- try to use XCompositeNameWindowPixmap, but it does not work as expected .. :/
+
+
+Modified: trunk/svnonly/comptest/comptest.c
+===================================================================
+--- trunk/svnonly/comptest/comptest.c	2007-11-15 13:32:20 UTC (rev 857)
++++ trunk/svnonly/comptest/comptest.c	2007-11-19 18:28:31 UTC (rev 858)
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include &quot;comptest.h&quot;
++#include &lt;s3d_keysym.h&gt;
+ #include &lt;stdio.h&gt;
+ #include &lt;stdlib.h&gt;        /* malloc(), free() */
+ #include &lt;time.h&gt;         /* nanosleep() */
+@@ -78,6 +79,7 @@
+ 	int xpos, ypos;
+ 
+ 	win-&gt;oid = s3d_new_object();
++	s3d_link(win-&gt;oid, screen_oid);
+ 	/*
+ 	 for (i = 0;i &lt; 8;i++) {
+ 	  sver[i*3 + 0] = vertices[i*3+0] * win-&gt;attr.width / 20;
+@@ -107,16 +109,16 @@
+ 
+ 	for (y = 0; y &lt; win-&gt;attr.height;  y += TEXH) { /* the first column */
+ 		ypos = (y + TEXH &gt; win-&gt;attr.height) ? win-&gt;attr.height : y + TEXH ;
+-		s3d_push_vertex(win-&gt;oid, 0, -((float)ypos) / 20, -1);
++		s3d_push_vertex(win-&gt;oid, 0, -((float)ypos) , -1);
+ 		voffset++;
+ 	}
+ 	for (x = 0; x &lt; win-&gt;attr.width; x += TEXW) { /* the first row */
+ 		xpos = (x + TEXW &gt; win-&gt;attr.width) ? win-&gt;attr.width : x + TEXW ;
+-		s3d_push_vertex(win-&gt;oid, ((float)xpos) / 20, 0, -1);
++		s3d_push_vertex(win-&gt;oid, ((float)xpos) , 0, -1);
+ 
+ 		for (y = 0; y &lt; win-&gt;attr.height; y += TEXH) {
+ 			ypos = (y + TEXH &gt; win-&gt;attr.height) ? win-&gt;attr.height : y + TEXH  ;
+-			s3d_push_vertex(win-&gt;oid, ((float)xpos) / 20, -((float)ypos) / 20, -1);
++			s3d_push_vertex(win-&gt;oid, ((float)xpos) , -((float)ypos) , -1);
+ 			s3d_push_material_a(win-&gt;oid,
+ 			                    0.0, 0.8, 0.0 , 1.0,
+ 			                    1.0, 1.0, 1.0 , 1.0,
+@@ -136,8 +138,28 @@
+ 	s3d_flags_on(win-&gt;oid, S3D_OF_VISIBLE);
+ }
+ 
++static int key(struct s3d_evt *evt)
++{
++	struct s3d_key_event *key = (struct s3d_key_event *)evt-&gt;buf;
++	if (key-&gt;keysym == S3DK_RETURN) {
++		printf(&quot;camera into position ...\n&quot;);
++
++		s3d_translate(0, 0,0, SCREEN_SCALE);
++		s3d_rotate(0,0,0,0);
++
++		
++
++	}
++	return(0);
++
++}
++int screen_width = 0;
++int screen_height = 0;
++int screen_oid = -1;
++
+ int main(int argc, char **argv)
+ {
++	XWindowAttributes    attr;
+ 	Window        root_return, parent_return;
+ 	unsigned int     nchildren;
+ 	Window       *children;
+@@ -146,7 +168,15 @@
+ 
+ 	if (xinit())
+ 		return(1);
++	XGetWindowAttributes(dpy, RootWindow(dpy, 0), &amp;attr);
++	screen_width = attr.width;
++	screen_height = attr.height;
++
+ 	if (!s3d_init(&amp;argc, &amp;argv, &quot;comptest&quot;)) {
++		s3d_set_callback(S3D_EVENT_KEY, key);
++		screen_oid = s3d_new_object();
++		s3d_translate(screen_oid, -SCREEN_SCALE * (float)screen_width/((float) screen_height), SCREEN_SCALE, 0);
++		s3d_scale(screen_oid, 2* SCREEN_SCALE/((float)screen_height));
+ 		for (scr_no = 0; scr_no &lt; ScreenCount(dpy); scr_no++) {
+ 			XCompositeRedirectSubwindows(dpy, RootWindow(dpy, scr_no), CompositeRedirectAutomatic);
+ 			/*   XCompositeRedirectSubwindows(dpy, RootWindow(dpy, scr_no), CompositeRedirectManual);*/
+
+Modified: trunk/svnonly/comptest/comptest.h
+===================================================================
+--- trunk/svnonly/comptest/comptest.h	2007-11-15 13:32:20 UTC (rev 857)
++++ trunk/svnonly/comptest/comptest.h	2007-11-19 18:28:31 UTC (rev 858)
+@@ -17,6 +17,7 @@
+ #endif
+ 
+ #define MAXEVENTS 50  /* maximum events per loop. */
++#define SCREEN_SCALE	5.0
+ 
+ /* must be 2^x */
+ #define TEXW 256
+@@ -32,6 +33,7 @@
+ 	Damage       damage;  /* damage notification */
+ 	XRenderPictureAttributes  pa;
+ 	XRenderPictFormat    *format;
++	Pixmap			pix;
+ 	Picture       picture;
+ 	int     already_updated;
+ 	int        oid;
+@@ -41,6 +43,9 @@
+ };
+ 
+ /* comptest.c */
++extern int screen_width;
++extern int screen_height;
++extern int screen_oid;
+ void deco_box(struct window *win);
+ /* window.c */
+ void window_update_content(struct window *win, int x, int y, int width, int height);
+
+Modified: trunk/svnonly/comptest/window.c
+===================================================================
+--- trunk/svnonly/comptest/window.c	2007-11-15 13:32:20 UTC (rev 857)
++++ trunk/svnonly/comptest/window.c	2007-11-19 18:28:31 UTC (rev 858)
+@@ -27,7 +27,7 @@
+ struct window   *window_head = NULL;
+ 
+ void window_set_position(struct window *win) {
+-	s3d_translate(win-&gt;oid, win-&gt;attr.x / 20, -win-&gt;attr.y / 20, -0.01 * win-&gt;no);
++	s3d_translate(win-&gt;oid, win-&gt;attr.x, -win-&gt;attr.y, -0.01 * win-&gt;no);
+ }
+ 
+ void window_restack(struct window *win, Window above) 
+@@ -100,13 +100,14 @@
+ 		win-&gt;pa.subwindow_mode = IncludeInferiors;
+ 		win-&gt;picture = XRenderCreatePicture(dpy, win-&gt;id, win-&gt;format, CPSubwindowMode, &amp;win-&gt;pa);
+ 	}*/
++	win-&gt;pix = None;
+ 	win-&gt;no = 0;
+ 	win-&gt;oid = -1;
+ 	win-&gt;next = window_head;
+ 	window_head = win;
+ 	win-&gt;already_updated = 0;
+ 	window_update_content(win, 0, 0, win-&gt;attr.width, win-&gt;attr.height);
+-	printf(&quot;window (%d) added\n&quot;, (int)id);
++/*	printf(&quot;window (%d) added\n&quot;, (int)id);*/
+ }
+ 
+ void window_remove(Window id)
+@@ -118,6 +119,7 @@
+ 
+ 	if (*wp == NULL) {
+ 		printf(&quot;!!!! not found (window %d) for removal.\n&quot;, (int)id);
++		exit(-1);
+ 		return;
+ 	}
+ 	window = *wp;
+@@ -144,7 +146,9 @@
+ 		win-&gt;attr.y = y;
+ 		win-&gt;attr.width = width;
+ 		win-&gt;attr.height = height;
++		printf(&quot;new XCompositeNameWindowPixmap\n&quot;);
+ 
++
+ 		window_update_content(win, 0, 0, width, height);
+ 		return;
+ 	}
+@@ -163,6 +167,10 @@
+ 		win-&gt;attr.width = width;
+ 		win-&gt;attr.height = height;
+ 
++		printf(&quot;new XCompositeNameWindowPixmap\n&quot;);
++		XFreePixmap(dpy, win-&gt;pix);
++		win-&gt;pix = XCompositeNameWindowPixmap(dpy, win-&gt;id);
++
+ 		s3d_del_object(win-&gt;oid); /* delete the window and redraw */
+ 		win-&gt;oid = -1;
+ 		window_update_content(win, 0, 0, width, height);
+@@ -189,7 +197,6 @@
+ 	unsigned long *s;
+ 	uint32_t *t;
+ 
+-
+ 	if (image-&gt;format == ZPixmap) {
+ 		/*  printf(&quot;XImage: %dx%d, format %d (%d), bpp: %d, depth %d, pad %d\n&quot;,
+ 		         image-&gt;width, image-&gt;height, image-&gt;format,
+@@ -277,14 +284,23 @@
+ 		printf(&quot;request image: xleft = %d, xright = %d, width = %d, x:y = %d:%d, width:height = %d:%d, ~TEXW = %08x\n&quot;,
+ 		       xleft, xright, width, x, y, width, height, ~TEXW);*/
+ 		image = XGetImage(dpy, win-&gt;id, xleft, y, chunk_width, height, AllPlanes, ZPixmap);
++/*		if (win-&gt;pix == None)
++			XFreePixmap(dpy, win-&gt;pix);
++		win-&gt;pix = XCompositeNameWindowPixmap(dpy, win-&gt;id);*/
++
++		image = XGetImage(dpy, win-&gt;pix, xleft, y, chunk_width, height, AllPlanes, ZPixmap);
+ 		if (!image) {
+ /*			printf(&quot;XGetImage Error: xleft = %d, xright = %d, width = %d, x:y = %d:%d, width:height = %d:%d\n&quot;,
+ 							xleft, xright, width, x, y, width, height);*/
++			if (win-&gt;oid != -1) {
++				s3d_del_object(win-&gt;oid);
++				win-&gt;oid = -1;
++			}
++				
+ 			return;
+ 		}
+ 		if (win-&gt;oid == -1)
+ 			deco_box(win);
+-		/*  printf(&quot;image_convert\n&quot;);*/
+ 		image_convert(image, bitmap);
+ 		/*  printf(&quot;load textures ...\n&quot;);*/
+ 		for (ytop = y; ytop &lt; y + height; ytop = ybottom) {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000850.html">[S3d-svn] r857 - trunk/svnonly/comptest
+</A></li>
+	<LI>Next message: <A HREF="000852.html">[S3d-svn] r859 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#851">[ date ]</a>
+              <a href="thread.html#851">[ thread ]</a>
+              <a href="subject.html#851">[ subject ]</a>
+              <a href="author.html#851">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

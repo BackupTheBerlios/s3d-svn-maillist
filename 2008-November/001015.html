@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1035 - in trunk: apps/s3dfm libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1035%20-%20in%20trunk%3A%20apps/s3dfm%20libs3d%20libs3dw&In-Reply-To=%3C200811231602.mANG28He009675%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001014.html">
+   <LINK REL="Next"  HREF="001016.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1035 - in trunk: apps/s3dfm libs3d libs3dw</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1035%20-%20in%20trunk%3A%20apps/s3dfm%20libs3d%20libs3dw&In-Reply-To=%3C200811231602.mANG28He009675%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1035 - in trunk: apps/s3dfm libs3d libs3dw">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 23 17:02:08 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001014.html">[S3d-svn] r1034 - trunk/libs3d
+</A></li>
+        <LI>Next message: <A HREF="001016.html">[S3d-svn] r1036 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1015">[ date ]</a>
+              <a href="thread.html#1015">[ thread ]</a>
+              <a href="subject.html#1015">[ subject ]</a>
+              <a href="author.html#1015">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-11-23 17:02:07 +0100 (Sun, 23 Nov 2008)
+New Revision: 1035
+
+Modified:
+   trunk/apps/s3dfm/event.c
+   trunk/libs3d/network.c
+   trunk/libs3d/shm.c
+   trunk/libs3d/tcp.c
+   trunk/libs3dw/button.c
+Log:
+Use stdint uint*_t instead of u_int*_t
+
+Modified: trunk/apps/s3dfm/event.c
+===================================================================
+--- trunk/apps/s3dfm/event.c	2008-11-23 16:02:01 UTC (rev 1034)
++++ trunk/apps/s3dfm/event.c	2008-11-23 16:02:07 UTC (rev 1035)
+@@ -120,7 +120,7 @@
+ 	int oid;
+ 	t_node *f;
+ 	s3dw_handle_click(evt);
+-	oid = (int) * ((u_int32_t *)evt-&gt;buf);
++	oid = (int) * ((uint32_t *)evt-&gt;buf);
+ 	if (NULL != (f = node_getbyoid(&amp;root, oid))) {
+ 		if (f-&gt;objs.close == oid) {
+ 			box_close(f, 1);
+
+Modified: trunk/libs3d/network.c
+===================================================================
+--- trunk/libs3d/network.c	2008-11-23 16:02:01 UTC (rev 1034)
++++ trunk/libs3d/network.c	2008-11-23 16:02:07 UTC (rev 1035)
+@@ -34,14 +34,14 @@
+ static int _s3d_net_receive(void);
+ #endif
+ 
+-int net_send(u_int8_t opcode, char *buf, u_int16_t length)
++int net_send(uint8_t opcode, char *buf, uint16_t length)
+ {
+ 	char *ptr;
+ 	/*  char *buff; */
+-	char buff[65539];  /*  u_int16_t really shouldn't be bigger ;) */
++	char buff[65539];  /*  uint16_t really shouldn't be bigger ;) */
+ 	*(buff) = opcode;
+ 	ptr = buff + 1;
+-	*((u_int16_t *) ptr) = htons(length);
++	*((uint16_t *) ptr) = htons(length);
+ 	if (length != 0)
+ 		memcpy(buff + 3, buf, length);
+ 	switch (con_type) {
+
+Modified: trunk/libs3d/shm.c
+===================================================================
+--- trunk/libs3d/shm.c	2008-11-23 16:02:01 UTC (rev 1034)
++++ trunk/libs3d/shm.c	2008-11-23 16:02:07 UTC (rev 1035)
+@@ -170,7 +170,7 @@
+ {
+ 	int      found = 0;
+ 	char     opcode, *buf;
+-	u_int16_t   length;
++	uint16_t   length;
+ 	struct shmid_ds   d;
+ 
+ 	if (data_in == NULL)
+
+Modified: trunk/libs3d/tcp.c
+===================================================================
+--- trunk/libs3d/tcp.c	2008-11-23 16:02:01 UTC (rev 1034)
++++ trunk/libs3d/tcp.c	2008-11-23 16:02:07 UTC (rev 1035)
+@@ -146,7 +146,7 @@
+ 	struct timeval   tv;   /*  time structure */
+ 	int      found = 0;
+ 	char     opcode, *buf;
+-	u_int16_t   length;
++	uint16_t   length;
+ 
+ 
+ 	if (s3d_socket != -1) {
+
+Modified: trunk/libs3dw/button.c
+===================================================================
+--- trunk/libs3dw/button.c	2008-11-23 16:02:01 UTC (rev 1034)
++++ trunk/libs3dw/button.c	2008-11-23 16:02:07 UTC (rev 1035)
+@@ -33,7 +33,7 @@
+ 	s3dw_button *button = (s3dw_button *)widget;
+ 	float length;
+ 	float vertices[8*3];
+-	u_int32_t polygons[10*4] = {
++	uint32_t polygons[10*4] = {
+ 		0, 4, 5, 0,
+ 		0, 5, 1, 0,
+ 		1, 5, 6, 0,
+@@ -147,7 +147,7 @@
+ }
+ 
+ /* handle click on a button */
+-int s3dw_button_event_click(s3dw_widget *widget, u_int32_t oid)
++int s3dw_button_event_click(s3dw_widget *widget, uint32_t oid)
+ {
+ 	s3dw_button *button = (s3dw_button *)widget;
+ 	if ((button-&gt;oid_text == oid) || (widget-&gt;oid == oid)) {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001014.html">[S3d-svn] r1034 - trunk/libs3d
+</A></li>
+	<LI>Next message: <A HREF="001016.html">[S3d-svn] r1036 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1015">[ date ]</a>
+              <a href="thread.html#1015">[ thread ]</a>
+              <a href="subject.html#1015">[ subject ]</a>
+              <a href="author.html#1015">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

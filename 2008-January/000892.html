@@ -1,0 +1,417 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r899 - trunk/example
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-January/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r899%20-%20trunk/example&In-Reply-To=%3C200801072325.m07NPqQq029623%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000891.html">
+   <LINK REL="Next"  HREF="000893.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r899 - trunk/example</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r899%20-%20trunk/example&In-Reply-To=%3C200801072325.m07NPqQq029623%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r899 - trunk/example">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan  8 00:25:52 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000891.html">[S3d-svn] r898 - trunk/example
+</A></li>
+        <LI>Next message: <A HREF="000893.html">[S3d-svn] r900 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#892">[ date ]</a>
+              <a href="thread.html#892">[ thread ]</a>
+              <a href="subject.html#892">[ subject ]</a>
+              <a href="author.html#892">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-01-08 00:25:51 +0100 (Tue, 08 Jan 2008)
+New Revision: 899
+
+Modified:
+   trunk/example/filebrowser.c
+   trunk/example/katze.c
+   trunk/example/modelloader.c
+   trunk/example/nichtsnutz.c
+   trunk/example/ptrtest.c
+   trunk/example/radius_test.c
+   trunk/example/s3dclock.c
+   trunk/example/snowman.c
+   trunk/example/strtest.c
+   trunk/example/texturetest.c
+   trunk/example/wiresphere.c
+Log:
+examples: Try not to mix float and double arithmetic
+
+
+Modified: trunk/example/filebrowser.c
+===================================================================
+--- trunk/example/filebrowser.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/filebrowser.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -47,6 +47,9 @@
+ 
+ #define M_DIR  512
+ #define M_NAME  256
++
++#define DEG2RAD(x) (x * ((float)M_PI / 180.0f))
++
+ static int folder, geometry, mp3, movie, duno, dot, dotdot;
+ struct t_item {
+ 	int icon_oid, descr_oid, pie_oid;
+@@ -140,26 +143,26 @@
+ 			px = posx;
+ 			py = posy;
+ 			pz = posz;
+-			alpha = ((360.0 * n) / ((float)i));
+-			radius = ((n_item * 10) / (M_PI * 4));
++			alpha = ((360.0f * n) / ((float)i));
++			radius = ((n_item * 10) / ((float)M_PI * 4));
+ 			if (n_item &lt; 5)
+-				radius = ((50) / (M_PI * 4));
++				radius = ((50) / ((float)M_PI * 4));
+ 			else
+-				radius = ((n_item * 10) / (M_PI * 4));
+-			px = posx - sin(alpha * M_PI / 180.0) * radius;
++				radius = ((n_item * 10) / ((float)M_PI * 4));
++			px = posx - sinf(DEG2RAD(alpha)) * radius;
+ 			pz = posy;
+-			pz = posz - cos(alpha * M_PI / 180.0) * radius;
++			pz = posz - cosf(DEG2RAD(alpha)) * radius;
+ 
+ 			item[n].pie_oid = s3d_new_object();
+ 			s3d_push_vertex(item[n].pie_oid, 0, -2, 0);
+-			al = ((360.0 * (n - 0.5)) / ((float)i));
++			al = ((360.0f * (n - 0.5f)) / ((float)i));
+ 			s3d_push_vertex(item[n].pie_oid,
+-			                posx - sin(al*M_PI / 180.0)*radius, -2, posz - cos(al*M_PI / 180.0)*radius);
+-			al = ((360.0 * (n + 0.5)) / ((float)i));
++			                posx - sinf(DEG2RAD(al))*radius, -2, posz - cosf(DEG2RAD(al))*radius);
++			al = ((360.0f * (n + 0.5f)) / ((float)i));
+ 			s3d_push_vertex(item[n].pie_oid,
+-			                posx - sin(al*M_PI / 180.0)*radius, -2, posz - cos(al*M_PI / 180.0)*radius);
++			                posx - sinf(DEG2RAD(al))*radius, -2, posz - cosf(DEG2RAD(al))*radius);
+ 
+-			f = 1.0 - 0.05 * (n % 2);
++			f = 1.0f - 0.05f * (n % 2);
+ 			switch (item[n].type) {
+ 			case T_LOCALDIR:
+ 				s3d_push_material(item[n].pie_oid,  0, f, 0,   0.5, 0.5, 0.5,  f, f, f);
+@@ -176,8 +179,8 @@
+ 			}
+ 			s3d_push_polygon(item[n].pie_oid, 0, 2, 1, 0);
+ 
+-			s3d_push_vertex(item[n].pie_oid, pz, -2, 0);
+-			s3d_translate(item[n].icon_oid, px, py, pz);
++			s3d_push_vertex(item[n].pie_oid, (float)pz, -2.f, 0.f);
++			s3d_translate(item[n].icon_oid, (float)px, (float)py, (float)pz);
+ 			s3d_rotate(item[n].icon_oid, 0, alpha, 0);
+ 			s3d_flags_on(item[n].icon_oid, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+ 			s3d_flags_on(item[n].pie_oid, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+
+Modified: trunk/example/katze.c
+===================================================================
+--- trunk/example/katze.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/katze.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -38,14 +38,14 @@
+ {
+ 	float pos;
+ 	a = (a + 2) % 360;
+-	pos = sin((5 * a * M_PI) / 180) * 20;
++	pos = sinf((5.f * a * (float)M_PI) / 180.f) * 20.f;
+ 	s3d_rotate(legfr, 0, 90, 180 + pos);
+ 	s3d_rotate(legfl, 0, 90, 180 - pos);
+ 	s3d_rotate(legbr, 0, 0, 180 + pos);
+ 	s3d_rotate(legbl, 0, 0, 180 - pos);
+ 
+ 	s3d_rotate(tail, 0, 30, 110 + pos);
+-	s3d_rotate(rot_point, 0, -a, 0);
++	s3d_rotate(rot_point, 0, (float)-a, 0);
+ 	nanosleep(&amp;t, NULL);
+ }
+ int main(int argc, char **argv)
+
+Modified: trunk/example/modelloader.c
+===================================================================
+--- trunk/example/modelloader.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/modelloader.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -34,7 +34,7 @@
+ static int i, oid;
+ static void mainloop(void)
+ {
+-	s3d_rotate(oid, 0, i, 0);
++	s3d_rotate(oid, 0, (float)i, 0);
+ 	i = (i + 1) % 360;
+ 	nanosleep(&amp;t, NULL);
+ }
+
+Modified: trunk/example/nichtsnutz.c
+===================================================================
+--- trunk/example/nichtsnutz.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/nichtsnutz.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -47,23 +47,23 @@
+ static void mainloop(void)
+ {
+ 
+-	al = (alpha * M_PI / 180);
+-	r = 5.0;
++	al = (alpha * (float)M_PI / 180.f);
++	r = 5.0f;
+ 
+-	CatPos[0] = sin(al) * r;
++	CatPos[0] = sinf(al) * r;
+ 	CatPos[1] = 0;
+-	CatPos[2] = cos(al) * r;
++	CatPos[2] = cosf(al) * r;
+ 	s3d_translate(object, CatPos[0] , CatPos[1], CatPos[2]);
+ 	s3d_rotate(object, 0, alpha, 0);
+-	alpha = alpha + 0.1;
+-	if (alpha &gt; 360.0) alpha = 0.0;
++	alpha = alpha + 0.1f;
++	if (alpha &gt; 360.0f) alpha = 0.0f;
+ 
+ 	length = s3d_vector_length(CatPos);
+ 
+ 
+-	RotCam[0][0] = (CatPos[0] * 12.0) / length;
+-	RotCam[0][1] = (CatPos[1] * 12.0) / length;
+-	RotCam[0][2] = (CatPos[2] * 12.0) / length;
++	RotCam[0][0] = (CatPos[0] * 12.0f) / length;
++	RotCam[0][1] = (CatPos[1] * 12.0f) / length;
++	RotCam[0][2] = (CatPos[2] * 12.0f) / length;
+ 
+ 
+ 	if (foll) {
+@@ -82,7 +82,7 @@
+ 		Tmp[2] = CamPosition[0][2] - CatPos[2];
+ 
+ 		angle = s3d_vector_angle(Tmp, TmpMove);
+-		angle = (CatPos[0] &gt; 0) ? (180 - (180 / M_PI * angle)) : (180 + (180 / M_PI * angle));
++		angle = (CatPos[0] &gt; 0) ? (180.f - (180.f / (float)M_PI * angle)) : (180.f + (180.f / (float)M_PI * angle));
+ 		printf(&quot;%f %f\n&quot;, angle, al);
+ 
+ 		CamPosition[1][1] = (CamPosition[1][1] * 4 + angle) / 5;
+
+Modified: trunk/example/ptrtest.c
+===================================================================
+--- trunk/example/ptrtest.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/ptrtest.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -44,10 +44,10 @@
+ {
+ 	float a;
+ 	alpha = (alpha + 1) % 360;
+-	s3d_rotate(o, alpha, 0, 0);
+-	a = (((float)alpha) * M_PI / 180);
+-	s3d_translate(0, sin(a)*30, 0, 30 + cos(a)*30);
+-	s3d_rotate(0, sin(a)*30, alpha, 0);
++	s3d_rotate(o, (float)alpha, 0.f, 0.f);
++	a = (((float)alpha) * (float)M_PI / 180.f);
++	s3d_translate(0.f, sinf(a)*30.f, 0.f, 30.f + cosf(a)*30.f);
++	s3d_rotate(0, sinf(a)*30.f, (float)alpha, 0.f);
+ 	nanosleep(&amp;t, NULL);
+ }
+ static int object_info(struct s3d_evt *hrmz)
+@@ -61,7 +61,7 @@
+ 		}
+ 	}
+ 	if (inf-&gt;object == 1) { /* of course, a link s3d_link(o,1 would be much easier ... */
+-		s3d_translate(o, (inf-&gt;trans_x)*2.0, (inf-&gt;trans_y)*2.0, -2);
++		s3d_translate(o, (inf-&gt;trans_x)*2.0f, (inf-&gt;trans_y)*2.0f, -2);
+ 	}
+ 	return(0);
+ }
+
+Modified: trunk/example/radius_test.c
+===================================================================
+--- trunk/example/radius_test.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/radius_test.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -34,12 +34,12 @@
+ static void mainloop(void)
+ {
+ 	float f, g, h;
+-	f = sin((M_PI * (i % 360)) / 180.0);
+-	g = cos((M_PI * (i % 360)) / 180.0);
+-	h = sin((M_PI * ((3 * i) % 360)) / 180.0);
++	f = sinf(((float)M_PI * (i % 360)) / 180.0f);
++	g = cosf(((float)M_PI * (i % 360)) / 180.0f);
++	h = sinf(((float)M_PI * ((3 * i) % 360)) / 180.0f);
+ 
+ 	s3d_translate(item1, f*10, h*2, g*5);
+-	s3d_rotate(item1, 0, i % 360, 0);
++	s3d_rotate(item1, 0, (float)(i % 360), 0);
+ 	/* s3d_scale(item1,h+3,h+3,h+3);*/
+ 
+ 	/* s3d_translate(item2,f*10,0, g*5);*/
+
+Modified: trunk/example/s3dclock.c
+===================================================================
+--- trunk/example/s3dclock.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/s3dclock.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -48,9 +48,9 @@
+ 	if (now != onow) {
+ 		o_str_oid = str_oid;
+ 		mytime = localtime(&amp;now);
+-		s3d_rotate(lil_p, 0, 0, -((mytime-&gt;tm_hour % 12) / 12.0)*360.0);
+-		s3d_rotate(big_p, 0, 0, -(mytime-&gt;tm_min / 60.0)*360.0);
+-		s3d_rotate(sec_p, 0, 0, -(mytime-&gt;tm_sec / 60.0)*360.0);
++		s3d_rotate(lil_p, 0, 0, -((mytime-&gt;tm_hour % 12) / 12.0f)*360.0f);
++		s3d_rotate(big_p, 0, 0, -(mytime-&gt;tm_min / 60.0f)*360.0f);
++		s3d_rotate(sec_p, 0, 0, -(mytime-&gt;tm_sec / 60.0f)*360.0f);
+ 		sprintf(time_str, &quot;%02d:%02d:%02d&quot;, mytime-&gt;tm_hour, mytime-&gt;tm_min, mytime-&gt;tm_sec);
+ 		str_oid = s3d_draw_string(time_str, NULL);
+ 		s3d_translate(str_oid, -1, -1.3, 0);
+
+Modified: trunk/example/snowman.c
+===================================================================
+--- trunk/example/snowman.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/snowman.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -37,14 +37,14 @@
+ {
+ 	float pos;
+ 	a = (a + 3) % 360;
+-	pos = sin((a * M_PI) / 180) * 5;
++	pos = sinf((a * (float)M_PI) / 180.f) * 5.f;
+ 	if (pos &lt; 0) pos *= -1;
+-	s3d_rotate(oid_head, 0, a, 0);
+-	s3d_rotate(oid_middle, 0, a, 0);
+-	s3d_rotate(oid_foot, 0, a, 0);
+-	s3d_translate(oid_head,  0, 1.5 + 2.00*pos, 0);
+-	s3d_translate(oid_middle, 0, 0   + 1.25*pos, 0);
+-	s3d_translate(oid_foot,  0, -2  + 1.00*pos, 0);
++	s3d_rotate(oid_head, 0, (float)a, 0);
++	s3d_rotate(oid_middle, 0, (float)a, 0);
++	s3d_rotate(oid_foot, 0, (float)a, 0);
++	s3d_translate(oid_head,  0, 1.5f + 2.0f*pos, 0);
++	s3d_translate(oid_middle, 0, 0   + 1.25f*pos, 0);
++	s3d_translate(oid_foot,  0, -2  + 1.00f*pos, 0);
+ 	nanosleep(&amp;t, NULL);
+ }
+ int main(int argc, char **argv)
+
+Modified: trunk/example/strtest.c
+===================================================================
+--- trunk/example/strtest.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/strtest.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -47,7 +47,7 @@
+ 		s3d_select_font(&quot;vera&quot;);
+ 		/*  o=s3d_draw_string(&quot;The lazy fox is bored enough to jump over everything it sees. weird, isn't it?!&quot;,NULL);  */
+ 		for (i = 0;i &lt; 256;i++)
+-			c[255-i] = i;
++			c[255-i] = (char)i;
+ 		o = s3d_draw_string(c, NULL);
+ 		/*  o=s3d_draw_string(&quot;A&quot;,NULL);*/
+ 		s3d_flags_on(o, S3D_OF_VISIBLE);
+
+Modified: trunk/example/texturetest.c
+===================================================================
+--- trunk/example/texturetest.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/texturetest.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -34,7 +34,7 @@
+ static void mainloop(void)
+ {
+ 	i = (i + 1) % 360;
+-	s3d_rotate(oid, 0, i, 0);
++	s3d_rotate(oid, 0, (float)i, 0);
+ 	nanosleep(&amp;t, NULL);
+ }
+ #define MAXX 24
+@@ -67,8 +67,8 @@
+ 		for (y = 0;y &lt; MAXY;y++)
+ 			for (x = 0;x &lt; MAXX;x++) {
+ 				data[(y*MAXX+x)*4+0] = (char)((x * 255) / MAXX);
+-				data[(y*MAXX+x)*4+1] = ((x * y) / (MAXX * MAXY));
+-				data[(y*MAXX+x)*4+2] = ((y * 255) / MAXX);
++				data[(y*MAXX+x)*4+1] = (char)((x * y) / (MAXX * MAXY));
++				data[(y*MAXX+x)*4+2] = (char)((y * 255) / MAXX);
+ 				data[(y*MAXX+x)*4+3] = 255;
+ 			}
+ 		s3d_push_texture(oid, MAXX, MAXY);
+
+Modified: trunk/example/wiresphere.c
+===================================================================
+--- trunk/example/wiresphere.c	2008-01-07 23:25:35 UTC (rev 898)
++++ trunk/example/wiresphere.c	2008-01-07 23:25:51 UTC (rev 899)
+@@ -36,7 +36,7 @@
+ static int wire_sphere(int slices, int stacks)
+ {
+ 	int x, y, i, o;
+-	int num_v, num_l;
++	unsigned int num_v, num_l;
+ 	float *v, *n;  /* vertices, normals */
+ 	float alpha, beta;
+ 	unsigned int *l; /* lines */
+@@ -47,12 +47,12 @@
+ 	l = malloc(sizeof(unsigned int) * 3 * num_l);
+ 	i = 0;
+ 	for (x = 0;x &lt; slices;x++) {
+-		alpha = (x * 360.0 / slices) * M_PI / 180.0;
++		alpha = (x * 360.0f / slices) * (float)M_PI / 180.0f;
+ 		for (y = 0;y &lt; (stacks + 1);y++) {
+-			beta = ((y * 180 / slices) - 90.0) * M_PI / 180.0;
+-			v[i*3+0] = cos(alpha) * cos(beta);
+-			v[i*3+1] = sin(beta);
+-			v[i*3+2] = sin(alpha) * cos(beta);
++			beta = ((y * 180 / slices) - 90.0f) * (float)M_PI / 180.0f;
++			v[i*3+0] = cosf(alpha) * cosf(beta);
++			v[i*3+1] = sinf(beta);
++			v[i*3+2] = sinf(alpha) * cosf(beta);
+ 			i++;
+ 		}
+ 	}
+@@ -91,9 +91,9 @@
+ 	s3d_push_material(o, 0, 0, 1,
+ 	                  1, 0, 0,
+ 	                  0, 1, 0);
+-	s3d_push_vertices(o, v, num_v);
+-	s3d_push_lines(o, l, num_l);
+-	s3d_load_line_normals(o, n, 0, num_l);
++	s3d_push_vertices(o, v, (uint16_t)num_v);
++	s3d_push_lines(o, l, (uint16_t)num_l);
++	s3d_load_line_normals(o, n, 0, (uint16_t)num_l);
+ 	free(v);
+ 	free(n);
+ 	free(l);
+@@ -107,7 +107,7 @@
+ static void mainloop(void)
+ {
+ 	r = (r + 1) % 360;
+-	s3d_rotate(oid, 0, r, 0);
++	s3d_rotate(oid, 0, (float)r, 0);
+ 	nanosleep(&amp;t, NULL);
+ 
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000891.html">[S3d-svn] r898 - trunk/example
+</A></li>
+	<LI>Next message: <A HREF="000893.html">[S3d-svn] r900 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#892">[ date ]</a>
+              <a href="thread.html#892">[ thread ]</a>
+              <a href="subject.html#892">[ subject ]</a>
+              <a href="author.html#892">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

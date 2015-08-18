@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r291 - trunk/Documentation/s3dapi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r291%20-%20trunk/Documentation/s3dapi&In-Reply-To=%3C200605242253.k4OMrD95026773%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000283.html">
+   <LINK REL="Next"  HREF="000285.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r291 - trunk/Documentation/s3dapi</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r291%20-%20trunk/Documentation/s3dapi&In-Reply-To=%3C200605242253.k4OMrD95026773%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r291 - trunk/Documentation/s3dapi">dotslash at berlios.de
+       </A><BR>
+    <I>Thu May 25 00:53:13 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000283.html">[S3d-svn] r290 - in trunk: . apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000285.html">[S3d-svn] r292 - in trunk: . example
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#284">[ date ]</a>
+              <a href="thread.html#284">[ thread ]</a>
+              <a href="subject.html#284">[ subject ]</a>
+              <a href="author.html#284">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-25 00:53:12 +0200 (Thu, 25 May 2006)
+New Revision: 291
+
+Modified:
+   trunk/Documentation/s3dapi/s3dapi.docbook
+Log:
+- docbook s3d_pep/load_!polygon!_tex_coord(s)
+
+Modified: trunk/Documentation/s3dapi/s3dapi.docbook
+===================================================================
+--- trunk/Documentation/s3dapi/s3dapi.docbook	2006-05-17 16:00:15 UTC (rev 290)
++++ trunk/Documentation/s3dapi/s3dapi.docbook	2006-05-24 22:53:12 UTC (rev 291)
+@@ -519,12 +519,12 @@
+ &lt;/para&gt;
+ &lt;/sect1&gt;
+ 
+-&lt;sect1 id=&quot;s3d_pep_tex_coord&quot;&gt;
+-&lt;title&gt;s3d_pep_tex_coord&lt;/title&gt;
++&lt;sect1 id=&quot;s3d_pep_polygon_tex_coord&quot;&gt;
++&lt;title&gt;s3d_pep_polygon_tex_coord&lt;/title&gt;
+ &lt;funcsynopsis&gt;
+ &lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+ &lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pep_tex_coord&lt;/function&gt;&lt;/funcdef&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pep_polygon_tex_coord&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;object&lt;/parameter&gt;, 
+ float &lt;parameter&gt;x1&lt;/parameter&gt;, 
+@@ -540,16 +540,16 @@
+ Pimp the last polygon pushed with some textures coordinates, x and y values for each vertex point respectively.
+ Those values may be between 0 and 1 and are vertex points on the &lt;link linkend=&quot;s3d_pep_material_texture&quot;&gt;
+ texture defined in the material&lt;/link&gt; of the polygon. If you have more polygons which should get a texture, use
+-&lt;link linkend=&quot;s3d_pep_tex_coords&quot;&gt;s3d_pep_tex_coords()&lt;/link&gt;
++&lt;link linkend=&quot;s3d_pep_polygon_tex_coords&quot;&gt;s3d_pep_polygon_tex_coords()&lt;/link&gt;
+ &lt;/para&gt;
+ &lt;/sect1&gt;
+ 
+-&lt;sect1 id=&quot;s3d_pep_tex_coords&quot;&gt;
+-&lt;title&gt;s3d_pep_tex_coords&lt;/title&gt;
++&lt;sect1 id=&quot;s3d_pep_polygon_tex_coords&quot;&gt;
++&lt;title&gt;s3d_pep_polygon_tex_coords&lt;/title&gt;
+ &lt;funcsynopsis&gt;
+ &lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+ &lt;funcprototype&gt;
+-&lt;funcdef&gt;int &lt;function&gt;s3d_pep_tex_coords&lt;/function&gt;&lt;/funcdef&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_pep_polygon_tex_coords&lt;/function&gt;&lt;/funcdef&gt;
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;object&lt;/parameter&gt;, 
+ float *&lt;parameter&gt;tbuf&lt;/parameter&gt;, 
+@@ -559,7 +559,7 @@
+ &lt;/funcsynopsis&gt;
+ &lt;para&gt;
+ Pimp the latest n polygons with texture coordinates. tbuf has 6*n float values for its entries, which are supplied in the order
+-as in &lt;link linkend=&quot;s3d_pep_tex_coord&quot;&gt;s3d_pep_polygon_tex_coord()&lt;/link&gt;
++as in &lt;link linkend=&quot;s3d_pep_polygon_tex_coord&quot;&gt;s3d_pep_polygon_tex_coord()&lt;/link&gt;
+ &lt;/para&gt;
+ &lt;/sect1&gt;
+ 
+@@ -799,7 +799,7 @@
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+ &lt;para&gt;
+-Just as &lt;link linkend=&quot;s3d_pep_tex_coords&quot;&gt;s3d_load_tex_coords()&lt;/link&gt;, with the difference you won't alter 
++Just as &lt;link linkend=&quot;s3d_pep_polygon_tex_coords&quot;&gt;s3d_pep_polygon_tex_coords()&lt;/link&gt;, with the difference you won't alter 
+ the latest n polygons but n polygons starting with index start.
+ &lt;/para&gt;
+ &lt;/sect1&gt;
+@@ -827,7 +827,7 @@
+ as the image will be sent to server in fragments. Of course, you will have created the texture with 
+ &lt;link linkend=&quot;s3d_push_texture&quot;&gt;s3d_push_texture&lt;/link&gt;, have an material assigned to the texture with &lt;link linkend=&quot;s3d_pep_material_texture&quot;&gt;
+ s3d_pep_material_texture()&lt;/link&gt; and have your polygons set sane polygon texture coords 
+-using &lt;link linkend=&quot;s3d_pep_tex_coord&quot;&gt;s3d_pep_tex_coord()&lt;/link&gt;.
++using &lt;link linkend=&quot;s3d_pep_polygon_tex_coord&quot;&gt;s3d_pep_polygon_tex_coord()&lt;/link&gt;.
+ &lt;/para&gt;
+ &lt;/sect1&gt;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000283.html">[S3d-svn] r290 - in trunk: . apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000285.html">[S3d-svn] r292 - in trunk: . example
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#284">[ date ]</a>
+              <a href="thread.html#284">[ thread ]</a>
+              <a href="subject.html#284">[ subject ]</a>
+              <a href="author.html#284">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

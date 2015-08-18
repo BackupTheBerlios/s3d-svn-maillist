@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r270 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r270%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200605041138.k44BcfQg021624%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000262.html">
+   <LINK REL="Next"  HREF="000264.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r270 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r270%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200605041138.k44BcfQg021624%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r270 - in trunk: . server">dotslash at berlios.de
+       </A><BR>
+    <I>Thu May  4 13:38:41 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000262.html">[S3d-svn] r269 - in trunk: . apps/dot_mcp client server
+</A></li>
+        <LI>Next message: <A HREF="000264.html">[S3d-svn] r271 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#263">[ date ]</a>
+              <a href="thread.html#263">[ thread ]</a>
+              <a href="subject.html#263">[ subject ]</a>
+              <a href="author.html#263">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-04 13:38:09 +0200 (Thu, 04 May 2006)
+New Revision: 270
+
+Modified:
+   trunk/
+   trunk/server/graphics.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r504 at balthasar</A>:  dotslash | 2006-05-04 13:37:23 +0200
+ - repairing select ..
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:501
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:504
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2006-05-03 09:19:43 UTC (rev 269)
++++ trunk/server/graphics.c	2006-05-04 11:38:09 UTC (rev 270)
+@@ -151,10 +151,16 @@
+ 					{
+ /*						dprintf(HIGH,&quot;object %d is in %s frustum&quot;,j,k?&quot;&quot;:&quot;not&quot;);*/
+ 						if (select_mode==1)
++						{
++							dprintf(MED,&quot;glPushName(%d)&quot;,j);
+ 							glPushName(j);
++						}
+ 						obj_render(ap,j);
+ 						if (select_mode==1)
++						{
++							dprintf(MED,&quot;glPopName(%d)&quot;,j);
+ 							glPopName();
++						}
+ 					}
+ 				}
+ 			}
+@@ -172,11 +178,11 @@
+ 	struct t_vertex x,y;
+ 	int k;
+ 	for (i=0;i&lt;p-&gt;n_obj;i++)
+-	{
++	{   /* check all mcp objects ... */
+ 		o=p-&gt;object[i];
+ 		if (o!=NULL)
+ 		{
+-			if (o-&gt;oflags&amp;OF_VISIBLE)   /*  it's even visible;) */
++			if (o-&gt;oflags&amp;OF_VISIBLE)   /*  it's even visible ;) */
+ 			{
+ 				if (o-&gt;oflags&amp;OF_VIRTUAL)  /*  we have an app here. */
+ 				{
+@@ -209,7 +215,7 @@
+ 							}
+ 						}
+ 					}
+-				} else if ((o-&gt;oflags&amp;OF_CLONE) &amp;&amp; (p-&gt;object[o-&gt;n_vertex]-&gt;oflags&amp;OF_VIRTUAL))
++				} else if ((o-&gt;oflags&amp;OF_CLONE) &amp;&amp; (p-&gt;object[o-&gt;n_vertex]-&gt;oflags&amp;OF_VIRTUAL))  /* it's a clone of an app */
+ 				{
+ 					if (select_mode==1)
+ 						glLoadName(o-&gt;n_vertex);/*TODO: what to do if a clone is selected?! */
+@@ -217,7 +223,7 @@
+ 					render_virtual_object(o);
+ 					render_virtual_object(p-&gt;object[o-&gt;n_vertex]); 
+ 					glPopMatrix();
+-				} else {
++				} else { /* it's a &quot;regular&quot; mcp object */
+ 					if ((select_mode ==0 ) || (p-&gt;object[i]-&gt;oflags&amp;OF_SELECTABLE)) /* either select mode is off or it's selectable */
+ 					{
+ 						if (select_mode==1)
+@@ -245,7 +251,7 @@
+ 	int i,j;
+ 	GLint viewport[4];
+ 	GLfloat xpos,ypos;
+-	float big,z1;
++	float big,z1,z2;
+ 	uint32_t mcp_o,o;
+ 	struct t_process *p=get_proc_by_pid(MCP);
+ 	GLuint select_buf[SBSIZE],*ptr,names,hits;
+@@ -295,24 +301,24 @@
+ 		/* check all the hits, only select the nearest ... */
+ 		for (i=0;i&lt;hits;i++)
+ 		{
+-			names=*ptr;
+-			dprintf(LOW,&quot;number of names for hit = %d&quot;, names); ptr++;
+-			z1=*ptr/0x7fffffff;
+-		    dprintf(LOW,&quot; z1 is %g;&quot;, (float) *ptr/0x7fffffff); ptr++;
+-		    dprintf(LOW,&quot; z2 is %g&quot;, (float) *ptr/0x7fffffff); ptr++;
++			names=*ptr;				ptr++;
++			z1=(float)*ptr/0x7fffffff;		ptr++;
++			z2=(float)*ptr/0x7fffffff;		ptr++;
+ 			mcp_o=o=-1;
+-			for (j=0;j&lt;names;j++)
++			if (z1&lt;big)
+ 			{
+-				if (z1&lt;big)
++				for (j=0;j&lt;names;j++)
+ 				{
+ 					switch (j)
+ 					{
+ 						case 0:mcp_o=	*ptr;break;
+ 						case 1:o=		*ptr;break;
+ 					}
++					ptr++;
+ 				}
+-				ptr++;
++				big=z1;
+ 			}
++		    dprintf(LOW,&quot;[HIT %d] names %d [z1:%f|z2:%f] mcp_o=%d, o=%d &quot;,i,names, z1, z2, mcp_o, o);
+ 		}
+ 		dprintf(MED,&quot;mcp_o= %d, o= %d&quot;,mcp_o,o);
+ 		ptr=select_buf;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000262.html">[S3d-svn] r269 - in trunk: . apps/dot_mcp client server
+</A></li>
+	<LI>Next message: <A HREF="000264.html">[S3d-svn] r271 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#263">[ date ]</a>
+              <a href="thread.html#263">[ thread ]</a>
+              <a href="subject.html#263">[ subject ]</a>
+              <a href="author.html#263">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

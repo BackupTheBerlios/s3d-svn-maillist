@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r605 - branches/s3d-cmake/cmake/modules
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r605%20-%20branches/s3d-cmake/cmake/modules&In-Reply-To=%3C200706252156.l5PLu0Ib022999%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000595.html">
+   <LINK REL="Next"  HREF="000598.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r605 - branches/s3d-cmake/cmake/modules</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r605%20-%20branches/s3d-cmake/cmake/modules&In-Reply-To=%3C200706252156.l5PLu0Ib022999%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r605 - branches/s3d-cmake/cmake/modules">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Jun 25 23:56:00 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000595.html">[S3d-svn] r604 - branches/s3d-cmake/cmake/modules
+</A></li>
+        <LI>Next message: <A HREF="000598.html">[S3d-svn] r606 - in branches/s3d-cmake: apps/s3d_x11gate	apps/s3dosm server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#596">[ date ]</a>
+              <a href="thread.html#596">[ thread ]</a>
+              <a href="subject.html#596">[ subject ]</a>
+              <a href="author.html#596">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-06-25 23:56:00 +0200 (Mon, 25 Jun 2007)
+New Revision: 605
+
+Modified:
+   branches/s3d-cmake/cmake/modules/FindFREETYPE.cmake
+   branches/s3d-cmake/cmake/modules/FindFontconfig.cmake
+   branches/s3d-cmake/cmake/modules/FindG3D.cmake
+   branches/s3d-cmake/cmake/modules/FindGLIB.cmake
+Log:
+- Cache *_DEFINITIONS in Find*.cmake
+- FORCE set of variables to cache to be sure that concatenated strings are overridden
+
+
+Modified: branches/s3d-cmake/cmake/modules/FindFREETYPE.cmake
+===================================================================
+--- branches/s3d-cmake/cmake/modules/FindFREETYPE.cmake	2007-06-25 21:55:59 UTC (rev 604)
++++ branches/s3d-cmake/cmake/modules/FindFREETYPE.cmake	2007-06-25 21:56:00 UTC (rev 605)
+@@ -53,9 +53,10 @@
+ 	endif (FREETYPE_FOUND)
+ 
+ 	# set visibility in cache
+-	set(FREETYPE_INCLUDE_DIR ${FREETYPE_INCLUDE_DIR} CACHE STRING &quot;Path to a file.&quot;)
+-	set(FREETYPE_LIBRARIES ${FREETYPE_INCLUDE_DIR} CACHE STRING &quot;Path to a library.&quot;)
+- 	mark_as_advanced(FREETYPE_INCLUDE_DIR FREETYPE_LIBRARIES)
++	set(FREETYPE_INCLUDE_DIR ${FREETYPE_INCLUDE_DIR} CACHE STRING &quot;Path to a file.&quot; FORCE)
++	set(FREETYPE_LIBRARIES ${FREETYPE_LIBRARIES} CACHE STRING &quot;Path to a library.&quot; FORCE)
++	set(FREETYPE_DEFINITIONS ${FREETYPE_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
++ 	mark_as_advanced(FREETYPE_INCLUDE_DIR FREETYPE_LIBRARIES FREETYPE_DEFINITIONS)
+ 
+ 	# mark as internal
+ 	set(FREETYPECONFIG_INCLUDE_DIR ${FREETYPECONFIG_INCLUDE_DIR} CACHE INTERNAL &quot;Path to a config file.&quot; FORCE)
+
+Modified: branches/s3d-cmake/cmake/modules/FindFontconfig.cmake
+===================================================================
+--- branches/s3d-cmake/cmake/modules/FindFontconfig.cmake	2007-06-25 21:55:59 UTC (rev 604)
++++ branches/s3d-cmake/cmake/modules/FindFontconfig.cmake	2007-06-25 21:56:00 UTC (rev 605)
+@@ -39,6 +39,8 @@
+ 		endif (FONTCONFIG_FIND_REQUIRED)
+ 	endif (FONTCONFIG_FOUND)
+ 
+- 	mark_as_advanced(FONTCONFIG_INCLUDE_DIR FONTCONFIG_LIBRARIES)
++	# set visibility in cache
++	set(FONTCONFIG_DEFINITIONS ${FONTCONFIG_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
++ 	mark_as_advanced(FONTCONFIG_INCLUDE_DIR FONTCONFIG_LIBRARIES FONTCONFIG_DEFINITIONS)
+ 
+-endif (FONTCONFIG_LIBRARIES AND FONTCONFIG_INCLUDE_DIR)
+\ No newline at end of file
++endif (FONTCONFIG_LIBRARIES AND FONTCONFIG_INCLUDE_DIR)
+
+Modified: branches/s3d-cmake/cmake/modules/FindG3D.cmake
+===================================================================
+--- branches/s3d-cmake/cmake/modules/FindG3D.cmake	2007-06-25 21:55:59 UTC (rev 604)
++++ branches/s3d-cmake/cmake/modules/FindG3D.cmake	2007-06-25 21:56:00 UTC (rev 605)
+@@ -39,6 +39,8 @@
+ 		endif (G3D_FIND_REQUIRED)
+ 	endif (G3D_FOUND)
+ 
+- 	mark_as_advanced(G3D_INCLUDE_DIR G3D_LIBRARIES)
++	# set visibility in cache
++	set(G3D_DEFINITIONS ${G3D_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
++ 	mark_as_advanced(G3D_INCLUDE_DIR G3D_LIBRARIES G3D_DEFINITIONS)
+ 
+-endif (G3D_LIBRARIES AND G3D_INCLUDE_DIR)
+\ No newline at end of file
++endif (G3D_LIBRARIES AND G3D_INCLUDE_DIR)
+
+Modified: branches/s3d-cmake/cmake/modules/FindGLIB.cmake
+===================================================================
+--- branches/s3d-cmake/cmake/modules/FindGLIB.cmake	2007-06-25 21:55:59 UTC (rev 604)
++++ branches/s3d-cmake/cmake/modules/FindGLIB.cmake	2007-06-25 21:56:00 UTC (rev 605)
+@@ -58,9 +58,10 @@
+ 	endif (GLIB2_FOUND)
+ 
+ 	# set visibility in cache
+-	set(GLIB2_INCLUDE_DIR ${GLIB2_INCLUDE_DIR} CACHE STRING &quot;Path to a file.&quot;)
+-	set(GLIB2_LIBRARIES ${GLIB2_INCLUDE_DIR} CACHE STRING &quot;Path to a library.&quot;)
+- 	mark_as_advanced(GLIB2_INCLUDE_DIR GLIB2_LIBRARIES)
++	set(GLIB2_INCLUDE_DIR ${GLIB2_INCLUDE_DIR} CACHE STRING &quot;Path to a file.&quot; FORCE)
++	set(GLIB2_LIBRARIES ${GLIB2_LIBRARIES} CACHE STRING &quot;Path to a library.&quot; FORCE)
++	set(GLIB2_DEFINITIONS ${GLIB2_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
++ 	mark_as_advanced(GLIB2_INCLUDE_DIR GLIB2_LIBRARIES GLIB2_DEFINITIONS)
+ 
+ 	# mark as internal
+ 	set(GLIBCONFIG_INCLUDE_DIR ${GLIBCONFIG_INCLUDE_DIR} CACHE INTERNAL &quot;Path to a config file.&quot; FORCE)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000595.html">[S3d-svn] r604 - branches/s3d-cmake/cmake/modules
+</A></li>
+	<LI>Next message: <A HREF="000598.html">[S3d-svn] r606 - in branches/s3d-cmake: apps/s3d_x11gate	apps/s3dosm server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#596">[ date ]</a>
+              <a href="thread.html#596">[ thread ]</a>
+              <a href="subject.html#596">[ subject ]</a>
+              <a href="author.html#596">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

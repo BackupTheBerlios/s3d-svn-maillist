@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r466 - in trunk: . apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r466%20-%20in%20trunk%3A%20.%20apps/s3dosm&In-Reply-To=%3C200611092203.kA9M3Bet026557%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000458.html">
+   <LINK REL="Next"  HREF="000460.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r466 - in trunk: . apps/s3dosm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r466%20-%20in%20trunk%3A%20.%20apps/s3dosm&In-Reply-To=%3C200611092203.kA9M3Bet026557%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r466 - in trunk: . apps/s3dosm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Thu Nov  9 23:03:11 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000458.html">[S3d-svn] r465 - in trunk: . apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000460.html">[S3d-svn] r467 - in trunk: . libs3d/libg3d/plugins/import
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#459">[ date ]</a>
+              <a href="thread.html#459">[ thread ]</a>
+              <a href="subject.html#459">[ subject ]</a>
+              <a href="author.html#459">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-11-09 23:03:11 +0100 (Thu, 09 Nov 2006)
+New Revision: 466
+
+Added:
+   trunk/apps/s3dosm/tag.c
+Modified:
+   trunk/
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1123 at kero</A>:  dotslash | 2006-11-09 23:03:08 +0100
+ - forgot tag.c
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1121
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1123
+
+Added: trunk/apps/s3dosm/tag.c
+===================================================================
+--- trunk/apps/s3dosm/tag.c	2006-11-09 22:00:54 UTC (rev 465)
++++ trunk/apps/s3dosm/tag.c	2006-11-09 22:03:11 UTC (rev 466)
+@@ -0,0 +1,28 @@
++#include &quot;s3dosm.h&quot;
++#include &lt;stdio.h&gt;	/* printf() */
++#include &lt;string.h&gt;	/* strcmp() */
++#include &lt;stdlib.h&gt;	/* realloc() */
++void tag_add(object_t *obj,char *k, char *v)
++{
++	tag_t *t;
++	obj-&gt;tag_n++;
++	obj-&gt;tag_p=realloc(obj-&gt;tag_p,obj-&gt;tag_n*sizeof(tag_t));
++	if (k!=NULL &amp;&amp; v!=NULL)
++	{
++		t=&amp;(obj-&gt;tag_p[obj-&gt;tag_n-1]);
++		t-&gt;ttype=TAG_UNKNOWN;
++		t-&gt;k=strdup(k);
++		t-&gt;v=strdup(v);
++		t-&gt;d.s=v;
++		if (0==strcmp(k,&quot;name&quot;))	t-&gt;ttype=TAG_NAME;
++	}
++}
++tag_t *tag_get(object_t *obj, char *k)
++{
++	int i;
++	for (i=0;i&lt;obj-&gt;tag_n;i++)
++	{
++		if (0==strcmp(obj-&gt;tag_p[i].k,k)) return(&amp;(obj-&gt;tag_p[i]));
++	}
++	return(NULL);
++}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000458.html">[S3d-svn] r465 - in trunk: . apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000460.html">[S3d-svn] r467 - in trunk: . libs3d/libg3d/plugins/import
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#459">[ date ]</a>
+              <a href="thread.html#459">[ thread ]</a>
+              <a href="subject.html#459">[ subject ]</a>
+              <a href="author.html#459">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

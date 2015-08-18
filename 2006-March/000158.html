@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r162 - trunk/apps/dot_mcp
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r162%20-%20trunk/apps/dot_mcp&In-Reply-To=%3C200603141519.k2EFJqs0032096%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000157.html">
+   <LINK REL="Next"  HREF="000159.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r162 - trunk/apps/dot_mcp</H1>
+    <B>ankon at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r162%20-%20trunk/apps/dot_mcp&In-Reply-To=%3C200603141519.k2EFJqs0032096%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r162 - trunk/apps/dot_mcp">ankon at berlios.de
+       </A><BR>
+    <I>Tue Mar 14 16:19:52 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000157.html">[S3d-svn] r161 - in trunk: . client
+</A></li>
+        <LI>Next message: <A HREF="000159.html">[S3d-svn] r163 - trunk/objs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#158">[ date ]</a>
+              <a href="thread.html#158">[ thread ]</a>
+              <a href="subject.html#158">[ subject ]</a>
+              <a href="author.html#158">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: ankon
+Date: 2006-03-14 16:19:50 +0100 (Tue, 14 Mar 2006)
+New Revision: 162
+
+Modified:
+   trunk/apps/dot_mcp/Makefile.am
+Log:
+Install dot_mcp.h (the path may be off, but i guess it's okay for now)
+
+
+
+Modified: trunk/apps/dot_mcp/Makefile.am
+===================================================================
+--- trunk/apps/dot_mcp/Makefile.am	2006-03-14 14:51:43 UTC (rev 161)
++++ trunk/apps/dot_mcp/Makefile.am	2006-03-14 15:19:50 UTC (rev 162)
+@@ -1,7 +1,7 @@
+ bin_PROGRAMS=	dot_mcp
+ 
+ dot_mcpincludedir = $(pkgincludedir)/dot_mcp
+-dot_mcpinclude_HEADERS =  
++dot_mcpinclude_HEADERS =  dot_mcp.h
+ 
+ dot_mcp_SOURCES =  \
+ 	main.c menu.c
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000157.html">[S3d-svn] r161 - in trunk: . client
+</A></li>
+	<LI>Next message: <A HREF="000159.html">[S3d-svn] r163 - trunk/objs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#158">[ date ]</a>
+              <a href="thread.html#158">[ thread ]</a>
+              <a href="subject.html#158">[ subject ]</a>
+              <a href="author.html#158">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

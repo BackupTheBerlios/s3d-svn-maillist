@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r324 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r324%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200606041149.k54BnPQQ003112%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000316.html">
+   <LINK REL="Next"  HREF="000318.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r324 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r324%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200606041149.k54BnPQQ003112%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r324 - in trunk: . server">dotslash at berlios.de
+       </A><BR>
+    <I>Sun Jun  4 13:49:25 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000316.html">[S3d-svn] r323 - trunk/example
+</A></li>
+        <LI>Next message: <A HREF="000318.html">[S3d-svn] r325 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#317">[ date ]</a>
+              <a href="thread.html#317">[ thread ]</a>
+              <a href="subject.html#317">[ subject ]</a>
+              <a href="author.html#317">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-04 13:49:14 +0200 (Sun, 04 Jun 2006)
+New Revision: 324
+
+Modified:
+   trunk/
+   trunk/server/matrix.c
+   trunk/server/object.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r688 at balthasar</A>:  dotslash | 2006-06-04 13:48:54 +0200
+ - ignore inf/nan numbers
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:680
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:688
+
+Modified: trunk/server/matrix.c
+===================================================================
+--- trunk/server/matrix.c	2006-06-04 11:44:18 UTC (rev 323)
++++ trunk/server/matrix.c	2006-06-04 11:49:14 UTC (rev 324)
+@@ -163,6 +163,7 @@
+ 					goto check;
+ 				}
+ 			dprintf(MED,&quot;nothing to swap, can't reverse this matrix! returning ... &quot;);
++			mat_debug(Mm);
+ 			return(-1); /* the dead end!! */
+ 		}
+ 	}
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2006-06-04 11:44:18 UTC (rev 323)
++++ trunk/server/object.c	2006-06-04 11:49:14 UTC (rev 324)
+@@ -1187,7 +1187,9 @@
+ 	float v[3];
+ 	if (obj_valid(p,oid,obj))
+ 	{
+-		dprintf(VLOW,&quot;[translate|pid %d] %d: %3.3f %3.3f %3.3f&quot;,p-&gt;id,oid,obj-&gt;translate.x,obj-&gt;translate.y,obj-&gt;translate.z);
++		if (isnan(transv[0])||isinf(transv[0])) return(-1);
++		if (isnan(transv[1])||isinf(transv[1])) return(-1);
++		if (isnan(transv[2])||isinf(transv[2])) return(-1);
+ 		if ((p-&gt;id!=MCP) &amp;&amp; (obj-&gt;oflags&amp;OF_SYSTEM))
+ 		{
+ 			if (focus_oid==p-&gt;mcp_oid)
+@@ -1209,7 +1211,7 @@
+ 			obj-&gt;translate.z=*(transv+2);
+ 			obj_pos_update(p,oid,oid);
+ 		}
+-
++		dprintf(LOW,&quot;[translate|pid %d] %d: %3.3f %3.3f %3.3f&quot;,p-&gt;id,oid,obj-&gt;translate.x,obj-&gt;translate.y,obj-&gt;translate.z);
+ 	}
+ 	return(0);
+ }
+@@ -1222,7 +1224,9 @@
+ 	float f;
+ 	if (obj_valid(p,oid,obj))
+ 	{
+-		dprintf(VLOW,&quot;[rotate|pid %d] %d: %3.3f %3.3f %3.3f&quot;,p-&gt;id,oid,obj-&gt;rotate.x,obj-&gt;rotate.y,obj-&gt;rotate.z);
++		if (isnan(rotv[0])||isinf(rotv[0])) return(-1);
++		if (isnan(rotv[1])||isinf(rotv[1])) return(-1);
++		if (isnan(rotv[2])||isinf(rotv[2])) return(-1);
+ 		if ((p-&gt;id!=MCP) &amp;&amp; (obj-&gt;oflags&amp;OF_SYSTEM))
+ 		{
+ 			if (focus_oid==p-&gt;mcp_oid)
+@@ -1247,6 +1251,7 @@
+ 			obj-&gt;rotate.z=f;
+ 			obj_pos_update(p,oid,oid);
+ 		}
++		dprintf(LOW,&quot;[rotate|pid %d] %d: %3.3f %3.3f %3.3f&quot;,p-&gt;id,oid,obj-&gt;rotate.x,obj-&gt;rotate.y,obj-&gt;rotate.z);
+ 	}
+ 	return(0);
+ }
+@@ -1456,7 +1461,7 @@
+ 	}
+ 	/* reverse in the application space */
+ 	mySetMatrix(mcp_p-&gt;object[p-&gt;mcp_oid]-&gt;m);
+-	myInvert();
++	if (myInvert()) return; /* we don't bother if the matrix doesn't work. */
+ 	myTransform3f(v);
+ 
+ 	p-&gt;object[oid]-&gt;rotate.x=fs.x-fa.x;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000316.html">[S3d-svn] r323 - trunk/example
+</A></li>
+	<LI>Next message: <A HREF="000318.html">[S3d-svn] r325 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#317">[ date ]</a>
+              <a href="thread.html#317">[ thread ]</a>
+              <a href="subject.html#317">[ subject ]</a>
+              <a href="author.html#317">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

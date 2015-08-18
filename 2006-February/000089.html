@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r93 - in trunk: apps/olsrs3d apps/s3dgps example
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r93%20-%20in%20trunk%3A%20apps/olsrs3d%20apps/s3dgps%20example&In-Reply-To=%3C200602212024.k1LKO1VO028633%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000088.html">
+   <LINK REL="Next"  HREF="000090.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r93 - in trunk: apps/olsrs3d apps/s3dgps example</H1>
+    <B>ankon at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r93%20-%20in%20trunk%3A%20apps/olsrs3d%20apps/s3dgps%20example&In-Reply-To=%3C200602212024.k1LKO1VO028633%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r93 - in trunk: apps/olsrs3d apps/s3dgps example">ankon at berlios.de
+       </A><BR>
+    <I>Tue Feb 21 21:24:01 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000088.html">[S3d-svn] r92 - in trunk: . extras
+</A></li>
+        <LI>Next message: <A HREF="000090.html">[S3d-svn] r94 - in trunk: . objs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#89">[ date ]</a>
+              <a href="thread.html#89">[ thread ]</a>
+              <a href="subject.html#89">[ subject ]</a>
+              <a href="author.html#89">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: ankon
+Date: 2006-02-21 21:23:56 +0100 (Tue, 21 Feb 2006)
+New Revision: 93
+
+Modified:
+   trunk/apps/olsrs3d/Makefile.am
+   trunk/apps/s3dgps/Makefile.am
+   trunk/example/Makefile.am
+Log:
+Replace {} with (), and remove some empty things.
+
+
+
+Modified: trunk/apps/olsrs3d/Makefile.am
+===================================================================
+--- trunk/apps/olsrs3d/Makefile.am	2006-02-20 21:08:08 UTC (rev 92)
++++ trunk/apps/olsrs3d/Makefile.am	2006-02-21 20:23:56 UTC (rev 93)
+@@ -1,6 +1,6 @@
+ bin_PROGRAMS=	olsrs3d
+ 
+-olsrs3dincludedir = ${pkgincludedir}/olsrs3d
++olsrs3dincludedir = $(pkgincludedir)/olsrs3d
+ olsrs3dinclude_HEADERS =  \
+ 	olsrs3d.h
+ 
+@@ -9,9 +9,9 @@
+ 	main.c \
+ 	net.c
+ 
+-olsrs3d_CPPFLAGS=	-I${top_srcdir}/client
+-olsrs3d_LDADD=		${top_builddir}/client/libs3d.la
++olsrs3d_CPPFLAGS=	-I$(top_srcdir)/client
++olsrs3d_LDADD=		$(top_builddir)/client/libs3d.la
+ 
+ EXTRA_DIST = \
+-	output.sample
++	output.sample TODO
+ 
+
+Modified: trunk/apps/s3dgps/Makefile.am
+===================================================================
+--- trunk/apps/s3dgps/Makefile.am	2006-02-20 21:08:08 UTC (rev 92)
++++ trunk/apps/s3dgps/Makefile.am	2006-02-21 20:23:56 UTC (rev 93)
+@@ -3,8 +3,6 @@
+ s3dgps_SOURCES =  \
+ 	s3dgps.c
+ 
+-s3dgps_CPPFLAGS=	-I${top_srcdir}/client @GPS_CFLAGS@ @SIMAGE_CFLAGS@
+-s3dgps_LDADD=		${top_builddir}/client/libs3d.la @GPS_LIBS@ @SIMAGE_LIBS@
++s3dgps_CPPFLAGS=	-I$(top_srcdir)/client @GPS_CFLAGS@ @SIMAGE_CFLAGS@
++s3dgps_LDADD=		$(top_builddir)/client/libs3d.la @GPS_LIBS@ @SIMAGE_LIBS@
+ 
+-EXTRA_DIST =  
+-
+
+Modified: trunk/example/Makefile.am
+===================================================================
+--- trunk/example/Makefile.am	2006-02-20 21:08:08 UTC (rev 92)
++++ trunk/example/Makefile.am	2006-02-21 20:23:56 UTC (rev 93)
+@@ -12,8 +12,8 @@
+ strtest_SOURCES=	strtest.c
+ texturetest_SOURCES=	texturetest.c
+ 
+-CPPFLAGS=		-I${top_srcdir}/server -I${top_srcdir}/client
+-LIBS=			${top_builddir}/client/libs3d.la
++CPPFLAGS=		-I$(top_srcdir)/server -I$(top_srcdir)/client
++LIBS=			$(top_builddir)/client/libs3d.la
+ 
+ EXTRA_DIST=	\
+ 	TODO
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000088.html">[S3d-svn] r92 - in trunk: . extras
+</A></li>
+	<LI>Next message: <A HREF="000090.html">[S3d-svn] r94 - in trunk: . objs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#89">[ date ]</a>
+              <a href="thread.html#89">[ thread ]</a>
+              <a href="subject.html#89">[ subject ]</a>
+              <a href="author.html#89">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,671 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r438 - in trunk: . apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r438%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200609261616.k8QGGNkk020695%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000430.html">
+   <LINK REL="Next"  HREF="000432.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r438 - in trunk: . apps/s3dfm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r438%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200609261616.k8QGGNkk020695%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r438 - in trunk: . apps/s3dfm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Tue Sep 26 18:16:23 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000430.html">[S3d-svn] r437 - in trunk: . apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000432.html">[S3d-svn] r439 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#431">[ date ]</a>
+              <a href="thread.html#431">[ thread ]</a>
+              <a href="subject.html#431">[ subject ]</a>
+              <a href="author.html#431">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-26 18:16:22 +0200 (Tue, 26 Sep 2006)
+New Revision: 438
+
+Modified:
+   trunk/
+   trunk/apps/s3dfm/animation.c
+   trunk/apps/s3dfm/box.c
+   trunk/apps/s3dfm/event.c
+   trunk/apps/s3dfm/icon.c
+   trunk/apps/s3dfm/node.c
+   trunk/apps/s3dfm/parse.c
+   trunk/apps/s3dfm/s3dfm.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1063 at balthasar</A>:  dotslash | 2006-09-26 18:16:18 +0200
+ - rewrite almost as functional as original ...
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1061
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1063
+
+Modified: trunk/apps/s3dfm/animation.c
+===================================================================
+--- trunk/apps/s3dfm/animation.c	2006-09-26 14:54:49 UTC (rev 437)
++++ trunk/apps/s3dfm/animation.c	2006-09-26 16:16:22 UTC (rev 438)
+@@ -66,6 +66,7 @@
+ 	printf(&quot;px: %f py:%f pz: %f\n&quot;,root.px,root.py,root.pz);*/
+ 
+ 	ani_add(&amp;root);
++	focus=f;
+ 	if (((cam.dpx-cam.px)* (cam.dpx-cam.px) + (cam.dpy-cam.py)* (cam.dpy-cam.py) 
+ 		  + (cam.dpz-cam.pz)* (cam.dpz-cam.pz))	&gt; ( 10 * 10))
+ 	{
+
+Modified: trunk/apps/s3dfm/box.c
+===================================================================
+--- trunk/apps/s3dfm/box.c	2006-09-26 14:54:49 UTC (rev 437)
++++ trunk/apps/s3dfm/box.c	2006-09-26 16:16:22 UTC (rev 438)
+@@ -30,6 +30,7 @@
+ {
+ 	box_buildblock(dir);
+ 	box_sidelabel(dir);
++	ani_doit(dir);
+     s3d_flags_on(dir-&gt;oid,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+     s3d_flags_on(dir-&gt;objs.close,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+     s3d_flags_on(dir-&gt;objs.title,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+@@ -50,47 +51,8 @@
+ 	}
+ 	box_order_icons(dir);
+ }
+-/* order the icons properly */
+-void box_order_icons(t_node *dir)
+-{
+-	int dps,i;
+-	dps=ceil(sqrt(dir-&gt;n_sub)); /* directories per line */
+-	for (i=0;i&lt;dir-&gt;n_sub;i++)
+-	{
+-		printf(&quot;ordering icon %s\n&quot;,dir-&gt;sub[i]-&gt;name);
+-		dir-&gt;sub[i]-&gt;dpx = -1 +2*  ((float)((int)i%dps)+0.5)/((float)dps);
+-		dir-&gt;sub[i]-&gt;dpy = 0.5+((float)((int)i/dps)+0.5)/((float)dps)-0.5;
+-		dir-&gt;sub[i]-&gt;dpz = 1.0;
+-		dir-&gt;sub[i]-&gt;scale = (float)1.0/((float)dps);
+-		dir-&gt;sub[i]-&gt;dscale = 0.001;
+-		dir-&gt;sub[i]-&gt;dpx = 0;
+-		dir-&gt;sub[i]-&gt;dpy = 0;
+-		dir-&gt;sub[i]-&gt;dpz = 1;
+-		/* make a first setup so there is no flickering */
+-		s3d_link(dir-&gt;sub[i]-&gt;oid,dir-&gt;oid); /* if it's already displayed, make sure it linked properly ... */
+-		ani_doit(dir-&gt;sub[i]);
+-		ani_add(dir-&gt;sub[i]); /* apply transformation */
+-		s3d_flags_on(dir-&gt;sub[i]-&gt;oid,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-		s3d_flags_on(dir-&gt;sub[i]-&gt;objs.str,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 
+-		
+-	}
+-}
+ 
+-/* remove old items on the box */
+-/*
+-void box_dissolve(t_node *dir)
+-{
+-	if (dir-&gt;objs.close!=-1)		{	s3d_del_object(dir-&gt;objs.close);		dir-&gt;objs.close=-1; }
+-	if (dir-&gt;objs.select!=-1)	{	s3d_del_object(dir-&gt;objs.select);	dir-&gt;objs.select=-1; }
+-	if (dir-&gt;objs.title!=-1)		{	s3d_del_object(dir-&gt;objs.title);		dir-&gt;objs.title=-1; }
+-	if (dir-&gt;objs.titlestr!=-1)	{	s3d_del_object(dir-&gt;objs.titlestr);	dir-&gt;objs.titlestr=-1; }
+-	if (dir-&gt;oid!=-1)			s3d_del_object(dir-&gt;oid);
+-
+-}*/
+-
+-
+-
+ /* places the string at the left side of the cube */
+ void box_sidelabel(t_node *dir)
+ {
+@@ -178,21 +140,44 @@
+ 						0.5,0.5,0.6,
+ 						0.5,0.5,0.6);
+ 
++	/* top */
+ 	s3d_push_polygon(dir-&gt;oid,4,6,5,1);
+ 	s3d_push_polygon(dir-&gt;oid,4,7,6,1);
++	/* bottom */
++	s3d_push_polygon(dir-&gt;oid,8,11,3,1);
++	s3d_push_polygon(dir-&gt;oid,8,3,0,1);
+ 
++
++	/* left */
+ 	s3d_push_polygon(dir-&gt;oid,0,4,5,0);
+ 	s3d_push_polygon(dir-&gt;oid,0,5,1,0);
+ 	
++	/* back */
+ 	s3d_push_polygon(dir-&gt;oid,3,7,4,0);
+ 	s3d_push_polygon(dir-&gt;oid,3,4,0,0);
+ 
++	/* right */
+ 	s3d_push_polygon(dir-&gt;oid,2,6,7,0);
+ 	s3d_push_polygon(dir-&gt;oid,2,7,3,0);
+ 	
++	/* front */
+ 	s3d_push_polygon(dir-&gt;oid,8,9,10,0);
+ 	s3d_push_polygon(dir-&gt;oid,8,10,11,0);
++	/* left inner side */
++	s3d_push_polygon(dir-&gt;oid,1,5,9,0);
++	s3d_push_polygon(dir-&gt;oid,1,9,8,0);
+ 
++	/* right inner side */
++	s3d_push_polygon(dir-&gt;oid,2,11,10,0);
++	s3d_push_polygon(dir-&gt;oid,2,10,6,0);
++
++	/* top inner side */
++	s3d_push_polygon(dir-&gt;oid,9,5,6,0);
++	s3d_push_polygon(dir-&gt;oid,9,6,10,0);
++
++
++
++
+ 	/* draw the select, close buttons ... */
+ 	dir-&gt;objs.close=s3d_new_object();
+ 	s3d_push_material(dir-&gt;objs.close,
+@@ -235,117 +220,95 @@
+ /*	printf(&quot;FULLNAME is [%s]\n&quot;,fullname);*/
+ 	return(0);
+ }
+-/* display a directoy on the top of another, draw it's icons etc ... */
+-/*
++/* display a directoy on the top of another */
+ int box_expand(t_node *dir)
+ {
+-	int i;
+-	float  px,pz;
+-	int dirn;
+-	px=pz=0.0;
+ 	printf(&quot;box_expand( %s )\n&quot;,dir-&gt;name);
+-	if (dir-&gt;disp)		undisplay(dir);
+-	box_buildblock(dir);
+-	if (dir-&gt;parent!=NULL)
+-		dir-&gt;parent-&gt;dirs_opened++;
+- / * count directories * /
+-	dirn=0;
+-	for (i=0;i&lt;dir-&gt;n_sub;i++)
++	switch (dir-&gt;disp)
+ 	{
+-		if (dir-&gt;sub[i].type==T_FOLDER) dirn++;
++		case D_DIR:			return(0); /* already done */
++		case D_ICON:		icon_undisplay(dir); /* undisplay previously displayed types, like icons etc */
++			break;
++		case D_NONE:		break; /* ignore */
++		default:			return(-1); /* panic */
+ 	}
++	dir-&gt;dpx=0.0;
++	dir-&gt;dpy=BOXHEIGHT;
++	dir-&gt;dpz=0.0;
++	dir-&gt;dscale=0.01;
++	box_draw(dir);
+ 
+-	/ * draw icons, if necceasry * /
+-	for (i=0;i&lt;dir-&gt;n_sub;i++)
++	/* initialize position on the parent */
++	if (dir-&gt;parent!=NULL)	
+ 	{
+-		if (!dir-&gt;sub[i].disp)	icon_draw(dir,i);
+-		else {
+-			printf(&quot;link %d to the block %d of %s\n&quot;,dir-&gt;sub[i].block,dir-&gt;oid,dir-&gt;name);
+-			s3d_link(dir-&gt;sub[i].block,dir-&gt;oid); / * if it's already displayed, make sure it linked properly ... * /
+-		}
++		dir-&gt;parent-&gt;dirs_opened++;
++		s3d_link(dir-&gt;oid,dir-&gt;parent-&gt;oid);
++		box_order_subdirs(dir-&gt;parent);
+ 	}
+-	if (dir-&gt;parent!=NULL)
+-	{
+-		s3d_link(dir-&gt;oid,dir-&gt;parent-&gt;block);
+-		dir-&gt;dpx=0.0;
+-		dir-&gt;dpy=BOXHEIGHT;
+-		dir-&gt;dpz=0.0;
+-		dir-&gt;dscale=0.0;
+-		box_position_kids(dir-&gt;parent);
+-		ani_doit(dir);
+-	}
+-	box_sidelabel(dir);
+ 	return(0);
+ }
+-
+-*/
++/* remove s3d-objects of a directory node */
+ int box_undisplay(t_node *dir)
+ {
+-	/*
+-	int i;
+-	t_node *par;
+ 	printf(&quot;box_undisplay( %s )\n&quot;,dir-&gt;name);
+-	for (i=0;i&lt;dir-&gt;n_sub;i++)
+-	{
+-		if (dir-&gt;sub[i].disp==D_ICON)	icon_undisplay(&amp;(dir-&gt;sub[i]));
+-		else if (dir-&gt;sub[i].disp!=0)	
+-				printf(&quot;not undisplaying: %s (disp = %d)\n&quot;,dir-&gt;sub[i].name, dir-&gt;sub[i].disp);
+-	}
+-	if ((par=dir-&gt;parent)!=NULL) / * we can't do this on root.... * /
+-	{
+-		for (i=0;i&lt;par-&gt;n_item;i++)
+-			if (&amp;par-&gt;list[i]==dir)
+-				break;
+-		if (i!=par-&gt;n_item) / * if it actually was in the parents item list * /
+-		{
+-			icon_draw(par,i);
+-			s3d_flags_on(dir-&gt;oid,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-			s3d_flags_on(dir-&gt;objs.str,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-		}
+-		par-&gt;dirs_opened--;
+-	} else {
+-		/ * we're root ... * /
+-		box_dissolve(dir);
+-	}
++	if (dir-&gt;objs.close!=-1)		{	s3d_del_object(dir-&gt;objs.close);		dir-&gt;objs.close=-1; }
++	if (dir-&gt;objs.select!=-1)	{	s3d_del_object(dir-&gt;objs.select);	dir-&gt;objs.select=-1; }
++	if (dir-&gt;objs.title!=-1)		{	s3d_del_object(dir-&gt;objs.title);		dir-&gt;objs.title=-1; }
++	if (dir-&gt;objs.titlestr!=-1)	{	s3d_del_object(dir-&gt;objs.titlestr);	dir-&gt;objs.titlestr=-1; }
++	if (dir-&gt;oid!=-1)			s3d_del_object(dir-&gt;oid);
++	dir-&gt;disp=D_NONE;
++	return(0);
++}
++/* the opposite effect of box_expand, e.g. transforming the box back to an icon */
++int box_unexpand(t_node *dir)
++{
++	if (dir-&gt;parent==NULL) /* we can't do this on root.... */
++		return(-1);
++	box_undisplay(dir);
++	icon_draw(dir);
++	box_order_icons(dir-&gt;parent);
++	dir-&gt;parent-&gt;dirs_opened--;
+ 	printf(&quot;[U]ndisplayed %s\n&quot;,dir-&gt;name);
+-/ * 	dir-&gt;dirs_opened=0;* /
+-	dir-&gt;detached=0;
+-	*/
+ 	return(0);
+ }
++
+ /* undisplay a directory, thus recursively removing the kids.*/
+-/*
+-int box_collapse(t_node *dir,int force)
++/* if force is 1, even the directory is removed even if it still have selected kids */
++int box_close(t_node *dir,int force)
+ {
+ 	int i;
+ 	int ret;
+-	printf(&quot;box_collapse( %s )\n&quot;,dir-&gt;name);
++	printf(&quot;box_close( %s )\n&quot;,dir-&gt;name);
+ 	if (&amp;root==dir)
+ 	{
+ 		printf(&quot;won't undisplay root window ... \n&quot;);
+ 		return(-1);
+ 	}
+-	if (dir-&gt;detached &amp;&amp; !force)
+-		return(1);
+-	if (dir-&gt;disp!=D_DIR)
++	if (dir-&gt;detached &amp;&amp; !force)	return(1);
++	if (dir-&gt;disp!=D_DIR) /* that should not be happening ... */
+ 	{
+ 		printf(&quot;[A]lready undisplayed %s, nothing to do ...\n&quot;,dir-&gt;name);
+ 		return(-1);
+ 	}
+-	/ * undisplaying kids. ret will be != 0 if any of the kids did not close correctly * /
++	/* undisplaying kids. ret will be != 0 if any of the kids did not close correctly */
+ 	ret=0;
+ 	for (i=0;i&lt;dir-&gt;n_sub;i++)
+-		if (dir-&gt;sub[i].disp==D_DIR)
+-			ret|=box_collapse(&amp;dir-&gt;sub[i],force);
+-
+-	if (ret &amp;&amp; !force) return(ret); / * if anything got wrong, return here ... * /
+-	undisplay(dir);
+-	if (dir-&gt;parent!=NULL)
++		if (dir-&gt;sub[i]-&gt;disp==D_DIR)
++			ret|=box_close(dir-&gt;sub[i],force);
++	if (ret &amp;&amp; !force) 
+ 	{
+-		box_position_kids(dir-&gt;parent);
++		box_order_subdirs(dir);
++		return(ret); /* if anything got wrong, return here ... */
++	} else {
++		/* also remove the icons */
++		for (i=0;i&lt;dir-&gt;n_sub;i++)
++			if (dir-&gt;sub[i]-&gt;disp==D_ICON)
++				icon_undisplay(dir-&gt;sub[i]);
++		box_undisplay(dir);
+ 	}
+ 	return(ret);
+ }
++/*
+ / * only display dir and its kids, but nothing below. * /
+ int box_collapse_grandkids(t_node *dir)
+ {
+@@ -400,14 +363,25 @@
+ 			}
+ 	}
+ }
+-void box_select(t_node *dir)
++/* order the icons properly */
++void box_order_icons(t_node *dir)
+ {
+-	dir-&gt;detached=dir-&gt;detached?0:1; /* swapping, not sure if !dir-&gt;detached would do the same .. */
+-	if ((dir-&gt;type==T_FOLDER) &amp;&amp; dir-&gt;disp)
++	int dps,i;
++	dps=ceil(sqrt(dir-&gt;n_sub)); /* directories per line */
++	for (i=0;i&lt;dir-&gt;n_sub;i++)
+ 	{
+-		if (dir-&gt;parent!=NULL)
+-			box_order_subdirs(dir-&gt;parent);
+-	} else {
+-		/* nothing yet ... */
++		dir-&gt;sub[i]-&gt;px = -1 +2*  ((float)((int)i%dps)+0.5)/((float)dps);
++		dir-&gt;sub[i]-&gt;py = 0.5+((float)((int)i/dps)+0.5)/((float)dps)-0.5;
++		dir-&gt;sub[i]-&gt;pz = 1.0;
++		dir-&gt;sub[i]-&gt;scale = (float)1.0/((float)dps);
++		dir-&gt;sub[i]-&gt;dscale = dir-&gt;sub[i]-&gt;scale;
++		dir-&gt;sub[i]-&gt;dpx = dir-&gt;sub[i]-&gt;px;
++		dir-&gt;sub[i]-&gt;dpy = dir-&gt;sub[i]-&gt;py;
++		dir-&gt;sub[i]-&gt;dpz = dir-&gt;sub[i]-&gt;dpz;
++		/* make a first setup so there is no flickering */
++		s3d_link(dir-&gt;sub[i]-&gt;oid,dir-&gt;oid); /* if it's already displayed, make sure it linked properly ... */
++		ani_finish(dir-&gt;sub[i], -1);
++		s3d_flags_on(dir-&gt;sub[i]-&gt;oid,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++		s3d_flags_on(dir-&gt;sub[i]-&gt;objs.str,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 	}
+ }
+
+Modified: trunk/apps/s3dfm/event.c
+===================================================================
+--- trunk/apps/s3dfm/event.c	2006-09-26 14:54:49 UTC (rev 437)
++++ trunk/apps/s3dfm/event.c	2006-09-26 16:16:22 UTC (rev 438)
+@@ -99,30 +99,34 @@
+ 	{
+ 		if (f-&gt;objs.close==oid)
+ 		{
+-/*			box_collapse(f,1);*/
+-/*			if (f-&gt;parent!=NULL)
+-				ani_focus(f-&gt;parent);*/
++			box_close(f,1);
++			if (f-&gt;parent!=NULL)
++				ani_focus(f-&gt;parent);
+ 			return;
+ 		}
+ 		if (f-&gt;objs.select==oid)
+ 		{
+ 			printf(&quot;[S]electing %s\n&quot;,f-&gt;name);
+-			box_select(f);
++			node_select(f);
+ 			return;
+ 		}
+-		if (f-&gt;type==T_FOLDER)
++		switch (f-&gt;disp)
+ 		{
+-			if (f-&gt;disp == D_DIR)
+-			{
++			case D_DIR:
+ 				printf(&quot;[F]ound, Already displayed - ani_focus( %s )\n&quot;,f-&gt;name);
+-			} else {
+-				if (!f-&gt;parsed)	parse_dir(f);
+-/*				box_expand(f);*/
+-			}
+-			focus=f;
+-			ani_focus(f);
+-		} else
+-			printf(&quot;[F]ound, but %s is no folder\n&quot;,f-&gt;name);
++				ani_focus(f);
++				break;
++			case D_ICON:
++				if (f-&gt;type==T_FOLDER)
++				{
++					parse_dir(f);
++					box_expand(f);	
++					ani_focus(f);
++				} else {
++					node_select(f);
++				}
++				break;
++		}
+ 	} else {
+ /*		printf(&quot;[C]ould not find :/\n&quot;);*/
+ 	}
+
+Modified: trunk/apps/s3dfm/icon.c
+===================================================================
+--- trunk/apps/s3dfm/icon.c	2006-09-26 14:54:49 UTC (rev 437)
++++ trunk/apps/s3dfm/icon.c	2006-09-26 16:16:22 UTC (rev 438)
+@@ -44,7 +44,6 @@
+ 				5,1,0,0,				5,0,4,0	
+ 				};
+ 	float len;
+-	printf(&quot;icon_draw( %s )\n&quot;,dir-&gt;name);
+ 	/* find position for the new block in our directory box */
+ 	/* create the block */
+ 	dir-&gt;oid=s3d_new_object();
+@@ -78,13 +77,11 @@
+ 	s3d_translate(dir-&gt;objs.str,-0.9,-0.3,0.1);
+ 	s3d_rotate(dir-&gt;objs.str,0,0,0);
+ 	s3d_link(dir-&gt;objs.str,dir-&gt;oid);
+-
+ 	dir-&gt;disp=D_ICON;
+ 	return(0);
+ }
+ int icon_undisplay(t_node *dir)
+ {
+-	printf(&quot;icon_undisplay( %s )\n&quot;,dir-&gt;name);
+ 	if (dir-&gt;oid!=-1)
+ 	{
+ 		s3d_del_object(dir-&gt;oid);
+
+Modified: trunk/apps/s3dfm/node.c
+===================================================================
+--- trunk/apps/s3dfm/node.c	2006-09-26 14:54:49 UTC (rev 437)
++++ trunk/apps/s3dfm/node.c	2006-09-26 16:16:22 UTC (rev 438)
+@@ -149,3 +149,22 @@
+ 	*/
+ 	return(0);
+ }
++/* node select handles click on the detach button. selected items can be moved, copied etc.*/
++void node_select(t_node *dir)
++{
++	printf(&quot;node_select(%s)\n&quot;,dir-&gt;name);
++	dir-&gt;detached=dir-&gt;detached?0:1; /* swapping, not sure if !dir-&gt;detached would do the same .. */
++	printf(&quot;dir-&gt;type = %d\n&quot;,dir-&gt;disp);
++	switch (dir-&gt;disp)
++	{
++		case D_DIR:
++			if (dir-&gt;parent!=NULL)
++				box_order_subdirs(dir-&gt;parent);
++			break;
++		case D_ICON:
++			dir-&gt;pz=dir-&gt;detached*0.2+1.0;
++			ani_add(dir);
++			break;
++		/* nothing yet ... */
++	}
++}
+
+Modified: trunk/apps/s3dfm/parse.c
+===================================================================
+--- trunk/apps/s3dfm/parse.c	2006-09-26 14:54:49 UTC (rev 437)
++++ trunk/apps/s3dfm/parse.c	2006-09-26 16:16:22 UTC (rev 438)
+@@ -74,40 +74,36 @@
+ 					dir-&gt;sub[i]-&gt;parent = dir;
+ 				}
+ 				/* find out the filetype ... very simple */
+-				else {
+-					ext=strrchr(nstr,'.');
+-					strncpy(ndir,path,M_DIR);
+-			    	strncat(ndir,namelist[n]-&gt;d_name,M_DIR);
+-				    if ((namelist[n]-&gt;d_type==DT_DIR) ||
+-						((namelist[n]-&gt;d_type==DT_UNKNOWN) &amp;&amp; ((dirhd=opendir(ndir))!=NULL)))
+-						{
+-							dir-&gt;sub[i]-&gt;type=T_FOLDER;
+-							closedir(dirhd);
+-						}
+-					else 
+-					{
+-					   if (ext!=NULL)
+-					   {
+-						   if (0==strncmp(ext,&quot;.3ds&quot;,strlen(ext)&lt;4?strlen(ext):4))		   dir-&gt;sub[i]-&gt;type=T_GEOMETRY;
+-						   else if (0==strncmp(ext,&quot;.mp3&quot;,strlen(ext)&lt;4?strlen(ext):4))	   dir-&gt;sub[i]-&gt;type=T_MUSIC;
+-					   }	
+-					}
+-				}
+-	
+-				dir-&gt;sub[i]-&gt;check=0;
++				ext=strrchr(nstr,'.');
++				strncpy(ndir,path,M_DIR);
++		    	strncat(ndir,namelist[n]-&gt;d_name,M_DIR);
++			    if ((namelist[n]-&gt;d_type==DT_DIR) || ((namelist[n]-&gt;d_type==DT_UNKNOWN) &amp;&amp; ((dirhd=opendir(ndir))!=NULL)))
++				{
++					dir-&gt;sub[i]-&gt;type=T_FOLDER;
++					closedir(dirhd);
++				} else if (ext!=NULL)
++				   {
++					   if (0==strncmp(ext,&quot;.3ds&quot;,strlen(ext)&lt;4?strlen(ext):4))		   dir-&gt;sub[i]-&gt;type=T_GEOMETRY;
++					   else if (0==strncmp(ext,&quot;.mp3&quot;,strlen(ext)&lt;4?strlen(ext):4))	   dir-&gt;sub[i]-&gt;type=T_MUSIC;
++				   }	
++				dir-&gt;sub[i]-&gt;check=0; /* check=0 means we've already processed this item */
+ 			}
+ 	   	    free(namelist[n]);
+ 		}
+ 		free(namelist);
++		dir-&gt;check=0;
+ 		for (i=0;i&lt;dir-&gt;n_sub;i++)
+ 			if (dir-&gt;sub[i]-&gt;check) 
+-			/* not checked yet... that means the item is not in the reparsed directory, ie vanished.
+-			 * so we're removing it from our queue */
+ 			{
++				/* not checked yet... that means the item is not in the reparsed directory, ie vanished.
++				 * so we're removing it from our queue */
+ 				node_delete(dir-&gt;sub[i]);
+ 				dir-&gt;n_sub--;
+ 				dir-&gt;sub[i]=dir-&gt;sub[dir-&gt;n_sub]; /* exchange with the last one */
++				dir-&gt;check=1;
+ 			}
++		/* if we removed something, then shrink the buffer accordingly .. */
++		if (dir-&gt;check)		dir-&gt;sub = realloc( dir-&gt;sub , dir-&gt;n_sub * sizeof(t_node *) );
+ 		dir-&gt;parsed=1;
+    	}
+ 	return(0);
+
+Modified: trunk/apps/s3dfm/s3dfm.h
+===================================================================
+--- trunk/apps/s3dfm/s3dfm.h	2006-09-26 14:54:49 UTC (rev 437)
++++ trunk/apps/s3dfm/s3dfm.h	2006-09-26 16:16:22 UTC (rev 438)
+@@ -81,13 +81,6 @@
+ extern t_node root,cam; /* some global objects */
+ extern t_node *focus;	/* the focused object */
+ 
+-/* node.c */
+-t_node 		*node_getbypath(char *path);
+-void 		 node_path(t_node *dir, char *path);
+-t_node 		*node_getbyoid(t_node *t, int oid);
+-int 		 node_init(t_node *dir);
+-int 		 node_delete(t_node *dir);
+-int 		 node_undisplay(t_node *dir);
+ /* animation.c */
+ float		 ani_get_scale(t_node *f);
+ void 		 ani_focus(t_node *f);
+@@ -99,10 +92,6 @@
+ void 		 ani_iterate(t_node *f);
+ int 		 ani_check(t_node *f);
+ void 		 ani_mate();
+-/* event.c */
+-void 		 event_click(struct s3d_evt *evt);
+-void		 event_key(struct s3d_evt *evt);
+-void		 event_oinfo(struct s3d_evt *hrmz);
+ /* box.c */
+ void	 	 box_draw(t_node *dir);
+ void 	 	 box_draw_icons(t_node *dir);
+@@ -110,13 +99,10 @@
+ void  		 box_order_icons(t_node *dir);
+ void	 	 box_sidelabel(t_node *dir);
+ int 		 box_buildblock(t_node *dir);
+-void		 box_select(t_node *dir);
+ void 		 box_order_subdirs(t_node *dir);
+-/* parse.c */
+-int 		 parse_dir(t_node *dir);
+-/* icon.c */
+-int 		 icon_draw(t_node *dir);
+-int 		 icon_undisplay(t_node *dir);
++int 		 box_expand(t_node *dir);
++int 		 box_unexpand(t_node *dir);
++int 		 box_close(t_node *dir,int force);
+ /* dialog.c */
+ void		 close_win(s3dw_widget *button);
+ void		 window_help();
+@@ -129,11 +115,10 @@
+ void		 window_mkdir(char *path);
+ void		 window_move(char *path);
+ void		 window_info(char *path);
+-/* string.c */
+-void 		 dots_at_start(char *s, unsigned int n, t_node *d);
+-void		 dotted_int(char *s,unsigned int i);
+-char		 *mstrncat(char *dest, const char *src, int n);
+-char		 *mstrncpy(char *dest, const char *src, int n);
++/* event.c */
++void 		 event_click(struct s3d_evt *evt);
++void		 event_key(struct s3d_evt *evt);
++void		 event_oinfo(struct s3d_evt *hrmz);
+ /* fs.c */
+ filelist	 *fl_new(char *path);
+ void		 fl_del(filelist *fl);
+@@ -144,4 +129,21 @@
+ void	 	 fs_approx(char *source, int *files, int *dirs, int *bytes);
+ int			 fs_copy(char *source, char *dest);
+ int			 fs_move(char *source, char *dest);
+-int			 fs_unlink(char *dest);
++int			 fs_unlink(char *dest);/* icon.c */
++int 		 icon_draw(t_node *dir);
++int 		 icon_undisplay(t_node *dir);
++/* node.c */
++t_node 		*node_getbypath(char *path);
++void 		 node_path(t_node *dir, char *path);
++t_node 		*node_getbyoid(t_node *t, int oid);
++int 		 node_init(t_node *dir);
++int 		 node_delete(t_node *dir);
++int 		 node_undisplay(t_node *dir);
++void		 node_select(t_node *dir);
++/* parse.c */
++int 		 parse_dir(t_node *dir);
++/* string.c */
++void 		 dots_at_start(char *s, unsigned int n, t_node *d);
++void		 dotted_int(char *s,unsigned int i);
++char		 *mstrncat(char *dest, const char *src, int n);
++char		 *mstrncpy(char *dest, const char *src, int n);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000430.html">[S3d-svn] r437 - in trunk: . apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000432.html">[S3d-svn] r439 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#431">[ date ]</a>
+              <a href="thread.html#431">[ thread ]</a>
+              <a href="subject.html#431">[ subject ]</a>
+              <a href="author.html#431">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r48 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r48%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602110253.k1B2rQWD031763%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000043.html">
+   <LINK REL="Next"  HREF="000045.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r48 - trunk/apps/olsrs3d</H1>
+    <B>nichtsnutz at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r48%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602110253.k1B2rQWD031763%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r48 - trunk/apps/olsrs3d">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Sat Feb 11 03:53:26 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000043.html">[S3d-svn] r47 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000045.html">[S3d-svn] r49 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#44">[ date ]</a>
+              <a href="thread.html#44">[ thread ]</a>
+              <a href="subject.html#44">[ subject ]</a>
+              <a href="author.html#44">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-02-11 03:53:15 +0100 (Sat, 11 Feb 2006)
+New Revision: 48
+
+Modified:
+   trunk/apps/olsrs3d/olsrs3d.h
+Log:
+defines struct Obj_to_ip for a linked list to, find ip and coordinates per objekt_id in a binary tree
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-02-10 23:01:18 UTC (rev 47)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-02-11 02:53:15 UTC (rev 48)
+@@ -33,10 +33,16 @@
+ 
+ };
+ 
++struct Obj_to_ip {
++	int id;
++	struct olsr_node *olsr_node;
++	struct Obj_to_ip *next;
++};
+ 
+ 
+-extern struct olsr_node *Root;   /* top of olsr node tree */
+-extern int	*obj_to_ip;
++
++extern struct olsr_node *Root;   															/* top of olsr node tree */
++extern struct Obj_to_ip *Obj_to_ip_head, *Obj_to_ip_end;			/* struct list */
+ extern int 	max, new_max;
+ extern float 	*adj;
+ extern int	*adj_obj;
+@@ -57,3 +63,7 @@
+ int net_init(char *host);
+ int net_main();
+ int net_quit();
++/* main obj2ip list*/
++void lst_add(int id,struct olsr_node **olsr_node);
++void lst_del(int id);
++struct olsr_node **lst_search(int id);
+\ No newline at end of file
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000043.html">[S3d-svn] r47 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000045.html">[S3d-svn] r49 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#44">[ date ]</a>
+              <a href="thread.html#44">[ thread ]</a>
+              <a href="subject.html#44">[ subject ]</a>
+              <a href="author.html#44">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,38 @@
+From ecsv at mail.berlios.de  Sun Aug 21 17:56:49 2011
+From: ecsv at mail.berlios.de (ecsv at BerliOS)
+Date: Sun, 21 Aug 2011 17:56:49 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.2-5-3-g7491025
+Message-ID: <20110821155649.54FFF480CC1@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  7491025f568a0d3ab0e9fa1f3695af321459b65f (commit)
+      from  6f443142f5e4590db9a02995beba7d6534d5dce2 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 7491025f568a0d3ab0e9fa1f3695af321459b65f
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sun Aug 21 17:56:03 2011 +0200
+
+    Don't mix implicit and explicit rules to prevent FTBFS with make 3.82
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/rules |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

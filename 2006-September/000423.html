@@ -1,0 +1,261 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r430 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r430%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200609192040.k8JKeSYt009852%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000422.html">
+   <LINK REL="Next"  HREF="000424.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r430 - trunk/apps/olsrs3d</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r430%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200609192040.k8JKeSYt009852%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r430 - trunk/apps/olsrs3d">marec at mail.berlios.de
+       </A><BR>
+    <I>Tue Sep 19 22:40:28 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000422.html">[S3d-svn] r429 - in trunk: . libs3d/libg3d/plugins/import
+</A></li>
+        <LI>Next message: <A HREF="000424.html">[S3d-svn] r431 - in trunk: . libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#423">[ date ]</a>
+              <a href="thread.html#423">[ thread ]</a>
+              <a href="subject.html#423">[ subject ]</a>
+              <a href="author.html#423">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-09-19 22:40:28 +0200 (Tue, 19 Sep 2006)
+New Revision: 430
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/olsrs3d.h
+   trunk/apps/olsrs3d/process.c
+   trunk/apps/olsrs3d/search.c
+Log:
+- oid search in progress.c fixed - return NULL if not found
+- move to node on double click
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-09-19 14:11:17 UTC (rev 429)
++++ trunk/apps/olsrs3d/main.c	2006-09-19 20:40:28 UTC (rev 430)
+@@ -84,6 +84,8 @@
+ int Btn_close_id = -1;
+ 
+ int Btn_close_obj;
++int Last_Click_Time = 0;
++int Last_Click_Oid = 0;
+ float Title_len;
+ 
+ /***
+@@ -158,6 +160,8 @@
+ 	s3dw_show(S3DWIDGET(infwin));
+ 
+ }
++
++
+ /***
+  *
+  * print error and exit
+@@ -173,6 +177,18 @@
+ 
+ 
+ 
++unsigned int get_time(void) {
++
++	struct timeval tv;
++
++	gettimeofday(tv, NULL);
++
++	return tv.tv_sec * 1000 + tv.tv_usec / 1000;
++
++}
++
++
++
+ /***
+  *
+  * calculate distance between 2 vectors =&gt; <A HREF="http://en.wikipedia.org/wiki/Euclidean_distance">http://en.wikipedia.org/wiki/Euclidean_distance</A>
+@@ -875,9 +891,10 @@
+ 
+ void object_click(struct s3d_evt *evt)
+ {
+-	int oid,i;
++	int oid, i;
+ 	char ip_str[50];
+-	struct Obj_to_ip *obj_to_ip_tmp;
++	struct olsr_node *olsr_node;
++	struct timeval tv;
+ 
+ 	s3dw_handle_click(evt);
+ /*	if( get_search_status() == WIDGET )
+@@ -888,27 +905,20 @@
+ 
+ 	oid=(int)*((unsigned long *)evt-&gt;buf);
+ 
+-	if( get_search_status() != FOLLOW ){
+ 
+-		obj_to_ip_tmp = Obj_to_ip_head;
++	if ( ( get_search_status() != FOLLOW ) &amp;&amp; ( Last_Click_Oid == oid ) &amp;&amp; ( Last_Click_Time + 250 &gt; get_time() ) ) {
+ 
+-		while ( obj_to_ip_tmp != Obj_to_ip_end ) {
++		olsr_node = lst_search(oid);
+ 
+-			if ( obj_to_ip_tmp-&gt;id == oid ) {
++		if ( olsr_node != NULL )
++			follow_node_by_click( olsr_node );
+ 
+-				follow_node_by_click( obj_to_ip_tmp-&gt;olsr_node );
+-				break;
++	}
+ 
+-			} else {
++	Last_Click_Oid = oid;
++	Last_Click_Time = get_time();
+ 
+-				obj_to_ip_tmp = obj_to_ip_tmp-&gt;next;
+ 
+-			}
+-
+-		}
+-
+-	}
+-
+ /*	if( oid == Btn_close_id )
+ 	{
+ 		s3d_del_object(Btn_close_id);
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-09-19 14:11:17 UTC (rev 429)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-09-19 20:40:28 UTC (rev 430)
+@@ -60,9 +60,9 @@
+ void lst_initialize();
+ void lst_add(int id,struct olsr_node **olsr_node);
+ void lst_del(int id);
+-struct olsr_node **lst_search(int id);
++struct olsr_node *lst_search(int id);
+ void lst_out();
+-void move_lst_ptr(int *id);
++struct olsr_node *move_lst_ptr(int *id);
+ int process_main();
+ /* net */
+ int net_init(char *host);
+@@ -70,7 +70,6 @@
+ int net_quit();
+ /* main */
+ void out_of_mem( void );
+-struct olsr_node **lst_search(int id);
+ void print_etx( void );
+ float dist(float p1[], float p2[]);
+ void window_error(char *msg);
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-09-19 14:11:17 UTC (rev 429)
++++ trunk/apps/olsrs3d/process.c	2006-09-19 20:40:28 UTC (rev 430)
+@@ -311,15 +311,17 @@
+  *
+  */
+ 
+-void move_lst_ptr(int *id) {
++struct olsr_node *move_lst_ptr(int *id) {
+ 	/* printf(&quot;obj2ip: move for %d\n&quot;,*id); */
+ 	/* head to point at end or id lass then first element in linked list*/
+-	if(Obj_to_ip_head-&gt;next == Obj_to_ip_head || *id &lt; Obj_to_ip_head-&gt;next-&gt;id)
++	if(Obj_to_ip_head-&gt;next == Obj_to_ip_head || *id &lt; Obj_to_ip_head-&gt;next-&gt;id) {
+ 		List_ptr = Obj_to_ip_head;
++		return NULL;
+  	/* id is greather then last element in linked list */
+-	else if(*id &gt; Obj_to_ip_end-&gt;prev-&gt;id)
++	} else if(*id &gt; Obj_to_ip_end-&gt;prev-&gt;id) {
+ 		List_ptr = Obj_to_ip_end-&gt;prev;
+-	else {
++		return NULL;
++	} else {
+ 		/* printf(&quot;obj2ip: ok i search deeper ;-) for id=%d\n&quot;,*id); */
+ 		if((*id - (int) Obj_to_ip_head-&gt;next-&gt;id) &lt;= ((int)(Obj_to_ip_end-&gt;prev-&gt;id)-*id)) {
+ 			List_ptr = Obj_to_ip_head;
+@@ -340,6 +342,12 @@
+ 			}
+ 			List_ptr = List_ptr-&gt;prev;
+ 		}
++
++		if ( List_ptr-&gt;id == *id )
++			return List_ptr-&gt;olsr_node;
++		else
++			return NULL;
++
+ 		/* printf(&quot;obj2ip: found id to insert between %d--&gt; .. &lt;--%d to search/delete %d--&gt; .. &lt;--%d\n&quot;,List_ptr-&gt;id,List_ptr-&gt;next-&gt;next-&gt;id,List_ptr-&gt;prev-&gt;id,List_ptr-&gt;next-&gt;id); */
+ 	}
+ }
+@@ -357,14 +365,10 @@
+  *
+  */
+ 
+-struct olsr_node **lst_search(int id) {
+-	move_lst_ptr(&amp;id);
+-	/* TODO: return NULL when no node found */
+-	/* if(id != List_ptr-&gt;id) */
+-		/* printf(&quot;obj2ip: search id....id not found\n&quot;); */
+-	/* else */
+-		/* printf(&quot;obj2ip: search found objekt_id=%d objekt_ip=%s\n&quot;,List_ptr-&gt;id,List_ptr-&gt;olsr_node-&gt;ip); */
+-	return(&amp;List_ptr-&gt;olsr_node);
++struct olsr_node *lst_search(int id) {
++
++	return( move_lst_ptr(&amp;id) );
++
+ }
+ 
+ void lst_out() {
+
+Modified: trunk/apps/olsrs3d/search.c
+===================================================================
+--- trunk/apps/olsrs3d/search.c	2006-09-19 14:11:17 UTC (rev 429)
++++ trunk/apps/olsrs3d/search.c	2006-09-19 20:40:28 UTC (rev 430)
+@@ -321,7 +321,6 @@
+ 
+ 		result = strncmp( (*search_node)-&gt;ip, ip, NAMEMAX );
+ 
+-		printf( &quot;ip: %s\n&quot;, (*search_node)-&gt;ip );
+ 		if ( result == 0 )
+ 			break;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000422.html">[S3d-svn] r429 - in trunk: . libs3d/libg3d/plugins/import
+</A></li>
+	<LI>Next message: <A HREF="000424.html">[S3d-svn] r431 - in trunk: . libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#423">[ date ]</a>
+              <a href="thread.html#423">[ thread ]</a>
+              <a href="subject.html#423">[ subject ]</a>
+              <a href="author.html#423">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r44 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r44%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602102156.k1ALux8Q009218%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000039.html">
+   <LINK REL="Next"  HREF="000041.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r44 - trunk/apps/olsrs3d</H1>
+    <B>marec at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r44%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602102156.k1ALux8Q009218%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r44 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Fri Feb 10 22:56:59 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000039.html">[S3d-svn] r43 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000041.html">[S3d-svn] r45 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#40">[ date ]</a>
+              <a href="thread.html#40">[ thread ]</a>
+              <a href="subject.html#40">[ subject ]</a>
+              <a href="author.html#40">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-02-10 22:56:56 +0100 (Fri, 10 Feb 2006)
+New Revision: 44
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/process.c
+Log:
+adj-list finishing II
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-02-10 21:25:03 UTC (rev 43)
++++ trunk/apps/olsrs3d/main.c	2006-02-10 21:56:56 UTC (rev 44)
+@@ -186,7 +186,7 @@
+ 	while ( (*olsr_con) != NULL ) {
+ 
+ 		distance = dirt( olsr_node-&gt;pos_vec, (*olsr_con)-&gt;olsr_node-&gt;pos_vec, tmp_mov_vec );
+-		f = (*olsr_con)-&gt;etx / distance;
++		f = (*olsr_con)-&gt;etx * 5.0 / distance;
+ 		if ( f &lt; 0.3 ) f = 0.3;
+ 		mov_add( olsr_node-&gt;mov_vec, tmp_mov_vec, 1/f-1);
+ 
+@@ -203,13 +203,14 @@
+ 
+ 		s3d_pop_vertex( (*olsr_con)-&gt;obj_id, 6 );
+ 		s3d_pop_polygon( (*olsr_con)-&gt;obj_id, 2 );
++
+ 		s3d_push_vertex( (*olsr_con)-&gt;obj_id, olsr_node-&gt;pos_vec[0], olsr_node-&gt;pos_vec[1], olsr_node-&gt;pos_vec[2] );
+ 		s3d_push_vertex( (*olsr_con)-&gt;obj_id, olsr_node-&gt;pos_vec[0]+0.2, olsr_node-&gt;pos_vec[1], olsr_node-&gt;pos_vec[2] );
+ 		s3d_push_vertex( (*olsr_con)-&gt;obj_id, olsr_node-&gt;pos_vec[0]-0.2, olsr_node-&gt;pos_vec[1], olsr_node-&gt;pos_vec[2] );
+ 
+-		s3d_push_vertex( (*olsr_con)-&gt;obj_id, olsr_node-&gt;pos_vec[0], olsr_node-&gt;pos_vec[1], olsr_node-&gt;pos_vec[2] );
+-		s3d_push_vertex( (*olsr_con)-&gt;obj_id, olsr_node-&gt;pos_vec[0], olsr_node-&gt;pos_vec[1]+0.2, olsr_node-&gt;pos_vec[2] );
+-		s3d_push_vertex( (*olsr_con)-&gt;obj_id, olsr_node-&gt;pos_vec[0], olsr_node-&gt;pos_vec[1]-0.2, olsr_node-&gt;pos_vec[2] );
++		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;olsr_node-&gt;pos_vec[0], (*olsr_con)-&gt;olsr_node-&gt;pos_vec[1], (*olsr_con)-&gt;olsr_node-&gt;pos_vec[2] );
++		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;olsr_node-&gt;pos_vec[0], (*olsr_con)-&gt;olsr_node-&gt;pos_vec[1]+0.2, (*olsr_con)-&gt;olsr_node-&gt;pos_vec[2] );
++		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;olsr_node-&gt;pos_vec[0], (*olsr_con)-&gt;olsr_node-&gt;pos_vec[1]-0.2, (*olsr_con)-&gt;olsr_node-&gt;pos_vec[2] );
+ 
+ 		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 0,4,5,0);
+ 		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 3,1,2,0);
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-02-10 21:25:03 UTC (rev 43)
++++ trunk/apps/olsrs3d/process.c	2006-02-10 21:56:56 UTC (rev 44)
+@@ -27,15 +27,18 @@
+ 		(*olsr_con) = malloc( sizeof( struct olsr_con ) );
+ 		if ( (*olsr_con) == NULL ) out_of_mem();
+ 
+-		// create connection object
++		/* create connection object */
+ 		(*olsr_con)-&gt;obj_id = s3d_new_object();
+-		s3d_push_material((*olsr_con)-&gt;obj_id,
++		s3d_push_material( (*olsr_con)-&gt;obj_id,
+ 				  1.0,1.0,1.0,
+ 				  1.0,1.0,1.0,
+ 				  1.0,1.0,1.0);
+-		s3d_push_polygon((*olsr_con)-&gt;obj_id,0,4,5,0);
+-		s3d_push_polygon((*olsr_con)-&gt;obj_id,3,1,2,0);
+ 
++		s3d_flags_on( (*olsr_con)-&gt;obj_id, S3D_OF_VISIBLE );
++
++		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 0,4,5,0 );
++		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 3,1,2,0 );
++
+ 		(*olsr_con)-&gt;next_olsr_con = NULL;
+ 		(*olsr_con)-&gt;olsr_node = con_to;
+ 		(*olsr_con)-&gt;etx = l;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000039.html">[S3d-svn] r43 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000041.html">[S3d-svn] r45 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#40">[ date ]</a>
+              <a href="thread.html#40">[ thread ]</a>
+              <a href="subject.html#40">[ subject ]</a>
+              <a href="author.html#40">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

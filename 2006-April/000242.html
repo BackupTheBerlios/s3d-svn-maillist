@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r249 - trunk/apps/s3dgps
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-April/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r249%20-%20trunk/apps/s3dgps&In-Reply-To=%3C200604130810.k3D8Asap023563%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000241.html">
+   <LINK REL="Next"  HREF="000243.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r249 - trunk/apps/s3dgps</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r249%20-%20trunk/apps/s3dgps&In-Reply-To=%3C200604130810.k3D8Asap023563%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r249 - trunk/apps/s3dgps">dotslash at berlios.de
+       </A><BR>
+    <I>Thu Apr 13 10:10:54 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000241.html">[S3d-svn] r248 - in trunk: . client
+</A></li>
+        <LI>Next message: <A HREF="000243.html">[S3d-svn] r250 - in trunk: . apps/dot_mcp
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#242">[ date ]</a>
+              <a href="thread.html#242">[ thread ]</a>
+              <a href="subject.html#242">[ subject ]</a>
+              <a href="author.html#242">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-04-13 10:10:01 +0200 (Thu, 13 Apr 2006)
+New Revision: 249
+
+Modified:
+   trunk/apps/s3dgps/s3dgps.c
+Log:
+- new gps.h compatibility
+
+Modified: trunk/apps/s3dgps/s3dgps.c
+===================================================================
+--- trunk/apps/s3dgps/s3dgps.c	2006-04-10 08:53:33 UTC (rev 248)
++++ trunk/apps/s3dgps/s3dgps.c	2006-04-13 08:10:01 UTC (rev 249)
+@@ -24,6 +24,9 @@
+ 
+ #include &lt;s3d.h&gt;
+ #include &lt;gps.h&gt; 	/* gps_*() */
++#ifdef NMEA_CHANNELS
++#define GPS_NEW
++#endif
+ #include &lt;stdio.h&gt; 	/* printf() */
+ #include &lt;errno.h&gt;  /* errno */
+ #include &lt;stdlib.h&gt;	/* malloc(), free() */
+@@ -210,7 +213,7 @@
+ }
+ void show_gpsdata(struct gps_data_t *dgps)
+ {
+-	if (!dgps-&gt;online) 
++/*	if (!dgps-&gt;online) 
+ 		printf(&quot;WARNING: no connection to gps device\n&quot;);
+ 	printf(&quot;[%d] lat/long: [%f|%f], altitude %f\n&quot;,frame,dgps-&gt;latitude,dgps-&gt;longitude,dgps-&gt;altitude);
+ 	printf(&quot;speed [kph]: %f&quot;,dgps-&gt;speed/KNOTS_TO_KPH);
+@@ -227,15 +230,26 @@
+ 		case MODE_NO_FIX:	printf(&quot;mode: no fix\n&quot;);break;
+ 		case MODE_2D:		printf(&quot;mode: 2d fix\n&quot;);break;
+ 		case MODE_3D:		printf(&quot;mode: 3d fix\n&quot;);break;
+-	}
++	}*/
+ }
+ int lastfix=0;
+ void show_position(struct gps_data_t *dgps)
+ {
+ 	int fix=1;
+ 	float x,y,z,p;
++#ifdef GPS_NEW
+ 	if (!dgps-&gt;online) 
+ 		fix=0;
++	switch (dgps-&gt;fix.mode)
++	{
++		case MODE_NOT_SEEN:	fix=0;break;
++		case MODE_NO_FIX:	fix=0;break;
++	}
++	if (fix) {
++		calc_position(dgps-&gt;fix.longitude,dgps-&gt;fix.latitude,&amp;x,&amp;y,&amp;z);
++#else
++	if (!dgps-&gt;online) 
++		fix=0;
+ 	switch (dgps-&gt;mode)
+ 	{
+ 		case MODE_NOT_SEEN:	fix=0;break;
+@@ -243,6 +257,7 @@
+ 	}
+ 	if (fix) {
+ 		calc_position(dgps-&gt;longitude,dgps-&gt;latitude,&amp;x,&amp;y,&amp;z);
++#endif
+ /*		calc_position(dgps-&gt;latitude,dgps-&gt;longitude,&amp;x,&amp;y,&amp;z);*/
+ 		p=sin(M_PI*((2*frame)%180)/180.0);
+ /*		if (p&lt;0.0) p*=-1.0;*/
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000241.html">[S3d-svn] r248 - in trunk: . client
+</A></li>
+	<LI>Next message: <A HREF="000243.html">[S3d-svn] r250 - in trunk: . apps/dot_mcp
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#242">[ date ]</a>
+              <a href="thread.html#242">[ thread ]</a>
+              <a href="subject.html#242">[ subject ]</a>
+              <a href="author.html#242">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

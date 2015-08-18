@@ -1,0 +1,353 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r106 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r106%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602250929.k1P9TsJD002153%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000101.html">
+   <LINK REL="Next"  HREF="000103.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r106 - trunk/apps/olsrs3d</H1>
+    <B>marec at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r106%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602250929.k1P9TsJD002153%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r106 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Sat Feb 25 10:29:54 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000101.html">[S3d-svn] r105 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000103.html">[S3d-svn] r107 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#102">[ date ]</a>
+              <a href="thread.html#102">[ thread ]</a>
+              <a href="subject.html#102">[ subject ]</a>
+              <a href="author.html#102">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-02-25 10:29:50 +0100 (Sat, 25 Feb 2006)
+New Revision: 106
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/net.c
+   trunk/apps/olsrs3d/olsrs3d.h
+   trunk/apps/olsrs3d/process.c
+Log:
+parse line redone fixed II
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-02-24 17:44:10 UTC (rev 105)
++++ trunk/apps/olsrs3d/main.c	2006-02-25 09:29:50 UTC (rev 106)
+@@ -16,6 +16,8 @@
+ struct olsr_node *Olsr_root = NULL;   /* top of olsr node tree */
+ struct Obj_to_ip *Obj_to_ip_head, *Obj_to_ip_end, *List_ptr;   /* needed pointer for linked list */
+ 
++int Byte_count;
++
+ int node_count=-1;
+ int alpha=0;
+ int Olsr_node_obj, Olsr_node_inet_obj, Olsr_node_hna_net, mesh;
+@@ -519,18 +521,12 @@
+ 
+ 
+ 
+-void mainloop()
+-{
+-	int i,j,o,r;
+-	float d,gd,f,m[3];
+-	float z[3]={0,0,0};
+-/* 	for (i=0;i&lt;max;i++)
+- 	{
+- 		node[i].mov[0]=
+- 		node[i].mov[1]=
+- 		node[i].mov[2]=0.0;
+- 	} */
++void mainloop() {
+ 
++	int net_result;   /* result of function net_main */
++
++	Byte_count = 0;
++
+ 	/* calculate new movement vector */
+ 	calc_olsr_node_mov();
+ 
+@@ -540,64 +536,8 @@
+ 	/* move it */
+ 	move_olsr_nodes();
+ 
+-	/*	for (i=0;i&lt;max;i++)
+-		{
+-			for (j=i+1;j&lt;max;j++)
+-			{
+-				if (i!=j)
+-				{
+-					gd=adj[i*max+j];
+-					d=dirt(node[i].pos,node[j].pos,m);
+-					if (gd==0.0)*/	/* points are not connected
+-					{
+-					printf(&quot;distance between i and j: %f\n&quot;,d);
+-						if (d&lt;0.1) d=0.1;
+-						mov_add(node[j].mov,m,100/(d*d));
+-						mov_add(node[i].mov,m,-100/(d*d));
+-					} else { / * connected!! * /
+-
+-						f=(gd)/d;
+-						if (f&lt;0.3) f=0.3;
+-						mov_add(node[i].mov,m,1/f-1);
+-						mov_add(node[j].mov,m,-(1/f-1));
+-					printf(&quot;distance between %d and %d: %f / %f = %f\n&quot;,i,j,gd,d,f);
+-					}
+-				}
+-			}
+-			d=dirt(node[i].pos,z,m);
+-		mov_add(node[i].mov,m,d/100); * move a little bit to point zero
+-		mov_add(node[i].mov,m,1); * move a little bit to point zero
+-	}
+-	/ * move it!! * /
+- 	for (i=0;i&lt;max;i++)
+- 	{
+-/ *		printf(&quot;applying move vector for point %d: %f:%f:%f\n&quot;,i,node[i].mov[0],node[i].mov[1],node[i].mov[2]); * /
+- 		if ((d=dist(node[i].mov,z))&gt;10.0)
+- 			mov_add(node[i].pos,node[i].mov,1.0/((float )d)); / * normalize * /
+- 		else
+- 			mov_add(node[i].pos,node[i].mov,0.1);
+- 		s3d_translate(node[i].obj,node[i].pos[0],node[i].pos[1],node[i].pos[2]);
+- 		for (j=i+1;j&lt;max;j++)
+- 			if ((o=adj_obj[max*i+j])!=-1)
+- 			{
+- 				s3d_pop_vertex(o,6);
+-/ *				s3d_pop_polygon(o,2);* /
+- 				s3d_push_vertex(o,node[i].pos[0],	 node[i].pos[1],node[i].pos[2]);
+- 				s3d_push_vertex(o,node[i].pos[0]+0.2,node[i].pos[1],node[i].pos[2]);
+- 				s3d_push_vertex(o,node[i].pos[0]--&gt;id0.2,node[i].pos[1],node[i].pos[2]);
+-
+- 				s3d_push_vertex(o,node[j].pos[0],	 node[j].pos[1],node[j].pos[2]);
+- 				s3d_push_vertex(o,node[j].pos[0],node[j].pos[1]+0.2,node[j].pos[2]);
+- 				s3d_push_vertex(o,node[j].pos[0],node[j].pos[1]-0.2,node[j].pos[2]);
+-
+-/ *				s3d_push_polygon(o,0,4,5,0);
+-				s3d_push_polygon(o,3,1,2,0);* /
+- 			}
+- 	} */
+-
+-	while (0!=(r=net_main())) {
+-		if (r==-1)
+-		{
++	while ( 0!= ( net_result = net_main() ) ) {
++		if ( net_result == -1 ) {
+ 			s3d_quit();
+ 			break;
+ 		}
+@@ -612,6 +552,7 @@
+ 	usleep(100000);
+ /*	sleep(1);*/
+ 	return;
++
+ }
+ 
+ void stop()
+
+Modified: trunk/apps/olsrs3d/net.c
+===================================================================
+--- trunk/apps/olsrs3d/net.c	2006-02-24 17:44:10 UTC (rev 105)
++++ trunk/apps/olsrs3d/net.c	2006-02-25 09:29:50 UTC (rev 106)
+@@ -43,26 +43,35 @@
+ 	fcntl(sockfd,F_SETFL, O_NONBLOCK);
+ 	return(0);
+ }
+-int net_main()
+-{
++
++int net_main() {
++
+ 	if ((numbytes=recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
+ 		if (errno==EAGAIN)
+ 			return(0); /* well, that's okay ... */
+ 		perror(&quot;recv&quot;);
+ 		return(-1);
+ 	}
+-	if (numbytes==0)
+-	{
++
++	if (numbytes==0) {
+ 		printf(&quot;connection reset\n&quot;);
+ 		return(-1);
+ 	}
++
+ 	buf[numbytes] = '\0';
+- 	/*strncat(lbuf,buf,MAXLINESIZE);*/
+-	strncpy(lbuf,buf,MAXLINESIZE);
+-	printf(&quot;nach strncpy\n&quot;);
++ 	strncat(lbuf,buf,MAXLINESIZE);
++// 	printf( &quot;lbuf: %s\n&quot;, lbuf );
++
+ 	process_main();
+-	return(1);
++
++	if ( Byte_count += numbytes &gt; 1000 ) {
++		return(0);   /* continue mainloop */
++	} else {
++		return(1);   /* continue reading data from socket */
++	}
++
+ }
++
+ int net_quit()
+ {
+     close(sockfd);
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-02-24 17:44:10 UTC (rev 105)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-02-25 09:29:50 UTC (rev 106)
+@@ -63,16 +63,20 @@
+ extern struct olsr_node *Olsr_root;   /* top of olsr node tree */
+ extern struct Obj_to_ip *Obj_to_ip_head, *Obj_to_ip_end,*List_ptr;   /* struct list */
+ 
++extern int	Olsr_node_obj;
++extern int	Olsr_node_inet_obj;
++extern int	Olsr_node_hna_net;
++
++extern int Byte_count;
++extern int ZeroPoint;
++
+ extern int 	max, new_max;
+ extern float 	*adj;
+ extern int	*adj_obj;
+-extern int	Olsr_node_obj;
+-extern int	Olsr_node_inet_obj;
+-extern int	Olsr_node_hna_net;
+ extern int	node_count;
+ extern float 	bottom,left;
+-extern int ZeroPoint;
+ 
++
+ struct t_node 	*node;
+ #define MAXLINESIZE 1000 /* lines in a digraph just shouldn't get that longer ... */
+ #define MAXDATASIZE 100 /* max number of bytes we can get at once  */
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-02-24 17:44:10 UTC (rev 105)
++++ trunk/apps/olsrs3d/process.c	2006-02-25 09:29:50 UTC (rev 106)
+@@ -503,19 +503,24 @@
+ 
+ 	int dn;
+ 	float f;
+-	char *lbuf_ptr, *con_from, *con_to, *etx;
++	char *lbuf_ptr, *last_cr_ptr, *con_from, *con_from_end, *con_to, *con_to_end, *etx, *etx_end;
+ 	struct olsr_node *olsr_node1;   /* pointer to olsr nodes */
+ 	struct olsr_node *olsr_node2;
+-	
++
+ 	lbuf_ptr = lbuf;
++	last_cr_ptr = NULL;
+ 
++	con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
++	dn = 0;
++
+ 	while ( (*lbuf_ptr) != '\0' ) {
+ 
+ 		/* printf( &quot;%c&quot;,(*lbuf_ptr) ); */
+ 
+ 		if ( (*lbuf_ptr) == '\n' ) {
+ 
+-			con_from = con_to = etx = NULL;
++			last_cr_ptr = lbuf_ptr;
++			con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
+ 			dn = 0;
+ 
+ 		}
+@@ -527,22 +532,31 @@
+ 				case 0:
+ 					con_from = ++lbuf_ptr;
+ 					break;
++				case 1:
++					con_from_end = lbuf_ptr;
++					break;
+ 				case 2:
+ 					con_to = ++lbuf_ptr;
+ 					break;
++				case 3:
++					con_to_end = lbuf_ptr;
++					break;
+ 				case 4:
+ 					etx = ++lbuf_ptr;
+ 					break;
+-				default:
+-					(*lbuf_ptr) = '\0';   /* string terminator!! */
++				case 5:
++					etx_end = lbuf_ptr;
+ 					break;
+ 
+ 			}
+ 
+ 			if ( ++dn == 6 ) {
+ 
+-/* 				printf( &quot;con_from: %s, con_to: %s, etx: %s\n&quot;, con_from, con_to, etx ); */
++				/* terminate strings - but not before 6 '&quot;' */
++				(*con_from_end) = (*con_to_end) = (*etx_end) = '\0';
+ 
++// 				printf( &quot;dn: %i, con_from: %s, con_to: %s, etx: %s\n&quot;, dn, con_from, con_to, etx );
++
+ 				/* announced network via HNA */
+ 				if ( strncmp( etx, &quot;HNA&quot;, NAMEMAX ) == 0 ) {
+ 
+@@ -587,8 +601,9 @@
+ 
+ 				}
+ 
+-				con_from = con_to = etx = NULL;
++				con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
+ 				dn = 0;
++				last_cr_ptr = lbuf_ptr;
+ 
+ 			}
+ 
+@@ -598,6 +613,8 @@
+ 
+ 	}
+ 
++	if ( last_cr_ptr != NULL ) memmove( lbuf, ++last_cr_ptr, strlen( last_cr_ptr) );
++
+ 	return(0);
+ 
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000101.html">[S3d-svn] r105 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000103.html">[S3d-svn] r107 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#102">[ date ]</a>
+              <a href="thread.html#102">[ thread ]</a>
+              <a href="subject.html#102">[ subject ]</a>
+              <a href="author.html#102">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

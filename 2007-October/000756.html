@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r764 - trunk/libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r764%20-%20trunk/libs3d&In-Reply-To=%3C200710182358.l9INwPWS030414%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000755.html">
+   <LINK REL="Next"  HREF="000757.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r764 - trunk/libs3d</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r764%20-%20trunk/libs3d&In-Reply-To=%3C200710182358.l9INwPWS030414%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r764 - trunk/libs3d">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 01:58:25 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000755.html">[S3d-svn] r763 - trunk/libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000757.html">[S3d-svn] r765 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#756">[ date ]</a>
+              <a href="thread.html#756">[ thread ]</a>
+              <a href="subject.html#756">[ subject ]</a>
+              <a href="author.html#756">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 01:58:25 +0200 (Fri, 19 Oct 2007)
+New Revision: 764
+
+Modified:
+   trunk/libs3d/s3dlib.h
+Log:
+Sync declaration and definition of _tcp_init
+
+
+Modified: trunk/libs3d/s3dlib.h
+===================================================================
+--- trunk/libs3d/s3dlib.h	2007-10-18 23:58:17 UTC (rev 763)
++++ trunk/libs3d/s3dlib.h	2007-10-18 23:58:25 UTC (rev 764)
+@@ -115,7 +115,7 @@
+ int s3d_net_init(char *urlc);
+ #ifdef TCP
+ /* tcp.c */
+-int _tcp_init();
++int _tcp_init(char *sv, int pn);
+ int _tcp_quit();
+ int _s3d_tcp_net_receive();
+ int tcp_writen(char *str, int s);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000755.html">[S3d-svn] r763 - trunk/libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000757.html">[S3d-svn] r765 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#756">[ date ]</a>
+              <a href="thread.html#756">[ thread ]</a>
+              <a href="subject.html#756">[ subject ]</a>
+              <a href="author.html#756">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

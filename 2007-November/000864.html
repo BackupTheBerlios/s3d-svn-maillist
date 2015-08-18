@@ -1,0 +1,312 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r871 - trunk/svnonly/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r871%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711211233.lALCXmhR026859%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000863.html">
+   <LINK REL="Next"  HREF="000865.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r871 - trunk/svnonly/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r871%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711211233.lALCXmhR026859%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r871 - trunk/svnonly/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Wed Nov 21 13:33:48 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000863.html">[S3d-svn] r870 - trunk/svnonly/comptest
+</A></li>
+        <LI>Next message: <A HREF="000865.html">[S3d-svn] r872 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#864">[ date ]</a>
+              <a href="thread.html#864">[ thread ]</a>
+              <a href="subject.html#864">[ subject ]</a>
+              <a href="author.html#864">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-21 13:33:47 +0100 (Wed, 21 Nov 2007)
+New Revision: 871
+
+Modified:
+   trunk/svnonly/comptest/comptest.c
+   trunk/svnonly/comptest/comptest.h
+   trunk/svnonly/comptest/window.c
+   trunk/svnonly/comptest/x11.c
+Log:
+- hide and show windows if they are (un)mapped
+
+
+Modified: trunk/svnonly/comptest/comptest.c
+===================================================================
+--- trunk/svnonly/comptest/comptest.c	2007-11-21 11:56:27 UTC (rev 870)
++++ trunk/svnonly/comptest/comptest.c	2007-11-21 12:33:47 UTC (rev 871)
+@@ -28,17 +28,23 @@
+ #include &lt;time.h&gt;         /* nanosleep() */
+ #include &lt;errno.h&gt;			/* errno */
+ 
++#include &lt;sys/time.h&gt;		/* gettimeofday() */
++#include &lt;time.h&gt;			/* gettimeofday() */
+ 
+ 
+-
+-
+ static struct timespec t = {
+ 	0, 50*1000*1000
+ }; /* 50 mili seconds */
+ 
+ static void mainloop(void)
+ {
++	struct timeval start, stop;
++	float secs;
++	gettimeofday(&amp;start, NULL);
+ 	event();
++	gettimeofday(&amp;stop, NULL);
++	secs = (stop.tv_sec - start.tv_sec) + (stop.tv_usec - start.tv_usec)/1e6;
++/*	printf(&quot;msecs to process events: %3.3f\n&quot;, secs*1e3);*/
+ 	nanosleep(&amp;t, NULL);
+ }
+ 
+@@ -135,7 +141,8 @@
+ 	}
+ 	window_set_position(win);
+ 	/*  push data on texture 0 position (0,0) */
+-	s3d_flags_on(win-&gt;oid, S3D_OF_VISIBLE);
++	if (win-&gt;mapped)
++		s3d_flags_on(win-&gt;oid, S3D_OF_VISIBLE);
+ }
+ 
+ static int key(struct s3d_evt *evt)
+
+Modified: trunk/svnonly/comptest/comptest.h
+===================================================================
+--- trunk/svnonly/comptest/comptest.h	2007-11-21 11:56:27 UTC (rev 870)
++++ trunk/svnonly/comptest/comptest.h	2007-11-21 12:33:47 UTC (rev 871)
+@@ -39,6 +39,7 @@
+ 	XRectangle	content_update;
+ 	int        oid;
+ 	int		   no;
++	int 		mapped;
+ 
+ 	struct window     *next;
+ };
+@@ -52,8 +53,7 @@
+ void window_set_position(struct window *win);
+ void window_restack(struct window *win, Window above);
+ struct window *window_find(Window id);
+-struct window *window_find(Window id);
+-void window_add(Display *dpy, Window id);
++struct window *window_add(Display *dpy, Window id);
+ void window_remove(Window id);
+ void window_update_content(struct window *win);
+ void window_update_geometry(struct window *win);
+
+Modified: trunk/svnonly/comptest/window.c
+===================================================================
+--- trunk/svnonly/comptest/window.c	2007-11-21 11:56:27 UTC (rev 870)
++++ trunk/svnonly/comptest/window.c	2007-11-21 12:33:47 UTC (rev 871)
+@@ -23,6 +23,7 @@
+ 
+ #include &quot;comptest.h&quot;
+ #include &lt;stdlib.h&gt;	/* malloc(), free() */
++#include &lt;string.h&gt;	/* memcpy() */
+ #include &lt;stdio.h&gt;	/* printf() */
+ struct window   *window_head = NULL;
+ 
+@@ -74,16 +75,18 @@
+ 
+ }
+ 
+-void window_add(Display *dpy, Window id)
++struct window *window_add(Display *dpy, Window id)
+ {
+ 	struct window *win;
+ 	win = malloc(sizeof(struct window));
+ 	if (!win)
+-		return;
++		return(NULL);
+ 
++	printf(&quot;window_add(%d)\n&quot;, (int) id);
+ 	if (window_find(id) != NULL) {
+ 		printf(&quot;!!!! Window already added\n&quot;);
+-		return;
++		free(win);
++		return(NULL);
+ 	}
+ 	win-&gt;id = id;
+ 	win-&gt;next = window_head;
+@@ -92,12 +95,13 @@
+ 	win-&gt;pix = None;
+ 	win-&gt;no = 0;
+ 	win-&gt;oid = -1;
+-	win-&gt;content_update_needed = 1;
++	win-&gt;content_update_needed = 0;
+ 	win-&gt;geometry_update_needed = 0;
+ 	win-&gt;content_update.x = 0;
+ 	win-&gt;content_update.y = 0;
+ 	win-&gt;content_update.width = 0;
+ 	win-&gt;content_update.height = 0;
++	win-&gt;mapped = 0;
+ 
+ 
+ 
+@@ -107,10 +111,8 @@
+ 	 * that would help here. */
+ 	if (!XGetWindowAttributes(dpy, win-&gt;id, &amp;win-&gt;attr)) {
+ 		/* window does not exit, next event is probably it's removal ... */
+-		return;
++		return(win);
+ 	}
+-	win-&gt;content_update.width = win-&gt;attr.width;
+-	win-&gt;content_update.height = win-&gt;attr.height;
+ 
+ 	/* XSelectInput(dpy, win-&gt;id, ExposureMask|ButtonPressMask|KeyPressMask*/
+ /*	XSelectInput(dpy, win-&gt;id, SubstructureNotifyMask | ExposureMask | StructureNotifyMask | PropertyChangeMask);*/
+@@ -124,8 +126,37 @@
+ 		window_restack(win, win-&gt;next-&gt;id);
+ 	
+ 	XCompositeRedirectWindow(dpy, id, CompositeRedirectAutomatic);
++	return(win);
+ }
++void window_map(struct window *win)
++{
++	printf(&quot;window_map(%d)\n&quot;, win-&gt;id);
++	if (win-&gt;mapped)
++		return;
+ 
++	win-&gt;mapped = 1;
++	win-&gt;content_update_needed = 1;
++	win-&gt;content_update.x = 0;
++	win-&gt;content_update.y = 0;
++	win-&gt;content_update.width = win-&gt;attr.width;
++	win-&gt;content_update.height = win-&gt;attr.height;
++	if (win-&gt;oid != -1)
++		s3d_flags_on(win-&gt;oid, S3D_OF_VISIBLE);
++
++
++}
++
++void window_unmap(struct window *win)
++{
++	if (!win-&gt;mapped)
++		return;
++	win-&gt;mapped = 0;
++	if (win-&gt;oid != -1)
++		s3d_flags_off(win-&gt;oid, S3D_OF_VISIBLE);
++
++	/* TODO: handle */
++}
++
+ void window_remove(Window id)
+ {
+ 	struct window **wp, *window;
+
+Modified: trunk/svnonly/comptest/x11.c
+===================================================================
+--- trunk/svnonly/comptest/x11.c	2007-11-21 11:56:27 UTC (rev 870)
++++ trunk/svnonly/comptest/x11.c	2007-11-21 12:33:47 UTC (rev 871)
+@@ -185,11 +185,7 @@
+ {
+ 	XEvent event;
+ 	struct window *window;
+-	struct timeval start, stop;
+-	float secs;
+ 
+-
+-	gettimeofday(&amp;start, NULL);
+ 	while (XPending(dpy)) {
+ 		XNextEvent(dpy, &amp;event);
+ 		print_event(dpy, &amp;event);
+@@ -223,6 +219,22 @@
+ 			}
+ 			break;
+ 			 }
++		case MapNotify:{
++			XMapEvent *e = &amp;event.xmap;
++			window = window_find(e-&gt;window);
++			if (window != NULL)
++				window_map(window);
++			break;
++			}
++		case UnmapNotify:{
++			XUnmapEvent *e = &amp;event.xunmap;
++			window = window_find(e-&gt;window);
++			if (window != NULL)
++				window_unmap(window);
++			break;
++			}
++
++
+ 		case CreateNotify:{
+ 			XCreateWindowEvent *e = &amp;event.xcreatewindow;
+ 			window_add(e-&gt;display, e-&gt;window);
+@@ -247,9 +259,7 @@
+ 		}
+ 	}
+ 
+-	gettimeofday(&amp;stop, NULL);
+-	secs = (stop.tv_sec - start.tv_sec) + (stop.tv_usec - start.tv_usec)/1e6;
+-	printf(&quot;msecs to process events: %3.3f, %d windows updated\n&quot;, secs*1e3, d);
++/*	printf(&quot;%d windows updated\n&quot;, d);*/
+ 
+ }
+ 
+@@ -258,6 +268,7 @@
+ 	Window        root_return, parent_return;
+ 	unsigned int     nchildren;
+ 	Window       *children;
++	struct window *win;
+ 	int     i, scr_no;
+ 
+ 	for (scr_no = 0; scr_no &lt; ScreenCount(dpy); scr_no++) {
+@@ -267,8 +278,12 @@
+ 					 SubstructureNotifyMask | ExposureMask | StructureNotifyMask | PropertyChangeMask);
+ 	
+ 		XQueryTree(dpy, RootWindow(dpy, scr_no), &amp;root_return, &amp;parent_return, &amp;children, &amp;nchildren);
+-		for (i = 0; i &lt; (int)nchildren; i++)
+-			window_add(dpy, children[i]);
++		for (i = 0; i &lt; (int)nchildren; i++) {
++			win = window_add(dpy, children[i]);
++			if (win != NULL &amp;&amp; win-&gt;attr.map_state != IsUnmapped)
++				window_map(win);
++
++		}
+ 		XFree(children);
+ 	}
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000863.html">[S3d-svn] r870 - trunk/svnonly/comptest
+</A></li>
+	<LI>Next message: <A HREF="000865.html">[S3d-svn] r872 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#864">[ date ]</a>
+              <a href="thread.html#864">[ thread ]</a>
+              <a href="subject.html#864">[ subject ]</a>
+              <a href="author.html#864">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

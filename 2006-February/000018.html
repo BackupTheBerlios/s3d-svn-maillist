@@ -1,0 +1,186 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r22 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r22%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602031327.k13DR2Bw001673%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000017.html">
+   <LINK REL="Next"  HREF="000019.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r22 - trunk/apps/olsrs3d</H1>
+    <B>marec at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r22%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602031327.k13DR2Bw001673%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r22 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Fri Feb  3 14:27:02 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000017.html">[S3d-svn] r21 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000019.html">[S3d-svn] r23 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#18">[ date ]</a>
+              <a href="thread.html#18">[ thread ]</a>
+              <a href="subject.html#18">[ subject ]</a>
+              <a href="author.html#18">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-02-03 14:26:47 +0100 (Fri, 03 Feb 2006)
+New Revision: 22
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+Log:
+comments added to olsr3d source
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-02-03 13:26:01 UTC (rev 21)
++++ trunk/apps/olsrs3d/main.c	2006-02-03 13:26:47 UTC (rev 22)
+@@ -13,6 +13,17 @@
+ float bottom=-1.0;
+ float left=-1.0;
+ 
++/***
++ *
++ * calculate distance between 2 vectors =&gt; <A HREF="http://en.wikipedia.org/wiki/Euclidean_distance">http://en.wikipedia.org/wiki/Euclidean_distance</A>
++ *
++ *   p1   =&gt;   vector of node 1
++ *   p2   =&gt;   vector of node 2
++ *
++ *   return distance
++ *
++ ***/
++
+ float dist(float p1[], float p2[])
+ {
+ 	float p[3];
+@@ -22,6 +33,21 @@
+ 	return (sqrt(p[0]*p[0]   +  p[1]*p[1]  +  p[2]*p[2]));
+ 
+ }
++
++
++
++/***
++ *
++ * calculate distance between 2 vectors and substract vector1 from vector2
++ *  =&gt; <A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Vector_addition_and_subtraction">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Vector_addition_and_subtraction</A>
++ *
++ *   p1   =&gt;   vector of node 1
++ *   p2   =&gt;   vector of node 2
++ *
++ *   return distance
++ *
++ ***/
++
+ float dirt(float p1[], float p2[], float p3[])
+ {
+ 	float d;
+@@ -36,6 +62,20 @@
+ 	}
+ 	return(d);
+ }
++
++
++
++/***
++ *
++ * calculate new movement of node by adding the product of the factor and the vector to the movement vector
++ *  =&gt; <A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Scalar_multiplication">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Scalar_multiplication</A>
++ *
++ *   mov  =&gt;   current mov vector
++ *   p    =&gt;   vector of node
++ *   fac  =&gt;   factor which is
++ *
++ ***/
++
+ void mov_add(float mov[], float p[], float fac)
+ {
+ /*	if (fac&gt;1000)
+@@ -45,6 +85,9 @@
+ 	mov[1]+=fac*p[1];
+ 	mov[2]+=fac*p[2];
+ }
++
++
++
+ void mainloop()
+ {
+ 	int i,j,o,r;
+@@ -101,17 +144,17 @@
+ 				s3d_push_vertex(o,node[i].pos[0],	 node[i].pos[1],node[i].pos[2]);
+ 				s3d_push_vertex(o,node[i].pos[0]+0.2,node[i].pos[1],node[i].pos[2]);
+ 				s3d_push_vertex(o,node[i].pos[0]-0.2,node[i].pos[1],node[i].pos[2]);
+-				
++
+ 				s3d_push_vertex(o,node[j].pos[0],	 node[j].pos[1],node[j].pos[2]);
+ 				s3d_push_vertex(o,node[j].pos[0],node[j].pos[1]+0.2,node[j].pos[2]);
+ 				s3d_push_vertex(o,node[j].pos[0],node[j].pos[1]-0.2,node[j].pos[2]);
+-				
++
+ /*				s3d_push_polygon(o,0,4,5,0);
+ 				s3d_push_polygon(o,3,1,2,0);*/
+ 			}
+ 	}
+-	while (0!=(r=net_main())) 
+-		if (r==-1) 
++	while (0!=(r=net_main()))
++		if (r==-1)
+ 		{
+ 			s3d_quit();
+ 			break;
+@@ -155,7 +198,7 @@
+ 	if (!net_init(host))
+ 	{
+ 
+-		if (!s3d_init(&amp;argc,&amp;argv,&quot;olsrs3d&quot;)) 
++		if (!s3d_init(&amp;argc,&amp;argv,&quot;olsrs3d&quot;))
+ 		{
+ 			s3d_set_callback(S3D_EVENT_OBJ_INFO,object_info);
+ 			if (s3d_select_font(&quot;vera&quot;))
+@@ -167,7 +210,7 @@
+ 			s3d_scale(mesh,0.15);
+ 
+ 			s3d_mainloop(mainloop);
+-			s3d_quit(); 
++			s3d_quit();
+ 			net_quit();
+ 			process_quit();
+ 		}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000017.html">[S3d-svn] r21 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000019.html">[S3d-svn] r23 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#18">[ date ]</a>
+              <a href="thread.html#18">[ thread ]</a>
+              <a href="subject.html#18">[ subject ]</a>
+              <a href="author.html#18">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

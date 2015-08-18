@@ -1,0 +1,265 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r287 - in trunk: . apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r287%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200605162221.k4GML4x1014008%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000279.html">
+   <LINK REL="Next"  HREF="000281.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r287 - in trunk: . apps/s3dfm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r287%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200605162221.k4GML4x1014008%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r287 - in trunk: . apps/s3dfm">dotslash at berlios.de
+       </A><BR>
+    <I>Wed May 17 00:21:04 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000279.html">[S3d-svn] r286 - in trunk: . Documentation/s3dapi
+</A></li>
+        <LI>Next message: <A HREF="000281.html">[S3d-svn] r288 - in trunk: . apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#280">[ date ]</a>
+              <a href="thread.html#280">[ thread ]</a>
+              <a href="subject.html#280">[ subject ]</a>
+              <a href="author.html#280">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-17 00:21:03 +0200 (Wed, 17 May 2006)
+New Revision: 287
+
+Modified:
+   trunk/
+   trunk/apps/s3dfm/animation.c
+   trunk/apps/s3dfm/box.c
+   trunk/apps/s3dfm/main.c
+   trunk/apps/s3dfm/s3dfm.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r575 at balthasar</A>:  dotslash | 2006-05-17 00:19:05 +0200
+ - some cleanup s3dfm
+ - floating objects (click the blue button ;D)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:573
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:575
+
+Modified: trunk/apps/s3dfm/animation.c
+===================================================================
+--- trunk/apps/s3dfm/animation.c	2006-05-16 21:03:11 UTC (rev 286)
++++ trunk/apps/s3dfm/animation.c	2006-05-16 22:21:03 UTC (rev 287)
+@@ -45,7 +45,6 @@
+ 	root.px-=f-&gt;px;
+ 	root.pz-=f-&gt;pz;
+ 	root.py-=BOXHEIGHT;
+-/*	printf(&quot;[S]cale factor of %s: %f\n&quot;,f-&gt;name,1/s);*/
+ 	root.px*=1/s;
+ 	root.py*=1/s;
+ 	root.pz*=1/s;
+@@ -59,12 +58,12 @@
+ 	root.py=0.0;
+ 	root.pz=0.0;
+ 	moveon=1;
+-	printf(&quot;[Z]ooming to %s\n&quot;,f-&gt;name);
++/*	printf(&quot;[Z]ooming to %s\n&quot;,f-&gt;name);*/
+ 	box_collapse_grandkids(f);
+ 	root.scale=ani_get_scale(f);
+ 	root.py-=1.5;
+-	printf(&quot;[R]escaling to %f\n&quot;,root.scale);
+-	printf(&quot;px: %f py:%f pz: %f\n&quot;,root.px,root.py,root.pz);
++/*	printf(&quot;[R]escaling to %f\n&quot;,root.scale);
++	printf(&quot;px: %f py:%f pz: %f\n&quot;,root.px,root.py,root.pz);*/
+ 
+ 	ani_add(&amp;root);
+ 	if (((cam.dpx-cam.px)* (cam.dpx-cam.px) + (cam.dpy-cam.py)* (cam.dpy-cam.py) 
+
+Modified: trunk/apps/s3dfm/box.c
+===================================================================
+--- trunk/apps/s3dfm/box.c	2006-05-16 21:03:11 UTC (rev 286)
++++ trunk/apps/s3dfm/box.c	2006-05-16 22:21:03 UTC (rev 287)
+@@ -49,6 +49,7 @@
+ 	dir-&gt;px=dir-&gt;py=dir-&gt;pz=0.0;
+ 	dir-&gt;dpx=dir-&gt;dpy=dir-&gt;dpz=0.0;
+ 	dir-&gt;scale=dir-&gt;dscale=1.0;
++	dir-&gt;detached=0;
+ 
+ 	return(0);
+ }
+@@ -141,7 +142,7 @@
+ 	char fname[30];
+ 	char *fullname=fname;
+ 	struct t_item *d;
+-	int i,j,m;
++	int i,j;
+ 	float len;
+ 	float vertices[]=
+ 			{-BHP,0,-BHP,
+@@ -196,7 +197,7 @@
+ 		3,7,4,0,
+ 		3,4,0,0
+ 	};
+-	printf(&quot;new block for %s\n&quot;,dir-&gt;name);
++/*	printf(&quot;new block for %s\n&quot;,dir-&gt;name);*/
+ 
+ 	dir-&gt;block=s3d_new_object();
+ 	s3d_push_vertices(dir-&gt;block,vertices,sizeof(vertices)/(3*sizeof(float)));
+@@ -286,7 +287,7 @@
+ 		s3d_scale(dir-&gt;titlestr,0.2);
+ 	s3d_translate(dir-&gt;titlestr,-1.0,1.05,1.01);
+ 	s3d_link(dir-&gt;titlestr,dir-&gt;block);
+-	printf(&quot;FULLNAME is [%s]\n&quot;,fullname);
++/*	printf(&quot;FULLNAME is [%s]\n&quot;,fullname);*/
+ 	return(0);
+ }
+ 
+@@ -410,7 +411,7 @@
+ void box_position_kids(struct t_item *dir)
+ {
+ 	int i,j;
+-	printf(&quot;placeontop dir %s, %d\n&quot;,dir-&gt;name,dir-&gt;dirs_opened);
++/*	printf(&quot;placeontop dir %s, %d\n&quot;,dir-&gt;name,dir-&gt;dirs_opened);*/
+ 	switch (dir-&gt;dirs_opened)
+ 	{
+ 		case 0: return;
+@@ -420,7 +421,7 @@
+ 				if (dir-&gt;list[i].disp)
+ 				{
+ 					dir-&gt;list[i].px=0.0;
+-					dir-&gt;list[i].py=BOXHEIGHT;
++					dir-&gt;list[i].py=BOXHEIGHT+dir-&gt;list[i].detached*0.3;
+ 					dir-&gt;list[i].pz=0.0;
+ 					dir-&gt;list[i].scale=0.2;
+ 					ani_add(&amp;dir-&gt;list[i]);
+@@ -434,7 +435,7 @@
+ 				if (dir-&gt;list[i].disp)
+ 				{
+ 					dir-&gt;list[i].px=0.8 * sin(((float)j*2*M_PI)/((float)dir-&gt;dirs_opened));
+-					dir-&gt;list[i].py=BOXHEIGHT;
++					dir-&gt;list[i].py=BOXHEIGHT+dir-&gt;list[i].detached*0.3;
+ 					dir-&gt;list[i].pz=0.8 * cos(((float)j*2*M_PI)/((float)dir-&gt;dirs_opened));
+ 					dir-&gt;list[i].scale=0.2;
+ 					ani_add(&amp;dir-&gt;list[i]);
+@@ -444,3 +445,14 @@
+ 			}
+ 	}
+ }
++void box_select(struct t_item *dir)
++{
++	dir-&gt;detached=dir-&gt;detached?0:1; /* swapping, not sure if !dir-&gt;detached would do the same .. */
++	if ((dir-&gt;type==T_FOLDER) &amp;&amp; dir-&gt;disp)
++	{
++		if (dir-&gt;parent!=NULL)
++			box_position_kids(dir-&gt;parent);
++	} else {
++		/* nothing yet ... */
++	}
++}
+
+Modified: trunk/apps/s3dfm/main.c
+===================================================================
+--- trunk/apps/s3dfm/main.c	2006-05-16 21:03:11 UTC (rev 286)
++++ trunk/apps/s3dfm/main.c	2006-05-16 22:21:03 UTC (rev 287)
+@@ -52,7 +52,7 @@
+ 	if (dir-&gt;n_item&gt;0) /* refusing */
+ 		return(-1);
+ 	get_path(dir,path);
+-	printf(&quot;scanning %s\n&quot;,path);
++/*	printf(&quot;scanning %s\n&quot;,path);*/
+     n = i = scandir(path, &amp;namelist, 0, alphasort);
+     if (n &lt; 0)
+ 	{
+@@ -64,7 +64,7 @@
+ 		list=malloc(sizeof(struct t_item)*i);
+ 		dir-&gt;list=list;
+ 		dir-&gt;n_item=n;
+-		printf(&quot;found %d items, processing ...\n&quot;,n);
++/*		printf(&quot;found %d items, processing ...\n&quot;,n);*/
+         while(n--) {
+ 			box_init(&amp;list[n]);
+ 			nstr=namelist[n]-&gt;d_name;
+@@ -106,6 +106,9 @@
+ 	if (t-&gt;block==oid)		return(t);
+ 	if (t-&gt;str==oid)		return(t);
+ 	if (t-&gt;close==oid)		return(t);
++	if (t-&gt;select==oid)		return(t);
++	if (t-&gt;title==oid)		return(t);
++	if (t-&gt;titlestr==oid)	return(t);
+ 	if (t-&gt;type==T_FOLDER)
+ 		for (i=0;i&lt;t-&gt;n_item;i++)
+ 			if ((f=finditem(&amp;(t-&gt;list[i]),oid))!=NULL)
+@@ -140,6 +143,12 @@
+ 				ani_focus(f-&gt;parent);
+ 			return;
+ 		}
++		if (f-&gt;select==oid)
++		{
++			printf(&quot;[S]electing %s\n&quot;,f-&gt;name);
++			box_select(f);
++			return;
++		}
+ 		if (f-&gt;type==T_FOLDER)
+ 		{
+ 			printf(&quot;[F]ound, expanding %s\n&quot;,f-&gt;name);
+
+Modified: trunk/apps/s3dfm/s3dfm.h
+===================================================================
+--- trunk/apps/s3dfm/s3dfm.h	2006-05-16 21:03:11 UTC (rev 286)
++++ trunk/apps/s3dfm/s3dfm.h	2006-05-16 22:21:03 UTC (rev 287)
+@@ -46,6 +46,7 @@
+ 	int str,close,select,title,titlestr;	/* object ids ...*/
+ 	int block;								/* oid of the block */
+ 	int dirs_opened;						/* how many directories are on the block */
++	int detached;							/* if it's detached ... */
+ 	char name[M_NAME];						/* name (e.g. file name) */
+ 	float len;
+ 	struct t_item *parent;					/* parent item */
+@@ -80,7 +81,8 @@
+ int box_collapse_grandkids(struct t_item *dir);
+ int box_expand(struct t_item *dir);
+ int box_buildblock(struct t_item *dir);
++int box_icon(struct t_item *dir,int i);
++int box_init(struct t_item *dir);
+ void box_sidelabel(struct t_item *dir);
+ void box_position_kids(struct t_item *dir);
+-int box_icon(struct t_item *dir,int i);
+-int box_init(struct t_item *dir);
++void box_select(struct t_item *dir);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000279.html">[S3d-svn] r286 - in trunk: . Documentation/s3dapi
+</A></li>
+	<LI>Next message: <A HREF="000281.html">[S3d-svn] r288 - in trunk: . apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#280">[ date ]</a>
+              <a href="thread.html#280">[ thread ]</a>
+              <a href="subject.html#280">[ subject ]</a>
+              <a href="author.html#280">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

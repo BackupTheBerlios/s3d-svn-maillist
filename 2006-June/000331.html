@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r338 - in trunk: . libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r338%20-%20in%20trunk%3A%20.%20libs3dw&In-Reply-To=%3C200606051604.k55G4VjM018092%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000330.html">
+   <LINK REL="Next"  HREF="000332.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r338 - in trunk: . libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r338%20-%20in%20trunk%3A%20.%20libs3dw&In-Reply-To=%3C200606051604.k55G4VjM018092%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r338 - in trunk: . libs3dw">dotslash at berlios.de
+       </A><BR>
+    <I>Mon Jun  5 18:04:31 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000330.html">[S3d-svn] r337 - in trunk: . apps/s3dfm libs3dw server
+</A></li>
+        <LI>Next message: <A HREF="000332.html">[S3d-svn] r339 - in trunk: . Documentation Documentation/libg3d Documentation/libg3d/api Documentation/libg3d/api/tmpl Documentation/s3dapi libs3d/libg3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#331">[ date ]</a>
+              <a href="thread.html#331">[ thread ]</a>
+              <a href="subject.html#331">[ subject ]</a>
+              <a href="author.html#331">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-05 18:04:31 +0200 (Mon, 05 Jun 2006)
+New Revision: 338
+
+Modified:
+   trunk/
+   trunk/libs3dw/s3dw.h
+   trunk/libs3dw/widget.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r727 at balthasar</A>:  dotslash | 2006-06-05 18:04:24 +0200
+ - changes to move widgets
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:725
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:727
+
+Modified: trunk/libs3dw/s3dw.h
+===================================================================
+--- trunk/libs3dw/s3dw.h	2006-06-05 15:19:15 UTC (rev 337)
++++ trunk/libs3dw/s3dw.h	2006-06-05 16:04:31 UTC (rev 338)
+@@ -126,11 +126,13 @@
+ void 				 s3dw_input_change_text(s3dw_input *input, char *text);
+ s3dw_surface 		*s3dw_surface_new(char *title, float width, float height);
+ 
+-void s3dw_delete(s3dw_widget *widget);
+-void s3dw_show(s3dw_widget *widget);
+-void s3dw_focus(s3dw_widget *focus);
++s3dw_widget 		*s3dw_getroot();
++void				 s3dw_moveit(s3dw_widget *widget);
++void 				 s3dw_delete(s3dw_widget *widget);
++void 				 s3dw_show(s3dw_widget *widget);
++void 				 s3dw_focus(s3dw_widget *focus);
+ 
+-void s3dw_handle_click(struct s3d_evt *evt);
+-void s3dw_handle_key(struct s3d_evt *evt);
++void 				 s3dw_handle_click(struct s3d_evt *evt);
++void 				 s3dw_handle_key(struct s3d_evt *evt);
+ 
+-void s3dw_ani_mate();
++void 				 s3dw_ani_mate();
+
+Modified: trunk/libs3dw/widget.c
+===================================================================
+--- trunk/libs3dw/widget.c	2006-06-05 15:19:15 UTC (rev 337)
++++ trunk/libs3dw/widget.c	2006-06-05 16:04:31 UTC (rev 338)
+@@ -133,3 +133,8 @@
+ 	widget-&gt;flags|=S3DW_ONSCREEN;
+ 	s3dwcb_show[widget-&gt;type](widget);
+ }
++/* apply the moves ... */
++void				 s3dw_moveit(s3dw_widget *widget)
++{
++	s3dw_ani_add(widget);
++}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000330.html">[S3d-svn] r337 - in trunk: . apps/s3dfm libs3dw server
+</A></li>
+	<LI>Next message: <A HREF="000332.html">[S3d-svn] r339 - in trunk: . Documentation Documentation/libg3d Documentation/libg3d/api Documentation/libg3d/api/tmpl Documentation/s3dapi libs3d/libg3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#331">[ date ]</a>
+              <a href="thread.html#331">[ thread ]</a>
+              <a href="subject.html#331">[ subject ]</a>
+              <a href="author.html#331">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

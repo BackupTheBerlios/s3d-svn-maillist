@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-106-ge9e5237
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2011-April/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20branch%2C%20master%2C%0A%09updated.%20v0.2.1.1-106-ge9e5237&In-Reply-To=%3C20110423230718.93D7F481370%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001141.html">
+   <LINK REL="Next"  HREF="001143.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-106-ge9e5237</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20branch%2C%20master%2C%0A%09updated.%20v0.2.1.1-106-ge9e5237&In-Reply-To=%3C20110423230718.93D7F481370%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-106-ge9e5237">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Apr 24 01:07:18 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001141.html">[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-104-gbbca1e7
+</A></li>
+        <LI>Next message: <A HREF="001143.html">[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-110-g0987537
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1142">[ date ]</a>
+              <a href="thread.html#1142">[ thread ]</a>
+              <a href="subject.html#1142">[ subject ]</a>
+              <a href="author.html#1142">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project &quot;Project s3d at BerliOS&quot;.
+
+The branch, master has been updated
+       via  e9e523763f43058e58da99ae0f532ddbac74ae0b (commit)
+       via  7dad7e52867b8e2d6a19d043b21f5138c8ffdf49 (commit)
+      from  bbca1e70308efff49967d571078b6301fffae6c0 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit e9e523763f43058e58da99ae0f532ddbac74ae0b
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven at narfation.org</A>&gt;
+Date:   Sun Apr 24 01:04:23 2011 +0200
+
+    server: Reformat source files
+
+commit 7dad7e52867b8e2d6a19d043b21f5138c8ffdf49
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven at narfation.org</A>&gt;
+Date:   Sun Apr 24 00:50:51 2011 +0200
+
+    server: Remove &quot;dead&quot; code
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ server/allocate.c     |   15 +-
+ server/config.h       |    3 +-
+ server/cull.c         |   20 +-
+ server/endian.c       |   18 +-
+ server/error.c        |   17 +-
+ server/event.c        |   50 ++--
+ server/global.h       |  161 ++++++-----
+ server/graphics.c     |   94 +++----
+ server/graphics_sdl.c |   13 +-
+ server/main.c         |   51 ++--
+ server/matrix.c       |   82 +++---
+ server/mcp.c          |   30 +--
+ server/navigation.c   |   44 +--
+ server/network.c      |   41 ++--
+ server/object.c       |  788 +++++++++++++++++++++++++------------------------
+ server/process.c      |  100 ++++---
+ server/proto.c        |  192 ++++++-------
+ server/proto.h        |    9 +-
+ server/shm.c          |  140 +++++-----
+ server/shm_ringbuf.c  |   55 ++---
+ server/tcp.c          |   95 ++++---
+ server/user.c         |   15 +-
+ server/user_sdl.c     |   10 +-
+ 23 files changed, 1009 insertions(+), 1034 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001141.html">[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-104-gbbca1e7
+</A></li>
+	<LI>Next message: <A HREF="001143.html">[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-110-g0987537
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1142">[ date ]</a>
+              <a href="thread.html#1142">[ thread ]</a>
+              <a href="subject.html#1142">[ subject ]</a>
+              <a href="author.html#1142">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

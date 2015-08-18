@@ -1,0 +1,576 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r306 - in trunk: example libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r306%20-%20in%20trunk%3A%20example%20libs3dw&In-Reply-To=%3C200605281950.k4SJoojC001013%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000298.html">
+   <LINK REL="Next"  HREF="000300.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r306 - in trunk: example libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r306%20-%20in%20trunk%3A%20example%20libs3dw&In-Reply-To=%3C200605281950.k4SJoojC001013%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r306 - in trunk: example libs3dw">dotslash at berlios.de
+       </A><BR>
+    <I>Sun May 28 21:50:50 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000298.html">[S3d-svn] r305 - trunk/libs3d
+</A></li>
+        <LI>Next message: <A HREF="000300.html">[S3d-svn] r307 - trunk/libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#299">[ date ]</a>
+              <a href="thread.html#299">[ thread ]</a>
+              <a href="subject.html#299">[ subject ]</a>
+              <a href="author.html#299">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-28 21:50:34 +0200 (Sun, 28 May 2006)
+New Revision: 306
+
+Modified:
+   trunk/example/widgets.c
+   trunk/libs3dw/Makefile.am
+   trunk/libs3dw/button.c
+   trunk/libs3dw/s3dw.h
+   trunk/libs3dw/s3dw_int.h
+   trunk/libs3dw/style.c
+   trunk/libs3dw/surface.c
+Log:
+- libs3dw now supports (responding) buttons. see the widgets example
+- animation is already in the code, but not activated yet (sliding windows,
+  following the camera are to come ...)
+
+Modified: trunk/example/widgets.c
+===================================================================
+--- trunk/example/widgets.c	2006-05-28 19:48:34 UTC (rev 305)
++++ trunk/example/widgets.c	2006-05-28 19:50:34 UTC (rev 306)
+@@ -29,6 +29,7 @@
+ #include &lt;stdio.h&gt;  /* NULL */
+ #include &lt;time.h&gt;	/* nanosleep() */
+ 
++struct s3dw_surface *surface;
+ static struct timespec t={0,100*1000*1000}; /* 100 mili seconds */
+ void mainloop()
+ {
+@@ -36,18 +37,48 @@
+ }
+ void object_click(struct s3d_evt *evt)
+ {
++	s3dw_click_event(evt);
++/*	s3d_quit();*/
++}
++void okay_button(struct s3dw_button *dummy)
++{
+ 	s3d_quit();
+ }
+-	
+ 
++void forward_button(struct s3dw_button *dummy)
++{
++	struct s3dw_button *button;
++	s3dw_surface_delete(surface);
++	surface=s3dw_surface_new(&quot;Let's go&quot;,10,7);
++	s3dw_button_new(surface,&quot;Fast Forward!!&quot;,1,1);
++	button=s3dw_button_new(surface,&quot;Okay&quot;,4,4);
++	button-&gt;onclick=okay_button;
++
++}
++void high_button(struct s3dw_button *dummy)
++{
++	struct s3dw_button *button;
++	s3dw_surface_delete(surface);
++	surface=s3dw_surface_new(&quot;Up Up'n Away!&quot;,10,7);
++	s3dw_button_new(surface,&quot;Fly away ...&quot;,1,1);
++	button=s3dw_button_new(surface,&quot;Okay&quot;,4,4);
++	button-&gt;onclick=okay_button;
++
++}
++
+ int main (int argc, char **argv)
+ {
+-	struct s3dw_surface *surface;
+-	if (!s3d_init(&amp;argc,&amp;argv,&quot;widgettest&quot;))	
++	struct s3dw_button *button;
++	if (!s3d_init(&amp;argc,&amp;argv,&quot;widgettest&quot;))
+ 	{
+ 		s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
+-		surface=s3dw_surface_new(&quot;Testsurface&quot;,10,10);
+-		s3dw_button_new(surface,&quot;Hello world&quot;,1,1);
++
++		surface=s3dw_surface_new(&quot;Hello World&quot;,20,10);
++		s3dw_button_new(surface,&quot;Where do you want to fly today?&quot;,1,1);
++		button=s3dw_button_new(surface,&quot;Forward&quot;,1,7);
++		button-&gt;onclick=forward_button;
++		button=s3dw_button_new(surface,&quot;Into the Sky&quot;,10,7);
++		button-&gt;onclick=high_button;
+ 		s3d_mainloop(mainloop);
+ 		s3d_quit();
+ 	}
+
+Modified: trunk/libs3dw/Makefile.am
+===================================================================
+--- trunk/libs3dw/Makefile.am	2006-05-28 19:48:34 UTC (rev 305)
++++ trunk/libs3dw/Makefile.am	2006-05-28 19:50:34 UTC (rev 306)
+@@ -1,6 +1,6 @@
+ lib_LTLIBRARIES=	libs3dw.la
+ 
+-libs3dw_la_SOURCES=	button.c surface.c style.c
++libs3dw_la_SOURCES=	button.c surface.c object.c style.c event.c animate.c
+ 			
+ include_HEADERS= 	s3dw.h
+ noinst_HEADERS=		s3dw_int.h
+
+Modified: trunk/libs3dw/button.c
+===================================================================
+--- trunk/libs3dw/button.c	2006-05-28 19:48:34 UTC (rev 305)
++++ trunk/libs3dw/button.c	2006-05-28 19:50:34 UTC (rev 306)
+@@ -30,7 +30,7 @@
+ 
+ 
+ /* create a new button in the surface */
+-struct s3dw_button *s3dw_button_new(struct s3dw_surface *surface, char *text, int posx, int posy)
++struct s3dw_button *s3dw_button_new(struct s3dw_surface *surface, char *text, float posx, float posy)
+ {
+ 	struct s3dw_button *button;
+ 	struct s3dw_object *object;
+@@ -49,15 +49,15 @@
+ 			4,6,5,0
+ 	};
+ 	button=(struct s3dw_button *)malloc(sizeof(struct s3dw_button));
+-	object=(struct s3dw_object *)malloc(sizeof(struct s3dw_object));
++	object=s3dw_object_new();
+ 	object-&gt;type=S3DW_TBUTTON;
++	button-&gt;_object=object;
+ 	/* draw button */
+ 	button-&gt;_text=strdup(text);
+ 	button-&gt;_flags=0;
+-	s3d_select_font(&quot;vera&quot;);
++	button-&gt;onclick=NULL;
+ 	button-&gt;_oid_text=s3d_draw_string(button-&gt;_text,&amp;length);
+ 	s3d_pep_materials_a(button-&gt;_oid_text,surface-&gt;_style-&gt;text_mat,1);
+-	button-&gt;_oid_box=s3d_new_object();
+ 	/* width of the button depends on the length of the text */
+ 	vertices[0*3+0]=0.0;			vertices[0*3+1]=0.0;		vertices[0*3+2]=0.0;	
+ 	vertices[1*3+0]=0.0;			vertices[1*3+1]=-2.0;		vertices[1*3+2]=0.0;	
+@@ -67,17 +67,20 @@
+ 	vertices[5*3+0]=0.25;			vertices[5*3+1]=-1.75;		vertices[5*3+2]=0.25;	
+ 	vertices[6*3+0]=length+0.75;	vertices[6*3+1]=-1.75;		vertices[6*3+2]=0.25;	
+ 	vertices[7*3+0]=length+0.75;	vertices[7*3+1]=-0.25;		vertices[7*3+2]=0.25;	
++	button-&gt;_oid_box=s3d_new_object();
+ 	s3d_push_materials_a(button-&gt;_oid_box,surface-&gt;_style-&gt;input_mat,1);
+ 	s3d_push_vertices   (button-&gt;_oid_box,vertices,8);
+ 	s3d_push_polygons   (button-&gt;_oid_box,polygons,10);
+-	s3d_link(		   button-&gt;_oid_box,surface-&gt;_oid);
++	s3d_link(		   button-&gt;_oid_box,surface-&gt;oid);
+ 	s3d_link(		   button-&gt;_oid_text,button-&gt;_oid_box);
+ 	s3d_translate(button-&gt;_oid_text,0.5,-1.5,0.30);
+ 	s3d_translate(button-&gt;_oid_box,posx,-posy,0);
+-	object-&gt;posx=posx;
+-	object-&gt;posy=posy;
++	object-&gt;x=posx;
++	object-&gt;y=posy;
+ 	object-&gt;width=length+1;
+ 	object-&gt;height=2;
++	object-&gt;data.button=button;
++	object-&gt;o=&amp;(button-&gt;_oid_box);
+     s3d_flags_on(button-&gt;_oid_box,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+     s3d_flags_on(button-&gt;_oid_text,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 
+@@ -94,3 +97,12 @@
+ }
+ 
+ 
++void s3dw_button_event_click(struct s3dw_button *button, unsigned long oid)
++{
++	if ((button-&gt;_oid_text==oid) || (button-&gt;_oid_box==oid))
++	{
++		if (button-&gt;onclick!=NULL)
++			button-&gt;onclick(button);
++	}
++	
++}
+
+Modified: trunk/libs3dw/s3dw.h
+===================================================================
+--- trunk/libs3dw/s3dw.h	2006-05-28 19:48:34 UTC (rev 305)
++++ trunk/libs3dw/s3dw.h	2006-05-28 19:50:34 UTC (rev 306)
+@@ -34,28 +34,41 @@
+ 
+ struct s3dw_button {
+ 	char *_text;
++	struct s3dw_object *_object;
+ 	int   _flags;
+-	int   _oid_text;
+-	int   _oid_box;
++	void (*onclick)(struct s3dw_button *);
++	unsigned long   _oid_text;
++	unsigned long   _oid_box;
++	
+ };
+ struct s3dw_input {
+ 	char *_text;
+ 	int   _flags;
++	struct s3dw_object *_object;
+ };
+ 
+ struct s3dw_object {
+ 	int type;
+-	float posx,posy,width,height;
++	float x,y,z,s,rx,ry,rz;
++	float dx,dy,dz,ds,drx,dry,drz;
++	float width,height;
++	unsigned long *o;
++	struct s3dw_surface *_surface;
+ 	union {
+-		struct s3dw_button *button;
+-		struct s3dw_input  *input;
+-	} object;
++		struct s3dw_button  *button;
++		struct s3dw_input   *input;
++		struct s3dw_surface *surface;
++	} data;
+ };
+ 
+ struct s3dw_surface {
+-	int 				  _oid;
++	unsigned long		  oid;
++	unsigned long		  _oid_title;
++	unsigned long		  _oid_tbar;
+ 	int 				  _flags;
+ 	int 				  _nobj;
++	char				 *title;
++	struct s3dw_object   *_object;
+ 	struct s3dw_object 	**_pobj;
+ 	struct s3dw_style 	 *_style;
+ };
+@@ -66,13 +79,15 @@
+ 	float surface_mat[12];
+ 	float input_mat[12];
+ 	float text_mat[12];
++	float title_mat[12];
++	float title_text_mat[12];
+ };
+ /* button.c */
+-struct s3dw_button *s3dw_button_new(struct s3dw_surface *surface, char *text, int posx, int posy);
+-void s3dw_button_destroy(struct s3dw_button *button);
++struct s3dw_button *s3dw_button_new(struct s3dw_surface *surface, char *text, float posx, float posy);
+ /* surface.c */
+-struct s3dw_surface *s3dw_surface_new();
+-void s3dw_surface_destroy(struct s3dw_surface *surface);
+-void s3dw_surface_append_obj(struct s3dw_surface *surface, struct s3dw_object *object);
+-/* style.c */
+-extern struct s3dw_style def_style;
++struct s3dw_surface *s3dw_surface_new(char *title, float width, float height);
++void s3dw_surface_delete(struct s3dw_surface *surface);
++/* event.c */
++void s3dw_click_event(struct s3d_evt *evt);
++/* animate.c */
++void s3dw_ani_mate();
+
+Modified: trunk/libs3dw/s3dw_int.h
+===================================================================
+--- trunk/libs3dw/s3dw_int.h	2006-05-28 19:48:34 UTC (rev 305)
++++ trunk/libs3dw/s3dw_int.h	2006-05-28 19:50:34 UTC (rev 306)
+@@ -22,4 +22,29 @@
+  */
+ 
+ #include &lt;s3dlib.h&gt; /* dprintf() */
++#define MAXANI		16
++#define ZOOMS		5
++extern	struct s3dw_object  **psurf;
++extern	int					  nsurf;
+ 
++/* button.c */
++void s3dw_button_destroy(struct s3dw_button *button);
++void s3dw_button_event_click(struct s3dw_button *button, unsigned long oid);
++/* object.c */
++struct s3dw_object *s3dw_object_new();
++void s3dw_object_destroy(struct s3dw_object *object);
++void s3dw_object_event_click(struct s3dw_object *object, unsigned long oid);
++/* surface.c */
++void s3dw_surface_event_click(struct s3dw_surface *surface, unsigned long oid);
++void s3dw_surface_append_obj(struct s3dw_surface *surface, struct s3dw_object *object);
++void s3dw_surface_event_click(struct s3dw_surface *surface, unsigned long oid);
++/* style.c */
++extern struct s3dw_style def_style;
++/* animate.c */
++int  _s3dw_ani_onstack(struct s3dw_object *f);
++void _s3dw_ani_add(struct s3dw_object *f);
++void _s3dw_ani_del(int i);
++void _s3dw_ani_doit(struct s3dw_object *f);
++void _s3dw_ani_finish(struct s3dw_object *f, int i);
++void _s3dw_ani_iterate(struct s3dw_object *f);
++int  _s3dw_ani_check(struct s3dw_object *f);
+
+Modified: trunk/libs3dw/style.c
+===================================================================
+--- trunk/libs3dw/style.c	2006-05-28 19:48:34 UTC (rev 305)
++++ trunk/libs3dw/style.c	2006-05-28 19:50:34 UTC (rev 306)
+@@ -30,19 +30,32 @@
+ /* default style */
+ struct s3dw_style def_style={&quot;default&quot;,
+ /* surface_mat */
+-{0.5,0.5,0.5,1.0, 
+- 0.5,0.5,0.5,1.0, 
+- 0.5,0.5,0.5,1.0}
++{0.7,0.7,0.7,1.0, 
++ 0.7,0.7,0.7,1.0, 
++ 0.7,0.7,0.7,1.0}
+ ,
+ /* input_mat */
+-{0.5,0.5,0.5,1.0,
+- 0.5,0.5,0.5,1.0,
+- 0.5,0.5,0.5,1.0
++{0.7,0.7,0.7,1.0,
++ 0.7,0.7,0.7,1.0,
++ 0.7,0.7,0.7,1.0
+ },
+ /* text_mat */
+ {
+  0.0,0.0,0.0,1.0,
+  1.0,1.0,1.0,1.0,
+  0.0,0.0,0.0,1.0
+-}};
++},
++/* title_mat */
++{
++ 0.0,0.4,0.8,1.0,
++ 1.0,1.0,1.0,1.0,
++ 0.0,0.4,0.8,1.0
++},
++/* title_text_mat */
++{
++ 0.0,0.0,0.0,1.0,
++ 0.0,0.0,0.0,1.0,
++ 0.0,0.0,0.0,1.0
++}
++};
+ 
+
+Modified: trunk/libs3dw/surface.c
+===================================================================
+--- trunk/libs3dw/surface.c	2006-05-28 19:48:34 UTC (rev 305)
++++ trunk/libs3dw/surface.c	2006-05-28 19:50:34 UTC (rev 306)
+@@ -25,41 +25,143 @@
+ #include &lt;s3dw.h&gt;
+ #include &lt;s3dw_int.h&gt;
+ #include &lt;stdlib.h&gt; /* malloc() */
++#include &lt;string.h&gt; /* strdup() */
++
++struct s3dw_object **psurf=NULL;
++int					  nsurf=0;
+ /* create a new surface */
+-struct s3dw_surface *s3dw_surface_new()
++struct s3dw_surface *s3dw_surface_new(char *title, float width, float height)
+ {
+-	struct s3dw_surface *ret;
+-	ret=(struct s3dw_surface *)malloc(sizeof(struct s3dw_surface));
+-	ret-&gt;_oid=s3d_new_object();
+-	ret-&gt;_flags=0;
+-	ret-&gt;_nobj=0;
+-	ret-&gt;_pobj=NULL;
+-	ret-&gt;_style=&amp;def_style;
+-	return(ret);
++	struct s3dw_surface *surface;
++	struct s3dw_object  *object;
++	int textlen;
++	float length;
++	float vertices[8*3]={
++		0,0,0,
++		1,0,0,
++		1,1,0,
++		0,1,0,
++		0,0,1,
++		1,0,1,
++		1,1,1,
++		0,1,1
++	};
++	float sver[8*3], tver[8*3];
++	unsigned long polygon[10*4]={
++		0,1,2,0,
++		0,2,3,0,
++		1,5,6,0,
++		1,6,2,0,
++		2,6,7,0,
++		2,7,3,0,
++		4,0,3,0,
++		4,3,7,0,
++		5,4,7,0,
++		5,7,6,0
++	};
++	unsigned long tpol[10*4];
++	int i;
++			
++	surface=(struct s3dw_surface *)malloc(sizeof(struct s3dw_surface));
++	surface-&gt;oid=s3d_new_object();
++	surface-&gt;_oid_tbar=s3d_new_object();
++	surface-&gt;_flags=0;
++	surface-&gt;_nobj=0;
++	surface-&gt;_pobj=NULL;
++	surface-&gt;_style=&amp;def_style;
++	surface-&gt;title=strdup(title);
++
++	nsurf++;
++	psurf=realloc(psurf,sizeof(struct s3dw_object **)*nsurf);
++	object=s3dw_object_new();
++	object-&gt;type=S3DW_TSURFACE;
++	object-&gt;data.surface=surface;
++	object-&gt;width=width;
++	object-&gt;height=height;
++	object-&gt;o=&amp;(surface-&gt;oid);
++	surface-&gt;_object=object;
++	psurf[nsurf-1]=object;
++	
++	s3d_select_font(&quot;vera&quot;);
++	surface-&gt;_oid_title=s3d_draw_string(surface-&gt;title,&amp;length);
++	while (length &gt; (object-&gt;width+1))
++	{
++
++		dprintf(HIGH,&quot;%f &gt; %f&quot;,length,object-&gt;width+1);
++		textlen=strlen(surface-&gt;title);
++		if (length&gt;((object-&gt;width+1)*1.3))
++			textlen=textlen*((object-&gt;width+1)*1.1/length);
++		if (textlen&gt;4)
++		{
++			surface-&gt;title[textlen-2]=0;
++			surface-&gt;title[textlen-3]='.';
++			surface-&gt;title[textlen-4]='.';
++			s3d_del_object(surface-&gt;_oid_title);
++			surface-&gt;_oid_title=s3d_draw_string(surface-&gt;title,&amp;length);
++		} else {
++			break;
++		}
++	}
++ 	/* prepare vertices */
++	for (i=0;i&lt;8;i++)
++	{
++		sver[i*3 + 0]=vertices[i*3+0] * width;
++		sver[i*3 + 1]=vertices[i*3+1] * -height;
++		sver[i*3 + 2]=vertices[i*3+2] * -1;
++		tver[i*3 + 0]=vertices[i*3+0] * width;
++		tver[i*3 + 1]=vertices[i*3+1];
++		tver[i*3 + 2]=vertices[i*3+2] * -1;
++	}
++	/* swap */
++	for (i=0;i&lt;10;i++)
++	{
++	   tpol[i*4 + 0]=polygon[i*4 + 1];
++	   tpol[i*4 + 1]=polygon[i*4 + 0];
++	   tpol[i*4 + 2]=polygon[i*4 + 2];
++	   tpol[i*4 + 3]=polygon[i*4 + 3];
++	}
++	s3d_push_vertices(surface-&gt;oid,sver,8);
++	s3d_push_vertices(surface-&gt;_oid_tbar,tver,8);
++	s3d_push_materials_a(surface-&gt;oid      ,surface-&gt;_style-&gt;surface_mat,1);
++	s3d_push_materials_a(surface-&gt;_oid_tbar,surface-&gt;_style-&gt;title_mat,1);
++	s3d_pep_materials_a(surface-&gt;_oid_title,surface-&gt;_style-&gt;title_text_mat,1);
++	s3d_push_polygons(surface-&gt;oid,polygon,10);
++	s3d_push_polygons(surface-&gt;_oid_tbar,tpol,10);
++	s3d_link(surface-&gt;_oid_tbar,surface-&gt;oid);
++	s3d_link(surface-&gt;_oid_title,surface-&gt;_oid_tbar);
++	s3d_translate(surface-&gt;_oid_title,0.5,0.2,0.1);
++    s3d_flags_on(surface-&gt;oid,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++    s3d_flags_on(surface-&gt;_oid_title,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++    s3d_flags_on(surface-&gt;_oid_tbar,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++	return(surface);
+ }
+ 
+ /* destroy the surface */
+-void s3dw_surface_destroy(struct s3dw_surface *surface)
++void s3dw_surface_delete(struct s3dw_surface *surface)
+ {
+ 	int i;
+-	s3d_del_object(surface-&gt;_oid);
+ 	if (surface-&gt;_nobj&gt;0)
+ 	{
+ 		for (i=0;i&lt;surface-&gt;_nobj;i++)
+ 		{
+-			switch (surface-&gt;_pobj[i]-&gt;type)
+-			{
+-				case S3DW_TBUTTON:
+-						s3dw_button_destroy(surface-&gt;_pobj[i]-&gt;object.button);
+-						free(surface-&gt;_pobj[i]);
+-						break;
+-				default:
+-						printf(&quot;can't free this type (yet) - memory leak\n&quot;);
+-			}
++			s3dw_object_destroy(surface-&gt;_pobj[i]);
+ 		}
+ 		free(surface-&gt;_pobj);
+ 	}
++	s3d_del_object(surface-&gt;oid);
++	s3d_del_object(surface-&gt;_oid_tbar);
++	s3d_del_object(surface-&gt;_oid_title);
++	for (i=0;i&lt;nsurf;i++) /* search ... */
++		if (psurf[i]-&gt;data.surface==surface) /* ... and destroy */
++		{
++			psurf[i]=psurf[nsurf-1]; /* swap last element to the to be deleted one */
++			nsurf--;
++			break;
++		}
++	free(surface-&gt;title);
++	free(surface-&gt;_object);
+ 	free(surface);
++
+ }
+ /* append an object */
+ void s3dw_surface_append_obj(struct s3dw_surface *surface, struct s3dw_object *object)
+@@ -67,5 +169,21 @@
+ 	surface-&gt;_nobj++;
+ 	surface-&gt;_pobj=realloc(surface-&gt;_pobj,sizeof(struct s3dw_object *)*surface-&gt;_nobj);
+ 	surface-&gt;_pobj[surface-&gt;_nobj-1]=object;
++	object-&gt;_surface=surface;
+ }
++/* test objects of the surface for clicks */
++void s3dw_surface_event_click(struct s3dw_surface *surface, unsigned long oid)
++{
++	int i;
++	if (surface-&gt;oid==oid)
++	{
++		dprintf(MED,&quot;body %s clicked&quot;,surface-&gt;title);
++	}
++	if ((surface-&gt;_oid_tbar==oid) || (surface-&gt;_oid_title==oid))
++	{
++		dprintf(MED,&quot;title %s clicked&quot;,surface-&gt;title);
++	}
++	for (i=0;i&lt;surface-&gt;_nobj;i++)
++		s3dw_object_event_click(surface-&gt;_pobj[i],oid);
++}
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000298.html">[S3d-svn] r305 - trunk/libs3d
+</A></li>
+	<LI>Next message: <A HREF="000300.html">[S3d-svn] r307 - trunk/libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#299">[ date ]</a>
+              <a href="thread.html#299">[ thread ]</a>
+              <a href="subject.html#299">[ subject ]</a>
+              <a href="author.html#299">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

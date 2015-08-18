@@ -1,0 +1,382 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r812 - in trunk: . apps apps/meshs3d svnonly	svnonly/testvis
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r812%20-%20in%20trunk%3A%20.%20apps%20apps/meshs3d%20svnonly%0A%09svnonly/testvis&In-Reply-To=%3C200710232309.l9NN9fk6023251%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000803.html">
+   <LINK REL="Next"  HREF="000805.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r812 - in trunk: . apps apps/meshs3d svnonly	svnonly/testvis</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r812%20-%20in%20trunk%3A%20.%20apps%20apps/meshs3d%20svnonly%0A%09svnonly/testvis&In-Reply-To=%3C200710232309.l9NN9fk6023251%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r812 - in trunk: . apps apps/meshs3d svnonly	svnonly/testvis">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Wed Oct 24 01:09:41 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000803.html">[S3d-svn] r811 - in trunk/Documentation: libs3d libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000805.html">[S3d-svn] r813 - trunk/svnonly
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#804">[ date ]</a>
+              <a href="thread.html#804">[ thread ]</a>
+              <a href="subject.html#804">[ subject ]</a>
+              <a href="author.html#804">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-10-24 01:09:41 +0200 (Wed, 24 Oct 2007)
+New Revision: 812
+
+Added:
+   trunk/svnonly/
+   trunk/svnonly/comptest/
+   trunk/svnonly/meshs3d_testdata/
+   trunk/svnonly/olsrs3d/
+   trunk/svnonly/testvis/
+   trunk/svnonly/testvis/testvis.README
+   trunk/svnonly/testvis/testvis.c
+   trunk/svnonly/vistest/
+Removed:
+   trunk/apps/comptest/
+   trunk/apps/meshs3d/testvis.README
+   trunk/apps/meshs3d/testvis.c
+   trunk/apps/olsrs3d/
+Modified:
+   trunk/CMakeLists.txt
+   trunk/apps/CMakeLists.txt
+Log:
+- create svnonly and move some things into it which
+  are not to be part of the release
+
+
+Modified: trunk/CMakeLists.txt
+===================================================================
+--- trunk/CMakeLists.txt	2007-10-23 23:04:51 UTC (rev 811)
++++ trunk/CMakeLists.txt	2007-10-23 23:09:41 UTC (rev 812)
+@@ -27,6 +27,7 @@
+ include(ConfigureChecks.cmake)
+ 
+ add_subdirectory(apps)
++add_subdirectory(svnonly)
+ add_subdirectory(cmake)
+ add_subdirectory(Documentation)
+ add_subdirectory(example)
+
+Modified: trunk/apps/CMakeLists.txt
+===================================================================
+--- trunk/apps/CMakeLists.txt	2007-10-23 23:04:51 UTC (rev 811)
++++ trunk/apps/CMakeLists.txt	2007-10-23 23:09:41 UTC (rev 812)
+@@ -1,8 +1,6 @@
+-add_subdirectory(comptest)
+ add_subdirectory(dot_mcp)
+ add_subdirectory(kism3d)
+ add_subdirectory(meshs3d)
+-add_subdirectory(olsrs3d)
+ add_subdirectory(s3dfm)
+ add_subdirectory(s3dosm)
+ add_subdirectory(s3dvt)
+
+Deleted: trunk/apps/meshs3d/testvis.README
+===================================================================
+--- trunk/apps/meshs3d/testvis.README	2007-10-23 23:04:51 UTC (rev 811)
++++ trunk/apps/meshs3d/testvis.README	2007-10-23 23:09:41 UTC (rev 812)
+@@ -1,25 +0,0 @@
+-handle only one connected client
+-
+-usage:
+-
+-add a dot draw line:
+-
+-testivs: add &quot;104.65.0.42&quot; -&gt; &quot;104.0.7.254&quot;[label=&quot;4.03&quot;];
+-
+-list lines (output index:line | active) :
+-
+-testivs: list
+-1: &quot;104.65.0.42&quot; -&gt; &quot;104.0.7.254&quot;[label=&quot;4.03&quot;]; | 1
+-
+-remove line with index 1:
+-testvis: rem 1
+-
+-deactive output of line with index 1:
+-testvis: dea 1
+-
+-activate output of line with index 1:
+-testvis: act 1
+-
+-quit testvis:
+-testvis: quit
+-
+
+Deleted: trunk/apps/meshs3d/testvis.c
+===================================================================
+--- trunk/apps/meshs3d/testvis.c	2007-10-23 23:04:51 UTC (rev 811)
++++ trunk/apps/meshs3d/testvis.c	2007-10-23 23:09:41 UTC (rev 812)
+@@ -1,223 +0,0 @@
+-#include &lt;stdio.h&gt;
+-#include &lt;sys/types.h&gt;
+-#include &lt;sys/socket.h&gt;
+-#include &lt;stdlib.h&gt;
+-#include &lt;string.h&gt;
+-#include &lt;pthread.h&gt;
+-#include &lt;sys/socket.h&gt;
+-#include &lt;sys/types.h&gt;
+-#include &lt;arpa/inet.h&gt;
+-#include &lt;unistd.h&gt;
+-#include &lt;signal.h&gt;
+-
+-#define BUFFER_SIZE 1000
+-#define LINE_SIZE 100
+-
+-struct data {
+-	int index;
+-	int active;
+-	char line[LINE_SIZE];
+-	struct data *next;
+-};
+-
+-struct t_data {
+-	struct data *head, *end;
+-};
+-
+-
+-void list_data(struct data *head, struct data *end)
+-{
+-	struct data *tmp;
+-
+-	for (tmp = head-&gt;next;tmp != end;tmp = tmp-&gt;next) {
+-		printf(&quot;%d: %s | %d\n&quot;, tmp-&gt;index, tmp-&gt;line, tmp-&gt;active);
+-	}
+-}
+-
+-void rem_data(int index, struct data *head, struct data *end)
+-{
+-	struct data *tmp, *prev = head;
+-
+-	for (tmp = head-&gt;next;tmp != end;prev = tmp, tmp = tmp-&gt;next) {
+-		if (tmp-&gt;index == index)
+-			break;
+-	}
+-
+-	if (tmp != end) {
+-
+-		prev-&gt;next = tmp-&gt;next;
+-
+-		printf(&quot;remove index %d\n&quot;, tmp-&gt;index);
+-		free(tmp);
+-	} else {
+-		printf(&quot;index not found\n&quot;);
+-	}
+-	return;
+-}
+-
+-void dea_data(int index, struct data *head, struct data *end)
+-{
+-	struct data *tmp;
+-
+-	for (tmp = head-&gt;next;tmp != end; tmp = tmp-&gt;next) {
+-		if (tmp-&gt;index == index)
+-			break;
+-	}
+-
+-	if (tmp != end &amp;&amp; tmp != head) {
+-		tmp-&gt;active = 0;
+-	}
+-	return;
+-}
+-
+-void act_data(int index, struct data *head, struct data *end)
+-{
+-	struct data *tmp;
+-
+-	for (tmp = head-&gt;next;tmp != end; tmp = tmp-&gt;next) {
+-		if (tmp-&gt;index == index)
+-			break;
+-	}
+-
+-	if (tmp != end &amp;&amp; tmp != head) {
+-		tmp-&gt;active = 1;
+-	}
+-	return;
+-}
+-
+-static void sig(int signr)
+-{
+-	return;
+-}
+-
+-void *server(void *args)
+-{
+-	struct t_data *t = (struct t_data*)args;
+-	int listen_fd, yes = 1;
+-	struct sockaddr_in sock, client;
+-	struct data *tmp;
+-
+-	int sock2;
+-	socklen_t len;
+-
+-	char buffer[2000];
+-	char start[] = &quot;digraph topology\n{\n&quot;;
+-	char end[] = &quot;}\n&quot;;
+-	int index;
+-
+-	signal(SIGPIPE, sig);
+-
+-	listen_fd = socket(PF_INET, SOCK_STREAM, 0);
+-	setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &amp;yes, sizeof(int));
+-
+-	memset((char *) &amp;sock, 0, sizeof(sock));
+-	sock.sin_family = AF_INET;
+-	sock.sin_addr.s_addr = htonl(INADDR_ANY);
+-	sock.sin_port = htons(2004);
+-
+-	bind(listen_fd, (struct sockaddr *) &amp;sock, sizeof(sock));
+-	listen(listen_fd, 1);
+-
+-	len = sizeof(client);
+-
+-	while (1) {
+-
+-		sock2 = accept(listen_fd, (struct sockaddr*) &amp; client, &amp;len);
+-
+-		while (1) {
+-
+-			memset(buffer, 0, 2000);
+-			strcat(buffer, start);
+-			index = strlen(start);
+-
+-			for (tmp = t-&gt;head-&gt;next;tmp != t-&gt;end;tmp = tmp-&gt;next) {
+-
+-				if (!tmp-&gt;active)
+-					continue;
+-				strcat(&amp;buffer[index], tmp-&gt;line);
+-				index += strlen(tmp-&gt;line);
+-				strcat(&amp;buffer[index], &quot;\n&quot;);
+-				index++;
+-
+-			}
+-
+-			strcat(&amp;buffer[index], end);
+-			buffer[index+2] = 0;
+-			if (send(sock2, buffer, strlen(buffer), 0) &lt; 1)
+-				break;
+-
+-			sleep(3);
+-
+-		}
+-	}
+-
+-	return NULL;
+-}
+-
+-int main()
+-{
+-	char buffer[BUFFER_SIZE];
+-	char *tmp_buffer;
+-	struct data *head, *z, *t;
+-	static int index = 0;
+-	struct t_data t_dat;
+-	pthread_t thread;
+-
+-	head = malloc(sizeof(*head));
+-	z = malloc(sizeof(*z));
+-
+-	head-&gt;next = z;
+-
+-	t_dat.head = head;
+-	t_dat.end = z;
+-	pthread_create(&amp;thread, NULL, server, &amp;t_dat);
+-	pthread_detach(thread);
+-	printf(&quot;\ntestivs: &quot;);
+-
+-	while (fgets(buffer, BUFFER_SIZE, stdin)) {
+-
+-		if ((tmp_buffer = strstr(buffer, &quot;add&quot;)) != NULL) {
+-			tmp_buffer[strlen(tmp_buffer) - 1] = 0;
+-			tmp_buffer += 4;
+-			t = malloc(sizeof(*t));
+-			snprintf(t-&gt;line, LINE_SIZE, tmp_buffer);
+-			t-&gt;index = ++index;
+-			t-&gt;active = 1;
+-			t-&gt;next = head-&gt;next;
+-			head-&gt;next = t;
+-		} else if ((tmp_buffer = strstr(buffer, &quot;list&quot;)) != NULL) {
+-
+-			list_data(head, z);
+-
+-		} else if ((tmp_buffer = strstr(buffer, &quot;rem&quot;)) != NULL) {
+-
+-			tmp_buffer[strlen(tmp_buffer) - 1] = 0;
+-			tmp_buffer += 4;
+-			rem_data(atoi(tmp_buffer), head, z);
+-
+-		} else if ((tmp_buffer = strstr(buffer, &quot;dea&quot;)) != NULL) {
+-
+-			tmp_buffer[strlen(tmp_buffer) - 1] = 0;
+-			tmp_buffer += 4;
+-			dea_data(atoi(tmp_buffer), head, z);
+-
+-		} else if ((tmp_buffer = strstr(buffer, &quot;act&quot;)) != NULL) {
+-
+-			tmp_buffer[strlen(tmp_buffer) - 1] = 0;
+-			tmp_buffer += 4;
+-			act_data(atoi(tmp_buffer), head, z);
+-
+-		} else if ((tmp_buffer = strstr(buffer, &quot;quit&quot;)) != NULL) {
+-
+-			break;
+-
+-		} else
+-
+-			printf(&quot;command not found\n&quot;);
+-
+-		printf(&quot;testivs: &quot;);
+-
+-	}
+-
+-	return 0;
+-}
+
+Copied: trunk/svnonly/comptest (from rev 809, trunk/apps/comptest)
+
+Copied: trunk/svnonly/olsrs3d (from rev 809, trunk/apps/olsrs3d)
+
+Copied: trunk/svnonly/testvis/testvis.README (from rev 809, trunk/apps/meshs3d/testvis.README)
+
+Copied: trunk/svnonly/testvis/testvis.c (from rev 809, trunk/apps/meshs3d/testvis.c)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000803.html">[S3d-svn] r811 - in trunk/Documentation: libs3d libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000805.html">[S3d-svn] r813 - trunk/svnonly
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#804">[ date ]</a>
+              <a href="thread.html#804">[ thread ]</a>
+              <a href="subject.html#804">[ subject ]</a>
+              <a href="author.html#804">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

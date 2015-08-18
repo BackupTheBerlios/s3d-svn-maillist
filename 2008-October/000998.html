@@ -1,0 +1,1158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1018 - trunk/cmake/modules
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1018%20-%20trunk/cmake/modules&In-Reply-To=%3C200810282246.m9SMkwkg000214%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000997.html">
+   <LINK REL="Next"  HREF="000999.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1018 - trunk/cmake/modules</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1018%20-%20trunk/cmake/modules&In-Reply-To=%3C200810282246.m9SMkwkg000214%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1018 - trunk/cmake/modules">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Oct 28 23:46:58 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000997.html">[S3d-svn] r1017 - in trunk: apps/meshs3d apps/s3dosm	experimental/olsrs3d libs3d server
+</A></li>
+        <LI>Next message: <A HREF="000999.html">[S3d-svn] r1019 - trunk/objs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#998">[ date ]</a>
+              <a href="thread.html#998">[ thread ]</a>
+              <a href="subject.html#998">[ subject ]</a>
+              <a href="author.html#998">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-10-28 23:46:57 +0100 (Tue, 28 Oct 2008)
+New Revision: 1018
+
+Modified:
+   trunk/cmake/modules/EnableProfiling.cmake
+   trunk/cmake/modules/FindBluetooth.cmake
+   trunk/cmake/modules/FindCWiid.cmake
+   trunk/cmake/modules/FindDocbook.cmake
+   trunk/cmake/modules/FindFREETYPE.cmake
+   trunk/cmake/modules/FindFontconfig.cmake
+   trunk/cmake/modules/FindG3D.cmake
+   trunk/cmake/modules/FindGLIB.cmake
+   trunk/cmake/modules/FindGPS.cmake
+   trunk/cmake/modules/FindMath.cmake
+   trunk/cmake/modules/FindPThreads.cmake
+   trunk/cmake/modules/FindSQLite3.cmake
+   trunk/cmake/modules/FindXcomposite.cmake
+   trunk/cmake/modules/FindXdamage.cmake
+   trunk/cmake/modules/FindXfixes.cmake
+   trunk/cmake/modules/FindXrender.cmake
+   trunk/cmake/modules/FindXtst.cmake
+   trunk/cmake/modules/LateErrors.cmake
+   trunk/cmake/modules/LateStatus.cmake
+   trunk/cmake/modules/LateStatusPartial.cmake
+   trunk/cmake/modules/SetC9X.cmake
+   trunk/cmake/modules/SetCCWarnFlags.cmake
+   trunk/cmake/modules/SetDebugLevel.cmake
+   trunk/cmake/modules/TestForSHM.cmake
+   trunk/cmake/modules/TestForSIGS.cmake
+   trunk/cmake/modules/TestForTCP.cmake
+   trunk/cmake/modules/TestGCCVisibility.cmake
+   trunk/cmake/modules/TestUnusedParam.cmake
+Log:
+Add BSD-3 copyright notice to cmake/modules/*.cmake
+
+Modified: trunk/cmake/modules/EnableProfiling.cmake
+===================================================================
+--- trunk/cmake/modules/EnableProfiling.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/EnableProfiling.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -1,3 +1,30 @@
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
++
+ # add option for enabling/disabling profiling
+ option(PROFILING &quot;Enable/disable support for profiling with gprof&quot; OFF)
+ 
+
+Modified: trunk/cmake/modules/FindBluetooth.cmake
+===================================================================
+--- trunk/cmake/modules/FindBluetooth.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/FindBluetooth.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -2,6 +2,33 @@
+ #  BLUETOOTH_FOUND - If false, do not try to use Bluetooth.
+ #  BLUETOOTH_INCLUDE_DIRS - where to find bluetooth/bluetooth.h
+ #  BLUETOOTH_LIBRARIES - the libraries to link against
++#
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ 
+ if (BLUETOOTH_LIBRARIES AND BLUETOOTH_INCLUDE_DIRS)
+
+Modified: trunk/cmake/modules/FindCWiid.cmake
+===================================================================
+--- trunk/cmake/modules/FindCWiid.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/FindCWiid.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -2,6 +2,33 @@
+ #  CWIID_FOUND - If false, do not try to use CWiid.
+ #  CWIID_INCLUDE_DIRS - where to find cwiid.h
+ #  CWIID_LIBRARIES - the libraries to link against
++#
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ find_package(Bluetooth)
+ 
+
+Modified: trunk/cmake/modules/FindDocbook.cmake
+===================================================================
+--- trunk/cmake/modules/FindDocbook.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/FindDocbook.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -4,6 +4,32 @@
+ #
+ #  DOCBOOK2HTML_COMPILER: path to the HTML convert
+ #
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ find_program(DOCBOOK2HTML_COMPILER
+ 	NAMES xmlto
+
+Modified: trunk/cmake/modules/FindFREETYPE.cmake
+===================================================================
+--- trunk/cmake/modules/FindFREETYPE.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/FindFREETYPE.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -3,6 +3,33 @@
+ #  FREETYPE_INCLUDE_DIRS - where to find freetype/config/ftheader.h and ft2build.h, etc.
+ #  FREETYPE_LIBRARIES - the libraries to link against
+ #  FREETYPE_DEFINITIONS - switches required for FREETYPE
++#
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ 
+ if (FREETYPE_LIBRARIES AND FREETYPE_INCLUDE_DIRS)
+
+Modified: trunk/cmake/modules/FindFontconfig.cmake
+===================================================================
+--- trunk/cmake/modules/FindFontconfig.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/FindFontconfig.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -3,6 +3,33 @@
+ #  FONTCONFIG_INCLUDE_DIRS - where to find fontconfig/fontconfig.h
+ #  FONTCONFIG_LIBRARIES - the libraries to link against
+ #  FONTCONFIG_DEFINITIONS - switches required for FONTCONFIG
++#
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ 
+ if (FONTCONFIG_LIBRARIES AND FONTCONFIG_INCLUDE_DIRS)
+
+Modified: trunk/cmake/modules/FindG3D.cmake
+===================================================================
+--- trunk/cmake/modules/FindG3D.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/FindG3D.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -3,6 +3,33 @@
+ #  G3D_INCLUDE_DIRS - where to find g3d/g3d.h
+ #  G3D_LIBRARIES - the libraries to link against
+ #  G3D_DEFINITIONS - switches required for G3D
++#
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ 
+ if (G3D_LIBRARIES AND G3D_INCLUDE_DIRS)
+
+Modified: trunk/cmake/modules/FindGLIB.cmake
+===================================================================
+--- trunk/cmake/modules/FindGLIB.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/FindGLIB.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -3,6 +3,33 @@
+ #  GLIB2_INCLUDE_DIRS - where to find glib.h and glibconfig.h, etc.
+ #  GLIB2_LIBRARIES - the libraries to link against
+ #  GLIB2_DEFINITIONS - switches required for GLIB2
++#
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ 
+ if (GLIB2_LIBRARIES AND GLIB2_INCLUDE_DIRS)
+
+Modified: trunk/cmake/modules/FindGPS.cmake
+===================================================================
+--- trunk/cmake/modules/FindGPS.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/FindGPS.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -2,6 +2,33 @@
+ #  GPS_FOUND - If false, do not try to use GPS.
+ #  GPS_INCLUDE_DIRS - where to find gps.h
+ #  GPS_LIBRARIES - the libraries to link against
++#
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ 
+ if (GPS_LIBRARIES AND GPS_INCLUDE_DIRS)
+
+Modified: trunk/cmake/modules/FindMath.cmake
+===================================================================
+--- trunk/cmake/modules/FindMath.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/FindMath.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -1,6 +1,33 @@
+ # Try to find libm
+ #  MATH_FOUND - If false, do not try to use libm
+ #  MATH_LIBRARIES - the libraries to link against
++#
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ 
+ if (MATH_LIBRARIES)
+
+Modified: trunk/cmake/modules/FindPThreads.cmake
+===================================================================
+--- trunk/cmake/modules/FindPThreads.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/FindPThreads.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -2,6 +2,33 @@
+ #  PTHREADS_FOUND - If false, do not try to use PThreads.
+ #  PTHREADS_INCLUDE_DIRS - where to find pthreads.h
+ #  PTHREADS_LIBRARIES - the libraries to link against
++#
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ 
+ if (PTHREADS_LIBRARIES AND PTHREADS_INCLUDE_DIRS)
+
+Modified: trunk/cmake/modules/FindSQLite3.cmake
+===================================================================
+--- trunk/cmake/modules/FindSQLite3.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/FindSQLite3.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -3,6 +3,33 @@
+ #  SQLITE3_INCLUDE_DIRS - where to find sqlite3.h
+ #  SQLITE3_LIBRARIES - the libraries to link against
+ #  SQLITE3_DEFINITIONS - switches required for SQLite3
++#
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ 
+ if (SQLITE3_LIBRARIES AND SQLITE3_INCLUDE_DIRS)
+
+Modified: trunk/cmake/modules/FindXcomposite.cmake
+===================================================================
+--- trunk/cmake/modules/FindXcomposite.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/FindXcomposite.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -2,6 +2,33 @@
+ #  XCOMPOSITE_FOUND - If false, do not try to use Xcomposite
+ #  XCOMPOSITE_LIBRARIES - the libraries to link against
+ #  XCOMPOSITE_DEFINITIONS - switches required for Xcomposite
++#
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ 
+ if (XCOMPOSITE_LIBRARIES)
+
+Modified: trunk/cmake/modules/FindXdamage.cmake
+===================================================================
+--- trunk/cmake/modules/FindXdamage.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/FindXdamage.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -2,6 +2,33 @@
+ #  XDAMAGE_FOUND - If false, do not try to use Xdamage
+ #  XDAMAGE_LIBRARIES - the libraries to link against
+ #  XDAMAGE_DEFINITIONS - switches required for Xdamage
++#
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ 
+ if (XDAMAGE_LIBRARIES)
+
+Modified: trunk/cmake/modules/FindXfixes.cmake
+===================================================================
+--- trunk/cmake/modules/FindXfixes.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/FindXfixes.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -2,6 +2,33 @@
+ #  XFIXES_FOUND - If false, do not try to use Xfixes
+ #  XFIXES_LIBRARIES - the libraries to link against
+ #  XFIXES_DEFINITIONS - switches required for Xfixes
++#
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ 
+ if (XFIXES_LIBRARIES)
+
+Modified: trunk/cmake/modules/FindXrender.cmake
+===================================================================
+--- trunk/cmake/modules/FindXrender.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/FindXrender.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -2,6 +2,33 @@
+ #  XRENDER_FOUND - If false, do not try to use Xrender
+ #  XRENDER_LIBRARIES - the libraries to link against
+ #  XRENDER_DEFINITIONS - switches required for Xrender
++#
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ 
+ if (XRENDER_LIBRARIES)
+
+Modified: trunk/cmake/modules/FindXtst.cmake
+===================================================================
+--- trunk/cmake/modules/FindXtst.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/FindXtst.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -2,6 +2,33 @@
+ #  XTST_FOUND - If false, do not try to use Xtst.
+ #  XTST_LIBRARIES - the libraries to link against
+ #  XTST_DEFINITIONS - switches required for Xtst
++#
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ 
+ if (XTST_LIBRARIES)
+
+Modified: trunk/cmake/modules/LateErrors.cmake
+===================================================================
+--- trunk/cmake/modules/LateErrors.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/LateErrors.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -2,6 +2,33 @@
+ #
+ # PkgError_Later(errmsg)
+ # Collected_PkgErrors()
++#
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ macro(PkgError_Later _errmsg)
+ 	set(pgk_error &quot;${pgk_error}\n\t${_errmsg}&quot;)
+
+Modified: trunk/cmake/modules/LateStatus.cmake
+===================================================================
+--- trunk/cmake/modules/LateStatus.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/LateStatus.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -2,6 +2,33 @@
+ #
+ # PkgStatus_Later(errmsg)
+ # Collected_PkgStatus(modulename)
++#
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ macro(PkgStatus_Later _errmsg)
+ 	set(pgk_status &quot;${pgk_status}\n\t${_errmsg}&quot;)
+
+Modified: trunk/cmake/modules/LateStatusPartial.cmake
+===================================================================
+--- trunk/cmake/modules/LateStatusPartial.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/LateStatusPartial.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -2,6 +2,33 @@
+ #
+ # PkgStatusPartial_Later(errmsg)
+ # Collected_PkgStatusPartial(modulename)
++#
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ 
+ macro(PkgStatusPartial_Later _errmsg)
+ 	set(pgk_statuspartial &quot;${pgk_status}\n\t${_errmsg}&quot;)
+
+Modified: trunk/cmake/modules/SetC9X.cmake
+===================================================================
+--- trunk/cmake/modules/SetC9X.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/SetC9X.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -1,3 +1,29 @@
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ include(CheckCCompilerFlag)
+ 
+ # Enable c99/c9x
+
+Modified: trunk/cmake/modules/SetCCWarnFlags.cmake
+===================================================================
+--- trunk/cmake/modules/SetCCWarnFlags.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/SetCCWarnFlags.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -1,3 +1,29 @@
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ include(CheckCCompilerFlag)
+ 
+ # Enable all warnings if possible (gnu cc)
+
+Modified: trunk/cmake/modules/SetDebugLevel.cmake
+===================================================================
+--- trunk/cmake/modules/SetDebugLevel.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/SetDebugLevel.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -1,3 +1,30 @@
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
++
+ # if user set debug level
+ string(TOUPPER &quot;${DEBUG}&quot; DEBUG_UPPER)
+ set(DEBUG ${DEBUG}
+
+Modified: trunk/cmake/modules/TestForSHM.cmake
+===================================================================
+--- trunk/cmake/modules/TestForSHM.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/TestForSHM.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -1,2 +1,28 @@
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
+ include(CheckFunctionExists)
+ check_function_exists(shmget HAVE_SHM)
+
+Modified: trunk/cmake/modules/TestForSIGS.cmake
+===================================================================
+--- trunk/cmake/modules/TestForSIGS.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/TestForSIGS.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -1,3 +1,30 @@
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
++
+ include(CheckFunctionExists)
+ check_function_exists(signal HAVE_SIGS_FUNC)
+ 
+
+Modified: trunk/cmake/modules/TestForTCP.cmake
+===================================================================
+--- trunk/cmake/modules/TestForTCP.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/TestForTCP.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -1,2 +1,29 @@
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
++
+ include(CheckFunctionExists)
+ check_function_exists(socket HAVE_TCP)
+
+Modified: trunk/cmake/modules/TestGCCVisibility.cmake
+===================================================================
+--- trunk/cmake/modules/TestGCCVisibility.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/TestGCCVisibility.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -1,3 +1,30 @@
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
++
+ include(CheckCCompilerFlag)
+ 
+ # Hide non exported functions/variables
+
+Modified: trunk/cmake/modules/TestUnusedParam.cmake
+===================================================================
+--- trunk/cmake/modules/TestUnusedParam.cmake	2008-10-28 22:46:49 UTC (rev 1017)
++++ trunk/cmake/modules/TestUnusedParam.cmake	2008-10-28 22:46:57 UTC (rev 1018)
+@@ -1,3 +1,30 @@
++# Copyright (c) 2007-2008 Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++# 3. The names of Kitware, Inc., the Insight Consortium, or the names of
++#    any consortium members, or of any contributors, may not be used to
++#    endorse or promote products derived from this software without
++#    specific prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++# SUCH DAMAGE.
++
+ include(CheckCSourceCompiles)
+ check_c_source_compiles(&quot;int main(int argc __attribute__((unused)), char *argv[] __attribute__((unused))) { return 0; }&quot; UNUSEDPARAM_ATTRIBUTE)
+-check_c_source_compiles(&quot;int main(int, char *[]) { return 0; }&quot; UNUSEDPARAM_OMIT)
+\ No newline at end of file
++check_c_source_compiles(&quot;int main(int, char *[]) { return 0; }&quot; UNUSEDPARAM_OMIT)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000997.html">[S3d-svn] r1017 - in trunk: apps/meshs3d apps/s3dosm	experimental/olsrs3d libs3d server
+</A></li>
+	<LI>Next message: <A HREF="000999.html">[S3d-svn] r1019 - trunk/objs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#998">[ date ]</a>
+              <a href="thread.html#998">[ thread ]</a>
+              <a href="subject.html#998">[ subject ]</a>
+              <a href="author.html#998">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

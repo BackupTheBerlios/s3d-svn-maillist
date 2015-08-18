@@ -1,0 +1,278 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r999 - in trunk/Documentation: . libs3d libs3dw	manpages/man3
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r999%20-%20in%20trunk/Documentation%3A%20.%20libs3d%20libs3dw%0A%09manpages/man3&In-Reply-To=%3C200809080942.m889ghRj028364%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000978.html">
+   <LINK REL="Next"  HREF="000980.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r999 - in trunk/Documentation: . libs3d libs3dw	manpages/man3</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r999%20-%20in%20trunk/Documentation%3A%20.%20libs3d%20libs3dw%0A%09manpages/man3&In-Reply-To=%3C200809080942.m889ghRj028364%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r999 - in trunk/Documentation: . libs3d libs3dw	manpages/man3">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep  8 11:42:43 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000978.html">[S3d-svn] r998 - in trunk: Documentation/libs3d	Documentation/manpages/man3 libs3d
+</A></li>
+        <LI>Next message: <A HREF="000980.html">[S3d-svn] r1000 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#979">[ date ]</a>
+              <a href="thread.html#979">[ thread ]</a>
+              <a href="subject.html#979">[ subject ]</a>
+              <a href="author.html#979">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-08 11:42:42 +0200 (Mon, 08 Sep 2008)
+New Revision: 999
+
+Modified:
+   trunk/Documentation/extractdefinitions.py
+   trunk/Documentation/libs3d/functions.docbook
+   trunk/Documentation/libs3dw/functions.docbook
+   trunk/Documentation/manpages/man3/s3d_find_event.3
+   trunk/Documentation/manpages/man3/s3d_pop_event.3
+   trunk/Documentation/manpages/man3/s3dw_button_new.3
+   trunk/Documentation/manpages/man3/s3dw_getroot.3
+   trunk/Documentation/manpages/man3/s3dw_input_gettext.3
+   trunk/Documentation/manpages/man3/s3dw_input_new.3
+   trunk/Documentation/manpages/man3/s3dw_label_new.3
+   trunk/Documentation/manpages/man3/s3dw_surface_new.3
+   trunk/Documentation/manpages/man3/s3dw_textbox_new.3
+Log:
+Don't add space between * of the return type and the function name in docbook
+
+Modified: trunk/Documentation/extractdefinitions.py
+===================================================================
+--- trunk/Documentation/extractdefinitions.py	2008-09-08 09:42:36 UTC (rev 998)
++++ trunk/Documentation/extractdefinitions.py	2008-09-08 09:42:42 UTC (rev 999)
+@@ -466,7 +466,10 @@
+ 		funcprototype = create_append(funcsynopsis, 'funcprototype')
+ 
+ 		funcdef = create_append(funcprototype, 'funcdef')
+-		create_append_text(funcdef, function['return']+&quot; &quot;)
++		create_append_text(funcdef, function['return'])
++		if function['return'][-1:] != &quot;*&quot;:
++				# dont add space between * and name
++				create_append_text(funcdef, &quot; &quot;)
+ 
+ 		func = create_append(funcdef, 'function')
+ 		create_append_text(func, function['name'])
+@@ -624,7 +627,10 @@
+ 		funcprototype = create_append(funcsynopsis, 'funcprototype')
+ 
+ 		funcdef = create_append(funcprototype, 'funcdef')
+-		create_append_text(funcdef, function['return']+&quot; &quot;)
++		create_append_text(funcdef, function['return'])
++		if function['return'][-1:] != &quot;*&quot;:
++				# dont add space between * and name
++				create_append_text(funcdef, &quot; &quot;)
+ 
+ 		func = create_append(funcdef, 'function')
+ 		create_append_text(func, function['name'])
+
+Modified: trunk/Documentation/libs3d/functions.docbook
+===================================================================
+--- trunk/Documentation/libs3d/functions.docbook	2008-09-08 09:42:36 UTC (rev 998)
++++ trunk/Documentation/libs3d/functions.docbook	2008-09-08 09:42:42 UTC (rev 999)
+@@ -125,8 +125,8 @@
+ &lt;sect2 id=&quot;s3d_angle_to_cam&quot;&gt;&lt;title&gt;s3d_angle_to_cam&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;float &lt;function&gt;s3d_angle_to_cam&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const float &lt;parameter&gt;obj_pos&lt;/parameter&gt;[]&lt;/paramdef&gt;&lt;paramdef&gt;const float &lt;parameter&gt;cam_pos&lt;/parameter&gt;[]&lt;/paramdef&gt;&lt;paramdef&gt;float *&lt;parameter&gt;angle_rad&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Given obj_pos and cam_pos in the format float[3], angle_rad about which angle the object should be rotated around the y-axis so that it faces the camera. This might become handy if you have some text floating in space and want it to face the camera. <A HREF="http://en.wikipedia.org/wiki/Vector_(spatial">http://en.wikipedia.org/wiki/Vector_(spatial</A>)         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_vector_cross_product&quot;&gt;&lt;title&gt;s3d_vector_cross_product&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3d_vector_cross_product&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const float &lt;parameter&gt;vector1&lt;/parameter&gt;[]&lt;/paramdef&gt;&lt;paramdef&gt;const float &lt;parameter&gt;vector2&lt;/parameter&gt;[]&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;result_vector&lt;/parameter&gt;[]&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Calculates and returns the cross product of vector1 and vector2. All vectors should have the format float[3]. More info on wikipedia. <A HREF="http://en.wikipedia.org/wiki/Vector_(spatial">http://en.wikipedia.org/wiki/Vector_(spatial</A>)         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_push_event&quot;&gt;&lt;title&gt;s3d_push_event&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3d_push_event&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;struct s3d_evt *&lt;parameter&gt;newevt&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Pushes an event onto the event-stack. Usually you don't need to do this manually.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_pop_event&quot;&gt;&lt;title&gt;s3d_pop_event&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;struct s3d_evt * &lt;function&gt;s3d_pop_event&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Pops the latest event from the stack. Don't forget to free() both the event and its buffer! Returns a pointer to struct &lt;link linkend=&quot;structs3d_evt&quot;&gt;s3d_evt&lt;/link&gt;.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3d_find_event&quot;&gt;&lt;title&gt;s3d_find_event&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;struct s3d_evt * &lt;function&gt;s3d_find_event&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;uint8_t &lt;parameter&gt;event&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Finds the latest occurrence of an event, giving the event type as argument. Returns a pointer to struct &lt;link linkend=&quot;structs3d_evt&quot;&gt;s3d_evt&lt;/link&gt;.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_pop_event&quot;&gt;&lt;title&gt;s3d_pop_event&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;struct s3d_evt *&lt;function&gt;s3d_pop_event&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Pops the latest event from the stack. Don't forget to free() both the event and its buffer! Returns a pointer to struct &lt;link linkend=&quot;structs3d_evt&quot;&gt;s3d_evt&lt;/link&gt;.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3d_find_event&quot;&gt;&lt;title&gt;s3d_find_event&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;struct s3d_evt *&lt;function&gt;s3d_find_event&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;uint8_t &lt;parameter&gt;event&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Finds the latest occurrence of an event, giving the event type as argument. Returns a pointer to struct &lt;link linkend=&quot;structs3d_evt&quot;&gt;s3d_evt&lt;/link&gt;.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_delete_event&quot;&gt;&lt;title&gt;s3d_delete_event&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;int &lt;function&gt;s3d_delete_event&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const struct s3d_evt *&lt;parameter&gt;devt&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Deletes an event, the argument is the pointer to the event which is to be deleted (maybe obtained from &lt;link linkend=&quot;s3d_find_event&quot;&gt;s3d_find_event&lt;/link&gt;).         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3d_set_callback&quot;&gt;&lt;title&gt;s3d_set_callback&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3d.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3d_set_callback&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;uint8_t &lt;parameter&gt;event&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;s3d_cb &lt;parameter&gt;func&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Sets a callback for a certain event. this is very useful for event-oriented applications. event callbacks will not interrupt each other or the mainloop.&lt;/para&gt;&lt;warning&gt;&lt;para&gt;Defining callbacks will only work after calling &lt;link linkend=&quot;s3d_init&quot;&gt;s3d_init&lt;/link&gt;()
+ &lt;/para&gt;&lt;/warning&gt;&lt;programlisting&gt; #include &lt;inttypes.h&gt;
+
+Modified: trunk/Documentation/libs3dw/functions.docbook
+===================================================================
+--- trunk/Documentation/libs3dw/functions.docbook	2008-09-08 09:42:36 UTC (rev 998)
++++ trunk/Documentation/libs3dw/functions.docbook	2008-09-08 09:42:42 UTC (rev 999)
+@@ -1,12 +1,12 @@
+-&lt;sect2 id=&quot;s3dw_button_new&quot;&gt;&lt;title&gt;s3dw_button_new&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;s3dw_button * &lt;function&gt;s3dw_button_new&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const char *&lt;parameter&gt;text&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;posx&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;posy&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Creates a new button on the surface, with &quot;text&quot; written on it and the upper left corner at (posx,posy) on the surface.&lt;/para&gt;&lt;para&gt;See &lt;link linkend=&quot;s3dw_button&quot;&gt;s3dw_button&lt;/link&gt; for information about callbacks which may be defined.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3dw_label_new&quot;&gt;&lt;title&gt;s3dw_label_new&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;s3dw_label * &lt;function&gt;s3dw_label_new&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const char *&lt;parameter&gt;text&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;posx&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;posy&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Creates a new label on the surface, with &quot;text&quot; written on it and the upper left corner at (posx,posy) on the surface.&lt;/para&gt;&lt;para&gt;See &lt;link linkend=&quot;s3dw_label&quot;&gt;s3dw_label&lt;/link&gt; for information about callbacks which may be defined.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3dw_input_new&quot;&gt;&lt;title&gt;s3dw_input_new&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;s3dw_input * &lt;function&gt;s3dw_input_new&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;width&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;posx&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;posy&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Creates a new input-box on the surface with a input width of &quot;width&quot;, the upper left corner at (posx,posy) on the surface. The input-box is empty on creation and can be change with &lt;link linkend=&quot;s3dw_input_change_text&quot;&gt;s3dw_input_change_text&lt;/link&gt;, and received with &lt;link linkend=&quot;s3dw_input_gettext&quot;&gt;s3dw_input_gettext&lt;/link&gt;&lt;/para&gt;&lt;para&gt;See &lt;link linkend=&quot;s3dw_input&quot;&gt;s3dw_input&lt;/link&gt; for information about callbacks which may be defined.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3dw_textbox_new&quot;&gt;&lt;title&gt;s3dw_textbox_new&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;s3dw_textbox * &lt;function&gt;s3dw_textbox_new&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const char *&lt;parameter&gt;text&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;posx&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;posy&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;width&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;height&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Creates a new textbox on the surface, with &quot;text&quot; written on it and the upper left corner at (posx,posy) on the surface. Width and height define the size of the textbox including scrollbars which are rendered around the textfield.&lt;/para&gt;&lt;para&gt;See &lt;link linkend=&quot;s3dw_textbox&quot;&gt;s3dw_textbox&lt;/link&gt; for information about callbacks which may be defined.         &lt;/para&gt;&lt;/sect!
+ 2&gt;
+-&lt;sect2 id=&quot;s3dw_input_gettext&quot;&gt;&lt;title&gt;s3dw_input_gettext&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;char * &lt;function&gt;s3dw_input_gettext&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_input *&lt;parameter&gt;input&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Returns the text which is currently entered in the referenced input-box.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3dw_button_new&quot;&gt;&lt;title&gt;s3dw_button_new&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;s3dw_button *&lt;function&gt;s3dw_button_new&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const char *&lt;parameter&gt;text&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;posx&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;posy&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Creates a new button on the surface, with &quot;text&quot; written on it and the upper left corner at (posx,posy) on the surface.&lt;/para&gt;&lt;para&gt;See &lt;link linkend=&quot;s3dw_button&quot;&gt;s3dw_button&lt;/link&gt; for information about callbacks which may be defined.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3dw_label_new&quot;&gt;&lt;title&gt;s3dw_label_new&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;s3dw_label *&lt;function&gt;s3dw_label_new&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const char *&lt;parameter&gt;text&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;posx&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;posy&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Creates a new label on the surface, with &quot;text&quot; written on it and the upper left corner at (posx,posy) on the surface.&lt;/para&gt;&lt;para&gt;See &lt;link linkend=&quot;s3dw_label&quot;&gt;s3dw_label&lt;/link&gt; for information about callbacks which may be defined.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3dw_input_new&quot;&gt;&lt;title&gt;s3dw_input_new&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;s3dw_input *&lt;function&gt;s3dw_input_new&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;width&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;posx&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;posy&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Creates a new input-box on the surface with a input width of &quot;width&quot;, the upper left corner at (posx,posy) on the surface. The input-box is empty on creation and can be change with &lt;link linkend=&quot;s3dw_input_change_text&quot;&gt;s3dw_input_change_text&lt;/link&gt;, and received with &lt;link linkend=&quot;s3dw_input_gettext&quot;&gt;s3dw_input_gettext&lt;/link&gt;&lt;/para&gt;&lt;para&gt;See &lt;link linkend=&quot;s3dw_input&quot;&gt;s3dw_input&lt;/link&gt; for information about callbacks which may be defined.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3dw_textbox_new&quot;&gt;&lt;title&gt;s3dw_textbox_new&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;s3dw_textbox *&lt;function&gt;s3dw_textbox_new&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const s3dw_surface *&lt;parameter&gt;surface&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const char *&lt;parameter&gt;text&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;posx&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;posy&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;width&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;height&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Creates a new textbox on the surface, with &quot;text&quot; written on it and the upper left corner at (posx,posy) on the surface. Width and height define the size of the textbox including scrollbars which are rendered around the textfield.&lt;/para&gt;&lt;para&gt;See &lt;link linkend=&quot;s3dw_textbox&quot;&gt;s3dw_textbox&lt;/link&gt; for information about callbacks which may be defined.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3dw_input_gettext&quot;&gt;&lt;title&gt;s3dw_input_gettext&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;char *&lt;function&gt;s3dw_input_gettext&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_input *&lt;parameter&gt;input&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Returns the text which is currently entered in the referenced input-box.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3dw_input_change_text&quot;&gt;&lt;title&gt;s3dw_input_change_text&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_input_change_text&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_input *&lt;parameter&gt;input&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const char *&lt;parameter&gt;text&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Change the text in the referenced input-box to the specified text.         &lt;/para&gt;&lt;/sect2&gt;
+ &lt;sect2 id=&quot;s3dw_label_change_text&quot;&gt;&lt;title&gt;s3dw_label_change_text&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;void &lt;function&gt;s3dw_label_change_text&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;s3dw_label *&lt;parameter&gt;label&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;const char *&lt;parameter&gt;text&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Change the text in the referenced label to the specified text.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3dw_surface_new&quot;&gt;&lt;title&gt;s3dw_surface_new&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;s3dw_surface * &lt;function&gt;s3dw_surface_new&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const char *&lt;parameter&gt;title&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;width&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;height&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Creates a new surface (a new window) with title &quot;title&quot; and dimension &quot;width&quot; x &quot;height&quot;.&lt;/para&gt;&lt;para&gt;See &lt;link linkend=&quot;s3dw_surface&quot;&gt;s3dw_surface&lt;/link&gt; for information about callbacks which may be defined.         &lt;/para&gt;&lt;/sect2&gt;
+-&lt;sect2 id=&quot;s3dw_getroot&quot;&gt;&lt;title&gt;s3dw_getroot&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;s3dw_widget * &lt;function&gt;s3dw_getroot&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Returns the root-widget, which holds all the surfaces. E.g. if you want to move all widgets at once, adjust the root-widgets x,y,z and use &lt;link linkend=&quot;s3dw_moveit&quot;&gt;s3dw_moveit&lt;/link&gt;()&lt;/para&gt;&lt;programlisting&gt; &lt;link linkend=&quot;s3dw_widget&quot;&gt;s3dw_widget&lt;/link&gt; *root = &lt;link linkend=&quot;s3dw_getroot&quot;&gt;s3dw_getroot&lt;/link&gt;();
++&lt;sect2 id=&quot;s3dw_surface_new&quot;&gt;&lt;title&gt;s3dw_surface_new&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;s3dw_surface *&lt;function&gt;s3dw_surface_new&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;const char *&lt;parameter&gt;title&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;width&lt;/parameter&gt;&lt;/paramdef&gt;&lt;paramdef&gt;float &lt;parameter&gt;height&lt;/parameter&gt;&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Creates a new surface (a new window) with title &quot;title&quot; and dimension &quot;width&quot; x &quot;height&quot;.&lt;/para&gt;&lt;para&gt;See &lt;link linkend=&quot;s3dw_surface&quot;&gt;s3dw_surface&lt;/link&gt; for information about callbacks which may be defined.         &lt;/para&gt;&lt;/sect2&gt;
++&lt;sect2 id=&quot;s3dw_getroot&quot;&gt;&lt;title&gt;s3dw_getroot&lt;/title&gt;&lt;funcsynopsis&gt;&lt;funcsynopsisinfo&gt;#include &lt;s3dw.h&gt;&lt;/funcsynopsisinfo&gt;&lt;funcprototype&gt;&lt;funcdef&gt;s3dw_widget *&lt;function&gt;s3dw_getroot&lt;/function&gt;&lt;/funcdef&gt;&lt;paramdef&gt;void&lt;/paramdef&gt;&lt;/funcprototype&gt;&lt;/funcsynopsis&gt;&lt;para&gt;Returns the root-widget, which holds all the surfaces. E.g. if you want to move all widgets at once, adjust the root-widgets x,y,z and use &lt;link linkend=&quot;s3dw_moveit&quot;&gt;s3dw_moveit&lt;/link&gt;()&lt;/para&gt;&lt;programlisting&gt; &lt;link linkend=&quot;s3dw_widget&quot;&gt;s3dw_widget&lt;/link&gt; *root = &lt;link linkend=&quot;s3dw_getroot&quot;&gt;s3dw_getroot&lt;/link&gt;();
+  // move widget center to (0,5,0). upon creation, it's centered at (0,0,0),
+  // so this might move it up
+  root-&gt;x=0;
+
+Modified: trunk/Documentation/manpages/man3/s3d_find_event.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_find_event.3	2008-09-08 09:42:36 UTC (rev 998)
++++ trunk/Documentation/manpages/man3/s3d_find_event.3	2008-09-08 09:42:42 UTC (rev 999)
+@@ -6,7 +6,7 @@
+ .nf 
+ #include &lt;s3d.h&gt; 
+ .sp 1 
+-\fBstruct s3d_evt * \fBs3d_find_event\fP\fR( 
++\fBstruct s3d_evt *\fBs3d_find_event\fP\fR( 
+ \fB	uint8_t \fBevent\fR\fR); 
+ .fi 
+ .SH &quot;Description&quot; 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pop_event.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pop_event.3	2008-09-08 09:42:36 UTC (rev 998)
++++ trunk/Documentation/manpages/man3/s3d_pop_event.3	2008-09-08 09:42:42 UTC (rev 999)
+@@ -6,7 +6,7 @@
+ .nf 
+ #include &lt;s3d.h&gt; 
+ .sp 1 
+-\fBstruct s3d_evt * \fBs3d_pop_event\fP\fR(\fBvoid\fR) 
++\fBstruct s3d_evt *\fBs3d_pop_event\fP\fR(\fBvoid\fR) 
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_button_new.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_button_new.3	2008-09-08 09:42:36 UTC (rev 998)
++++ trunk/Documentation/manpages/man3/s3dw_button_new.3	2008-09-08 09:42:42 UTC (rev 999)
+@@ -6,7 +6,7 @@
+ .nf 
+ #include &lt;s3dw.h&gt; 
+ .sp 1 
+-\fBs3dw_button * \fBs3dw_button_new\fP\fR( 
++\fBs3dw_button *\fBs3dw_button_new\fP\fR( 
+ \fB	const s3dw_surface *\fBsurface\fR\fR, 
+ \fB	const char *\fBtext\fR\fR, 
+ \fB	float \fBposx\fR\fR, 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_getroot.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_getroot.3	2008-09-08 09:42:36 UTC (rev 998)
++++ trunk/Documentation/manpages/man3/s3dw_getroot.3	2008-09-08 09:42:42 UTC (rev 999)
+@@ -6,7 +6,7 @@
+ .nf 
+ #include &lt;s3dw.h&gt; 
+ .sp 1 
+-\fBs3dw_widget * \fBs3dw_getroot\fP\fR(\fBvoid\fR) 
++\fBs3dw_widget *\fBs3dw_getroot\fP\fR(\fBvoid\fR) 
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_input_gettext.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_input_gettext.3	2008-09-08 09:42:36 UTC (rev 998)
++++ trunk/Documentation/manpages/man3/s3dw_input_gettext.3	2008-09-08 09:42:42 UTC (rev 999)
+@@ -6,7 +6,7 @@
+ .nf 
+ #include &lt;s3dw.h&gt; 
+ .sp 1 
+-\fBchar * \fBs3dw_input_gettext\fP\fR( 
++\fBchar *\fBs3dw_input_gettext\fP\fR( 
+ \fB	s3dw_input *\fBinput\fR\fR); 
+ .fi 
+ .SH &quot;Description&quot; 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_input_new.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_input_new.3	2008-09-08 09:42:36 UTC (rev 998)
++++ trunk/Documentation/manpages/man3/s3dw_input_new.3	2008-09-08 09:42:42 UTC (rev 999)
+@@ -6,7 +6,7 @@
+ .nf 
+ #include &lt;s3dw.h&gt; 
+ .sp 1 
+-\fBs3dw_input * \fBs3dw_input_new\fP\fR( 
++\fBs3dw_input *\fBs3dw_input_new\fP\fR( 
+ \fB	const s3dw_surface *\fBsurface\fR\fR, 
+ \fB	float \fBwidth\fR\fR, 
+ \fB	float \fBposx\fR\fR, 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_label_new.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_label_new.3	2008-09-08 09:42:36 UTC (rev 998)
++++ trunk/Documentation/manpages/man3/s3dw_label_new.3	2008-09-08 09:42:42 UTC (rev 999)
+@@ -6,7 +6,7 @@
+ .nf 
+ #include &lt;s3dw.h&gt; 
+ .sp 1 
+-\fBs3dw_label * \fBs3dw_label_new\fP\fR( 
++\fBs3dw_label *\fBs3dw_label_new\fP\fR( 
+ \fB	const s3dw_surface *\fBsurface\fR\fR, 
+ \fB	const char *\fBtext\fR\fR, 
+ \fB	float \fBposx\fR\fR, 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_surface_new.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_surface_new.3	2008-09-08 09:42:36 UTC (rev 998)
++++ trunk/Documentation/manpages/man3/s3dw_surface_new.3	2008-09-08 09:42:42 UTC (rev 999)
+@@ -6,7 +6,7 @@
+ .nf 
+ #include &lt;s3dw.h&gt; 
+ .sp 1 
+-\fBs3dw_surface * \fBs3dw_surface_new\fP\fR( 
++\fBs3dw_surface *\fBs3dw_surface_new\fP\fR( 
+ \fB	const char *\fBtitle\fR\fR, 
+ \fB	float \fBwidth\fR\fR, 
+ \fB	float \fBheight\fR\fR); 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_textbox_new.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_textbox_new.3	2008-09-08 09:42:36 UTC (rev 998)
++++ trunk/Documentation/manpages/man3/s3dw_textbox_new.3	2008-09-08 09:42:42 UTC (rev 999)
+@@ -6,7 +6,7 @@
+ .nf 
+ #include &lt;s3dw.h&gt; 
+ .sp 1 
+-\fBs3dw_textbox * \fBs3dw_textbox_new\fP\fR( 
++\fBs3dw_textbox *\fBs3dw_textbox_new\fP\fR( 
+ \fB	const s3dw_surface *\fBsurface\fR\fR, 
+ \fB	const char *\fBtext\fR\fR, 
+ \fB	float \fBposx\fR\fR, 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000978.html">[S3d-svn] r998 - in trunk: Documentation/libs3d	Documentation/manpages/man3 libs3d
+</A></li>
+	<LI>Next message: <A HREF="000980.html">[S3d-svn] r1000 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#979">[ date ]</a>
+              <a href="thread.html#979">[ thread ]</a>
+              <a href="subject.html#979">[ subject ]</a>
+              <a href="author.html#979">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

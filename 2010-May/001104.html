@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] Project s3d at BerliOS branch, debian,	updated. debian/0.2.1.1-4-8-gdf7dd76
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2010-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20branch%2C%20debian%2C%0A%09updated.%20debian/0.2.1.1-4-8-gdf7dd76&In-Reply-To=%3C201005141003.o4EA3hrq019008%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001103.html">
+   <LINK REL="Next"  HREF="001105.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] Project s3d at BerliOS branch, debian,	updated. debian/0.2.1.1-4-8-gdf7dd76</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20branch%2C%20debian%2C%0A%09updated.%20debian/0.2.1.1-4-8-gdf7dd76&In-Reply-To=%3C201005141003.o4EA3hrq019008%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] Project s3d at BerliOS branch, debian,	updated. debian/0.2.1.1-4-8-gdf7dd76">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri May 14 12:03:43 CEST 2010</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001103.html">[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-20-gab07ae7
+</A></li>
+        <LI>Next message: <A HREF="001105.html">[S3d-svn] Project s3d at BerliOS annotated tag, debian/0.2.1.1-5,	created. debian/0.2.1.1-5
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1104">[ date ]</a>
+              <a href="thread.html#1104">[ thread ]</a>
+              <a href="subject.html#1104">[ subject ]</a>
+              <a href="author.html#1104">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project &quot;Project s3d at BerliOS&quot;.
+
+The branch, debian has been updated
+       via  df7dd7625e5097e044ade34d52cdc349abba7c0e (commit)
+       via  946fbf209c545c220dedb1a3799388770a427520 (commit)
+       via  9cd638ac51785bb0b06f15cef18527b7d7a95810 (commit)
+       via  0e9ae30bb510542c033dd4a5c2a2c05914c9a910 (commit)
+      from  42e007ed7fb14bf2f33b20ec826fbcb5bfb44704 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit df7dd7625e5097e044ade34d52cdc349abba7c0e
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Fri May 14 11:47:56 2010 +0200
+
+    Release s3d 0.2.1.1-5
+
+commit 946fbf209c545c220dedb1a3799388770a427520
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Fri May 14 11:42:49 2010 +0200
+
+    Reimplement PTY/TTY mode using glibc
+    
+    s3dvt used to open a pty/pts pair by searching /dev for those files.
+    Those paths have been changed and the overall procedure to get a slave
+    pseudo terminal is now dramatically different.
+    
+    Glibc provides enough functionality to create a pair of pseudo terminal
+    master and slave without doing a lot of filesystem work. It is possible
+    that on non linux system extra functions must be implemented to get it
+    working. Those functions are getpt which should open /dev/ptmx and
+    ptsname_r which stores the name of the slave device in an extra buffer.
+
+commit 9cd638ac51785bb0b06f15cef18527b7d7a95810
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Fri May 14 11:39:46 2010 +0200
+
+    Don't accidently use INFINITY from math.h
+    
+    math.h has a constant defined under the name INFINITY which is
+    only defined for floats and not for double. As result the
+    triangulation of some segments failed from time to time.
+    
+    This happens because we also include math.h and it may override our
+    definition of INFINITY. To solve this we just can use HUGE_VAL from
+    math.h which  is defined as the largest possible positive double.
+
+commit 0e9ae30bb510542c033dd4a5c2a2c05914c9a910
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Fri May 14 11:37:55 2010 +0200
+
+    Fix potential buffer overflow when parsing directory
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog                           |    9 ++-
+ debian/patches/libs3d_small-infinity.patch |   43 +++++++++++
+ debian/patches/s3dfm_overflow.patch        |   18 +++++
+ debian/patches/s3dvt_glibc-pty.patch       |  113 ++++++++++++++++++++++++++++
+ debian/patches/series                      |    3 +
+ 5 files changed, 184 insertions(+), 2 deletions(-)
+ create mode 100644 debian/patches/libs3d_small-infinity.patch
+ create mode 100644 debian/patches/s3dfm_overflow.patch
+ create mode 100644 debian/patches/s3dvt_glibc-pty.patch
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001103.html">[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-20-gab07ae7
+</A></li>
+	<LI>Next message: <A HREF="001105.html">[S3d-svn] Project s3d at BerliOS annotated tag, debian/0.2.1.1-5,	created. debian/0.2.1.1-5
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1104">[ date ]</a>
+              <a href="thread.html#1104">[ thread ]</a>
+              <a href="subject.html#1104">[ subject ]</a>
+              <a href="author.html#1104">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

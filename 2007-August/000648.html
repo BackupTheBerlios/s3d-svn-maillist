@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r657 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r657%20-%20trunk/server&In-Reply-To=%3C200708281621.l7SGLnLB008874%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000647.html">
+   <LINK REL="Next"  HREF="000650.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r657 - trunk/server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r657%20-%20trunk/server&In-Reply-To=%3C200708281621.l7SGLnLB008874%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r657 - trunk/server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Aug 28 18:21:49 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000647.html">[S3d-svn] r656 - trunk/apps/kism3d
+</A></li>
+        <LI>Next message: <A HREF="000650.html">[S3d-svn] r658 - in trunk: . libs3d libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#648">[ date ]</a>
+              <a href="thread.html#648">[ thread ]</a>
+              <a href="subject.html#648">[ subject ]</a>
+              <a href="author.html#648">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-08-28 18:21:47 +0200 (Tue, 28 Aug 2007)
+New Revision: 657
+
+Modified:
+   trunk/server/global.h
+   trunk/server/main.c
+   trunk/server/network.c
+   trunk/server/object.c
+Log:
+Mark unused parameters in server as explicit unused
+
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2007-08-28 16:21:46 UTC (rev 656)
++++ trunk/server/global.h	2007-08-28 16:21:47 UTC (rev 657)
+@@ -36,6 +36,15 @@
+ extern int frame_mode; 	 /*  GLUT, SDL, ... ? */
+ extern int running;		 /*  server running flag */
+ /*  relevance macros */
++#ifndef S3DUNUSED
++	#if defined(UNUSEDPARAM_ATTRIBUTE)
++		#define S3DUNUSED(x) (x)__attribute__((unused))
++	#elif defined(UNUSEDPARAM_OMIT)
++		#define S3DUNUSED(x) /* x */
++	#else
++		#define S3DUNUSED(x) x
++	#endif
++#endif
+ #define NAME_MAX	256		 /*  limit for names [e.g. process names] */
+ #define MCP			0		 /*  the mcp's pid	 */
+ #define TEXTURE_MAX_W	2048
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2007-08-28 16:21:46 UTC (rev 656)
++++ trunk/server/main.c	2007-08-28 16:21:47 UTC (rev 657)
+@@ -51,12 +51,12 @@
+ static void mainloop(void);
+ #ifdef SIGS
+ /*  handles the SIGINT command. maybe put signals in a special file? */
+-void sigint_handler(int sig)
++void sigint_handler(int S3DUNUSED(sig))
+ {
+ 	s3dprintf(HIGH,&quot;oh my gosh there is a sigint/term signal! running away ...&quot;);
+ 	quit();
+ }
+-void sigchld_handler(int sig)
++void sigchld_handler(int S3DUNUSED(sig))
+ {
+ 	if (kidpid!=0)
+ 	{
+@@ -66,7 +66,7 @@
+ 	}
+ }
+ #endif
+-void sigusr_handler(int sig)
++void sigusr_handler(int S3DUNUSED(sig))
+ {
+ 	s3dprintf(HIGH,&quot;father told use he's done, so lets start to think about the rc file ...&quot;);
+ 	running=1;
+
+Modified: trunk/server/network.c
+===================================================================
+--- trunk/server/network.c	2007-08-28 16:21:46 UTC (rev 656)
++++ trunk/server/network.c	2007-08-28 16:21:47 UTC (rev 657)
+@@ -48,12 +48,12 @@
+ #endif 
+ 
+ #ifdef SIGS
+-void sigpipe_handler(int unused)  
++void sigpipe_handler(int S3DUNUSED(unused))  
+ {
+ 	errs(&quot;sigpip_handler()&quot;,&quot;there is a broken pipe somewhere&quot;);
+ }
+ 
+-void sigio_handler(int unused)
++void sigio_handler(int S3DUNUSED(unused))
+ {
+ 	sigio=1;
+ }
+@@ -82,7 +82,7 @@
+    return(0);
+ }
+ int					 turn;
+-int	net_turn_off(int interval)
++int	net_turn_off(int S3DUNUSED(interval))
+ {
+ 	s3dprintf(VLOW,&quot;Warning: High traffic on Network, interrupting read.&quot;);
+ 	turn=0;
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2007-08-28 16:21:46 UTC (rev 656)
++++ trunk/server/object.c	2007-08-28 16:21:47 UTC (rev 657)
+@@ -873,7 +873,7 @@
+ 	return(0);
+ }
+ /* the interal texture updating function ... this is for opengl*/
+-static void obj_update_tex(struct t_tex *tex,u_int16_t x,u_int16_t y,u_int16_t w,u_int16_t h,u_int8_t *pixbuf)
++static void obj_update_tex(struct t_tex *tex,u_int16_t S3DUNUSED(x),u_int16_t S3DUNUSED(y),u_int16_t S3DUNUSED(w),u_int16_t S3DUNUSED(h),u_int8_t *S3DUNUSED(pixbuf))
+ {
+ 	GLuint t;
+ 	if ((t=tex-&gt;gl_texnum)!=-1)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000647.html">[S3d-svn] r656 - trunk/apps/kism3d
+</A></li>
+	<LI>Next message: <A HREF="000650.html">[S3d-svn] r658 - in trunk: . libs3d libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#648">[ date ]</a>
+              <a href="thread.html#648">[ thread ]</a>
+              <a href="subject.html#648">[ subject ]</a>
+              <a href="author.html#648">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

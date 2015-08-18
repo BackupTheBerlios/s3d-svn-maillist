@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r684 - trunk/apps/s3d_x11gate
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r684%20-%20trunk/apps/s3d_x11gate&In-Reply-To=%3C200709232157.l8NLv2Dm013363%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000675.html">
+   <LINK REL="Next"  HREF="000677.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r684 - trunk/apps/s3d_x11gate</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r684%20-%20trunk/apps/s3d_x11gate&In-Reply-To=%3C200709232157.l8NLv2Dm013363%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r684 - trunk/apps/s3d_x11gate">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Sep 23 23:57:02 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000675.html">[S3d-svn] r683 - trunk/apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000677.html">[S3d-svn] r685 - trunk/apps/s3d_x11gate
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#676">[ date ]</a>
+              <a href="thread.html#676">[ thread ]</a>
+              <a href="subject.html#676">[ subject ]</a>
+              <a href="author.html#676">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-09-23 23:57:02 +0200 (Sun, 23 Sep 2007)
+New Revision: 684
+
+Modified:
+   trunk/apps/s3d_x11gate/s3d_x11gate.c
+Log:
+Fix -Wextra sign warnings in s3d_x11gate
+
+
+Modified: trunk/apps/s3d_x11gate/s3d_x11gate.c
+===================================================================
+--- trunk/apps/s3d_x11gate/s3d_x11gate.c	2007-09-23 21:56:40 UTC (rev 683)
++++ trunk/apps/s3d_x11gate/s3d_x11gate.c	2007-09-23 21:57:02 UTC (rev 684)
+@@ -35,10 +35,6 @@
+ #include &lt;sys/time.h&gt;  /* gettimeofday */
+ #include &lt;sys/ipc.h&gt;
+ #include &lt;sys/shm.h&gt;
+-static struct timespec t = {
+-	0, 100*1000*1000
+-}; /* 100 mili seconds */
+-
+ int oid;
+ XImage *image;
+ Display *dpy = 0;
+@@ -67,12 +63,13 @@
+ }
+ void mainloop()
+ {
+-	int x, y;
++#define MAGIC_CHANGED ((unsigned int)~0)
++	unsigned int x, y;
+ 	int rs, gs, bs;
+ 	unsigned long d;
+ 	int bpp;
+ 	char *swap_timg;
+-	int last_change, start_change;
++	unsigned int last_change, start_change;
+ 	gettimeofday(&amp;end, NULL);
+ 	count[0] += (end.tv_sec - start.tv_sec) * 10000000 + end.tv_usec - start.tv_usec;
+ 	start.tv_sec = end.tv_sec;
+@@ -101,8 +98,8 @@
+ 		  printf(&quot;green: size %d, offset %d\n&quot;,gs,goff);
+ 		  printf(&quot;blue: size %d, offset %d\n&quot;,bs,boff);
+ 		  printf(&quot;bits per pixel:%d\n&quot;,bpp);*/
+-		last_change = -1;
+-		start_change = -1;
++		last_change = MAGIC_CHANGED;
++		start_change = MAGIC_CHANGED;
+ 		for (y = 0;y &lt; height;y++) {
+ 
+ 			for (x = 0;x &lt; width;x++) {
+@@ -116,20 +113,20 @@
+ 				                ((unsigned long *)otex_image)[(y*width+x)])
+ 					last_change = y;
+ 			}
+-			if (last_change != -1) {
+-				if (start_change == -1) {
++			if (last_change != MAGIC_CHANGED) {
++				if (start_change == MAGIC_CHANGED) {
+ 					start_change = y;
+ 					/*      printf(&quot;setting start_change to %d\n&quot;,start_change); */
+ 				}
+ 				if (last_change != y) {  /*  last change is already over, post it! */
+ 					s3d_load_texture(oid, 0, 0, start_change, width, last_change - start_change + 1, (unsigned char *)tex_image + start_change*width*4);
+-					start_change = -1;
+-					last_change = -1;
++					start_change = MAGIC_CHANGED;
++					last_change = MAGIC_CHANGED;
+ 				}
+ 			}
+ 		}
+ 		/*  posting the last bit, maybe */
+-		if (last_change != -1) {
++		if (last_change != MAGIC_CHANGED) {
+ 			/*   printf(&quot;last one: [%d-%d]&quot;,start_change,last_change);*/
+ 			s3d_load_texture(oid, 0, 0, start_change, width, last_change - start_change, (unsigned char *)tex_image + start_change*width*4);
+ 		}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000675.html">[S3d-svn] r683 - trunk/apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000677.html">[S3d-svn] r685 - trunk/apps/s3d_x11gate
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#676">[ date ]</a>
+              <a href="thread.html#676">[ thread ]</a>
+              <a href="subject.html#676">[ subject ]</a>
+              <a href="author.html#676">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

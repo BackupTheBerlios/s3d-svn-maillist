@@ -1,0 +1,445 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r880 - trunk/libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r880%20-%20trunk/libs3d&In-Reply-To=%3C200711252008.lAPK8aPK026213%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000872.html">
+   <LINK REL="Next"  HREF="000874.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r880 - trunk/libs3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r880%20-%20trunk/libs3d&In-Reply-To=%3C200711252008.lAPK8aPK026213%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r880 - trunk/libs3d">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 25 21:08:36 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000872.html">[S3d-svn] r879 - trunk/libs3d
+</A></li>
+        <LI>Next message: <A HREF="000874.html">[S3d-svn] r881 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#873">[ date ]</a>
+              <a href="thread.html#873">[ thread ]</a>
+              <a href="subject.html#873">[ subject ]</a>
+              <a href="author.html#873">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-25 21:08:35 +0100 (Sun, 25 Nov 2007)
+New Revision: 880
+
+Modified:
+   trunk/libs3d/callback.c
+   trunk/libs3d/config.h
+   trunk/libs3d/error.c
+   trunk/libs3d/event.c
+   trunk/libs3d/fontselect.c
+   trunk/libs3d/freetype.c
+   trunk/libs3d/io.c
+   trunk/libs3d/modelread.c
+   trunk/libs3d/network.c
+   trunk/libs3d/object_queue.c
+   trunk/libs3d/proto_in.c
+   trunk/libs3d/proto_out.c
+   trunk/libs3d/s3d.h
+   trunk/libs3d/s3d_keysym.h
+   trunk/libs3d/s3dlib.h
+   trunk/libs3d/sei_construct.c
+   trunk/libs3d/sei_interface.h
+   trunk/libs3d/sei_misc.c
+   trunk/libs3d/sei_monotone.c
+   trunk/libs3d/sei_tri.c
+   trunk/libs3d/sei_triangulate.h
+   trunk/libs3d/shm.c
+   trunk/libs3d/shm_ringbuf.c
+   trunk/libs3d/tcp.c
+   trunk/libs3d/vector.c
+Log:
+- update copyright dates
+
+
+Modified: trunk/libs3d/callback.c
+===================================================================
+--- trunk/libs3d/callback.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/callback.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * callback.c
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+
+Modified: trunk/libs3d/config.h
+===================================================================
+--- trunk/libs3d/config.h	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/config.h	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * config.h
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+
+Modified: trunk/libs3d/error.c
+===================================================================
+--- trunk/libs3d/error.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/error.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * error.c
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+
+Modified: trunk/libs3d/event.c
+===================================================================
+--- trunk/libs3d/event.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/event.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * event.c
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+
+Modified: trunk/libs3d/fontselect.c
+===================================================================
+--- trunk/libs3d/fontselect.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/fontselect.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * fontselect.c
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+
+Modified: trunk/libs3d/freetype.c
+===================================================================
+--- trunk/libs3d/freetype.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/freetype.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * freetype.c
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+
+Modified: trunk/libs3d/io.c
+===================================================================
+--- trunk/libs3d/io.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/io.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * io.c
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+
+Modified: trunk/libs3d/modelread.c
+===================================================================
+--- trunk/libs3d/modelread.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/modelread.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * modelread.c
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+
+Modified: trunk/libs3d/network.c
+===================================================================
+--- trunk/libs3d/network.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/network.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * network.c
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+
+Modified: trunk/libs3d/object_queue.c
+===================================================================
+--- trunk/libs3d/object_queue.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/object_queue.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * object_queue.c
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+
+Modified: trunk/libs3d/proto_in.c
+===================================================================
+--- trunk/libs3d/proto_in.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/proto_in.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * proto_in.c
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+
+Modified: trunk/libs3d/proto_out.c
+===================================================================
+--- trunk/libs3d/proto_out.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/proto_out.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * proto_out.c
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+
+Modified: trunk/libs3d/s3d.h
+===================================================================
+--- trunk/libs3d/s3d.h	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/s3d.h	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * s3d.h
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+
+Modified: trunk/libs3d/s3d_keysym.h
+===================================================================
+--- trunk/libs3d/s3d_keysym.h	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/s3d_keysym.h	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * s3d_keysym.h
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  * Copyright (C) 1997-2004 Sam Lantinga &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">slouken at libsdl.org</A>&gt;
+  *
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+
+Modified: trunk/libs3d/s3dlib.h
+===================================================================
+--- trunk/libs3d/s3dlib.h	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/s3dlib.h	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * s3dlib.h
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+
+Modified: trunk/libs3d/sei_construct.c
+===================================================================
+--- trunk/libs3d/sei_construct.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/sei_construct.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * sei_construct.c
+  *
+- * Copyright (C) 2006 Simon Wunderlich
++ * Copyright (C) 2006-2007 Simon Wunderlich
+  * Copyright (C) 1994 A. Narkhede and D .Manocha, who released their code
+  * for public domain:
+  * &lt;snip&gt;
+
+Modified: trunk/libs3d/sei_interface.h
+===================================================================
+--- trunk/libs3d/sei_interface.h	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/sei_interface.h	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * sei_interface.h
+  *
+- * Copyright (C) 2006 Simon Wunderlich
++ * Copyright (C) 2006-2007 Simon Wunderlich
+  * Copyright (C) 1994 A. Narkhede and D .Manocha, who released their code
+  * for public domain:
+  * &lt;snip&gt;
+
+Modified: trunk/libs3d/sei_misc.c
+===================================================================
+--- trunk/libs3d/sei_misc.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/sei_misc.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * sei_misc.c
+  *
+- * Copyright (C) 2006 Simon Wunderlich
++ * Copyright (C) 2006-2007 Simon Wunderlich
+  * Copyright (C) 1994 A. Narkhede and D .Manocha, who released their code
+  * for public domain:
+  * &lt;snip&gt;
+
+Modified: trunk/libs3d/sei_monotone.c
+===================================================================
+--- trunk/libs3d/sei_monotone.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/sei_monotone.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * sei_monotone.c
+  *
+- * Copyright (C) 2006 Simon Wunderlich
++ * Copyright (C) 2006-2007 Simon Wunderlich
+  * Copyright (C) 1994 A. Narkhede and D .Manocha, who released their code
+  * for public domain:
+  * &lt;snip&gt;
+
+Modified: trunk/libs3d/sei_tri.c
+===================================================================
+--- trunk/libs3d/sei_tri.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/sei_tri.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * sei_tri.c
+  *
+- * Copyright (C) 2006 Simon Wunderlich
++ * Copyright (C) 2006-2007 Simon Wunderlich
+  * Copyright (C) 1994 A. Narkhede and D .Manocha, who released their code
+  * for public domain:
+  * &lt;snip&gt;
+
+Modified: trunk/libs3d/sei_triangulate.h
+===================================================================
+--- trunk/libs3d/sei_triangulate.h	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/sei_triangulate.h	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * sei_triangulate.h
+  *
+- * Copyright (C) 2006 Simon Wunderlich
++ * Copyright (C) 2006-2007 Simon Wunderlich
+  * Copyright (C) 1994 A. Narkhede and D .Manocha, who released their code
+  * for public domain:
+  * &lt;snip&gt;
+
+Modified: trunk/libs3d/shm.c
+===================================================================
+--- trunk/libs3d/shm.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/shm.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * shm.c
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+
+Modified: trunk/libs3d/shm_ringbuf.c
+===================================================================
+--- trunk/libs3d/shm_ringbuf.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/shm_ringbuf.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * shm_ringbuf.c
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+
+Modified: trunk/libs3d/tcp.c
+===================================================================
+--- trunk/libs3d/tcp.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/tcp.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * tcp.c
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+  * This file is part of the s3d API, the API of s3d (the 3d network display server).
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+
+Modified: trunk/libs3d/vector.c
+===================================================================
+--- trunk/libs3d/vector.c	2007-11-25 20:04:45 UTC (rev 879)
++++ trunk/libs3d/vector.c	2007-11-25 20:08:35 UTC (rev 880)
+@@ -1,7 +1,7 @@
+ /*
+  * vector.c
+  *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ * Copyright (C) 2004-2007 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *                         Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
+  *                         Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
+  *
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000872.html">[S3d-svn] r879 - trunk/libs3d
+</A></li>
+	<LI>Next message: <A HREF="000874.html">[S3d-svn] r881 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#873">[ date ]</a>
+              <a href="thread.html#873">[ thread ]</a>
+              <a href="subject.html#873">[ subject ]</a>
+              <a href="author.html#873">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

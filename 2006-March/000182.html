@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r186 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r186%20-%20trunk&In-Reply-To=%3C200603152020.k2FKK3GM013560%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000181.html">
+   <LINK REL="Next"  HREF="000183.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r186 - trunk</H1>
+    <B>ankon at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r186%20-%20trunk&In-Reply-To=%3C200603152020.k2FKK3GM013560%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r186 - trunk">ankon at berlios.de
+       </A><BR>
+    <I>Wed Mar 15 21:20:03 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000181.html">[S3d-svn] r185 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000183.html">[S3d-svn] r187 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#182">[ date ]</a>
+              <a href="thread.html#182">[ thread ]</a>
+              <a href="subject.html#182">[ subject ]</a>
+              <a href="author.html#182">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: ankon
+Date: 2006-03-15 21:19:59 +0100 (Wed, 15 Mar 2006)
+New Revision: 186
+
+Modified:
+   trunk/configure.ac
+Log:
+Use positive logic for checks for glut and sdl.
+Looks like I'm to dense to get the concept of &quot;!=&quot; right. 
+
+Found by trying to build s3d on a system w/o glut.
+
+
+
+Modified: trunk/configure.ac
+===================================================================
+--- trunk/configure.ac	2006-03-15 20:12:37 UTC (rev 185)
++++ trunk/configure.ac	2006-03-15 20:19:59 UTC (rev 186)
+@@ -73,9 +73,9 @@
+ 
+ MDL_HAVE_OPENGL
+ AC_SEARCH_LIBS(glutInit, glut, [
+-HAVE_glut=x
++HAVE_glut=&quot;yes&quot;
+ GLUT_CFLAGS=
+-GLUT_LIBS=-lglut
++GLUT_LIBS=&quot;-lglut&quot;
+ ], [
+ HAVE_glut=
+ GLUT_CFLAGS=
+@@ -85,19 +85,19 @@
+ AC_SUBST(GLUT_LIBS)
+ 
+ SDL_VERSION=1.2.7
+-AM_PATH_SDL($SDL_VERSION, [HAVE_SDL=&quot;x&quot;], [])
+-if test &quot;x${HAVE_glut}&quot; != &quot;x&quot;; then
++AM_PATH_SDL($SDL_VERSION, [HAVE_SDL=&quot;yes&quot;], [])
++if test &quot;x${HAVE_glut}&quot; = &quot;xyes&quot;; then
+ 	AC_DEFINE([G_GLUT], 1, [Use GLUT])
+ fi
+-if test &quot;x${HAVE_SDL}&quot; != &quot;x&quot;; then
++if test &quot;x${HAVE_SDL}&quot; = &quot;xyes&quot;; then
+ 	AC_DEFINE([G_SDL], 1, [Use SDL])
+ fi
+ if test &quot;x${HAVE_glut}${HAVE_SDL}&quot; = &quot;x&quot;; then
+ 	AC_MSG_ERROR([No OpenGL Framework found. Try installing GLUT or SDL, or both])
+ fi
+ 
+-AM_CONDITIONAL([BUILD_SDL], test x&quot;${HAVE_SDL}&quot; != x)
+-AM_CONDITIONAL([BUILD_GLUT], test x&quot;${HAVE_glut}&quot; != x)
++AM_CONDITIONAL([BUILD_SDL], test x&quot;${HAVE_SDL}&quot; = xyes)
++AM_CONDITIONAL([BUILD_GLUT], test x&quot;${HAVE_glut}&quot; = xyes)
+ 
+ dnl ##################################### CLIENT #######################################
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000181.html">[S3d-svn] r185 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000183.html">[S3d-svn] r187 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#182">[ date ]</a>
+              <a href="thread.html#182">[ thread ]</a>
+              <a href="subject.html#182">[ subject ]</a>
+              <a href="author.html#182">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

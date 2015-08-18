@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r266 - in trunk: . apps/dot_mcp
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r266%20-%20in%20trunk%3A%20.%20apps/dot_mcp&In-Reply-To=%3C200605021959.k42JxZ63019919%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000258.html">
+   <LINK REL="Next"  HREF="000260.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r266 - in trunk: . apps/dot_mcp</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r266%20-%20in%20trunk%3A%20.%20apps/dot_mcp&In-Reply-To=%3C200605021959.k42JxZ63019919%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r266 - in trunk: . apps/dot_mcp">dotslash at berlios.de
+       </A><BR>
+    <I>Tue May  2 21:59:35 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000258.html">[S3d-svn] r265 - in trunk: . apps/dot_mcp server
+</A></li>
+        <LI>Next message: <A HREF="000260.html">[S3d-svn] r267 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#259">[ date ]</a>
+              <a href="thread.html#259">[ thread ]</a>
+              <a href="subject.html#259">[ subject ]</a>
+              <a href="author.html#259">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-02 21:59:33 +0200 (Tue, 02 May 2006)
+New Revision: 266
+
+Modified:
+   trunk/
+   trunk/apps/dot_mcp/main.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r495 at balthasar</A>:  dotslash | 2006-05-02 21:58:59 +0200
+ - rotate the s3d-button a lil bit ...
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:493
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:495
+
+Modified: trunk/apps/dot_mcp/main.c
+===================================================================
+--- trunk/apps/dot_mcp/main.c	2006-05-02 19:36:29 UTC (rev 265)
++++ trunk/apps/dot_mcp/main.c	2006-05-02 19:59:33 UTC (rev 266)
+@@ -218,6 +218,7 @@
+ {
+ 	struct app *a=apps;
+ 	int j=0;
++	float u[3],v[3],ya,xa;
+ 	while (a!=NULL)
+ 	{
+ 		if (a-&gt;init)	
+@@ -237,6 +238,13 @@
+ 		a=a-&gt;next;
+ 	}
+ 	s3d_translate(menu,	left*zoom+0.4,(-bottom)*zoom-0.4,-zoom);
++	
++	v[0]=0;				v[1]=0;					v[2]=1;
++	u[0]=left*zoom+0.4; u[1]=0;					u[2]=-zoom;
++	ya=s3d_vector_angle(v,u);
++	u[0]=0; 			u[1]=(-bottom)*zoom;	u[2]=-zoom;
++	xa=s3d_vector_angle(v,u);
++	s3d_rotate(menu, 0 ,30,0); 
+ }
+ void mcp_object(struct s3d_evt *hrmz)
+ {
+@@ -440,12 +448,12 @@
+ 
+ int main (int argc, char **argv)
+ {
+-		s3d_set_callback(S3D_EVENT_OBJ_INFO,object_info);
+-		s3d_set_callback(S3D_MCP_OBJECT,mcp_object);
+-		s3d_set_callback(S3D_EVENT_QUIT,stop);
+-		s3d_set_callback(S3D_MCP_DEL_OBJECT,mcp_del_object);
+-		s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
+-		s3d_set_callback(S3D_EVENT_KEY,keypress);
++	s3d_set_callback(S3D_EVENT_OBJ_INFO,object_info);
++	s3d_set_callback(S3D_MCP_OBJECT,mcp_object);
++	s3d_set_callback(S3D_EVENT_QUIT,stop);
++	s3d_set_callback(S3D_MCP_DEL_OBJECT,mcp_del_object);
++	s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
++	s3d_set_callback(S3D_EVENT_KEY,keypress);
+ 
+ 	if (!s3d_init(&amp;argc,&amp;argv,&quot;mcp&quot;))	
+ 	{
+@@ -455,11 +463,6 @@
+ 		{
+ 			printf(&quot;font not found\n&quot;);
+ 		}
+-/*		sphere=s3d_import_3ds_file(&quot;objs/sphere.3ds&quot;);*/
+-/*		s3d_pep_material_a(sphere,
+-					1,1,1,0.2,
+-					1,1,1,0.2,
+-					1,1,1,0.2);*/
+ 		min_but=s3d_import_3ds_file(&quot;objs/btn_minimize.3ds&quot;);
+ 		rotate=s3d_import_3ds_file(&quot;objs/btn_rotate.3ds&quot;);
+ 		reset=s3d_import_3ds_file(&quot;objs/reset.3ds&quot;);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000258.html">[S3d-svn] r265 - in trunk: . apps/dot_mcp server
+</A></li>
+	<LI>Next message: <A HREF="000260.html">[S3d-svn] r267 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#259">[ date ]</a>
+              <a href="thread.html#259">[ thread ]</a>
+              <a href="subject.html#259">[ subject ]</a>
+              <a href="author.html#259">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r18 - in trunk: . client
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-January/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r18%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200601311638.k0VGcvHo024692%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000013.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r18 - in trunk: . client</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r18%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200601311638.k0VGcvHo024692%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r18 - in trunk: . client">dotslash at berlios.de
+       </A><BR>
+    <I>Tue Jan 31 17:38:57 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000013.html">[S3d-svn] r17 - trunk
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#14">[ date ]</a>
+              <a href="thread.html#14">[ thread ]</a>
+              <a href="subject.html#14">[ subject ]</a>
+              <a href="author.html#14">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-01-31 17:38:56 +0100 (Tue, 31 Jan 2006)
+New Revision: 18
+
+Modified:
+   trunk/
+   trunk/client/freetype.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r27 at balthasar</A>:  dotslash | 2006-01-31 17:38:48 +0100
+ Not using (incomplete) new triangulation function, use old (mostly working, sometimes crashing) libglu one ...
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:23
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:27
+
+Modified: trunk/client/freetype.c
+===================================================================
+--- trunk/client/freetype.c	2006-01-31 10:35:01 UTC (rev 17)
++++ trunk/client/freetype.c	2006-01-31 16:38:56 UTC (rev 18)
+@@ -199,7 +199,7 @@
+ 	return(0);
+ }
+ /*  tessaltes a character and adds it to the buffer */
+-int _s3d_add_tessbuf_gl(unsigned short a)
++int _s3d_add_tessbuf(unsigned short a)
+ {
+ 	float norm;
+ 	int j,c;
+@@ -249,7 +249,7 @@
+ 	return(0);
+ }
+ /*  tesselates a character and adds it to the buffer, without glu */
+-int _s3d_add_tessbuf(unsigned short a)
++int _s3d_add_tessbuf_new(unsigned short a)
+ {
+ 	float norm;
+ 	int j,c,start;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000013.html">[S3d-svn] r17 - trunk
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#14">[ date ]</a>
+              <a href="thread.html#14">[ thread ]</a>
+              <a href="subject.html#14">[ subject ]</a>
+              <a href="author.html#14">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

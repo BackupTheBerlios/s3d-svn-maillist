@@ -1,0 +1,218 @@
+From lazhur at mail.berlios.de  Wed Sep  9 14:26:02 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Wed, 9 Sep 2009 14:26:02 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	updated. v0.2.1.1-5-g476b471
+Message-ID: <200909091226.n89CQ2MV025160@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been updated
+       via  476b471b5c252ef591929308585bff52aef3b475 (commit)
+      from  3138bf53baec43ffafd798d3d7966061bf8b0805 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 476b471b5c252ef591929308585bff52aef3b475
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Sep 9 14:24:54 2009 +0200
+
+    Correct conversion from string constant to ???char*???
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ experimental/comptest/x11.c |    2 +-
+ libs3d/s3dlib.h             |    2 +-
+ libs3d/tcp.c                |    2 +-
+ libs3dw/s3dw.h              |    4 ++--
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Sep 12 15:25:57 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 12 Sep 2009 15:25:57 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-1-4-g748baef
+Message-ID: <200909121325.n8CDPvFG019818@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  748baef3f6fe6e31061dc568652b2a7c4727862e (commit)
+       via  ce5f646e39094f25c0f6b2f940f3d170e0506e4a (commit)
+      from  bc883eda0767440b2dcf21a8bd105db3c4fa4238 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 748baef3f6fe6e31061dc568652b2a7c4727862e
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Sep 12 15:24:19 2009 +0200
+
+    Remove number before patches as order is given by debian/patches/series
+
+commit ce5f646e39094f25c0f6b2f940f3d170e0506e4a
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Sep 12 15:18:15 2009 +0200
+
+    Change to dep3 patch tagging guidelines
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog                                   |    3 +++
+ ...e-examples.patch => installable-examples.patch} |    9 +++------
+ debian/patches/series                              |    2 +-
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+ rename debian/patches/{100-installable-examples.patch => installable-examples.patch} (92%)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sun Sep 13 00:19:39 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun, 13 Sep 2009 00:19:39 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-1-5-g762a951
+Message-ID: <200909122219.n8CMJdFv011491@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  762a9518d1ffeb9d4447d693511db8bc0c8cb479 (commit)
+      from  748baef3f6fe6e31061dc568652b2a7c4727862e (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 762a9518d1ffeb9d4447d693511db8bc0c8cb479
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sun Sep 13 00:19:48 2009 +0200
+
+    Rebuild patches with git-dep3-format
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/patches/installable-examples.patch |   30 ++++++++--------------------
+ 1 files changed, 9 insertions(+), 21 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Fri Sep 18 20:36:37 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Fri, 18 Sep 2009 20:36:37 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-66-gd0b565b
+Message-ID: <200909181836.n8IIabfE011680@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  d0b565b2f0fc6720659754473f374583d7b7a9cd (commit)
+      from  0f9c384b6a60ab7ea7b6954e1e72d3ae799d5515 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit d0b565b2f0fc6720659754473f374583d7b7a9cd
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Fri Sep 18 20:19:10 2009 +0200
+
+    Use python-config instead of hardcoded files for python modules
+    
+    Hardcoded paths for python development files are on most distributions
+    version specific and thus we must use python-config to find the current
+    correct paths for the user/distribution prefered python version.
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ extras/swig/Makefile |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sun Sep 20 16:37:10 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun, 20 Sep 2009 16:37:10 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-1-7-g36d3616
+Message-ID: <200909201437.n8KEb9oE016340@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  36d36169192ee8a9b003f4eca2b3192b7fedc4c3 (commit)
+       via  b130a35041591242b254f55df9568dab842a0f7c (commit)
+      from  762a9518d1ffeb9d4447d693511db8bc0c8cb479 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 36d36169192ee8a9b003f4eca2b3192b7fedc4c3
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sun Sep 20 16:30:45 2009 +0200
+
+    Correct version number for soname and pkg-config
+
+commit b130a35041591242b254f55df9568dab842a0f7c
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sun Sep 20 16:22:38 2009 +0200
+
+    Remove Martin Stern from debian/copyright as his files were removed
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog                    |    2 ++
+ debian/copyright                    |    1 -
+ debian/patches/series               |    1 +
+ debian/patches/version_number.patch |   16 ++++++++++++++++
+ 4 files changed, 19 insertions(+), 1 deletions(-)
+ create mode 100644 debian/patches/version_number.patch
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

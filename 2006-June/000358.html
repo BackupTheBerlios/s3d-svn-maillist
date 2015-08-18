@@ -1,0 +1,426 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r365 - in trunk: example libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r365%20-%20in%20trunk%3A%20example%20libs3dw&In-Reply-To=%3C200606271732.k5RHWoVf005721%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000357.html">
+   <LINK REL="Next"  HREF="000359.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r365 - in trunk: example libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r365%20-%20in%20trunk%3A%20example%20libs3dw&In-Reply-To=%3C200606271732.k5RHWoVf005721%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r365 - in trunk: example libs3dw">dotslash at berlios.de
+       </A><BR>
+    <I>Tue Jun 27 19:32:50 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000357.html">[S3d-svn] r364 - trunk/libs3d
+</A></li>
+        <LI>Next message: <A HREF="000359.html">[S3d-svn] r366 - in trunk: . libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#358">[ date ]</a>
+              <a href="thread.html#358">[ thread ]</a>
+              <a href="subject.html#358">[ subject ]</a>
+              <a href="author.html#358">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-27 19:32:46 +0200 (Tue, 27 Jun 2006)
+New Revision: 365
+
+Modified:
+   trunk/example/widgets.c
+   trunk/libs3dw/Makefile.am
+   trunk/libs3dw/animate.c
+   trunk/libs3dw/arrange.c
+   trunk/libs3dw/event.c
+   trunk/libs3dw/root.c
+   trunk/libs3dw/s3dw.h
+   trunk/libs3dw/s3dw_int.h
+Log:
+- widgets are turning to user (not really yet, but it's funny :D)
+- s3dw_object_info(), so s3dw will get info about the objects
+- widgets move away from camera (no ugly clipping effects)
+
+Modified: trunk/example/widgets.c
+===================================================================
+--- trunk/example/widgets.c	2006-06-27 16:54:56 UTC (rev 364)
++++ trunk/example/widgets.c	2006-06-27 17:32:46 UTC (rev 365)
+@@ -132,6 +132,7 @@
+ 	{
+ 		s3d_set_callback(S3D_EVENT_OBJ_CLICK,click);
+ 		s3d_set_callback(S3D_EVENT_KEY,key);
++		s3d_set_callback(S3D_EVENT_OBJ_INFO,s3dw_object_info);
+ 		/* this creates the &quot;window&quot; */
+ 		surface=s3dw_surface_new(&quot;Hello World&quot;,20,10);
+ 		
+
+Modified: trunk/libs3dw/Makefile.am
+===================================================================
+--- trunk/libs3dw/Makefile.am	2006-06-27 16:54:56 UTC (rev 364)
++++ trunk/libs3dw/Makefile.am	2006-06-27 17:32:46 UTC (rev 365)
+@@ -1,6 +1,6 @@
+ lib_LTLIBRARIES=	libs3dw.la
+ 
+-libs3dw_la_SOURCES=	button.c surface.c widget.c style.c event.c animate.c label.c input.c root.c arrange.c
++libs3dw_la_SOURCES=	button.c surface.c widget.c style.c event.c animate.c label.c input.c root.c arrange.c 
+ 			
+ include_HEADERS= 	s3dw.h
+ noinst_HEADERS=		s3dw_int.h
+
+Modified: trunk/libs3dw/animate.c
+===================================================================
+--- trunk/libs3dw/animate.c	2006-06-27 16:54:56 UTC (rev 364)
++++ trunk/libs3dw/animate.c	2006-06-27 17:32:46 UTC (rev 365)
+@@ -81,6 +81,9 @@
+ 	f-&gt;ax= f-&gt;x;
+ 	f-&gt;ay= f-&gt;y;
+ 	f-&gt;az= f-&gt;z;
++	f-&gt;arx= f-&gt;rx;
++	f-&gt;ary= f-&gt;ry;
++	f-&gt;arz= f-&gt;rz;
+ 	f-&gt;as= f-&gt;s;
+ 	s3dw_ani_doit(f);
+ 	if (i!=-1)
+@@ -91,6 +94,9 @@
+ 	f-&gt;ax=(f-&gt;x + f-&gt;ax*ZOOMS)/(ZOOMS+1);
+ 	f-&gt;ay=(f-&gt;y + f-&gt;ay*ZOOMS)/(ZOOMS+1);
+ 	f-&gt;az=(f-&gt;z + f-&gt;az*ZOOMS)/(ZOOMS+1);
++	f-&gt;arx=(f-&gt;rx + f-&gt;arx*ZOOMS)/(ZOOMS+1);
++	f-&gt;ary=(f-&gt;ry + f-&gt;ary*ZOOMS)/(ZOOMS+1);
++	f-&gt;arz=(f-&gt;rz + f-&gt;arz*ZOOMS)/(ZOOMS+1);
+ 	f-&gt;as=(f-&gt;s + f-&gt;as*ZOOMS)/(ZOOMS+1);
+ 
+ }
+@@ -98,11 +104,15 @@
+ /* checks if f is good enough */
+ int s3dw_ani_check(s3dw_widget *f)
+ {
+-	float x,y,z;
++	float x,y,z,rx,ry,rz;
+ 	x=f-&gt;ax - f-&gt;x;
+ 	y=f-&gt;ay - f-&gt;y;
+ 	z=f-&gt;az - f-&gt;z;
+-	if (((fabs(f-&gt;as - f-&gt;s)/f-&gt;s)&gt;0.01) || (sqrt(x*x+y*y+z*z) &gt; 0.01))
++	rx=f-&gt;arx - f-&gt;rx;
++	ry=f-&gt;ary - f-&gt;ry;
++	rz=f-&gt;arz - f-&gt;rz;
++
++	if (((fabs(f-&gt;as - f-&gt;s)/f-&gt;s)&gt;0.01) || (sqrt(x*x+y*y+z*z) &gt; 0.01) || (sqrt(rx*rx+ry*ry+rz*rz) &gt; 0.01))
+ 		return(0);
+ 	return(1);
+ }
+
+Modified: trunk/libs3dw/arrange.c
+===================================================================
+--- trunk/libs3dw/arrange.c	2006-06-27 16:54:56 UTC (rev 364)
++++ trunk/libs3dw/arrange.c	2006-06-27 17:32:46 UTC (rev 365)
+@@ -25,12 +25,14 @@
+ #include &lt;s3dw.h&gt;
+ #include &lt;s3dw_int.h&gt;
+ #include &lt;stdlib.h&gt; /* rand(), RAND_MAX */
++#include &lt;math.h&gt;	/* M_PI */
++s3dw_widget *cam=NULL;
+ 
+ void s3dw_arr_widgetcenter(s3dw_widget *widget, float *center)
+ {
+-	center[0]=widget-&gt;width/2;
+-	center[1]=-widget-&gt;height/2+0.5;
+-	center[2]=0.5;
++	center[0]=widget-&gt;s*widget-&gt;width/2;
++	center[1]=widget-&gt;s*-widget-&gt;height/2+0.5;
++	center[2]=widget-&gt;s*0.5;
+ 	
+ }
+ void s3dw_arr_normdir(float *dir)
+@@ -47,6 +49,34 @@
+ 	dir[1]/=dirlen;
+ 	dir[2]/=dirlen;
+ }
++void s3dw_turn()
++{
++	s3dw_widget *w,*root=s3dw_getroot();
++	int i;
++	float a[3],b[3],ry,rz;
++	a[0]=0;
++	a[1]=0;
++	a[2]=1;
++	for (i=0;i&lt;root-&gt;nobj;i++)
++	{
++		w=root-&gt;pobj[i];
++		if (w-&gt;oid!=0)
++		{
++			/* horizontal movement */
++			b[0]=w-&gt;x   - cam-&gt;x;
++			b[1]=0;
++			b[2]=w-&gt;z   - cam-&gt;z;
++			ry=180*s3d_vector_angle(a,b)/M_PI;
++			b[0]=w-&gt;x   - cam-&gt;x;
++			b[1]=0;
++			b[2]=w-&gt;z   - cam-&gt;z;
++			rz=180*s3d_vector_angle(a,b)/M_PI;
++			w-&gt;ry=ry;
++			w-&gt;rz=rz;
++			s3dprintf(MED,&quot;turn %03.3f, %03.3f&quot;,ry,rz);
++		}
++	}
++}
+ void s3dw_arrange()
+ {
+ 	s3dw_widget *w1,*w2,*root=s3dw_getroot();
+@@ -60,11 +90,13 @@
+ 	for (i=0;i&lt;root-&gt;nobj;i++)
+ 		if (!(root-&gt;pobj[i]-&gt;flags&amp;S3DW_ARRANGED)) arranged=0;
+ 	if (arranged) return; /* no arrangement necceasary .... */
+-
++/*	if (cam-&gt;flags|S3DW_*/
++		
+ 	if (root-&gt;nobj==1)
+ 	{
+ 		w1=root-&gt;pobj[0];
+ 		w1-&gt;flags|=S3DW_ARRANGED; /* done */
++		return;
+ 	}
+ 	for (i=0;i&lt;root-&gt;nobj;i++)
+ 	{
+@@ -92,15 +124,29 @@
+ 					tomove=((len1+len2+1)-dirlen);
+ 					move1=len1/(len1+len2);
+ 					move2=len2/(len1+len2);
+-					w1-&gt;x += tomove * move1 *  dir[0];
+-					w1-&gt;y += tomove * move1 *  dir[1];
+-					w1-&gt;z += tomove * move1 *  dir[2];
+-					w2-&gt;x += tomove * move2 * -dir[0];
+-					w2-&gt;y += tomove * move2 * -dir[1];
+-					w2-&gt;z += tomove * move2 * -dir[2];
++					if (w1-&gt;oid!=0)
++					{
++						w1-&gt;x += tomove * move1 *  dir[0];
++						w1-&gt;y += tomove * move1 *  dir[1];
++						w1-&gt;z += tomove * move1 *  dir[2];
++						s3dw_ani_add(w1);
++					} else {
++						w2-&gt;x += tomove * move2 * -dir[0];
++						w2-&gt;y += tomove * move2 * -dir[1];
++						w2-&gt;z += tomove * move2 * -dir[2];
+ 
+-					s3dw_ani_add(w1);
+-					s3dw_ani_add(w2);
++					}
++					if (w2-&gt;oid!=0)
++					{
++						w2-&gt;x += tomove * move2 * -dir[0];
++						w2-&gt;y += tomove * move2 * -dir[1];
++						w2-&gt;z += tomove * move2 * -dir[2];
++						s3dw_ani_add(w2);
++					} else {
++						w1-&gt;x += tomove * move1 *  dir[0];
++						w1-&gt;y += tomove * move1 *  dir[1];
++						w1-&gt;z += tomove * move1 *  dir[2];
++					}
+ 				}
+ 			}
+ 		if (arranged)
+
+Modified: trunk/libs3dw/event.c
+===================================================================
+--- trunk/libs3dw/event.c	2006-06-27 16:54:56 UTC (rev 364)
++++ trunk/libs3dw/event.c	2006-06-27 17:32:46 UTC (rev 365)
+@@ -24,8 +24,8 @@
+ #include &lt;s3d.h&gt;
+ #include &lt;s3dw.h&gt;
+ #include &lt;s3dw_int.h&gt;
+-int modkey;
+-
++static int modkey;
++extern s3dw_widget *cam;
+ void s3dw_handle_click(struct s3d_evt *evt)
+ {
+ 	unsigned long oid=*((unsigned long *)evt-&gt;buf);
+@@ -36,3 +36,18 @@
+ 	struct s3d_key_event *keys=(struct s3d_key_event *)evt-&gt;buf;
+ 	s3dw_widget_event_key(s3dw_getroot(),keys);
+ }
++
++void s3dw_object_info(struct s3d_evt *evt)
++{
++	struct s3d_obj_info *info=(struct s3d_obj_info *)evt-&gt;buf;
++	if (info-&gt;object==0) /* the cam */
++	{
++		if (cam==NULL)	s3dw_getroot(); /* init, get cam */
++		cam-&gt;ax=cam-&gt;x=info-&gt;trans_x;
++		cam-&gt;ay=cam-&gt;y=info-&gt;trans_y;
++		cam-&gt;az=cam-&gt;z=info-&gt;trans_z;
++		cam-&gt;flags&amp;=~S3DW_ARRANGED;
++		s3dw_arrange();
++		s3dw_turn();
++	}
++}
+
+Modified: trunk/libs3dw/root.c
+===================================================================
+--- trunk/libs3dw/root.c	2006-06-27 16:54:56 UTC (rev 364)
++++ trunk/libs3dw/root.c	2006-06-27 17:32:46 UTC (rev 365)
+@@ -25,7 +25,9 @@
+ #include &lt;s3dw.h&gt;
+ #include &lt;s3dw_int.h&gt;
+ #include &lt;stdlib.h&gt; /* malloc() */
+-static s3dw_widget *root;
++#include &lt;stdio.h&gt;   /* printf() */
++static s3dw_widget *root=NULL;
++extern s3dw_widget *cam;
+ 
+ /* just destroy the widget */
+ void s3dw_root_destroy(s3dw_widget *widget)
+@@ -36,16 +38,15 @@
+ void s3dw_nothing(s3dw_widget *widget)
+ {
+ }
+-/* dummy handler */
+-int s3dw_root_event_click(s3dw_widget *widget,unsigned long oid)
++int s3dw_click_nothing(s3dw_widget *widget, unsigned long dummy)
+ {
+ 	return(0);
+ }
+-/* dummy handler */
+-int s3dw_root_event_key(s3dw_widget *widget,struct s3d_key_event *keys)
++int s3dw_key_nothing(s3dw_widget *widget, struct s3d_key_event *dummy)
+ {
+ 	return(0);
+ }
++
+ /* get the root .... if it's NULL, the lib is not initialized, so do this too ... */
+ s3dw_widget *s3dw_getroot()
+ {
+@@ -57,8 +58,20 @@
+ 		root-&gt;oid=s3d_new_object();
+ 		root-&gt;style=&amp;def_style;
+ 		root-&gt;flags=S3DW_VISIBLE|S3DW_ACTIVE;
++		cam=(s3dw_widget *)malloc(sizeof(s3dw_widget));
++		s3dw_widget_new(cam);
++		cam-&gt;type=S3DW_TCAM;
++		cam-&gt;oid=0;
++		cam-&gt;style=&amp;def_style;
++		cam-&gt;s=10;
++		cam-&gt;width=1;
++		cam-&gt;height=0;
++		cam-&gt;flags=S3DW_VISIBLE|S3DW_ACTIVE;
++
++		s3dw_widget_append(root, cam);
+ 		/* setup callback tables */
+ 		s3dwcb_show[S3DW_TROOT]=		s3dw_nothing;
++		s3dwcb_show[S3DW_TCAM]=			s3dw_nothing;
+ 		s3dwcb_show[S3DW_TSURFACE]=		s3dw_surface_show;
+ 		s3dwcb_show[S3DW_TBUTTON]=		s3dw_button_show;
+ 		s3dwcb_show[S3DW_TLABEL]=		s3dw_label_show;
+@@ -70,18 +83,21 @@
+ 		s3dwcb_hide[S3DW_TINPUT]=		s3dw_input_hide;
+ 		
+ 		s3dwcb_destroy[S3DW_TROOT]=		s3dw_root_destroy;
++		s3dwcb_destroy[S3DW_TCAM]=		s3dw_root_destroy;
+ 		s3dwcb_destroy[S3DW_TSURFACE]=	s3dw_surface_destroy;
+ 		s3dwcb_destroy[S3DW_TBUTTON]=	s3dw_button_destroy;
+ 		s3dwcb_destroy[S3DW_TLABEL]=	s3dw_label_destroy;
+ 		s3dwcb_destroy[S3DW_TINPUT]=	s3dw_input_destroy;
+ 
+-		s3dwcb_click[S3DW_TROOT]=		s3dw_root_event_click;
++		s3dwcb_click[S3DW_TROOT]=		s3dw_click_nothing;
++		s3dwcb_click[S3DW_TCAM]=		s3dw_click_nothing;
+ 		s3dwcb_click[S3DW_TSURFACE]=	s3dw_surface_event_click;
+ 		s3dwcb_click[S3DW_TBUTTON]=		s3dw_button_event_click;
+ 		s3dwcb_click[S3DW_TLABEL]=		s3dw_label_event_click;
+ 		s3dwcb_click[S3DW_TINPUT]=		s3dw_input_event_click;
+ 
+-		s3dwcb_key[S3DW_TROOT]=			s3dw_root_event_key;
++		s3dwcb_key[S3DW_TROOT]=			s3dw_key_nothing;
++		s3dwcb_key[S3DW_TCAM]=			s3dw_key_nothing;
+ 		s3dwcb_key[S3DW_TSURFACE]=		s3dw_surface_event_key;
+ 		s3dwcb_key[S3DW_TBUTTON]=		s3dw_button_event_key;
+ 		s3dwcb_key[S3DW_TLABEL]=		s3dw_label_event_key;
+
+Modified: trunk/libs3dw/s3dw.h
+===================================================================
+--- trunk/libs3dw/s3dw.h	2006-06-27 16:54:56 UTC (rev 364)
++++ trunk/libs3dw/s3dw.h	2006-06-27 17:32:46 UTC (rev 365)
+@@ -32,11 +32,16 @@
+ #define		S3DW_ONSCREEN	256
+ /* if the surface (or widget) is already properly arranged */
+ #define 	S3DW_ARRANGED	512
++/* follow the camera */
++#define 	S3DW_FOLLOW_CAM	1024
++/* turn to the camera */
++#define 	S3DW_TURN_CAM	2048
+ /* just a typecaster to beatify code. use it if you like */
+ #define 	S3DWIDGET(x)	((s3dw_widget *)x)
+ 
+ enum {
+ 	S3DW_TROOT,
++	S3DW_TCAM,
+ 	S3DW_TSURFACE,
+ 	S3DW_TBUTTON,
+ 	S3DW_TLABEL,
+@@ -134,5 +139,6 @@
+ 
+ void 				 s3dw_handle_click(struct s3d_evt *evt);
+ void 				 s3dw_handle_key(struct s3d_evt *evt);
++void 				 s3dw_object_info(struct s3d_evt *evt);
+ 
+ void 				 s3dw_ani_mate();
+
+Modified: trunk/libs3dw/s3dw_int.h
+===================================================================
+--- trunk/libs3dw/s3dw_int.h	2006-06-27 16:54:56 UTC (rev 364)
++++ trunk/libs3dw/s3dw_int.h	2006-06-27 17:32:46 UTC (rev 365)
+@@ -36,9 +36,9 @@
+ /* root.c */
+ s3dw_widget *s3dw_getroot();
+ void s3dw_nothing(s3dw_widget *widget);
++int s3dw_click_nothing(s3dw_widget *widget, unsigned long dummy);
++int s3dw_key_nothing(s3dw_widget *widget, struct s3d_key_event *dummy);
+ void s3dw_root_destroy(s3dw_widget *widget);
+-int s3dw_root_event_click(s3dw_widget *widget, unsigned long oid);
+-int s3dw_root_event_key(s3dw_widget *widget, struct s3d_key_event *keys);
+ /* widget.c */
+ s3dw_widget *s3dw_widget_new();
+ void s3dw_widget_append(s3dw_widget *parent, s3dw_widget *widget);
+@@ -95,3 +95,4 @@
+ void s3dw_arrange();
+ void s3dw_arr_widgetcenter(s3dw_widget *widget, float *center);
+ void s3dw_arr_normdir(float *dir);
++void s3dw_turn();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000357.html">[S3d-svn] r364 - trunk/libs3d
+</A></li>
+	<LI>Next message: <A HREF="000359.html">[S3d-svn] r366 - in trunk: . libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#358">[ date ]</a>
+              <a href="thread.html#358">[ thread ]</a>
+              <a href="subject.html#358">[ subject ]</a>
+              <a href="author.html#358">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

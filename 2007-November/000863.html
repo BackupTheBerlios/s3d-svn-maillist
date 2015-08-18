@@ -1,0 +1,407 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r870 - trunk/svnonly/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r870%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711211156.lALBuhON015806%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000862.html">
+   <LINK REL="Next"  HREF="000864.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r870 - trunk/svnonly/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r870%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711211156.lALBuhON015806%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r870 - trunk/svnonly/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Wed Nov 21 12:56:43 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000862.html">[S3d-svn] r869 - trunk/svnonly/comptest
+</A></li>
+        <LI>Next message: <A HREF="000864.html">[S3d-svn] r871 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#863">[ date ]</a>
+              <a href="thread.html#863">[ thread ]</a>
+              <a href="subject.html#863">[ subject ]</a>
+              <a href="author.html#863">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-21 12:56:27 +0100 (Wed, 21 Nov 2007)
+New Revision: 870
+
+Modified:
+   trunk/svnonly/comptest/comptest.h
+   trunk/svnonly/comptest/window.c
+   trunk/svnonly/comptest/x11.c
+Log:
+- split updated flags into geometry_update_needed and content_update_needed,
+  process both after all pending events were dealt with
+- some cleanup, print statistics about the time usage
+
+
+Modified: trunk/svnonly/comptest/comptest.h
+===================================================================
+--- trunk/svnonly/comptest/comptest.h	2007-11-21 00:56:28 UTC (rev 869)
++++ trunk/svnonly/comptest/comptest.h	2007-11-21 11:56:27 UTC (rev 870)
+@@ -24,6 +24,8 @@
+ #define TEXH 256
+ #define TEXNUM(win, x, y) \
+   ((((win-&gt;attr.height + TEXH - 1)&amp; ~(TEXH-1))/TEXH) * ((int)(x/TEXH)) + ((int)(y/TEXW)))
++#define MIN(x,y)	(((x)&lt;(y))?(x):(y))
++#define MAX(x,y)	(((x)&gt;(y))?(x):(y))
+ 
+ 
+ struct window {
+@@ -32,7 +34,9 @@
+ 	XImage      *image;
+ 	Damage       damage;  /* damage notification */
+ 	Pixmap			pix;
+-	int     already_updated;
++	int			geometry_update_needed;
++	int     	content_update_needed;
++	XRectangle	content_update;
+ 	int        oid;
+ 	int		   no;
+ 
+@@ -45,15 +49,14 @@
+ extern int screen_oid;
+ void deco_box(struct window *win);
+ /* window.c */
+-void window_update_content(struct window *win, int x, int y, int width, int height);
+ void window_set_position(struct window *win);
+ void window_restack(struct window *win, Window above);
+ struct window *window_find(Window id);
+ struct window *window_find(Window id);
+ void window_add(Display *dpy, Window id);
+ void window_remove(Window id);
+-void window_update_content(struct window *win, int x, int y, int width, int height);
+-void window_update_geometry(struct window *win, int x, int y, int width, int height);
++void window_update_content(struct window *win);
++void window_update_geometry(struct window *win);
+ 
+ extern struct window   *window_head;
+ /* x11.c */
+
+Modified: trunk/svnonly/comptest/window.c
+===================================================================
+--- trunk/svnonly/comptest/window.c	2007-11-21 00:56:28 UTC (rev 869)
++++ trunk/svnonly/comptest/window.c	2007-11-21 11:56:27 UTC (rev 870)
+@@ -92,8 +92,15 @@
+ 	win-&gt;pix = None;
+ 	win-&gt;no = 0;
+ 	win-&gt;oid = -1;
+-	win-&gt;already_updated = 0;
++	win-&gt;content_update_needed = 1;
++	win-&gt;geometry_update_needed = 0;
++	win-&gt;content_update.x = 0;
++	win-&gt;content_update.y = 0;
++	win-&gt;content_update.width = 0;
++	win-&gt;content_update.height = 0;
+ 
++
++
+ 	/* TODO: at my place, windows are created and destroyed in the same moment. so this 
+ 	 * function fails sometimes. 
+ 	 * maybe there is a function asking something like &quot;is there really a window with id ;win-&gt;id'...&quot;. 
+@@ -102,22 +109,21 @@
+ 		/* window does not exit, next event is probably it's removal ... */
+ 		return;
+ 	}
++	win-&gt;content_update.width = win-&gt;attr.width;
++	win-&gt;content_update.height = win-&gt;attr.height;
+ 
+ 	/* XSelectInput(dpy, win-&gt;id, ExposureMask|ButtonPressMask|KeyPressMask*/
+ /*	XSelectInput(dpy, win-&gt;id, SubstructureNotifyMask | ExposureMask | StructureNotifyMask | PropertyChangeMask);*/
+ 	XSelectInput(dpy, win-&gt;id, 0);
+ 
+-	win-&gt;damage = XDamageCreate(dpy, win-&gt;id, XDamageReportNonEmpty);
++	if (win-&gt;attr.class != InputOnly)		/* don't create damage on these windows */
++		win-&gt;damage = XDamageCreate(dpy, win-&gt;id, XDamageReportNonEmpty);
+ 	if (win-&gt;next == NULL) 
+ 		window_restack(win, None);
+ 	else
+ 		window_restack(win, win-&gt;next-&gt;id);
+ 	
+-
+-
+ 	XCompositeRedirectWindow(dpy, id, CompositeRedirectAutomatic);
+-	window_update_content(win, 0, 0, win-&gt;attr.width, win-&gt;attr.height);
+-/*	printf(&quot;window (%d) added\n&quot;, (int)id);*/
+ }
+ 
+ void window_remove(Window id)
+@@ -142,48 +148,43 @@
+ 		XFreePixmap(dpy, window-&gt;pix);
+ 	if (window-&gt;oid != -1)
+ 		s3d_del_object(window-&gt;oid);
+-	if (window-&gt;damage)
+-		XDamageDestroy(dpy, window-&gt;damage);
++/*  Damage is automatically destroyed */
++/*	if (window-&gt;damage != None)
++		XDamageDestroy(dpy, window-&gt;damage);	*/
+ 
+ 	free(window);
+ }
+-void window_update_geometry(struct window *win, int x, int y, int width, int height)
++void window_update_geometry(struct window *win)
+ {
++	XWindowAttributes attr;	
++	win-&gt;geometry_update_needed = 0;
+ 
+-	if (win-&gt;oid == -1) {
+-		win-&gt;attr.x = x;
+-		win-&gt;attr.y = y;
+-		win-&gt;attr.width = width;
+-		win-&gt;attr.height = height;
+-
+-		window_update_content(win, 0, 0, width, height);
++	if (!XGetWindowAttributes(dpy, win-&gt;id, &amp;attr))
+ 		return;
+-	}
+-	if (win-&gt;pix != None) {
+-		XFreePixmap(dpy, win-&gt;pix);
+-		win-&gt;pix = None;
+-	}
+ 
+-	if ((win-&gt;attr.width == width) &amp;&amp; (win-&gt;attr.height == height)) {
+-		if ((win-&gt;attr.x == x) &amp;&amp; (win-&gt;attr.y == y)) {
++	if (win-&gt;oid == -1) {
++		win-&gt;content_update_needed = 1;
++	} 
++
++	if ((win-&gt;attr.width == attr.width) &amp;&amp; (win-&gt;attr.height == attr.height)) {
++		if ((win-&gt;attr.x == attr.x) &amp;&amp; (win-&gt;attr.y == attr.y)) {
+ 			printf(&quot;position did not change\n&quot;);
+-			return;
+ 		} else {
+-			win-&gt;attr.x = x;
+-			win-&gt;attr.y = y;
++			memcpy(&amp;win-&gt;attr, &amp;attr, sizeof(attr));
+ 			window_set_position(win);
++			return;
+ 		}
+ 	} else {
+-		win-&gt;attr.x = x;
+-		win-&gt;attr.y = y;
+-		win-&gt;attr.width = width;
+-		win-&gt;attr.height = height;
++		if (win-&gt;pix != None) {
++			XFreePixmap(dpy, win-&gt;pix);
++			win-&gt;pix = None;
++		}
+ 
+ 		s3d_del_object(win-&gt;oid); /* delete the window and redraw */
+ 		win-&gt;oid = -1;
+-		window_update_content(win, 0, 0, width, height);
+-
++		win-&gt;content_update_needed = 1;
+ 	}
++	memcpy(&amp;win-&gt;attr, &amp;attr, sizeof(attr));
+ }
+ 
+ /* convert X-format to s3ds RGBA 32bit format */
+@@ -238,14 +239,25 @@
+ }
+ 
+ /* takes a bounding box and updates its window contents */
+-void window_update_content(struct window *win, int x, int y, int width, int height)
++void window_update_content(struct window *win)
+ {
++	int x, y, width, height;
+ 	int chunk_width, chunk_height;
+ 	int xleft, xright;
+ 	int ytop, ybottom;
+ 	char *bitmap;
+ 	XImage *image;
+ 
++	x = win-&gt;content_update.x;
++	y = win-&gt;content_update.y;
++	width = win-&gt;content_update.width;
++	height = win-&gt;content_update.height;
++
++	/* done with updating, or at least we tried */
++	win-&gt;content_update.width = 0;
++	win-&gt;content_update.height = 0;
++	win-&gt;content_update_needed = 0;
++
+ 	if (win-&gt;attr.map_state == IsUnmapped)	/* not mapped images can't be grabbed */
+ 		return;
+ 
+@@ -257,16 +269,6 @@
+ 	if (width &gt; win-&gt;attr.width - x)   width = win-&gt;attr.width - x;
+ 	if (height &gt; win-&gt;attr.height - y)   height = win-&gt;attr.height - y;
+ 
+-	if (x == 0 &amp;&amp; y == 0 &amp;&amp; width == win-&gt;attr.width &amp;&amp; height == win-&gt;attr.height) {
+-		if (win-&gt;already_updated)
+-			return;
+-		else
+-			win-&gt;already_updated = 1;
+-	}
+-
+-	/* if (!win-&gt;oid)
+-	  deco_box(win);
+-	*/
+ 	bitmap = malloc(TEXW * height * sizeof(uint32_t));
+ 	for (xleft = x; xleft &lt; x + width ; xleft = xright) {
+ 		xright = (xleft + TEXW) &amp; ~(TEXW - 1);
+@@ -290,8 +292,9 @@
+ 		}
+ 		if (win-&gt;oid == -1)
+ 			deco_box(win);
++
+ 		image_convert(image, bitmap);
+-		/*  printf(&quot;load textures ...\n&quot;);*/
++
+ 		for (ytop = y; ytop &lt; y + height; ytop = ybottom) {
+ 			ybottom = (ytop + TEXH) &amp; ~(TEXH - 1);
+ 			if (ybottom &gt; y + height)
+@@ -299,11 +302,7 @@
+ 			chunk_height = ybottom - ytop;
+ 			s3d_load_texture(win-&gt;oid, TEXNUM(win, xleft, ytop), xleft % TEXW, ytop % TEXH,
+ 			                 chunk_width, chunk_height, (unsigned char *)bitmap + chunk_width * (ytop - y) * 4);
+-			/*   printf(&quot;s3d_load_texture(%d, %d, %d, %d, %d, %d, %010p);\n&quot;,
+-			       win-&gt;oid, TEXNUM(win, xleft, ytop), xleft % TEXW, ytop % TEXH,
+-			        chunk_width, chunk_height, (unsigned char *)bitmap + chunk_width * (ytop - y) * 4);*/
+ 		}
+-		/*  printf(&quot;done loading textures\n&quot;); */
+ 		XDestroyImage(image);
+ 	}
+ 	free(bitmap);
+
+Modified: trunk/svnonly/comptest/x11.c
+===================================================================
+--- trunk/svnonly/comptest/x11.c	2007-11-21 00:56:28 UTC (rev 869)
++++ trunk/svnonly/comptest/x11.c	2007-11-21 11:56:27 UTC (rev 870)
+@@ -23,6 +23,7 @@
+ 
+ #include &quot;comptest.h&quot;
+ #include &lt;stdio.h&gt;		/* printf() */
++#include &lt;string.h&gt;		/* memcpy() */
+ #include &lt;X11/Xproto.h&gt;	/* X_* request defines */
+ 
+ #define XCOMPOSITE_VERSION_0_2 200
+@@ -164,18 +165,32 @@
+ 	return(0);
+ }
+ 
++/* find biggest bounding rect of the two given rects, write it into dest */
++void merge_rect( XRectangle *dest, XRectangle *src) {
++	int max;
++	if (dest-&gt;width == 0 || dest-&gt;height == 0) {
++		memcpy(dest, src, sizeof(*dest));
++		return;
++	}
++	max = MAX(dest-&gt;width + dest-&gt;x, src-&gt;width + src-&gt;x);
++	dest-&gt;x = MIN(dest-&gt;x, src-&gt;x);
++	dest-&gt;width = max - dest-&gt;x;
+ 
++	max = MAX(dest-&gt;height + dest-&gt;y, src-&gt;height + src-&gt;y);
++	dest-&gt;y = MIN(dest-&gt;y, src-&gt;y);
++	dest-&gt;height = max - dest-&gt;y;
++}
++
+ void event(void)
+ {
+ 	XEvent event;
+ 	struct window *window;
+-	int i;
+-	int ret;
+-/*	for (window = window_head; window != NULL; window = window-&gt;next)
+-		window-&gt;already_updated = 0;*/
++	struct timeval start, stop;
++	float secs;
+ 
++
++	gettimeofday(&amp;start, NULL);
+ 	while (XPending(dpy)) {
+-/*	for (i = 0; i &lt; MAXEVENTS &amp;&amp; XPending(dpy); i++) {*/
+ 		XNextEvent(dpy, &amp;event);
+ 		print_event(dpy, &amp;event);
+ 		switch (event.type - xdamage.event) {
+@@ -186,11 +201,10 @@
+ 			          e-&gt;area.width, e-&gt;area.height, e-&gt;area.x, e-&gt;area.y);*/
+ 			XDamageSubtract(dpy, e-&gt;damage, None, None);
+ 			window = window_find(e-&gt;drawable);
+-			if (window != NULL)
+-				window-&gt;already_updated = 0;
+-				/* TODO: remember the rect damaged, and only update this part later. merge it if there was
+-				 * already damage. */
+-/*				window_update_content(window, e-&gt;area.x, e-&gt;area.y, e-&gt;area.width, e-&gt;area.height);*/
++			if (window != NULL) {
++				window-&gt;content_update_needed = 1;
++				merge_rect(&amp;window-&gt;content_update, &amp;e-&gt;area);
++			}
+ 			break;
+ 		   }
+ 
+@@ -203,7 +217,7 @@
+ 				/*    printf(&quot;Configure: window = %d, geometry = %d:%d (at %d:%d)\n&quot;,
+ 				           (int)e-&gt;window, e-&gt;width, e-&gt;height, e-&gt;x, e-&gt;y);*/
+ 				window_restack(window, e-&gt;above);
+-				window_update_geometry(window, e-&gt;x, e-&gt;y, e-&gt;width, e-&gt;height);
++				window-&gt;geometry_update_needed = 1;
+ 			} else {
+ 				printf(&quot;Configure: Could not find window to configure.\n&quot;);
+ 			}
+@@ -221,12 +235,22 @@
+ 		   }
+ 		}
+ 	}
+-	for (window = window_head; window != NULL; window = window-&gt;next)
+-		if (window-&gt;already_updated == 0) {
+-			window_update_content(window, 0,0, window-&gt;attr.width, window-&gt;attr.height);
+-			window-&gt;already_updated = 1;
++	int d;
++	d = 0;
++	for (window = window_head; window != NULL; window = window-&gt;next) {
++		if (window-&gt;geometry_update_needed) 
++			window_update_geometry(window);
++		if (window-&gt;content_update_needed) 
++		{
++			window_update_content(window);
++			d++;
+ 		}
++	}
+ 
++	gettimeofday(&amp;stop, NULL);
++	secs = (stop.tv_sec - start.tv_sec) + (stop.tv_usec - start.tv_usec)/1e6;
++	printf(&quot;msecs to process events: %3.3f, %d windows updated\n&quot;, secs*1e3, d);
++
+ }
+ 
+ void x11_addwindows() 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000862.html">[S3d-svn] r869 - trunk/svnonly/comptest
+</A></li>
+	<LI>Next message: <A HREF="000864.html">[S3d-svn] r871 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#863">[ date ]</a>
+              <a href="thread.html#863">[ thread ]</a>
+              <a href="subject.html#863">[ subject ]</a>
+              <a href="author.html#863">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

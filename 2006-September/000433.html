@@ -1,0 +1,856 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r440 - in trunk: . apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r440%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200609280945.k8S9jabv021106%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000432.html">
+   <LINK REL="Next"  HREF="000434.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r440 - in trunk: . apps/s3dfm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r440%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200609280945.k8S9jabv021106%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r440 - in trunk: . apps/s3dfm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Thu Sep 28 11:45:36 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000432.html">[S3d-svn] r439 - in trunk: . apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000434.html">[S3d-svn] r441 - in trunk: . apps/dot_mcp apps/olsrs3d	apps/s3d_x11gate apps/s3dfm apps/s3dvt example libs3d libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#433">[ date ]</a>
+              <a href="thread.html#433">[ thread ]</a>
+              <a href="subject.html#433">[ subject ]</a>
+              <a href="author.html#433">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-28 11:45:35 +0200 (Thu, 28 Sep 2006)
+New Revision: 440
+
+Added:
+   trunk/apps/s3dfm/fly.c
+   trunk/apps/s3dfm/focus.c
+Modified:
+   trunk/
+   trunk/apps/s3dfm/Makefile.am
+   trunk/apps/s3dfm/animation.c
+   trunk/apps/s3dfm/box.c
+   trunk/apps/s3dfm/event.c
+   trunk/apps/s3dfm/icon.c
+   trunk/apps/s3dfm/main.c
+   trunk/apps/s3dfm/node.c
+   trunk/apps/s3dfm/parse.c
+   trunk/apps/s3dfm/s3dfm.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1069 at balthasar</A>:  dotslash | 2006-09-28 11:45:22 +0200
+ - use keyboard to select files
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1065
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1069
+
+Modified: trunk/apps/s3dfm/Makefile.am
+===================================================================
+--- trunk/apps/s3dfm/Makefile.am	2006-09-26 22:37:02 UTC (rev 439)
++++ trunk/apps/s3dfm/Makefile.am	2006-09-28 09:45:35 UTC (rev 440)
+@@ -7,7 +7,7 @@
+ s3dfm_SOURCES =  \
+ 	main.c box.c animation.c event.c \
+ 	fs.c dialog.c parse.c icon.c node.c \
+-	string.c
++	string.c fly.c focus.c
+ 
+ s3dfm_CPPFLAGS=		-I${top_srcdir}/libs3d -I${top_srcdir}/libs3dw
+ s3dfm_LDADD=		${top_builddir}/libs3d/libs3d.la ${top_builddir}/libs3dw/libs3dw.la
+
+Modified: trunk/apps/s3dfm/animation.c
+===================================================================
+--- trunk/apps/s3dfm/animation.c	2006-09-26 22:37:02 UTC (rev 439)
++++ trunk/apps/s3dfm/animation.c	2006-09-28 09:45:35 UTC (rev 440)
+@@ -29,53 +29,7 @@
+ /* the animation stack */
+ static t_node *ani_s[MAXANI];
+ static int ani_n=0;
+-extern t_node root,cam;
+-int moveon=1;
+ 
+-/* get the scale for the rootbox zoom */
+-float ani_get_scale(t_node *f)
+-{
+-	float scale,s;
+-	s=0.2;
+-	scale=1/s;
+-	if (f-&gt;parent!=NULL)
+-		scale=1/s*ani_get_scale(f-&gt;parent);
+-	else
+-		return(1.0);
+-	root.px-=f-&gt;px;
+-	root.pz-=f-&gt;pz;
+-	root.py-=BOXHEIGHT+f-&gt;detached*DETHEIGHT;
+-	root.px*=1/s;
+-	root.py*=1/s;
+-	root.pz*=1/s;
+-	
+-	return(scale);
+-}
+-/* center f for the viewer, therefore moving the root box ... */
+-void ani_focus(t_node *f)
+-{
+-	root.px=0.0;
+-	root.py=0.0;
+-	root.pz=0.0;
+-	moveon=1;
+-/*	printf(&quot;[Z]ooming to %s\n&quot;,f-&gt;name);*/
+-/*	box_collapse_grandkids(f);*/
+-	root.scale=ani_get_scale(f);
+-	root.py-=1.5;
+-/*	printf(&quot;[R]escaling to %f\n&quot;,root.scale);
+-	printf(&quot;px: %f py:%f pz: %f\n&quot;,root.px,root.py,root.pz);*/
+-
+-	ani_add(&amp;root);
+-	focus=f;
+-	if (((cam.dpx-cam.px)* (cam.dpx-cam.px) + (cam.dpy-cam.py)* (cam.dpy-cam.py) 
+-		  + (cam.dpz-cam.pz)* (cam.dpz-cam.pz))	&gt; ( 10 * 10))
+-	{
+-		cam.px=0;
+-		cam.py=0;
+-		cam.pz=5;
+-		ani_add(&amp;cam);
+-	}
+-}
+ /* is node f already on stack? */
+ int ani_onstack(t_node *f)
+ {
+
+Modified: trunk/apps/s3dfm/box.c
+===================================================================
+--- trunk/apps/s3dfm/box.c	2006-09-26 22:37:02 UTC (rev 439)
++++ trunk/apps/s3dfm/box.c	2006-09-28 09:45:35 UTC (rev 440)
+@@ -38,8 +38,8 @@
+     s3d_flags_on(dir-&gt;objs.titlestr,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 	dir-&gt;disp=D_DIR;
+ 	box_draw_icons(dir);
++}
+ 
+-}
+ /* draw all the icons which are not displayed yet */
+ void box_draw_icons(t_node *dir)
+ {
+@@ -70,7 +70,16 @@
+ 	s3d_link(dir-&gt;objs.str,dir-&gt;oid);
+ 	s3d_flags_on(dir-&gt;objs.str,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ }
++/* gives another color for the focused box */
++void box_focus_color(t_node *dir, int on)
++{
++	
++	s3d_pep_material(dir-&gt;oid,
++						0.5+on*0.3,0.5+on*0.3,0.5+on*0.3,
++						0.5+on*0.3,0.5+on*0.3,0.5+on*0.3,
++						0.5+on*0.3,0.5+on*0.3,0.5+on*0.3);
+ 
++}
+ /* creates a big block which will hold files and subdirs on top */
+ int box_buildblock(t_node *dir)
+ {
+@@ -141,17 +150,13 @@
+ 						0.5,0.5,0.5,
+ 						0.5,0.5,0.5
+ 					);
+-	s3d_push_material(dir-&gt;oid,
+-						0.5,0.5,0.6,
+-						0.5,0.5,0.6,
+-						0.5,0.5,0.6);
+ 
+ 	/* top */
+-	s3d_push_polygon(dir-&gt;oid,4,6,5,1);
+-	s3d_push_polygon(dir-&gt;oid,4,7,6,1);
++	s3d_push_polygon(dir-&gt;oid,4,6,5,0);
++	s3d_push_polygon(dir-&gt;oid,4,7,6,0);
+ 	/* bottom */
+-	s3d_push_polygon(dir-&gt;oid,8,11,3,1);
+-	s3d_push_polygon(dir-&gt;oid,8,3,0,1);
++	s3d_push_polygon(dir-&gt;oid,8,11,3,0);
++	s3d_push_polygon(dir-&gt;oid,8,3,0,0);
+ 
+ 
+ 	/* left */
+@@ -289,7 +294,7 @@
+ 	printf(&quot;box_close( %s )\n&quot;,dir-&gt;name);
+ 	if (&amp;root==dir)
+ 	{
+-		printf(&quot;won't undisplay root window ... \n&quot;);
++		printf(&quot;won't close down root box ... \n&quot;);
+ 		return(-1);
+ 	}
+ 	if (dir-&gt;detached &amp;&amp; !force)	return(1);
+@@ -298,7 +303,7 @@
+ 		printf(&quot;[A]lready undisplayed %s, nothing to do ...\n&quot;,dir-&gt;name);
+ 		return(-1);
+ 	}
+-	/* undisplaying kids. ret will be != 0 if any of the kids did not close correctly */
++	/* closing kids. ret will be != 0 if any of the kids did not close correctly */
+ 	ret=0;
+ 	for (i=0;i&lt;dir-&gt;n_sub;i++)
+ 		if (dir-&gt;sub[i]-&gt;disp==D_DIR)
+@@ -309,9 +314,14 @@
+ 		return(ret); 
+ 	} else {
+ 		/* also remove the icons */
++		if (focus==dir)			focus_set(dir-&gt;parent);
+ 		for (i=0;i&lt;dir-&gt;n_sub;i++)
+ 			if (dir-&gt;sub[i]-&gt;disp==D_ICON)
++			{
+ 				icon_undisplay(dir-&gt;sub[i]);
++				if (focus==dir-&gt;sub[i])
++					focus_set(dir-&gt;parent);
++			}
+ 		box_unexpand(dir);
+ 	}
+ 	return(ret);
+
+Modified: trunk/apps/s3dfm/event.c
+===================================================================
+--- trunk/apps/s3dfm/event.c	2006-09-26 22:37:02 UTC (rev 439)
++++ trunk/apps/s3dfm/event.c	2006-09-28 09:45:35 UTC (rev 440)
+@@ -67,7 +67,7 @@
+ 				{/* refresh this window ... */
+ 					printf(&quot;[R]efreshing %s\n&quot;,focus-&gt;name);
+ /*					parse_again(focus);*/
+-					ani_focus(focus);
++					focus_set(focus);
+ 				}
+ 				break;
+ 		case S3DK_F1:
+@@ -82,8 +82,28 @@
+ 		case S3DK_F7:
+ 				window_mkdir(path);
+ 				break;
+-
+-
++		case S3DK_F10:
++				printf(&quot;focus %s\n&quot;,focus-&gt;name);
++				fly_set_absolute_position(focus);
++				break;
++		case S3DK_UP:
++		case S3DK_LEFT:
++		case S3DK_RIGHT:
++		case S3DK_DOWN:
++				focus_by_key(keys-&gt;keysym);
++				printf(&quot;pindex of focus = %d\n&quot;,focus-&gt;pindex);
++				break;
++		case S3DK_RETURN:
++		case S3DK_SPACE:
++				node_select(focus);
++				break;
++		case S3DK_BACKSPACE:
++				if (focus-&gt;disp==D_DIR)
++					box_close(focus,1);
++				else if (focus-&gt;parent!=NULL)
++						box_close(focus-&gt;parent,1);
++				break;
++				
+ 	}
+ 	s3dw_handle_key(evt);
+ }
+@@ -108,23 +128,7 @@
+ 			node_select(f);
+ 			return;
+ 		}
+-		switch (f-&gt;disp)
+-		{
+-			case D_DIR:
+-				printf(&quot;[F]ound, Already displayed - ani_focus( %s )\n&quot;,f-&gt;name);
+-				ani_focus(f);
+-				break;
+-			case D_ICON:
+-				if (f-&gt;type==T_FOLDER)
+-				{
+-					parse_dir(f);
+-					box_expand(f);	
+-					ani_focus(f);
+-				} else {
+-					node_select(f);
+-				}
+-				break;
+-		}
++		node_select(f);
+ 	} else {
+ /*		printf(&quot;[C]ould not find :/\n&quot;);*/
+ 	}
+
+Added: trunk/apps/s3dfm/fly.c
+===================================================================
+--- trunk/apps/s3dfm/fly.c	2006-09-26 22:37:02 UTC (rev 439)
++++ trunk/apps/s3dfm/fly.c	2006-09-28 09:45:35 UTC (rev 440)
+@@ -0,0 +1,54 @@
++/*
++ * fly.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3dfm, a s3d file manager.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3dfm is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3dfm is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3dfm; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#include &quot;s3dfm.h&quot;
++#include &lt;stdio.h&gt;	/* NULL */
++#include &lt;string.h&gt; /* strncpy() */
++static void _get_pos(t_node *work, t_node *f)
++{
++	if (f-&gt;parent!=NULL) _get_pos(work,f-&gt;parent);
++	work-&gt;px+=f-&gt;px										* work-&gt;scale;
++	work-&gt;pz+=f-&gt;pz										* work-&gt;scale;
++	work-&gt;py+=f-&gt;py										* work-&gt;scale;
++	printf(&quot;%s: %3.3f %3.3f %3.3f - %3.3f\n&quot;,f-&gt;name, f-&gt;px, f-&gt;py, f-&gt;pz, f-&gt;scale );
++	printf(&quot;### %3.3f %3.3f %3.3f - %3.3f)\n&quot;, work-&gt;px, work-&gt;py, work-&gt;pz, work-&gt;scale);
++
++	if (f-&gt;parent==NULL)	work-&gt;scale = f-&gt;scale;
++	else					work-&gt;scale = work-&gt;scale * f-&gt;scale;
++	
++}
++
++int fly_set_absolute_position(t_node *node)
++{
++	t_node work;
++	node_init(&amp;work);
++	work.px = node-&gt;px;
++	work.py = node-&gt;py;
++	work.pz = node-&gt;pz;
++	printf(&quot;selected node %s: %3.3f %3.3f %3.3f, %3.3f\n&quot;,node-&gt;name, node-&gt;px, node-&gt;py, node-&gt;pz, node-&gt;scale);
++	work.parent = node-&gt;parent;
++	strncpy(work.name,node-&gt;name,M_NAME);
++	_get_pos(&amp;work, node);
++	printf(&quot;absolute position: %f %f %f - %f\n&quot;, work.px, work.py, work.pz, work.scale);
++	return(0);
++}
+
+Added: trunk/apps/s3dfm/focus.c
+===================================================================
+--- trunk/apps/s3dfm/focus.c	2006-09-26 22:37:02 UTC (rev 439)
++++ trunk/apps/s3dfm/focus.c	2006-09-28 09:45:35 UTC (rev 440)
+@@ -0,0 +1,217 @@
++/*
++ * focus.c
++ * 
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3dfm, a s3d file manager.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3dfm is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3dfm is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3dfm; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#include &quot;s3dfm.h&quot;
++#include &lt;s3d_keysym.h&gt;
++#include &lt;stdio.h&gt; /* printf() */
++#include &lt;math.h&gt;  /* ceil(), sqrt() */
++int moveon=1;
++
++/* get the scale for the rootbox zoom */
++float focus_get_scale(t_node *f)
++{
++	float scale,s;
++	if (f-&gt;disp==D_DIR)
++	{
++		s=0.2;
++		scale=1/s;
++		if (f-&gt;parent!=NULL)
++			scale=1/s*focus_get_scale(f-&gt;parent);
++		else
++			return(1.0);
++		root.px-=f-&gt;px;
++		root.pz-=f-&gt;pz;
++		root.py-=BOXHEIGHT+f-&gt;detached*DETHEIGHT;
++		root.px*=1/s;
++		root.py*=1/s;
++		root.pz*=1/s;
++		return(scale);
++	} else {
++		if (f-&gt;parent!=NULL)		return(focus_get_scale(f-&gt;parent));	/* icons etc */
++		else  						return(1.0);						/* that should never happen */
++	}
++	
++}
++/* center f for the viewer, therefore moving the root box ... */
++void focus_set(t_node *f)
++{
++	root.px=0.0;
++	root.py=0.0;
++	root.pz=0.0;
++	moveon=1;
++/*	printf(&quot;[Z]ooming to %s\n&quot;,f-&gt;name);*/
++/*	box_collapse_grandkids(f);*/
++	root.scale=focus_get_scale(f);
++	root.py-=1.5;
++/*	printf(&quot;[R]escaling to %f\n&quot;,root.scale);
++	printf(&quot;px: %f py:%f pz: %f\n&quot;,root.px,root.py,root.pz);*/
++
++	ani_add(&amp;root);
++	node_focus_color(focus,0);
++	node_focus_color(f,1);
++	focus=f;
++	if (((cam.dpx-cam.px)* (cam.dpx-cam.px) + (cam.dpy-cam.py)* (cam.dpy-cam.py) 
++		  + (cam.dpz-cam.pz)* (cam.dpz-cam.pz))	&gt; ( 10 * 10))
++	{
++		cam.px=0;
++		cam.py=0;
++		cam.pz=5;
++		ani_add(&amp;cam);
++	}
++}
++
++/* uses a keysym to set the focus new */
++void focus_by_key(int keysym)
++{
++	int i,rowsize;
++	if (focus-&gt;pindex!=-1)
++	{
++		switch (focus-&gt;disp)
++		{
++			case D_DIR:
++				switch (keysym)
++				{
++					case S3DK_RIGHT:
++						/* cycle to the next directory on the ring */
++						for (i=focus-&gt;pindex-1;i&gt;=0;i--)
++							if (focus-&gt;parent-&gt;sub[i]-&gt;disp==D_DIR)
++							{ /* found a directory before, cycle */
++								focus_set(focus-&gt;parent-&gt;sub[i]);
++								break;
++							}
++						if (i==-1) /* nothing found, wrap to the other side */
++						for (i=focus-&gt;parent-&gt;n_sub-1;i&gt;=focus-&gt;pindex+1;i--)
++							if (focus-&gt;parent-&gt;sub[i]-&gt;disp==D_DIR)
++							{ /* found a directory before, cycle */
++								focus_set(focus-&gt;parent-&gt;sub[i]);
++								break;
++							}
++						break;
++					case S3DK_LEFT:
++						/* cycle to the next directory on the ring */
++						for (i=focus-&gt;pindex+1;i&lt;focus-&gt;parent-&gt;n_sub;i++)
++							if (focus-&gt;parent-&gt;sub[i]-&gt;disp==D_DIR)
++							{ /* found a directory before, cycle */
++								focus_set(focus-&gt;parent-&gt;sub[i]);
++								break;
++							}
++						if (i==focus-&gt;parent-&gt;n_sub) /* nothing found, wrap to the other side */
++						for (i=0;i&lt;focus-&gt;pindex;i++)
++							if (focus-&gt;parent-&gt;sub[i]-&gt;disp==D_DIR)
++							{ /* found a directory before, cycle */
++								focus_set(focus-&gt;parent-&gt;sub[i]);
++								break;
++							}
++						break;
++					case S3DK_UP:
++						/* go in the first entry of this directory, if possible */
++						if (focus-&gt;n_sub&gt;0)
++							focus_set(focus-&gt;sub[0]);
++						break;
++					case S3DK_DOWN:
++						/* go to first icon entry of parent,  or parent itself */
++						for (i=focus-&gt;parent-&gt;n_sub-1;i&gt;=0;i--)
++							if (focus-&gt;parent-&gt;sub[i]-&gt;disp==D_ICON)
++							{ /* found a directory before, cycle */
++								focus_set(focus-&gt;parent-&gt;sub[i]);
++								break;
++							}
++						if (i==0) /* no icons? go to parent. */
++							focus_set(focus-&gt;parent);
++						break;
++
++
++
++				}
++				break;
++			case D_ICON:
++				switch (keysym)
++				{
++					case S3DK_LEFT:
++						/* search for the next icon on the left side */
++						i=focus-&gt;pindex;
++						do {
++							i--;
++							if (i&lt;0) i=focus-&gt;parent-&gt;n_sub-1;
++						} while (focus-&gt;parent-&gt;sub[i]-&gt;disp!=D_ICON);
++						focus_set(focus-&gt;parent-&gt;sub[i]);
++						break;
++					case S3DK_RIGHT:
++						/* search for the next icon on the right side */
++						i=focus-&gt;pindex;
++						do {
++							i++;
++							if (i&gt;=focus-&gt;parent-&gt;n_sub) i=0;
++						} while (focus-&gt;parent-&gt;sub[i]-&gt;disp!=D_ICON);
++						focus_set(focus-&gt;parent-&gt;sub[i]);
++						break;
++					case S3DK_UP:
++						/* search for the next icon on the left side */
++						i=focus-&gt;pindex;
++						rowsize=ceil(sqrt(focus-&gt;parent-&gt;n_sub)); /* items per line */
++						do {
++							i+=rowsize;
++							if (i&gt;=focus-&gt;parent-&gt;n_sub) break;
++						} while (focus-&gt;parent-&gt;sub[i]-&gt;disp!=D_ICON);
++						if (i&gt;=focus-&gt;parent-&gt;n_sub) 
++						{
++							/* go to the first activated dir above ... */
++							for (i=0;i&lt;focus-&gt;parent-&gt;n_sub;i++)
++								if (focus-&gt;parent-&gt;sub[i]-&gt;disp==D_DIR)
++								{ /* found a directory before, cycle */
++									focus_set(focus-&gt;parent-&gt;sub[i]);
++									break;
++								}
++						}
++						else		focus_set(focus-&gt;parent-&gt;sub[i]);
++						break;
++					case S3DK_DOWN:
++						/* search for the next icon on the left side */
++						i=focus-&gt;pindex;
++						rowsize=ceil(sqrt(focus-&gt;parent-&gt;n_sub)); /* items per line */
++						do {
++							i-=rowsize;
++							if (i&lt;0) break;
++						} while (focus-&gt;parent-&gt;sub[i]-&gt;disp!=D_ICON);
++						if (i&lt;0) 
++							focus_set(focus-&gt;parent);
++						else						
++							focus_set(focus-&gt;parent-&gt;sub[i]);
++						break;
++
++				}
++				break;
++		}
++	} else {
++		/* probably root */
++		switch (keysym)
++		{
++			case S3DK_UP:
++				/* go in the first entry of this directory, if possible */
++				if (focus-&gt;n_sub&gt;0)
++					focus_set(focus-&gt;sub[0]);
++				break;
++		}
++	}
++
++}
+
+Modified: trunk/apps/s3dfm/icon.c
+===================================================================
+--- trunk/apps/s3dfm/icon.c	2006-09-26 22:37:02 UTC (rev 439)
++++ trunk/apps/s3dfm/icon.c	2006-09-28 09:45:35 UTC (rev 440)
+@@ -22,10 +22,34 @@
+  */
+ 
+ #include &quot;s3dfm.h&quot;
+-#include &lt;stdio.h&gt; 	 /*  printf() */
+-#include &lt;math.h&gt;	 /*  sin(),cos() */
+-#include &lt;string.h&gt;  /*  strlen() */
+-/* draws icon dir, which is number i (used for nice coloring) */
++#include &lt;stdio.h&gt; 	 /* printf() */
++#include &lt;math.h&gt;	 /* sin(),cos() */
++#include &lt;string.h&gt;  /* strlen() */
++#include &lt;stdlib.h&gt;  /* memcpy() */
++float icon_colors[T_TYPENUM][12]={
++		/* T_DUNO */
++	{	0,0,0.5,1.0,
++		0,0,0.5,1.0,
++		0,0,0.5,1.0 },
++		/* T_FOLDER */
++	{	0.4,0.4,0,1.0,
++		0.4,0.4,0,1.0,
++		0.4,0.4,0,1.0}};
++
++/* gives another color for the focused item */
++void icon_focus_color(t_node *dir, int on)
++{
++	float color[12];
++	int i;
++	memcpy(color,icon_colors[dir-&gt;type],sizeof(color));
++	if (on) for(i=0;i&lt;3;i++) {
++			color[i*4 + 0]+=0.3;
++			color[i*4 + 1]+=0.3;
++			color[i*4 + 2]+=0.3;
++	}
++	s3d_pep_materials_a(dir-&gt;oid,color,1);
++}
++/* draws icon dir */
+ int icon_draw(t_node *dir)
+ {
+ 	float vertices[]={	-1,-0.5,0,
+@@ -48,20 +72,7 @@
+ 	/* create the block */
+ 	dir-&gt;oid=s3d_new_object();
+ 	s3d_push_vertices(dir-&gt;oid,vertices,8);
+-	switch (dir-&gt;type)
+-	{
+-		case T_FOLDER:
+-			s3d_push_material(dir-&gt;oid,
+-									0.4,0.4,0,
+-									0.4,0.4,0,
+-									0.4,0.4,0);
+-			break;
+-		default:
+-			s3d_push_material(dir-&gt;oid,
+-									0,0,0.5,
+-									0,0,0.5,
+-									0,0,0.5);
+-	};
++	s3d_push_materials_a(dir-&gt;oid,icon_colors[dir-&gt;type],1);
+ 	s3d_push_polygons(dir-&gt;oid,polys,10);
+ 
+ 	/* draw and position the string */
+
+Modified: trunk/apps/s3dfm/main.c
+===================================================================
+--- trunk/apps/s3dfm/main.c	2006-09-26 22:37:02 UTC (rev 439)
++++ trunk/apps/s3dfm/main.c	2006-09-28 09:45:35 UTC (rev 440)
+@@ -55,7 +55,7 @@
+ 		parse_dir(&amp;root);
+ 		box_draw(&amp;root);
+ 		ani_doit(&amp;root);
+-		ani_focus(&amp;root);
++		focus_set(&amp;root);
+ 		
+ 		
+ 		
+
+Modified: trunk/apps/s3dfm/node.c
+===================================================================
+--- trunk/apps/s3dfm/node.c	2006-09-26 22:37:02 UTC (rev 439)
++++ trunk/apps/s3dfm/node.c	2006-09-28 09:45:35 UTC (rev 440)
+@@ -106,8 +106,8 @@
+ 	dir-&gt;disp=D_NONE;
+ 	dir-&gt;parsed=0;
+ 
++	dir-&gt;pindex=-1;
+ 	dir-&gt;check=0;
+-	dir-&gt;px=root.pz=0.0;
+ 	dir-&gt;dirs_opened=0;
+ 	dir-&gt;type=T_DUNO;
+ 	dir-&gt;px=dir-&gt;py=dir-&gt;pz=0.0;
+@@ -153,17 +153,35 @@
+ /* node select handles click on the detach button. selected items can be moved, copied etc.*/
+ void node_select(t_node *dir)
+ {
++		
+ 	dir-&gt;detached=dir-&gt;detached?0:1; /* swapping, not sure if !dir-&gt;detached would do the same .. */
+ 	switch (dir-&gt;disp)
+ 	{
+ 		case D_DIR:
++			focus_set(dir);
+ 			if (dir-&gt;parent!=NULL)
+ 				box_order_subdirs(dir-&gt;parent);
+ 			break;
+ 		case D_ICON:
+-			dir-&gt;pz=dir-&gt;detached*0.2+1.0;
+-			ani_add(dir);
++			if (dir-&gt;type==T_FOLDER)
++			{
++				dir-&gt;detached=0;
++				parse_dir(dir);
++				box_expand(dir);
++			} else {
++				dir-&gt;pz=dir-&gt;detached*0.2+1.0;
++				ani_add(dir);
++			}
++			focus_set(dir);
+ 			break;
+-		/* nothing yet ... */
+ 	}
+ }
++/* change color etc if a node is focused */
++void node_focus_color(t_node *node, int on)
++{
++	switch (node-&gt;disp)
++	{
++		case D_DIR:  box_focus_color(node,on);	break;
++		case D_ICON: icon_focus_color(node,on); break;
++	}
++}
+
+Modified: trunk/apps/s3dfm/parse.c
+===================================================================
+--- trunk/apps/s3dfm/parse.c	2006-09-26 22:37:02 UTC (rev 439)
++++ trunk/apps/s3dfm/parse.c	2006-09-28 09:45:35 UTC (rev 440)
+@@ -74,6 +74,8 @@
+ 					dir-&gt;sub[i]-&gt;parent = dir;
+ 				}
+ 				/* find out the filetype ... very simple */
++				dir-&gt;sub[i]-&gt;type=T_DUNO;
++				dir-&gt;sub[i]-&gt;pindex=i;
+ 				ext=strrchr(nstr,'.');
+ 				strncpy(ndir,path,M_DIR);
+ 		    	strncat(ndir,namelist[n]-&gt;d_name,M_DIR);
+@@ -81,11 +83,11 @@
+ 				{
+ 					dir-&gt;sub[i]-&gt;type=T_FOLDER;
+ 					closedir(dirhd);
+-				} else if (ext!=NULL)
++				} /*else if (ext!=NULL)
+ 				   {
+ 					   if (0==strncmp(ext,&quot;.3ds&quot;,strlen(ext)&lt;4?strlen(ext):4))		   dir-&gt;sub[i]-&gt;type=T_GEOMETRY;
+ 					   else if (0==strncmp(ext,&quot;.mp3&quot;,strlen(ext)&lt;4?strlen(ext):4))	   dir-&gt;sub[i]-&gt;type=T_MUSIC;
+-				   }	
++				   }	*/
+ 				dir-&gt;sub[i]-&gt;check=0; /* check=0 means we've already processed this item */
+ 			}
+ 	   	    free(namelist[n]);
+@@ -100,6 +102,7 @@
+ 				node_delete(dir-&gt;sub[i]);
+ 				dir-&gt;n_sub--;
+ 				dir-&gt;sub[i]=dir-&gt;sub[dir-&gt;n_sub]; /* exchange with the last one */
++				dir-&gt;sub[i]-&gt;pindex=i;
+ 				dir-&gt;check=1;
+ 			}
+ 		/* if we removed something, then shrink the buffer accordingly .. */
+
+Modified: trunk/apps/s3dfm/s3dfm.h
+===================================================================
+--- trunk/apps/s3dfm/s3dfm.h	2006-09-26 22:37:02 UTC (rev 439)
++++ trunk/apps/s3dfm/s3dfm.h	2006-09-28 09:45:35 UTC (rev 440)
+@@ -25,11 +25,8 @@
+ #include &lt;s3d.h&gt;
+ #include &lt;s3dw.h&gt;
+ #define T_DUNO		0
+-#define T_LOCALDIR	1
+-#define T_BACKDIR	2
+-#define T_FOLDER	3
+-#define T_GEOMETRY	4
+-#define T_MUSIC		5
++#define T_FOLDER	1
++#define T_TYPENUM	2
+ 
+ #define M_DIR		512
+ #define M_NAME		256
+@@ -61,6 +58,7 @@
+ #define D_DIR		2
+ 	int				 parsed,detached;					/* Flags for parsed/detached (selected) nodes ... */
+ 	int 			 oid;								/* main oid, e.g the block or icons oid */
++	int 			 pindex;							/* the index in parents structure */
+ 	struct 			 {	
+ 		/* some objects which might be used ... if not, should be -1 */
+ 		int 		 close,select,title,titlestr; /* box decorations. */
+@@ -83,8 +81,6 @@
+ extern t_node *focus;	/* the focused object */
+ 
+ /* animation.c */
+-float		 ani_get_scale(t_node *f);
+-void 		 ani_focus(t_node *f);
+ int 		 ani_onstack(t_node *f);
+ void 		 ani_add(t_node *f);
+ void 		 ani_del(int i);
+@@ -104,6 +100,7 @@
+ int 		 box_expand(t_node *dir);
+ int 		 box_unexpand(t_node *dir);
+ int 		 box_close(t_node *dir,int force);
++void 		 box_focus_color(t_node *dir, int on);
+ /* dialog.c */
+ void		 close_win(s3dw_widget *button);
+ void		 window_help();
+@@ -120,6 +117,10 @@
+ void 		 event_click(struct s3d_evt *evt);
+ void		 event_key(struct s3d_evt *evt);
+ void		 event_oinfo(struct s3d_evt *hrmz);
++/* focus.c */
++void 		 focus_by_key(int keysym);
++float		 focus_get_scale(t_node *f);
++void 		 focus_set(t_node *f);
+ /* fs.c */
+ filelist	 *fl_new(char *path);
+ void		 fl_del(filelist *fl);
+@@ -130,9 +131,11 @@
+ void	 	 fs_approx(char *source, int *files, int *dirs, int *bytes);
+ int			 fs_copy(char *source, char *dest);
+ int			 fs_move(char *source, char *dest);
+-int			 fs_unlink(char *dest);/* icon.c */
++int			 fs_unlink(char *dest);
++/* icon.c */
+ int 		 icon_draw(t_node *dir);
+ int 		 icon_undisplay(t_node *dir);
++void 		 icon_focus_color(t_node *dir, int on);
+ /* node.c */
+ t_node 		*node_getbypath(char *path);
+ void 		 node_path(t_node *dir, char *path);
+@@ -141,6 +144,7 @@
+ int 		 node_delete(t_node *dir);
+ int 		 node_undisplay(t_node *dir);
+ void		 node_select(t_node *dir);
++void 		 node_focus_color(t_node *node, int on);
+ /* parse.c */
+ int 		 parse_dir(t_node *dir);
+ /* string.c */
+@@ -148,3 +152,5 @@
+ char 		*dots_at_start(char *str, unsigned int n, t_node *d);
+ char		*mstrncat(char *dest, const char *src, int n);
+ char		*mstrncpy(char *dest, const char *src, int n);
++/* fly.c */
++int 		 fly_set_absolute_position(t_node *node);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000432.html">[S3d-svn] r439 - in trunk: . apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000434.html">[S3d-svn] r441 - in trunk: . apps/dot_mcp apps/olsrs3d	apps/s3d_x11gate apps/s3dfm apps/s3dvt example libs3d libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#433">[ date ]</a>
+              <a href="thread.html#433">[ thread ]</a>
+              <a href="subject.html#433">[ subject ]</a>
+              <a href="author.html#433">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

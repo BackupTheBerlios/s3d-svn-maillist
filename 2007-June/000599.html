@@ -1,0 +1,287 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r601 - in branches/s3d-cmake: . apps/dot_mcp apps/kism3d	apps/meshs3d apps/olsrs3d apps/s3d_x11gate apps/s3dfm	apps/s3dosm apps/s3dvt libs3d libs3dw objs server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r601%20-%20in%20branches/s3d-cmake%3A%20.%20apps/dot_mcp%20apps/kism3d%0A%09apps/meshs3d%20apps/olsrs3d%20apps/s3d_x11gate%20apps/s3dfm%0A%09apps/s3dosm%20apps/s3dvt%20libs3d%20libs3dw%20objs%20server&In-Reply-To=%3C200706252155.l5PLtuRo022915%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000594.html">
+   <LINK REL="Next"  HREF="000592.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r601 - in branches/s3d-cmake: . apps/dot_mcp apps/kism3d	apps/meshs3d apps/olsrs3d apps/s3d_x11gate apps/s3dfm	apps/s3dosm apps/s3dvt libs3d libs3dw objs server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r601%20-%20in%20branches/s3d-cmake%3A%20.%20apps/dot_mcp%20apps/kism3d%0A%09apps/meshs3d%20apps/olsrs3d%20apps/s3d_x11gate%20apps/s3dfm%0A%09apps/s3dosm%20apps/s3dvt%20libs3d%20libs3dw%20objs%20server&In-Reply-To=%3C200706252155.l5PLtuRo022915%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r601 - in branches/s3d-cmake: . apps/dot_mcp apps/kism3d	apps/meshs3d apps/olsrs3d apps/s3d_x11gate apps/s3dfm	apps/s3dosm apps/s3dvt libs3d libs3dw objs server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Jun 25 23:55:56 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000594.html">[S3d-svn] r599 - in branches/s3d-cmake: . Documentation	Documentation/libg3d Documentation/libg3d/api	Documentation/libs3d Documentation/libs3dw	Documentation/manpages Documentation/server apps apps/dot_mcp	apps/kism3d apps/meshs3d apps/olsrs3d apps/s3d_x11gate	apps/s3dfm apps/s3dosm apps/s3dvt cmake cmake/modules example	libs3d libs3dw objs server
+</A></li>
+        <LI>Next message: <A HREF="000592.html">[S3d-svn] r602 - in branches/s3d-cmake: . cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#599">[ date ]</a>
+              <a href="thread.html#599">[ thread ]</a>
+              <a href="subject.html#599">[ subject ]</a>
+              <a href="author.html#599">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-06-25 23:55:55 +0200 (Mon, 25 Jun 2007)
+New Revision: 601
+
+Modified:
+   branches/s3d-cmake/CMakeLists.txt
+   branches/s3d-cmake/apps/dot_mcp/CMakeLists.txt
+   branches/s3d-cmake/apps/kism3d/CMakeLists.txt
+   branches/s3d-cmake/apps/meshs3d/CMakeLists.txt
+   branches/s3d-cmake/apps/olsrs3d/CMakeLists.txt
+   branches/s3d-cmake/apps/s3d_x11gate/CMakeLists.txt
+   branches/s3d-cmake/apps/s3dfm/CMakeLists.txt
+   branches/s3d-cmake/apps/s3dosm/CMakeLists.txt
+   branches/s3d-cmake/apps/s3dvt/CMakeLists.txt
+   branches/s3d-cmake/libs3d/CMakeLists.txt
+   branches/s3d-cmake/libs3dw/CMakeLists.txt
+   branches/s3d-cmake/objs/CMakeLists.txt
+   branches/s3d-cmake/server/CMakeLists.txt
+Log:
+- Added install informations
+- Corrected output name of server
+- Corrected OBJECTPATH for installed files
+
+
+Modified: branches/s3d-cmake/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/CMakeLists.txt	2007-06-25 21:55:53 UTC (rev 600)
++++ branches/s3d-cmake/CMakeLists.txt	2007-06-25 21:55:55 UTC (rev 601)
+@@ -1,7 +1,7 @@
+ project(s3d)
+ 
+ # set path to objects
+-set(OBJECTPATH &quot;${CMAKE_INSTALL_PREFIX}/objs:${CMAKE_CURRENT_SOURCE_DIR}/objs&quot;)
++set(OBJECTPATH &quot;${CMAKE_INSTALL_PREFIX}/share/s3d/objs:${CMAKE_CURRENT_SOURCE_DIR}/objs&quot;)
+ 
+ # Run configure stuff
+ include(ConfigureChecks.cmake)
+
+Modified: branches/s3d-cmake/apps/dot_mcp/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/apps/dot_mcp/CMakeLists.txt	2007-06-25 21:55:53 UTC (rev 600)
++++ branches/s3d-cmake/apps/dot_mcp/CMakeLists.txt	2007-06-25 21:55:55 UTC (rev 601)
+@@ -1,4 +1,7 @@
+ include_directories(${CMAKE_SOURCE_DIR}/libs3d)
+ 
+ add_executable(dot_mpc main.c menu.c)
+-target_link_libraries(dot_mpc s3d)
+\ No newline at end of file
++target_link_libraries(dot_mpc s3d)
++
++# install 
++install(TARGETS dot_mpc RUNTIME DESTINATION bin)
+
+Modified: branches/s3d-cmake/apps/kism3d/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/apps/kism3d/CMakeLists.txt	2007-06-25 21:55:53 UTC (rev 600)
++++ branches/s3d-cmake/apps/kism3d/CMakeLists.txt	2007-06-25 21:55:55 UTC (rev 601)
+@@ -1,4 +1,7 @@
+ include_directories(${CMAKE_SOURCE_DIR}/libs3d ${CMAKE_SOURCE_DIR}/libs3dw)
+ 
+ add_executable(kism3d client.c gui.c kism3d.c network.c)
+-target_link_libraries(kism3d s3d s3dw)
+\ No newline at end of file
++target_link_libraries(kism3d s3d s3dw)
++
++# install 
++install(TARGETS kism3d RUNTIME DESTINATION bin)
+
+Modified: branches/s3d-cmake/apps/meshs3d/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/apps/meshs3d/CMakeLists.txt	2007-06-25 21:55:53 UTC (rev 600)
++++ branches/s3d-cmake/apps/meshs3d/CMakeLists.txt	2007-06-25 21:55:55 UTC (rev 601)
+@@ -1,4 +1,7 @@
+ include_directories(${CMAKE_SOURCE_DIR}/libs3d ${CMAKE_SOURCE_DIR}/libs3dw)
+ 
+ add_executable(meshs3d hash.c main.c net.c process.c)
+-target_link_libraries(meshs3d s3d s3dw)
+\ No newline at end of file
++target_link_libraries(meshs3d s3d s3dw)
++
++# install 
++install(TARGETS meshs3d RUNTIME DESTINATION bin)
+
+Modified: branches/s3d-cmake/apps/olsrs3d/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/apps/olsrs3d/CMakeLists.txt	2007-06-25 21:55:53 UTC (rev 600)
++++ branches/s3d-cmake/apps/olsrs3d/CMakeLists.txt	2007-06-25 21:55:55 UTC (rev 601)
+@@ -1,4 +1,7 @@
+ include_directories(${CMAKE_SOURCE_DIR}/libs3d ${CMAKE_SOURCE_DIR}/libs3dw)
+ 
+ add_executable(olsrs3d main.c net.c process.c search.c)
+-target_link_libraries(olsrs3d s3d s3dw)
+\ No newline at end of file
++target_link_libraries(olsrs3d s3d s3dw)
++
++# install 
++install(TARGETS olsrs3d RUNTIME DESTINATION bin)
+
+Modified: branches/s3d-cmake/apps/s3d_x11gate/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/apps/s3d_x11gate/CMakeLists.txt	2007-06-25 21:55:53 UTC (rev 600)
++++ branches/s3d-cmake/apps/s3d_x11gate/CMakeLists.txt	2007-06-25 21:55:55 UTC (rev 601)
+@@ -1,4 +1,7 @@
+ #include_directories(${CMAKE_SOURCE_DIR}/libs3d ${CMAKE_SOURCE_DIR}/libs3dw)
+ 
+ #add_executable(s3d_x11gate s3d_x11gate.c)
+-#target_link_libraries(s3d_x11gate s3d s3dw)
+\ No newline at end of file
++#target_link_libraries(s3d_x11gate s3d s3dw)
++
++# install
++#install(TARGETS s3d_x11gate RUNTIME DESTINATION bin)
+
+Modified: branches/s3d-cmake/apps/s3dfm/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/apps/s3dfm/CMakeLists.txt	2007-06-25 21:55:53 UTC (rev 600)
++++ branches/s3d-cmake/apps/s3dfm/CMakeLists.txt	2007-06-25 21:55:55 UTC (rev 601)
+@@ -2,4 +2,7 @@
+ 
+ add_executable(s3dfm animation.c box.c dialog.c event.c fly.c focus.c fs.c
+ 	icon.c main.c node.c parse.c string.c)
+-target_link_libraries(s3dfm s3d s3dw)
+\ No newline at end of file
++target_link_libraries(s3dfm s3d s3dw)
++
++# install 
++install(TARGETS s3dfm RUNTIME DESTINATION bin)
+
+Modified: branches/s3d-cmake/apps/s3dosm/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/apps/s3dosm/CMakeLists.txt	2007-06-25 21:55:53 UTC (rev 600)
++++ branches/s3d-cmake/apps/s3dosm/CMakeLists.txt	2007-06-25 21:55:55 UTC (rev 601)
+@@ -4,4 +4,7 @@
+ #	io.c kismet.c main.c nav.c net.c object.c olsrs3d.c osm.c
+ #	process.c search.c tag.c ui.c)
+ 
+-#target_link_libraries(s3dosm s3d s3dw)
+\ No newline at end of file
++#target_link_libraries(s3dosm s3d s3dw)
++
++# install 
++#install(TARGETS s3dosm RUNTIME DESTINATION bin)
+
+Modified: branches/s3d-cmake/apps/s3dvt/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/apps/s3dvt/CMakeLists.txt	2007-06-25 21:55:53 UTC (rev 600)
++++ branches/s3d-cmake/apps/s3dvt/CMakeLists.txt	2007-06-25 21:55:55 UTC (rev 601)
+@@ -1,4 +1,7 @@
+ include_directories(${CMAKE_SOURCE_DIR}/libs3d)
+ 
+ add_executable(s3dvt main.c terminal.c)
+-target_link_libraries(s3dvt s3d)
+\ No newline at end of file
++target_link_libraries(s3dvt s3d)
++
++# install
++install(TARGETS s3dvt RUNTIME DESTINATION bin)
+
+Modified: branches/s3d-cmake/libs3d/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/libs3d/CMakeLists.txt	2007-06-25 21:55:53 UTC (rev 600)
++++ branches/s3d-cmake/libs3d/CMakeLists.txt	2007-06-25 21:55:55 UTC (rev 601)
+@@ -5,3 +5,11 @@
+ 	sei_construct.c sei_misc.c sei_monotone.c sei_tri.c shm.c
+ 	shm_ringbuf.c tcp.c vector.c)
+ target_link_libraries(s3d ${G3D_LIBRARIES} ${FONTCONFIG_LIBRARIES})
++
++# install
++install(TARGETS s3d
++	LIBRARY DESTINATION lib
++	ARCHIVE DESTINATION lib
++)
++
++install(FILES s3d.h s3d_keysym.h DESTINATION include/)
+
+Modified: branches/s3d-cmake/libs3dw/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/libs3dw/CMakeLists.txt	2007-06-25 21:55:53 UTC (rev 600)
++++ branches/s3d-cmake/libs3dw/CMakeLists.txt	2007-06-25 21:55:55 UTC (rev 601)
+@@ -2,3 +2,11 @@
+ 
+ add_library(s3dw SHARED animate.c arrange.c button.c event.c input.c
+ 	label.c root.c scrollbar.c style.c surface.c textbox.c widget.c)
++
++# install
++install(TARGETS s3dw
++	LIBRARY DESTINATION lib
++	ARCHIVE DESTINATION lib
++)
++
++install(FILES s3dw.h DESTINATION include/)
+
+Modified: branches/s3d-cmake/objs/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/objs/CMakeLists.txt	2007-06-25 21:55:53 UTC (rev 600)
++++ branches/s3d-cmake/objs/CMakeLists.txt	2007-06-25 21:55:55 UTC (rev 601)
+@@ -0,0 +1,13 @@
++set(s3d-objs abs2.3ds abs.3ds accesspoint.3ds accesspoint_inet.3ds arrow2.3ds
++	arrow.3ds AUTHORS big_p.3ds bigsphere.3ds btn_close.3ds btn_maximize.3ds
++	btn_minimize.3ds btn_rotate.3ds clock_bg.3ds comp.3ds cube.3ds cubey.3ds
++	cubeyholes.3ds dot.3ds dotdot.3ds duno.3ds film.3ds folder.3ds
++	geometry.3ds go_button.3ds internet.3ds katze_body.3ds katze_leg.3ds
++	katze_tail.3ds lil_p.3ds materials.3ds meshnode.3ds miu.3ds
++	new_sphere.3ds notes.3ds reset.3ds ringsystem.3ds rotate.3ds
++	s3d_berlios_de.3ds s3dstart.3ds sec_p.3ds snow_body.3ds snow_foot.3ds
++	snow_head.3ds sphere.3ds spikeybla.3ds star.3ds weirdball.3ds
++	wtf.3ds xyz.3ds)
++
++# install
++install(FILES ${s3d-objs} DESTINATION share/s3d/objs)
+
+Modified: branches/s3d-cmake/server/CMakeLists.txt
+===================================================================
+--- branches/s3d-cmake/server/CMakeLists.txt	2007-06-25 21:55:53 UTC (rev 600)
++++ branches/s3d-cmake/server/CMakeLists.txt	2007-06-25 21:55:55 UTC (rev 601)
+@@ -4,5 +4,8 @@
+ 	shm_ringbuf.c tcp.c user.c user_sdl.c)
+ 
+ target_link_libraries(s3d-server ${OPENGL_LIBRARY} ${SDL_LIBRARY})
++set_target_properties(s3d-server PROPERTIES OUTPUT_NAME &quot;s3d&quot;)
++#graphics_glut.c user_glut.c 
+ 
+-#graphics_glut.c user_glut.c 
++# install 
++install(TARGETS s3d-server RUNTIME DESTINATION bin)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000594.html">[S3d-svn] r599 - in branches/s3d-cmake: . Documentation	Documentation/libg3d Documentation/libg3d/api	Documentation/libs3d Documentation/libs3dw	Documentation/manpages Documentation/server apps apps/dot_mcp	apps/kism3d apps/meshs3d apps/olsrs3d apps/s3d_x11gate	apps/s3dfm apps/s3dosm apps/s3dvt cmake cmake/modules example	libs3d libs3dw objs server
+</A></li>
+	<LI>Next message: <A HREF="000592.html">[S3d-svn] r602 - in branches/s3d-cmake: . cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#599">[ date ]</a>
+              <a href="thread.html#599">[ thread ]</a>
+              <a href="subject.html#599">[ subject ]</a>
+              <a href="author.html#599">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

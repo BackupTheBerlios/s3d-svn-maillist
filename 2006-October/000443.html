@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r450 - in trunk: . swig
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r450%20-%20in%20trunk%3A%20.%20swig&In-Reply-To=%3C200610191801.k9JI1mIx018747%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000442.html">
+   <LINK REL="Next"  HREF="000444.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r450 - in trunk: . swig</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r450%20-%20in%20trunk%3A%20.%20swig&In-Reply-To=%3C200610191801.k9JI1mIx018747%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r450 - in trunk: . swig">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Thu Oct 19 20:01:48 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000442.html">[S3d-svn] r449 - in trunk: . libs3d
+</A></li>
+        <LI>Next message: <A HREF="000444.html">[S3d-svn] r451 - in trunk: . swig
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#443">[ date ]</a>
+              <a href="thread.html#443">[ thread ]</a>
+              <a href="subject.html#443">[ subject ]</a>
+              <a href="author.html#443">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-10-19 20:01:48 +0200 (Thu, 19 Oct 2006)
+New Revision: 450
+
+Added:
+   trunk/swig/s3d_test.py
+Modified:
+   trunk/
+   trunk/swig/Makefile
+   trunk/swig/s3d.i
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1092 at kero</A>:  dotslash | 2006-10-19 20:01:25 +0200
+ - works somehow. I don't know how to get c-callbacks into python, but some basic functionality is here ...
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1090
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1092
+
+Modified: trunk/swig/Makefile
+===================================================================
+--- trunk/swig/Makefile	2006-10-19 17:17:00 UTC (rev 449)
++++ trunk/swig/Makefile	2006-10-19 18:01:48 UTC (rev 450)
+@@ -8,4 +8,4 @@
+ 	 gcc -fPIC -c s3d_wrap.c -I/usr/include/python2.3/
+ 	 gcc -shared s3d_wrap.o -ls3d -o $(PYTHON_MOD)
+ clean:
+-	rm -f $(MODS) *.o *.py s3d_wrap.c
++	rm -f $(MODS) *.o s3d_wrap.c s3d.py s3d.pyc
+
+Modified: trunk/swig/s3d.i
+===================================================================
+--- trunk/swig/s3d.i	2006-10-19 17:17:00 UTC (rev 449)
++++ trunk/swig/s3d.i	2006-10-19 18:01:48 UTC (rev 450)
+@@ -1,4 +1,15 @@
+ %module s3d
++typedef unsigned int uint32_t;
++%inline %{
++int s3dpy_init(char *name)
++{
++	return s3d_init(NULL,NULL,name);
++}
++int s3dpy_draw_string(char *str)
++{
++	return s3d_draw_string(str,NULL);
++}
++%}
+ %{
+ #include &lt;s3d.h&gt;
+ #include &lt;s3d_keysym.h&gt;
+
+Added: trunk/swig/s3d_test.py
+===================================================================
+--- trunk/swig/s3d_test.py	2006-10-19 17:17:00 UTC (rev 449)
++++ trunk/swig/s3d_test.py	2006-10-19 18:01:48 UTC (rev 450)
+@@ -0,0 +1,9 @@
++#!/usr/bin/python
++from s3d import *
++from time import sleep
++if 0 == s3dpy_init(&quot;hello world&quot;):
++	s3d_select_font(&quot;vera&quot;)
++	o = s3dpy_draw_string(&quot;hello from python&quot;)
++	s3d_flags_on(o, S3D_OF_VISIBLE)
++	sleep(10)
++	s3d_quit()
+
+
+Property changes on: trunk/swig/s3d_test.py
+___________________________________________________________________
+Name: svn:mime-type
+   + text/script
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000442.html">[S3d-svn] r449 - in trunk: . libs3d
+</A></li>
+	<LI>Next message: <A HREF="000444.html">[S3d-svn] r451 - in trunk: . swig
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#443">[ date ]</a>
+              <a href="thread.html#443">[ thread ]</a>
+              <a href="subject.html#443">[ subject ]</a>
+              <a href="author.html#443">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

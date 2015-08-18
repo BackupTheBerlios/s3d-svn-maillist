@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r372 - in trunk: . apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r372%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200606302222.k5UMMrgB003049%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000366.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r372 - in trunk: . apps/s3dfm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r372%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200606302222.k5UMMrgB003049%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r372 - in trunk: . apps/s3dfm">dotslash at berlios.de
+       </A><BR>
+    <I>Sat Jul  1 00:22:53 CEST 2006</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000366.html">[S3d-svn] r373 - in trunk/apps: dot_mcp s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#365">[ date ]</a>
+              <a href="thread.html#365">[ thread ]</a>
+              <a href="subject.html#365">[ subject ]</a>
+              <a href="author.html#365">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-07-01 00:22:53 +0200 (Sat, 01 Jul 2006)
+New Revision: 372
+
+Modified:
+   trunk/
+   trunk/apps/s3dfm/dialog.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r875 at balthasar</A>:  dotslash | 2006-07-01 00:22:48 +0200
+ - dotted byte count
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:873
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:875
+
+Modified: trunk/apps/s3dfm/dialog.c
+===================================================================
+--- trunk/apps/s3dfm/dialog.c	2006-06-30 21:45:36 UTC (rev 371)
++++ trunk/apps/s3dfm/dialog.c	2006-06-30 22:22:53 UTC (rev 372)
+@@ -82,6 +82,28 @@
+ {
+ 	s3dw_delete(button-&gt;parent); /* parent =surface. this means close containing window */
+ }
++void dotted_int(char *s,unsigned int i)
++{
++	char st[M_DIR];
++	int p;
++	p=0;
++	st[0]=0;
++	while (i&gt;0)
++	{
++		if ((p+1)%4==0) {
++			st[p]='.';
++			p++;
++		}
++		st[p]=(i%10)+'0';
++		i=i/10;
++		p++;
++	}
++	if (p&gt;0) p--;
++	st[p+1]=0;
++	for (i=0;i&lt;p+1;i++)
++		s[i]=st[p-i];
++	s[p+1]=0;
++}
+ 
+ void info_window(char *path)
+ {
+@@ -90,10 +112,12 @@
+ 	char string1[M_DIR];
+ 	char string2[M_DIR];
+ 	int b,d,f;
++	char bd[M_DIR];
+ 	float l;
+ 	snprintf(string1,M_DIR,&quot;Info for %s&quot;,path);
+ 	fs_approx(path, &amp;f, &amp;d, &amp;b);
+-	snprintf(string2 ,M_DIR,&quot;%d bytes in %d files and %d Directories&quot;,b,f,d);
++	dotted_int(bd,b);
++	snprintf(string2 ,M_DIR,&quot;%s bytes in %d files and %d Directories&quot;,bd,f,d);
+ 	
+ 	l=((strlen(string1)&gt;strlen(string2)) ? strlen(string1) :strlen(string2))*0.7;
+ 	
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000366.html">[S3d-svn] r373 - in trunk/apps: dot_mcp s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#365">[ date ]</a>
+              <a href="thread.html#365">[ thread ]</a>
+              <a href="subject.html#365">[ subject ]</a>
+              <a href="author.html#365">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

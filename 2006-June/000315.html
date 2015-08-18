@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r322 - trunk/example
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r322%20-%20trunk/example&In-Reply-To=%3C200606041139.k54Bdd9s000620%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000314.html">
+   <LINK REL="Next"  HREF="000316.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r322 - trunk/example</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r322%20-%20trunk/example&In-Reply-To=%3C200606041139.k54Bdd9s000620%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r322 - trunk/example">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Sun Jun  4 13:39:39 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000314.html">[S3d-svn] r321 - trunk/example
+</A></li>
+        <LI>Next message: <A HREF="000316.html">[S3d-svn] r323 - trunk/example
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#315">[ date ]</a>
+              <a href="thread.html#315">[ thread ]</a>
+              <a href="subject.html#315">[ subject ]</a>
+              <a href="author.html#315">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-06-04 13:39:38 +0200 (Sun, 04 Jun 2006)
+New Revision: 322
+
+Modified:
+   trunk/example/nichtsnutz.c
+Log:
+testing
+
+
+Modified: trunk/example/nichtsnutz.c
+===================================================================
+--- trunk/example/nichtsnutz.c	2006-06-04 11:16:26 UTC (rev 321)
++++ trunk/example/nichtsnutz.c	2006-06-04 11:39:38 UTC (rev 322)
+@@ -33,7 +33,7 @@
+ static struct timespec t={0,10*1000*1000}; /* 10 mili seconds */
+ 
+ int object,foll;
+-float al, r, alpha=0.0, Asp, Bottom, Left, angle;
++float al, r, rc ,alpha=0.0, Asp, Bottom, Left, angle;
+ float CamPosition[2][3],
+ 	  TmpMove[3],
+ 	  Tmp[3],
+@@ -48,21 +48,27 @@
+ 	
+ 	al=(alpha*M_PI/180);
+     r = 5.0;
++	rc = 12.0;
+ 	
+ 	CatPos[0] = sin(al)*r;
+ 	CatPos[1] = 0;
+ 	CatPos[2] = cos(al)*r;
+-	
++	/*
++	RotCam[0][0] = sin(al) * rc;
++	RotCam[0][1] = 0.0;
++	RotCam[0][2] = cos(al) * rc;
++	*/
+ 	s3d_translate(object,CatPos[0] ,CatPos[1], CatPos[2]);
+ 	s3d_rotate(object, 0, alpha, 0);
+ 	alpha = alpha+0.1;
+ 	if (alpha&gt;360.0) alpha=0.0;
+ 	
+-	length = s3d_vector_length(CatPos);
++	/* length = s3d_vector_length(CatPos); */
+ 
++
+ 	RotCam[0][0] = ( CatPos[0] * 12.0 ) / length;
+-	RotCam[0][1] = ( CatPos[1] != 0 ) ?(( CatPos[1] * 12 ) / length):0;
+-	RotCam[0][2] = ( CatPos[2] * RotCam[0][0] ) / CatPos[0];
++	RotCam[0][1] = ( CatPos[1] * 12.0 ) / length;
++	RotCam[0][2] = ( CatPos[2] * 12.0 ) / length;
+ 	
+ 	
+ 	if( foll )
+@@ -75,14 +81,14 @@
+ 
+ 		TmpMove[0] = 0.0;
+ 		TmpMove[1] = 0.0;
+-		TmpMove[2] = 1.0;
++		TmpMove[2] = -1.0;
+ 
+ 		Tmp[0] = CamPosition[0][0] - CatPos[0];
+ 		Tmp[1] = 0.0;
+ 		Tmp[2] = CamPosition[0][2] - CatPos[2];
+ 		
+ 		angle = s3d_vector_angle(Tmp,TmpMove);
+-		angle = (CatPos[0] &gt; 0)?(180-(180 / M_PI * -angle)):(180+(180 / M_PI * -angle));
++		angle = (CatPos[0] &gt; 0)?(180-(180 / M_PI * angle)):(180+(180 / M_PI * angle));
+ 		printf(&quot;%f %f\n&quot;,angle,al);
+ 	
+ 		CamPosition[1][1] = (CamPosition[1][1]*4 + angle)/5;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000314.html">[S3d-svn] r321 - trunk/example
+</A></li>
+	<LI>Next message: <A HREF="000316.html">[S3d-svn] r323 - trunk/example
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#315">[ date ]</a>
+              <a href="thread.html#315">[ thread ]</a>
+              <a href="subject.html#315">[ subject ]</a>
+              <a href="author.html#315">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

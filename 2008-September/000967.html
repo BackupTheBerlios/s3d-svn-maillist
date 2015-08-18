@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r987 - trunk/Documentation
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r987%20-%20trunk/Documentation&In-Reply-To=%3C200809031545.m83FjtN7031384%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000966.html">
+   <LINK REL="Next"  HREF="000968.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r987 - trunk/Documentation</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r987%20-%20trunk/Documentation&In-Reply-To=%3C200809031545.m83FjtN7031384%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r987 - trunk/Documentation">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Wed Sep  3 17:45:55 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000966.html">[S3d-svn] r986 - trunk/Documentation
+</A></li>
+        <LI>Next message: <A HREF="000968.html">[S3d-svn] r988 - trunk/Documentation
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#967">[ date ]</a>
+              <a href="thread.html#967">[ thread ]</a>
+              <a href="subject.html#967">[ subject ]</a>
+              <a href="author.html#967">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-03 17:45:55 +0200 (Wed, 03 Sep 2008)
+New Revision: 987
+
+Modified:
+   trunk/Documentation/extractdefinitions.py
+Log:
+Save function parameters in a specialized class
+
+Modified: trunk/Documentation/extractdefinitions.py
+===================================================================
+--- trunk/Documentation/extractdefinitions.py	2008-09-03 15:45:50 UTC (rev 986)
++++ trunk/Documentation/extractdefinitions.py	2008-09-03 15:45:55 UTC (rev 987)
+@@ -158,6 +158,34 @@
+ 	def isempty(self):
+ 		return (len(self.t) == 0) or (len(self.t) == 1 and self.t[0]['text'].strip() == '')
+ 
++class function_param:
++	def __init__(self, node):
++		self.param = {'type' : '', 'declname' : '', 'array' : ''}
++		for n in node.childNodes:
++			if n.nodeName == 'type':
++				self.param['type'] = get_text(n)
++
++			if n.nodeName == 'declname':
++				self.param['declname'] = get_text(n)
++
++			if n.nodeName == 'array':
++				self.param['array'] = get_text(n)
++
++	def dom_append(self, funcprototype, intent = &quot;&quot;):
++		paramdef = create_append(funcprototype, 'paramdef')
++
++		create_append_text(paramdef, intent+self.param['type'])
++
++		if self.param['declname'] != '':
++			if self.param['type'][-1:] != &quot;*&quot;:
++				# dont add space between * and name
++				create_append_text(paramdef, &quot; &quot;)
++			parameter = create_append(paramdef, 'parameter')
++			create_append_text(parameter, self.param['declname'])
++
++		if self.param['array'] != '':
++			create_append_text(paramdef, self.param['array'])
++
+ def remove_exportdefinitions(function_return):
+ 	exports = [&quot;S3DEXPORT&quot;, &quot;S3DWEXPORT&quot;]
+ 	for export in exports:
+@@ -209,19 +237,8 @@
+ 				function['return'] = remove_exportdefinitions(get_text(node2))
+ 
+ 			if node2.nodeName == &quot;param&quot;:
+-				param = {'type' : '', 'declname' : '', 'array' : ''}
+-				for n in node2.childNodes:
+-					if n.nodeName == 'type':
+-						param['type'] = get_text(n)
++				function['param'].append(function_param(node2))
+ 
+-					if n.nodeName == 'declname':
+-						param['declname'] = get_text(n)
+-
+-					if n.nodeName == 'array':
+-						param['array'] = get_text(n)
+-
+-				function['param'].append(param)
+-
+ 			if node2.nodeName == 'detaileddescription':
+ 				function['help'] = detaileddescription(node2)
+ 
+@@ -329,20 +346,8 @@
+ 		# add parameter to function definition
+ 		param_num = len(function['param'])
+ 		for i in range(0, param_num):
+-			paramdef = create_append(funcprototype, 'paramdef')
++			function['param'][i].dom_append(funcprototype)
+ 
+-			create_append_text(paramdef, function['param'][i]['type'])
+-
+-			if function['param'][i]['declname'] != '':
+-				if function['param'][i]['type'][-1:] != &quot;*&quot;:
+-					# dont add space between * and name
+-					create_append_text(paramdef, &quot; &quot;)
+-				parameter = create_append(paramdef, 'parameter')
+-				create_append_text(parameter, function['param'][i]['declname'])
+-
+-			if function['param'][i]['array'] != '':
+-				create_append_text(paramdef, function['param'][i]['array'])
+-
+ 		# add help to function
+ 		function['help'].dom_append(sect2)
+ 
+@@ -503,19 +508,8 @@
+ 		
+ 		param_num = len(function['param'])
+ 		for i in range(0, param_num):
+-			paramdef = create_append(funcprototype, 'paramdef')
+-			create_append_text(paramdef, &quot;\t&quot;+function['param'][i]['type'])
++			function['param'][i].dom_append(funcprototype, &quot;\t&quot;)
+ 
+-			if function['param'][i]['declname'] != '':
+-				if function['param'][i]['type'][-1:] != &quot;*&quot;:
+-					# dont add space between * and name
+-					create_append_text(paramdef, &quot; &quot;)
+-				parameter = create_append(paramdef, 'parameter')
+-				create_append_text(parameter, function['param'][i]['declname'])
+-
+-			if function['param'][i]['array'] != '':
+-				create_append_text(paramdef, function['param'][i]['array'])
+-
+ 		# add help to function
+ 		refsect1 = create_append(refentry, 'refsect1')
+ 		title = create_append(refsect1, 'title')
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000966.html">[S3d-svn] r986 - trunk/Documentation
+</A></li>
+	<LI>Next message: <A HREF="000968.html">[S3d-svn] r988 - trunk/Documentation
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#967">[ date ]</a>
+              <a href="thread.html#967">[ thread ]</a>
+              <a href="subject.html#967">[ subject ]</a>
+              <a href="author.html#967">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

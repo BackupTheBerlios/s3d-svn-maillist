@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r60 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r60%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602121737.k1CHbcgB023859%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000055.html">
+   <LINK REL="Next"  HREF="000057.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r60 - trunk/apps/olsrs3d</H1>
+    <B>marec at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r60%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602121737.k1CHbcgB023859%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r60 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Sun Feb 12 18:37:38 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000055.html">[S3d-svn] r59 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000057.html">[S3d-svn] r61 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#56">[ date ]</a>
+              <a href="thread.html#56">[ thread ]</a>
+              <a href="subject.html#56">[ subject ]</a>
+              <a href="author.html#56">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-02-12 18:37:33 +0100 (Sun, 12 Feb 2006)
+New Revision: 60
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/process.c
+Log:
+node drifting fix II
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-02-12 09:18:41 UTC (rev 59)
++++ trunk/apps/olsrs3d/main.c	2006-02-12 17:37:33 UTC (rev 60)
+@@ -224,16 +224,6 @@
+ 			mov_add( (*olsr_con)-&gt;left_olsr_node-&gt;mov_vec, tmp_mov_vec, 1 / f - 1 );
+ 			mov_add( (*olsr_con)-&gt;right_olsr_node-&gt;mov_vec, tmp_mov_vec, - ( 1 / f - 1 ) );
+ 
+-			if ( strcmp( (*olsr_con)-&gt;left_olsr_node-&gt;ip, &quot;104.131.131.1&quot; ) == 0 ) {
+-
+-				printf( &quot;con_to: %s, own_etx: %f, other_etx: %f, vec: %f,%f,%f\n&quot;, (*olsr_con)-&gt;right_olsr_node-&gt;ip, (*olsr_con)-&gt;left_etx, (*olsr_con)-&gt;right_etx, (*olsr_con)-&gt;left_olsr_node-&gt;mov_vec[0], (*olsr_con)-&gt;left_olsr_node-&gt;mov_vec[1], (*olsr_con)-&gt;left_olsr_node-&gt;mov_vec[2] );
+-			
+-			} else if ( strcmp( (*olsr_con)-&gt;right_olsr_node-&gt;ip, &quot;104.131.131.1&quot; ) == 0 ) {
+-
+-				printf( &quot;con_to: %s, own_etx: %f, other_etx: %f, vec: %f,%f,%f\n&quot;, (*olsr_con)-&gt;left_olsr_node-&gt;ip, (*olsr_con)-&gt;right_etx, (*olsr_con)-&gt;left_etx, (*olsr_con)-&gt;right_olsr_node-&gt;mov_vec[0], (*olsr_con)-&gt;right_olsr_node-&gt;mov_vec[1], (*olsr_con)-&gt;right_olsr_node-&gt;mov_vec[2] );
+-
+-			}
+-
+ // 		}
+ 
+ 		olsr_con = &amp;(*olsr_con)-&gt;next_olsr_con;
+@@ -328,7 +318,7 @@
+ 
+ 	// calculate new movement vector
+ 	calc_olsr_node_mov();
+-	printf( &quot;calc ended !\n&quot; );
++
+ 	// prepare nodes
+ 	handle_olsr_node( Olsr_root );
+ 
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-02-12 09:18:41 UTC (rev 59)
++++ trunk/apps/olsrs3d/process.c	2006-02-12 17:37:33 UTC (rev 60)
+@@ -1,6 +1,7 @@
+-#include &lt;stdio.h&gt; /* NULL */
+-#include &lt;string.h&gt; /* strlen(), memmove() */
+-#include &lt;stdlib.h&gt; /* rand(), malloc(), realloc(), free(), strtof() */
++#include &lt;stdio.h&gt; 	/* NULL */
++#include &lt;string.h&gt; 	/* strlen(), memmove() */
++#include &lt;stdlib.h&gt; 	/* rand(), malloc(), realloc(), free(), strtof() */
++#include &lt;math.h&gt;		/* sin(), cos() */
+ #include &lt;s3d.h&gt;
+ #include &quot;olsrs3d.h&quot;
+ char lbuf[MAXLINESIZE];
+@@ -160,7 +161,7 @@
+ 
+ void *get_olsr_node( struct olsr_node **olsr_node, char *ip ) {
+ 
+-	int i;   /* inc var */
++	/* int i;    inc var */
+ 	int result;   /* result of strcmp */
+ 
+ 	while ( (*olsr_node) != NULL ) {
+@@ -193,11 +194,27 @@
+ 
+ 		if ( Debug ) printf( &quot;new olsr node: %s\n&quot;, (*olsr_node)-&gt;ip );
+ 
+-		for ( i=0; i&lt;3; i++ ) {
+-			(*olsr_node)-&gt;pos_vec[i] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
+-			(*olsr_node)-&gt;mov_vec[i] = 0.0;
+-		}
++// 		for ( i=0; i&lt;3; i++ ) {
+ 
++// 			alpha = ( ( 360.0 * rand() ) / ( ( float ) i ) );
++// 			radius=((n_item*10)/(M_PI*4));
++// 			if (n_item&lt;5)
++// 				radius=((50)/(M_PI*4));
++// 			else
++// 				radius=((n_item*10)/(M_PI*4));
++// 			px=posx-sin(alpha*M_PI/180.0)*radius;
++// 			pz=posy;
++// 			pz=posz-cos(alpha*M_PI/180.0)*radius;
++			
++// 			(*olsr_node)-&gt;pos_vec[i] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
++			(*olsr_node)-&gt;pos_vec[0] = ( ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0 ) - sin( ( ( 360.0 * rand() ) / 100.0 ) * M_PI / 180.0 ) * ( 20.0 / ( M_PI * 4 ) );
++			(*olsr_node)-&gt;pos_vec[1] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
++			(*olsr_node)-&gt;pos_vec[2] = (*olsr_node)-&gt;pos_vec[1] - cos( ( ( 360.0 * rand() ) / 100.0 ) * M_PI / 180.0 ) * ( 20.0 / ( M_PI * 4 ) );
++// 			printf( &quot;vec1: %f, vec2: %f, vec3: %f\n&quot;, (*olsr_node)-&gt;pos_vec[0], (*olsr_node)-&gt;pos_vec[1], (*olsr_node)-&gt;pos_vec[2] );
++			(*olsr_node)-&gt;mov_vec[0] = (*olsr_node)-&gt;mov_vec[1] = (*olsr_node)-&gt;mov_vec[2] = 0.0;
++			
++// 		}
++
+ 		(*olsr_node)-&gt;obj_id = -1;
+ 		(*olsr_node)-&gt;desc_id = -1;
+ 		(*olsr_node)-&gt;olsr_con = NULL;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000055.html">[S3d-svn] r59 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000057.html">[S3d-svn] r61 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#56">[ date ]</a>
+              <a href="thread.html#56">[ thread ]</a>
+              <a href="subject.html#56">[ subject ]</a>
+              <a href="author.html#56">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

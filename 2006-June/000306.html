@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r313 - in trunk: . libs3d/libg3d/plugins/image libs3d/libg3d/plugins/import
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r313%20-%20in%20trunk%3A%20.%20libs3d/libg3d/plugins/image%20libs3d/libg3d/plugins/import&In-Reply-To=%3C200606021801.k52I1rdF030004%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000305.html">
+   <LINK REL="Next"  HREF="000307.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r313 - in trunk: . libs3d/libg3d/plugins/image libs3d/libg3d/plugins/import</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r313%20-%20in%20trunk%3A%20.%20libs3d/libg3d/plugins/image%20libs3d/libg3d/plugins/import&In-Reply-To=%3C200606021801.k52I1rdF030004%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r313 - in trunk: . libs3d/libg3d/plugins/image libs3d/libg3d/plugins/import">dotslash at berlios.de
+       </A><BR>
+    <I>Fri Jun  2 20:01:53 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000305.html">[S3d-svn] r312 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000307.html">[S3d-svn] r314 - in trunk: . libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#306">[ date ]</a>
+              <a href="thread.html#306">[ thread ]</a>
+              <a href="subject.html#306">[ subject ]</a>
+              <a href="author.html#306">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-02 20:01:51 +0200 (Fri, 02 Jun 2006)
+New Revision: 313
+
+Modified:
+   trunk/
+   trunk/configure.ac
+   trunk/libs3d/libg3d/plugins/image/Makefile.am
+   trunk/libs3d/libg3d/plugins/import/imp_vrml_v1.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r671 at balthasar</A>:  dotslash | 2006-06-02 20:01:43 +0200
+ - remove gtk/gdk bindings
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:669
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:671
+
+Modified: trunk/configure.ac
+===================================================================
+--- trunk/configure.ac	2006-06-02 17:51:08 UTC (rev 312)
++++ trunk/configure.ac	2006-06-02 18:01:51 UTC (rev 313)
+@@ -155,14 +155,14 @@
+ AM_PATH_GLIB_2_0(2.0.0,,AC_MSG_ERROR([glib &gt;= 2.0 is needed]), gmodule gobject)
+ 
+ # gdk-pixbuf
+-AM_PATH_GTK_2_0(2.0.0, have_gtk2=true)
+-if test &quot;x$have_gtk2&quot; = &quot;xtrue&quot; ; then
+-GDKPIXBUF_CFLAGS=$GTK_CFLAGS
+-GDKPIXBUF_LIBS=$GTK_LIBS
+-AC_SUBST(GDKPIXBUF_CFLAGS)
+-AC_SUBST(GDKPIXBUF_LIBS)
+-fi
+-AM_CONDITIONAL([HAVE_GDKPIXBUF], test &quot;x$have_gtk2&quot; = &quot;xtrue&quot;)
++#AM_PATH_GTK_2_0(2.0.0, have_gtk2=true)
++#if test &quot;x$have_gtk2&quot; = &quot;xtrue&quot; ; then
++#GDKPIXBUF_CFLAGS=$GTK_CFLAGS
++#GDKPIXBUF_LIBS=$GTK_LIBS
++#AC_SUBST(GDKPIXBUF_CFLAGS)
++#AC_SUBST(GDKPIXBUF_LIBS)
++#fi
++#AM_CONDITIONAL([HAVE_GDKPIXBUF], test &quot;x$have_gtk2&quot; = &quot;xtrue&quot;)
+ 
+ # AC_DEFINE_DIR(PLUGIN_DIR, libdir/$PACKAGE/plugins, [Plugin directory])
+ 
+
+Modified: trunk/libs3d/libg3d/plugins/image/Makefile.am
+===================================================================
+--- trunk/libs3d/libg3d/plugins/image/Makefile.am	2006-06-02 17:51:08 UTC (rev 312)
++++ trunk/libs3d/libg3d/plugins/image/Makefile.am	2006-06-02 18:01:51 UTC (rev 313)
+@@ -4,9 +4,9 @@
+ 	img_bmp.la \
+ 	img_sgi.la
+ 
+-if HAVE_GDKPIXBUF
+-pluginimg_LTLIBRARIES += img_gdkpixbuf.la
+-endif
++#if HAVE_GDKPIXBUF
++#pluginimg_LTLIBRARIES += img_gdkpixbuf.la
++#endif
+ 
+ AM_CFLAGS = \
+ 	-Wall -ansi -pedantic \
+@@ -27,7 +27,7 @@
+ img_bmp_la_SOURCES = img_bmp.c
+ img_sgi_la_SOURCES = img_sgi.c
+ 
+-img_gdkpixbuf_la_CFLAGS = ${AM_CFLAGS} @GDKPIXBUF_CFLAGS@
+-img_gdkpixbuf_la_SOURCES = img_gdkpixbuf.c
+-img_gdkpixbuf_la_LIBADD = @GDKPIXBUF_LIBS@
++#img_gdkpixbuf_la_CFLAGS = ${AM_CFLAGS} @GDKPIXBUF_CFLAGS@
++#img_gdkpixbuf_la_SOURCES = img_gdkpixbuf.c
++#img_gdkpixbuf_la_LIBADD = @GDKPIXBUF_LIBS@
+ 
+
+Modified: trunk/libs3d/libg3d/plugins/import/imp_vrml_v1.c
+===================================================================
+--- trunk/libs3d/libg3d/plugins/import/imp_vrml_v1.c	2006-06-02 17:51:08 UTC (rev 312)
++++ trunk/libs3d/libg3d/plugins/import/imp_vrml_v1.c	2006-06-02 18:01:51 UTC (rev 313)
+@@ -999,7 +999,7 @@
+ #endif
+ 
+         if ( ! yyg-&gt;yy_state_buf )
+-            yyg-&gt;yy_state_buf = (yy_state_type *)vrml_v1_yyalloc(YY_BUF_SIZE + 2  ,yyscanner);
++            yyg-&gt;yy_state_buf = (yy_state_type *)vrml_v1_yyalloc(((YY_BUF_SIZE + 2) * sizeof(yy_state_type))  ,yyscanner);
+ 
+ 		if ( ! yyg-&gt;yy_start )
+ 			yyg-&gt;yy_start = 1;	/* first start state */
+@@ -2333,7 +2333,6 @@
+ /** Setup the input buffer state to scan a string. The next call to vrml_v1_yylex() will
+  * scan from a @e copy of @a str.
+  * @param str a NUL-terminated string to scan
+- * @param yy_str a NUL-terminated string to scan
+  * @param yyscanner The scanner object.
+  * @return the newly allocated buffer state object.
+  * @note If you want to scan bytes that may contain NUL values, then use
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000305.html">[S3d-svn] r312 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000307.html">[S3d-svn] r314 - in trunk: . libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#306">[ date ]</a>
+              <a href="thread.html#306">[ thread ]</a>
+              <a href="subject.html#306">[ subject ]</a>
+              <a href="author.html#306">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

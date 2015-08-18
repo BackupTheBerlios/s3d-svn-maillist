@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r467 - in trunk: . libs3d/libg3d/plugins/import
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r467%20-%20in%20trunk%3A%20.%20libs3d/libg3d/plugins/import&In-Reply-To=%3C200611101948.kAAJm7XY026537%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000459.html">
+   <LINK REL="Next"  HREF="000461.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r467 - in trunk: . libs3d/libg3d/plugins/import</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r467%20-%20in%20trunk%3A%20.%20libs3d/libg3d/plugins/import&In-Reply-To=%3C200611101948.kAAJm7XY026537%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r467 - in trunk: . libs3d/libg3d/plugins/import">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Fri Nov 10 20:48:07 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000459.html">[S3d-svn] r466 - in trunk: . apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000461.html">[S3d-svn] r468 - in trunk: . libs3d/libg3d/plugins/import
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#460">[ date ]</a>
+              <a href="thread.html#460">[ thread ]</a>
+              <a href="subject.html#460">[ subject ]</a>
+              <a href="author.html#460">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-11-10 20:48:06 +0100 (Fri, 10 Nov 2006)
+New Revision: 467
+
+Modified:
+   trunk/
+   trunk/libs3d/libg3d/plugins/import/Makefile.am
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1125 at kero</A>:  dotslash | 2006-11-10 20:48:00 +0100
+ - removed leocad lib - it only creates weird warnings for us.
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1123
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1125
+
+Modified: trunk/libs3d/libg3d/plugins/import/Makefile.am
+===================================================================
+--- trunk/libs3d/libg3d/plugins/import/Makefile.am	2006-11-09 22:03:11 UTC (rev 466)
++++ trunk/libs3d/libg3d/plugins/import/Makefile.am	2006-11-10 19:48:06 UTC (rev 467)
+@@ -8,7 +8,6 @@
+ 	imp_dxf.la \
+ 	imp_heightfield.la \
+ 	imp_iob.la \
+-	imp_leocad.la \
+ 	imp_lwo.la \
+ 	imp_md2.la \
+ 	imp_md3.la \
+@@ -16,6 +15,7 @@
+ 	imp_obj.la \
+ 	imp_q3o.la \
+ 	imp_vrml.la
++#	imp_leocad.la 
+ 
+ # we are experimental ;D
+ pluginimp_LTLIBRARIES += \
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000459.html">[S3d-svn] r466 - in trunk: . apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000461.html">[S3d-svn] r468 - in trunk: . libs3d/libg3d/plugins/import
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#460">[ date ]</a>
+              <a href="thread.html#460">[ thread ]</a>
+              <a href="subject.html#460">[ subject ]</a>
+              <a href="author.html#460">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,214 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r367 - in trunk: . libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r367%20-%20in%20trunk%3A%20.%20libs3dw&In-Reply-To=%3C200606292103.k5TL3wUW003258%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000359.html">
+   <LINK REL="Next"  HREF="000361.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r367 - in trunk: . libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r367%20-%20in%20trunk%3A%20.%20libs3dw&In-Reply-To=%3C200606292103.k5TL3wUW003258%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r367 - in trunk: . libs3dw">dotslash at berlios.de
+       </A><BR>
+    <I>Thu Jun 29 23:03:58 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000359.html">[S3d-svn] r366 - in trunk: . libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000361.html">[S3d-svn] r368 - in trunk: . libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#360">[ date ]</a>
+              <a href="thread.html#360">[ thread ]</a>
+              <a href="subject.html#360">[ subject ]</a>
+              <a href="author.html#360">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-29 23:03:58 +0200 (Thu, 29 Jun 2006)
+New Revision: 367
+
+Modified:
+   trunk/
+   trunk/libs3dw/animate.c
+   trunk/libs3dw/arrange.c
+   trunk/libs3dw/event.c
+   trunk/libs3dw/s3dw_int.h
+   trunk/libs3dw/surface.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r865 at balthasar</A>:  dotslash | 2006-06-29 23:03:53 +0200
+ - some improvements for smoother window movement ....
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:863
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:865
+
+Modified: trunk/libs3dw/animate.c
+===================================================================
+--- trunk/libs3dw/animate.c	2006-06-29 20:12:38 UTC (rev 366)
++++ trunk/libs3dw/animate.c	2006-06-29 21:03:58 UTC (rev 367)
+@@ -30,6 +30,7 @@
+ static s3dw_widget *ani_s[MAXANI];
+ static int ani_n=0;
+ static int animation_on=0;
++int ani_need_arr=0;
+ 
+ /* is item f already on stack? */
+ int s3dw_ani_onstack(s3dw_widget *f)
+@@ -116,12 +117,23 @@
+ 		return(0);
+ 	return(1);
+ }
++/* need an arrangement ... */
++void s3dw_ani_needarr()
++{
++	ani_need_arr=1;
++	if (!animation_on)	
++	{
++		while (ani_need_arr) s3dw_arrange();
++	}
++		
++}
+ /* doing the whole animation thing */
+ void s3dw_ani_mate()
+ {
+ 	int i;
+ 	s3dw_widget *f;
+ 	animation_on=1;			/* animation is activated */
++	if (ani_need_arr) s3dw_arrange();
+ 	for (i=0;i&lt;ani_n;i++)
+ 	{
+ 		f=ani_s[i];
+
+Modified: trunk/libs3dw/arrange.c
+===================================================================
+--- trunk/libs3dw/arrange.c	2006-06-29 20:12:38 UTC (rev 366)
++++ trunk/libs3dw/arrange.c	2006-06-29 21:03:58 UTC (rev 367)
+@@ -28,6 +28,7 @@
+ #include &lt;math.h&gt;	/* M_PI */
+ #define R2D		(180/M_PI)
+ s3dw_widget *cam=NULL;
++extern int ani_need_arr;
+ 
+ void s3dw_arr_widgetcenter(s3dw_widget *widget, float *center)
+ {
+@@ -113,13 +114,14 @@
+ void s3dw_arrange()
+ {
+ 	s3dw_widget *w1,*w2,*root=s3dw_getroot();
+-	int i,j,arranged;
++	int i,j,arranged,allarr;
+ 	float len1,len2, dirlen;
+ 	float tomove, move1, move2;
+ 	float f1[3],f2[3],dir[3];
+ 
+ 	/* test if there is anything to arrange ... */
+ 	arranged=1;
++	ani_need_arr=0;
+ 	for (i=0;i&lt;root-&gt;nobj;i++)
+ 		if (!(root-&gt;pobj[i]-&gt;flags&amp;S3DW_ARRANGED)) arranged=0;
+ 	if (arranged) return; /* no arrangement necceasary .... */
+@@ -131,6 +133,7 @@
+ 		w1-&gt;flags|=S3DW_ARRANGED; /* done */
+ 		return;
+ 	}
++	allarr=1;
+ 	for (i=0;i&lt;root-&gt;nobj;i++)
+ 	{
+ 		w1=root-&gt;pobj[i];
+@@ -149,6 +152,7 @@
+ 				dirlen=s3d_vector_length(dir);
+ 				if (dirlen&lt;(len1+len2))
+ 				{
++					allarr=0;
+ 					arranged=0;
+ 					w1-&gt;flags&amp;=~S3DW_ARRANGED;
+ 					w2-&gt;flags&amp;=~S3DW_ARRANGED;
+@@ -185,4 +189,6 @@
+ 		if (arranged)
+ 			w1-&gt;flags|=S3DW_ARRANGED;
+ 	}
++	if (allarr)	ani_need_arr=0;
++	s3dw_turn();
+ }
+
+Modified: trunk/libs3dw/event.c
+===================================================================
+--- trunk/libs3dw/event.c	2006-06-29 20:12:38 UTC (rev 366)
++++ trunk/libs3dw/event.c	2006-06-29 21:03:58 UTC (rev 367)
+@@ -47,7 +47,6 @@
+ 		cam-&gt;ay=cam-&gt;y=info-&gt;trans_y;
+ 		cam-&gt;az=cam-&gt;z=info-&gt;trans_z;
+ 		cam-&gt;flags&amp;=~S3DW_ARRANGED;
+-		s3dw_arrange();
+-		s3dw_turn();
++		s3dw_ani_needarr();
+ 	}
+ }
+
+Modified: trunk/libs3dw/s3dw_int.h
+===================================================================
+--- trunk/libs3dw/s3dw_int.h	2006-06-29 20:12:38 UTC (rev 366)
++++ trunk/libs3dw/s3dw_int.h	2006-06-29 21:03:58 UTC (rev 367)
+@@ -90,6 +90,7 @@
+ void s3dw_ani_doit(s3dw_widget *f);
+ void s3dw_ani_finish(s3dw_widget *f, int i);
+ void s3dw_ani_iterate(s3dw_widget *f);
++void s3dw_ani_needarr();
+ int  s3dw_ani_check(s3dw_widget *f);
+ /* arrange.c */
+ void s3dw_arrange();
+
+Modified: trunk/libs3dw/surface.c
+===================================================================
+--- trunk/libs3dw/surface.c	2006-06-29 20:12:38 UTC (rev 366)
++++ trunk/libs3dw/surface.c	2006-06-29 21:03:58 UTC (rev 367)
+@@ -145,7 +145,7 @@
+ 	widget-&gt;z=-f1[2];
+ 	s3dw_widget_append(s3dw_getroot(),widget);
+ 	s3dw_surface_draw(widget);
+-	s3dw_arrange();
++	s3dw_ani_needarr();
+ 	s3dw_ani_add(widget);
+ 	return(surface);
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000359.html">[S3d-svn] r366 - in trunk: . libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000361.html">[S3d-svn] r368 - in trunk: . libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#360">[ date ]</a>
+              <a href="thread.html#360">[ thread ]</a>
+              <a href="subject.html#360">[ subject ]</a>
+              <a href="author.html#360">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

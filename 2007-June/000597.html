@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r608 - branches/s3d-cmake/cmake/modules
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r608%20-%20branches/s3d-cmake/cmake/modules&In-Reply-To=%3C200706252156.l5PLu2qJ023069%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000598.html">
+   <LINK REL="Next"  HREF="000602.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r608 - branches/s3d-cmake/cmake/modules</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r608%20-%20branches/s3d-cmake/cmake/modules&In-Reply-To=%3C200706252156.l5PLu2qJ023069%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r608 - branches/s3d-cmake/cmake/modules">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Jun 25 23:56:02 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000598.html">[S3d-svn] r606 - in branches/s3d-cmake: apps/s3d_x11gate	apps/s3dosm server
+</A></li>
+        <LI>Next message: <A HREF="000602.html">[S3d-svn] r607 - in branches/s3d-cmake: . cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#597">[ date ]</a>
+              <a href="thread.html#597">[ thread ]</a>
+              <a href="subject.html#597">[ subject ]</a>
+              <a href="author.html#597">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-06-25 23:56:02 +0200 (Mon, 25 Jun 2007)
+New Revision: 608
+
+Modified:
+   branches/s3d-cmake/cmake/modules/FindFREETYPE.cmake
+   branches/s3d-cmake/cmake/modules/FindGLIB.cmake
+Log:
+- Define *_LIBRARIES as FILEPATH and *_INCLUDE_DIR as PATH in FindGLIB and FindFreeType for better usage via cmake guis
+- Use list(APPEND...) instead of set(...) to concat two lists in FindGLIB and FindFreeType
+
+
+Modified: branches/s3d-cmake/cmake/modules/FindFREETYPE.cmake
+===================================================================
+--- branches/s3d-cmake/cmake/modules/FindFREETYPE.cmake	2007-06-25 21:56:01 UTC (rev 607)
++++ branches/s3d-cmake/cmake/modules/FindFREETYPE.cmake	2007-06-25 21:56:02 UTC (rev 608)
+@@ -33,7 +33,7 @@
+ 	)
+ 	
+ 	if (FREETYPE_INCLUDE_DIR AND FREETYPECONFIG_INCLUDE_DIR)
+-		set(FREETYPE_INCLUDE_DIR ${FREETYPE_INCLUDE_DIR} ${FREETYPECONFIG_INCLUDE_DIR})
++		list(APPEND FREETYPE_INCLUDE_DIR ${FREETYPECONFIG_INCLUDE_DIR})
+ 	else (FREETYPE_INCLUDE_DIR AND FREETYPECONFIG_INCLUDE_DIR)
+ 		set(FREETYPE_INCLUDE_DIR)
+ 	endif (FREETYPE_INCLUDE_DIR AND FREETYPECONFIG_INCLUDE_DIR)
+@@ -53,8 +53,8 @@
+ 	endif (FREETYPE_FOUND)
+ 
+ 	# set visibility in cache
+-	set(FREETYPE_INCLUDE_DIR ${FREETYPE_INCLUDE_DIR} CACHE STRING &quot;Path to a file.&quot; FORCE)
+-	set(FREETYPE_LIBRARIES ${FREETYPE_LIBRARIES} CACHE STRING &quot;Path to a library.&quot; FORCE)
++	set(FREETYPE_INCLUDE_DIR ${FREETYPE_INCLUDE_DIR} CACHE PATH &quot;Path to a file.&quot; FORCE)
++	set(FREETYPE_LIBRARIES ${FREETYPE_LIBRARIES} CACHE FILEPATH &quot;Path to a library.&quot; FORCE)
+ 	set(FREETYPE_DEFINITIONS ${FREETYPE_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
+  	mark_as_advanced(FREETYPE_INCLUDE_DIR FREETYPE_LIBRARIES FREETYPE_DEFINITIONS)
+ 
+
+Modified: branches/s3d-cmake/cmake/modules/FindGLIB.cmake
+===================================================================
+--- branches/s3d-cmake/cmake/modules/FindGLIB.cmake	2007-06-25 21:56:01 UTC (rev 607)
++++ branches/s3d-cmake/cmake/modules/FindGLIB.cmake	2007-06-25 21:56:02 UTC (rev 608)
+@@ -38,7 +38,7 @@
+ 	)
+ 	
+ 	if (GLIB2_INCLUDE_DIR AND GLIBCONFIG_INCLUDE_DIR)
+-		set(GLIB2_INCLUDE_DIR ${GLIB2_INCLUDE_DIR} ${GLIBCONFIG_INCLUDE_DIR})
++		list(APPEND GLIB2_INCLUDE_DIR ${GLIBCONFIG_INCLUDE_DIR})
+ 	else (GLIB2_INCLUDE_DIR AND GLIBCONFIG_INCLUDE_DIR)
+ 		set(GLIB2_INCLUDE_DIR)
+ 	endif (GLIB2_INCLUDE_DIR AND GLIBCONFIG_INCLUDE_DIR)
+@@ -58,8 +58,8 @@
+ 	endif (GLIB2_FOUND)
+ 
+ 	# set visibility in cache
+-	set(GLIB2_INCLUDE_DIR ${GLIB2_INCLUDE_DIR} CACHE STRING &quot;Path to a file.&quot; FORCE)
+-	set(GLIB2_LIBRARIES ${GLIB2_LIBRARIES} CACHE STRING &quot;Path to a library.&quot; FORCE)
++	set(GLIB2_INCLUDE_DIR ${GLIB2_INCLUDE_DIR} CACHE PATH &quot;Path to a file.&quot; FORCE)
++	set(GLIB2_LIBRARIES ${GLIB2_LIBRARIES} CACHE FILEPATH &quot;Path to a library.&quot; FORCE)
+ 	set(GLIB2_DEFINITIONS ${GLIB2_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
+  	mark_as_advanced(GLIB2_INCLUDE_DIR GLIB2_LIBRARIES GLIB2_DEFINITIONS)
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000598.html">[S3d-svn] r606 - in branches/s3d-cmake: apps/s3d_x11gate	apps/s3dosm server
+</A></li>
+	<LI>Next message: <A HREF="000602.html">[S3d-svn] r607 - in branches/s3d-cmake: . cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#597">[ date ]</a>
+              <a href="thread.html#597">[ thread ]</a>
+              <a href="subject.html#597">[ subject ]</a>
+              <a href="author.html#597">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

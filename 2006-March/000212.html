@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r216 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r216%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603191356.k2JDuV7U019796%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000211.html">
+   <LINK REL="Next"  HREF="000213.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r216 - trunk/apps/olsrs3d</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r216%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603191356.k2JDuV7U019796%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r216 - trunk/apps/olsrs3d">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Sun Mar 19 14:56:31 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000211.html">[S3d-svn] r215 - in trunk/apps/olsrs3d: . doxygen doxygen/html doxygen/latex doxygen/xml
+</A></li>
+        <LI>Next message: <A HREF="000213.html">[S3d-svn] r217 - in trunk: . Documentation Documentation/s3dapi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#212">[ date ]</a>
+              <a href="thread.html#212">[ thread ]</a>
+              <a href="subject.html#212">[ subject ]</a>
+              <a href="author.html#212">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-03-19 14:56:11 +0100 (Sun, 19 Mar 2006)
+New Revision: 216
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+Log:
+add output for clicked node ( etx of clicked node to connected node and etx of connected node to clicked node ), not final
+
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-03-19 12:31:45 UTC (rev 215)
++++ trunk/apps/olsrs3d/main.c	2006-03-19 13:56:11 UTC (rev 216)
+@@ -49,6 +49,9 @@
+ int Olsr_node_count = 0, Last_olsr_node_count = -1;
+ int Olsr_node_count_obj = -1;
+ int Olsr_ip_label_obj = -1;
++int *Olsr_neighbour_label_obj = NULL;
++int Size;
++
+ int Net_read_count;
+ 
+ int Olsr_node_obj, Olsr_node_inet_obj, Olsr_node_hna_net;
+@@ -749,22 +752,69 @@
+ 	/* float distance,tmp_vector[3]; */
+ 	char ip_str[50];
+ 	struct olsr_node *olsr_node;
++	float ln;
++	struct olsr_neigh_list *tmpNeighbour;
++	float p = 1.0;
++	int i;
++	
+ 	oid=(int)*((unsigned long *)evt-&gt;buf);
+ 	olsr_node = *lst_search(oid);
+-	/* printf(&quot;obj2ip: search return %s\n&quot;,olsr_node-&gt;ip); */
++	
+ 	/*
+ 	distance = dirt(CamPosition[0],olsr_node-&gt;pos_vec,tmp_vector);
+ 	mov_add(ZeroPosition,tmp_vector,1.0);
+ 	s3d_translate(ZeroPoint,ZeroPosition[0] * -1,ZeroPosition[1] * -1,ZeroPosition[2] * -1);
+ 	*/
++	
++	/* print clicked object ip and connections */
+ 	if ( Olsr_ip_label_obj != -1 ) s3d_del_object( Olsr_ip_label_obj );
+-	/*Olsr_ip_label_obj = s3d_clone(olsr_node-&gt;desc_id);*/
+-	snprintf( ip_str, 50, &quot;ip: %s&quot;, olsr_node-&gt;ip );
+-	Olsr_ip_label_obj = s3d_draw_string( ip_str, NULL );
++	snprintf( ip_str, 35, &quot;ip: %s&quot;, olsr_node-&gt;ip );
++	Olsr_ip_label_obj = s3d_draw_string( ip_str, &amp;ln );
+ 	s3d_link( Olsr_ip_label_obj, 0 );
+ 	s3d_flags_on( Olsr_ip_label_obj, S3D_OF_VISIBLE );
+ 	s3d_scale( Olsr_ip_label_obj, 0.2 );
+-	s3d_translate( Olsr_ip_label_obj, Left*3.0, -Bottom*3.0-0.6, -3.0 );
++	s3d_translate( Olsr_ip_label_obj,-Left*3.0-(ln * 0.2), -Bottom*3.0-0.8, -3.0 );
++	
++	if( Olsr_neighbour_label_obj != NULL )
++	{
++		/* int n = sizeof(Olsr_neighbour_label_obj) / sizeof(int);*/
++		for(i=0; i &lt; Size; i++)
++		{
++			printf(&quot;remove %d\n&quot;,Olsr_neighbour_label_obj[i]);
++			s3d_del_object( Olsr_neighbour_label_obj[i] );
++		}
++		free(Olsr_neighbour_label_obj);
++		Olsr_neighbour_label_obj = NULL;
++	}
++	
++	tmpNeighbour = olsr_node-&gt;olsr_neigh_list;
++	
++	Size = 0;
++	while(tmpNeighbour != NULL)
++	{
++		Size++;
++		tmpNeighbour = tmpNeighbour-&gt;next_olsr_neigh_list;
++	}
++	
++	Olsr_neighbour_label_obj = malloc(Size*sizeof(int));
++	tmpNeighbour = olsr_node-&gt;olsr_neigh_list;
++	
++	for(i = 0; i &lt; Size ;i++)
++	{	
++		char nIpStr[60];
++		float len;
++		snprintf(nIpStr, 60, &quot;%10.2f %s %10.2f&quot;, (strcmp(olsr_node-&gt;ip,tmpNeighbour-&gt;olsr_con-&gt;right_olsr_node-&gt;ip)?tmpNeighbour-&gt;olsr_con-&gt;left_etx:tmpNeighbour-&gt;olsr_con-&gt;right_etx),
++				    (strcmp(olsr_node-&gt;ip,tmpNeighbour-&gt;olsr_con-&gt;right_olsr_node-&gt;ip)?tmpNeighbour-&gt;olsr_con-&gt;right_olsr_node-&gt;ip:tmpNeighbour-&gt;olsr_con-&gt;left_olsr_node-&gt;ip),
++				    	(strcmp(olsr_node-&gt;ip,tmpNeighbour-&gt;olsr_con-&gt;right_olsr_node-&gt;ip)?tmpNeighbour-&gt;olsr_con-&gt;right_etx:tmpNeighbour-&gt;olsr_con-&gt;left_etx));
++		Olsr_neighbour_label_obj[i] = s3d_draw_string( nIpStr, &amp;len );
++		s3d_link(Olsr_neighbour_label_obj[i], 0);
++		s3d_flags_on(Olsr_neighbour_label_obj[i], S3D_OF_VISIBLE );
++		s3d_scale(Olsr_neighbour_label_obj[i], 0.2 );
++		s3d_translate(Olsr_neighbour_label_obj[i], -Left*3.0-(len * 0.2), -Bottom*3.0-p, -3.0 );
++		tmpNeighbour = tmpNeighbour-&gt;next_olsr_neigh_list;
++		p += 0.2;
++		printf(&quot;create %d\n&quot;,Olsr_neighbour_label_obj[i]);
++	}
+ }
+ 
+ /***
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000211.html">[S3d-svn] r215 - in trunk/apps/olsrs3d: . doxygen doxygen/html doxygen/latex doxygen/xml
+</A></li>
+	<LI>Next message: <A HREF="000213.html">[S3d-svn] r217 - in trunk: . Documentation Documentation/s3dapi
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#212">[ date ]</a>
+              <a href="thread.html#212">[ thread ]</a>
+              <a href="subject.html#212">[ subject ]</a>
+              <a href="author.html#212">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

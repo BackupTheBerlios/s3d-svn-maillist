@@ -1,0 +1,230 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r355 - in trunk: . libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r355%20-%20in%20trunk%3A%20.%20libs3d&In-Reply-To=%3C200606111431.k5BEVSWT024546%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000347.html">
+   <LINK REL="Next"  HREF="000349.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r355 - in trunk: . libs3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r355%20-%20in%20trunk%3A%20.%20libs3d&In-Reply-To=%3C200606111431.k5BEVSWT024546%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r355 - in trunk: . libs3d">dotslash at berlios.de
+       </A><BR>
+    <I>Sun Jun 11 16:31:28 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000347.html">[S3d-svn] r354 - in trunk: . extras
+</A></li>
+        <LI>Next message: <A HREF="000349.html">[S3d-svn] r356 - in trunk: . extras libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#348">[ date ]</a>
+              <a href="thread.html#348">[ thread ]</a>
+              <a href="subject.html#348">[ subject ]</a>
+              <a href="author.html#348">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-11 16:31:27 +0200 (Sun, 11 Jun 2006)
+New Revision: 355
+
+Modified:
+   trunk/
+   trunk/libs3d/config.h
+   trunk/libs3d/io.c
+   trunk/libs3d/object_queue.c
+   trunk/libs3d/tcp.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r759 at balthasar</A>:  dotslash | 2006-06-11 16:31:17 +0200
+ - WITH_SIGNALS -&gt; SIGS, confused it ...
+ - some cleanups
+ - include ../config.h 
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:757
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:759
+
+Modified: trunk/libs3d/config.h
+===================================================================
+--- trunk/libs3d/config.h	2006-06-10 17:57:03 UTC (rev 354)
++++ trunk/libs3d/config.h	2006-06-11 14:31:27 UTC (rev 355)
+@@ -22,6 +22,9 @@
+  */
+ 
+ 
++/* use the global config.h */
++#include &quot;../config.h&quot; 
++
+ /*  this is definitly the better way to pick fonts. */
+ 
+ #define WITH_FONTCONFIG
+
+Modified: trunk/libs3d/io.c
+===================================================================
+--- trunk/libs3d/io.c	2006-06-10 17:57:03 UTC (rev 354)
++++ trunk/libs3d/io.c	2006-06-11 14:31:27 UTC (rev 355)
+@@ -33,8 +33,8 @@
+ #include &lt;errno.h&gt;		 /*  errno */
+ #include &lt;sys/socket.h&gt;  /*  socket() */
+ #include &lt;getopt.h&gt;		 /*  getopt() */
+-#include &lt;fcntl.h&gt;		 /*  fcntl() */
+ #ifdef SIGS
++#include &lt;fcntl.h&gt;		 /*  fcntl() */
+ #include &lt;signal.h&gt;		 /*  signal.h, SIG_PIPE */
+ #endif
+ #include &lt;netinet/in.h&gt;  /*  htons(),htonl() */
+@@ -47,14 +47,6 @@
+ /*  this file is the client-lib-implementation which holds the function to connect and control the server. */
+ #ifdef SIGS
+ int _s3d_sigio=0;
+-void sigpipe_handler(int sig, int code)  /*  ... ? */
+-{
+-	errs(&quot;sigpipe_handler()&quot;,&quot;there is a broken pipe somewhere&quot;);
+-}
+-void sigio_handler(int sig, int code)  /*  ... ? */
+-{
+-	_s3d_sigio=1;
+-}
+ void sigint_handler(int sig, int code)  /*  ... ? */
+ {
+ 	/*s3d_quit();*/ /* TODO: sometimes no clean quit ?!*/
+
+Modified: trunk/libs3d/object_queue.c
+===================================================================
+--- trunk/libs3d/object_queue.c	2006-06-10 17:57:03 UTC (rev 354)
++++ trunk/libs3d/object_queue.c	2006-06-11 14:31:27 UTC (rev 355)
+@@ -32,12 +32,13 @@
+ /*  access when needed. this also makes things more asynchronous, */
+ /*  therefore faster (I hope). */
+ 
+-#define Q_UNUSED	-1				 /*  unused slot magic number */
+-#define MAX_REQ		100				 /*  don't request more than that. */
+-static unsigned int *queue;			 /*  the object id's */
+-static int queue_size=0;			 /*  the size of the object queue */
+-static int requested;				 /*  counter of how many addtional */
+-									 /*  objects have been requested */
++#define Q_UNUSED	-1				 	/*  unused slot magic number */
++#define MAX_REQ		100				 	/*  don't request more than that. */
++static unsigned int *queue;			 	/*  the object id's */
++static int queue_size=0;			 	/*  the size of the object queue */
++static int requested;				 	/*  counter of how many addtional */
++									 	/*  objects have been requested */
++static struct timespec t={0,10*1000};	/* 10 micro seconds */
+ /*  initializes the object queue */
+ int _queue_init()
+ {
+@@ -71,6 +72,7 @@
+ 		{
+ /* 			s3dprintf(LOW,&quot;placing it at position %d&quot;,i); */
+ 			queue[i]=oid;
++			requested--;
+ 			return(0);
+ 		}
+ 	if (queue_size==0) return(-1);  /*  already quit. */
+@@ -78,10 +80,10 @@
+ /* 	s3dprintf(LOW,&quot;no place for object, resizing stack.&quot;,i); */
+ 	queue=realloc(queue,sizeof(unsigned int)*(queue_size+1));
+ 	queue_size+=1;
++	requested--;
+ 	queue[queue_size-1]=oid;
+ 	return(0);
+ }
+-static struct timespec t={0,10*1000}; /* 10 micro seconds */
+ /*  an object is requested!! give one out: */
+ unsigned int _queue_want_object()
+ {
+
+Modified: trunk/libs3d/tcp.c
+===================================================================
+--- trunk/libs3d/tcp.c	2006-06-10 17:57:03 UTC (rev 354)
++++ trunk/libs3d/tcp.c	2006-06-11 14:31:27 UTC (rev 355)
+@@ -27,7 +27,6 @@
+ #include &lt;stdlib.h&gt;		 /*  malloc(), free() */
+ #include &lt;unistd.h&gt;		 /*  read(), write() */
+ #include &lt;errno.h&gt;		 /*  errno */
+-
+ #include &lt;string.h&gt; 	 /*  memcpy() */
+ #include &lt;sys/socket.h&gt;
+ #include &lt;netinet/in.h&gt;  /*  htons(),htonl() */
+@@ -35,7 +34,23 @@
+ 	#include &lt;sys/select.h&gt;
+ 	#include &lt;netdb.h&gt;		 /*  gethostbyname()  */
+ #endif
++#ifdef SIGS
++#include &lt;fcntl.h&gt;		 /*  fcntl */
++#include &lt;signal.h&gt;		 /*  signal(), SIGPIPE, SIGIO */
++extern int _s3d_sigio;
++#endif
++
+ int s3d_socket;		 /*  this is the socket which holds the tcp-socket .... */
++void sigpipe_handler(int sig, int code)  /*  ... ? */
++{
++	errs(&quot;sigpipe_handler()&quot;,&quot;there is a broken pipe somewhere&quot;);
++}
++void sigio_handler(int sig, int code)  /*  ... ? */
++{
++	_s3d_sigio=1;
++}
++
++
+ int _tcp_init(char *sv, int pn)
+ {
+ 	int 	 			 sd;
+@@ -43,7 +58,7 @@
+ /*	char			 	*port=NULL;*/
+ 	struct sockaddr_in 	 sock;
+ 	struct hostent 		*server=0;
+-#ifdef WITH_SIGNALS
++#ifdef SIGS
+ 	_s3d_sigio=0;
+ #endif
+ #ifdef WIN32 
+@@ -77,7 +92,7 @@
+ 	}
+ /*    if ( fcntl(sd, F_SETFL, O_ASYNC | O_NONBLOCK) &lt; 0 ) */
+ /* 		errn(&quot;fcntl()&quot;,errno); */
+-#ifdef WITH_SIGNALS
++#ifdef SIGS 
+    if ( fcntl(sd, F_SETFL, O_ASYNC ) &lt; 0 )
+ 		errn(&quot;fcntl()&quot;,errno);
+    if ( fcntl(sd, F_SETOWN, getpid()) &lt; 0 )
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000347.html">[S3d-svn] r354 - in trunk: . extras
+</A></li>
+	<LI>Next message: <A HREF="000349.html">[S3d-svn] r356 - in trunk: . extras libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#348">[ date ]</a>
+              <a href="thread.html#348">[ thread ]</a>
+              <a href="subject.html#348">[ subject ]</a>
+              <a href="author.html#348">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

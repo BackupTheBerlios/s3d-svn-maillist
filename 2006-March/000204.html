@@ -1,0 +1,364 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r208 - in trunk: . apps/dot_mcp apps/olsrs3d apps/s3dvt server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r208%20-%20in%20trunk%3A%20.%20apps/dot_mcp%20apps/olsrs3d%20apps/s3dvt%20server&In-Reply-To=%3C200603181519.k2IFJpum013207%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000203.html">
+   <LINK REL="Next"  HREF="000205.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r208 - in trunk: . apps/dot_mcp apps/olsrs3d apps/s3dvt server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r208%20-%20in%20trunk%3A%20.%20apps/dot_mcp%20apps/olsrs3d%20apps/s3dvt%20server&In-Reply-To=%3C200603181519.k2IFJpum013207%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r208 - in trunk: . apps/dot_mcp apps/olsrs3d apps/s3dvt server">dotslash at berlios.de
+       </A><BR>
+    <I>Sat Mar 18 16:19:51 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000203.html">[S3d-svn] r207 - in trunk: . example
+</A></li>
+        <LI>Next message: <A HREF="000205.html">[S3d-svn] r209 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#204">[ date ]</a>
+              <a href="thread.html#204">[ thread ]</a>
+              <a href="subject.html#204">[ subject ]</a>
+              <a href="author.html#204">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-03-18 16:19:50 +0100 (Sat, 18 Mar 2006)
+New Revision: 208
+
+Modified:
+   trunk/
+   trunk/apps/dot_mcp/main.c
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/s3dvt/main.c
+   trunk/server/object.c
+   trunk/server/user.c
+   trunk/server/user_glut.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r316 at balthasar</A>:  dotslash | 2006-03-18 16:19:38 +0100
+ - support for special keys in terminal, mcp and olsrs3d (arrows etc)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:312
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:316
+
+Modified: trunk/apps/dot_mcp/main.c
+===================================================================
+--- trunk/apps/dot_mcp/main.c	2006-03-18 14:59:33 UTC (rev 207)
++++ trunk/apps/dot_mcp/main.c	2006-03-18 15:19:50 UTC (rev 208)
+@@ -22,7 +22,8 @@
+  */
+ 
+ 
+-#include &quot;s3d.h&quot;
++#include &lt;s3d.h&gt;
++#include &lt;s3d_keysym.h&gt;
+ #include &quot;dot_mcp.h&quot;
+ #include &lt;unistd.h&gt;  /*  sleep() */
+ #include &lt;stdlib.h&gt;  /*  free(), malloc() */
+@@ -382,7 +383,7 @@
+ 	key=*((unsigned short *)event-&gt;buf);
+ 	switch (key)
+ 	{
+-		case 1:  ego_mode=(ego_mode+1)%2;
++		case S3DK_F1:  ego_mode=(ego_mode+1)%2;
+ 				 printf(&quot;ego mode %d\n&quot;,ego_mode);
+ 				 break;
+ 		case 'w':ydif=-1;break;
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-03-18 14:59:33 UTC (rev 207)
++++ trunk/apps/olsrs3d/main.c	2006-03-18 15:19:50 UTC (rev 208)
+@@ -27,6 +27,7 @@
+ 
+ #include &lt;stdio.h&gt;
+ #include &lt;s3d.h&gt;
++#include &lt;s3d_keysym.h&gt;
+ #include &lt;time.h&gt;	      /* nanosleep() */
+ #include &lt;string.h&gt;	/* strncpy() */
+ #include &lt;math.h&gt;		/* sqrt() */
+@@ -685,25 +686,25 @@
+ 	int key;
+ 	key=*((unsigned short *)event-&gt;buf);
+ 	switch(key) {
+-		case 27: /* esc -&gt; close olsr */
++		case S3DK_ESCAPE: /* esc -&gt; close olsr */
+ 			stop();
+ 			break;
+ 		case 15: /* strg + o */
+ 			lst_out(); /* output ob2ip list */
+ 			break;
+-		case 99: /* c -&gt; color on/off */
++		case 'c': /* c -&gt; color on/off */
+ 			if(ColorSwitch) ColorSwitch = 0;
+ 			else ColorSwitch = 1;
+ 			break;
+-		case 114: /* r -&gt; rotate start/stop*/
++		case 'r': /* r -&gt; rotate start/stop*/
+ 			if(RotateSwitch) RotateSwitch = 0;
+ 			else RotateSwitch = 1;
+ 			break;
+-		case 43: /* + -&gt; rotate speed increase*/
++		case '+': /* + -&gt; rotate speed increase*/
+ 			if(RotateSwitch &amp;&amp; RotateSpeed &lt; 10)
+ 				RotateSpeed++;
+ 			break;
+-		case 45: /* - -&gt; rotate speed decrease*/
++		case '-': /* - -&gt; rotate speed decrease*/
+ 			if(RotateSwitch &amp;&amp; RotateSpeed &gt; 1)
+ 				RotateSpeed--;
+ 			break;
+@@ -711,19 +712,19 @@
+ 			s3d_translate(ZeroPoint,0.0,0.0,0.0);
+ 			ZeroPosition[0] = ZeroPosition[1] = ZeroPosition[2] = 0.0;
+ 			break;
+-		case 101: /* arrow up -&gt; move nodes up */
++		case S3DK_UP: /* arrow up -&gt; move nodes up */
+ 			ZeroPosition[1]++;
+ 			s3d_translate(ZeroPoint,ZeroPosition[0],ZeroPosition[1],ZeroPosition[2]);
+ 			break;
+-		case 103: /* arrow down -&gt; move nodes down */
++		case S3DK_DOWN: /* arrow down -&gt; move nodes down */
+ 			ZeroPosition[1]--;
+ 			s3d_translate(ZeroPoint,ZeroPosition[0],ZeroPosition[1],ZeroPosition[2]);
+ 			break;
+-		case 104: /* page up -&gt; change factor in calc_olsr_node_mov */
++		case S3DK_PAGEUP: /* page up -&gt; change factor in calc_olsr_node_mov */
+ 			if(factor &lt; 0.9)
+ 				factor += 0.1;
+ 			break;
+-		case 105: /* page down -&gt; change factor in calc_olsr_node_mov */
++		case S3DK_PAGEDOWN: /* page down -&gt; change factor in calc_olsr_node_mov */
+ 			if(factor &gt; 0.3)
+ 				factor -= 0.1;
+ 			break;
+@@ -741,8 +742,8 @@
+ 	int oid;
+ 	/* float distance,tmp_vector[3]; */
+ 	char ip_str[50];
++	struct olsr_node *olsr_node;
+ 	oid=(int)*((unsigned long *)evt-&gt;buf);
+-	struct olsr_node *olsr_node;
+ 	olsr_node = *lst_search(oid);
+ 	/* printf(&quot;obj2ip: search return %s\n&quot;,olsr_node-&gt;ip); */
+ 	/*
+
+Modified: trunk/apps/s3dvt/main.c
+===================================================================
+--- trunk/apps/s3dvt/main.c	2006-03-18 14:59:33 UTC (rev 207)
++++ trunk/apps/s3dvt/main.c	2006-03-18 15:19:50 UTC (rev 208)
+@@ -33,6 +33,7 @@
+ #include &lt;sys/ioctl.h&gt; 	 /*  ioctl() */
+ #include &lt;pthread.h&gt;	 /*  pthread_create() */
+ #include &lt;s3d.h&gt;		 /*  s3d_* */
++#include &lt;s3d_keysym.h&gt;	 /*  key symbols */
+ #include &lt;time.h&gt;	/* nanosleep() */
+ static struct timespec t={0,10*1000*1000}; /* 10 mili seconds */
+ 
+@@ -399,9 +400,91 @@
+ 	int key;
+ 	key=*((unsigned short *)event-&gt;buf);
+ /*	printf(&quot;received key: %d\n&quot;,key);*/
+-	if (key==13) key=10;
+-	if ((char)key)  /*  \0 is no good idea .. */
+-		term_addchar((char)key);
++	switch (key)
++	{
++		case S3DK_F1:
++		case S3DK_F2:
++		case S3DK_F3:
++		case S3DK_F4:
++		case S3DK_F5:
++			term_addchar(0x1b);
++			term_addchar('[');
++			term_addchar('1');
++			term_addchar(key-S3DK_F1+'1');
++			break;
++		case S3DK_F6:
++		case S3DK_F7:
++		case S3DK_F8:
++			term_addchar(0x1b);
++			term_addchar('[');
++			term_addchar('1');
++			term_addchar((key-S3DK_F6)+'7');
++			break;
++		case S3DK_F9:
++		case S3DK_F10:
++			term_addchar(0x1b);
++			term_addchar('[');
++			term_addchar('2');
++			term_addchar((key-S3DK_F9)+'0');
++			break;
++		case S3DK_F11:
++		case S3DK_F12:
++			term_addchar(0x1b);
++			term_addchar('[');
++			term_addchar('2');
++			term_addchar((key-S3DK_F11)+'3');
++			break;
++		case S3DK_UP:
++			term_addchar(0x1b);
++			term_addchar('[');
++			term_addchar('A');
++			break;
++		case S3DK_DOWN:
++			term_addchar(0x1b);
++			term_addchar('[');
++			term_addchar('B');
++			break;
++		case S3DK_RIGHT:
++			term_addchar(0x1b);
++			term_addchar('[');
++			term_addchar('C');
++			break;
++		case S3DK_LEFT:
++			term_addchar(0x1b);
++			term_addchar('[');
++			term_addchar('D');
++			break;
++		case S3DK_PAGEUP:
++			term_addchar(0x1b);
++			term_addchar('[');
++			term_addchar('5');
++			term_addchar('~');
++			break;
++		case S3DK_PAGEDOWN:
++			term_addchar(0x1b);
++			term_addchar('[');
++			term_addchar('6');
++			term_addchar('~');
++			break;
++		case S3DK_HOME:
++			term_addchar(0x1b);
++			term_addchar('[');
++			term_addchar('7');
++			term_addchar('~');
++			break;
++		case S3DK_END:
++			term_addchar(0x1b);
++			term_addchar('[');
++			term_addchar('8');
++			term_addchar('~');
++			break;
++		case 13:
++			term_addchar(10);
++			break;
++		default:
++			if ((char)key)  /*  \0 is no good idea .. */
++				term_addchar((char)key);
++	}
+ 
+ }
+ int i=0;
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2006-03-18 14:59:33 UTC (rev 207)
++++ trunk/server/object.c	2006-03-18 15:19:50 UTC (rev 208)
+@@ -1371,7 +1371,7 @@
+ 					event_ptr_changed();
+ 					break;
+ 				default:
+-					dprintf(LOW,&quot;[obj_pos_upd|pid %d] %d unknown systen event&quot;,p-&gt;id,oid);
++					dprintf(LOW,&quot;[obj_pos_upd|pid %d] %d unknown system event&quot;,p-&gt;id,oid);
+ 					
+ 			}
+ 
+
+Modified: trunk/server/user.c
+===================================================================
+--- trunk/server/user.c	2006-03-18 14:59:33 UTC (rev 207)
++++ trunk/server/user.c	2006-03-18 15:19:50 UTC (rev 208)
+@@ -60,10 +60,7 @@
+ 	if (state==0)  /*  down */
+ 	{
+ 		dprintf(LOW, &quot;got key %d!!&quot;,key);
+-		switch (key) {
+-			default:
+-				event_key_pressed(key);
+-		}
++		event_key_pressed(key);
+ 	}
+ }
+ void user_mouse(int button, int state, int x, int y) 
+
+Modified: trunk/server/user_glut.c
+===================================================================
+--- trunk/server/user_glut.c	2006-03-18 14:59:33 UTC (rev 207)
++++ trunk/server/user_glut.c	2006-03-18 15:19:50 UTC (rev 208)
+@@ -45,8 +45,12 @@
+ 
+ void keyboard(unsigned char key, int x, int y)
+ {
+-	uint16_t mkey;
+-	switch (key) /* handle special keys */
++	user_key(key,0);
++}
++void special(int skey, int x, int y)
++{
++	unsigned short mkey;
++	switch (skey) /* handle special keys */
+ 	{
+ 		case GLUT_KEY_F1:		mkey=S3DK_F1;	break;
+ 		case GLUT_KEY_F2:		mkey=S3DK_F2;	break;
+@@ -69,15 +73,11 @@
+ 		case GLUT_KEY_HOME:		mkey=S3DK_HOME;break;
+ 		case GLUT_KEY_END: 		mkey=S3DK_END;break;
+ 		case GLUT_KEY_INSERT: 	mkey=S3DK_INSERT;break;
+-
+-		default: mkey=key;
++		default: 				mkey=skey; break;
+ 	}
++	dprintf(MED,&quot;special(): %d -&gt; %d&quot;,skey,mkey);
+ 	user_key(mkey,0);
+ }
+-void special(int skey, int x, int y)
+-{
+-	user_key(skey,0);
+-}
+ void mouse_motion(int x, int y)
+ {
+ 	user_mouse(but,2,x,y);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000203.html">[S3d-svn] r207 - in trunk: . example
+</A></li>
+	<LI>Next message: <A HREF="000205.html">[S3d-svn] r209 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#204">[ date ]</a>
+              <a href="thread.html#204">[ thread ]</a>
+              <a href="subject.html#204">[ subject ]</a>
+              <a href="author.html#204">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

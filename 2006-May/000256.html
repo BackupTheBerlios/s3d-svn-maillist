@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r263 - in trunk: . client
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r263%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200605021855.k42IttPU008415%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000255.html">
+   <LINK REL="Next"  HREF="000257.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r263 - in trunk: . client</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r263%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200605021855.k42IttPU008415%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r263 - in trunk: . client">dotslash at berlios.de
+       </A><BR>
+    <I>Tue May  2 20:55:55 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000255.html">[S3d-svn] r262 - in trunk: . server
+</A></li>
+        <LI>Next message: <A HREF="000257.html">[S3d-svn] r264 - in trunk: . client
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#256">[ date ]</a>
+              <a href="thread.html#256">[ thread ]</a>
+              <a href="subject.html#256">[ subject ]</a>
+              <a href="author.html#256">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-02 20:55:53 +0200 (Tue, 02 May 2006)
+New Revision: 263
+
+Modified:
+   trunk/
+   trunk/client/fontselect.c
+   trunk/client/shm.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r489 at balthasar</A>:  dotslash | 2006-05-02 20:55:20 +0200
+ - remove unneeded newlines
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:487
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:489
+
+Modified: trunk/client/fontselect.c
+===================================================================
+--- trunk/client/fontselect.c	2006-05-02 18:13:21 UTC (rev 262)
++++ trunk/client/fontselect.c	2006-05-02 18:55:53 UTC (rev 263)
+@@ -69,12 +69,12 @@
+ 
+ 	dpy = XOpenDisplay(disp);  /*  Open display and check for success */
+ 	if (dpy == NULL) 
+-	  errds(VHIGH, &quot;s3d_findfont()&quot;,&quot;unable to open display %s\n&quot;, XDisplayName (disp));
++	  errds(VHIGH, &quot;s3d_findfont()&quot;,&quot;unable to open display %s&quot;, XDisplayName (disp));
+ 	else 
+ 	{
+ 		if (!(flist = XGetFontPath (dpy, &amp;fnum)))
+ 		{
+-		    errds(VHIGH, &quot;s3d_findfont():XGetFontPath()&quot;,&quot;unable to get font path.\n&quot;);
++		    errds(VHIGH, &quot;s3d_findfont():XGetFontPath()&quot;,&quot;unable to get font path.&quot;);
+ 		}
+ 		else 
+ 		while (fnum--)
+
+Modified: trunk/client/shm.c
+===================================================================
+--- trunk/client/shm.c	2006-05-02 18:13:21 UTC (rev 262)
++++ trunk/client/shm.c	2006-05-02 18:55:53 UTC (rev 263)
+@@ -56,7 +56,7 @@
+ 		errn(&quot;shm_init():ftok()&quot;,errno);
+ 		return(1);
+ 	}
+-	dprintf(MED,&quot;init key is 0x%08x\n&quot;,key);
++	dprintf(MED,&quot;init key is 0x%08x&quot;,key);
+ 	
+ 	/* connect to the segment: */
+ 	if ((shmid = shmget(key, SHM_SIZE, 0644 )) == -1) {
+@@ -70,10 +70,10 @@
+ 		errn(&quot;shm_init():shmat()&quot;,errno);
+ 		return(1);
+ 	}
+-	dprintf(MED,&quot;right now, next_keys are: %08x, %08x\n&quot;,next_key[0],next_key[1]);
++	dprintf(MED,&quot;right now, next_keys are: %08x, %08x&quot;,next_key[0],next_key[1]);
+ 	while ((0==(key_in=next_key[1])) || (0==(key_out=next_key[0])));
+ 	next_key[0]=next_key[1]=0;
+-	dprintf(MED,&quot;right now, next_keys are: %08x, %08x\n&quot;,key_in,key_out);
++	dprintf(MED,&quot;right now, next_keys are: %08x, %08x&quot;,key_in,key_out);
+ 	/* as we have the new key, we  can detach here now. */
+ 	if (shmdt(next_key) == -1) { 
+ 		errn(&quot;shm_init():shmdt()&quot;,errno);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000255.html">[S3d-svn] r262 - in trunk: . server
+</A></li>
+	<LI>Next message: <A HREF="000257.html">[S3d-svn] r264 - in trunk: . client
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#256">[ date ]</a>
+              <a href="thread.html#256">[ thread ]</a>
+              <a href="subject.html#256">[ subject ]</a>
+              <a href="author.html#256">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

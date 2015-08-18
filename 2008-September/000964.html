@@ -1,0 +1,1454 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r984 - in trunk/Documentation/manpages: . man1 man3 man9
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r984%20-%20in%20trunk/Documentation/manpages%3A%20.%20man1%20man3%20man9&In-Reply-To=%3C200809011908.m81J8C5m006537%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000963.html">
+   <LINK REL="Next"  HREF="000965.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r984 - in trunk/Documentation/manpages: . man1 man3 man9</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r984%20-%20in%20trunk/Documentation/manpages%3A%20.%20man1%20man3%20man9&In-Reply-To=%3C200809011908.m81J8C5m006537%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r984 - in trunk/Documentation/manpages: . man1 man3 man9">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep  1 21:08:12 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000963.html">[S3d-svn] r983 - trunk/Documentation/manpages/man1
+</A></li>
+        <LI>Next message: <A HREF="000965.html">[S3d-svn] r985 - trunk/Documentation
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#964">[ date ]</a>
+              <a href="thread.html#964">[ thread ]</a>
+              <a href="subject.html#964">[ subject ]</a>
+              <a href="author.html#964">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-01 21:08:08 +0200 (Mon, 01 Sep 2008)
+New Revision: 984
+
+Modified:
+   trunk/Documentation/manpages/build-manpages.sh
+   trunk/Documentation/manpages/man1/dot_mcp.1
+   trunk/Documentation/manpages/man1/kism3d.1
+   trunk/Documentation/manpages/man1/meshs3d.1
+   trunk/Documentation/manpages/man1/s3d.1
+   trunk/Documentation/manpages/man1/s3d_x11gate.1
+   trunk/Documentation/manpages/man1/s3dfm.1
+   trunk/Documentation/manpages/man1/s3dosm.1
+   trunk/Documentation/manpages/man1/s3dvt.1
+   trunk/Documentation/manpages/man3/s3d_angle_to_cam.3
+   trunk/Documentation/manpages/man3/s3d_clear_callback.3
+   trunk/Documentation/manpages/man3/s3d_clone.3
+   trunk/Documentation/manpages/man3/s3d_clone_target.3
+   trunk/Documentation/manpages/man3/s3d_del_object.3
+   trunk/Documentation/manpages/man3/s3d_delete_event.3
+   trunk/Documentation/manpages/man3/s3d_draw_string.3
+   trunk/Documentation/manpages/man3/s3d_find_event.3
+   trunk/Documentation/manpages/man3/s3d_flags_off.3
+   trunk/Documentation/manpages/man3/s3d_flags_on.3
+   trunk/Documentation/manpages/man3/s3d_get_callback.3
+   trunk/Documentation/manpages/man3/s3d_ignore_callback.3
+   trunk/Documentation/manpages/man3/s3d_import_model_file.3
+   trunk/Documentation/manpages/man3/s3d_init.3
+   trunk/Documentation/manpages/man3/s3d_link.3
+   trunk/Documentation/manpages/man3/s3d_load_line_normals.3
+   trunk/Documentation/manpages/man3/s3d_load_materials_a.3
+   trunk/Documentation/manpages/man3/s3d_load_polygon_normals.3
+   trunk/Documentation/manpages/man3/s3d_load_polygon_tex_coords.3
+   trunk/Documentation/manpages/man3/s3d_load_texture.3
+   trunk/Documentation/manpages/man3/s3d_mainloop.3
+   trunk/Documentation/manpages/man3/s3d_mcp_focus.3
+   trunk/Documentation/manpages/man3/s3d_net_check.3
+   trunk/Documentation/manpages/man3/s3d_new_object.3
+   trunk/Documentation/manpages/man3/s3d_open_file.3
+   trunk/Documentation/manpages/man3/s3d_pep_line.3
+   trunk/Documentation/manpages/man3/s3d_pep_line_normals.3
+   trunk/Documentation/manpages/man3/s3d_pep_lines.3
+   trunk/Documentation/manpages/man3/s3d_pep_material.3
+   trunk/Documentation/manpages/man3/s3d_pep_material_a.3
+   trunk/Documentation/manpages/man3/s3d_pep_material_texture.3
+   trunk/Documentation/manpages/man3/s3d_pep_materials_a.3
+   trunk/Documentation/manpages/man3/s3d_pep_polygon_normals.3
+   trunk/Documentation/manpages/man3/s3d_pep_polygon_tex_coord.3
+   trunk/Documentation/manpages/man3/s3d_pep_polygon_tex_coords.3
+   trunk/Documentation/manpages/man3/s3d_pep_vertex.3
+   trunk/Documentation/manpages/man3/s3d_pep_vertices.3
+   trunk/Documentation/manpages/man3/s3d_pop_event.3
+   trunk/Documentation/manpages/man3/s3d_pop_line.3
+   trunk/Documentation/manpages/man3/s3d_pop_material.3
+   trunk/Documentation/manpages/man3/s3d_pop_polygon.3
+   trunk/Documentation/manpages/man3/s3d_pop_texture.3
+   trunk/Documentation/manpages/man3/s3d_pop_vertex.3
+   trunk/Documentation/manpages/man3/s3d_process_stack.3
+   trunk/Documentation/manpages/man3/s3d_push_event.3
+   trunk/Documentation/manpages/man3/s3d_push_line.3
+   trunk/Documentation/manpages/man3/s3d_push_lines.3
+   trunk/Documentation/manpages/man3/s3d_push_material.3
+   trunk/Documentation/manpages/man3/s3d_push_material_a.3
+   trunk/Documentation/manpages/man3/s3d_push_materials_a.3
+   trunk/Documentation/manpages/man3/s3d_push_polygon.3
+   trunk/Documentation/manpages/man3/s3d_push_polygons.3
+   trunk/Documentation/manpages/man3/s3d_push_texture.3
+   trunk/Documentation/manpages/man3/s3d_push_textures.3
+   trunk/Documentation/manpages/man3/s3d_push_vertex.3
+   trunk/Documentation/manpages/man3/s3d_push_vertices.3
+   trunk/Documentation/manpages/man3/s3d_quit.3
+   trunk/Documentation/manpages/man3/s3d_rotate.3
+   trunk/Documentation/manpages/man3/s3d_scale.3
+   trunk/Documentation/manpages/man3/s3d_select_font.3
+   trunk/Documentation/manpages/man3/s3d_set_callback.3
+   trunk/Documentation/manpages/man3/s3d_strlen.3
+   trunk/Documentation/manpages/man3/s3d_translate.3
+   trunk/Documentation/manpages/man3/s3d_unlink.3
+   trunk/Documentation/manpages/man3/s3d_usage.3
+   trunk/Documentation/manpages/man3/s3d_vector_angle.3
+   trunk/Documentation/manpages/man3/s3d_vector_cross_product.3
+   trunk/Documentation/manpages/man3/s3d_vector_dot_product.3
+   trunk/Documentation/manpages/man3/s3d_vector_length.3
+   trunk/Documentation/manpages/man3/s3d_vector_subtract.3
+   trunk/Documentation/manpages/man3/s3dw_ani_mate.3
+   trunk/Documentation/manpages/man3/s3dw_button_new.3
+   trunk/Documentation/manpages/man3/s3dw_delete.3
+   trunk/Documentation/manpages/man3/s3dw_focus.3
+   trunk/Documentation/manpages/man3/s3dw_getroot.3
+   trunk/Documentation/manpages/man3/s3dw_handle_click.3
+   trunk/Documentation/manpages/man3/s3dw_handle_key.3
+   trunk/Documentation/manpages/man3/s3dw_input_change_text.3
+   trunk/Documentation/manpages/man3/s3dw_input_gettext.3
+   trunk/Documentation/manpages/man3/s3dw_input_new.3
+   trunk/Documentation/manpages/man3/s3dw_label_change_text.3
+   trunk/Documentation/manpages/man3/s3dw_label_new.3
+   trunk/Documentation/manpages/man3/s3dw_moveit.3
+   trunk/Documentation/manpages/man3/s3dw_object_info.3
+   trunk/Documentation/manpages/man3/s3dw_show.3
+   trunk/Documentation/manpages/man3/s3dw_surface_new.3
+   trunk/Documentation/manpages/man3/s3dw_textbox_change_text.3
+   trunk/Documentation/manpages/man3/s3dw_textbox_new.3
+   trunk/Documentation/manpages/man3/s3dw_textbox_scrolldown.3
+   trunk/Documentation/manpages/man3/s3dw_textbox_scrollleft.3
+   trunk/Documentation/manpages/man3/s3dw_textbox_scrollright.3
+   trunk/Documentation/manpages/man3/s3dw_textbox_scrollto.3
+   trunk/Documentation/manpages/man3/s3dw_textbox_scrollup.3
+   trunk/Documentation/manpages/man9/mcp_object.9
+   trunk/Documentation/manpages/man9/s3d_but_info.9
+   trunk/Documentation/manpages/man9/s3d_evt.9
+   trunk/Documentation/manpages/man9/s3d_key_event.9
+   trunk/Documentation/manpages/man9/s3d_obj_info.9
+   trunk/Documentation/manpages/man9/s3dw_button.9
+   trunk/Documentation/manpages/man9/s3dw_input.9
+   trunk/Documentation/manpages/man9/s3dw_label.9
+   trunk/Documentation/manpages/man9/s3dw_scrollbar.9
+   trunk/Documentation/manpages/man9/s3dw_style.9
+   trunk/Documentation/manpages/man9/s3dw_surface.9
+   trunk/Documentation/manpages/man9/s3dw_textbox.9
+   trunk/Documentation/manpages/man9/s3dw_widget.9
+Log:
+Remove date and time from manpage comment
+
+This should reduce the changed files when running build-manpages without
+significant changed data sources.
+
+Modified: trunk/Documentation/manpages/build-manpages.sh
+===================================================================
+--- trunk/Documentation/manpages/build-manpages.sh	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/build-manpages.sh	2008-09-01 19:08:08 UTC (rev 984)
+@@ -4,6 +4,7 @@
+ 	for man in man${i}/*.sgml; do
+ 		if [ -e ${man}  ] ; then
+ 			docbook-to-man ${man} &gt;${man%.sgml}.${i};
++			sed -i 's/^\(\.\\&quot; created by instant \/ docbook-to-man\).*$/\1/' ${man%.sgml}.${i}
+ 		fi
+ 	done
+ done
+
+Modified: trunk/Documentation/manpages/man1/dot_mcp.1
+===================================================================
+--- trunk/Documentation/manpages/man1/dot_mcp.1	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man1/dot_mcp.1	2008-09-01 19:08:08 UTC (rev 984)
+@@ -22,4 +22,4 @@
+ \fBs3d\fR(1). 
+ .PP 
+ \fI s3d project page on berlios  (link to URL <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>) \fR  
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man1/kism3d.1
+===================================================================
+--- trunk/Documentation/manpages/man1/kism3d.1	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man1/kism3d.1	2008-09-01 19:08:08 UTC (rev 984)
+@@ -23,4 +23,4 @@
+ \fBs3d\fR(1), \fBkismet\fR(1). 
+ .PP 
+ \fI s3d project page on berlios  (link to URL <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>) \fR  
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man1/meshs3d.1
+===================================================================
+--- trunk/Documentation/manpages/man1/meshs3d.1	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man1/meshs3d.1	2008-09-01 19:08:08 UTC (rev 984)
+@@ -29,4 +29,4 @@
+ \fBs3d\fR(1), \fBolsrd\fR(8), \fBbatmand\fR (8). 
+ .PP 
+ \fI s3d project page on berlios  (link to URL <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>) \fR  
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man1/s3d.1
+===================================================================
+--- trunk/Documentation/manpages/man1/s3d.1	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man1/s3d.1	2008-09-01 19:08:08 UTC (rev 984)
+@@ -31,4 +31,4 @@
+ This manual page was written by Timo Schneider <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">timo.schneider at s2004.tu-chemnitz.de</A>  
+ for the \fBDebian\fP project (but may be used by others). 
+  
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man1/s3d_x11gate.1
+===================================================================
+--- trunk/Documentation/manpages/man1/s3d_x11gate.1	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man1/s3d_x11gate.1	2008-09-01 19:08:08 UTC (rev 984)
+@@ -24,4 +24,4 @@
+ \fBs3d\fR(1). 
+ .PP 
+ \fI s3d project page on berlios  (link to URL <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>) \fR  
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man1/s3dfm.1
+===================================================================
+--- trunk/Documentation/manpages/man1/s3dfm.1	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man1/s3dfm.1	2008-09-01 19:08:08 UTC (rev 984)
+@@ -25,4 +25,4 @@
+ \fBs3d\fR(1). 
+ .PP 
+ \fI s3d project page on berlios  (link to URL <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>) \fR  
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man1/s3dosm.1
+===================================================================
+--- trunk/Documentation/manpages/man1/s3dosm.1	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man1/s3dosm.1	2008-09-01 19:08:08 UTC (rev 984)
+@@ -42,4 +42,4 @@
+ \fBs3d\fR(1). 
+ .PP 
+ \fI s3d project page on berlios  (link to URL <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>) \fR  
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man1/s3dvt.1
+===================================================================
+--- trunk/Documentation/manpages/man1/s3dvt.1	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man1/s3dvt.1	2008-09-01 19:08:08 UTC (rev 984)
+@@ -24,4 +24,4 @@
+ \fBs3d\fR(1). 
+ .PP 
+ \fI s3d project page on berlios  (link to URL <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>) \fR  
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_angle_to_cam.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_angle_to_cam.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_angle_to_cam.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -14,4 +14,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Given obj_pos and cam_pos in the format float[3], angle_rad about which angle the object should be rotated around the y-axis so that it faces the camera. This might become handy if you have some text floating in space and want it to face the camera. <A HREF="http://en.wikipedia.org/wiki/Vector_(spatial">http://en.wikipedia.org/wiki/Vector_(spatial</A>)          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_clear_callback.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_clear_callback.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_clear_callback.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Clears the callback which is associated with the event.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_clone.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_clone.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_clone.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Clones an already exisiting object. They get just look the same as the parent-object and will change when the parent-object changes. Cloning especially makes sense if you want to use the same object a lot of times. Move and transform is independent from the parent. The function returns the childs object id.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_clone_target.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_clone_target.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_clone_target.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -13,4 +13,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Changes the clone target of oid to another object (toid). This assumes you've got oid from s3d_clone before.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_del_object.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_del_object.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_del_object.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Deletes the object referenced by oid.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_delete_event.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_delete_event.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_delete_event.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ deletes an event, the argument is the pointer to the event which is to be deleted (maybe obtained from s3d_find_event).          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_draw_string.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_draw_string.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_draw_string.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -23,4 +23,4 @@
+ // not interested in the length? do that: s3d_draw_string(str, NULL); 
+ .fi 
+ .PP 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_find_event.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_find_event.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_find_event.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Finds the latest occurence of an event, giving the event type as argument. Returns a pointer to struct s3d_evt.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_flags_off.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_flags_off.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_flags_off.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -13,4 +13,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ turn some flags off for object.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_flags_on.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_flags_on.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_flags_on.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -20,4 +20,4 @@
+ If you don't toggle OF_VISIBLE on, you won't see your object. usually you want this. (at least after you *push()d all your content)  
+  
+ .RE 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_get_callback.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_get_callback.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_get_callback.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -20,4 +20,4 @@
+ // will call the key-handling function with argument e. 
+ .fi 
+ .PP 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_ignore_callback.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_ignore_callback.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_ignore_callback.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Sets the callback on ignore, that means it won't be queued up for later use. An incoming event of this type will simply be skipped.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_import_model_file.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_import_model_file.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_import_model_file.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -19,4 +19,4 @@
+ Of course, you won't forget to toggle it visible, won't you?  
+  
+ .RE 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_init.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_init.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_init.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -27,4 +27,4 @@
+ } 
+ .fi 
+ .PP 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_link.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_link.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_link.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -13,4 +13,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ A linked object will move along with it's link parent. For example if you have a book on a table, you can link the book to the table so the book will &quot;keep on the table&quot; if you move the table around in space. It will also rotate with the table etc.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_load_line_normals.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_load_line_normals.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_load_line_normals.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -15,4 +15,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Just as s3d_pep_line_normals(), with the difference you won't alter the latest n lines but n lines starting with index start.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_load_materials_a.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_load_materials_a.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_load_materials_a.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -15,4 +15,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Loads n materials starting from index position start into the Material stack. See s3d_push_materials_a for more informatino about the values in mbuf.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_load_polygon_normals.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_load_polygon_normals.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_load_polygon_normals.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -15,4 +15,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Just as s3d_pep_polygon_normals(), with the difference you won't alter the latest n polygons but n polygons starting with index start.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_load_polygon_tex_coords.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_load_polygon_tex_coords.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_load_polygon_tex_coords.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -15,4 +15,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Just as s3d_pep_polygon_tex_coords(), with the difference you won't alter the latest n polygons but n polygons starting with index start.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_load_texture.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_load_texture.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_load_texture.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -25,4 +25,4 @@
+ Of course, you won't forget to toggle it visible, won't you?  
+  
+ .RE 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_mainloop.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_mainloop.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_mainloop.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -23,4 +23,4 @@
+ s3d_mainloop(mainloop()); 
+ .fi 
+ .PP 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_mcp_focus.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_mcp_focus.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_mcp_focus.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ This is an mcp-only function. It gives focus (for receiving key-strokes etc.) to an app referenced by it's mcp-object-id.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_net_check.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_net_check.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_net_check.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ This functions is for programs which do not employ a mainloop, hence they need to check for new events on their own. Programs like these must make sure to call this function from time to time to convince the server that they did not freeze or bail out.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_new_object.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_new_object.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_new_object.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -19,4 +19,4 @@
+ Of course, you won't forget to toggle it visible, won't you?  
+  
+ .RE 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_open_file.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_open_file.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_open_file.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -13,4 +13,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ This opens the file fname, setting *pointer to it's memory position. the function will return the size of buffer. you can free() the pointer when you're finished.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_line.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_line.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_pep_line.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -15,4 +15,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Alter the latest pushed line, overwriting with the supplied values.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_line_normals.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_line_normals.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_pep_line_normals.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -16,4 +16,4 @@
+ Adds normal information to lines, giving each vertex of a line a normal information. This makes lines somewhat nicer, you'll need that especially when you're going to build wireframe models. 
+ .PP 
+ nbuf should contain n * 6 float values, for each vertex a normal vector (x,y,z), and you have 2 Vertices for each line so that makes 6 float values per line in Total.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_lines.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_lines.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_pep_lines.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -14,4 +14,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Alter the latest n pushed lines. lbuf holds the values which are used to overwrite the old data, n entries with each 3 uint32_t specifying first, second vertex and material of each line.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_material.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_material.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_pep_material.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -21,4 +21,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Overwriting the latest pushed Material, overwriting the current value with the specified one. See s3d_pep_materials_a if you want to pep more materials.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_material_a.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_material_a.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_pep_material_a.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -24,4 +24,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Overwriting the latest pushed Material, overwriting the current value with the specified one, with alpha value in contrast to s3d_pep_material See s3d_push_materials_a if you want to pep more materials.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_material_texture.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_material_texture.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_pep_material_texture.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -13,4 +13,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Assign the latest material a texture referenced by the index tex. Of course, you will have pushed this texture with s3d_push_texture()          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_materials_a.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_materials_a.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_pep_materials_a.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -14,4 +14,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Alters the last n pushed Materials. See s3d_push_materials_a() for more information how mbuf should look like. Use s3d_pep_material_a() if you only want to alter the latest material.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_polygon_normals.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_polygon_normals.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_pep_polygon_normals.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -16,4 +16,4 @@
+ Adds normal information to polygons, giving each vertex of a polygon a normal information. With this, you can achieve smoothed edge effects. 
+ .PP 
+ nbuf should contain n * 9 float values, for each vertex a normal vector (x,y,z), and you have 3 Vertices for each Polygon so that makes 9 float values per Polygon in Total. Don't worry if you don't use this, it's kind of hard to calculate and the server will always use some proper normal values (same for every vertex, calculated by the plane which is defined by the 3 points of the polygon.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_polygon_tex_coord.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_polygon_tex_coord.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_pep_polygon_tex_coord.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -18,4 +18,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Pimp the last polygon pushed with some textures coordinates, x and y values for each vertex point respectively. Those values may be between 0 and 1 and are vertex points on the texture defined in the material of the polygon. If you have more polygons which should get a texture, use s3d_pep_polygon_tex_coords()          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_polygon_tex_coords.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_polygon_tex_coords.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_pep_polygon_tex_coords.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -14,4 +14,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Pimp the latest n polygons with texture coordinates. tbuf has 6*n float values for its entries, which are supplied in the order as in s3d_pep_polygon_tex_coord()          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_vertex.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_vertex.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_pep_vertex.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -15,4 +15,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Alter the latest pushed vertex, overwriting with the supplied values.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pep_vertices.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pep_vertices.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_pep_vertices.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -14,4 +14,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Alter the latest n pushed vertex. vbuf holds the values which are used to overwrite the old data, n entries with each 3 floats specifying x,y,z of the vertices.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pop_event.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pop_event.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_pop_event.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Pops the latest event from the stack. Don't forget to free() both the event and its buffer! Returns a pointer to struct s3d_evt.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pop_line.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pop_line.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_pop_line.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -13,4 +13,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Deletes the latest n lines from the line stack of the object.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pop_material.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pop_material.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_pop_material.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -13,4 +13,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Deletes the latest n material from the material stack of the object.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pop_polygon.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pop_polygon.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_pop_polygon.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -13,4 +13,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Deletes the latest n polygon from the polygon stack of the object.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pop_texture.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pop_texture.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_pop_texture.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -13,4 +13,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Deletes the latest n textures from the texture stack of the object.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_pop_vertex.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pop_vertex.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_pop_vertex.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -13,4 +13,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Deletes the latest n vertices from the vertex stack of the object.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_process_stack.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_process_stack.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_process_stack.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -16,4 +16,4 @@
+ Deprecated 
+ .PP 
+ This is probably obsolete          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_event.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_event.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_push_event.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Pushes an event onto the event-stack. Usually you don't need to do this manually.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_line.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_line.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_push_line.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -15,4 +15,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Push one line on the linestack of the object. It takes 2 vertex-index- numbers and one material material-index-nr. as argument. If you have a lot of lines to push, use s3d_push_lines()          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_lines.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_lines.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_push_lines.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -14,4 +14,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Pushing n lines on the linestack of the object, each lbuf has a size of n*3, each entry has the index number of the first vertex, second vertex and material number just as in s3d_push_line().          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_material.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_material.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_push_material.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -21,4 +21,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ pushes a material for an object. you will have to count them yourself too, as polygons will ask for the material index number. the material properties are given in rgb (red/green/blue) color codes, in float. 0.0 is the minimum, 1.0 is the maximum a color value can be. the specular color is the color which is directly reflected from the light source. the diffuse color is the color which can be seen in the bright side of the object, and the ambience color is the color of the shadow side of the object.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_material_a.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_material_a.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_push_material_a.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -24,4 +24,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Same as s3d_push_material, but color has alpha value added. Use s3d_push_materials_a() if you have a lot of materials to push.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_materials_a.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_materials_a.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_push_materials_a.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -36,4 +36,4 @@
+ s3d_push_materials_a(object, mbuf, 2); // push a red and a cyan material 
+ .fi 
+ .PP 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_polygon.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_polygon.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_push_polygon.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -27,4 +27,4 @@
+ // this will create a red polygon 
+ .fi 
+ .PP 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_polygons.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_polygons.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_push_polygons.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -26,4 +26,4 @@
+ // push one polygon with the pbuf data 
+ .fi 
+ .PP 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_texture.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_texture.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_push_texture.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -14,4 +14,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Adds a new texture with height w and height h on the texturestack.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_textures.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_textures.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_push_textures.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -14,4 +14,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ As for vertices, you can push arrays of textures on the texture stack to have greater performance. The tbuf should contain n texture sizes which consist of 2 uint16_t values for width and height for each texture.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_vertex.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_vertex.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_push_vertex.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -15,4 +15,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ pushes a vertex onto the vertex stack. make sure that you count how many vertices you've pushed because you'll need that for referencing when you push your polygons.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_push_vertices.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_push_vertices.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_push_vertices.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -22,4 +22,4 @@
+ s3d_push_vertices(object, vertices, 3); // pushing 3 vertices 
+ .fi 
+ .PP 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_quit.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_quit.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_quit.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ closes the connection and cleares the event-stack. it can also be used to leave the s3d_mainloop().          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_rotate.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_rotate.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_rotate.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -30,4 +30,4 @@
+ // object will be rotated 180 degrees around the x-axis, not 270 degress! 
+ .fi 
+ .PP 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_scale.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_scale.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_scale.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -20,4 +20,4 @@
+ s=0 is forbidden and will be ignored! s3d_scale is also absolute, not relative!  
+  
+ .RE 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_select_font.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_select_font.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_select_font.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -23,4 +23,4 @@
+ s3d_select_font(&quot;vera&quot;); // will use the vera font face 
+ .fi 
+ .PP 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_set_callback.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_set_callback.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_set_callback.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -32,4 +32,4 @@
+ // this will tell you when a object got clicked 
+ .fi 
+ .PP 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_strlen.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_strlen.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_strlen.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Returns the length of the string if it were rendered with the currently selected font. That might be useful to estimate the size used for a text and render the background or bounding box before inserting the text.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_translate.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_translate.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_translate.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -28,4 +28,4 @@
+ // object will end up at 4,0,0 and not 6,0,0!! 
+ .fi 
+ .PP 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_unlink.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_unlink.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_unlink.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Remove the link of object oid to its target.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_usage.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_usage.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_usage.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Prints the possible parameter for the client library (which can be passed in s3d_init())          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_vector_angle.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_vector_angle.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_vector_angle.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -13,4 +13,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Calculates and returns the angle between vector1 and vector2. Please note that the resulting angle is between 0 and PI, therefore not covering the whole period! To convert in degrees just do result*180/M_PI. All vectors should have the format float[3]. More info on wikipedia. <A HREF="http://en.wikipedia.org/wiki/Vector_(spatial">http://en.wikipedia.org/wiki/Vector_(spatial</A>)          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_vector_cross_product.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_vector_cross_product.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_vector_cross_product.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -14,4 +14,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Calculates and returns the cross product of vector1 and vector2. All vectors should have the format float[3]. More info on wikipedia. <A HREF="http://en.wikipedia.org/wiki/Vector_(spatial">http://en.wikipedia.org/wiki/Vector_(spatial</A>)          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_vector_dot_product.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_vector_dot_product.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_vector_dot_product.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -13,4 +13,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Calculates and returns the dot product of vector1 and vector2. All vectors should have the format float[3]. More info on wikipedia. <A HREF="http://en.wikipedia.org/wiki/Vector_(spatial">http://en.wikipedia.org/wiki/Vector_(spatial</A>)          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_vector_length.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_vector_length.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_vector_length.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Calculates and returns the length of the given vector (which should be of the type float[3]). More info on wikipedia <A HREF="http://en.wikipedia.org/wiki/Vector_(spatial">http://en.wikipedia.org/wiki/Vector_(spatial</A>)          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3d_vector_subtract.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_vector_subtract.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3d_vector_subtract.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -14,4 +14,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Subtracts vector1 from vector2, writing result into result_vector. All vectors should have the format float[3]. More info on wikipedia. <A HREF="http://en.wikipedia.org/wiki/Vector_(spatial">http://en.wikipedia.org/wiki/Vector_(spatial</A>)          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_ani_mate.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_ani_mate.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_ani_mate.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -27,4 +27,4 @@
+ s3d_mainloop(mainloop); 
+ .fi 
+ .PP 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_button_new.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_button_new.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_button_new.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -17,4 +17,4 @@
+ Creates a new button on the surface, with &quot;text&quot; written on it and the upper left corner at (posx,posy) on the surface. 
+ .PP 
+ See s3dw_button for information about callbacks which may be defined.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_delete.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_delete.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_delete.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Deletes any widget. Should be casted with S3DWIDGET().          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_focus.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_focus.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_focus.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Gives focus to the widget, relative to its parent. That means you can focus a surface, and each surface can focus one of its element, e.g. an input field. Should be casted with S3DWIDGET().          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_getroot.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_getroot.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_getroot.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -23,4 +23,4 @@
+ s3dw_moveit(root); 
+ .fi 
+ .PP 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_handle_click.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_handle_click.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_handle_click.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -30,4 +30,4 @@
+ s3d_set_callback(S3D_EVENT_OBJ_CLICK,click); 
+ .fi 
+ .PP 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_handle_key.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_handle_key.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_handle_key.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -30,4 +30,4 @@
+ s3d_set_callback(S3D_EVENT_KEY,key); 
+ .fi 
+ .PP 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_input_change_text.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_input_change_text.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_input_change_text.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -13,4 +13,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Change the text in the referenced input-box to the specified text.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_input_gettext.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_input_gettext.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_input_gettext.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Returns the text which is currently entered in the referenced input-box.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_input_new.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_input_new.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_input_new.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -17,4 +17,4 @@
+ Creates a new input-box on the surface with a input width of &quot;width&quot;, the upper left corner at (posx,posy) on the surface. The input-box is empty on creation and can be change with s3dw_input_change_text, and received with s3dw_input_gettext 
+ .PP 
+ See s3dw_input for information about callbacks which may be defined.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_label_change_text.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_label_change_text.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_label_change_text.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -13,4 +13,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Change the text in the referenced label to the specified text.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_label_new.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_label_new.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_label_new.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -17,4 +17,4 @@
+ Creates a new label on the surface, with &quot;text&quot; written on it and the upper left corner at (posx,posy) on the surface. 
+ .PP 
+ See s3dw_label for information about callbacks which may be defined.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_moveit.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_moveit.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_moveit.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Moves/translates the widget as you specified in it's private s3dw_widget structure. Should be casted with S3DWIDGET().          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_object_info.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_object_info.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_object_info.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ This can be used to let s3dw handle S3D_EVENT_OBJ_INFO-events. With this, s3dw can consider the camera position and makes things like following the camera possible.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_show.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_show.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_show.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Switches a widget visible. Should be casted with S3DWIDGET().          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_surface_new.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_surface_new.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_surface_new.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -16,4 +16,4 @@
+ Creates a new surface (a new window) with title &quot;title&quot; and dimension &quot;width&quot; x &quot;height&quot;. 
+ .PP 
+ See s3dw_surface for information about callbacks which may be defined.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_textbox_change_text.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_textbox_change_text.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_textbox_change_text.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -13,4 +13,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Change the text in the referenced textbox to the specified text.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_textbox_new.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_textbox_new.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_textbox_new.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -19,4 +19,4 @@
+ Creates a new textbox on the surface, with &quot;text&quot; written on it and the upper left corner at (posx,posy) on the surface. Width and height define the size of the textbox including scrollbars which are rendered around the textfield. 
+ .PP 
+ See s3dw_textbox for information about callbacks which may be defined.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_textbox_scrolldown.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_textbox_scrolldown.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_textbox_scrolldown.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Scrolls the text in the textbox down by one line, if possible.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_textbox_scrollleft.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_textbox_scrollleft.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_textbox_scrollleft.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Scrolls the text in the textbox to the left by one character, if possible.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_textbox_scrollright.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_textbox_scrollright.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_textbox_scrollright.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Scrolls the text in the textbox to the right by one character, if possible.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_textbox_scrollto.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_textbox_scrollto.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_textbox_scrollto.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -14,4 +14,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Scrolls the text in the textbox so that the character in row y, column x is in the top left corner of the textbox.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man3/s3dw_textbox_scrollup.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_textbox_scrollup.3	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man3/s3dw_textbox_scrollup.3	2008-09-01 19:08:08 UTC (rev 984)
+@@ -12,4 +12,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Scrolls the text in the textbox up by one line, if possible.          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man9/mcp_object.9
+===================================================================
+--- trunk/Documentation/manpages/man9/mcp_object.9	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man9/mcp_object.9	2008-09-01 19:08:08 UTC (rev 984)
+@@ -24,4 +24,4 @@
+ Deprecated 
+ .PP 
+ don't use, to be removed soon (use struct s3d_but_info). ;)      
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man9/s3d_but_info.9
+===================================================================
+--- trunk/Documentation/manpages/man9/s3d_but_info.9	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man9/s3d_but_info.9	2008-09-01 19:08:08 UTC (rev 984)
+@@ -18,4 +18,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ Can be used on the buffer of an event of type S3D_EVENT_MBUTTON.      
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man9/s3d_evt.9
+===================================================================
+--- trunk/Documentation/manpages/man9/s3d_evt.9	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man9/s3d_evt.9	2008-09-01 19:08:08 UTC (rev 984)
+@@ -28,4 +28,4 @@
+ is the pointer to the multiple purpose buffer, which will have more specific information about the object          
+ .IP &quot;next&quot; 10 
+ can be safely ignored ;)          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man9/s3d_key_event.9
+===================================================================
+--- trunk/Documentation/manpages/man9/s3d_key_event.9	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man9/s3d_key_event.9	2008-09-01 19:08:08 UTC (rev 984)
+@@ -18,4 +18,4 @@
+ .fi 
+ .PP 
+ .SH &quot;Description&quot; 
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man9/s3d_obj_info.9
+===================================================================
+--- trunk/Documentation/manpages/man9/s3d_obj_info.9	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man9/s3d_obj_info.9	2008-09-01 19:08:08 UTC (rev 984)
+@@ -29,4 +29,4 @@
+ Can be used on the buffer of an event of type S3D_EVENT_OBJ_INFO. name will usually contain nothing for usual objects, but mcp objects will contain the applications names here. r is the radius of the convex sphere an object, which will also be interesting for the mcp. 
+ .PP 
+ Special objects like camera, pointer will have the &quot;sys_&quot; prefix in the name and will be named &quot;pointer0&quot;, &quot;pointer1&quot; ... or &quot;cam0&quot;, &quot;cam1&quot; ... For cam object, scale will contain the aspect ratio.      
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man9/s3dw_button.9
+===================================================================
+--- trunk/Documentation/manpages/man9/s3dw_button.9	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man9/s3dw_button.9	2008-09-01 19:08:08 UTC (rev 984)
+@@ -20,4 +20,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ The buttons is just a button as you would expect it in a 2D widget library. It only reacts on clicks.      
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man9/s3dw_input.9
+===================================================================
+--- trunk/Documentation/manpages/man9/s3dw_input.9	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man9/s3dw_input.9	2008-09-01 19:08:08 UTC (rev 984)
+@@ -21,4 +21,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ The inputs is an input-field where a user may type things. onclick reacts on click in the field, onedit notifies you when someone writes in the field.      
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man9/s3dw_label.9
+===================================================================
+--- trunk/Documentation/manpages/man9/s3dw_label.9	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man9/s3dw_label.9	2008-09-01 19:08:08 UTC (rev 984)
+@@ -19,4 +19,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ The labels is an label-field where a user may type things. onclick reacts on click in the field, onedit notifies you when someone writes in the field.      
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man9/s3dw_scrollbar.9
+===================================================================
+--- trunk/Documentation/manpages/man9/s3dw_scrollbar.9	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man9/s3dw_scrollbar.9	2008-09-01 19:08:08 UTC (rev 984)
+@@ -25,4 +25,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ The Scrollbar should be placed around scrollable content. Currently only the left and right icons are clickable (lonclick and ronclick callbacks), in vertical mode lonclick is the callback for the up icon, ronclick the callback for the down icon.      
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man9/s3dw_style.9
+===================================================================
+--- trunk/Documentation/manpages/man9/s3dw_style.9	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man9/s3dw_style.9	2008-09-01 19:08:08 UTC (rev 984)
+@@ -40,4 +40,4 @@
+ material for the title bar          
+ .IP &quot;title_text_mat&quot; 10 
+ material for the text on the title bar          
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man9/s3dw_surface.9
+===================================================================
+--- trunk/Documentation/manpages/man9/s3dw_surface.9	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man9/s3dw_surface.9	2008-09-01 19:08:08 UTC (rev 984)
+@@ -20,4 +20,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ A surface is the window of this widget library, holding all of our elements like buttons, inputfields etc ...      
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man9/s3dw_textbox.9
+===================================================================
+--- trunk/Documentation/manpages/man9/s3dw_textbox.9	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man9/s3dw_textbox.9	2008-09-01 19:08:08 UTC (rev 984)
+@@ -25,4 +25,4 @@
+ .SH &quot;Description&quot; 
+ .PP 
+ A textbox shows some text with scrollbars to scroll around. It can currently only react to a click event.      
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+Modified: trunk/Documentation/manpages/man9/s3dw_widget.9
+===================================================================
+--- trunk/Documentation/manpages/man9/s3dw_widget.9	2008-09-01 18:53:03 UTC (rev 983)
++++ trunk/Documentation/manpages/man9/s3dw_widget.9	2008-09-01 19:08:08 UTC (rev 984)
+@@ -43,4 +43,4 @@
+ This is the most basic widget type, it contains all the &quot;general&quot; widget information. If you want to move a widget, you'd change x,y,z,s and rx,ry,rz and call s3dw_moveit to turn your action reality. Every other widget has this type as first entry, so a simple typecast to s3dw_widget will give you the widgets &quot;general&quot; information. For typecast, you may use S3DWIDGET(). 
+ .PP 
+ The pointer ptr allows linking to user-specific datastructures. That comes in handy if the widget is called back by an event, and the program must now find out on which data the user reacted.      
+-.\&quot; created by instant / docbook-to-man, Mon 01 Sep 2008, 20:31 
++.\&quot; created by instant / docbook-to-man
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000963.html">[S3d-svn] r983 - trunk/Documentation/manpages/man1
+</A></li>
+	<LI>Next message: <A HREF="000965.html">[S3d-svn] r985 - trunk/Documentation
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#964">[ date ]</a>
+              <a href="thread.html#964">[ thread ]</a>
+              <a href="subject.html#964">[ subject ]</a>
+              <a href="author.html#964">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

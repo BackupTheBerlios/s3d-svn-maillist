@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r679 - trunk/apps/kism3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r679%20-%20trunk/apps/kism3d&In-Reply-To=%3C200709232156.l8NLu64M013085%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000670.html">
+   <LINK REL="Next"  HREF="000672.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r679 - trunk/apps/kism3d</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r679%20-%20trunk/apps/kism3d&In-Reply-To=%3C200709232156.l8NLu64M013085%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r679 - trunk/apps/kism3d">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Sep 23 23:56:06 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000670.html">[S3d-svn] r678 - trunk/apps/dot_mcp
+</A></li>
+        <LI>Next message: <A HREF="000672.html">[S3d-svn] r680 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#671">[ date ]</a>
+              <a href="thread.html#671">[ thread ]</a>
+              <a href="subject.html#671">[ subject ]</a>
+              <a href="author.html#671">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-09-23 23:56:05 +0200 (Sun, 23 Sep 2007)
+New Revision: 679
+
+Modified:
+   trunk/apps/kism3d/gui.c
+Log:
+Fix -Wextra sign warnings in kisms3d
+
+
+Modified: trunk/apps/kism3d/gui.c
+===================================================================
+--- trunk/apps/kism3d/gui.c	2007-09-23 21:55:58 UTC (rev 678)
++++ trunk/apps/kism3d/gui.c	2007-09-23 21:56:05 UTC (rev 679)
+@@ -37,7 +37,7 @@
+ float CamPosition[2][3];          /* CamPosition[trans|rot][x-z] */
+ 
+ int Last_Click_Oid = 0;
+-int Last_Click_Time = 0;
++unsigned int Last_Click_Time = 0;
+ 
+ void *Cam_target = NULL;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000670.html">[S3d-svn] r678 - trunk/apps/dot_mcp
+</A></li>
+	<LI>Next message: <A HREF="000672.html">[S3d-svn] r680 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#671">[ date ]</a>
+              <a href="thread.html#671">[ thread ]</a>
+              <a href="subject.html#671">[ subject ]</a>
+              <a href="author.html#671">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

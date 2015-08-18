@@ -1,0 +1,218 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r244 - in trunk: . objs server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r244%20-%20in%20trunk%3A%20.%20objs%20server&In-Reply-To=%3C200603301640.k2UGekDW002729%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000236.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r244 - in trunk: . objs server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r244%20-%20in%20trunk%3A%20.%20objs%20server&In-Reply-To=%3C200603301640.k2UGekDW002729%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r244 - in trunk: . objs server">dotslash at berlios.de
+       </A><BR>
+    <I>Thu Mar 30 18:40:46 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000236.html">[S3d-svn] r243 - in trunk: . example server
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#237">[ date ]</a>
+              <a href="thread.html#237">[ thread ]</a>
+              <a href="subject.html#237">[ subject ]</a>
+              <a href="author.html#237">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-03-30 18:40:39 +0200 (Thu, 30 Mar 2006)
+New Revision: 244
+
+Added:
+   trunk/objs/reset.3ds
+Modified:
+   trunk/
+   trunk/TODO
+   trunk/objs/Makefile.am
+   trunk/server/TODO
+   trunk/server/graphics.c
+   trunk/server/graphics_sdl.c
+   trunk/server/user_sdl.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r368 at balthasar</A>:  dotslash | 2006-03-30 18:38:45 +0200
+ - sdl framemode resizeable
+ - reset icon was missing in the svn tree (click in the mcp and teleport back to [0,0,5])
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:365
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:368
+
+Modified: trunk/TODO
+===================================================================
+--- trunk/TODO	2006-03-29 20:48:05 UTC (rev 243)
++++ trunk/TODO	2006-03-30 16:40:39 UTC (rev 244)
+@@ -1,6 +1,4 @@
+ general:
+-	* put s3d.h into ${PREFIX}/include/, not ${PREFIX}/include/s3d/
+-	* svn add reset.3ds?!
+ 	* FULLSCREEN!
+ dot_mcp:
+ 	* sane paths for applications
+
+Modified: trunk/objs/Makefile.am
+===================================================================
+--- trunk/objs/Makefile.am	2006-03-29 20:48:05 UTC (rev 243)
++++ trunk/objs/Makefile.am	2006-03-30 16:40:39 UTC (rev 244)
+@@ -1,6 +1,7 @@
+ objsdir=	$(pkgdatadir)/objs
+ dist_objs_DATA = \
+ 	s3dstart.3ds \
++	reset.3ds \
+ 	internet.3ds \
+ 	katze_tail.3ds \
+ 	sec_p.3ds \
+
+Added: trunk/objs/reset.3ds
+===================================================================
+(Binary files differ)
+
+
+Property changes on: trunk/objs/reset.3ds
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Modified: trunk/server/TODO
+===================================================================
+--- trunk/server/TODO	2006-03-29 20:48:05 UTC (rev 243)
++++ trunk/server/TODO	2006-03-30 16:40:39 UTC (rev 244)
+@@ -1,4 +1,5 @@
+ HIGH:
++ - properly buffer incoming network traffic!!
+ MED:
+  - culling for selection-mode - do it with line-culling, not plane-culling!
+  - stop networking grepping after some deadline to prevent DoS ...?
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2006-03-29 20:48:05 UTC (rev 243)
++++ trunk/server/graphics.c	2006-03-30 16:40:39 UTC (rev 244)
+@@ -373,14 +373,19 @@
+ 	glLoadIdentity();
+ 	glMultMatrixf(m);
+ 
+-	glFlush();
+ 	switch (frame_mode)
+ 	{
+ #ifdef G_GLUT
+-		case FRAME_GLUT:glutSwapBuffers();break;
++		case FRAME_GLUT:
++				glFlush();
++				glutSwapBuffers();
++				break;
+ #endif
+ #ifdef G_SDL
+-    	case FRAME_SDL:SDL_GL_SwapBuffers();break;
++    	case FRAME_SDL:
++				/* SDL will glFlush itself */
++				SDL_GL_SwapBuffers(); 
++				break;
+ #endif
+ #ifdef G_GLX
+ 		case FRAME_GLX:...
+
+Modified: trunk/server/graphics_sdl.c
+===================================================================
+--- trunk/server/graphics_sdl.c	2006-03-29 20:48:05 UTC (rev 243)
++++ trunk/server/graphics_sdl.c	2006-03-30 16:40:39 UTC (rev 244)
+@@ -26,16 +26,15 @@
+ #include &lt;SDL_opengl.h&gt;
+ #include &lt;SDL.h&gt;
+ 
++int SDLFlags = 0;					 /*  some flags for SDL */
+ int graphics_init_sdl()
+ {
+     SDL_Surface *GLwin = NULL;
+     SDL_VideoInfo *VideoInfo;
+-    int SDLFlags = 0;				 /*  nothing */
+     int rgb_size[3]; 				 /*  for SDL_GL attributes */
+ 	dprintf(MED,&quot;Using SDL driver ...&quot;);
+ 	
+-    SDLFlags = SDL_OPENGL;
+-    SDLFlags |= SDL_GL_DOUBLEBUFFER;
++    SDLFlags = SDL_OPENGL | SDL_GL_DOUBLEBUFFER | SDL_HWPALETTE | SDL_RESIZABLE;
+     if (SDL_Init(SDL_INIT_VIDEO) &lt; 0)  		
+ 			errsf(&quot;SDL_Init()&quot;,SDL_GetError());
+     if ((VideoInfo = (SDL_VideoInfo *)SDL_GetVideoInfo())==NULL)
+
+Modified: trunk/server/user_sdl.c
+===================================================================
+--- trunk/server/user_sdl.c	2006-03-29 20:48:05 UTC (rev 243)
++++ trunk/server/user_sdl.c	2006-03-30 16:40:39 UTC (rev 244)
+@@ -26,11 +26,14 @@
+ #include &lt;SDL.h&gt;
+ /*  this file reads user input */
+ /*  this is done right now by SDL-polling */
++
++extern int SDLFlags;
+ int user_init_sdl() {
+ 	return(0);
+ }
+ int user_main_sdl() {
+   SDL_Event 	event;
++  SDL_Surface *GLwin = NULL;
+   while (SDL_PollEvent(&amp;event)) 
+   {
+ 	switch (event.type)
+@@ -91,8 +94,11 @@
+ 		case SDL_ACTIVEEVENT:		dprintf(VLOW,&quot;SDL_ACTIVEEVENT&quot;);break;
+ 		case SDL_KEYUP:				dprintf(VLOW,&quot;SDL_KEYUP&quot;);break;
+ 		case SDL_SYSWMEVENT:		dprintf(VLOW,&quot;SDL_SYSWMEVENT&quot;);break;
+-		case SDL_VIDEORESIZE:		dprintf(VLOW,&quot;SDL_VIDEORESIZE&quot;);break;
+-		case SDL_VIDEOEXPOSE:		dprintf(VLOW,&quot;SDL_VIDEOEXPOSE&quot;);break;
++		case SDL_VIDEORESIZE:		if ((GLwin = SDL_SetVideoMode(event.resize.w,event.resize.h,16,SDLFlags))==NULL) 
++										errsf(&quot;SDL_SetVideoMode()&quot;,SDL_GetError());
++									graphics_reshape(event.resize.w,event.resize.h);
++									break;
++		case SDL_VIDEOEXPOSE:		dprintf(LOW,&quot;SDL_VIDEOEXPOSE&quot;);break;
+ 		case SDL_USEREVENT:			dprintf(VLOW,&quot;SDL_USEREVENT&quot;);break;
+ 		case SDL_JOYAXISMOTION:		dprintf(VLOW,&quot;SDL_JOYAXISMOTION&quot;);break;
+ 		case SDL_JOYBALLMOTION:		dprintf(VLOW,&quot;SDL_JOYBALLMOTION&quot;);break;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000236.html">[S3d-svn] r243 - in trunk: . example server
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#237">[ date ]</a>
+              <a href="thread.html#237">[ thread ]</a>
+              <a href="subject.html#237">[ subject ]</a>
+              <a href="author.html#237">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

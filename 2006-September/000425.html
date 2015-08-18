@@ -1,0 +1,274 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r432 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r432%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200609251352.k8PDqp4s005415%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000424.html">
+   <LINK REL="Next"  HREF="000426.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r432 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r432%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200609251352.k8PDqp4s005415%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r432 - in trunk: . server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 25 15:52:51 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000424.html">[S3d-svn] r431 - in trunk: . libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000426.html">[S3d-svn] r433 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#425">[ date ]</a>
+              <a href="thread.html#425">[ thread ]</a>
+              <a href="subject.html#425">[ subject ]</a>
+              <a href="author.html#425">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-25 15:52:51 +0200 (Mon, 25 Sep 2006)
+New Revision: 432
+
+Modified:
+   trunk/
+   trunk/INSTALL
+   trunk/configure.ac
+   trunk/server/graphics.c
+   trunk/server/main.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1042 at balthasar</A>:  dotslash | 2006-09-25 15:52:46 +0200
+ - s3d --no-rc does not call kill(kidpid, SIGUSR1) if there is no kid
+ - remove GLUT from autoconf recommendations (but it's still possible to select)
+ - cleanup old INSTALL
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1040
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1042
+
+Modified: trunk/INSTALL
+===================================================================
+--- trunk/INSTALL	2006-09-19 20:57:02 UTC (rev 431)
++++ trunk/INSTALL	2006-09-25 13:52:51 UTC (rev 432)
+@@ -1,9 +1,28 @@
+-### 1 Preparing 
+ 
++
++             ________
++            /        \________  _______
++            \         \       \|       \
++         ____\     ___/____   /|_       \
++        /     \     \    \    \ |        \
++        \            \____\_   \|         \
++         \___________/          \    |    /
++                 s3D \__________/________/
++				
++						INSTALL
++
++
++
++
++1. Preparing 
++------------
++
++
+ Before being able to install s3d and the sample programs, you need to prepare
+ the build, and compile s3d. 
+ 
+-### 1.1 Subversion Checkout
++1.1. Subversion Checkout
++------------------------
+ 
+ If you are using a version directly checked out from subversion, you will need
+ to setup the GNU autotools first. The following assumes that automake 1.9,
+@@ -26,7 +45,8 @@
+ 
+ to learn about more configuration parameters.
+ 
+-### 1.2 Preparing a Released Version
++1.2 Preparing a Released Version
++--------------------------------
+ 
+ A released version of s3d contains a pregenerated configure script, which you
+ can run directly:
+@@ -37,7 +57,8 @@
+ features you have to enable them with --enable-debug and --enable-profiling,
+ respectively.
+ 
+-### 2 Building
++2. Building
++-----------
+ 
+ After configure has finished, you can start the build of s3d:
+ 
+@@ -46,15 +67,23 @@
+ in the root directory will compile server, client-lib and the examples
+ for you.
+ 
+-after that, go
+ 
+-$ cd server
+-$ ./s3d --no-rc
++3. Installing
++-------------
+ 
+-fire up the server. if you're lucky, a window appears.now the s3d is listening 
+-on port 6066. 
+-now it's time to test some things. on another terminal:
++Because of the new plugins, things need to be installed before you can test. 
+ 
++$ make install
++
++installs s3d in the selected prefix (default /usr/local/*), you may need to become 
++root first.
++
++$ s3d --no-rc
++
++fires up the server. Uf you're lucky, a X11 window appears. Now the s3d is listening 
++on TCP port 6066. 
++Now it's time to test some things. on another terminal:
++
+ $ cd examples
+ $ ./3dsloader miu3ds/miu.3ds
+ 
+@@ -62,17 +91,28 @@
+ mouse-button pushed.
+ now you can try the MCP, which is something like a windowmanager in X:
+ 
+-$ cd examples
++$ cd apps/dot_mcp
+ $ ./dot_mcp
+ 
+ now you should get some fancy window decorations :D
+ there are a few other examples, just play around
+ 
+-### 3 Installing
++4. s3drc
++--------
+ 
+-You can use the install target to install s3d into the selected prefix. 
++We recommend to make use of the .s3drc. The idea is the same as in .xinitrc,
++starting the window manager (the mcp) along with the server. When the .s3drc
++is finished, the server will go down with it (so you can press a &quot;quit&quot; button
++in the mcp).
+ 
+-$ make install
++Give it a try:
+ 
+-Depending on the selected prefix, you may need to become superuser first.
++$ cat &lt;&lt; EOF &gt; ~/.s3drc
++#!/bin/sh
++dot_mcp
++EOF
++$ s3d
+ 
++(note, this time without --no-rc)
++
++
+
+Modified: trunk/configure.ac
+===================================================================
+--- trunk/configure.ac	2006-09-19 20:57:02 UTC (rev 431)
++++ trunk/configure.ac	2006-09-25 13:52:51 UTC (rev 432)
+@@ -92,8 +92,8 @@
+ if test &quot;x${HAVE_SDL}&quot; = &quot;xyes&quot;; then
+ 	AC_DEFINE([G_SDL], 1, [Use SDL])
+ fi
+-if test &quot;x${HAVE_glut}${HAVE_SDL}&quot; = &quot;x&quot;; then
+-	AC_MSG_ERROR([No OpenGL Framework found. Try installing GLUT or SDL, or both])
++if test &quot;x${HAVE_SDL}&quot; = &quot;x&quot;; then
++	AC_MSG_ERROR([Please install SDL.])
+ fi
+ 
+ AM_CONDITIONAL([BUILD_SDL], test x&quot;${HAVE_SDL}&quot; = xyes)
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2006-09-19 20:57:02 UTC (rev 431)
++++ trunk/server/graphics.c	2006-09-25 13:52:51 UTC (rev 432)
+@@ -355,11 +355,6 @@
+ 	GLfloat light0_diff[]={0.5,0.5,0.5,1.0};
+ 	GLfloat light0_amb[]={1.0,1.0,1.0,1.0};
+ 	
+-/*
+-	GLfloat wire_amb[]={0.1,0.3,0.1,0.5};
+-	GLfloat wire_diff[]={0.1,0.3,0.1,0.5};
+-	GLfloat wire_spec[]={1.0,1.0,1.0,0.5};
+-*/
+ 	select_mode=0;
+ 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  /*  clear screen */
+ 	 /*  set up the cam ... */
+@@ -385,20 +380,6 @@
+ 
+  	glPushMatrix();  /*  save the cam */ 
+ 		render_by_mcp();
+-/*
+-#ifdef DEBUG
+-#ifdef G_GLUT
+-		glPushMatrix();
+-			glRotatef(90,1.0,0.0,0.0);	
+-			/ * set some evilish green color * /
+-			glMaterialfv(GL_FRONT,GL_AMBIENT,wire_amb);
+-			glMaterialfv(GL_FRONT,GL_SPECULAR,wire_spec);
+-			glMaterialfv(GL_FRONT,GL_DIFFUSE,wire_diff);
+-			
+-			glutWireTorus(100,100,40,40);
+-		glPopMatrix();
+-#endif
+-#endif*/
+  	glPopMatrix();  /*  restore the cam */ 
+ 	glLoadIdentity();
+ 	glMultMatrixf(m);
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2006-09-19 20:57:02 UTC (rev 431)
++++ trunk/server/main.c	2006-09-25 13:52:51 UTC (rev 432)
+@@ -177,7 +177,8 @@
+ 	        errn(&quot;init():signal()&quot;,errno);
+     if (signal(SIGTERM, sigint_handler) == SIG_ERR) 
+ 	        errn(&quot;init():signal()&quot;,errno);
+-	kill(kidpid, SIGUSR1);
++	if (kidpid!=0)
++		kill(kidpid, SIGUSR1);
+ #endif
+ 	return(0);
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000424.html">[S3d-svn] r431 - in trunk: . libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000426.html">[S3d-svn] r433 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#425">[ date ]</a>
+              <a href="thread.html#425">[ thread ]</a>
+              <a href="subject.html#425">[ subject ]</a>
+              <a href="author.html#425">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

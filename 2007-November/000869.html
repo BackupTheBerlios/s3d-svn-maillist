@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r876 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r876%20-%20trunk/server&In-Reply-To=%3C200711251930.lAPJUZka022258%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000868.html">
+   <LINK REL="Next"  HREF="000870.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r876 - trunk/server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r876%20-%20trunk/server&In-Reply-To=%3C200711251930.lAPJUZka022258%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r876 - trunk/server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 25 20:30:35 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000868.html">[S3d-svn] r875 - trunk/server
+</A></li>
+        <LI>Next message: <A HREF="000870.html">[S3d-svn] r877 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#869">[ date ]</a>
+              <a href="thread.html#869">[ thread ]</a>
+              <a href="subject.html#869">[ subject ]</a>
+              <a href="author.html#869">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-25 20:30:35 +0100 (Sun, 25 Nov 2007)
+New Revision: 876
+
+Modified:
+   trunk/server/object.c
+Log:
+- clean up texture size calculation
+
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2007-11-25 15:59:54 UTC (rev 875)
++++ trunk/server/object.c	2007-11-25 19:30:35 UTC (rev 876)
+@@ -342,25 +342,22 @@
+ 					/* find the next power of 2 that can hold the width of the texture */
+ 					for (hm = 1; hm &lt; obj-&gt;p_tex[m+i].tw; hm *= 2);
+ 					s3dprintf(MED, &quot;hm %d, tw %d&quot;, hm, obj-&gt;p_tex[m+i].tw);
+-					if (hm == obj-&gt;p_tex[m+i].tw)  {
++					obj-&gt;p_tex[m+i].w = hm;
++					if (hm == obj-&gt;p_tex[m+i].tw)  
+ 						obj-&gt;p_tex[m+i].xs = 1.0;
+-						obj-&gt;p_tex[m+i].w = hm;
+-
+-					} else {
+-						obj-&gt;p_tex[m+i].w = hm;
++					 else 
+ 						obj-&gt;p_tex[m+i].xs = (float)((double)obj-&gt;p_tex[m+i].tw) / ((double)obj-&gt;p_tex[m+i].w);
+-					}
++
+ 					/* find the next power of 2 that can hold the height of the texture */
+ 					for (hm = 1; hm &lt; obj-&gt;p_tex[m+i].th; hm *= 2);
+ 					s3dprintf(MED, &quot;hm %d, th %d&quot;, hm, obj-&gt;p_tex[m+i].th);
+ 
+-					if (hm == obj-&gt;p_tex[m+i].th)  {
++					obj-&gt;p_tex[m+i].h = hm;
++					if (hm == obj-&gt;p_tex[m+i].th)  
+ 						obj-&gt;p_tex[m+i].ys = 1.0;
+-						obj-&gt;p_tex[m+i].h = obj-&gt;p_tex[m+i].th;
+-					} else  {
+-						obj-&gt;p_tex[m+i].h = hm;
++					else  
+ 						obj-&gt;p_tex[m+i].ys = (float)((double)obj-&gt;p_tex[m+i].th) / ((double)obj-&gt;p_tex[m+i].h);
+-					}
++
+ 					errds(LOW, &quot;obj_push_tex()&quot;, &quot;setting up %d %d (in mem: %d %d) texture&quot;,
+ 					      obj-&gt;p_tex[m+i].tw,
+ 					      obj-&gt;p_tex[m+i].th,
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000868.html">[S3d-svn] r875 - trunk/server
+</A></li>
+	<LI>Next message: <A HREF="000870.html">[S3d-svn] r877 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#869">[ date ]</a>
+              <a href="thread.html#869">[ thread ]</a>
+              <a href="subject.html#869">[ subject ]</a>
+              <a href="author.html#869">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

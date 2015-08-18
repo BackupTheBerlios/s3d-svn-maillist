@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r848 - trunk/svnonly/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r848%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711082120.lA8LKdQH015219%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000840.html">
+   <LINK REL="Next"  HREF="000842.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r848 - trunk/svnonly/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r848%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711082120.lA8LKdQH015219%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r848 - trunk/svnonly/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Thu Nov  8 22:20:39 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000840.html">[S3d-svn] r847 - trunk/server
+</A></li>
+        <LI>Next message: <A HREF="000842.html">[S3d-svn] r849 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#841">[ date ]</a>
+              <a href="thread.html#841">[ thread ]</a>
+              <a href="subject.html#841">[ subject ]</a>
+              <a href="author.html#841">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-08 22:20:39 +0100 (Thu, 08 Nov 2007)
+New Revision: 848
+
+Modified:
+   trunk/svnonly/comptest/comptest.c
+Log:
+- print BadMatch Errors
+- remove some of them
+
+
+Modified: trunk/svnonly/comptest/comptest.c
+===================================================================
+--- trunk/svnonly/comptest/comptest.c	2007-11-08 20:40:41 UTC (rev 847)
++++ trunk/svnonly/comptest/comptest.c	2007-11-08 21:20:39 UTC (rev 848)
+@@ -103,6 +103,12 @@
+ {
+ 	char *name = &quot;unknown&quot;;
+ 	switch (event-&gt;type &amp; 0x7f) {
++	case CreateNotify:
++		name = &quot;Create&quot;;
++		break;
++	case DestroyNotify:
++		name = &quot;Destroy&quot;;
++		break;
+ 	case Expose:
+ 		name = &quot;Expose&quot;;
+ 		break;
+@@ -181,7 +187,13 @@
+ 	default:
+ 		break;
+ 	}
++	switch (event-&gt;error_code) {
++	case BadMatch:
++		name = &quot;BadMatch&quot;;
++		break;
++	}
+ 
++
+ 	printf(&quot;error %d (name: %s) request %d minor %d serial %d\n&quot;,
+ 	       event-&gt;error_code, name, event-&gt;request_code, event-&gt;minor_code, (int)event-&gt;serial);
+ 	return(0);
+@@ -459,6 +471,15 @@
+ 	char *bitmap;
+ 	XImage *image;
+ 
++	if (win-&gt;attr.map_state == IsUnmapped)	/* not mapped images can't be grabbed */
++		return;
++
++	if (win-&gt;attr.class == InputOnly)		/* can't grab image from this source */
++	{
++		printf(&quot;inputonly window\n&quot;);
++		return;
++	}
++
+ 	/* update the whole window for now. */
+ 	/* x = 50;
+ 	 y = 50;
+@@ -485,8 +506,9 @@
+ 		if (xright &gt; (x + width))
+ 			xright = x + width;
+ 		chunk_width = xright - xleft;
++/*		printf(&quot;map-state = %d, backing_store = %d\n&quot;, win-&gt;attr.map_state);
+ 		printf(&quot;request image: xleft = %d, xright = %d, width = %d, x:y = %d:%d, width:height = %d:%d, ~TEXW = %08x\n&quot;,
+-		       xleft, xright, width, x, y, width, height, ~TEXW);
++		       xleft, xright, width, x, y, width, height, ~TEXW);*/
+ 		image = XGetImage(dpy, win-&gt;id, xleft, y, chunk_width, height, AllPlanes, ZPixmap);
+ 		if (!image)
+ 			return;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000840.html">[S3d-svn] r847 - trunk/server
+</A></li>
+	<LI>Next message: <A HREF="000842.html">[S3d-svn] r849 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#841">[ date ]</a>
+              <a href="thread.html#841">[ thread ]</a>
+              <a href="subject.html#841">[ subject ]</a>
+              <a href="author.html#841">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

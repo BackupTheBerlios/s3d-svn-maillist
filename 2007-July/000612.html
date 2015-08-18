@@ -1,0 +1,232 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r619 - branches/s3d-cmake/apps/meshs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r619%20-%20branches/s3d-cmake/apps/meshs3d&In-Reply-To=%3C200707011315.l61DF2W8032087%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000609.html">
+   <LINK REL="Next"  HREF="000611.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r619 - branches/s3d-cmake/apps/meshs3d</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r619%20-%20branches/s3d-cmake/apps/meshs3d&In-Reply-To=%3C200707011315.l61DF2W8032087%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r619 - branches/s3d-cmake/apps/meshs3d">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Jul  1 15:15:02 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000609.html">[S3d-svn] r618 - in branches/s3d-cmake: libs3d server
+</A></li>
+        <LI>Next message: <A HREF="000611.html">[S3d-svn] r620 - in branches/s3d-cmake: apps/meshs3d libs3d libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#612">[ date ]</a>
+              <a href="thread.html#612">[ thread ]</a>
+              <a href="subject.html#612">[ subject ]</a>
+              <a href="author.html#612">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-07-01 15:15:01 +0200 (Sun, 01 Jul 2007)
+New Revision: 619
+
+Modified:
+   branches/s3d-cmake/apps/meshs3d/allocate.c
+   branches/s3d-cmake/apps/meshs3d/main.c
+   branches/s3d-cmake/apps/meshs3d/meshs3d.h
+   branches/s3d-cmake/apps/meshs3d/process.c
+Log:
+- Replace C++ comments in C source with C comments
+
+
+Modified: branches/s3d-cmake/apps/meshs3d/allocate.c
+===================================================================
+--- branches/s3d-cmake/apps/meshs3d/allocate.c	2007-07-01 13:15:00 UTC (rev 618)
++++ branches/s3d-cmake/apps/meshs3d/allocate.c	2007-07-01 13:15:01 UTC (rev 619)
+@@ -189,7 +189,7 @@
+ 	struct chunkTrailer *chunkTrailer;
+ 	unsigned char *chunk;
+ 
+-// 	printf(&quot;sizeof(struct chunkHeader) = %u, sizeof (struct chunkTrailer) = %u\n&quot;, sizeof (struct chunkHeader), sizeof (struct chunkTrailer));
++	/* printf(&quot;sizeof(struct chunkHeader) = %u, sizeof (struct chunkTrailer) = %u\n&quot;, sizeof (struct chunkHeader), sizeof (struct chunkTrailer)); */
+ 
+ 	memory = malloc(length + sizeof(struct chunkHeader) + sizeof(struct chunkTrailer));
+ 
+
+Modified: branches/s3d-cmake/apps/meshs3d/main.c
+===================================================================
+--- branches/s3d-cmake/apps/meshs3d/main.c	2007-07-01 13:15:00 UTC (rev 618)
++++ branches/s3d-cmake/apps/meshs3d/main.c	2007-07-01 13:15:01 UTC (rev 619)
+@@ -219,16 +219,17 @@
+ 				move_meshnode( sec_node );
+ 			}
+ 		}
+-// 		first_node = hash_find( node_hash, &amp;con-&gt;ip[0] );
+-// 		sec_node = hash_find( node_hash, &amp;con-&gt;ip[1] );
+-// 		distance = dirt( first_node-&gt;pos_vec, sec_node-&gt;pos_vec, tmp_mov_vec );
+-// 		f = ( ( con-&gt;etx1_sqrt + con-&gt;etx2_sqrt ) / 4.0 ) / distance;
+-// 
+-// 		/***
+-// 		 * drift factor - 0.0 &lt; factor &lt; 1.0 ( best results: 0.3 &lt; factor &lt; 0.9
+-// 		 * small factor: fast and strong drift to neighbours
+-// 		 ***/
+-// 		if ( f &lt; Factor ) f = Factor;
++		/* first_node = hash_find( node_hash, &amp;con-&gt;ip[0] );
++		sec_node = hash_find( node_hash, &amp;con-&gt;ip[1] );
++		distance = dirt( first_node-&gt;pos_vec, sec_node-&gt;pos_vec, tmp_mov_vec );
++		f = ( ( con-&gt;etx1_sqrt + con-&gt;etx2_sqrt ) / 4.0 ) / distance; */
++
++		/***
++		 * drift factor - 0.0 &lt; factor &lt; 1.0 ( best results: 0.3 &lt; factor &lt; 0.9
++		 * small factor: fast and strong drift to neighbours
++		 ***/
++		/* if ( f &lt; Factor ) f = Factor; */
++		
+ 	}
+ 
+ }
+@@ -240,7 +241,7 @@
+ 
+ 	calc_node_mov();
+ 	handle_node();
+-// 	move_nodes();
++	/* move_nodes(); */
+ 
+ 	while ( ( net_result = net_main() ) != 0 ) {
+ 		if ( net_result == -1 ) {
+@@ -285,8 +286,8 @@
+ 	if ( Global.debug )
+ 		printf( &quot;debug mode enabled ...\n&quot; );
+ 
+-//	/* initialize obj2ip linked list */
+-//	lst_initialize();
++	/* initialize obj2ip linked list */
++	/* lst_initialize(); */
+ 
+ 	/* delete olsrs3d options */
+ 	while ( ( optind &lt; argc ) &amp;&amp; ( argv[optind][0] != '-' ) ) optind++;		/* optind may point to ip addr of '-H' */
+@@ -302,10 +303,10 @@
+ 
+ 	if (!net_init(olsr_host))
+ 	{
+-//		s3d_set_callback(S3D_EVENT_OBJ_INFO,object_info);
+-//		s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
+-//		s3d_set_callback(S3D_EVENT_KEY,keypress);
+-//		s3d_set_callback(S3D_EVENT_QUIT,stop);
++		/* s3d_set_callback(S3D_EVENT_OBJ_INFO,object_info);
++		s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
++		s3d_set_callback(S3D_EVENT_KEY,keypress);
++		s3d_set_callback(S3D_EVENT_QUIT,stop); */
+ 
+ 		if (!s3d_init(&amp;argc,&amp;argv,&quot;meshs3d&quot;))
+ 		{
+@@ -328,7 +329,7 @@
+ 			/* create_search_widget( 0, 0, 300 ); */
+ 
+ 			Global.obj_zero_point = s3d_new_object();
+-//			Output_border[0] = Output_border[1] = Output_border[2] = Output_border[3] = -1;
++			/* Output_border[0] = Output_border[1] = Output_border[2] = Output_border[3] = -1; */
+ 
+ 			s3d_mainloop(mainloop);
+ 			s3d_quit();
+
+Modified: branches/s3d-cmake/apps/meshs3d/meshs3d.h
+===================================================================
+--- branches/s3d-cmake/apps/meshs3d/meshs3d.h	2007-07-01 13:15:00 UTC (rev 618)
++++ branches/s3d-cmake/apps/meshs3d/meshs3d.h	2007-07-01 13:15:01 UTC (rev 619)
+@@ -91,13 +91,15 @@
+ extern struct hashtable_t *con_hash;
+ 
+ /* process.c */
+-//void lst_initialize();
+-//void lst_add(int id,struct olsr_node **olsr_node);
+-//void lst_del(int id);
+-//struct olsr_node *lst_search(int id);
+-//void lst_out();
+-//struct olsr_node *move_lst_ptr(int *id);
+-//int process_main();
++/*
++void lst_initialize();
++void lst_add(int id,struct olsr_node **olsr_node);
++void lst_del(int id);
++struct olsr_node *lst_search(int id);
++void lst_out();
++struct olsr_node *move_lst_ptr(int *id);
++int process_main();
++*/
+ void process_init();
+ 
+ /* net.c */
+@@ -106,7 +108,9 @@
+ int net_quit();
+ 
+ /* main */
+-//void out_of_mem( void );
+-//void print_etx( void );
+-//float dist(float p1[], float p2[]);
+-//void window_error(char *msg);
++/*
++void out_of_mem( void );
++void print_etx( void );
++float dist(float p1[], float p2[]);
++void window_error(char *msg);
++*/
+
+Modified: branches/s3d-cmake/apps/meshs3d/process.c
+===================================================================
+--- branches/s3d-cmake/apps/meshs3d/process.c	2007-07-01 13:15:00 UTC (rev 618)
++++ branches/s3d-cmake/apps/meshs3d/process.c	2007-07-01 13:15:01 UTC (rev 619)
+@@ -253,7 +253,7 @@
+ 
+ 				(*con_from_end) = (*con_to_end) = (*etx_end) = '\0';
+ 
+-// 				if( Global.debug ) printf( &quot;con_from: %s, con_to: %s, etx: %s\n&quot;, con_from, con_to, etx );
++				/* if( Global.debug ) printf( &quot;con_from: %s, con_to: %s, etx: %s\n&quot;, con_from, con_to, etx ); */
+ 
+ 				/* announced network via HNA */
+ 				if ( strncmp( etx, &quot;HNA&quot;, NAMEMAX ) == 0 )
+@@ -278,8 +278,8 @@
+ 					handle_mesh_node( &amp;int_con_from, con_from );
+ 					handle_mesh_node( &amp;int_con_to, con_to );
+ 					handle_con( int_con_from, int_con_to, f);
+-// 					node_from = (struct node *) hash_find( node_hash, &amp;int_con_from );
+-// 					node_to = (struct node *) hash_find( node_hash, &amp;int_con_to );
++					/* node_from = (struct node *) hash_find( node_hash, &amp;int_con_from );
++					node_to = (struct node *) hash_find( node_hash, &amp;int_con_to ); */
+ 				}
+ 				/* remove zerobyte */
+ 				(*con_from_end) = (*con_to_end) = (*etx_end) = '&quot;';
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000609.html">[S3d-svn] r618 - in branches/s3d-cmake: libs3d server
+</A></li>
+	<LI>Next message: <A HREF="000611.html">[S3d-svn] r620 - in branches/s3d-cmake: apps/meshs3d libs3d libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#612">[ date ]</a>
+              <a href="thread.html#612">[ thread ]</a>
+              <a href="subject.html#612">[ subject ]</a>
+              <a href="author.html#612">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

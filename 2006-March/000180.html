@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r184 - trunk/config
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r184%20-%20trunk/config&In-Reply-To=%3C200603151959.k2FJxFWZ003393%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000179.html">
+   <LINK REL="Next"  HREF="000181.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r184 - trunk/config</H1>
+    <B>ankon at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r184%20-%20trunk/config&In-Reply-To=%3C200603151959.k2FJxFWZ003393%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r184 - trunk/config">ankon at berlios.de
+       </A><BR>
+    <I>Wed Mar 15 20:59:15 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000179.html">[S3d-svn] r183 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000181.html">[S3d-svn] r185 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#180">[ date ]</a>
+              <a href="thread.html#180">[ thread ]</a>
+              <a href="subject.html#180">[ subject ]</a>
+              <a href="author.html#180">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: ankon
+Date: 2006-03-15 20:58:58 +0100 (Wed, 15 Mar 2006)
+New Revision: 184
+
+Modified:
+   trunk/config/pthread.m4
+Log:
+Make the pthread check a little bit more robust, and check for a
+compiler option -pthread before trying various libs.
+This should not change anything on most platforms, especially since
+SDL usually needs pthreads anyways and therefore SDL_CFLAGS/_LIBS will contain
+correct information.
+It may change a lot on FreeBSD/(alpha and others), which will create horribly broken things
+if -pthread is NOT used.
+
+
+
+Modified: trunk/config/pthread.m4
+===================================================================
+--- trunk/config/pthread.m4	2006-03-15 19:19:26 UTC (rev 183)
++++ trunk/config/pthread.m4	2006-03-15 19:58:58 UTC (rev 184)
+@@ -6,15 +6,28 @@
+ AC_DEFUN([HAVE_PTHREAD], [
+ 	PTHREAD_CFLAGS=&quot;&quot;
+         PTHREAD_LIBS=&quot;&quot;
+-        AC_CHECK_LIB(pthread, pthread_create, PTHREAD_LIBS=&quot;-lpthread&quot;,
+-                [AC_CHECK_LIB(pthreads, pthread_create, PTHREAD_LIBS=&quot;-lpthreads&quot;,
+-                    [AC_CHECK_LIB(c_r, pthread_create, PTHREAD_LIBS=&quot;-lc_r&quot;,
+-                        [AC_CHECK_LIB(pthread, __pthread_attr_init_system, PTHREAD_LIBS=&quot;-lpthread&quot;,
+-                                [AC_CHECK_FUNC(pthread_create)]
+-                        )]
+-                    )]
+-                )]
+-        )
++	save_CFLAGS=$CFLAGS
++	save_LDFLAGS=$LDFLAGS
++	CFLAGS=&quot;$CFLAGS -pthread&quot;
++	LDFLAGS=&quot;$LDFLAGS -pthread&quot;
++	AC_CHECK_FUNC(pthread_create, [
++		CFLAGS=$save_CFLAGS
++		LDFLAGS=$save_LDFLAGS
++		PTHREAD_CFLAGS=&quot;-pthread&quot;
++		PTHREAD_LIBS=&quot;-pthread&quot;
++	], [
++		CFLAGS=$save_CFLAGS
++		LDFLAGS=$save_LDFLAGS
++	        AC_CHECK_LIB(pthread, pthread_create, PTHREAD_LIBS=&quot;-lpthread&quot;,
++        	        [AC_CHECK_LIB(pthreads, pthread_create, PTHREAD_LIBS=&quot;-lpthreads&quot;,
++                	    [AC_CHECK_LIB(c_r, pthread_create, PTHREAD_LIBS=&quot;-lc_r&quot;,
++                        	[AC_CHECK_LIB(pthread, __pthread_attr_init_system, PTHREAD_LIBS=&quot;-lpthread&quot;,
++                                	[AC_CHECK_FUNC(pthread_create)]
++	                        )]
++        	            )]
++                	)]
++	        )
++	])
+         AC_SUBST(PTHREAD_CFLAGS)
+         AC_SUBST(PTHREAD_LIBS)
+ ])
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000179.html">[S3d-svn] r183 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000181.html">[S3d-svn] r185 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#180">[ date ]</a>
+              <a href="thread.html#180">[ thread ]</a>
+              <a href="subject.html#180">[ subject ]</a>
+              <a href="author.html#180">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

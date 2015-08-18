@@ -1,0 +1,353 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r892 - trunk/libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-January/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r892%20-%20trunk/libs3d&In-Reply-To=%3C200801072324.m07NOgvB029241%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000884.html">
+   <LINK REL="Next"  HREF="000886.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r892 - trunk/libs3d</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r892%20-%20trunk/libs3d&In-Reply-To=%3C200801072324.m07NOgvB029241%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r892 - trunk/libs3d">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan  8 00:24:42 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000884.html">[S3d-svn] r891 - in trunk: libs3d libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000886.html">[S3d-svn] r893 - trunk/apps/dot_mcp
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#885">[ date ]</a>
+              <a href="thread.html#885">[ thread ]</a>
+              <a href="subject.html#885">[ subject ]</a>
+              <a href="author.html#885">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-01-08 00:24:41 +0100 (Tue, 08 Jan 2008)
+New Revision: 892
+
+Modified:
+   trunk/libs3d/freetype.c
+   trunk/libs3d/sei_construct.c
+   trunk/libs3d/sei_monotone.c
+   trunk/libs3d/sei_tri.c
+Log:
+libs3d: Remove nearly unused variables
+
+
+Modified: trunk/libs3d/freetype.c
+===================================================================
+--- trunk/libs3d/freetype.c	2008-01-07 23:24:27 UTC (rev 891)
++++ trunk/libs3d/freetype.c	2008-01-07 23:24:41 UTC (rev 892)
+@@ -55,8 +55,6 @@
+ static int ft_init = 0;
+ static int face_init = 0;
+ 
+-static int v_off;   /*  the vertex number offset, to have the right vertex numbers for each character */
+-static int ch;
+ static struct t_buf tess_buf[256];
+ 
+ 
+@@ -118,7 +116,7 @@
+ static int _s3d_add_tessbuf(uint16_t a)
+ {
+ 	float norm, ar, xa, ya;
+-	int i, j, k, c, n, start, outl, s, e;
++	int i, j, k, c, n, outl, s, e;
+ 	int np, pos;
+ 	int triangles[SEI_SS*2][3]; /* more than enough ... */
+ 	int ncontours, ncon;
+@@ -139,8 +137,6 @@
+ 	}
+ 	s3dprintf(VLOW, &quot;[T]riangulating character %c&quot;, a);
+ 	norm = 1.0 / face-&gt;glyph-&gt;metrics.vertAdvance;
+-	ch = a;
+-	v_off = 0;
+ 	if ((face-&gt;glyph-&gt;outline.n_points &gt; 0) &amp;&amp; (face-&gt;glyph-&gt;outline.n_points &lt; SEI_SS)) {
+ 		tess_buf[a].vn = face-&gt;glyph-&gt;outline.n_points;
+ 		tess_buf[a].vbuf = malloc(sizeof(float) * face-&gt;glyph-&gt;outline.n_points * 3);
+@@ -148,7 +144,6 @@
+ 		j = 0;
+ 		ncontours = face-&gt;glyph-&gt;outline.n_contours;
+ 		for (c = 0;c &lt; ncontours;c++) {
+-			start = j;  /* first point */
+ 			i = 0;
+ 			ncon = face-&gt;glyph-&gt;outline.contours[c]; /* position of the end of ths contour */
+ 			cntr[c] = ncon - j + 1;  /* how many points do we have here? */
+@@ -376,7 +371,6 @@
+ {
+ 	int i;
+ 	float xoff;
+-	int voff;
+ 	int len;
+ 	uint16_t a;
+ 	if (!ft_init)
+@@ -390,7 +384,6 @@
+ 	}
+ 	/*  standard material */
+ 	xoff = 0;
+-	voff = 0;
+ 	len = strlen(str);
+ 	for (i = 0;i &lt; len; i++) {
+ 		a = (uint8_t)str[i];
+
+Modified: trunk/libs3d/sei_construct.c
+===================================================================
+--- trunk/libs3d/sei_construct.c	2008-01-07 23:24:27 UTC (rev 891)
++++ trunk/libs3d/sei_construct.c	2008-01-07 23:24:41 UTC (rev 892)
+@@ -423,7 +423,7 @@
+ 	int tfirstr = 0, tlastr = 0, tfirstl, tlastl;
+ 	int i1, i2, t, tn;
+ 	point_t tpt;
+-	int tritop = 0, tribot = 0, is_swapped = 0;
++	int tribot = 0, is_swapped = 0;
+ 	int tmptriseg;
+ 	int tmpseg = 1;
+ 
+@@ -488,10 +488,9 @@
+ 		tr[tu].sink = i1;
+ 		tr[tl].sink = i2;
+ 		tfirst = tl;
+-	} else    /* v0 already present */
+-	{       /* Get the topmost intersecting trapezoid */
++	} else {    /* v0 already present */
++	       /* Get the topmost intersecting trapezoid */
+ 		tfirst = locate_endpoint(&amp;s.v0, &amp;s.v1, s.root0);
+-		tritop = 1;
+ 	}
+ 
+ 
+@@ -632,9 +631,9 @@
+ 				}
+ 			} else {   /* fresh seg. or upward cusp */
+ 				int tmp_u = tr[t].u0;
+-				int td0, td1;
++				int td0;
+ 				if (((td0 = tr[tmp_u].d0) &gt; 0) &amp;&amp;
+-				                ((td1 = tr[tmp_u].d1) &gt; 0)) {  /* upward cusp */
++				                (tr[tmp_u].d1 &gt; 0)) {  /* upward cusp */
+ 					if ((tr[td0].rseg &gt; 0) &amp;&amp;
+ 					                !is_left_of(tr[td0].rseg, &amp;s.v1)) {
+ 						tr[t].u0 = tr[t].u1 = tr[tn].u1 = -1;
+@@ -714,9 +713,9 @@
+ 				}
+ 			} else {   /* fresh seg. or upward cusp */
+ 				int tmp_u = tr[t].u0;
+-				int td0, td1;
++				int td0;
+ 				if (((td0 = tr[tmp_u].d0) &gt; 0) &amp;&amp;
+-				                ((td1 = tr[tmp_u].d1) &gt; 0)) {  /* upward cusp */
++				                (tr[tmp_u].d1 &gt; 0)) {  /* upward cusp */
+ 					if ((tr[td0].rseg &gt; 0) &amp;&amp;
+ 					                !is_left_of(tr[td0].rseg, &amp;s.v1)) {
+ 						tr[t].u0 = tr[t].u1 = tr[tn].u1 = -1;
+@@ -771,15 +770,13 @@
+ 		else {
+ 			double y0, yt;
+ 			point_t tmppt;
+-			int tnext, i_d0, i_d1;
++			int tnext, i_d0;
+ 			tmpseg = tr[tr[t].d0].rseg;
+ 
+-			i_d0 = i_d1 = FALSE;
++			i_d0 = FALSE;
+ 			if (FP_EQUAL(tr[t].lo.y, s.v0.y)) {
+ 				if (tr[t].lo.x &gt; s.v0.x)
+ 					i_d0 = TRUE;
+-				else
+-					i_d1 = TRUE;
+ 			} else {
+ 				tmppt.y = y0 = tr[t].lo.y;
+ 				yt = (y0 - s.v0.y) / (s.v1.y - s.v0.y);
+@@ -787,8 +784,6 @@
+ 
+ 				if (_less_than(&amp;tmppt, &amp;tr[t].lo))
+ 					i_d0 = TRUE;
+-				else
+-					i_d1 = TRUE;
+ 			}
+ 
+ 			/* check continuity from the top so that the lower-neighbour */
+@@ -824,9 +819,9 @@
+ 				}
+ 			} else {   /* fresh seg. or upward cusp */
+ 				int tmp_u = tr[t].u0;
+-				int td0, td1;
++				int td0;
+ 				if (((td0 = tr[tmp_u].d0) &gt; 0) &amp;&amp;
+-				                ((td1 = tr[tmp_u].d1) &gt; 0)) {  /* upward cusp */
++				                (tr[tmp_u].d1 &gt; 0)) {  /* upward cusp */
+ 					if ((tr[td0].rseg &gt; 0) &amp;&amp;
+ 					                !is_left_of(tr[td0].rseg, &amp;s.v1)) {
+ 						tr[t].u0 = tr[t].u1 = tr[tn].u1 = -1;
+
+Modified: trunk/libs3d/sei_monotone.c
+===================================================================
+--- trunk/libs3d/sei_monotone.c	2008-01-07 23:24:27 UTC (rev 891)
++++ trunk/libs3d/sei_monotone.c	2008-01-07 23:24:41 UTC (rev 892)
+@@ -303,7 +303,6 @@
+ 	int mnew;
+ 	int v0, v1;
+ 	int retval = -1;
+-	int do_switch = FALSE;
+ 
+ 	if ((trnum &lt;= 0) || visited[trnum])
+ 		return 0;
+@@ -325,7 +324,6 @@
+ 			v0 = tr[t-&gt;d1].lseg;
+ 			v1 = t-&gt;lseg;
+ 			if (from == t-&gt;d1) {
+-				do_switch = TRUE;
+ 				mnew = make_new_monotone_poly(mcur, v1, v0);
+ 				traverse_polygon(mcur, t-&gt;d1, trnum, TR_FROM_UP);
+ 				traverse_polygon(mnew, t-&gt;d0, trnum, TR_FROM_UP);
+@@ -348,7 +346,6 @@
+ 			v0 = t-&gt;rseg;
+ 			v1 = tr[t-&gt;u0].rseg;
+ 			if (from == t-&gt;u1) {
+-				do_switch = TRUE;
+ 				mnew = make_new_monotone_poly(mcur, v1, v0);
+ 				traverse_polygon(mcur, t-&gt;u1, trnum, TR_FROM_DN);
+ 				traverse_polygon(mnew, t-&gt;u0, trnum, TR_FROM_DN);
+@@ -373,7 +370,6 @@
+ 			retval = SP_2UP_2DN;
+ 			if (((dir == TR_FROM_DN) &amp;&amp; (t-&gt;d1 == from)) ||
+ 			                ((dir == TR_FROM_UP) &amp;&amp; (t-&gt;u1 == from))) {
+-				do_switch = TRUE;
+ 				mnew = make_new_monotone_poly(mcur, v1, v0);
+ 				traverse_polygon(mcur, t-&gt;u1, trnum, TR_FROM_DN);
+ 				traverse_polygon(mcur, t-&gt;d1, trnum, TR_FROM_UP);
+@@ -393,7 +389,6 @@
+ 
+ 				retval = SP_2UP_LEFT;
+ 				if ((dir == TR_FROM_UP) &amp;&amp; (t-&gt;u0 == from)) {
+-					do_switch = TRUE;
+ 					mnew = make_new_monotone_poly(mcur, v1, v0);
+ 					traverse_polygon(mcur, t-&gt;u0, trnum, TR_FROM_DN);
+ 					traverse_polygon(mnew, t-&gt;d0, trnum, TR_FROM_UP);
+@@ -411,7 +406,6 @@
+ 				v1 = tr[t-&gt;u0].rseg;
+ 				retval = SP_2UP_RIGHT;
+ 				if ((dir == TR_FROM_UP) &amp;&amp; (t-&gt;u1 == from)) {
+-					do_switch = TRUE;
+ 					mnew = make_new_monotone_poly(mcur, v1, v0);
+ 					traverse_polygon(mcur, t-&gt;u1, trnum, TR_FROM_DN);
+ 					traverse_polygon(mnew, t-&gt;d1, trnum, TR_FROM_UP);
+@@ -433,7 +427,6 @@
+ 				v1 = t-&gt;lseg;
+ 				retval = SP_2DN_LEFT;
+ 				if (!((dir == TR_FROM_DN) &amp;&amp; (t-&gt;d0 == from))) {
+-					do_switch = TRUE;
+ 					mnew = make_new_monotone_poly(mcur, v1, v0);
+ 					traverse_polygon(mcur, t-&gt;u1, trnum, TR_FROM_DN);
+ 					traverse_polygon(mcur, t-&gt;d1, trnum, TR_FROM_UP);
+@@ -452,7 +445,6 @@
+ 
+ 				retval = SP_2DN_RIGHT;
+ 				if ((dir == TR_FROM_DN) &amp;&amp; (t-&gt;d1 == from)) {
+-					do_switch = TRUE;
+ 					mnew = make_new_monotone_poly(mcur, v1, v0);
+ 					traverse_polygon(mcur, t-&gt;d1, trnum, TR_FROM_UP);
+ 					traverse_polygon(mnew, t-&gt;u1, trnum, TR_FROM_DN);
+@@ -473,7 +465,6 @@
+ 				v1 = t-&gt;lseg;
+ 				retval = SP_SIMPLE_LRDN;
+ 				if (dir == TR_FROM_UP) {
+-					do_switch = TRUE;
+ 					mnew = make_new_monotone_poly(mcur, v1, v0);
+ 					traverse_polygon(mcur, t-&gt;u0, trnum, TR_FROM_DN);
+ 					traverse_polygon(mcur, t-&gt;u1, trnum, TR_FROM_DN);
+@@ -493,7 +484,6 @@
+ 
+ 				retval = SP_SIMPLE_LRUP;
+ 				if (dir == TR_FROM_UP) {
+-					do_switch = TRUE;
+ 					mnew = make_new_monotone_poly(mcur, v1, v0);
+ 					traverse_polygon(mcur, t-&gt;u0, trnum, TR_FROM_DN);
+ 					traverse_polygon(mcur, t-&gt;u1, trnum, TR_FROM_DN);
+@@ -529,7 +519,7 @@
+ {
+ 	register int i;
+ 	point_t ymax, ymin;
+-	int p, vfirst, posmax, posmin, v;
++	int p, vfirst, posmax, v;
+ 	int vcount, processed;
+ 
+ 
+@@ -539,7 +529,7 @@
+ 		processed = FALSE;
+ 		vfirst = mchain[mon[i]].vnum;
+ 		ymax = ymin = vert[vfirst].pt;
+-		posmax = posmin = mon[i];
++		posmax = mon[i];
+ 		mchain[mon[i]].marked = TRUE;
+ 		p = mchain[mon[i]].next;
+ 		while ((v = mchain[p].vnum) != vfirst) {
+@@ -555,7 +545,6 @@
+ 			}
+ 			if (_less_than(&amp;vert[v].pt, &amp;ymin)) {
+ 				ymin = vert[v].pt;
+-				posmin = p;
+ 			}
+ 			p = mchain[p].next;
+ 			vcount++;
+
+Modified: trunk/libs3d/sei_tri.c
+===================================================================
+--- trunk/libs3d/sei_tri.c	2008-01-07 23:24:27 UTC (rev 891)
++++ trunk/libs3d/sei_tri.c	2008-01-07 23:24:41 UTC (rev 892)
+@@ -80,7 +80,7 @@
+ int sei_triangulate_polygon(int ncontours, int cntr[], double(*vertices)[2], int (*triangles)[3])
+ {
+ 	register int i;
+-	int nmonpoly, ccount, npoints, genus;
++	int nmonpoly, ccount, npoints;
+ 	int n;
+ 
+ 	memset((void *)seg, 0, sizeof(seg));
+@@ -118,7 +118,6 @@
+ 		ccount++;
+ 	}
+ 
+-	genus = ncontours - 1;
+ 	n = i - 1;
+ 
+ 	initialise(n);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000884.html">[S3d-svn] r891 - in trunk: libs3d libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000886.html">[S3d-svn] r893 - trunk/apps/dot_mcp
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#885">[ date ]</a>
+              <a href="thread.html#885">[ thread ]</a>
+              <a href="subject.html#885">[ subject ]</a>
+              <a href="author.html#885">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

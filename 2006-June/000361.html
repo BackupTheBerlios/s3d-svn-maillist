@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r368 - in trunk: . libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r368%20-%20in%20trunk%3A%20.%20libs3d&In-Reply-To=%3C200606302028.k5UKSUqb025853%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000360.html">
+   <LINK REL="Next"  HREF="000362.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r368 - in trunk: . libs3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r368%20-%20in%20trunk%3A%20.%20libs3d&In-Reply-To=%3C200606302028.k5UKSUqb025853%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r368 - in trunk: . libs3d">dotslash at berlios.de
+       </A><BR>
+    <I>Fri Jun 30 22:28:30 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000360.html">[S3d-svn] r367 - in trunk: . libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000362.html">[S3d-svn] r369 - in trunk: . libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#361">[ date ]</a>
+              <a href="thread.html#361">[ thread ]</a>
+              <a href="subject.html#361">[ subject ]</a>
+              <a href="author.html#361">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-30 22:28:30 +0200 (Fri, 30 Jun 2006)
+New Revision: 368
+
+Modified:
+   trunk/
+   trunk/libs3d/proto_in.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r867 at balthasar</A>:  dotslash | 2006-06-30 22:28:22 +0200
+ - process events sent before the init
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:865
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:867
+
+Modified: trunk/libs3d/proto_in.c
+===================================================================
+--- trunk/libs3d/proto_in.c	2006-06-29 21:03:58 UTC (rev 367)
++++ trunk/libs3d/proto_in.c	2006-06-30 20:28:30 UTC (rev 368)
+@@ -40,6 +40,7 @@
+ 	{
+ 		case S3D_P_S_INIT:
+ 			s3dprintf(MED,&quot;S3D_P_S_INIT: init!!&quot;);
++			s3d_process_stack();
+ 			cb_lock=0;
+ 			break;
+ 		case S3D_P_S_QUIT:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000360.html">[S3d-svn] r367 - in trunk: . libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000362.html">[S3d-svn] r369 - in trunk: . libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#361">[ date ]</a>
+              <a href="thread.html#361">[ thread ]</a>
+              <a href="subject.html#361">[ subject ]</a>
+              <a href="author.html#361">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

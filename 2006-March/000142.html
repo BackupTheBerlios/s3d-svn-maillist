@@ -1,0 +1,304 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r146 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r146%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200603101836.k2AIa5eS001930%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000141.html">
+   <LINK REL="Next"  HREF="000143.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r146 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r146%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200603101836.k2AIa5eS001930%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r146 - in trunk: . server">dotslash at berlios.de
+       </A><BR>
+    <I>Fri Mar 10 19:36:05 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000141.html">[S3d-svn] r145 - in trunk: . client
+</A></li>
+        <LI>Next message: <A HREF="000143.html">[S3d-svn] r147 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#142">[ date ]</a>
+              <a href="thread.html#142">[ thread ]</a>
+              <a href="subject.html#142">[ subject ]</a>
+              <a href="author.html#142">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-03-10 19:36:02 +0100 (Fri, 10 Mar 2006)
+New Revision: 146
+
+Modified:
+   trunk/
+   trunk/ChangeLog
+   trunk/INSTALL
+   trunk/TODO
+   trunk/server/event.c
+   trunk/server/main.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r209 at balthasar</A>:  dotslash | 2006-03-10 19:35:51 +0100
+ - added rc functionality: use /etc/s3drc or ~/.s3drc to
+   automatically fire up your mcp or anything you want.
+ - sprintf stdio.h header depedency in event.c		  
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:206
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:209
+
+Modified: trunk/ChangeLog
+===================================================================
+--- trunk/ChangeLog	2006-03-09 22:38:53 UTC (rev 145)
++++ trunk/ChangeLog	2006-03-10 18:36:02 UTC (rev 146)
+@@ -1,3 +1,6 @@
++2006-03-10  Simon Wunderlich - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++	- added rc functionality: use /etc/s3drc or ~/.s3drc to
++	  automatically fire up your mcp or anything you want.
+ 2006-03-07  Simon Wunderlich - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+ 	- fixed -O2 problem
+ 2006-03-03  Simon Wunderlich - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+
+Modified: trunk/INSTALL
+===================================================================
+--- trunk/INSTALL	2006-03-09 22:38:53 UTC (rev 145)
++++ trunk/INSTALL	2006-03-10 18:36:02 UTC (rev 146)
+@@ -49,7 +49,7 @@
+ after that, go
+ 
+ $ cd server
+-$ ./s3d
++$ ./s3d --no-rc
+ 
+ fire up the server. if you're lucky, a window appears.now the s3d is listening 
+ on port 6066. 
+@@ -71,10 +71,16 @@
+ ### 3 Installing
+ 
+ You can use the install target to install s3d into the selected prefix. 
+-Currently, you have to install s3d, otherwise the examples will not get built.
+ 
+ $ make install
+ 
+ Depending on the selected prefix, you may need to become superuser first.
+ 
++### 3.1 The RC
+ 
++You can automatically fire up the mcp or anything you want with s3d and 
++have it closed when s3d goes down or vice versa:
++
++just create a shellscript at position /etc/s3drc or ~/.s3drc, for example
++have it starting the mcp. Don't forget to toggle it executable (chmod 755 
++or so).
+
+Modified: trunk/TODO
+===================================================================
+--- trunk/TODO	2006-03-09 22:38:53 UTC (rev 145)
++++ trunk/TODO	2006-03-10 18:36:02 UTC (rev 146)
+@@ -2,5 +2,20 @@
+ 	shmat() return (char *) -1 or NULL?! data_ctos/data_stoc should
+ 	really not be 0x0
+ 
+-general:
+-	start mcp with s3d
++autotools:
++    * weird:
++	...
++	checking for cos in -lm... yes
++	./configure: line 22348: MDL_HAVE_OPENGL: command not found
++	checking for library containing glutInit... -lglut
++	...
++
++	...
++	checking for main in -lXtst... yes
++	./configure: line 23397: HAVE_PTHREAD: command not found
++	configure: creating ./config.status
++	...
++
++    * checking g77 is useless
++	* Apple todo: won't find -lX11 (for s3d_x11gate) while compiling
++	* OBJECTPATH for finding the object?
+
+Modified: trunk/server/event.c
+===================================================================
+--- trunk/server/event.c	2006-03-09 22:38:53 UTC (rev 145)
++++ trunk/server/event.c	2006-03-10 18:36:02 UTC (rev 146)
+@@ -24,6 +24,7 @@
+ 
+ #include &quot;global.h&quot;
+ #include &quot;proto.h&quot;
++#include &lt;stdio.h&gt;		/* sprintf() */
+ #ifdef WIN32 
+ #include &lt;winsock2.h&gt;
+ #else
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2006-03-09 22:38:53 UTC (rev 145)
++++ trunk/server/main.c	2006-03-10 18:36:02 UTC (rev 146)
+@@ -37,7 +37,13 @@
+ #endif
+ #include &lt;errno.h&gt;		 /*  errno() */
+ int frame_mode=0;
++int kidpid=0;
++int norc=0;
+ int running;
++static char *rc=NULL;
++static char *homerc=&quot;~/.s3drc&quot;;
++static char *etcrc =&quot;/etc/s3drc&quot;;
++char **s3drc[]={&amp;rc,&amp;homerc,&amp;etcrc};
+ 
+ static void mainloop(void);
+ #ifdef SIGS
+@@ -47,7 +53,55 @@
+ 	dprintf(HIGH,&quot;oh my gosh there is a sigint/term signal! running away ...&quot;);
+ 	quit();
+ }
++void sigchld_handler(int sig)
++{
++	if (kidpid!=0)
++	{
++		kidpid=0;
++	    dprintf(HIGH,&quot;how cruel, my kid died!!&quot;);
++		quit();
++	}
++}
+ #endif
++int rc_init()
++{
++	int ret,i;
++	if (signal(SIGCHLD, sigchld_handler) == SIG_ERR);
++	kidpid=fork();
++	running=1;
++	if (kidpid==-1)
++	{
++		errsf(&quot;rc_init()&quot;,&quot;*sobsob*, can't fork&quot;);
++		exit(1);
++	}
++	if (kidpid==0)
++	{
++		sleep(1); /* giving the father lots of time to set his signal handler
++					 and all his sockets up */
++		dprintf(VHIGH,&quot;hello, i'm the kid and will start the rc file now!&quot;);
++		for (i=0;i&lt;(sizeof(s3drc)/sizeof(char **));i++)
++		{
++			if ((*s3drc[i])!=NULL)
++			{
++				dprintf(LOW,&quot;[RC] launching %s&quot;,*s3drc[i]);
++				ret=system(*s3drc[i]);
++				dprintf(LOW,&quot;[RC] system() said %d&quot;,ret);
++				if (ret&lt;128) 
++				{
++					dprintf(LOW,&quot;[RC] system() did well, I guess.&quot;);
++					exit(0);
++				}
++			} 
++		}
++		errs(&quot;rc_init()&quot;, &quot;no usuable rc script found.&quot;);
++		errsf(&quot;rc_init()&quot;,&quot;You don't have an rc-script? create one (~/.s3drc) or use --no-rc !&quot;);
++		exit(1);
++	} else {
++		/* father just returns */
++	}		
++	return(0);
++
++}
+ /*  the mainloop, should be handling all signals */
+ static void mainloop(void) 
+ {
+@@ -69,6 +123,8 @@
+ /*  this initalizes all components.  */
+ int init() 
+ {
++	if (!norc)
++		rc_init();
+ 	if (!frame_mode)  /*  turn default frame_mode on */
+ 	{
+ #ifdef G_GLUT
+@@ -101,10 +157,19 @@
+ /*  things to be cleaned up  */
+ int quit()
+ {
+-	user_quit();
+-	network_quit();
+-	graphics_quit();
+-	process_quit();
++	if (running!=0)
++	{
++		user_quit();
++		network_quit();
++		graphics_quit();
++		process_quit();
++		if (kidpid!=0)
++		{ /* our kid is most probably still alive. kill it!! */
++			dprintf(HIGH,&quot;kill all the kids!!&quot;);
++			kill(kidpid,SIGTERM);
++			kidpid=0;
++		}
++	}
+ 	running=0;
+ 	dprintf(VHIGH,&quot;byebye, s3d quitting ...&quot;);
+ 	exit(0);
+@@ -120,6 +185,8 @@
+ 		{&quot;help&quot;,0,0,'h'},
+ 		{&quot;use-glut&quot;,0,0,'g'},
+ 		{&quot;use-sdl&quot;,0,0,'s'},
++		{&quot;rc&quot;,1,0,'r'},
++		{&quot;no-rc&quot;,0,0,'n'},
+ 		{0,0,0,0}
+ 	};
+ 	while (-1!=(c=getopt_long(argc,argv,&quot;?hgs&quot;,long_options,&amp;lopt_idx)))
+@@ -141,6 +208,15 @@
+ 					errs(&quot;process_args()&quot;,&quot;sorry, SDL is not available&quot;);
+ #endif					
+ 					break;
++				case 'r':
++					dprintf(VHIGH,&quot;using rc file: %s&quot;,optarg);
++					rc=optarg;
++					break;
++				case 'n':
++					dprintf(VHIGH,&quot;Using no rc file!&quot;);
++					norc=1;
++					break;
++
+ 				case '?':
+ 				case 'h':
+ 					dprintf(VHIGH,&quot;usage: %s [options]&quot;,argv[0]);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000141.html">[S3d-svn] r145 - in trunk: . client
+</A></li>
+	<LI>Next message: <A HREF="000143.html">[S3d-svn] r147 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#142">[ date ]</a>
+              <a href="thread.html#142">[ thread ]</a>
+              <a href="subject.html#142">[ subject ]</a>
+              <a href="author.html#142">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r491 - trunk/apps/kism3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r491%20-%20trunk/apps/kism3d&In-Reply-To=%3C200611271520.kARFKfAU023555%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000483.html">
+   <LINK REL="Next"  HREF="000485.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r491 - trunk/apps/kism3d</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r491%20-%20trunk/apps/kism3d&In-Reply-To=%3C200611271520.kARFKfAU023555%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r491 - trunk/apps/kism3d">marec at mail.berlios.de
+       </A><BR>
+    <I>Mon Nov 27 16:20:41 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000483.html">[S3d-svn] r490 - trunk/apps/kism3d
+</A></li>
+        <LI>Next message: <A HREF="000485.html">[S3d-svn] r492 - in trunk: . apps/kism3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#484">[ date ]</a>
+              <a href="thread.html#484">[ thread ]</a>
+              <a href="subject.html#484">[ subject ]</a>
+              <a href="author.html#484">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-11-27 16:20:41 +0100 (Mon, 27 Nov 2006)
+New Revision: 491
+
+Modified:
+   trunk/apps/kism3d/gui.c
+Log:
+beautify flying networks
+
+Modified: trunk/apps/kism3d/gui.c
+===================================================================
+--- trunk/apps/kism3d/gui.c	2006-11-27 01:32:23 UTC (rev 490)
++++ trunk/apps/kism3d/gui.c	2006-11-27 15:20:41 UTC (rev 491)
+@@ -139,7 +139,7 @@
+ 
+ 
+ 			wlan_network-&gt;scale_fac = wlan_network-&gt;num_wlan_clients + 2;
+-			s3d_translate( wlan_network-&gt;wrsphr_id, 0, -6 + wlan_network-&gt;scale_fac, 0 );
++			s3d_translate( wlan_network-&gt;wrsphr_id, 0, -6 + wlan_network-&gt;scale_fac, wlan_network-&gt;scale_fac );
+ 			s3d_scale( wlan_network-&gt;obj_id, wlan_network-&gt;scale_fac );
+ 
+ 			real_node_pos_x = sin( ( 360 / Num_networks ) * network_index ) * ( M_PI / 180 ) * ( ( ( 100 * Num_networks ) / 2 * M_PI ) );
+@@ -173,6 +173,7 @@
+ 					wlan_network-&gt;bssid_id = s3d_draw_string( wlan_network-&gt;bssid, &amp;wlan_network-&gt;bssid_len );
+ 					s3d_link( wlan_network-&gt;bssid_id, wlan_network-&gt;obj_id );
+ 					s3d_translate( wlan_network-&gt;bssid_id, - wlan_network-&gt;bssid_len / 2, -2, 0 );
++					s3d_scale( wlan_network-&gt;bssid_id, 0.2 );
+ 					s3d_flags_on( wlan_network-&gt;bssid_id, S3D_OF_VISIBLE );
+ 
+ 				}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000483.html">[S3d-svn] r490 - trunk/apps/kism3d
+</A></li>
+	<LI>Next message: <A HREF="000485.html">[S3d-svn] r492 - in trunk: . apps/kism3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#484">[ date ]</a>
+              <a href="thread.html#484">[ thread ]</a>
+              <a href="subject.html#484">[ subject ]</a>
+              <a href="author.html#484">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

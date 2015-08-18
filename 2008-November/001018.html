@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1038 - trunk/apps/s3dvt
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1038%20-%20trunk/apps/s3dvt&In-Reply-To=%3C200811262032.mAQKWR6c029238%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001017.html">
+   <LINK REL="Next"  HREF="001019.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1038 - trunk/apps/s3dvt</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1038%20-%20trunk/apps/s3dvt&In-Reply-To=%3C200811262032.mAQKWR6c029238%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1038 - trunk/apps/s3dvt">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Wed Nov 26 21:32:27 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001017.html">[S3d-svn] r1037 - trunk/example
+</A></li>
+        <LI>Next message: <A HREF="001019.html">[S3d-svn] r1039 - trunk/apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1018">[ date ]</a>
+              <a href="thread.html#1018">[ thread ]</a>
+              <a href="subject.html#1018">[ subject ]</a>
+              <a href="author.html#1018">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-11-26 21:32:26 +0100 (Wed, 26 Nov 2008)
+New Revision: 1038
+
+Modified:
+   trunk/apps/s3dvt/main.c
+Log:
+s3dvt: Disable TIOCSCTTY if not supported
+
+Modified: trunk/apps/s3dvt/main.c
+===================================================================
+--- trunk/apps/s3dvt/main.c	2008-11-23 16:02:18 UTC (rev 1037)
++++ trunk/apps/s3dvt/main.c	2008-11-26 20:32:26 UTC (rev 1038)
+@@ -142,8 +142,10 @@
+ 		if (setsid() &lt; 0)
+ 			printf(&quot;ERROR (setsid)\n&quot;);
+ 		/*     tcflush(curpty, TCIOFLUSH); */
++#ifdef TIOCSCTTY
+ 		if (ioctl(curtty, TIOCSCTTY, NULL))
+ 			printf(&quot;ERROR! (ttyflush)\n&quot;);;
++#endif /* TIOCSCTTY */
+ 		dup2(curtty, 0);
+ 		dup2(curtty, 1);
+ 		dup2(curtty, 2);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001017.html">[S3d-svn] r1037 - trunk/example
+</A></li>
+	<LI>Next message: <A HREF="001019.html">[S3d-svn] r1039 - trunk/apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1018">[ date ]</a>
+              <a href="thread.html#1018">[ thread ]</a>
+              <a href="subject.html#1018">[ subject ]</a>
+              <a href="author.html#1018">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

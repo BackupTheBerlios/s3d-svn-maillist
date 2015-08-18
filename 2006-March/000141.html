@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r145 - in trunk: . client
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r145%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200603092238.k29Mcs2r020548%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000140.html">
+   <LINK REL="Next"  HREF="000142.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r145 - in trunk: . client</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r145%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200603092238.k29Mcs2r020548%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r145 - in trunk: . client">dotslash at berlios.de
+       </A><BR>
+    <I>Thu Mar  9 23:38:54 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000140.html">[S3d-svn] r144 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000142.html">[S3d-svn] r146 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#141">[ date ]</a>
+              <a href="thread.html#141">[ thread ]</a>
+              <a href="subject.html#141">[ subject ]</a>
+              <a href="author.html#141">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-03-09 23:38:53 +0100 (Thu, 09 Mar 2006)
+New Revision: 145
+
+Modified:
+   trunk/
+   trunk/client/3dsread.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r206 at balthasar</A>:  dotslash | 2006-03-09 23:38:48 +0100
+ - absolute paths fix for object search path
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:204
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:206
+
+Modified: trunk/client/3dsread.c
+===================================================================
+--- trunk/client/3dsread.c	2006-03-09 20:06:37 UTC (rev 144)
++++ trunk/client/3dsread.c	2006-03-09 22:38:53 UTC (rev 145)
+@@ -37,7 +37,7 @@
+ 	char searchpath[1024];
+ 	char path[1024];
+ #ifndef OBJSDIR
+-#define OBJSDIR 	&quot;./:../:../../&quot;
++#define OBJSDIR 	&quot;./:../:../../:&quot;
+ #endif
+ 	
+ 	strncpy(searchpath,OBJSDIR,1023);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000140.html">[S3d-svn] r144 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000142.html">[S3d-svn] r146 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#141">[ date ]</a>
+              <a href="thread.html#141">[ thread ]</a>
+              <a href="subject.html#141">[ subject ]</a>
+              <a href="author.html#141">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

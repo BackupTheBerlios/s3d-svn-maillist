@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r493 - trunk/apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r493%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200611281227.kASCRkrY026768%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000485.html">
+   <LINK REL="Next"  HREF="000487.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r493 - trunk/apps/s3dosm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r493%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200611281227.kASCRkrY026768%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r493 - trunk/apps/s3dosm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Tue Nov 28 13:27:46 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000485.html">[S3d-svn] r492 - in trunk: . apps/kism3d
+</A></li>
+        <LI>Next message: <A HREF="000487.html">[S3d-svn] r494 - trunk/apps/kism3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#486">[ date ]</a>
+              <a href="thread.html#486">[ thread ]</a>
+              <a href="subject.html#486">[ subject ]</a>
+              <a href="author.html#486">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-11-28 13:27:46 +0100 (Tue, 28 Nov 2006)
+New Revision: 493
+
+Modified:
+   trunk/apps/s3dosm/db.c
+   trunk/apps/s3dosm/s3dosm.h
+Log:
+- insert segment and ways into database
+- turn off stackability by cpp-flag
+
+Modified: trunk/apps/s3dosm/db.c
+===================================================================
+--- trunk/apps/s3dosm/db.c	2006-11-27 16:10:05 UTC (rev 492)
++++ trunk/apps/s3dosm/db.c	2006-11-28 12:27:46 UTC (rev 493)
+@@ -73,13 +73,6 @@
+ 	char addquery[MAXQ];
+ 	tagid= db_insert_tags(node-&gt;base.tag_n,node-&gt;base.tag_p);
+ 	
+-/*	snprintf(addquery,MAXQ,&quot;INSERT INTO node (layer_id,latitude,longitude,altitude, visible, tag_id) VALUES (%d, %f, %f, %f, %d, %d);&quot;,
+-					(int)node-&gt;base.layerid,
+-					node-&gt;lat,
+-					node-&gt;lon,
+-					node-&gt;alt,
+-					node-&gt;visible, 
+-					tagid);*/
+ 	if (node-&gt;base.id==-1) /* give own id */
+ 		snprintf(addquery,MAXQ,&quot;INSERT INTO node (layer_id, latitude, longitude, altitude, visible, tag_id) VALUES (%d, %f, %f, %f, %d, %d);&quot;,
+ 						(int)node-&gt;base.layerid,				node-&gt;lat,		node-&gt;lon,		node-&gt;alt,		node-&gt;visible, 		tagid);
+@@ -93,12 +86,31 @@
+ 
+ int db_insert_segment(segment_t *seg)
+ {
+-	/* TODO */
++	int tagid;
++	char addquery[MAXQ];
++	tagid= db_insert_tags(seg-&gt;base.tag_n,seg-&gt;base.tag_p);
++
++/*	if (seg-&gt;base.id==-1) / * give own id * /
++		snprintf(addquery,MAXQ,&quot;INSERT INTO segment (layer_id, node_from, node_to, tag_id) VALUES (%d, %d, %d), %d;&quot;,
++						(int)seg-&gt;base.layerid,				(int)seg-&gt;from, (int)seg-&gt;to,	tagid );
++	else*/
++		snprintf(addquery,MAXQ,&quot;INSERT INTO segment (layer_id, seg_id, node_from, node_to, tag_id) VALUES (%d, %d, %d, %d, %d);&quot;,
++						(int)seg-&gt;base.layerid,(int)seg-&gt;base.id,(int)seg-&gt;from, (int)seg-&gt;to,	tagid );
++	db_exec(addquery, NULL, 0);
++
+ 	return(0);
+ }
+ int db_insert_way(way_t *way)
+ {
+-	/* TODO */
++	int tagid,i;
++	char addquery[MAXQ];
++	tagid= db_insert_tags(way-&gt;base.tag_n,way-&gt;base.tag_p);
++	snprintf(addquery,MAXQ,&quot;INSERT INTO way (layer_id, way_id, tag_id) VALUES (%d, %d, %d);&quot;,(int)way-&gt;base.layerid, (int)way-&gt;base.id, tagid );
++	db_exec(addquery, NULL, 0);
++	for (i=0;i&lt;way-&gt;seg_n;i++) {
++		snprintf(addquery,MAXQ,&quot;UPDATE segment SET way_id=%d WHERE seg_id=%d AND layer_id=%d;&quot;,(int)way-&gt;base.id,(int)way-&gt;seg_p[i],(int)way-&gt;base.layerid );
++		db_exec(addquery, NULL, 0);
++	}
+ 	return(0);
+ }
+ int db_insert_layer(char *layer_name)
+@@ -172,17 +184,20 @@
+ }
+ int db_exec(const char *query, sqlite3_callback callback, void *arg)
+ {
+-	int len;
+ 	int ret;
++#ifdef DB_STACK
+ 	if (callback==NULL) /* we can stack it */
+ 	{
++		int len;
+ 		len=strlen(query);
+ 		if (len+qlen&gt;=QBUF)
+ 			db_flush();
+ 		strncat(qbuf,query,QBUF);
+ 		qlen+=strlen(query);
+ 		ret=0;
+-	} else {
++	} else 
++#endif
++	{
+ 		ret=db_really_exec(query,callback,arg);		/* pass it to the real function */
+ 	}
+ 	return(ret);
+@@ -216,8 +231,8 @@
+ 	db_exec(&quot;CREATE TABLE tag (tag_id INT, tagkey TEXT, tagvalue TEXT);&quot;, NULL, 0);
+ 	db_exec(&quot;CREATE TABLE layer (layer_id INTEGER PRIMARY KEY, name TEXT, UNIQUE(layer_id));&quot;, NULL, 0);
+ 	db_exec(&quot;CREATE TABLE node (layer_id INT, node_id INTEGER PRIMARY KEY, latitude DOUBLE PRECISION, longitude DOUBLE PRECISION, altitude DOUBLE PRECISION, visible BOOLEAN, tag_id INT, UNIQUE(layer_id,node_id));&quot;,NULL,0);
+-	db_exec(&quot;CREATE TABLE segment (layer INT, seg_id INTEGER PRIMARY KEY, node_from INT, node_to INT, tag_id INT, way_id INT,UNIQUE(layer,seg_id));&quot;, NULL, 0);
+-	db_exec(&quot;CREATE TABLE way (way_id INTEGER PRIMARY KEY, tag_id INT, UNIQUE(way_id));&quot;, NULL, 0);
++	db_exec(&quot;CREATE TABLE segment (layer_id INT, seg_id INTEGER PRIMARY KEY, node_from INT, node_to INT, tag_id INT, way_id INT,UNIQUE(layer_id,seg_id));&quot;, NULL, 0);
++	db_exec(&quot;CREATE TABLE way (layer_id INTEGER, way_id INTEGER PRIMARY KEY, tag_id INT, UNIQUE(layer_id,way_id));&quot;, NULL, 0);
+ 	db_flush();
+ 	return(0);
+ }
+
+Modified: trunk/apps/s3dosm/s3dosm.h
+===================================================================
+--- trunk/apps/s3dosm/s3dosm.h	2006-11-27 16:10:05 UTC (rev 492)
++++ trunk/apps/s3dosm/s3dosm.h	2006-11-28 12:27:46 UTC (rev 493)
+@@ -1,5 +1,7 @@
+ #define	ESIZE	637800		/* earth size */
+ #define	RESCALE	1
++/* stack it */
++/* #define DB_STACK	1*/
+ 
+ typedef struct _layer_t layer_t;
+ typedef struct _adj_t adj_t;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000485.html">[S3d-svn] r492 - in trunk: . apps/kism3d
+</A></li>
+	<LI>Next message: <A HREF="000487.html">[S3d-svn] r494 - trunk/apps/kism3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#486">[ date ]</a>
+              <a href="thread.html#486">[ thread ]</a>
+              <a href="subject.html#486">[ subject ]</a>
+              <a href="author.html#486">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

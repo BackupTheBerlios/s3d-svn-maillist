@@ -1,0 +1,398 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r891 - in trunk: libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-January/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r891%20-%20in%20trunk%3A%20libs3d%20libs3dw&In-Reply-To=%3C200801072324.m07NOSbQ029161%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000883.html">
+   <LINK REL="Next"  HREF="000885.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r891 - in trunk: libs3d libs3dw</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r891%20-%20in%20trunk%3A%20libs3d%20libs3dw&In-Reply-To=%3C200801072324.m07NOSbQ029161%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r891 - in trunk: libs3d libs3dw">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan  8 00:24:28 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000883.html">[S3d-svn] r890 - in trunk: apps/dot_mcp libs3d
+</A></li>
+        <LI>Next message: <A HREF="000885.html">[S3d-svn] r892 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#884">[ date ]</a>
+              <a href="thread.html#884">[ thread ]</a>
+              <a href="subject.html#884">[ subject ]</a>
+              <a href="author.html#884">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-01-08 00:24:27 +0100 (Tue, 08 Jan 2008)
+New Revision: 891
+
+Modified:
+   trunk/libs3d/s3d.h
+   trunk/libs3d/s3dlib.h
+   trunk/libs3dw/s3dw.h
+Log:
+Manually mark functions to export for icc
+
+ICC 9.0 doesnt support gcc's pragmas to export many functions at once. We will
+produce a shared object without any exported functions when somebody tries to
+compile s3d with a new version of intels compiler suite.
+
+
+Modified: trunk/libs3d/s3d.h
+===================================================================
+--- trunk/libs3d/s3d.h	2008-01-07 23:24:15 UTC (rev 890)
++++ trunk/libs3d/s3d.h	2008-01-07 23:24:27 UTC (rev 891)
+@@ -23,6 +23,12 @@
+ #ifndef LIBS3D_H
+ #define LIBS3D_H
+ 
++#ifdef HAVE_GCCVISIBILITY
++#define S3DEXPORT __attribute__ ((visibility(&quot;default&quot;)))
++#else
++#define S3DEXPORT
++#endif
++
+ #include &lt;stdint.h&gt;  /* [u]intXX_t type definitions*/
+ /* definitions */
+ struct s3d_evt {
+@@ -81,113 +87,107 @@
+ };
+ 
+ /* framework functions */
+-#ifdef HAVE_GCCVISIBILITY
+-#pragma GCC visibility push(default) /* Only export following functions */
+-#endif
+-void s3d_usage(void);
+-int s3d_init(int *argc, char ***argv, char *name);
+-int s3d_quit(void);
+-int s3d_mainloop(void (*f)(void));
++S3DEXPORT void s3d_usage(void);
++S3DEXPORT int s3d_init(int *argc, char ***argv, char *name);
++S3DEXPORT int s3d_quit(void);
++S3DEXPORT int s3d_mainloop(void (*f)(void));
+ 
+ /* object manipulations */
+-int s3d_push_vertex(int object, float x, float y, float z);
+-int s3d_push_vertices(int object, float *vbuf, uint16_t n);
+-int s3d_push_material(int object,
++S3DEXPORT int s3d_push_vertex(int object, float x, float y, float z);
++S3DEXPORT int s3d_push_vertices(int object, float *vbuf, uint16_t n);
++S3DEXPORT int s3d_push_material(int object,
+                       float amb_r, float amb_g, float amb_b,
+                       float spec_r, float spec_g, float spec_b,
+                       float diff_r, float diff_g, float diff_b);
+-int s3d_pep_material(int object,
++S3DEXPORT int s3d_pep_material(int object,
+                      float amb_r, float amb_g, float amb_b,
+                      float spec_r, float spec_g, float spec_b,
+                      float diff_r, float diff_g, float diff_b);
+-int s3d_push_material_a(int object,
++S3DEXPORT int s3d_push_material_a(int object,
+                         float amb_r, float amb_g, float amb_b, float amb_a,
+                         float spec_r, float spec_g, float spec_b, float spec_a,
+                         float diff_r, float diff_g, float diff_b, float diff_a);
+-int s3d_push_materials_a(int object, float *mbuf, uint16_t n);
+-int s3d_pep_material_a(int object,
++S3DEXPORT int s3d_push_materials_a(int object, float *mbuf, uint16_t n);
++S3DEXPORT int s3d_pep_material_a(int object,
+                        float amb_r, float amb_g, float amb_b, float amb_a,
+                        float spec_r, float spec_g, float spec_b, float spec_a,
+                        float diff_r, float diff_g, float diff_b, float diff_a);
+ 
+-int s3d_pep_materials_a(int object, float *mbuf, uint16_t n);
+-int s3d_load_materials_a(int object, float *mbuf, uint32_t start, uint16_t n);
+-int s3d_push_polygon(int object, uint32_t v1, uint32_t v2, uint32_t v3, uint32_t material);
+-int s3d_push_polygons(int object, uint32_t *pbuf, uint16_t n);
+-int s3d_push_line(int object, uint32_t v1, uint32_t v2, uint32_t material);
+-int s3d_push_lines(int object, uint32_t *lbuf, uint16_t n);
+-int s3d_push_texture(int object, uint16_t w, uint16_t h);
+-int s3d_push_textures(int object, uint16_t *tbuf, uint16_t n);
+-int s3d_pop_vertex(int object, uint32_t n);
+-int s3d_pop_polygon(int object, uint32_t n);
+-int s3d_pop_material(int object, uint32_t n);
+-int s3d_pop_texture(int object, uint32_t n);
+-int s3d_pop_polygon(int object, uint32_t n);
+-int s3d_pop_line(int object, uint32_t n);
+-int s3d_pep_line_normals(int object, float *nbuf, uint16_t n);
+-int s3d_pep_polygon_normals(int object, float *nbuf, uint16_t n);
+-int s3d_pep_polygon_tex_coord(int object, float x1, float y1, float x2, float y2, float x3, float y3);
+-int s3d_pep_polygon_tex_coords(int object, float *tbuf, uint16_t n);
+-int s3d_pep_material_texture(int object, uint32_t tex);
+-int s3d_pep_vertex(int object, float x, float y, float z);
+-int s3d_pep_vertices(int object, float *vbuf, uint16_t n);
+-int s3d_pep_line(int object, int v1, int v2, int material);
+-int s3d_pep_lines(int object, uint32_t *lbuf, uint16_t n);
+-int s3d_load_line_normals(int object, float *nbuf, uint32_t start, uint16_t n);
+-int s3d_load_polygon_normals(int object, float *nbuf, uint32_t start, uint16_t n);
+-int s3d_load_polygon_tex_coords(int object, float *tbuf, uint32_t start, uint16_t n);
+-int s3d_load_texture(int object, uint32_t tex, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h, uint8_t *data);
++S3DEXPORT int s3d_pep_materials_a(int object, float *mbuf, uint16_t n);
++S3DEXPORT int s3d_load_materials_a(int object, float *mbuf, uint32_t start, uint16_t n);
++S3DEXPORT int s3d_push_polygon(int object, uint32_t v1, uint32_t v2, uint32_t v3, uint32_t material);
++S3DEXPORT int s3d_push_polygons(int object, uint32_t *pbuf, uint16_t n);
++S3DEXPORT int s3d_push_line(int object, uint32_t v1, uint32_t v2, uint32_t material);
++S3DEXPORT int s3d_push_lines(int object, uint32_t *lbuf, uint16_t n);
++S3DEXPORT int s3d_push_texture(int object, uint16_t w, uint16_t h);
++S3DEXPORT int s3d_push_textures(int object, uint16_t *tbuf, uint16_t n);
++S3DEXPORT int s3d_pop_vertex(int object, uint32_t n);
++S3DEXPORT int s3d_pop_polygon(int object, uint32_t n);
++S3DEXPORT int s3d_pop_material(int object, uint32_t n);
++S3DEXPORT int s3d_pop_texture(int object, uint32_t n);
++S3DEXPORT int s3d_pop_polygon(int object, uint32_t n);
++S3DEXPORT int s3d_pop_line(int object, uint32_t n);
++S3DEXPORT int s3d_pep_line_normals(int object, float *nbuf, uint16_t n);
++S3DEXPORT int s3d_pep_polygon_normals(int object, float *nbuf, uint16_t n);
++S3DEXPORT int s3d_pep_polygon_tex_coord(int object, float x1, float y1, float x2, float y2, float x3, float y3);
++S3DEXPORT int s3d_pep_polygon_tex_coords(int object, float *tbuf, uint16_t n);
++S3DEXPORT int s3d_pep_material_texture(int object, uint32_t tex);
++S3DEXPORT int s3d_pep_vertex(int object, float x, float y, float z);
++S3DEXPORT int s3d_pep_vertices(int object, float *vbuf, uint16_t n);
++S3DEXPORT int s3d_pep_line(int object, int v1, int v2, int material);
++S3DEXPORT int s3d_pep_lines(int object, uint32_t *lbuf, uint16_t n);
++S3DEXPORT int s3d_load_line_normals(int object, float *nbuf, uint32_t start, uint16_t n);
++S3DEXPORT int s3d_load_polygon_normals(int object, float *nbuf, uint32_t start, uint16_t n) ;
++S3DEXPORT int s3d_load_polygon_tex_coords(int object, float *tbuf, uint32_t start, uint16_t n);
++S3DEXPORT int s3d_load_texture(int object, uint32_t tex, uint16_t xpos, uint16_t ypos, uint16_t w, uint16_t h, uint8_t *data);
+ 
+-int s3d_new_object(void);
+-int s3d_del_object(int oid);
++S3DEXPORT int s3d_new_object(void);
++S3DEXPORT int s3d_del_object(int oid);
+ 
+-int s3d_clone(int oid);
+-int s3d_clone_target(int oid, int toid);
++S3DEXPORT int s3d_clone(int oid);
++S3DEXPORT int s3d_clone_target(int oid, int toid);
+ 
+-int s3d_link(int oid_from, int oid_to);
+-int s3d_unlink(int oid);
++S3DEXPORT int s3d_link(int oid_from, int oid_to);
++S3DEXPORT int s3d_unlink(int oid);
+ 
+-int s3d_flags_on(int object, uint32_t flags);
+-int s3d_flags_off(int object, uint32_t flags);
+-int s3d_translate(int object, float x, float y, float z);
+-int s3d_rotate(int object, float x, float y, float z);
+-int s3d_scale(int object, float s);
++S3DEXPORT int s3d_flags_on(int object, uint32_t flags);
++S3DEXPORT int s3d_flags_off(int object, uint32_t flags);
++S3DEXPORT int s3d_translate(int object, float x, float y, float z);
++S3DEXPORT int s3d_rotate(int object, float x, float y, float z);
++S3DEXPORT int s3d_scale(int object, float s);
+ 
+ /* high-level object creating */
+-int s3d_import_model_file(char *fname);
+-int s3d_open_file(char *fname, char **pointer);
+-int s3d_select_font(char *mask);
+-int s3d_draw_string(char *str, float *xlen);
+-float s3d_strlen(char *str);
++S3DEXPORT int s3d_import_model_file(char *fname);
++S3DEXPORT int s3d_open_file(char *fname, char **pointer);
++S3DEXPORT int s3d_select_font(char *mask);
++S3DEXPORT int s3d_draw_string(char *str, float *xlen);
++S3DEXPORT float s3d_strlen(char *str);
+ 
+ /* some vector calculation helpers */
+ 
+-float s3d_vector_length(float vector[]);
+-float s3d_vector_dot_product(float vector1[], float vector2[]);
+-void s3d_vector_subtract(float vector1[], float vector2[], float result_vector[]);
+-float s3d_vector_angle(float vector1[], float vector2[]);
+-float s3d_angle_to_cam(float obj_pos[], float cam_pos[], float *angle_rad);
+-void s3d_vector_cross_product(float vector1[], float vector2[], float result_vector[]);
++S3DEXPORT float s3d_vector_length(float vector[]);
++S3DEXPORT float s3d_vector_dot_product(float vector1[], float vector2[]);
++S3DEXPORT void s3d_vector_subtract(float vector1[], float vector2[], float result_vector[]);
++S3DEXPORT float s3d_vector_angle(float vector1[], float vector2[]);
++S3DEXPORT float s3d_angle_to_cam(float obj_pos[], float cam_pos[], float *angle_rad);
++S3DEXPORT void s3d_vector_cross_product(float vector1[], float vector2[], float result_vector[]);
+ 
+ /* event handlers */
+-void s3d_push_event(struct s3d_evt *newevt);
+-struct s3d_evt *s3d_pop_event(void);
+-struct s3d_evt *s3d_find_event(uint8_t event);
+-int s3d_delete_event(struct s3d_evt *devt);
++S3DEXPORT void s3d_push_event(struct s3d_evt *newevt);
++S3DEXPORT struct s3d_evt *s3d_pop_event(void);
++S3DEXPORT struct s3d_evt *s3d_find_event(uint8_t event);
++S3DEXPORT int s3d_delete_event(struct s3d_evt *devt);
+ 
+-void s3d_set_callback(uint8_t event, s3d_cb func);
+-void s3d_clear_callback(uint8_t event);
+-void s3d_ignore_callback(uint8_t event);
+-s3d_cb s3d_get_callback(uint8_t event);
+-void s3d_process_stack(void);
++S3DEXPORT void s3d_set_callback(uint8_t event, s3d_cb func);
++S3DEXPORT void s3d_clear_callback(uint8_t event);
++S3DEXPORT void s3d_ignore_callback(uint8_t event);
++S3DEXPORT s3d_cb s3d_get_callback(uint8_t event);
++S3DEXPORT void s3d_process_stack(void);
+ 
+ /* mcp special */
+-int s3d_mcp_focus(int object);
++S3DEXPORT int s3d_mcp_focus(int object);
+ 
+ /* for apps which don't employ s3d_mainloop() */
+-int s3d_net_check(void);
+-#ifdef HAVE_GCCVISIBILITY
+-#pragma GCC visibility pop
+-#endif
++S3DEXPORT int s3d_net_check(void);
+ 
+ #endif
+
+Modified: trunk/libs3d/s3dlib.h
+===================================================================
+--- trunk/libs3d/s3dlib.h	2008-01-07 23:24:15 UTC (rev 890)
++++ trunk/libs3d/s3dlib.h	2008-01-07 23:24:27 UTC (rev 891)
+@@ -41,6 +41,12 @@
+ #endif
+ #endif
+ 
++#ifdef HAVE_GCCVISIBILITY
++#define S3DEXPORT __attribute__ ((visibility(&quot;default&quot;)))
++#else
++#define S3DEXPORT
++#endif
++
+ #define VLOW 1
+ #define LOW  2
+ #define MED  3
+@@ -90,16 +96,9 @@
+ } __attribute__((__packed__));
+ 
+ #ifdef DEBUG
+-#ifdef HAVE_GCCVISIBILITY
+-#pragma GCC visibility push(default) /* Only export following functions */
+-#endif
+-void s3dprintf(int relevance, const char *fmt, ...);
+-void errdn(int relevance, char *func, int en);
+-void errds(int relevance, char *func, const char *fmt, ...);
+-#ifdef HAVE_GCCVISIBILITY
+-#pragma GCC visibility pop
+-#endif
+-
++S3DEXPORT void s3dprintf(int relevance, const char *fmt, ...);
++S3DEXPORT void errdn(int relevance, char *func, int en);
++S3DEXPORT void errds(int relevance, char *func, const char *fmt, ...);
+ #else
+ static __inline__ void s3dprintf(int S3DUNUSED(relevance),
+                                  const char *S3DUNUSED(fmt), ...) {}
+
+Modified: trunk/libs3dw/s3dw.h
+===================================================================
+--- trunk/libs3dw/s3dw.h	2008-01-07 23:24:15 UTC (rev 890)
++++ trunk/libs3dw/s3dw.h	2008-01-07 23:24:27 UTC (rev 891)
+@@ -28,6 +28,12 @@
+ #endif
+ #include &lt;stdint.h&gt;  /* [u]intXX_t type definitions*/
+ 
++#ifdef HAVE_GCCVISIBILITY
++#define S3DWEXPORT __attribute__ ((visibility(&quot;default&quot;)))
++#else
++#define S3DWEXPORT
++#endif
++
+ /* we want this widget visible, as long as the widgets below are also visible.
+  * on for all widgets, except surfaces which have to be switched visible
+  * with s3dw_show() */
+@@ -160,38 +166,32 @@
+ 	float title_text_mat[12]; /* material for the text on the title bar */
+ };
+ /* button.c */
+-#ifdef HAVE_GCCVISIBILITY
+-#pragma GCC visibility push(default) /* Only export following functions */
+-#endif
+-s3dw_button   *s3dw_button_new(s3dw_surface *surface, char *text, float posx, float posy);
+-s3dw_label    *s3dw_label_new(s3dw_surface *surface, char *text, float posx, float posy);
+-s3dw_input    *s3dw_input_new(s3dw_surface *surface, float width, float posx, float posy);
+-s3dw_textbox   *s3dw_textbox_new(s3dw_surface *surface, char *text, float posx, float posy, float width, float height);
+-char     *s3dw_input_gettext(s3dw_input *input);
+-void      s3dw_input_change_text(s3dw_input *input, char *text);
+-void      s3dw_label_change_text(s3dw_label *label, char *text);
+-s3dw_surface   *s3dw_surface_new(char *title, float width, float height);
++S3DWEXPORT s3dw_button   *s3dw_button_new(s3dw_surface *surface, char *text, float posx, float posy);
++S3DWEXPORT s3dw_label    *s3dw_label_new(s3dw_surface *surface, char *text, float posx, float posy);
++S3DWEXPORT s3dw_input    *s3dw_input_new(s3dw_surface *surface, float width, float posx, float posy);
++S3DWEXPORT s3dw_textbox   *s3dw_textbox_new(s3dw_surface *surface, char *text, float posx, float posy, float width, float height);
++S3DWEXPORT char     *s3dw_input_gettext(s3dw_input *input);
++S3DWEXPORT void      s3dw_input_change_text(s3dw_input *input, char *text);
++S3DWEXPORT void      s3dw_label_change_text(s3dw_label *label, char *text);
++S3DWEXPORT s3dw_surface   *s3dw_surface_new(char *title, float width, float height);
+ 
+-s3dw_widget   *s3dw_getroot(void);
+-void     s3dw_moveit(s3dw_widget *widget);
+-void      s3dw_delete(s3dw_widget *widget);
+-void      s3dw_show(s3dw_widget *widget);
+-void      s3dw_focus(s3dw_widget *focus);
++S3DWEXPORT s3dw_widget   *s3dw_getroot(void);
++S3DWEXPORT void     s3dw_moveit(s3dw_widget *widget);
++S3DWEXPORT void      s3dw_delete(s3dw_widget *widget);
++S3DWEXPORT void      s3dw_show(s3dw_widget *widget);
++S3DWEXPORT void      s3dw_focus(s3dw_widget *focus);
+ 
+-void      s3dw_textbox_scrollup(s3dw_textbox *textbox);
+-void      s3dw_textbox_scrolldown(s3dw_textbox *textbox);
+-void      s3dw_textbox_scrollleft(s3dw_textbox *textbox);
+-void      s3dw_textbox_scrollright(s3dw_textbox *textbox);
+-void      s3dw_textbox_scrollto(s3dw_textbox *textbox, int x, int y);
+-void      s3dw_textbox_change_text(s3dw_textbox *textbox, char *text);
++S3DWEXPORT void      s3dw_textbox_scrollup(s3dw_textbox *textbox);
++S3DWEXPORT void      s3dw_textbox_scrolldown(s3dw_textbox *textbox);
++S3DWEXPORT void      s3dw_textbox_scrollleft(s3dw_textbox *textbox);
++S3DWEXPORT void      s3dw_textbox_scrollright(s3dw_textbox *textbox);
++S3DWEXPORT void      s3dw_textbox_scrollto(s3dw_textbox *textbox, int x, int y);
++S3DWEXPORT void      s3dw_textbox_change_text(s3dw_textbox *textbox, char *text);
+ 
+-int      s3dw_handle_click(struct s3d_evt *evt);
+-int      s3dw_handle_key(struct s3d_evt *evt);
+-int      s3dw_object_info(struct s3d_evt *evt);
++S3DWEXPORT int      s3dw_handle_click(struct s3d_evt *evt);
++S3DWEXPORT int      s3dw_handle_key(struct s3d_evt *evt);
++S3DWEXPORT int      s3dw_object_info(struct s3d_evt *evt);
+ 
+-void      s3dw_ani_mate(void);
+-#ifdef HAVE_GCCVISIBILITY
+-#pragma GCC visibility pop
+-#endif
++S3DWEXPORT void      s3dw_ani_mate(void);
+ 
+ #endif
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000883.html">[S3d-svn] r890 - in trunk: apps/dot_mcp libs3d
+</A></li>
+	<LI>Next message: <A HREF="000885.html">[S3d-svn] r892 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#884">[ date ]</a>
+              <a href="thread.html#884">[ thread ]</a>
+              <a href="subject.html#884">[ subject ]</a>
+              <a href="author.html#884">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

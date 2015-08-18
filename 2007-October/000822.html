@@ -1,0 +1,464 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r829 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r829%20-%20trunk/server&In-Reply-To=%3C200710301651.l9UGp8Md031050%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000821.html">
+   <LINK REL="Next"  HREF="000823.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r829 - trunk/server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r829%20-%20trunk/server&In-Reply-To=%3C200710301651.l9UGp8Md031050%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r829 - trunk/server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Oct 30 17:51:08 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000821.html">[S3d-svn] r828 - in trunk: . server
+</A></li>
+        <LI>Next message: <A HREF="000823.html">[S3d-svn] r830 - trunk/Documentation/manpages
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#822">[ date ]</a>
+              <a href="thread.html#822">[ thread ]</a>
+              <a href="subject.html#822">[ subject ]</a>
+              <a href="author.html#822">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-30 17:51:06 +0100 (Tue, 30 Oct 2007)
+New Revision: 829
+
+Removed:
+   trunk/server/graphics_glut.c
+   trunk/server/user_glut.c
+Modified:
+   trunk/server/global.h
+   trunk/server/graphics.c
+   trunk/server/main.c
+   trunk/server/user.c
+Log:
+server: Remove GLUT specific parts
+
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2007-10-30 16:43:49 UTC (rev 828)
++++ trunk/server/global.h	2007-10-30 16:51:06 UTC (rev 829)
+@@ -33,7 +33,7 @@
+ #include &lt;sys/shm.h&gt; /* key_t */
+ #endif
+ /*  variables and defines */
+-extern int frame_mode;   /*  GLUT, SDL, ... ? */
++extern int frame_mode;   /*  SDL, ... ? */
+ extern int running;   /*  server running flag */
+ /*  relevance macros */
+ #ifndef S3DUNUSED
+@@ -201,7 +201,6 @@
+ };
+ enum {
+ 	zero,
+-	FRAME_GLUT,
+ 	FRAME_SDL
+ };
+ /*  main.c */
+@@ -264,10 +263,6 @@
+ int user_init(void);
+ int user_quit(void);
+ int user_main(void);
+-#ifdef G_GLUT
+-int user_init_glut(void);
+-int user_quit_glut(void);
+-#endif
+ #ifdef G_SDL
+ int user_init_sdl(void);
+ int user_quit_sdl(void);
+@@ -298,10 +293,6 @@
+ int graphics_pick_obj(int x, int y);
+ int graphics_init(void);
+ int render_by_mcp(void);
+-#ifdef G_GLUT
+-int graphics_init_glut(void);
+-int graphics_quit_glut(void);
+-#endif
+ #ifdef G_SDL
+ extern int aa_level;
+ extern int SDLFlags;
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2007-10-30 16:43:49 UTC (rev 828)
++++ trunk/server/graphics.c	2007-10-30 16:51:06 UTC (rev 829)
+@@ -25,10 +25,6 @@
+ #include &lt;stdlib.h&gt;   /*  malloc() */
+ #include &lt;string.h&gt;   /*  memcpy() */
+ 
+-#ifdef G_GLUT
+-#include &lt;GL/glut.h&gt;   /*  glutSwapBuffers() */
+-#endif
+-
+ #include &lt;GL/gl.h&gt;   /*  GLint */
+ #ifdef G_SDL
+ #include &lt;SDL.h&gt;  /*  SDL_GL_SwapBuffers */
+@@ -55,11 +51,6 @@
+ 		graphics_init_sdl();
+ 		break;
+ #endif
+-#ifdef G_GLUT
+-	case FRAME_GLUT:
+-		graphics_init_glut();
+-		break;
+-#endif
+ 	default:
+ 		return(-1);
+ 	}
+@@ -371,12 +362,6 @@
+ 	glMultMatrixf(m);
+ 
+ 	switch (frame_mode) {
+-#ifdef G_GLUT
+-	case FRAME_GLUT:
+-		glFlush();
+-		glutSwapBuffers();
+-		break;
+-#endif
+ #ifdef G_SDL
+ 	case FRAME_SDL:
+ 		/* SDL will glFlush itself */
+
+Deleted: trunk/server/graphics_glut.c
+===================================================================
+--- trunk/server/graphics_glut.c	2007-10-30 16:43:49 UTC (rev 828)
++++ trunk/server/graphics_glut.c	2007-10-30 16:51:06 UTC (rev 829)
+@@ -1,55 +0,0 @@
+-/*
+- * graphics_glut.c
+- *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+- *
+- * This file is part of s3d, a 3d network display server.
+- * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+- *
+- * s3d is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- *
+- * s3d is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with s3d; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- */
+-
+-
+-/*  this is the file for operation with glut ... */
+-/*  maybe we are able to choose if we want to use glut or sdl or any other lib later ... */
+-
+-#include &quot;global.h&quot;
+-#include &lt;stdio.h&gt;  /* NULL */
+-#include &lt;GL/glut.h&gt;   /*  all the glut functions */
+-#include &lt;GL/gl.h&gt;   /*  of course, the gl header */
+-#include &lt;stdlib.h&gt;  /* atexit() */
+-/*  glut version of graphics init ... */
+-int graphics_init_glut(void)
+-{
+-	/* XXX: Faking argc and argv is probably not a good idea. */
+-	int argc = 1;
+-	char *argv[] = {&quot;s3d&quot;, NULL};
+-	s3dprintf(MED, &quot;Using GLUT for GL/windowing ...&quot;);
+-	glutInit(&amp;argc, argv);
+-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGBA);
+-	glutInitWindowSize(X_RES, Y_RES);
+-	glutCreateWindow(&quot;grmbl&quot;);
+-	glutIdleFunc(one_time);
+-	if (0 != (atexit(quit)))
+-		s3dprintf(MED, &quot;Error in setting Exit function ...&quot;);
+-	glutDisplayFunc(graphics_main);
+-	glutReshapeFunc(graphics_reshape);
+-	return(0);
+-}
+-/*  nothing to be done ... */
+-int graphics_quit_glut(void)
+-{
+-	return(0);
+-}
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2007-10-30 16:43:49 UTC (rev 828)
++++ trunk/server/main.c	2007-10-30 16:51:06 UTC (rev 829)
+@@ -26,9 +26,6 @@
+ #include &lt;time.h&gt;   /* nanosleep() */
+ #include &lt;stdlib.h&gt;   /* exit() */
+ #include &lt;unistd.h&gt;   /* sleep(), fork() */
+-#ifdef G_GLUT
+-#include &lt;GL/glut.h&gt;   /*  glutMainLoop() */
+-#endif
+ #define  X_RES 800
+ #define  Y_RES 600
+ #include &lt;getopt.h&gt;   /*  getopt() */
+@@ -156,10 +153,7 @@
+ #ifdef G_SDL
+ 		frame_mode = FRAME_SDL;
+ #else
+-#ifdef G_GLUT
+-		frame_mode = FRAME_GLUT;
+ #endif
+-#endif
+ 	}
+ 	if (!frame_mode) {
+ 		errsf(&quot;init()&quot;, &quot;no framework mode available&quot;);
+@@ -206,19 +200,12 @@
+ 	int      c;
+ 	struct option long_options[] = {
+ 		{&quot;multisample&quot;,  1, NULL, 'm'
+-		}, {&quot;rc&quot;,    1, NULL, 'r'}, {&quot;help&quot;,   0, NULL, 'h'}, {&quot;use-glut&quot;,  0, NULL, 'g'}, {&quot;use-sdl&quot;,   0, NULL, 's'}, {&quot;no-rc&quot;,   0, NULL, 'n'}, {NULL, 0, NULL, 0}
++		}, {&quot;rc&quot;,    1, NULL, 'r'}, {&quot;help&quot;,   0, NULL, 'h'}, {&quot;use-sdl&quot;,   0, NULL, 's'}, {&quot;no-rc&quot;,   0, NULL, 'n'}, {NULL, 0, NULL, 0}
+ 	};
+ 	while (-1 != (c = getopt_long(argc, argv, &quot;?hgsnr:m:&quot;, long_options, &amp;lopt_idx))) {
+ 		switch (c) {
+ 		case 0:
+ 			break;
+-		case 'g':
+-#ifdef G_GLUT
+-			frame_mode = FRAME_GLUT;
+-#else
+-			errsf(&quot;process_args()&quot;, &quot;sorry, GLUT is not available&quot;);
+-#endif
+-			break;
+ 		case 's':
+ #ifdef G_SDL
+ 			frame_mode = FRAME_SDL;
+@@ -249,9 +236,6 @@
+ 			s3dprintf(VHIGH, &quot; --multisample, -m:\tSpecify Multisampling level (antialiasing) if available.\n\t\t(value 1-16, default 4, 0 = off),&quot;);
+ 			s3dprintf(VHIGH, &quot; --rc, -r:\tspecify a rc (startup script)&quot;);
+ 			s3dprintf(VHIGH, &quot; --no-rc, -n:\tdon't use a rc file (useful for debugging mcp's)&quot;);
+-#ifdef G_GLUT
+-			s3dprintf(VHIGH, &quot; --use-glut, -g:\tuse GLUT as framework-system&quot;);
+-#endif
+ #ifdef G_SDL
+ 			s3dprintf(VHIGH, &quot; --use-sdl, -s:\tuse SDL as framework-system&quot;);
+ #endif
+@@ -267,15 +251,7 @@
+ {
+ 	process_args(argc, argv);
+ 	init();
+-	switch (frame_mode) {
+-#ifdef G_GLUT
+-	case FRAME_GLUT:
+-		glutMainLoop();
+-		break;
+-#endif
+-	default:
+-		mainloop();
+-	}
++	mainloop();
+ 	quit();
+ 	return(0);
+ }
+
+Modified: trunk/server/user.c
+===================================================================
+--- trunk/server/user.c	2007-10-30 16:43:49 UTC (rev 828)
++++ trunk/server/user.c	2007-10-30 16:51:06 UTC (rev 829)
+@@ -30,11 +30,6 @@
+ int user_init(void)
+ {
+ 	switch (frame_mode) {
+-#ifdef G_GLUT
+-	case FRAME_GLUT:
+-		user_init_glut();
+-		break;
+-#endif
+ #ifdef G_SDL
+ 	case FRAME_SDL:
+ 		user_init_sdl();
+@@ -50,10 +45,6 @@
+ int user_main(void)
+ {
+ 	switch (frame_mode) {
+-#ifdef G_GLUT
+-	case FRAME_GLUT:
+-		return(0);  /*  glut uses callback functions */
+-#endif
+ #ifdef G_SDL
+ 	case FRAME_SDL:
+ 		user_main_sdl();
+
+Deleted: trunk/server/user_glut.c
+===================================================================
+--- trunk/server/user_glut.c	2007-10-30 16:43:49 UTC (rev 828)
++++ trunk/server/user_glut.c	2007-10-30 16:51:06 UTC (rev 829)
+@@ -1,133 +0,0 @@
+-/*
+- * user_glut.c
+- *
+- * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+- *
+- * This file is part of s3d, a 3d network display server.
+- * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+- *
+- * s3d is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- *
+- * s3d is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with s3d; if not, write to the Free Software
+- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- */
+-
+-
+-#include &quot;global.h&quot;
+-#include &lt;GL/glut.h&gt;   /*  all the glut functions */
+-#include &lt;s3d_keysym.h&gt; /* our very own (haha) keysyms */
+-/*  local prototypes */
+-void keyboard(uint8_t key, int x, int y);
+-void special(int skey, int x, int y);
+-void mouse_motion(int x, int y);
+-void passive_mouse_motion(int x, int y);
+-
+-/*  init user input things for glut */
+-int user_init_glut(void)
+-{
+-	s3dprintf(MED, &quot;using GLUT for user input&quot;);
+-	glutKeyboardFunc(keyboard);
+-	glutSpecialFunc(special);
+-	glutMouseFunc(user_mouse);
+-	glutMotionFunc(mouse_motion);
+-	glutPassiveMotionFunc(passive_mouse_motion);
+-	return(0);
+-}
+-
+-void keyboard(uint8_t key, int S3DUNUSED(x), int S3DUNUSED(y))
+-{
+-	user_key(key, key, 0, 0);
+-	user_key(key, key, 0, 1);
+-}
+-void special(int skey, int S3DUNUSED(x), int S3DUNUSED(y))
+-{
+-	uint16_t mkey;
+-	switch (skey) { /* handle special keys */
+-	case GLUT_KEY_F1:
+-		mkey = S3DK_F1;
+-		break;
+-	case GLUT_KEY_F2:
+-		mkey = S3DK_F2;
+-		break;
+-	case GLUT_KEY_F3:
+-		mkey = S3DK_F3;
+-		break;
+-	case GLUT_KEY_F4:
+-		mkey = S3DK_F4;
+-		break;
+-	case GLUT_KEY_F5:
+-		mkey = S3DK_F5;
+-		break;
+-	case GLUT_KEY_F6:
+-		mkey = S3DK_F6;
+-		break;
+-	case GLUT_KEY_F7:
+-		mkey = S3DK_F7;
+-		break;
+-	case GLUT_KEY_F8:
+-		mkey = S3DK_F8;
+-		break;
+-	case GLUT_KEY_F9:
+-		mkey = S3DK_F9;
+-		break;
+-	case GLUT_KEY_F10:
+-		mkey = S3DK_F10;
+-		break;
+-	case GLUT_KEY_F11:
+-		mkey = S3DK_F11;
+-		break;
+-	case GLUT_KEY_F12:
+-		mkey = S3DK_F12;
+-		break;
+-	case GLUT_KEY_LEFT:
+-		mkey = S3DK_LEFT;
+-		break;
+-	case GLUT_KEY_RIGHT:
+-		mkey = S3DK_RIGHT;
+-		break;
+-	case GLUT_KEY_UP:
+-		mkey = S3DK_UP;
+-		break;
+-	case GLUT_KEY_DOWN:
+-		mkey = S3DK_DOWN;
+-		break;
+-	case GLUT_KEY_PAGE_UP:
+-		mkey = S3DK_PAGEUP;
+-		break;
+-	case GLUT_KEY_PAGE_DOWN:
+-		mkey = S3DK_PAGEDOWN;
+-		break;
+-	case GLUT_KEY_HOME:
+-		mkey = S3DK_HOME;
+-		break;
+-	case GLUT_KEY_END:
+-		mkey = S3DK_END;
+-		break;
+-	case GLUT_KEY_INSERT:
+-		mkey = S3DK_INSERT;
+-		break;
+-	default:
+-		mkey = skey;
+-		break;
+-	}
+-	s3dprintf(MED, &quot;special(): %d -&gt; %d&quot;, skey, mkey);
+-	user_key(mkey, 0, 0, 0);
+-	user_key(mkey, 0, 0, 1);
+-}
+-void mouse_motion(int x, int y)
+-{
+-	user_mouse(but, 2, x, y);
+-}
+-void passive_mouse_motion(int x, int y)
+-{
+-	user_mouse(-1, -1, x, y);
+-}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000821.html">[S3d-svn] r828 - in trunk: . server
+</A></li>
+	<LI>Next message: <A HREF="000823.html">[S3d-svn] r830 - trunk/Documentation/manpages
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#822">[ date ]</a>
+              <a href="thread.html#822">[ thread ]</a>
+              <a href="subject.html#822">[ subject ]</a>
+              <a href="author.html#822">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,249 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-102-ge2a378d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2011-April/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20branch%2C%20master%2C%0A%09updated.%20v0.2.1.1-102-ge2a378d&In-Reply-To=%3C20110423190309.C78894814D0%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001138.html">
+   <LINK REL="Next"  HREF="001140.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-102-ge2a378d</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20branch%2C%20master%2C%0A%09updated.%20v0.2.1.1-102-ge2a378d&In-Reply-To=%3C20110423190309.C78894814D0%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-102-ge2a378d">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sat Apr 23 21:03:09 CEST 2011</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001138.html">[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-98-g8ce6bd3
+</A></li>
+        <LI>Next message: <A HREF="001140.html">[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-26-g200dd7f
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1139">[ date ]</a>
+              <a href="thread.html#1139">[ thread ]</a>
+              <a href="subject.html#1139">[ subject ]</a>
+              <a href="author.html#1139">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project &quot;Project s3d at BerliOS&quot;.
+
+The branch, master has been updated
+       via  e2a378d94c6ece5022b96716c4b9bf69da5ed7c6 (commit)
+       via  ffc189302b28200b4ee2b2148813e571ce28422d (commit)
+       via  e7d2540ff7c631cac5e880038f6d7712b41f67aa (commit)
+       via  397a8bf664cfd1c2725b248db7c945b1d46b9f6b (commit)
+      from  8ce6bd3eed10728d6e247a28dfe652b5b3b16b38 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit e2a378d94c6ece5022b96716c4b9bf69da5ed7c6
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven at narfation.org</A>&gt;
+Date:   Sat Apr 23 21:02:19 2011 +0200
+
+    Ignore temporary files generated during manpages generation
+
+commit ffc189302b28200b4ee2b2148813e571ce28422d
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven at narfation.org</A>&gt;
+Date:   Sat Apr 23 21:00:25 2011 +0200
+
+    Regenerate documentation with updated toolchain
+
+commit e7d2540ff7c631cac5e880038f6d7712b41f67aa
+Merge: 8ce6bd3 397a8bf
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven at narfation.org</A>&gt;
+Date:   Sat Apr 23 20:52:09 2011 +0200
+
+    Merge branch 'maint'
+    
+    Conflicts:
+    	apps/s3dosm/osm.c
+    	libs3d/s3d.h
+    	server/object.c
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ .gitignore                                         |    2 ++
+ Documentation/libs3dw/structs.docbook              |    4 ++--
+ Documentation/manpages/man1/dot_mcp.1              |   11 ++++++++++-
+ Documentation/manpages/man1/kism3d.1               |   11 ++++++++++-
+ Documentation/manpages/man1/meshs3d.1              |   11 ++++++++++-
+ Documentation/manpages/man1/s3d.1                  |   13 +++++++++++--
+ Documentation/manpages/man1/s3d_x11gate.1          |   11 ++++++++++-
+ Documentation/manpages/man1/s3dfm.1                |   11 ++++++++++-
+ Documentation/manpages/man1/s3dosm.1               |   11 ++++++++++-
+ Documentation/manpages/man1/s3dvt.1                |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_angle_to_cam.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_clear_callback.3   |    9 +++++++++
+ Documentation/manpages/man3/s3d_clone.3            |    9 +++++++++
+ Documentation/manpages/man3/s3d_clone_target.3     |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_del_object.3       |    9 +++++++++
+ Documentation/manpages/man3/s3d_delete_event.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_draw_string.3      |    9 +++++++++
+ Documentation/manpages/man3/s3d_find_event.3       |    9 +++++++++
+ Documentation/manpages/man3/s3d_flags_off.3        |    9 +++++++++
+ Documentation/manpages/man3/s3d_flags_on.3         |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_get_callback.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_ignore_callback.3  |   11 ++++++++++-
+ .../manpages/man3/s3d_import_model_file.3          |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_init.3             |    9 +++++++++
+ Documentation/manpages/man3/s3d_link.3             |   11 ++++++++++-
+ .../manpages/man3/s3d_load_line_normals.3          |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_load_materials_a.3 |    9 +++++++++
+ .../manpages/man3/s3d_load_polygon_normals.3       |   11 ++++++++++-
+ .../manpages/man3/s3d_load_polygon_tex_coords.3    |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_load_texture.3     |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_mainloop.3         |    9 +++++++++
+ Documentation/manpages/man3/s3d_mcp_focus.3        |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_net_check.3        |    9 +++++++++
+ Documentation/manpages/man3/s3d_new_object.3       |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_open_file.3        |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_pep_line.3         |    9 +++++++++
+ Documentation/manpages/man3/s3d_pep_line_normals.3 |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_pep_lines.3        |    9 +++++++++
+ Documentation/manpages/man3/s3d_pep_material.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_pep_material_a.3   |    9 +++++++++
+ .../manpages/man3/s3d_pep_material_texture.3       |    9 +++++++++
+ Documentation/manpages/man3/s3d_pep_materials_a.3  |    9 +++++++++
+ .../manpages/man3/s3d_pep_polygon_normals.3        |   11 ++++++++++-
+ .../manpages/man3/s3d_pep_polygon_tex_coord.3      |    9 +++++++++
+ .../manpages/man3/s3d_pep_polygon_tex_coords.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_pep_vertex.3       |    9 +++++++++
+ Documentation/manpages/man3/s3d_pep_vertices.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_pop_event.3        |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_pop_line.3         |    9 +++++++++
+ Documentation/manpages/man3/s3d_pop_material.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_pop_polygon.3      |    9 +++++++++
+ Documentation/manpages/man3/s3d_pop_texture.3      |    9 +++++++++
+ Documentation/manpages/man3/s3d_pop_vertex.3       |    9 +++++++++
+ Documentation/manpages/man3/s3d_process_stack.3    |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_event.3       |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_push_line.3        |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_lines.3       |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_material.3    |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_material_a.3  |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_materials_a.3 |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_polygon.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_polygons.3    |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_texture.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_textures.3    |    9 +++++++++
+ Documentation/manpages/man3/s3d_push_vertex.3      |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_push_vertices.3    |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_quit.3             |    9 +++++++++
+ Documentation/manpages/man3/s3d_rotate.3           |    9 +++++++++
+ Documentation/manpages/man3/s3d_scale.3            |    9 +++++++++
+ Documentation/manpages/man3/s3d_select_font.3      |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_set_callback.3     |    9 +++++++++
+ Documentation/manpages/man3/s3d_strlen.3           |    9 +++++++++
+ Documentation/manpages/man3/s3d_translate.3        |   11 ++++++++++-
+ Documentation/manpages/man3/s3d_unlink.3           |    9 +++++++++
+ Documentation/manpages/man3/s3d_usage.3            |    9 +++++++++
+ Documentation/manpages/man3/s3d_vector_angle.3     |    9 +++++++++
+ .../manpages/man3/s3d_vector_cross_product.3       |    9 +++++++++
+ .../manpages/man3/s3d_vector_dot_product.3         |    9 +++++++++
+ Documentation/manpages/man3/s3d_vector_length.3    |    9 +++++++++
+ Documentation/manpages/man3/s3d_vector_subtract.3  |    9 +++++++++
+ Documentation/manpages/man3/s3dw_ani_mate.3        |   11 ++++++++++-
+ Documentation/manpages/man3/s3dw_button_new.3      |    9 +++++++++
+ Documentation/manpages/man3/s3dw_delete.3          |    9 +++++++++
+ Documentation/manpages/man3/s3dw_focus.3           |    9 +++++++++
+ Documentation/manpages/man3/s3dw_getroot.3         |   11 ++++++++++-
+ Documentation/manpages/man3/s3dw_handle_click.3    |    9 +++++++++
+ Documentation/manpages/man3/s3dw_handle_key.3      |    9 +++++++++
+ .../manpages/man3/s3dw_input_change_text.3         |    9 +++++++++
+ Documentation/manpages/man3/s3dw_input_gettext.3   |    9 +++++++++
+ Documentation/manpages/man3/s3dw_input_new.3       |    9 +++++++++
+ .../manpages/man3/s3dw_label_change_text.3         |    9 +++++++++
+ Documentation/manpages/man3/s3dw_label_new.3       |    9 +++++++++
+ Documentation/manpages/man3/s3dw_moveit.3          |   11 ++++++++++-
+ Documentation/manpages/man3/s3dw_object_info.3     |    9 +++++++++
+ Documentation/manpages/man3/s3dw_show.3            |    9 +++++++++
+ Documentation/manpages/man3/s3dw_surface_new.3     |    9 +++++++++
+ .../manpages/man3/s3dw_textbox_change_text.3       |    9 +++++++++
+ Documentation/manpages/man3/s3dw_textbox_new.3     |    9 +++++++++
+ .../manpages/man3/s3dw_textbox_scrolldown.3        |    9 +++++++++
+ .../manpages/man3/s3dw_textbox_scrollleft.3        |    9 +++++++++
+ .../manpages/man3/s3dw_textbox_scrollright.3       |    9 +++++++++
+ .../manpages/man3/s3dw_textbox_scrollto.3          |    9 +++++++++
+ .../manpages/man3/s3dw_textbox_scrollup.3          |    9 +++++++++
+ Documentation/manpages/man9/mcp_object.9           |   11 ++++++++++-
+ Documentation/manpages/man9/s3d_but_info.9         |    9 +++++++++
+ Documentation/manpages/man9/s3d_evt.9              |    9 +++++++++
+ Documentation/manpages/man9/s3d_key_event.9        |    9 +++++++++
+ Documentation/manpages/man9/s3d_obj_info.9         |    9 +++++++++
+ Documentation/manpages/man9/s3dw_button.9          |    9 +++++++++
+ Documentation/manpages/man9/s3dw_input.9           |    9 +++++++++
+ Documentation/manpages/man9/s3dw_label.9           |    9 +++++++++
+ Documentation/manpages/man9/s3dw_scrollbar.9       |    9 +++++++++
+ Documentation/manpages/man9/s3dw_style.9           |   13 +++++++++++--
+ Documentation/manpages/man9/s3dw_surface.9         |    9 +++++++++
+ Documentation/manpages/man9/s3dw_textbox.9         |    9 +++++++++
+ Documentation/manpages/man9/s3dw_widget.9          |   11 ++++++++++-
+ README                                             |    2 +-
+ apps/s3dosm/osm.c                                  |    2 +-
+ cmake/modules/EnableProfiling.cmake                |    2 +-
+ cmake/modules/FilterPIE.cmake                      |    2 +-
+ cmake/modules/FindDocbook.cmake                    |    2 +-
+ cmake/modules/FindMath.cmake                       |    2 +-
+ cmake/modules/FindPThreads.cmake                   |    2 +-
+ cmake/modules/LateErrors.cmake                     |    2 +-
+ cmake/modules/LateStatus.cmake                     |    2 +-
+ cmake/modules/LateStatusPartial.cmake              |    2 +-
+ cmake/modules/S3DInternals.cmake                   |    2 +-
+ cmake/modules/SetC9X.cmake                         |    2 +-
+ cmake/modules/SetCCWarnFlags.cmake                 |    2 +-
+ cmake/modules/SetDebugLevel.cmake                  |    2 +-
+ cmake/modules/TestForSHM.cmake                     |    2 +-
+ cmake/modules/TestForSIGS.cmake                    |    2 +-
+ cmake/modules/TestForTCP.cmake                     |    2 +-
+ cmake/modules/TestGCCExternally.cmake              |    2 +-
+ cmake/modules/TestGCCSections.cmake                |    2 +-
+ cmake/modules/TestGCCVisibility.cmake              |    2 +-
+ cmake/modules/TestUnusedParam.cmake                |    2 +-
+ libs3d/s3d.h                                       |    2 +-
+ server/object.c                                    |    2 +-
+ 139 files changed, 1089 insertions(+), 61 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001138.html">[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-98-g8ce6bd3
+</A></li>
+	<LI>Next message: <A HREF="001140.html">[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-26-g200dd7f
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1139">[ date ]</a>
+              <a href="thread.html#1139">[ thread ]</a>
+              <a href="subject.html#1139">[ subject ]</a>
+              <a href="author.html#1139">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

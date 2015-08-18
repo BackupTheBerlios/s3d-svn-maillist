@@ -1,0 +1,258 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r304 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r304%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200605271641.k4RGfZrK017407%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000296.html">
+   <LINK REL="Next"  HREF="000298.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r304 - trunk/apps/olsrs3d</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r304%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200605271641.k4RGfZrK017407%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r304 - trunk/apps/olsrs3d">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Sat May 27 18:41:35 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000296.html">[S3d-svn] r303 - in trunk: . libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000298.html">[S3d-svn] r305 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#297">[ date ]</a>
+              <a href="thread.html#297">[ thread ]</a>
+              <a href="subject.html#297">[ subject ]</a>
+              <a href="author.html#297">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-05-27 18:41:31 +0200 (Sat, 27 May 2006)
+New Revision: 304
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+Log:
+- include rotatefactor in searchengine
+- scale closebutton from connectionlist bigger
+
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-05-25 22:27:59 UTC (rev 303)
++++ trunk/apps/olsrs3d/main.c	2006-05-27 16:41:31 UTC (rev 304)
+@@ -649,7 +649,7 @@
+ 	int net_result;   /* result of function net_main */
+ 	char nc_str[20];
+ 	float strLen;
+-	float target,current;
++	float target,current,diff[3],tmp_mov_vec[3],angle,angle_rad;
+ 	int i;
+ 	/* calculate new movement vector */
+ 	calc_olsr_node_mov();
+@@ -689,6 +689,14 @@
+ 			break;
+ 		}
+ 	}
++	
++	if(RotateSwitch) {
++		Zp_rotate = (Zp_rotate+RotateSpeed)%360;
++		s3d_rotate(ZeroPoint,0,Zp_rotate,0);
++	}
++	CamPosition2[0][0]=  CamPosition[0][0]*cos(Zp_rotate*M_PI/180.0) - CamPosition[0][2] * sin (Zp_rotate*M_PI/180.0);
++	CamPosition2[0][1]=  CamPosition[0][1];
++	CamPosition2[0][2]=  CamPosition[0][0]*sin(Zp_rotate*M_PI/180.0) + CamPosition[0][2] * cos (Zp_rotate*M_PI/180.0);
+ 
+ 	/* move to terminal */
+ 	if( move_cam_to == obj[obj_term]-&gt;oid )
+@@ -718,14 +726,25 @@
+ 		}
+ 	} else if ( move_cam_to != -2 &amp;&amp; move_cam_to != -1 ) {
+ 		Oid_focus = -1;
++		
++		/* s3d_vector_substract(CamPosition2[0], CamPosition[0], diff); */
++		
++		diff[0]=  search_node-&gt;pos_vec[0]*cos(Zp_rotate*M_PI/180.0) - search_node-&gt;pos_vec[2] * -sin (Zp_rotate*M_PI/180.0);
++		diff[1]=  search_node-&gt;pos_vec[1];
++		diff[2]=  search_node-&gt;pos_vec[0]*-sin(Zp_rotate*M_PI/180.0) + search_node-&gt;pos_vec[2] * cos (Zp_rotate*M_PI/180.0);
++
++		
++		CamPosition[0][0]=(CamPosition[0][0]*4+diff[0])/5;
++		CamPosition[0][1]=(CamPosition[0][1]*4+(diff[1])+2)/5;
++		CamPosition[0][2]=(CamPosition[0][2]*4+(diff[2]+10))/5;
++		
++		/*
++		CamPosition[0][0]=((CamPosition[0][0]*4+search_node-&gt;pos_vec[0])/5)+diff[0];
++		CamPosition[0][1]=((CamPosition[0][1]*4+(search_node-&gt;pos_vec[1])+2)/5)+diff[1];
++		CamPosition[0][2]=((CamPosition[0][2]*4+(search_node-&gt;pos_vec[2]+10))/5)+diff[2];
++		*/	
+ 		for( i=0; i&lt;3; i++)
+ 		{
+-			if( i==2 )
+-				CamPosition[0][i]=(CamPosition[0][i]*4+(search_node-&gt;pos_vec[i]+10))/5;
+-			else if ( i == 1 )
+-				CamPosition[0][i]=(CamPosition[0][i]*4+(search_node-&gt;pos_vec[i])+2)/5;
+-			else
+-				CamPosition[0][i]=(CamPosition[0][i]*4+search_node-&gt;pos_vec[i])/5;
+ 			target = 0.0;
+ 			current = CamPosition[1][i];
+ 
+@@ -735,6 +754,22 @@
+ 				current = CamPosition[1][i] - 360;
+ 			CamPosition[1][i]=(CamPosition[1][i]*4+target)/5;
+ 		}
++		/*
++		tmp_mov_vec[0] = diff[0] - search_node-&gt;pos_vec[0];
++		tmp_mov_vec[1] = 0; 
++		tmp_mov_vec[2] = diff[2] - search_node-&gt;pos_vec[2];
++
++		angle = s3d_vector_angle( CamPosition[1], tmp_mov_vec );
++
++		
++		if ( tmp_mov_vec[0] &gt; 0 ) {
++			angle_rad = 90.0/M_PI - angle;
++			angle = 180 - ( 180.0/M_PI * angle );
++		} else {
++			angle_rad = 90.0/M_PI + angle;
++			angle = 180 + ( 180.0/M_PI * angle );
++		}
++		*/
+ 		s3d_translate(0,CamPosition[0][0],CamPosition[0][1],CamPosition[0][2]);
+ 		s3d_rotate(0,CamPosition[1][0],CamPosition[1][1],CamPosition[1][2]);
+ 
+@@ -792,14 +827,7 @@
+ 		print_etx();
+ 	}
+ 
+-	if(RotateSwitch) {
+-		Zp_rotate = (Zp_rotate+RotateSpeed)%360;
+-		s3d_rotate(ZeroPoint,0,Zp_rotate,0);
+-	}
+-	CamPosition2[0][0]=  CamPosition[0][0]*cos(Zp_rotate*M_PI/180.0) - CamPosition[0][2] * sin (Zp_rotate*M_PI/180.0);
+-	CamPosition2[0][1]=  CamPosition[0][1];
+-	CamPosition2[0][2]=  CamPosition[0][0]*sin(Zp_rotate*M_PI/180.0) + CamPosition[0][2] * cos (Zp_rotate*M_PI/180.0);
+-
++	
+ 	if (cam_go &amp;&amp; move_cam_to == -1)
+ 	{ /* move a little bit closer ... */
+ 		CamPosition[0][0]=(CamPosition[0][0]*9+Olsr_node_pEtx-&gt;pos_vec[0])/10;
+@@ -859,14 +887,6 @@
+ 				s3d_translate(ZeroPoint,0.0,0.0,0.0);
+ 				ZeroPosition[0] = ZeroPosition[1] = ZeroPosition[2] = 0.0;
+ 				break;
+-			case S3DK_UP: /* arrow up -&gt; move nodes up */
+-				ZeroPosition[1]++;
+-				s3d_translate(ZeroPoint,ZeroPosition[0],ZeroPosition[1],ZeroPosition[2]);
+-				break;
+-			case S3DK_DOWN: /* arrow down -&gt; move nodes down */
+-				ZeroPosition[1]--;
+-				s3d_translate(ZeroPoint,ZeroPosition[0],ZeroPosition[1],ZeroPosition[2]);
+-				break;
+ 			case S3DK_PAGEUP: /* page up -&gt; change factor in calc_olsr_node_mov */
+ 				if(Factor &lt; 0.9)
+ 					Factor += 0.1;
+@@ -949,8 +969,8 @@
+ 			Btn_close_id = s3d_clone( Btn_close_obj );
+ 			s3d_link(Btn_close_id,0);
+ 			s3d_flags_on(Btn_close_id,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-			s3d_scale( Btn_close_id, 0.05 );
+-			s3d_translate( Btn_close_id,-Left*3.0-0.125, -Bottom*3.0-0.7, -3.0 );
++			s3d_scale( Btn_close_id, 0.10 );
++			s3d_translate( Btn_close_id,-Left*3.0-0.150, -Bottom*3.0-0.9, -3.0 );
+ 		}
+ 		
+ 		if ( Olsr_ip_label_obj != -1 ) s3d_del_object( Olsr_ip_label_obj );
+@@ -959,7 +979,7 @@
+ 		s3d_link( Olsr_ip_label_obj, 0 );
+ 		s3d_flags_on( Olsr_ip_label_obj, S3D_OF_VISIBLE );
+ 		s3d_scale( Olsr_ip_label_obj, 0.2 );
+-		s3d_translate( Olsr_ip_label_obj,-Left*3.0-(Title_len * 0.2)-0.15, -Bottom*3.0-1.0, -3.0 );
++		s3d_translate( Olsr_ip_label_obj,-Left*3.0-(Title_len * 0.2)-0.15, -Bottom*3.0-1.2, -3.0 );
+ 		/*
+ 		cam_go=1;
+ 		if ( Olsr_ip_label_obj != -1 ) s3d_del_object( Olsr_ip_label_obj );
+@@ -976,7 +996,7 @@
+ void print_etx()
+ {
+ 	struct olsr_neigh_list *tmpNeighbour;
+-	float p = 1.2;
++	float p = 1.4;
+ 	int i;
+ 	float len = 0.0, max_len=0.0;
+ 
+@@ -1035,16 +1055,16 @@
+ 					1.0,1.0,1.0,
+ 					1.0,1.0,1.0);
+ 			}
+-			s3d_push_vertex(Output_border[0], -Left*3.0-0.2,			-Bottom*3.0-0.7, -3.0);
+-			s3d_push_vertex(Output_border[0], -Left*3.0-(max_len*0.2),	-Bottom*3.0-0.7, -3.0);
++			s3d_push_vertex(Output_border[0], -Left*3.0-0.2,			-Bottom*3.0-0.9, -3.0);
++			s3d_push_vertex(Output_border[0], -Left*3.0-(max_len*0.2),	-Bottom*3.0-0.9, -3.0);
+ 
+-			s3d_push_vertex(Output_border[1], -Left*3.0-0.1,			-Bottom*3.0-0.8, -3.0);
++			s3d_push_vertex(Output_border[1], -Left*3.0-0.1,			-Bottom*3.0-1.0, -3.0);
+ 			s3d_push_vertex(Output_border[1], -Left*3.0-0.1,			-Bottom*3.0-p, 	-3.0);
+ 
+ 			s3d_push_vertex(Output_border[2], -Left*3.0-0.1,			-Bottom*3.0-p, 	-3.0);
+ 			s3d_push_vertex(Output_border[2], -Left*3.0-(max_len*0.2),	-Bottom*3.0-p, 	-3.0);
+ 
+-			s3d_push_vertex(Output_border[3], -Left*3.0-(max_len*0.2),	-Bottom*3.0-0.7, -3.0);
++			s3d_push_vertex(Output_border[3], -Left*3.0-(max_len*0.2),	-Bottom*3.0-0.9, -3.0);
+ 			s3d_push_vertex(Output_border[3], -Left*3.0-(max_len*0.2),	-Bottom*3.0-p, 	-3.0);
+ 
+ 			s3d_push_line( Output_border[0], 0,1,0);
+@@ -1066,16 +1086,16 @@
+ 			s3d_pop_vertex(Output_border[1], 2);
+ 			s3d_pop_vertex(Output_border[2], 2);
+ 			s3d_pop_vertex(Output_border[3], 2);
+-			s3d_push_vertex(Output_border[0], -Left*3.0-0.2,				-Bottom*3.0-0.7, -3.0);
+-			s3d_push_vertex(Output_border[0], -Left*3.0-(max_len*0.2),	-Bottom*3.0-0.7, -3.0);
++			s3d_push_vertex(Output_border[0], -Left*3.0-0.2,				-Bottom*3.0-0.9, -3.0);
++			s3d_push_vertex(Output_border[0], -Left*3.0-(max_len*0.2),	-Bottom*3.0-0.9, -3.0);
+ 
+-			s3d_push_vertex(Output_border[1], -Left*3.0-0.1,				-Bottom*3.0-0.8, -3.0);
++			s3d_push_vertex(Output_border[1], -Left*3.0-0.1,				-Bottom*3.0-1.0, -3.0);
+ 			s3d_push_vertex(Output_border[1], -Left*3.0-0.1,				-Bottom*3.0-p,	 -3.0);
+ 
+ 			s3d_push_vertex(Output_border[2], -Left*3.0-0.1,				-Bottom*3.0-p,	 -3.0);
+ 			s3d_push_vertex(Output_border[2], -Left*3.0-(max_len*0.2),	-Bottom*3.0-p,	 -3.0);
+ 
+-			s3d_push_vertex(Output_border[3], -Left*3.0-(max_len*0.2),	-Bottom*3.0-0.7, -3.0);
++			s3d_push_vertex(Output_border[3], -Left*3.0-(max_len*0.2),	-Bottom*3.0-0.9, -3.0);
+ 			s3d_push_vertex(Output_border[3], -Left*3.0-(max_len*0.2),	-Bottom*3.0-p, 	 -3.0);
+ 		}
+ 	}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000296.html">[S3d-svn] r303 - in trunk: . libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000298.html">[S3d-svn] r305 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#297">[ date ]</a>
+              <a href="thread.html#297">[ thread ]</a>
+              <a href="subject.html#297">[ subject ]</a>
+              <a href="author.html#297">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r806 - in trunk: . apps/meshs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r806%20-%20in%20trunk%3A%20.%20apps/meshs3d&In-Reply-To=%3C200710222123.l9MLNfSE006142%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000797.html">
+   <LINK REL="Next"  HREF="000799.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r806 - in trunk: . apps/meshs3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r806%20-%20in%20trunk%3A%20.%20apps/meshs3d&In-Reply-To=%3C200710222123.l9MLNfSE006142%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r806 - in trunk: . apps/meshs3d">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Oct 22 23:23:41 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000797.html">[S3d-svn] r805 - trunk/Documentation
+</A></li>
+        <LI>Next message: <A HREF="000799.html">[S3d-svn] r807 - trunk/extras/distro/gentoo/media-gfx/s3d-svn
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#798">[ date ]</a>
+              <a href="thread.html#798">[ thread ]</a>
+              <a href="subject.html#798">[ subject ]</a>
+              <a href="author.html#798">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-10-22 23:23:41 +0200 (Mon, 22 Oct 2007)
+New Revision: 806
+
+Modified:
+   trunk/
+   trunk/apps/meshs3d/meshs3d.h
+   trunk/apps/meshs3d/process.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r2754 at kero</A>:  dotslash | 2007-10-22 23:23:32 +0200
+ - let links to disappear if they are not mentioned in the block (e.g. direct link vanished)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2749
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2754
+
+Modified: trunk/apps/meshs3d/meshs3d.h
+===================================================================
+--- trunk/apps/meshs3d/meshs3d.h	2007-10-22 20:54:41 UTC (rev 805)
++++ trunk/apps/meshs3d/meshs3d.h	2007-10-22 21:23:41 UTC (rev 806)
+@@ -38,6 +38,7 @@
+ 	float etx2_sqrt;     /* sqrt etx of right olsr node */
+ 	int obj_id;        /* id of connection object in s3d */
+ 	int color;
++	int old;			/* check if the node has been announced in the last block */
+ 	float rgb;
+ };
+ 
+
+Modified: trunk/apps/meshs3d/process.c
+===================================================================
+--- trunk/apps/meshs3d/process.c	2007-10-22 20:54:41 UTC (rev 805)
++++ trunk/apps/meshs3d/process.c	2007-10-22 21:23:41 UTC (rev 806)
+@@ -181,6 +181,8 @@
+ 		con_hash = swaphash;
+ 	}
+ 
++	con-&gt;old = 0;
++
+ }
+ 
+ static struct node *handle_mesh_node(unsigned int ip, char *ip_string) {
+@@ -231,6 +233,8 @@
+ 	int dn;
+ 	float f;
+ 	char *lbuf_ptr, *last_cr_ptr, *con_from, *con_from_end, *con_to, *con_to_end, *etx, *etx_end, *tmp_char;
++	struct hash_it_t *hashit;
++	struct node_con *con;
+ 	char hna_name[NAMEMAX];
+ 	char hna_node[NAMEMAX];
+ 
+@@ -369,6 +373,20 @@
+ 
+ 			Global.output_block_completed = 1;
+ 
++			hashit = NULL;
++			/* check for old nodes and remove them */
++			while (NULL != (hashit = hash_iterate(con_hash, hashit))) {
++				con = (struct node_con *) hashit-&gt;bucket-&gt;data;
++				if (con-&gt;old) {
++					if (con-&gt;obj_id != -1) 
++						s3d_del_object(con-&gt;obj_id);
++					con-&gt;obj_id = -1;
++					hash_remove_bucket(con_hash, hashit);
++				}
++				con-&gt;old = 1;	/* set con on old. if it's still old in the next iteration, 
++								   we will remove it. */
++			}
++
+ 		}
+ 
+ 		lbuf_ptr++;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000797.html">[S3d-svn] r805 - trunk/Documentation
+</A></li>
+	<LI>Next message: <A HREF="000799.html">[S3d-svn] r807 - trunk/extras/distro/gentoo/media-gfx/s3d-svn
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#798">[ date ]</a>
+              <a href="thread.html#798">[ thread ]</a>
+              <a href="subject.html#798">[ subject ]</a>
+              <a href="author.html#798">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

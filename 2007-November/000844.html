@@ -1,0 +1,269 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r851 - trunk/svnonly/wiitest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r851%20-%20trunk/svnonly/wiitest&In-Reply-To=%3C200711091654.lA9Gs5SW030589%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000843.html">
+   <LINK REL="Next"  HREF="000845.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r851 - trunk/svnonly/wiitest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r851%20-%20trunk/svnonly/wiitest&In-Reply-To=%3C200711091654.lA9Gs5SW030589%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r851 - trunk/svnonly/wiitest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Fri Nov  9 17:54:05 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000843.html">[S3d-svn] r850 - trunk/svnonly/comptest
+</A></li>
+        <LI>Next message: <A HREF="000845.html">[S3d-svn] r852 - trunk/svnonly/wiitest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#844">[ date ]</a>
+              <a href="thread.html#844">[ thread ]</a>
+              <a href="subject.html#844">[ subject ]</a>
+              <a href="author.html#844">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-09 17:54:05 +0100 (Fri, 09 Nov 2007)
+New Revision: 851
+
+Modified:
+   trunk/svnonly/wiitest/wiitest.c
+Log:
+- wiitest: fixed rotation calculation
+- smooth over the last N_SMOOTH entries
+- code cleanup
+
+
+Modified: trunk/svnonly/wiitest/wiitest.c
+===================================================================
+--- trunk/svnonly/wiitest/wiitest.c	2007-11-08 23:10:19 UTC (rev 850)
++++ trunk/svnonly/wiitest/wiitest.c	2007-11-09 16:54:05 UTC (rev 851)
+@@ -27,19 +27,29 @@
+ #include &lt;s3d.h&gt;
+ #include &lt;math.h&gt; /* sin() */
+ #include &lt;time.h&gt; /* nanosleep() */
++#define N_SMOOTH		8		/* how much data is used to normalize */
+ 
+ static struct timespec t = {
+ 	0, 10*1000*1000
+ }; /* 10 mili seconds */
+ 
+ 
+-static float x[3] = {0, 0, 0};
+-static float move[3] = {0, 0, 0};
++/* &quot;public&quot; wii-data */
++static float wii_x[3] = {0, 0, 0};
++static float wii_move[3] = {0, 0, 0};
++static float wii_xrot = 0;
++static float wii_zrot = 0;
+ 
++/* private wii-data */
++static float x_data[N_SMOOTH][3];
++static float move_data[N_SMOOTH][3];
++static int dataindex;
++
+ static cwiid_err_t err;
+-static int oid_head;
+ static cwiid_wiimote_t *wiimote; /* wiimote handle */
+ 
++static int oid_head;
++
+ static void err(cwiid_wiimote_t *wiimote, const char *s, va_list ap)
+ {
+ 	if (wiimote) printf(&quot;%d:&quot;, cwiid_get_id(wiimote));
+@@ -47,75 +57,111 @@
+ 	vprintf(s, ap);
+ 	printf(&quot;\n&quot;);
+ }
+-static void mainloop(void)
++
++
++int wii_init(char *addr) 
+ {
++	int i,j;
++	bdaddr_t bdaddr; /* bluetooth device address */
++	cwiid_set_err(err);
++
++	/* Connect to address given on command-line, if present */
++	if (addr != NULL) {
++		str2ba(addr, &amp;bdaddr);
++	} else {
++		bdaddr = *BDADDR_ANY;
++	}
++
++	/* Connect to the wiimote */
++	printf(&quot;Put Wiimote in discoverable mode now (press 1+2)...\n&quot;);
++
++	if (!(wiimote = cwiid_open(&amp;bdaddr, 0))) {
++		fprintf(stderr, &quot;Unable to connect to wiimote\n&quot;);
++		return -1;
++	}
++
++	cwiid_set_rpt_mode(wiimote, CWIID_RPT_BTN | CWIID_RPT_ACC | CWIID_RPT_IR | CWIID_RPT_NUNCHUK | CWIID_RPT_CLASSIC);
++
++	for (i = 0; i &lt; N_SMOOTH; i++)
++		for (j = 0; j &lt; 3; j++) {
++			x_data[i][j] = 0;
++			move_data[i][j] = 0;
++		}
++	dataindex = 0;
++	return(0);
++
++}
++void wii_calcdata() 
++{
+ 	struct cwiid_state state; /* wiimote state */
+-	float z_normvec[3] = { -1, 0, 0};
+-	float x_normvec[3] = { 0, 1, 0};
+-	float xrot, zrot;
++	float z_normvec[3] = { 0, -1, 0};
++	float x_normvec[3] = { 0, 0, 1};
+ 	float y[3];
++	int i,j;
++	int lastindex;
+ 
+ 	cwiid_get_state(wiimote, &amp;state);
+ 
+-	y[0] = (state.acc[CWIID_X] - 128) / 128.0;
+-	y[1] = (state.acc[CWIID_Y] - 128) / 128.0;
+-	y[2] = (state.acc[CWIID_Z] - 128) / 128.0;
++	x_data[dataindex][0] = (state.acc[CWIID_X] - 128) / 128.0;
++	x_data[dataindex][2] = (state.acc[CWIID_Y] - 128) / 128.0;
++	x_data[dataindex][1] = (state.acc[CWIID_Z] - 128) / 128.0;
+ 
++	lastindex = (dataindex + N_SMOOTH - 1) % MAXNORM;
++	move_data[dataindex][0] =   x_data[lastindex][0] - x_data[dataindex][0];
++	move_data[dataindex][1] =   x_data[lastindex][1] - x_data[dataindex][1];
++	move_data[dataindex][2] = - x_data[lastindex][2] + x_data[dataindex][2];
++	dataindex = (dataindex + 1)%N_SMOOTH;
+ 	/* smooth it */
+-	x[0] = (x[0] * 9 + y[0]) / 10;
+-	x[1] = (x[1] * 9 + y[1]) / 10;
+-	x[2] = (x[2] * 9 + y[2]) / 10;
++	for (j = 0; j &lt; 3; j++) {
++		wii_x[j] = 0;
++		wii_move[j] = 0;
++	}
++	for (i = 0; i&lt; N_SMOOTH; i++) 
++		for (j = 0; j &lt; 3; j++) {
++			wii_x[j] +=    x_data[i][j];
++			wii_move[j] += move_data[i][j];
++	}
++	for (j = 0; j&lt; 3; j++) {
++		wii_x[j] /= N_SMOOTH;
++		wii_move[j] /= N_SMOOTH;
++	}
+ 
+-	move[0] = ((x[0] - y[0]) + move[0] * 9) / 10;
+-	move[1] = ((x[2] - y[2]) + move[1] * 9) / 10;
+-	move[2] = ((y[1] - x[1]) + move[2] * 9) / 10;
++	wii_xrot = s3d_vector_angle(x_normvec, wii_x);
++	wii_xrot = 90 - (180.0 / M_PI * wii_xrot);
+ 
+-	xrot = s3d_vector_angle(x_normvec, x);
+-	xrot = 90 - (180.0 / M_PI * xrot);
++	y[0] = wii_x[0];
++	y[1] = wii_x[1];
++	y[2] = 0;
+ 
+-	/* z_normvec[0] = -cos(xrot * M_PI/180) ;
+-	 z_normvec[1] = 0;
+-	 z_normvec[2] = +sin(xrot * M_PI/180) ;
+-	 printf(&quot;zn = %3.3f %3.3f %3.3f    &quot;, z_normvec[0], z_normvec[1], z_normvec[2]);*/
+-
+-	zrot = s3d_vector_angle(z_normvec, x);
++	wii_zrot = s3d_vector_angle(z_normvec, y);
+ 	/* take care of inverse cosinus */
+-	if (x[2] &gt; 0)      zrot = 180 - (180.0 / M_PI * zrot);
+-	else        zrot = 180 + (180.0 / M_PI * zrot);
+-	zrot -= 90;
++	if (wii_x[0] &lt; 0)   wii_zrot = 180 - (180.0 / M_PI * wii_zrot);
++	else        		wii_zrot = 180 + (180.0 / M_PI * wii_zrot);
++}
+ 
+-	printf(&quot;%3.3f %3.3f %3.3f, zrot = %3.3f, xrot = %3.3f\n&quot;, x[0], x[1], x[2], zrot, xrot);
+ 
+-	s3d_rotate(oid_head, xrot, 0, zrot);
+-	s3d_translate(oid_head, move[0]*10, move[1]*10, move[2]*10);
++static void mainloop(void)
++{
++	wii_calcdata();
+ 
++	s3d_rotate(oid_head, wii_xrot, 0, wii_zrot);
++	s3d_translate(oid_head, wii_move[0]*10, wii_move[1]*10, wii_move[2]*10);
++
+ 	nanosleep(&amp;t, NULL);
+ }
+ 
+ int main(int argc, char *argv[])
+ {
+-	bdaddr_t bdaddr; /* bluetooth device address */
++	char *addr;
+ 
+-	cwiid_set_err(err);
++	if (argc &gt; 1)
++		addr = argv[1];
++	else
++		addr = NULL;
+ 
+-	/* Connect to address given on command-line, if present */
+-	if (argc &gt; 1) {
+-		str2ba(argv[1], &amp;bdaddr);
+-	} else {
+-		bdaddr = *BDADDR_ANY;
+-	}
++	if (wii_init(addr))
++		return(-1);
+ 
+-	/* Connect to the wiimote */
+-	printf(&quot;Put Wiimote in discoverable mode now (press 1+2)...\n&quot;);
+-
+-	if (!(wiimote = cwiid_open(&amp;bdaddr, 0))) {
+-		fprintf(stderr, &quot;Unable to connect to wiimote\n&quot;);
+-		return -1;
+-	}
+-
+-	cwiid_set_rpt_mode(wiimote, CWIID_RPT_BTN | CWIID_RPT_ACC | CWIID_RPT_IR | CWIID_RPT_NUNCHUK | CWIID_RPT_CLASSIC);
+-
+-
+ 	if (!s3d_init(&amp;argc, &amp;argv, &quot;wiitest&quot;)) {
+ 		oid_head = s3d_import_model_file(&quot;objs/snow_head.3ds&quot;);
+ 		s3d_flags_on(oid_head, S3D_OF_VISIBLE);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000843.html">[S3d-svn] r850 - trunk/svnonly/comptest
+</A></li>
+	<LI>Next message: <A HREF="000845.html">[S3d-svn] r852 - trunk/svnonly/wiitest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#844">[ date ]</a>
+              <a href="thread.html#844">[ thread ]</a>
+              <a href="subject.html#844">[ subject ]</a>
+              <a href="author.html#844">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r267 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r267%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200605022003.k42K3SoK020988%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000259.html">
+   <LINK REL="Next"  HREF="000261.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r267 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r267%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200605022003.k42K3SoK020988%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r267 - in trunk: . server">dotslash at berlios.de
+       </A><BR>
+    <I>Tue May  2 22:03:28 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000259.html">[S3d-svn] r266 - in trunk: . apps/dot_mcp
+</A></li>
+        <LI>Next message: <A HREF="000261.html">[S3d-svn] r268 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#260">[ date ]</a>
+              <a href="thread.html#260">[ thread ]</a>
+              <a href="subject.html#260">[ subject ]</a>
+              <a href="author.html#260">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-02 22:03:25 +0200 (Tue, 02 May 2006)
+New Revision: 267
+
+Modified:
+   trunk/
+   trunk/server/process.c
+   trunk/server/proto.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r497 at balthasar</A>:  dotslash | 2006-05-02 22:02:50 +0200
+ - please don't segfault if we just try to employ another mcp. 
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:495
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:497
+
+Modified: trunk/server/process.c
+===================================================================
+--- trunk/server/process.c	2006-05-02 19:59:33 UTC (rev 266)
++++ trunk/server/process.c	2006-05-02 20:03:25 UTC (rev 267)
+@@ -65,7 +65,7 @@
+ 			return(&amp;procs_p[MCP]);
+ 		} else {
+ 			dprintf(LOW,&quot;the place for the mcp is already taken ...&quot;);
+-			return(NULL);
++			return(p);
+ 		}
+ 	} else {
+ 		strncpy(p-&gt;name, name, NAME_MAX);
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2006-05-02 19:59:33 UTC (rev 266)
++++ trunk/server/proto.c	2006-05-02 20:03:25 UTC (rev 267)
+@@ -71,7 +71,7 @@
+ 				if (length&gt;NAME_MAX) i=NAME_MAX; else i=length;
+ 				strncpy(name,(char *)buf,i);
+ 				dprintf(LOW,&quot;[%d]\&quot;%s\&quot; logged in&quot;, p-&gt;id,name);
+-				if (NULL==(p=process_protinit(p,name)))
++				if (p==process_protinit(p,name))
+ 					event_quit(p);  /*  couldn't get process */
+ 				else
+ 					event_init(p);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000259.html">[S3d-svn] r266 - in trunk: . apps/dot_mcp
+</A></li>
+	<LI>Next message: <A HREF="000261.html">[S3d-svn] r268 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#260">[ date ]</a>
+              <a href="thread.html#260">[ thread ]</a>
+              <a href="subject.html#260">[ subject ]</a>
+              <a href="author.html#260">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r458 - in trunk: . apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r458%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200610311608.k9VG8Rse020763%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000450.html">
+   <LINK REL="Next"  HREF="000452.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r458 - in trunk: . apps/s3dfm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r458%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200610311608.k9VG8Rse020763%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r458 - in trunk: . apps/s3dfm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Tue Oct 31 17:08:27 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000450.html">[S3d-svn] r457 - in trunk: . apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000452.html">[S3d-svn] r459 - in trunk: . libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#451">[ date ]</a>
+              <a href="thread.html#451">[ thread ]</a>
+              <a href="subject.html#451">[ subject ]</a>
+              <a href="author.html#451">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-10-31 17:08:26 +0100 (Tue, 31 Oct 2006)
+New Revision: 458
+
+Modified:
+   trunk/
+   trunk/apps/s3dfm/dialog.c
+   trunk/apps/s3dfm/fs.c
+   trunk/apps/s3dfm/s3dfm.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1108 at kero</A>:  dotslash | 2006-10-31 17:08:21 +0100
+ - only one error  (don't flood windows) -&gt; error handling states
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1106
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1108
+
+Modified: trunk/apps/s3dfm/dialog.c
+===================================================================
+--- trunk/apps/s3dfm/dialog.c	2006-10-31 14:23:17 UTC (rev 457)
++++ trunk/apps/s3dfm/dialog.c	2006-10-31 16:08:26 UTC (rev 458)
+@@ -110,6 +110,12 @@
+ 	button-&gt;onclick=close_win;
+ 	s3dw_show(S3DWIDGET(infwin));
+ }
++void window_fs_confirm_error(s3dw_widget *button)
++{
++	fs_err.state=ESTATE_NONE;
++	s3dw_delete(button-&gt;parent); /* parent =surface. this means close containing window */
++	
++}
+ void window_fs_errno(char *errmsg)
+ {
+ 	s3dw_surface *infwin;
+@@ -352,37 +358,39 @@
+ 			dummy.pz=0;
+ 			dummy.scale=0.01;
+ 		}
+-
+-		for (i=0;i&lt;fp-&gt;n;i++) {
+-			if (fp-&gt;p[i].state==STATE_FINISHED)
+-			{ /* we can go and clean up now. */
+-				if (NULL!=(node=node_getbypath(fp-&gt;p[i].name)))
+-				{
+-					printf(&quot;[CLEANUP] for node %s (%s)\n&quot;,node-&gt;name,fp-&gt;p[i].name);
+-					node-&gt;detached=0;
+-					if (node-&gt;parent!=NULL)
++		if (fp!=NULL) {
++			for (i=0;i&lt;fp-&gt;n;i++) {
++				if (fp-&gt;p[i].state==STATE_FINISHED)
++				{ /* we can go and clean up now. */
++					if (NULL!=(node=node_getbypath(fp-&gt;p[i].name)))
+ 					{
+-						parse_dir(node-&gt;parent);
+-						switch (node-&gt;disp)
++						printf(&quot;[CLEANUP] for node %s (%s)\n&quot;,node-&gt;name,fp-&gt;p[i].name);
++						node-&gt;detached=0;
++						if (node-&gt;parent!=NULL)
+ 						{
+-							case D_ICON:	box_order_icons(node-&gt;parent);					break;
+-							case D_DIR:		box_order_subdirs(node-&gt;parent);				break;
++							parse_dir(node-&gt;parent);
++							switch (node-&gt;disp)
++							{
++								case D_ICON:	box_order_icons(node-&gt;parent);					break;
++								case D_DIR:		box_order_subdirs(node-&gt;parent);				break;
++							}
+ 						}
+-					}
++					} else 
++						printf(&quot;node %s already vanished ...\n&quot;,fp-&gt;p[i].name);
++							
++					fp-&gt;p[i].state=STATE_CLEANED;
+ 				}
+-				fp-&gt;p[i].state=STATE_CLEANED;
+-			}
+-			if (fp-&gt;p[i].state&gt;STATE_NONE)
+-			{
+-				if (destnode!=NULL)
++				if (fp-&gt;p[i].state&gt;STATE_NONE)
+ 				{
+-					fp-&gt;p[i].anode-&gt;px=dummy.px;
+-					fp-&gt;p[i].anode-&gt;py=dummy.py;
+-					fp-&gt;p[i].anode-&gt;pz=dummy.pz;
+-					ani_add(fp-&gt;p[i].anode);
++					if (destnode!=NULL)
++					{
++						fp-&gt;p[i].anode-&gt;px=dummy.px;
++						fp-&gt;p[i].anode-&gt;py=dummy.py;
++						fp-&gt;p[i].anode-&gt;pz=dummy.pz;
++						ani_add(fp-&gt;p[i].anode);
++					}
++
+ 				}
+-
+-
+ 			}
+ 		}
+ 		if (fs_lock==TYPE_FINISHED)	{
+@@ -400,16 +408,22 @@
+ 					box_order_icons(destnode);	
+ 				}
+ 			destnode=NULL;
+-
+ 		}
+-		if (fs_err.active)
++		if (fs_err.state==ESTATE_RISE)
+ 		{
++			s3dw_surface *infwin;
++			s3dw_button  *button;
+ 			char errmsg[M_DIR];
+-			/* TODO: draw a window, wait for input */
++			float l;
++			fs_err.state=ESTATE_WAIT_FOR_CONFIRM;
+ 			snprintf(errmsg,M_DIR,&quot;Error \&quot;%s\&quot; on %s&quot;,fs_err.message,fs_err.file);
+-			errno=fs_err.err;
+-			window_fs_errno(errmsg);
+-			fs_err.active=0;
++			l=s3d_strlen(errmsg)+2;
++			infwin=s3dw_surface_new(&quot;Error&quot;,l,8);
++			s3dw_label_new(infwin,errmsg,1,2);
++			button=s3dw_button_new(infwin,&quot;OK&quot;,l/2-1,5);
++			button-&gt;onclick=window_fs_confirm_error;
++			s3dw_show(S3DWIDGET(infwin));
++			printf(&quot;fs_err is active ... message: %s\n&quot;,errmsg);
+ 		}
+ 	}
+ }
+
+Modified: trunk/apps/s3dfm/fs.c
+===================================================================
+--- trunk/apps/s3dfm/fs.c	2006-10-31 14:23:17 UTC (rev 457)
++++ trunk/apps/s3dfm/fs.c	2006-10-31 16:08:26 UTC (rev 458)
+@@ -342,9 +342,9 @@
+ 	fs_err.err=errno;
+ 	fs_err.message=message;
+ 	fs_err.file=file;
+-	fs_err.active=1;
++	fs_err.state=ESTATE_RISE;
+ 	printf(&quot;[FS ERROR]: %s %s %s&quot;,message,file,strerror(errno));
+-	while (fs_err.active) 
++	while (fs_err.state!=ESTATE_NONE) 
+ 		nanosleep(&amp;t,NULL);  /* until situation clear, wait (and don't waste cpu-time) */
+ 	return(0);
+ }
+
+Modified: trunk/apps/s3dfm/s3dfm.h
+===================================================================
+--- trunk/apps/s3dfm/s3dfm.h	2006-10-31 14:23:17 UTC (rev 457)
++++ trunk/apps/s3dfm/s3dfm.h	2006-10-31 16:08:26 UTC (rev 458)
+@@ -86,9 +86,16 @@
+ 	int n;
+ };
+ struct fs_error {
+-	int err,active;
++	int err,state;
+ 	char *message, *file;
+ };
++enum {
++	ESTATE_NONE,
++	ESTATE_RISE,
++	ESTATE_WAIT_FOR_CONFIRM
++		/* TODO: more states should be added and handed back to the filesystem processor, like 
++		 * skip, abort, retry ... */
++};
+ typedef struct _filelist filelist;
+ typedef struct _t_node   t_node;
+ typedef struct _t_file	 t_file;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000450.html">[S3d-svn] r457 - in trunk: . apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000452.html">[S3d-svn] r459 - in trunk: . libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#451">[ date ]</a>
+              <a href="thread.html#451">[ thread ]</a>
+              <a href="subject.html#451">[ subject ]</a>
+              <a href="author.html#451">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r713 - trunk/libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r713%20-%20trunk/libs3d&In-Reply-To=%3C200710061231.l96CVGTc000635%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000706.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r713 - trunk/libs3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r713%20-%20trunk/libs3d&In-Reply-To=%3C200710061231.l96CVGTc000635%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r713 - trunk/libs3d">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sat Oct  6 14:31:16 CEST 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000706.html">[S3d-svn] r714 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#705">[ date ]</a>
+              <a href="thread.html#705">[ thread ]</a>
+              <a href="subject.html#705">[ subject ]</a>
+              <a href="author.html#705">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-10-06 14:31:15 +0200 (Sat, 06 Oct 2007)
+New Revision: 713
+
+Modified:
+   trunk/libs3d/io.c
+Log:
+- increase init timeout from 1 to 10 seconds
+
+Modified: trunk/libs3d/io.c
+===================================================================
+--- trunk/libs3d/io.c	2007-09-24 19:37:45 UTC (rev 712)
++++ trunk/libs3d/io.c	2007-10-06 12:31:15 UTC (rev 713)
+@@ -120,8 +120,8 @@
+ 	char      buf[258];    /*  server buffer */
+ 	int      i;
+ 	struct timespec   t = {
+-		0, 10*1000*1000
+-	}; /* 10 mili second */
++		0, 100*1000*1000
++	}; /* 100 mili second */
+ 
+ 	cb_lock = 1; /* don't bother while initiating ... is set to 0 after INIT packet received. */
+ 	if (NULL != (s = getenv(&quot;S3D&quot;))) {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000706.html">[S3d-svn] r714 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#705">[ date ]</a>
+              <a href="thread.html#705">[ thread ]</a>
+              <a href="subject.html#705">[ subject ]</a>
+              <a href="author.html#705">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

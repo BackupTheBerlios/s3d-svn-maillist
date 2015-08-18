@@ -1,0 +1,459 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1066 - trunk/apps/meshs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2009-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1066%20-%20trunk/apps/meshs3d&In-Reply-To=%3C200907031554.n63FshX6004046%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="001047.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1066 - trunk/apps/meshs3d</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1066%20-%20trunk/apps/meshs3d&In-Reply-To=%3C200907031554.n63FshX6004046%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1066 - trunk/apps/meshs3d">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Jul  3 17:54:43 CEST 2009</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="001047.html">[S3d-svn] r1067 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1046">[ date ]</a>
+              <a href="thread.html#1046">[ thread ]</a>
+              <a href="subject.html#1046">[ subject ]</a>
+              <a href="author.html#1046">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2009-07-03 17:54:43 +0200 (Fri, 03 Jul 2009)
+New Revision: 1066
+
+Modified:
+   trunk/apps/meshs3d/main.c
+   trunk/apps/meshs3d/meshs3d.h
+   trunk/apps/meshs3d/process.c
+Log:
+meshs3d: Make data structures more flexibel in terms of ids
+
+The current data structures and hard on ips and a specific layout
+in memory. To support batman-adv we must also be able to accept
+mac addresses. These are longer and must be handled special.
+
+Modified: trunk/apps/meshs3d/main.c
+===================================================================
+--- trunk/apps/meshs3d/main.c	2009-05-12 15:46:40 UTC (rev 1065)
++++ trunk/apps/meshs3d/main.c	2009-07-03 15:54:43 UTC (rev 1066)
+@@ -110,7 +110,7 @@
+ 	struct node *node, *tmp_node;
+ 	struct node_con *con;
+ 	struct hash_it_t *hashit, *tmp_hashit = NULL;
+-	int ip[2];
++	struct node_con ids;
+ 	float angle, angle_rad;
+ 	float tmp_mov_vec[3], desc_norm_vec[3] = {0, 0, -1};
+ 
+@@ -135,7 +135,7 @@
+ 
+ 			s3d_flags_on(node-&gt;obj_id, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+ 
+-			node-&gt;desc_id = s3d_draw_string(node-&gt;ip_string, &amp;node-&gt;desc_length);
++			node-&gt;desc_id = s3d_draw_string(node-&gt;name_string, &amp;node-&gt;desc_length);
+ 			s3d_link(node-&gt;desc_id, node-&gt;obj_id);
+ 			s3d_translate(node-&gt;desc_id, - node-&gt;desc_length / 2, -2, 0);
+ 			s3d_flags_on(node-&gt;desc_id, S3D_OF_VISIBLE);
+@@ -156,10 +156,10 @@
+ 
+ 
+ 				if (node != tmp_node) {
+-					ip[0] = max(node-&gt;ip, tmp_node-&gt;ip);
+-					ip[1] = min(node-&gt;ip, tmp_node-&gt;ip);
++					ids.address[0] = max_id(node-&gt;address, tmp_node-&gt;address);
++					ids.address[1] = min_id(node-&gt;address, tmp_node-&gt;address);
+ 
+-					if (NULL != (con = (struct node_con*)hash_find(con_hash, ip))) {
++					if (NULL != (con = (struct node_con*)hash_find(con_hash, &amp;ids))) {
+ 						s3d_del_object(con-&gt;obj_id);
+ 						con-&gt;obj_id = -1;
+ 					}
+@@ -321,7 +321,7 @@
+ 	float distance;
+ 	float tmp_mov_vec[3], vertex_buf[6];
+ 	float f, wish_distance;
+-	int ip[2];
++	struct node_con ids;
+ 	struct node_con *con;
+ 	struct node *first_node, *sec_node;
+ 	struct hash_it_t *hashit1, *hashit2;
+@@ -338,18 +338,21 @@
+ 			continue;
+ 
+ 		while (NULL != (hashit2 = hash_iterate(node_hash, hashit2))) {
++			struct node_id max_node;
+ 
+ 			sec_node = (struct node *) hashit2-&gt;bucket-&gt;data;
+ 			if (!sec_node-&gt;visible)
+ 				continue;
+ 
+-			if (first_node != sec_node &amp;&amp; (max(first_node-&gt;ip, sec_node-&gt;ip) == first_node-&gt;ip)) {
++			max_node = max_id(first_node-&gt;address, sec_node-&gt;address);
+ 
+-				ip[0] = first_node-&gt;ip;
+-				ip[1] = sec_node-&gt;ip;
++			if (first_node != sec_node &amp;&amp; id_comp(&amp;max_node, &amp;first_node-&gt;address) == 0) {
++
++				ids.address[0] = first_node-&gt;address;
++				ids.address[1] = sec_node-&gt;address;
+ 				distance = dirt(first_node-&gt;pos_vec, sec_node-&gt;pos_vec, tmp_mov_vec);
+ 
+-				if ((NULL != (con = (struct node_con*)hash_find(con_hash, ip)))) {
++				if ((NULL != (con = (struct node_con*)hash_find(con_hash, &amp;ids)))) {
+ 
+ 					/* we have a connection */
+ 					wish_distance = ((con-&gt;etx1_sqrt + con-&gt;etx2_sqrt)) + 4;
+
+Modified: trunk/apps/meshs3d/meshs3d.h
+===================================================================
+--- trunk/apps/meshs3d/meshs3d.h	2009-05-12 15:46:40 UTC (rev 1065)
++++ trunk/apps/meshs3d/meshs3d.h	2009-07-03 15:54:43 UTC (rev 1066)
+@@ -28,13 +28,29 @@
+ 
+ #define max(x,y) ((x)&gt;(y)?(x):(y))
+ #define min(x,y) ((x)&lt;(y)?(x):(y))
++#define max_id(x,y) (id_comp(&amp;(x), &amp;(y)) &gt; 0?(x):(y))
++#define min_id(x,y) (id_comp(&amp;(x), &amp;(y)) &lt;=0?(x):(y))
++
+ #define NAMEMAX  128
+ #define MAXLINESIZE 1000  /* lines in a digraph just shouldn't get that longer ... */
+ #define MAXDATASIZE 100   /* max number of bytes we can get at once  */
+ 
++enum node_type {
++	node_undefined = 0,
++	node_ip /*,
++	node_mac */
++};
++
++struct node_id {
++	union {
++		uint32_t ip;
++	} id;
++	enum node_type type;
++};
++
+ /* linked list for the all connections */
+ struct node_con {
+-	unsigned int ip[2];
++	struct node_id address[2];
+ 	float etx1;       /* etx of left olsr node */
+ 	float etx2;      /* etx of right olsr node */
+ 	float etx1_sqrt;     /* sqrt of etx of left olsr node */
+@@ -54,8 +70,8 @@
+ 
+ /* we contruct a binary tree to handle the nodes */
+ struct node {
+-	unsigned int ip;
+-	char ip_string[NAMEMAX];  /* host ip */
++	struct node_id address;
++	char name_string[NAMEMAX];  /* host ip */
+ 	int node_type;     /* normal = 0, internet gateway = 1, via hna announced network = 2 */
+ 	int node_type_modified;   /* node_type modified flag */
+ 	int last_seen;     /* last seen counter */
+@@ -67,14 +83,6 @@
+ 	float desc_length;    /* length of node description object in s3d */
+ };
+ 
+-
+-struct obj_to_ip {
+-	int id;
+-	struct olsr_node *olsr_node;
+-	struct obj_to_ip *next;
+-	struct obj_to_ip *prev;
+-};
+-
+ struct glob {
+ 	int debug;
+ 	int obj_node_normal;
+@@ -108,6 +116,7 @@
+ void lst_out(void);
+ struct olsr_node *move_lst_ptr(int *id);
+ */
++int id_comp(const struct node_id* id1, const struct node_id* id2);
+ int process_main(void);
+ void process_init(void);
+ 
+
+Modified: trunk/apps/meshs3d/process.c
+===================================================================
+--- trunk/apps/meshs3d/process.c	2009-05-12 15:46:40 UTC (rev 1065)
++++ trunk/apps/meshs3d/process.c	2009-07-03 15:54:43 UTC (rev 1066)
+@@ -45,29 +45,82 @@
+ struct hashtable_t *node_hash;
+ struct hashtable_t *con_hash;
+ 
++int id_comp(const struct node_id* id1, const struct node_id* id2)
++{
++	if (id1-&gt;type == id2-&gt;type) {
++		switch (id1-&gt;type) {
++		case node_ip:
++			if (id1-&gt;id.ip == id2-&gt;id.ip) {
++				return 0;
++			} else if (id1-&gt;id.ip &lt; id2-&gt;id.ip) {
++				return -1;
++			} else {
++				return 1;
++			}
++			break;
++		case node_undefined:
++			return 0;
++		};
++	} else if (id1-&gt;type &lt; id2-&gt;type) {
++		return -1;
++	} else {
++		return 1;
++	}
+ 
+-static int long_comp(const void *data1, const void *data2)
+-{
+-	return(memcmp(data1, data2, 8));
++	return 0;
+ }
+ 
+-static int long_choose(const void *data, int32_t size)
++static int id_choose(const struct node_id *id, int32_t size)
+ {
+-	unsigned char *key = (unsigned char*)data;
+ 	uint32_t hash = 0;
+ 	size_t i;
++	struct node_id tmp = *id;
+ 
+-	for (i = 0; i &lt; 8; i++) {
+-		hash += key[i];
+-		hash += (hash &lt;&lt; 10);
+-		hash ^= (hash &gt;&gt; 6);
+-	}
++	switch (id-&gt;type) {
++	case node_ip:
++		for (i = 0; i &lt; sizeof(id-&gt;id.ip); i++) {
++			hash += tmp.id.ip &amp; 0xff;
++			tmp.id.ip = tmp.id.ip &gt;&gt; 8;
++			hash += (hash &lt;&lt; 10);
++			hash ^= (hash &gt;&gt; 6);
++		}
++		break;
++	case node_undefined:
++		hash = 0;
++	};
++
+ 	hash += (hash &lt;&lt; 3);
+ 	hash ^= (hash &gt;&gt; 11);
+ 	hash += (hash &lt;&lt; 15);
+ 	return (hash % size);
+ }
+ 
++static int long_comp(const void *data1, const void *data2)
++{
++	struct node_con *con1 = (struct node_con*)data1;
++	struct node_con *con2 = (struct node_con*)data2;
++	int cmp1, cmp2;
++
++	cmp1 = id_comp(&amp;con1-&gt;address[0], &amp;con2-&gt;address[0]);
++	cmp2 = id_comp(&amp;con1-&gt;address[1], &amp;con2-&gt;address[1]);
++
++	if (cmp1 == 0) {
++		return cmp2;
++	} else {
++		return cmp1;
++	}
++
++	return 0;
++}
++
++static int long_choose(const void *data, int32_t size)
++{
++	struct node_con *con = (struct node_con*)data;
++	int hash = id_choose(&amp;con-&gt;address[0], size)+id_choose(&amp;con-&gt;address[1], size);
++
++	return (hash % size);
++}
++
+ static int orig_comp(const void *data1, const void *data2)
+ {
+ 	return(memcmp(data1, data2, 4));
+@@ -112,21 +165,21 @@
+ 	return;
+ }
+ 
+-static void handle_con(unsigned int ip1, unsigned int ip2, float etx)
++static void handle_con(struct node_id id1, struct node_id id2, float etx)
+ {
+ 
+-	unsigned int ip[2];
++	struct node_con ids;
+ 	struct node_con *con;
+ 	struct hashtable_t *swaphash;
+ 
+-	ip[0] = max(ip1, ip2);
+-	ip[1] = min(ip1, ip2);
++	ids.address[0] = max_id(id1, id2);
++	ids.address[1] = min_id(id1, id2);
+ 
+-	con = (struct node_con*) hash_find(con_hash, ip);
++	con = (struct node_con*) hash_find(con_hash, &amp;ids);
+ 	if (con == NULL) {
+ 		con = (struct node_con *) debugMalloc(sizeof(struct node_con), 102);
+-		con-&gt;ip[0] = ip[0];
+-		con-&gt;ip[1] = ip[1];
++		con-&gt;address[0] = ids.address[0];
++		con-&gt;address[1] = ids.address[1];
+ 		con-&gt;color = 0;
+ 		/* draw line */
+ 		con-&gt;obj_id = s3d_new_object();
+@@ -159,7 +212,7 @@
+ 		s3d_flags_on(con-&gt;obj_id, S3D_OF_VISIBLE);
+ 	}
+ 
+-	if (con-&gt;ip[0] == ip1) {
++	if (id_comp(&amp;con-&gt;address[0], &amp;id1) == 0) {
+ 		con-&gt;etx1 = etx;
+ 		if (etx != -1000.00)
+ 			con-&gt;etx1_sqrt = sqrt(etx);
+@@ -185,7 +238,7 @@
+ 
+ }
+ 
+-static struct node *handle_mesh_node(unsigned int ip, char *ip_string)
++static struct node *handle_mesh_node(struct node_id id, char *name_string)
+ {
+ 	struct node *orig_node;
+ 	struct hashtable_t *swaphash;
+@@ -196,12 +249,12 @@
+ 			exit_error(&quot;Couldn't resize hash table \n&quot;);
+ 		node_hash = swaphash;
+ 	}
+-	orig_node = (struct node *) hash_find(node_hash, &amp;ip);
++	orig_node = (struct node *) hash_find(node_hash, &amp;id);
+ 
+ 	if (NULL == orig_node) {
+ 		orig_node = (struct node *)debugMalloc(sizeof(struct node), 101);
+-		orig_node-&gt;ip = ip;
+-		strncpy(orig_node-&gt;ip_string, ip_string, NAMEMAX);
++		orig_node-&gt;address = id;
++		strncpy(orig_node-&gt;name_string, name_string, NAMEMAX);
+ 
+ 		orig_node-&gt;node_type = 0;
+ 		orig_node-&gt;node_type_modified = 1;
+@@ -240,7 +293,8 @@
+ 	char hna_node[NAMEMAX];
+ 
+ 	struct node *tmp_node;
+-	unsigned int int_con_from = 0, int_con_to = 0, address;
++	struct node_id int_con_from, int_con_to;
++	unsigned int address;
+ 
+ 	lbuf_ptr = lbuf;
+ 	last_cr_ptr = NULL;
+@@ -248,6 +302,8 @@
+ 	con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
+ 	dn = 0;
+ 
++	memset(&amp;int_con_from, '\0', sizeof(struct node_id));
++	memset(&amp;int_con_to, '\0', sizeof(struct node_id));
+ 
+ 	while ((*lbuf_ptr) != '\0') {
+ 		if ((*lbuf_ptr) == '\n') {
+@@ -293,6 +349,7 @@
+ 							printf(&quot;%s is not a valid ip address\n&quot;, con_from);
+ 							continue;
+ 						}
++						int_con_from.type = node_ip;
+ 
+ 						tmp_node = handle_mesh_node(int_con_from, con_from);
+ 
+@@ -300,7 +357,7 @@
+ 
+ 							tmp_node-&gt;node_type = 1;
+ 							tmp_node-&gt;node_type_modified = 1;
+-							if (Global.debug) printf(&quot;new internet: %s\n&quot;, tmp_node-&gt;ip_string);
++							if (Global.debug) printf(&quot;new internet: %s\n&quot;, tmp_node-&gt;name_string);
+ 
+ 						}
+ 
+@@ -320,10 +377,12 @@
+ 							printf(&quot;%s is not a valid ip address\n&quot;, con_from);
+ 							continue;
+ 						}
++						int_con_from.type = node_ip;
+ 						if (inet_pton(AF_INET, hna_node, &amp;int_con_to) &lt; 1) {
+ 							printf(&quot;%s is not a valid ip address\n&quot;, hna_node);
+ 							continue;
+ 						}
++						int_con_to.type = node_ip;
+ 						tmp_char[0] = '/';
+ 
+ 						handle_mesh_node(int_con_from, con_from);
+@@ -333,7 +392,7 @@
+ 
+ 							tmp_node-&gt;node_type = 2;
+ 							tmp_node-&gt;node_type_modified = 1;
+-							if (Global.debug) printf(&quot;new hna network: %s\n&quot;, tmp_node-&gt;ip_string);
++							if (Global.debug) printf(&quot;new hna network: %s\n&quot;, tmp_node-&gt;name_string);
+ 
+ 						}
+ 
+@@ -351,10 +410,12 @@
+ 						printf(&quot;%s is not a valid ip address\n&quot;, con_from);
+ 						continue;
+ 					}
++					int_con_from.type = node_ip;
+ 					if (inet_pton(AF_INET, con_to, &amp;int_con_to) &lt; 1) {
+ 						printf(&quot;%s is not a valid ip address\n&quot;, con_to);
+ 						continue;
+ 					}
++					int_con_to.type = node_ip;
+ 
+ 					handle_mesh_node(int_con_from, con_from);
+ 					handle_mesh_node(int_con_to, con_to);
+@@ -363,8 +424,8 @@
+ 				}
+ 				/* remove zerobyte */
+ 				(*con_from_end) = (*con_to_end) = (*etx_end) = '&quot;';
+-				int_con_from = 0;
+-				int_con_to = 0;
++				memset(&amp;int_con_from, '\0', sizeof(struct node_id));
++				memset(&amp;int_con_to, '\0', sizeof(struct node_id));
+ 				con_from = con_from_end = con_to = con_to_end = etx = etx_end = NULL;
+ 				dn = 0;
+ 				last_cr_ptr = lbuf_ptr;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="001047.html">[S3d-svn] r1067 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1046">[ date ]</a>
+              <a href="thread.html#1046">[ thread ]</a>
+              <a href="subject.html#1046">[ subject ]</a>
+              <a href="author.html#1046">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

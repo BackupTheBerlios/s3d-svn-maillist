@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r920 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r920%20-%20trunk&In-Reply-To=%3C200807101655.m6AGtRJJ004557%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000912.html">
+   <LINK REL="Next"  HREF="000914.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r920 - trunk</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r920%20-%20trunk&In-Reply-To=%3C200807101655.m6AGtRJJ004557%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r920 - trunk">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Thu Jul 10 18:55:28 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000912.html">[S3d-svn] r919 - in trunk: . cmake/modules
+</A></li>
+        <LI>Next message: <A HREF="000914.html">[S3d-svn] r920 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#913">[ date ]</a>
+              <a href="thread.html#913">[ thread ]</a>
+              <a href="subject.html#913">[ subject ]</a>
+              <a href="author.html#913">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-07-10 18:55:24 +0200 (Thu, 10 Jul 2008)
+New Revision: 920
+
+Added:
+   trunk/.gitattributes
+Modified:
+   trunk/CMakeLists.txt
+Log:
+Only include experimental in build when it can be found
+
+It is possible to create a new release without the experimental folder
+and without changing any other file. This should make it possible to
+create a new release archive with git (&gt;= 1.6.0) by calling
+
+export V=0.3; git archive --format=tar --prefix=s3d-$V/ v$V | gzip -9 &gt; s3d-$V.tar.gz
+
+Added: trunk/.gitattributes
+===================================================================
+--- trunk/.gitattributes	2008-07-10 16:55:16 UTC (rev 919)
++++ trunk/.gitattributes	2008-07-10 16:55:24 UTC (rev 920)
+@@ -0,0 +1,3 @@
++experimental	export-ignore
++.gitignore	export-ignore
++.gitattributes	export-ignore
+
+Modified: trunk/CMakeLists.txt
+===================================================================
+--- trunk/CMakeLists.txt	2008-07-10 16:55:16 UTC (rev 919)
++++ trunk/CMakeLists.txt	2008-07-10 16:55:24 UTC (rev 920)
+@@ -29,13 +29,17 @@
+ add_subdirectory(libs3d)
+ add_subdirectory(libs3dw)
+ add_subdirectory(apps)
+-add_subdirectory(experimental)
+ add_subdirectory(cmake)
+ add_subdirectory(Documentation)
+ add_subdirectory(example)
+ add_subdirectory(objs)
+ add_subdirectory(server)
+ 
++file(GLOB INCLUDE_EXPERIMENTAL experimental)
++if (INCLUDE_EXPERIMENTAL)
++	add_subdirectory(experimental)
++endif (INCLUDE_EXPERIMENTAL)
++
+ # Generate s3drc
+ configure_file(s3drc.cmake ${s3d_BINARY_DIR}/s3drc)
+ install(FILES ${s3d_BINARY_DIR}/s3drc DESTINATION /etc)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000912.html">[S3d-svn] r919 - in trunk: . cmake/modules
+</A></li>
+	<LI>Next message: <A HREF="000914.html">[S3d-svn] r920 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#913">[ date ]</a>
+              <a href="thread.html#913">[ thread ]</a>
+              <a href="subject.html#913">[ subject ]</a>
+              <a href="author.html#913">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

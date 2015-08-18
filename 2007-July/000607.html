@@ -1,0 +1,217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r615 - in branches/s3d-cmake: libs3d server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r615%20-%20in%20branches/s3d-cmake%3A%20libs3d%20server&In-Reply-To=%3C200707011314.l61DEv6M031979%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000610.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r615 - in branches/s3d-cmake: libs3d server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r615%20-%20in%20branches/s3d-cmake%3A%20libs3d%20server&In-Reply-To=%3C200707011314.l61DEv6M031979%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r615 - in branches/s3d-cmake: libs3d server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Jul  1 15:14:57 CEST 2007</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000610.html">[S3d-svn] r616 - in branches/s3d-cmake: . apps/s3dosm libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#607">[ date ]</a>
+              <a href="thread.html#607">[ thread ]</a>
+              <a href="subject.html#607">[ subject ]</a>
+              <a href="author.html#607">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-07-01 15:14:56 +0200 (Sun, 01 Jul 2007)
+New Revision: 615
+
+Modified:
+   branches/s3d-cmake/libs3d/callback.c
+   branches/s3d-cmake/libs3d/event.c
+   branches/s3d-cmake/libs3d/io.c
+   branches/s3d-cmake/libs3d/object_queue.c
+   branches/s3d-cmake/libs3d/s3dlib.h
+   branches/s3d-cmake/libs3d/shm.c
+   branches/s3d-cmake/libs3d/tcp.c
+   branches/s3d-cmake/server/global.h
+Log:
+- some fixes for c89/c99 strict mode compatibility
+
+
+Modified: branches/s3d-cmake/libs3d/callback.c
+===================================================================
+--- branches/s3d-cmake/libs3d/callback.c	2007-06-26 18:46:01 UTC (rev 614)
++++ branches/s3d-cmake/libs3d/callback.c	2007-07-01 13:14:56 UTC (rev 615)
+@@ -53,6 +53,7 @@
+ static int _s3d_ignore(struct s3d_evt *evt)
+ {
+ 	/* do plain nothing */
++	return(0);
+ }
+ /*  sets a callback */
+ void s3d_set_callback(uint8_t event, s3d_cb func)
+
+Modified: branches/s3d-cmake/libs3d/event.c
+===================================================================
+--- branches/s3d-cmake/libs3d/event.c	2007-06-26 18:46:01 UTC (rev 614)
++++ branches/s3d-cmake/libs3d/event.c	2007-07-01 13:14:56 UTC (rev 615)
+@@ -67,7 +67,7 @@
+ 		s3d_stack=s3d_stack-&gt;next;
+ 	return ret;
+ }
+-struct s3d_evt *s3d_find_event(u_int8_t event)
++struct s3d_evt *s3d_find_event(uint8_t event)
+ {
+ 	struct s3d_evt *p;
+ 	p=s3d_stack;
+
+Modified: branches/s3d-cmake/libs3d/io.c
+===================================================================
+--- branches/s3d-cmake/libs3d/io.c	2007-06-26 18:46:01 UTC (rev 614)
++++ branches/s3d-cmake/libs3d/io.c	2007-07-01 13:14:56 UTC (rev 615)
+@@ -33,9 +33,12 @@
+ #include &lt;errno.h&gt;		 /*  errno */
+ #include &lt;sys/socket.h&gt;  /*  socket() */
+ #include &lt;getopt.h&gt;		 /*  getopt() */
++#define _POSIX_C_SOURCE 199309		/* we want struct timespec to be defined */
++#define __USE_POSIX199309 1
+ #include &lt;time.h&gt;		 /*  nanosleep() */
+ #ifdef SIGS
+ #include &lt;fcntl.h&gt;		 /*  fcntl() */
++#define __USE_BSD	1		/* we want sig_t to be defined */
+ #include &lt;signal.h&gt;		 /*  signal.h, SIG_PIPE */
+ #endif
+ #include &lt;netinet/in.h&gt;  /*  htons(),htonl() */
+
+Modified: branches/s3d-cmake/libs3d/object_queue.c
+===================================================================
+--- branches/s3d-cmake/libs3d/object_queue.c	2007-06-26 18:46:01 UTC (rev 614)
++++ branches/s3d-cmake/libs3d/object_queue.c	2007-07-01 13:14:56 UTC (rev 615)
+@@ -26,6 +26,8 @@
+ #include &quot;s3dlib.h&quot;
+ #include &quot;proto.h&quot;	 
+ #include &lt;stdlib.h&gt;	 /*  malloc(),free(), realloc() */
++#define _POSIX_C_SOURCE 199309		/* we want struct timespec to be defined */
++#define __USE_POSIX199309 1
+ #include &lt;time.h&gt;		 /* nanosleep() */
+ 
+ /*  objects are requested before beeing used for having fast  */
+
+Modified: branches/s3d-cmake/libs3d/s3dlib.h
+===================================================================
+--- branches/s3d-cmake/libs3d/s3dlib.h	2007-06-26 18:46:01 UTC (rev 614)
++++ branches/s3d-cmake/libs3d/s3dlib.h	2007-07-01 13:14:56 UTC (rev 615)
+@@ -60,11 +60,20 @@
+ /*  some local prototypes: */
+ /*  char *s3d_open_file(char *fname); */
+ int net_prot_in(uint8_t opcode, uint16_t length, char *buf);
++#ifdef DEBUG
+ void s3dprintf(int relevance, const char *fmt, ...);
++void errdn(int relevance, char *func,int en); 
++void errds(int relevance,char *func, const char *fmt, ...);
++
++#else 
++void static __inline__ s3dprintf(int relevance, const char *fmt, ...) {}
++void static __inline__ errdn(int relevance, char *func,int en) {}
++void static __inline__ errds(int relevance,char *func, const char *fmt, ...) {}
++
++#endif
+ void errn(char *func,int en);
+ void errs(char *func, char *msg);
+-void errdn(int relevance, char *func,int en); 
+-void errds(int relevance,char *func, const char *fmt, ...);
++
+ /*  fontselect.c */
+ char *s3d_findfont(char *mask);
+ /*  object_queue.c */
+@@ -115,10 +124,4 @@
+ };
+ int _s3d_tesselate(struct tessp_t *t,struct t_buf *b);
+ 
+-#include &quot;config.h&quot;
+-#ifndef DEBUG
+-#define s3dprintf(...) /* nothing */
+-#define errdn(...) /* nothing */
+-#define errds(...) /* nothing */
+-#endif
+ 
+
+Modified: branches/s3d-cmake/libs3d/shm.c
+===================================================================
+--- branches/s3d-cmake/libs3d/shm.c	2007-06-26 18:46:01 UTC (rev 614)
++++ branches/s3d-cmake/libs3d/shm.c	2007-07-01 13:14:56 UTC (rev 615)
+@@ -30,6 +30,8 @@
+ #include &lt;sys/shm.h&gt;
+ #include &lt;netinet/in.h&gt;	/* ntohs() */
+ #include &lt;errno.h&gt; 		/* errno */
++#define _POSIX_C_SOURCE 199309		/* we want struct timespec to be defined */
++#define __USE_POSIX199309 1
+ #include &lt;time.h&gt;		/* nanosleep() */
+ #ifdef SHM
+ 
+
+Modified: branches/s3d-cmake/libs3d/tcp.c
+===================================================================
+--- branches/s3d-cmake/libs3d/tcp.c	2007-06-26 18:46:01 UTC (rev 614)
++++ branches/s3d-cmake/libs3d/tcp.c	2007-07-01 13:14:56 UTC (rev 615)
+@@ -35,6 +35,7 @@
+ 	#include &lt;netdb.h&gt;		 /*  gethostbyname()  */
+ #endif
+ #ifdef SIGS
++#define __USE_BSD	1		/* we want sig_t and F_SETOWN to be defined */
+ #include &lt;fcntl.h&gt;		 /*  fcntl */
+ #include &lt;signal.h&gt;		 /*  signal(), SIGPIPE, SIGIO */
+ extern int _s3d_sigio;
+
+Modified: branches/s3d-cmake/server/global.h
+===================================================================
+--- branches/s3d-cmake/server/global.h	2007-06-26 18:46:01 UTC (rev 614)
++++ branches/s3d-cmake/server/global.h	2007-07-01 13:14:56 UTC (rev 615)
+@@ -277,8 +277,8 @@
+ void errds(int relevance,char *func, const char *fmt, ...);
+ void s3dprintf(int relevance, const char *msg, ...);
+ #else
+-static inline void errds(int relevance,char *func, const char *fmt, ...) {}
+-static inline void s3dprintf(int relevance, const char *msg, ...) {}
++static void __inline__ errds(int relevance,char *func, const char *fmt, ...) {}
++static void __inline__ s3dprintf(int relevance, const char *msg, ...) {}
+ #endif
+ /*  graphics.c */
+ int graphics_quit(void);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000610.html">[S3d-svn] r616 - in branches/s3d-cmake: . apps/s3dosm libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#607">[ date ]</a>
+              <a href="thread.html#607">[ thread ]</a>
+              <a href="subject.html#607">[ subject ]</a>
+              <a href="author.html#607">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

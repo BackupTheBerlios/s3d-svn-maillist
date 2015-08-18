@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r946 - trunk/apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r946%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200808162203.m7GM3UFP001107%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000925.html">
+   <LINK REL="Next"  HREF="000932.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r946 - trunk/apps/s3dosm</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r946%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200808162203.m7GM3UFP001107%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r946 - trunk/apps/s3dosm">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Aug 17 00:03:30 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000925.html">[S3d-svn] r945 - in trunk: apps/s3dfm apps/s3dosm example	experimental/comptest experimental/olsrs3d libs3d libs3dw server
+</A></li>
+        <LI>Next message: <A HREF="000932.html">[S3d-svn] r947 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#930">[ date ]</a>
+              <a href="thread.html#930">[ thread ]</a>
+              <a href="subject.html#930">[ subject ]</a>
+              <a href="author.html#930">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-08-17 00:03:30 +0200 (Sun, 17 Aug 2008)
+New Revision: 946
+
+Modified:
+   trunk/apps/s3dosm/osm.c
+Log:
+s3dosm: Only build segments between nodes with references (&lt;nd ref=&quot;...&quot; /&gt;)
+
+Modified: trunk/apps/s3dosm/osm.c
+===================================================================
+--- trunk/apps/s3dosm/osm.c	2008-08-16 22:03:23 UTC (rev 945)
++++ trunk/apps/s3dosm/osm.c	2008-08-16 22:03:30 UTC (rev 946)
+@@ -52,10 +52,9 @@
+ 	way_t way;
+ 	xmlNodePtr kids;
+ 	xmlAttrPtr attr, kattr;
+-	int nd, last_nd;
++	int nd = 0, last_nd = 0;
+ 	segment_t segment;
+ 	static int seg = 0;
+-	last_nd = 0;
+ 
+ 	way_init(&amp;way);
+ 
+@@ -82,7 +81,9 @@
+ 
+ 				db_insert_way_seg(&amp;way, seg);
+ 			}
+-			last_nd = nd;
++			if (nd != 0) {
++				last_nd = nd;
++			}
+ 		}
+ 	}
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000925.html">[S3d-svn] r945 - in trunk: apps/s3dfm apps/s3dosm example	experimental/comptest experimental/olsrs3d libs3d libs3dw server
+</A></li>
+	<LI>Next message: <A HREF="000932.html">[S3d-svn] r947 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#930">[ date ]</a>
+              <a href="thread.html#930">[ thread ]</a>
+              <a href="subject.html#930">[ subject ]</a>
+              <a href="author.html#930">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

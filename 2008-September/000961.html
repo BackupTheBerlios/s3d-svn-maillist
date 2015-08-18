@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r981 - trunk/Documentation
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r981%20-%20trunk/Documentation&In-Reply-To=%3C200809011844.m81Iix5v005154%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000960.html">
+   <LINK REL="Next"  HREF="000962.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r981 - trunk/Documentation</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r981%20-%20trunk/Documentation&In-Reply-To=%3C200809011844.m81Iix5v005154%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r981 - trunk/Documentation">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep  1 20:44:59 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000960.html">[S3d-svn] r980 - in trunk: Documentation Documentation/libs3d	Documentation/libs3dw libs3d libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000962.html">[S3d-svn] r982 - in trunk/Documentation: . libs3d libs3dw manpages	manpages/man1 manpages/man3 manpages/man9
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#961">[ date ]</a>
+              <a href="thread.html#961">[ thread ]</a>
+              <a href="subject.html#961">[ subject ]</a>
+              <a href="author.html#961">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-01 20:44:59 +0200 (Mon, 01 Sep 2008)
+New Revision: 981
+
+Modified:
+   trunk/Documentation/extractdefinitions.py
+Log:
+Use paramdef for every parameter and not for all one
+
+Modified: trunk/Documentation/extractdefinitions.py
+===================================================================
+--- trunk/Documentation/extractdefinitions.py	2008-08-31 22:19:18 UTC (rev 980)
++++ trunk/Documentation/extractdefinitions.py	2008-09-01 18:44:59 UTC (rev 981)
+@@ -279,11 +279,9 @@
+ 		create_append_text(sgml, func, function['name'])
+ 
+ 		# add parameter to function definition
+-		paramdef = create_append(sgml, funcprototype, 'paramdef')
+ 		param_num = len(function['param'])
+ 		for i in range(0, param_num):
+-			if i != 0:
+-				create_append_text(sgml, paramdef, &quot;, &quot;)
++			paramdef = create_append(sgml, funcprototype, 'paramdef')
+ 
+ 			create_append_text(sgml, paramdef, function['param'][i]['type'])
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000960.html">[S3d-svn] r980 - in trunk: Documentation Documentation/libs3d	Documentation/libs3dw libs3d libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000962.html">[S3d-svn] r982 - in trunk/Documentation: . libs3d libs3dw manpages	manpages/man1 manpages/man3 manpages/man9
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#961">[ date ]</a>
+              <a href="thread.html#961">[ thread ]</a>
+              <a href="subject.html#961">[ subject ]</a>
+              <a href="author.html#961">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

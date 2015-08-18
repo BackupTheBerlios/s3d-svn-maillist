@@ -1,0 +1,190 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r889 - trunk/svnonly/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-January/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r889%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200801010307.m0137gwQ026472%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000883.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r889 - trunk/svnonly/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r889%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200801010307.m0137gwQ026472%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r889 - trunk/svnonly/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan  1 04:07:42 CET 2008</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000883.html">[S3d-svn] r890 - in trunk: apps/dot_mcp libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#882">[ date ]</a>
+              <a href="thread.html#882">[ thread ]</a>
+              <a href="subject.html#882">[ subject ]</a>
+              <a href="author.html#882">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2008-01-01 04:07:41 +0100 (Tue, 01 Jan 2008)
+New Revision: 889
+
+Modified:
+   trunk/svnonly/comptest/comptest.c
+Log:
+- track pointer position
+
+
+Modified: trunk/svnonly/comptest/comptest.c
+===================================================================
+--- trunk/svnonly/comptest/comptest.c	2007-12-31 19:13:55 UTC (rev 888)
++++ trunk/svnonly/comptest/comptest.c	2008-01-01 03:07:41 UTC (rev 889)
+@@ -27,6 +27,7 @@
+ #include &lt;stdlib.h&gt;        /* malloc(), free() */
+ #include &lt;time.h&gt;         /* nanosleep() */
+ #include &lt;errno.h&gt;			/* errno */
++#include &lt;math.h&gt;			/* cos(), sin() */
+ 
+ #include &lt;sys/time.h&gt;		/* gettimeofday() */
+ #include &lt;time.h&gt;			/* gettimeofday() */
+@@ -158,8 +159,95 @@
+ 
+ 	}
+ 	return(0);
++}
++void x_rot(float vec[3], float angle) 
++{
++	float bak[3];
++	float c,s;
++	bak[1] = vec[1];
++	bak[2] = vec[2];
++	c = cos(angle);
++	s = sin(angle);
++	vec[1] = c*bak[1] - s*bak[2];
++	vec[2] = s*bak[1] + c*bak[2];
++}
+ 
++void y_rot(float vec[3], float angle) 
++{
++	float bak[3];
++	float c,s;
++	bak[0] = vec[0];
++	bak[2] = vec[2];
++
++	c = cos(angle);
++	s = sin(angle);
++	vec[0] = c*bak[0]  + s*bak[2];
++	vec[2] = -s*bak[0] + c*bak[2];
+ }
++float cam_pos[3]={0,0,0};
++float cam_rot[3]={0,0,0};
++float ptr_rot[3]={0,0,0};
++float ptr_pos[3]={0,0,0};
++int cursor;
++
++static int oinfo(struct s3d_evt *evt) 
++{
++	float ptr_dir[3];
++	float t;
++	struct s3d_obj_info *oinf= (struct s3d_obj_info *)evt-&gt;buf;
++	switch (oinf-&gt;object) {
++		case 0:	/* camera */
++			cam_pos[0] = oinf-&gt;trans_x;
++			cam_pos[1] = oinf-&gt;trans_y;
++			cam_pos[2] = oinf-&gt;trans_z;
++			cam_rot[0] = M_PI/180.0*oinf-&gt;rot_x;
++			cam_rot[1] = M_PI/180.0*oinf-&gt;rot_y;
++			cam_rot[2] = M_PI/180.0*oinf-&gt;rot_z;
++			break;
++		case 1:	/* pointer */
++			ptr_rot[0] = M_PI/180.0*oinf-&gt;rot_x;
++			ptr_rot[1] = M_PI/180.0*oinf-&gt;rot_y;
++			ptr_rot[2] = M_PI/180.0*oinf-&gt;rot_z;
++			break;
++	}
++	if (oinf-&gt;object &gt;= 2)
++		return(-1);
++
++	
++	printf(&quot;object info for object %d, name %s\n&quot;, oinf-&gt;object, oinf-&gt;name);
++	printf(&quot;trans: %3.3f %3.3f %3.3f\n&quot;, oinf-&gt;trans_x, oinf-&gt;trans_y, oinf-&gt;trans_z);
++	printf(&quot;rot:   %3.3f %3.3f %3.3f\n&quot;, oinf-&gt;rot_x, oinf-&gt;rot_y, oinf-&gt;rot_z);
++
++
++	/* TODO: ptr_r_y * ptr_r_x * cam_r_y * cam_r_x * I */
++	ptr_dir[0] = 0;
++	ptr_dir[1] = 0;
++	ptr_dir[2] = -1;
++
++
++	x_rot(ptr_dir, cam_rot[0]);
++	y_rot(ptr_dir, cam_rot[1]);
++	x_rot(ptr_dir, ptr_rot[0]);
++	y_rot(ptr_dir, ptr_rot[1]);
++
++
++
++	printf(&quot;pointer direction: %3.3f %3.3f %3.3f\n&quot;, ptr_dir[0], ptr_dir[1], ptr_dir[2]);
++
++	if (fabs(ptr_dir[2]) &lt; 1e-3)
++		return(-1);
++
++	t = - cam_pos[2]/ptr_dir[2];
++	ptr_pos[0] = cam_pos[0] + t *ptr_dir[0];
++	ptr_pos[1] = cam_pos[1] + t *ptr_dir[1];
++	ptr_pos[2] = 0;
++
++	printf(&quot;pointer position: %3.3f %3.3f\n&quot;, ptr_pos[0], ptr_pos[1]);
++	
++	s3d_translate(cursor, ptr_pos[0], ptr_pos[1], ptr_pos[2]);
++
++	return(0);
++}
+ int screen_width = 0;
+ int screen_height = 0;
+ int screen_oid = -1;
+@@ -184,7 +272,11 @@
+ 		return(1);
+ 
+ 	if (!s3d_init(&amp;argc, &amp;argv, &quot;comptest&quot;)) {
++		cursor = s3d_import_model_file(&quot;objs/arrow.3ds&quot;);
++		s3d_flags_on(cursor, S3D_OF_VISIBLE);
++
+ 		s3d_set_callback(S3D_EVENT_KEY, key);
++		s3d_set_callback(S3D_EVENT_OBJ_INFO, oinfo);
+ 
+ 		set_screenpos();
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000883.html">[S3d-svn] r890 - in trunk: apps/dot_mcp libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#882">[ date ]</a>
+              <a href="thread.html#882">[ thread ]</a>
+              <a href="subject.html#882">[ subject ]</a>
+              <a href="author.html#882">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

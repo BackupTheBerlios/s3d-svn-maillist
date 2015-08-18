@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r632 - trunk/extras/distro/gentoo/media-gfx/s3d-svn
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r632%20-%20trunk/extras/distro/gentoo/media-gfx/s3d-svn&In-Reply-To=%3C200707050000.l6500Lkk004363%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000622.html">
+   <LINK REL="Next"  HREF="000623.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r632 - trunk/extras/distro/gentoo/media-gfx/s3d-svn</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r632%20-%20trunk/extras/distro/gentoo/media-gfx/s3d-svn&In-Reply-To=%3C200707050000.l6500Lkk004363%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r632 - trunk/extras/distro/gentoo/media-gfx/s3d-svn">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Thu Jul  5 02:00:21 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000622.html">[S3d-svn] r630 - in trunk: . apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000623.html">[S3d-svn] r631 - in trunk: . apps/kism3d apps/s3dfm apps/s3dvt	cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#624">[ date ]</a>
+              <a href="thread.html#624">[ thread ]</a>
+              <a href="subject.html#624">[ subject ]</a>
+              <a href="author.html#624">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-07-05 02:00:14 +0200 (Thu, 05 Jul 2007)
+New Revision: 632
+
+Modified:
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/ChangeLog
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest
+   trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild
+Log:
+- Updated gentoo s3d-svn ebuilds to use cmake instead of autotools
+
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/ChangeLog
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/ChangeLog	2007-07-05 00:00:12 UTC (rev 631)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/ChangeLog	2007-07-05 00:00:14 UTC (rev 632)
+@@ -1,5 +1,10 @@
+ # ChangeLog for media-gfx/s3d-svn
+ 
++*s3d-svn-9999 (5 Jul 2007)
++
++  5 Jul 2007; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; s3d-svn-9999.ebuild:
++  Changed ebuild to use cmake instead of autotools.
++
+ *s3d-svn-9999 (26 Nov 2006)
+ 
+   26 Nov 2006; Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt; s3d-svn-9999.ebuild:
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest	2007-07-05 00:00:12 UTC (rev 631)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/Manifest	2007-07-05 00:00:14 UTC (rev 632)
+@@ -1,11 +1,11 @@
+-EBUILD s3d-svn-9999.ebuild 986 RMD160 8e237a2e5b13cb61449016e5eff0a9924d0270c3 SHA1 112dd0180beebd50a46584ae50d7024cca4935ec SHA256 a7311f9e57c595bdc77a7bbe4ead0f972222bd33f86a16a7ad4467fdc9ebaad0
+-MD5 333cca4eef0cb4e7e7bf6478e7127993 s3d-svn-9999.ebuild 986
+-RMD160 8e237a2e5b13cb61449016e5eff0a9924d0270c3 s3d-svn-9999.ebuild 986
+-SHA256 a7311f9e57c595bdc77a7bbe4ead0f972222bd33f86a16a7ad4467fdc9ebaad0 s3d-svn-9999.ebuild 986
+-MISC ChangeLog 295 RMD160 818b9134758d8a5d81be67d25ab990fe7cc71283 SHA1 529b5c00b3ad8067f06ce4bcc41d6a185fb2670d SHA256 cd5d36bee2dce3a94ce0f4f65ad7dc4ab8d299e48e57f48aa0a609eb06fe4885
+-MD5 569601eaa0bbba92427ed05da0dfc050 ChangeLog 295
+-RMD160 818b9134758d8a5d81be67d25ab990fe7cc71283 ChangeLog 295
+-SHA256 cd5d36bee2dce3a94ce0f4f65ad7dc4ab8d299e48e57f48aa0a609eb06fe4885 ChangeLog 295
++EBUILD s3d-svn-9999.ebuild 935 RMD160 8ba7ed1ef9f990eb127c39232a2a5afc50e46740 SHA1 102fc90130eb6bfc86a2bacb7bd6813f39723c61 SHA256 c1e976fb90541a2d360b001052c085f99a10682d5d87479816b07e40cc7acee9
++MD5 fc848a6f76a9fd799e482112d828aed8 s3d-svn-9999.ebuild 935
++RMD160 8ba7ed1ef9f990eb127c39232a2a5afc50e46740 s3d-svn-9999.ebuild 935
++SHA256 c1e976fb90541a2d360b001052c085f99a10682d5d87479816b07e40cc7acee9 s3d-svn-9999.ebuild 935
++MISC ChangeLog 450 RMD160 5e67ae09846f759c44d03abfa3a967e72b50f928 SHA1 3e6232ff249a170c9fab0c2ce88d84fec3ceff1e SHA256 0ce2752a5d002d2ff44085b1cc9ccddaa8d82e52fbaab77cf263d839aa1ab77a
++MD5 ecd9590d12d1825549e098a83c6b37b8 ChangeLog 450
++RMD160 5e67ae09846f759c44d03abfa3a967e72b50f928 ChangeLog 450
++SHA256 0ce2752a5d002d2ff44085b1cc9ccddaa8d82e52fbaab77cf263d839aa1ab77a ChangeLog 450
+ MISC metadata.xml 239 RMD160 236f28d8249f562b764e2d854580d8301b150418 SHA1 76f167e3abff81e9535c16a637fd1e7f91d4fda3 SHA256 c0f08f1f0c1ce07df414cd87bf028a15cae639c89b2d636714d50d8aa77c370f
+ MD5 261031c8b7aca6f50babf7e44b35deb1 metadata.xml 239
+ RMD160 236f28d8249f562b764e2d854580d8301b150418 metadata.xml 239
+
+Modified: trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild
+===================================================================
+--- trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild	2007-07-05 00:00:12 UTC (rev 631)
++++ trunk/extras/distro/gentoo/media-gfx/s3d-svn/s3d-svn-9999.ebuild	2007-07-05 00:00:14 UTC (rev 632)
+@@ -3,7 +3,6 @@
+ IUSE=&quot;gps&quot;
+ 
+ ESVN_REPO_URI=&quot;<A HREF="http://svn.berlios.de/svnroot/repos/s3d/trunk">http://svn.berlios.de/svnroot/repos/s3d/trunk</A>&quot;
+-ESVN_BOOTSTRAP=&quot;./autogen.sh --no-configure&quot;
+ 
+ DESCRIPTION=&quot;a 3d network display server&quot;
+ HOMEPAGE=&quot;<A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A>&quot;
+@@ -13,11 +12,9 @@
+ SLOT=&quot;0&quot;
+ 
+ DEPEND=&quot;${RDEPEND}
+-	&gt;=sys-devel/autoconf-2.59
+-	&gt;=sys-devel/automake-1.9
+ 	sys-devel/flex
+-	&gt;=sys-devel/libtool-1.5
+ 	&gt;=dev-db/sqlite-3
++	&gt;=dev-util/cmake-2.4.4
+ 	&quot;
+ RDEPEND=&quot;!media-gfx/s3d
+ 	&gt;=media-libs/libsdl-1.2.7
+@@ -45,14 +42,12 @@
+ 	&quot;
+ 
+ src_compile() {
+-	econf \
+-		--prefix=/usr/ \
+-		|| die &quot;econf failed&quot;
+-
++	cmake -DCMAKE_INSTALL_PREFIX=/usr/ ${cmake_opts} || die &quot;cmake failed&quot;
+ 	emake || die &quot;emake failed&quot;
+ }
+ 
+ src_install() {
+ 	emake DESTDIR=&quot;${D}&quot; install || die
++	dodoc ChangeLog README TODO
+ }
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000622.html">[S3d-svn] r630 - in trunk: . apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000623.html">[S3d-svn] r631 - in trunk: . apps/kism3d apps/s3dfm apps/s3dvt	cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#624">[ date ]</a>
+              <a href="thread.html#624">[ thread ]</a>
+              <a href="subject.html#624">[ subject ]</a>
+              <a href="author.html#624">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

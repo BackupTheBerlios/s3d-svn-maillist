@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1001 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1001%20-%20trunk/server&In-Reply-To=%3C200809252221.m8PML2up006607%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000980.html">
+   <LINK REL="Next"  HREF="000982.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1001 - trunk/server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1001%20-%20trunk/server&In-Reply-To=%3C200809252221.m8PML2up006607%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1001 - trunk/server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 26 00:21:02 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000980.html">[S3d-svn] r1000 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000982.html">[S3d-svn] r1002 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#981">[ date ]</a>
+              <a href="thread.html#981">[ thread ]</a>
+              <a href="subject.html#981">[ subject ]</a>
+              <a href="author.html#981">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-26 00:21:01 +0200 (Fri, 26 Sep 2008)
+New Revision: 1001
+
+Modified:
+   trunk/server/proto.c
+   trunk/server/shm.c
+   trunk/server/tcp.c
+Log:
+Read incoming data from aligned address
+
+When mips reads data from a unaligned address a sigbus will be generated.If it
+we will read it into a general register the kernel will emulate the read after
+noticing the cpu exception, but if we read into a fpu register the program will
+receive a sighub and stops. As workaround we read the 8 bit cmd and the 16 bit
+length into the input buffer and the user data will be saved to a address
+4 bytes or more away from the beginning of the start of te input buffer.
+This should be an aligned address. To establish this we use int_least32_t as
+reference data type.
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2008-09-25 22:15:00 UTC (rev 1000)
++++ trunk/server/proto.c	2008-09-25 22:21:01 UTC (rev 1001)
+@@ -24,9 +24,9 @@
+ 
+ #include &quot;global.h&quot;
+ #include &quot;proto.h&quot;
+-/* #include &lt;string.h&gt;  / *  memcpy() * / */
+ #include &lt;stdlib.h&gt;  /*  malloc() */
+ #include &lt;string.h&gt;  /*  strncpy(),memset() */
++#include &lt;stdint.h&gt;
+ #ifdef WIN32
+ #include &lt;winsock2.h&gt;
+ #else
+@@ -61,7 +61,7 @@
+ 		}
+ 	}
+ 	length = ntohs(*((uint16_t *)((uint8_t *)pbuf + 1)));
+-	cptr = buf = pbuf + 3;
++	cptr = buf = pbuf + sizeof(int_least32_t);
+ 	/*  if (mcp_oid==-1) s3dprintf(HIGH,&quot;couldn't find mcp-oid for pid %d!&quot;,p-&gt;id); */
+ 	switch (command) {
+ 	case S3D_P_C_INIT:
+
+Modified: trunk/server/shm.c
+===================================================================
+--- trunk/server/shm.c	2008-09-25 22:15:00 UTC (rev 1000)
++++ trunk/server/shm.c	2008-09-25 22:21:01 UTC (rev 1001)
+@@ -42,6 +42,7 @@
+ #include &lt;sys/ipc.h&gt;
+ #include &lt;sys/shm.h&gt;
+ #include &lt;time.h&gt; /* nanosleep() */
++#include &lt;stdint.h&gt;
+ 
+ static struct t_shmcb waiting_comblock;
+ 
+@@ -243,7 +244,7 @@
+ 			length = ntohs(*((uint16_t *)((uint8_t *)ibuf + 1)));
+ 			s3dprintf(VLOW, &quot;command %d, length %d&quot;, ibuf[0], length);
+ 			if (length &gt; 0) {
+-				shm_readn(dai, ibuf + 3, length);
++				shm_readn(dai, ibuf + sizeof(int_least32_t), length);
+ 			}
+ 			prot_com_in(p, ibuf);
+ 		}
+
+Modified: trunk/server/tcp.c
+===================================================================
+--- trunk/server/tcp.c	2008-09-25 22:15:00 UTC (rev 1000)
++++ trunk/server/tcp.c	2008-09-25 22:21:01 UTC (rev 1001)
+@@ -43,6 +43,7 @@
+ #endif
+ #include &lt;unistd.h&gt;   /*  read(),write(),getpid(),close() */
+ #include &lt;stdlib.h&gt;   /*  malloc(),free() */
++#include &lt;stdint.h&gt;
+ 
+ static int tcp_sockid;
+ int tcp_init(void)
+@@ -190,7 +191,7 @@
+ 		length = ntohs(*((uint16_t *)((uint8_t *)ibuf + 1)));
+ 		s3dprintf(VLOW, &quot;command %d, length %d&quot;, ibuf[0], length);
+ 		if (length &gt; 0) {
+-			tcp_readn(p-&gt;sockid, ibuf + 3, length);   /*  uint16_t is limited to 65536, so  */
++			tcp_readn(p-&gt;sockid, ibuf + sizeof(int_least32_t), length);   /*  uint16_t is limited to 65536, so  */
+ 			/*  length can't be bigger than that ... lucky */
+ 		}
+ 		prot_com_in(p, ibuf);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000980.html">[S3d-svn] r1000 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000982.html">[S3d-svn] r1002 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#981">[ date ]</a>
+              <a href="thread.html#981">[ thread ]</a>
+              <a href="subject.html#981">[ subject ]</a>
+              <a href="author.html#981">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r718 - trunk/apps/meshs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r718%20-%20trunk/apps/meshs3d&In-Reply-To=%3C200710082027.l98KROWV017595%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000709.html">
+   <LINK REL="Next"  HREF="000711.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r718 - trunk/apps/meshs3d</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r718%20-%20trunk/apps/meshs3d&In-Reply-To=%3C200710082027.l98KROWV017595%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r718 - trunk/apps/meshs3d">nichtsnutz at mail.berlios.de
+       </A><BR>
+    <I>Mon Oct  8 22:27:24 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000709.html">[S3d-svn] r717 - trunk/apps/meshs3d
+</A></li>
+        <LI>Next message: <A HREF="000711.html">[S3d-svn] r719 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#710">[ date ]</a>
+              <a href="thread.html#710">[ thread ]</a>
+              <a href="subject.html#710">[ subject ]</a>
+              <a href="author.html#710">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2007-10-08 22:27:24 +0200 (Mon, 08 Oct 2007)
+New Revision: 718
+
+Modified:
+   trunk/apps/meshs3d/main.c
+Log:
+fix node type
+
+
+Modified: trunk/apps/meshs3d/main.c
+===================================================================
+--- trunk/apps/meshs3d/main.c	2007-10-08 20:23:11 UTC (rev 717)
++++ trunk/apps/meshs3d/main.c	2007-10-08 20:27:24 UTC (rev 718)
+@@ -114,26 +114,25 @@
+ 		node = (struct node *) hashit-&gt;bucket-&gt;data;
+ 		if (node-&gt;node_type_modified) {
+ 
+-			node-&gt;node_type_modified = 0;
+-			if (node-&gt;obj_id) s3d_del_object(node-&gt;obj_id);
+ 
++			if (node-&gt;obj_id) s3d_del_object(node-&gt;obj_id);
+ 			if (node-&gt;desc_id) s3d_del_object(node-&gt;desc_id);
+ 
+-			if (node-&gt;node_type == 1) {
++			if (node-&gt;node_type == 1)
+ 				node-&gt;obj_id = s3d_clone(Global.obj_node_inet);
+-			} else if (node-&gt;node_type == 2) {
++			else if (node-&gt;node_type == 2)
+ 				node-&gt;obj_id = s3d_clone(Global.obj_node_hna);
+-			} else {
++			else
+ 				node-&gt;obj_id = s3d_clone(Global.obj_node_normal);
+-			}
+ 
++
+ 			s3d_flags_on(node-&gt;obj_id, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+ 			
+ 			node-&gt;desc_id = s3d_draw_string(node-&gt;ip_string, &amp;node-&gt;desc_length);
+ 			s3d_link(node-&gt;desc_id, node-&gt;obj_id);
+ 			s3d_translate(node-&gt;desc_id, - node-&gt;desc_length / 2, -2, 0);
+ 			s3d_flags_on(node-&gt;desc_id, S3D_OF_VISIBLE);
+-
++			
+ 			node-&gt;node_type_modified = 0;
+ 
+ 		}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000709.html">[S3d-svn] r717 - trunk/apps/meshs3d
+</A></li>
+	<LI>Next message: <A HREF="000711.html">[S3d-svn] r719 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#710">[ date ]</a>
+              <a href="thread.html#710">[ thread ]</a>
+              <a href="subject.html#710">[ subject ]</a>
+              <a href="author.html#710">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

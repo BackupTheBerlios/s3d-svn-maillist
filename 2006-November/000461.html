@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r468 - in trunk: . libs3d/libg3d/plugins/import
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r468%20-%20in%20trunk%3A%20.%20libs3d/libg3d/plugins/import&In-Reply-To=%3C200611102004.kAAK4o0r028404%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000460.html">
+   <LINK REL="Next"  HREF="000462.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r468 - in trunk: . libs3d/libg3d/plugins/import</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r468%20-%20in%20trunk%3A%20.%20libs3d/libg3d/plugins/import&In-Reply-To=%3C200611102004.kAAK4o0r028404%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r468 - in trunk: . libs3d/libg3d/plugins/import">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Fri Nov 10 21:04:50 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000460.html">[S3d-svn] r467 - in trunk: . libs3d/libg3d/plugins/import
+</A></li>
+        <LI>Next message: <A HREF="000462.html">[S3d-svn] r469 - in trunk: . apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#461">[ date ]</a>
+              <a href="thread.html#461">[ thread ]</a>
+              <a href="subject.html#461">[ subject ]</a>
+              <a href="author.html#461">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-11-10 21:04:49 +0100 (Fri, 10 Nov 2006)
+New Revision: 468
+
+Modified:
+   trunk/
+   trunk/libs3d/libg3d/plugins/import/imp_3ds.c
+   trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1127 at kero</A>:  dotslash | 2006-11-10 21:04:46 +0100
+ - remove debug output from imp_3ds.c
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1125
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1127
+
+Modified: trunk/libs3d/libg3d/plugins/import/imp_3ds.c
+===================================================================
+--- trunk/libs3d/libg3d/plugins/import/imp_3ds.c	2006-11-10 19:48:06 UTC (rev 467)
++++ trunk/libs3d/libg3d/plugins/import/imp_3ds.c	2006-11-10 20:04:49 UTC (rev 468)
+@@ -62,7 +62,9 @@
+ 	}
+ 	nbytes = g3d_read_int32_le(f);
+ 	nbytes -= 6;
++#if DEBUG &gt; 0
+ 	g_printerr(&quot;[%4.4X] 3DS file: main length: %d\n&quot;, magic, nbytes);
++#endif
+ 
+ 	global.context = context;
+ 	global.model = model;
+
+Modified: trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c
+===================================================================
+--- trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c	2006-11-10 19:48:06 UTC (rev 467)
++++ trunk/libs3d/libg3d/plugins/import/imp_3ds_callbacks.c	2006-11-10 20:04:49 UTC (rev 468)
+@@ -64,7 +64,9 @@
+ 			break;
+ 
+ 		default:
++#if DEBUG &gt; 0
+ 			g_printerr(&quot;[3DS] unhandled COLOR_F in 0x%04X\n&quot;, parent-&gt;id);
++#endif
+ 			break;
+ 	}
+ 
+@@ -104,7 +106,9 @@
+ 			break;
+ 
+ 		default:
++#if DEBUG &gt; 0
+ 			g_printerr(&quot;[3DS] unhandled COLOR_24 in 0x%04X\n&quot;, parent-&gt;id);
++#endif
+ 			break;
+ 	}
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000460.html">[S3d-svn] r467 - in trunk: . libs3d/libg3d/plugins/import
+</A></li>
+	<LI>Next message: <A HREF="000462.html">[S3d-svn] r469 - in trunk: . apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#461">[ date ]</a>
+              <a href="thread.html#461">[ thread ]</a>
+              <a href="subject.html#461">[ subject ]</a>
+              <a href="author.html#461">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

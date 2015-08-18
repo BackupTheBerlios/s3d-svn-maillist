@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1062 - trunk/experimental/testvis
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2009-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1062%20-%20trunk/experimental/testvis&In-Reply-To=%3C200905020850.n428o3IF004023%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="001043.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1062 - trunk/experimental/testvis</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1062%20-%20trunk/experimental/testvis&In-Reply-To=%3C200905020850.n428o3IF004023%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1062 - trunk/experimental/testvis">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sat May  2 10:50:03 CEST 2009</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="001043.html">[S3d-svn] r1063 - in trunk/Documentation: . manpages/man1	manpages/man3 manpages/man9
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1042">[ date ]</a>
+              <a href="thread.html#1042">[ thread ]</a>
+              <a href="subject.html#1042">[ subject ]</a>
+              <a href="author.html#1042">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2009-05-02 10:50:03 +0200 (Sat, 02 May 2009)
+New Revision: 1062
+
+Modified:
+   trunk/experimental/testvis/testvis.c
+Log:
+testvis: Return value in server fpr pthread_join
+
+server(..) is started by pthread_create. When it gets stopped
+pthread_join assigns value_ptr the address this function returns as
+return value of the thread.
+
+Modified: trunk/experimental/testvis/testvis.c
+===================================================================
+--- trunk/experimental/testvis/testvis.c	2009-04-27 21:28:18 UTC (rev 1061)
++++ trunk/experimental/testvis/testvis.c	2009-05-02 08:50:03 UTC (rev 1062)
+@@ -124,7 +124,7 @@
+ 	return;
+ }
+ 
+-static void *server(void *args)
++static void* server(void *args)
+ {
+ 	struct t_data *t = (struct t_data*)args;
+ 	int listen_fd, yes = 1;
+@@ -184,6 +184,8 @@
+ 
+ 		}
+ 	}
++
++	return NULL;
+ }
+ 
+ int main(void)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="001043.html">[S3d-svn] r1063 - in trunk/Documentation: . manpages/man1	manpages/man3 manpages/man9
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1042">[ date ]</a>
+              <a href="thread.html#1042">[ thread ]</a>
+              <a href="subject.html#1042">[ subject ]</a>
+              <a href="author.html#1042">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

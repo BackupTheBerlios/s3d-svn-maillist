@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r161 - in trunk: . client
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r161%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200603141452.k2EEq0sN024552%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000156.html">
+   <LINK REL="Next"  HREF="000158.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r161 - in trunk: . client</H1>
+    <B>ankon at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r161%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200603141452.k2EEq0sN024552%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r161 - in trunk: . client">ankon at berlios.de
+       </A><BR>
+    <I>Tue Mar 14 15:52:00 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000156.html">[S3d-svn] r160 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000158.html">[S3d-svn] r162 - trunk/apps/dot_mcp
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#157">[ date ]</a>
+              <a href="thread.html#157">[ thread ]</a>
+              <a href="subject.html#157">[ subject ]</a>
+              <a href="author.html#157">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: ankon
+Date: 2006-03-14 15:51:43 +0100 (Tue, 14 Mar 2006)
+New Revision: 161
+
+Modified:
+   trunk/Makefile.am
+   trunk/client/Makefile.am
+Log:
+Reference gpl.txt, the config/*m4 files, and client/lgpl.txt as EXTRA_DIST
+in their respective Makefile.ams.
+The *.m4's could be the reason for some strange configure messages
+
+
+
+Modified: trunk/Makefile.am
+===================================================================
+--- trunk/Makefile.am	2006-03-14 12:54:09 UTC (rev 160)
++++ trunk/Makefile.am	2006-03-14 14:51:43 UTC (rev 161)
+@@ -6,3 +6,8 @@
+ endif
+ 
+ SUBDIRS=server client apps $(MAYBE_EXAMPLES) objs
++
++EXTRA_DIST=	gpl.txt \
++		config/libtool15.m4 config/mdl_have_opengl.m4 \
++		config/pkg.m4 config/pthread.m4 config/sdl.m4 \
++		config/simage.m4
+
+Modified: trunk/client/Makefile.am
+===================================================================
+--- trunk/client/Makefile.am	2006-03-14 12:54:09 UTC (rev 160)
++++ trunk/client/Makefile.am	2006-03-14 14:51:43 UTC (rev 161)
+@@ -11,3 +11,4 @@
+ libs3d_la_CFLAGS=	@FONTCONFIG_CFLAGS@ @FREETYPE_CFLAGS@ 
+ libs3d_la_LIBADD=	@FONTCONFIG_LIBS@ @FREETYPE_LIBS@ 
+ 
++EXTRA_DIST=		lgpl.txt
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000156.html">[S3d-svn] r160 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000158.html">[S3d-svn] r162 - trunk/apps/dot_mcp
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#157">[ date ]</a>
+              <a href="thread.html#157">[ thread ]</a>
+              <a href="subject.html#157">[ subject ]</a>
+              <a href="author.html#157">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

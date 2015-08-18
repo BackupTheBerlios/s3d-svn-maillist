@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r380 - in trunk: . apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r380%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200609112013.k8BKD4a0009073%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000372.html">
+   <LINK REL="Next"  HREF="000374.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r380 - in trunk: . apps/s3dfm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r380%20-%20in%20trunk%3A%20.%20apps/s3dfm&In-Reply-To=%3C200609112013.k8BKD4a0009073%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r380 - in trunk: . apps/s3dfm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 11 22:13:04 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000372.html">[S3d-svn] r379 - in trunk: . apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000374.html">[S3d-svn] r381 - in trunk: example libs3d libs3d/libg3d/include/g3d	libs3d/libg3d/plugins/image libs3d/libg3d/plugins/import	libs3d/libg3d/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#373">[ date ]</a>
+              <a href="thread.html#373">[ thread ]</a>
+              <a href="subject.html#373">[ subject ]</a>
+              <a href="author.html#373">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-11 22:13:03 +0200 (Mon, 11 Sep 2006)
+New Revision: 380
+
+Modified:
+   trunk/
+   trunk/apps/s3dfm/dialog.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r900 at balthasar</A>:  dotslash | 2006-09-11 22:12:59 +0200
+ - properly refreshing root (focus fix)
+ - help window cleanup
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:898
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:900
+
+Modified: trunk/apps/s3dfm/dialog.c
+===================================================================
+--- trunk/apps/s3dfm/dialog.c	2006-09-11 20:04:38 UTC (rev 379)
++++ trunk/apps/s3dfm/dialog.c	2006-09-11 20:13:03 UTC (rev 380)
+@@ -57,6 +57,7 @@
+ 				{/* refresh this window ... */
+ 					printf(&quot;[R]efreshing %s\n&quot;,focus-&gt;name);
+ 					parse_again(focus);
++					ani_focus(focus);
+ 				}
+ 				break;
+ 		case S3DK_F1:
+@@ -166,18 +167,13 @@
+ {
+ 	s3dw_surface *infwin;
+ 	s3dw_button  *button;
+-	char string1[M_DIR];
+ 	infwin=s3dw_surface_new(&quot;Help Window&quot;,12,12);
+-	snprintf(string1,M_DIR,&quot;F1 - This Help Window&quot;);
+-	s3dw_label_new(infwin,string1,1,2);
+-	snprintf(string1,M_DIR,&quot;F5 - Copy&quot;);
+-	s3dw_label_new(infwin,string1,1,3);
+-	snprintf(string1,M_DIR,&quot;F6 - Move&quot;);
+-	s3dw_label_new(infwin,string1,1,4);
+-	snprintf(string1,M_DIR,&quot;R - Refresh&quot;);
+-	s3dw_label_new(infwin,string1,1,5);
+-	snprintf(string1,M_DIR,&quot;I - Info&quot;);
+-	s3dw_label_new(infwin,string1,1,6);
++	s3dw_label_new(infwin,&quot;F1 - This Help Window&quot;,1,2);
++	s3dw_label_new(infwin,&quot;F5 - Copy&quot;,1,3);
++	s3dw_label_new(infwin,&quot;F6 - Move&quot;,1,4);
++	s3dw_label_new(infwin,&quot;F7 - Create Directory&quot;,1,5);
++	s3dw_label_new(infwin,&quot;R - Refresh&quot;,1,6);
++	s3dw_label_new(infwin,&quot;I - Info&quot;,1,7);
+ 
+ 	button=s3dw_button_new(infwin,&quot;OK&quot;,4,10);
+ 	button-&gt;onclick=close_win;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000372.html">[S3d-svn] r379 - in trunk: . apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000374.html">[S3d-svn] r381 - in trunk: example libs3d libs3d/libg3d/include/g3d	libs3d/libg3d/plugins/image libs3d/libg3d/plugins/import	libs3d/libg3d/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#373">[ date ]</a>
+              <a href="thread.html#373">[ thread ]</a>
+              <a href="subject.html#373">[ subject ]</a>
+              <a href="author.html#373">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r487 - trunk
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r487%20-%20trunk&In-Reply-To=%3C200611261737.kAQHbpGW007142%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000479.html">
+   <LINK REL="Next"  HREF="000481.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r487 - trunk</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r487%20-%20trunk&In-Reply-To=%3C200611261737.kAQHbpGW007142%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r487 - trunk">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 26 18:37:51 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000479.html">[S3d-svn] r486 - in trunk: . apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000481.html">[S3d-svn] r488 - in trunk/extras/distro/gentoo/media-gfx/s3d-svn: .	files
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#480">[ date ]</a>
+              <a href="thread.html#480">[ thread ]</a>
+              <a href="subject.html#480">[ subject ]</a>
+              <a href="author.html#480">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-11-26 18:37:49 +0100 (Sun, 26 Nov 2006)
+New Revision: 487
+
+Modified:
+   trunk/
+   trunk/configure.ac
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1161 at kero</A>:  dotslash | 2006-11-26 18:37:30 +0100
+ - add sqlite dependency for s3dosm
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1160
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1161
+
+Modified: trunk/configure.ac
+===================================================================
+--- trunk/configure.ac	2006-11-26 17:37:44 UTC (rev 486)
++++ trunk/configure.ac	2006-11-26 17:37:49 UTC (rev 487)
+@@ -106,6 +106,7 @@
+ PKG_CHECK_MODULES(FONTCONFIG, fontconfig &gt;= 2.1.0, [:], [AC_MSG_ERROR([Please install fontconfig (version 2.1.0 or higher)])])
+ PKG_CHECK_MODULES(FREETYPE, freetype2 &gt;= 9.5.0, [:], [AC_MSG_ERROR([Please install freetype2 (version 9.5.0 or higher)])])
+ 
++PKG_CHECK_MODULES(SQLITE3, sqlite3 &gt;= 3.0, [HAVE_SQLITE3=&quot;yes&quot;], [])
+ # libxml2
+ AM_PATH_XML2(2.0.0, [HAVE_XML=&quot;yes&quot;], [])
+ 
+@@ -121,11 +122,23 @@
+ 
+ fi
+ 		
++if test x&quot;${HAVE_SQLITE3}&quot; = xyes ; then
++	LIBSQLITE3_CFLAGS=&quot;&quot;
++	LIBSQLITE3_LIBS=&quot;-lsqlite3&quot;
++	AC_SUBST(LIBSQLITE3_CFLAGS)
++	AC_SUBST(LIBSQLITE3_LIBS)
++else
++dnl ##################################### EXAMPLES / APPS ######################
++	WARNS=&quot;$WARNS
++ ### Sorry, you lack the sqlite3 library to compile the s3dosm application.&quot;
+ 
++fi
+ 
+ 
+-AM_CONDITIONAL([BUILD_S3DOSM], [test x&quot;${HAVE_XML}&quot; = xyes])
+ 
++
++AM_CONDITIONAL([BUILD_S3DOSM], [test x&quot;${HAVE_XML}&quot; = xyes &amp;&amp; test x&quot;${HAVE_SQLITE3}&quot; = xyes])
++
+ SIM_AC_HAVE_SIMAGE_IFELSE([
+ 	SIMAGE_CFLAGS=$sim_ac_simage_cppflags
+ 	SIMAGE_LIBS=&quot;$sim_ac_simage_ldflags $sim_ac_simage_libs&quot;
+@@ -236,12 +249,13 @@
+ #	libs3d/libg3d/doc/api/Makefile
+ #	libs3d/libg3d/m4/Makefile
+ #	libs3d/libg3d/tests/Makefile
+-
++if test &quot;x$WARNS&quot; != x; then
+ echo &quot;
+ --------------------------------------------------------------------------------
+-Warnings (not fatal, if any):
++Warnings (NOT FATAL, safe to ignore if you don't need any of those apps):
+ $WARNS
+ --------------------------------------------------------------------------------
+ &quot;
++fi
+ 
+ echo &quot;now use 'make' to compile and 'make install' to install&quot;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000479.html">[S3d-svn] r486 - in trunk: . apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000481.html">[S3d-svn] r488 - in trunk/extras/distro/gentoo/media-gfx/s3d-svn: .	files
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#480">[ date ]</a>
+              <a href="thread.html#480">[ thread ]</a>
+              <a href="subject.html#480">[ subject ]</a>
+              <a href="author.html#480">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,723 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r269 - in trunk: . apps/dot_mcp client server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r269%20-%20in%20trunk%3A%20.%20apps/dot_mcp%20client%20server&In-Reply-To=%3C200605030920.k439KLcD011542%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000261.html">
+   <LINK REL="Next"  HREF="000263.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r269 - in trunk: . apps/dot_mcp client server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r269%20-%20in%20trunk%3A%20.%20apps/dot_mcp%20client%20server&In-Reply-To=%3C200605030920.k439KLcD011542%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r269 - in trunk: . apps/dot_mcp client server">dotslash at berlios.de
+       </A><BR>
+    <I>Wed May  3 11:20:21 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000261.html">[S3d-svn] r268 - in trunk: . server
+</A></li>
+        <LI>Next message: <A HREF="000263.html">[S3d-svn] r270 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#262">[ date ]</a>
+              <a href="thread.html#262">[ thread ]</a>
+              <a href="subject.html#262">[ subject ]</a>
+              <a href="author.html#262">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-03 11:19:43 +0200 (Wed, 03 May 2006)
+New Revision: 269
+
+Modified:
+   trunk/
+   trunk/apps/dot_mcp/main.c
+   trunk/client/proto_out.c
+   trunk/client/s3d.h
+   trunk/server/TODO
+   trunk/server/global.h
+   trunk/server/graphics.c
+   trunk/server/object.c
+   trunk/server/proto.c
+   trunk/server/proto.h
+   trunk/server/user_sdl.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r501 at balthasar</A>:  dotslash | 2006-05-03 11:18:31 +0200
+ - add line normals (s3d_load/pep_line_normals)
+ - tune some gl things in the server
+ - enable mouse wheel in sdl frontend
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:499
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:501
+
+Modified: trunk/apps/dot_mcp/main.c
+===================================================================
+--- trunk/apps/dot_mcp/main.c	2006-05-03 07:19:15 UTC (rev 268)
++++ trunk/apps/dot_mcp/main.c	2006-05-03 09:19:43 UTC (rev 269)
+@@ -69,31 +69,58 @@
+ {
+ 	int o,i,j;
+ 	float R,r,a;
++	float ia,ja,iap,jap;
+ 	float v[SIDES*RINGS*3];
++	float n[SIDES*12]; /* normals */
+ 	unsigned long l[SIDES*RINGS*6];
+ 	o=s3d_new_object();
+ 	R=100; /* outer radius */
+ 	r=100; /* inner radius */
+ 	a=M_PI/180;
++	s3d_push_material_a(o, 0.2,0.6,0.2,0.5,
++						   1  ,1  ,1  ,0.5,
++						   0.2,0.6,0.2,0.5);
+ 	for (i=0;i&lt;RINGS;i++)
+-	for (j=0;j&lt;SIDES;j++)
+ 	{
+-		v[i*SIDES*3+ j*3 +0]=(R+r*cos(a*((float)j*360.0/SIDES)))* cos(a*((float)i*360.0/RINGS));
+-		v[i*SIDES*3+ j*3 +1]= r*sin(a* ((float)j*360.0/SIDES));
+-		v[i*SIDES*3+ j*3 +2]=(R+r*cos(a*((float)j*360.0/SIDES)))* sin(a*((float)i*360.0/RINGS));
++		for (j=0;j&lt;SIDES;j++)
++		{
++			ia=a*((float)i*360.0/RINGS);
++			ja=a*((float)j*360.0/SIDES);
++			iap=a*((float)(i+1)*360.0/RINGS);
++			jap=a*((float)(j+1)*360.0/SIDES);
++
++			v[i*SIDES*3+ j*3 +0]=(R+r*cos(ja))* cos(ia);
++			v[i*SIDES*3+ j*3 +1]=r*sin(ja);
++			v[i*SIDES*3+ j*3 +2]=(R+r*cos(ja))* sin(ia);
+ 		
+-		l[i*SIDES*6+ j*6 +0]=i*SIDES+ j;
+-		l[i*SIDES*6+ j*6 +1]=i*SIDES+ (j+1)%SIDES;
+-		l[i*SIDES*6+ j*6 +2]=0;
+-		l[i*SIDES*6+ j*6 +3]=i*SIDES+ j;
+-		l[i*SIDES*6+ j*6 +4]=((i+1)%RINGS)*SIDES+ j;
+-		l[i*SIDES*6+ j*6 +5]=0;
++			l[i*SIDES*6+ j*6 +0]=i*SIDES+ j;
++			l[i*SIDES*6+ j*6 +1]=i*SIDES+ (j+1)%SIDES;
++			l[i*SIDES*6+ j*6 +2]=0;
++			l[i*SIDES*6+ j*6 +3]=i*SIDES+ j;
++			l[i*SIDES*6+ j*6 +4]=((i+1)%RINGS)*SIDES+ j;
++			l[i*SIDES*6+ j*6 +5]=0;
++			
++			n[j*12 +0] =R*r*cos(ja)*    cos(ia) + r*r*cos(ja)* cos(ia)*cos(ia);
++			n[j*12 +1] =R*r*sin(ja)*    cos(ia) + r*r*sin(ja)* cos(ia)*cos(ia);
++			n[j*12 +2] =R*r*sin(ia) 			+ r*r*sin(ia)* cos(ia);
++			n[j*12 +3] =R*r*cos(jap)*    cos(ia)+ r*r*cos(jap)*cos(ia)*cos(ia);
++			n[j*12 +4] =R*r*sin(jap)*    cos(ia)+ r*r*sin(jap)*cos(ia)*cos(ia);
++			n[j*12 +5] =R*r*sin(ia) 			+ r*r*sin(ia)* cos(ia);
++
++			n[j*12 +6] =R*r*cos(ja)*    cos(ia) + r*r*cos(ja)* cos(ia)*cos(ia);
++			n[j*12 +7] =R*r*sin(ja)*    cos(ia) + r*r*sin(ja)* cos(ia)*cos(ia);
++			n[j*12 +8] =R*r*sin(ia) 			+ r*r*sin(ia)* cos(ia);
++			n[j*12 +9] =R*r*cos(ja)*    cos(iap)+ r*r*cos(ja)* cos(ia)*cos(iap);
++			n[j*12 +10]=R*r*sin(ja)*    cos(iap)+ r*r*sin(ja)* cos(ia)*cos(iap);
++			n[j*12 +11]=R*r*sin(iap) 			+ r*r*sin(iap)*cos(iap);
++		}
++		s3d_push_vertices(o,&amp;v[i*SIDES*3],SIDES);
++		s3d_push_lines(o,   &amp;l[i*SIDES*6],SIDES*2);
++		s3d_pep_line_normals(o,n,SIDES*2);
+ 	}
+-	s3d_push_material_a(o, 0.2,0.6,0.2,0.5,
+-						   1  ,1  ,1  ,0.5,
+-						   0.2,0.6,0.2,0.5);
+-	s3d_push_vertices(o,v,RINGS*SIDES);
+-	s3d_push_lines(o,l,RINGS*SIDES*2);
++/*	s3d_push_vertices(o,v,SIDES*RINGS);
++	s3d_push_lines(o,   l,SIDES*RINGS*2);*/
++
+ 	s3d_flags_on(o,S3D_OF_VISIBLE);
+ 	return(o);
+ }
+
+Modified: trunk/client/proto_out.c
+===================================================================
+--- trunk/client/proto_out.c	2006-05-03 07:19:15 UTC (rev 268)
++++ trunk/client/proto_out.c	2006-05-03 09:19:43 UTC (rev 269)
+@@ -475,6 +475,21 @@
+ 	return(0);
+ 	
+ }
++/*  adds normal information to the last n line. */
++int s3d_pep_line_normals(int object, float *nbuf,unsigned short n)
++{
++	unsigned char buf[MF_LEN+4];
++	if ((n*9*sizeof(float)+4)&gt;MF_LEN) 
++	{
++		errds(MED,&quot;s3d_pep_line_normals()&quot;,&quot;too much data&quot;);
++		return(-1);  /*  impossible */
++	}
++	*((uint32_t *)buf)=htonl(object);
++	memcpy(buf+4,nbuf,6*n*sizeof(float));
++	net_send(S3D_P_C_PEP_LINE_NORMAL,(char *)buf,n*6*sizeof(float)+4);
++	return(0);
++	
++}
+ /*  replaces the last vertex. */
+ int s3d_pep_vertex(int object, float x, float y, float z)
+ {
+@@ -528,7 +543,7 @@
+ 	unsigned char buf[MF_LEN+4];
+ 	if ((n*3*sizeof(float)+4)&gt;MF_LEN) 
+ 	{
+-		errds(MED,&quot;s3d_pep_polygon_normals()&quot;,&quot;too much data&quot;);
++		errds(MED,&quot;s3d_pep_vertices()&quot;,&quot;too much data&quot;);
+ 		return(-1);  /*  impossible */
+ 	}
+ 	*((uint32_t *)buf)=htonl(object);
+@@ -593,6 +608,33 @@
+ 	}
+ 	return(0);
+ }
++/*  adds normal information to the last n polygons. */
++int s3d_load_line_normals(int object, float *nbuf,unsigned long start, unsigned short n)
++{
++	char				buf[MF_LEN+4],*ptr;
++	int					f,i,len=n*6*4;
++	int					flen,stepl;
++	uint32_t			mstart;
++	if (n&lt;1)
++		return(-1);
++	mstart=start;
++	stepl=((int)((MF_LEN-8)/(6*4)))*(6*4);
++	f=len/(MF_LEN-8)+1;  /*  how many fragments? */
++	for (i=0;i&lt;f;i++)
++	{
++		ptr=buf;
++		*((uint32_t *)ptr)=htonl(object);			ptr+=sizeof(uint32_t);		  /*  object id */
++		*((uint32_t *)ptr)=htonl(mstart);			ptr+=sizeof(uint32_t);		  /*  start */
++		if (len-i*stepl&gt;stepl)
++			flen=stepl;
++		else
++			flen=(len-i*stepl);
++		memcpy(ptr,(char *)nbuf+i*stepl,flen);
++		net_send(S3D_P_C_PEP_LINE_NORMAL,buf,flen+8);
++		mstart+=stepl;
++	}
++	return(0);
++}
+ /*  adds texture coordinates to the last n polygons. */
+ int s3d_load_polygon_tex_coords(int object, float *tbuf, unsigned long start, unsigned short n)
+ {
+
+Modified: trunk/client/s3d.h
+===================================================================
+--- trunk/client/s3d.h	2006-05-03 07:19:15 UTC (rev 268)
++++ trunk/client/s3d.h	2006-05-03 09:19:43 UTC (rev 269)
+@@ -111,6 +111,7 @@
+ int s3d_pop_texture(int object, unsigned long n);
+ int s3d_pop_polygon(int object, unsigned long n);
+ int s3d_pop_line(int object, unsigned long n);
++int s3d_pep_line_normals(int object, float *nbuf,unsigned short n);
+ int s3d_pep_polygon_normals(int object, float *nbuf,unsigned short n);
+ int s3d_pep_polygon_tex_coord(int object, float x1, float y1, float x2, float y2, float x3, float y3);
+ int s3d_pep_polygon_tex_coords(int object, float *tbuf,unsigned short n);
+@@ -119,6 +120,7 @@
+ int s3d_pep_vertices(int object, float *vbuf,unsigned short n);
+ int s3d_pep_line(int object, int v1, int v2, int material);
+ int s3d_pep_lines(int object, unsigned long *lbuf,unsigned short n);
++int s3d_load_line_normals(int object, float *nbuf,unsigned long start, unsigned short n);
+ int s3d_load_polygon_normals(int object, float *nbuf,unsigned long start, unsigned short n);
+ int s3d_load_polygon_tex_coords(int object, float *tbuf, unsigned long start, unsigned short n);
+ int s3d_load_texture(int object, unsigned long tex, unsigned short xpos, unsigned short ypos, unsigned short w, unsigned short h, unsigned char *data);
+
+Modified: trunk/server/TODO
+===================================================================
+--- trunk/server/TODO	2006-05-03 07:19:15 UTC (rev 268)
++++ trunk/server/TODO	2006-05-03 09:19:43 UTC (rev 269)
+@@ -1,7 +1,6 @@
+ HIGH:
+  - properly buffer incoming network traffic!!
+ MED:
+- - pep_line_normals
+  - culling for selection-mode - do it with line-culling, not plane-culling!
+  - stop networking grepping after some deadline to prevent DoS ...?
+  - delete polygon normals when vertex got changed?!
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2006-05-03 07:19:15 UTC (rev 268)
++++ trunk/server/global.h	2006-05-03 09:19:43 UTC (rev 269)
+@@ -318,12 +318,14 @@
+ int obj_push_line		(struct t_process *p, uint32_t oid, uint32_t *x, uint32_t n);
+ int obj_push_tex		(struct t_process *p, uint32_t oid, uint16_t *x, uint32_t n);
+ int obj_pep_poly_normal	(struct t_process *p, uint32_t oid, float *x, uint32_t n);
++int obj_pep_line_normal (struct t_process *p, uint32_t oid, float *x, uint32_t n);
+ int obj_pep_poly_texc	(struct t_process *p, uint32_t oid, float *x, uint32_t  n);
+ int obj_pep_mat			(struct t_process *p, uint32_t oid, float *x, uint32_t n);
+ int obj_pep_mat_tex		(struct t_process *p, uint32_t oid, uint32_t *x, uint32_t n);
+ int obj_pep_vertex		(struct t_process *p, uint32_t oid, float *x, uint32_t n);
+ int obj_pep_line		(struct t_process *p, uint32_t oid, uint32_t *x, uint32_t n);
+ int obj_load_poly_normal(struct t_process *p, uint32_t oid, float *x, uint32_t start, uint32_t n);
++int obj_load_line_normal(struct t_process *p, uint32_t oid, float *x, uint32_t start, uint32_t n);
+ int obj_load_poly_texc	(struct t_process *p, uint32_t oid, float *x, uint32_t start, uint32_t n);
+ int obj_load_mat		(struct t_process *p, uint32_t oid, float *x, uint32_t start, uint32_t n);
+ int obj_load_tex		(struct t_process *p, uint32_t oid, uint32_t tex, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *pixbuf);
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2006-05-03 07:19:15 UTC (rev 268)
++++ trunk/server/graphics.c	2006-05-03 09:19:43 UTC (rev 269)
+@@ -60,33 +60,41 @@
+ #endif
+ 		default: return(-1);
+ 	}
++	/* light */
+ 	glEnable(GL_LIGHTING);
+ 	glEnable(GL_LIGHT0);
++	
++	/* depth test */
+ 	glEnable(GL_DEPTH_TEST);
++/*     glDepthFunc( GL_LEQUAL ); */
++	
++	/* textures */
+     glEnable(GL_TEXTURE_2D);
+-    glEnable(GL_BLEND);
+-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+-/*     glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE); */
+     glShadeModel (GL_SMOOTH);
++	glDisable(GL_DITHER);
+ 
+-/*     glDepthFunc( GL_LEQUAL ); */
++	/* lines */
++    glHint(GL_LINE_SMOOTH_HINT, GL_FASTEST); 
++    glLineWidth(1.0);
+     glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
+-	glDisable(GL_DITHER);
+-	glEnable(GL_NORMALIZE);
++	
++	/* polygon smoothing */
++	glDisable(GL_POLYGON_SMOOTH);
++/*    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST); */
++
++	/* normalizing */
+ 	glDisable(GL_AUTO_NORMAL);
+-    glLineWidth(1.0);
++	glDisable(GL_NORMALIZE); 		/* don't use the expensive GL_NORMALIZE, we use uniform scaling so GL_RESCALE_NORMAL is sufficent */
++	glEnable(GL_RESCALE_NORMAL);
++
++	/* blending */
++    glEnable(GL_BLEND);
++    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
++/*    glBlendFunc(GL_SRC_ALPHA_SATURATE, GL_ONE);*/
++
++	/* set shininess */
+ /* 	glMaterialfv(GL_FRONT_AND_BACK,GL_SHININESS,shin); */
+ 	glMaterialfv(GL_FRONT,GL_SHININESS,shin);
+-/*	cam.translate.x=0;
+-	cam.translate.y=0;
+-	cam.translate.z=5;
+-	cam.rotate.x=0;
+-	cam.rotate.y=0;
+-	cam.rotate.z=0;
+-	cam.scale=1;
+-	cam.oflags=OF_CAM;
+-	cam.linkid=-1;
+-	cam.m_uptodate=0;*/
+ 	graphics_reshape(X_RES,Y_RES);
+ 	return(0);
+ }
+@@ -336,7 +344,7 @@
+ 	struct t_process *p=get_proc_by_pid(MCP);
+ 	t_mtrx m;
+ 	GLfloat pos[]={100.0,20.0,100.0,1.0};
+-	GLfloat light0_spec[]={0.4,0.4,0.4,0.0};
++	GLfloat light0_spec[]={0.7,0.7,0.7,0.0};
+ 	GLfloat light0_shininess[] ={50.0};
+ 	GLfloat light0_diff[]={0.5,0.5,0.5,1.0};
+ 	GLfloat light0_amb[]={1.0,1.0,1.0,1.0};
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2006-05-03 07:19:15 UTC (rev 268)
++++ trunk/server/object.c	2006-05-03 09:19:43 UTC (rev 269)
+@@ -234,7 +234,6 @@
+ 				obj-&gt;p_poly[m+i].tc[0].x=obj-&gt;p_poly[m+i].n[0].y=obj-&gt;p_poly[m+i].n[0].z=0;
+ 				obj-&gt;p_poly[m+i].tc[1].x=obj-&gt;p_poly[m+i].n[1].y=obj-&gt;p_poly[m+i].n[1].z=0;
+ 				obj-&gt;p_poly[m+i].tc[2].x=obj-&gt;p_poly[m+i].n[2].y=obj-&gt;p_poly[m+i].n[2].z=0;
+-		 /* 		obj-&gt;p_poly[m+i].n=NULL;		/ *  no normals yet * / */
+ 			}
+ 			obj-&gt;n_poly+=n;
+ 		}
+@@ -369,6 +368,7 @@
+ 	uint32_t i,j,m;
+ 	struct t_obj *obj;
+ 	float *px;
++ 	float len; 
+ 	if (obj_valid(p,oid,obj))
+ 	{
+ 		m=obj-&gt;n_poly;
+@@ -396,6 +396,14 @@
+ 				obj-&gt;p_poly[i].n[j].x=*(px++);
+ 				obj-&gt;p_poly[i].n[j].y=*(px++);
+ 				obj-&gt;p_poly[i].n[j].z=*(px++);
++				len=sqrt(obj-&gt;p_poly[i].n[j].x*obj-&gt;p_poly[i].n[j].x + obj-&gt;p_poly[i].n[j].y*obj-&gt;p_poly[i].n[j].y +obj-&gt;p_poly[i].n[j].z*obj-&gt;p_poly[i].n[j].z);
++				if (len==0)
++					obj-&gt;p_poly[i].n[j].x=obj-&gt;p_poly[i].n[j].y=obj-&gt;p_poly[i].n[j].z=0;
++				else {
++					obj-&gt;p_poly[i].n[j].x/=len;
++					obj-&gt;p_poly[i].n[j].y/=len;
++					obj-&gt;p_poly[i].n[j].z/=len;
++				}
+ 			}
+ 		}
+ 	} else 
+@@ -404,7 +412,58 @@
+ 	}
+ 	return(0);
+ }
++/*  add some normal information to the line buffer */
++int obj_pep_line_normal(struct t_process *p, uint32_t oid, float *x, uint32_t n)
++{
++	uint32_t i,j,m;
++	struct t_obj *obj;
++	float *px;
++	float len;
++	if (obj_valid(p,oid,obj))
++	{
++		m=obj-&gt;n_line;
++		if (m&lt;n)	 /*  saving the first number of lines */
++			n=m;  /*  when more lines than available should be pepped,  */
++				 /*  just pep the first m liness */
++		px=x; 				 /*  movable pointer for x, later */
++		if (obj-&gt;oflags&amp;OF_NODATA)
++		{
++			errds(MED,&quot;obj_pep_line_normal()&quot;,&quot;error: no data on object allowed!&quot;);
++			return(-1);
++		}
+ 
++		if (obj-&gt;dplist)
++		{
++			dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++			glDeleteLists(obj-&gt;dplist,1);
++			obj-&gt;dplist=0;
++		}
++		dprintf(VLOW,&quot;pepping line's %d to %d&quot;,(m-n),m);
++		for (i=(m-n);i&lt;m;i++)
++		{
++			for (j=0;j&lt;2;j++)
++			{
++				obj-&gt;p_line[i].n[j].x=*(px++);
++				obj-&gt;p_line[i].n[j].y=*(px++);
++				obj-&gt;p_line[i].n[j].z=*(px++);
++				len=sqrt(obj-&gt;p_line[i].n[j].x*obj-&gt;p_line[i].n[j].x + obj-&gt;p_line[i].n[j].y*obj-&gt;p_line[i].n[j].y +obj-&gt;p_line[i].n[j].z*obj-&gt;p_line[i].n[j].z);
++				if (len==0)
++					obj-&gt;p_line[i].n[j].x=obj-&gt;p_line[i].n[j].y=obj-&gt;p_line[i].n[j].z=0;
++				else {
++					obj-&gt;p_line[i].n[j].x/=len;
++					obj-&gt;p_line[i].n[j].y/=len;
++					obj-&gt;p_line[i].n[j].z/=len;
++				}
++
++			}
++		}
++	} else 
++	{
++		return(-1);
++	}
++	return(0);
++}
++
+ /*  add textures coordinates to each vertex of the polygon(s) */
+ int obj_pep_poly_texc(struct t_process *p, uint32_t oid, float *x, uint32_t n)
+ {
+@@ -522,6 +581,8 @@
+ 			obj-&gt;p_line[i].v[0]=*(px++);
+ 			obj-&gt;p_line[i].v[1]=*(px++);
+ 			obj-&gt;p_line[i].mat=*(px++);
++			obj-&gt;p_line[i].n[0].x=obj-&gt;p_line[i].n[0].y=obj-&gt;p_line[i].n[0].z=0;
++			obj-&gt;p_line[i].n[1].x=obj-&gt;p_line[i].n[1].y=obj-&gt;p_line[i].n[1].z=0;
+ 		}
+ 	} else 
+ 	{
+@@ -640,6 +701,7 @@
+ 	uint32_t i,j,m;
+ 	struct t_obj *obj;
+ 	float *px;
++	float len;
+ 	if (obj_valid(p,oid,obj))
+ 	{
+ 		m=obj-&gt;n_poly;
+@@ -665,12 +727,68 @@
+ 				obj-&gt;p_poly[i].n[j].x=*(px++);
+ 				obj-&gt;p_poly[i].n[j].y=*(px++);
+ 				obj-&gt;p_poly[i].n[j].z=*(px++);
++				len=sqrt(obj-&gt;p_poly[i].n[j].x*obj-&gt;p_poly[i].n[j].x + obj-&gt;p_poly[i].n[j].y*obj-&gt;p_poly[i].n[j].y +obj-&gt;p_poly[i].n[j].z*obj-&gt;p_poly[i].n[j].z);
++				if (len==0)
++					obj-&gt;p_poly[i].n[j].x=obj-&gt;p_poly[i].n[j].y=obj-&gt;p_poly[i].n[j].z=0;
++				else {
++					obj-&gt;p_poly[i].n[j].x/=len;
++					obj-&gt;p_poly[i].n[j].y/=len;
++					obj-&gt;p_poly[i].n[j].z/=len;
++				}
++
+ 			}
+ 		}
+ 	} else 
+ 		return(-1);
+ 	return(0);
+ }
++/*  add some normal information to the line  buffer */
++int obj_load_line_normal(struct t_process *p, uint32_t oid, float *x, uint32_t start, uint32_t n)
++{
++	uint32_t i,j,m;
++	struct t_obj *obj;
++	float *px;
++	float len;
++	if (obj_valid(p,oid,obj))
++	{
++		m=obj-&gt;n_line;
++		if (m&lt;(start+n))	
++			n=m-start; 
++		px=x;
++		if (obj-&gt;oflags&amp;OF_NODATA)
++		{
++			errds(MED,&quot;obj_load_line_normal()&quot;,&quot;error: no data on object allowed!&quot;);
++			return(-1);
++		}
++
++		if (obj-&gt;dplist)
++		{
++			dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++			glDeleteLists(obj-&gt;dplist,1);
++			obj-&gt;dplist=0;
++		}
++		for (i=start;i&lt;(start+n);i++)
++		{
++			for (j=0;j&lt;2;j++)
++			{
++				obj-&gt;p_line[i].n[j].x=*(px++);
++				obj-&gt;p_line[i].n[j].y=*(px++);
++				obj-&gt;p_line[i].n[j].z=*(px++);
++				len=sqrt(obj-&gt;p_line[i].n[j].x*obj-&gt;p_line[i].n[j].x + obj-&gt;p_line[i].n[j].y*obj-&gt;p_line[i].n[j].y +obj-&gt;p_line[i].n[j].z*obj-&gt;p_line[i].n[j].z);
++				if (len==0)
++					obj-&gt;p_line[i].n[j].x=obj-&gt;p_line[i].n[j].y=obj-&gt;p_line[i].n[j].z=0;
++				else {
++					obj-&gt;p_line[i].n[j].x/=len;
++					obj-&gt;p_line[i].n[j].y/=len;
++					obj-&gt;p_line[i].n[j].z/=len;
++				}
++
++			}
++		}
++	} else 
++		return(-1);
++	return(0);
++}
+ /*  add textures coordinates to each vertex of the polygon(s) */
+ int obj_load_poly_texc(struct t_process *p, uint32_t oid, float *x, uint32_t start, uint32_t n)
+ {
+@@ -1467,8 +1585,7 @@
+ /* checks if a normal is set for a line object, or set some default oif not */
+ int check_line_normal(struct t_obj *obj, uint32_t pn)
+ {
+-	struct t_vertex *v[2],n;
+-	float len;
++	struct t_vertex *v[2];
+ 	int i,vp;
+ 	for (i=0;i&lt;2;i++)  /*  set and check */
+ 	{
+@@ -1481,27 +1598,6 @@
+ 		 obj-&gt;p_line[pn].n[0].y*obj-&gt;p_line[pn].n[0].y+
+ 		 obj-&gt;p_line[pn].n[0].z*obj-&gt;p_line[pn].n[0].z)==0)  
+ 	{ /* guess we have nothing set yet, so set something */
+-			/*
+-		n.x=v[1]-&gt;x-v[0]-&gt;x;
+-		n.y=v[1]-&gt;y-v[0]-&gt;y;
+-		n.z=v[1]-&gt;z-v[0]-&gt;z;
+-		len=sqrt(n.x*n.x+n.y*n.y+n.z*n.z);
+-		if (len==0.0F)
+-		{  * no length? no good ...*
+-			len=1.0;
+-			n.z=1.0;
+-			n.y=0.0;
+-			n.x=0.0;
+-		}
+-		n.x=n.x/len;
+-		n.y=n.y/len;
+-		n.z=n.z/len;
+-		obj-&gt;p_line[pn].n[0].x=n.x;
+-		obj-&gt;p_line[pn].n[0].y=n.y;
+-		obj-&gt;p_line[pn].n[0].z=n.z;
+-		obj-&gt;p_line[pn].n[1].x=-n.x;
+-		obj-&gt;p_line[pn].n[1].y=-n.y;
+-		obj-&gt;p_line[pn].n[1].z=-n.z;*/
+ 		for (i=0;i&lt;2;i++)
+ 		{
+ 			obj-&gt;p_line[pn].n[0].x=0;
+@@ -1662,7 +1758,13 @@
+ 		if (tex!=NULL)			glBindTexture( GL_TEXTURE_2D, 0);  /*  switch back to standard texture */
+ 		for (pn=0;pn&lt;obj-&gt;n_line; pn++)
+ 		{
+-			check_line_normal(obj,pn);
++			if (check_line_normal(obj,pn))
++			{
++				dprintf(HIGH,&quot;something is wrong with line %d!&quot;,pn);
++				if (obj-&gt;dplist) glEndList();	glPopMatrix(); /* clean up GL-stuff */
++				return(-1);
++			}
++
+ 			mat= obj-&gt;p_line[pn].mat;
+ 			if (mat!=omat) {
+ 				tex=NULL;
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2006-05-03 07:19:15 UTC (rev 268)
++++ trunk/server/proto.c	2006-05-03 09:19:43 UTC (rev 269)
+@@ -180,6 +180,15 @@
+ 					obj_pep_poly_normal(p,oid, (float *)cptr, num);
+ 				}
+ 				break;
++			case S3D_P_C_PEP_LINE_NORMAL:
++				if (length&gt;4)
++				{
++					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
++					num=(length-4)/(6*4);
++					dprintf(HIGH,&quot;PEP_LINE_NORMAL[%d]: oid %d, %.1f lines&quot;,length,oid, (length-4)/(6.0*4.0));
++					obj_pep_line_normal(p,oid, (float *)cptr, num);
++				}
++				break;
+ 			case S3D_P_C_PEP_POLY_TEXC:
+ 				if (length&gt;4)
+ 				{
+@@ -229,7 +238,16 @@
+ 					obj_pep_line(p,oid, (uint32_t *)cptr, num);
+ 				}
+ 				break;
+-
++			case S3D_P_C_LOAD_LINE_NORMAL:
++				if (length&gt;8)
++				{
++					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
++					toid=ntohl(*((uint32_t *)cptr));		cptr+=4;
++					num=(length-8)/(6*4);
++					dprintf(MED,&quot;LOAD_POLY_NORMAL[%d]: oid %d, %.2f lines&quot;,length,oid, (length-8)/(6.0*4.0));
++					obj_load_line_normal(p,oid, (float *)cptr, toid, num);
++				}
++				break;
+ 			case S3D_P_C_LOAD_POLY_NORMAL:
+ 				if (length&gt;8)
+ 				{
+
+Modified: trunk/server/proto.h
+===================================================================
+--- trunk/server/proto.h	2006-05-03 07:19:15 UTC (rev 268)
++++ trunk/server/proto.h	2006-05-03 09:19:43 UTC (rev 269)
+@@ -82,7 +82,7 @@
+ 			 /*  4b:		number */
+ #define S3D_P_C_PEP_POLY_NORMAL	16
+ 			 /*  4b:		object id */
+-			 /*  n*9f:	normals (3* x/y/z for each vertex of the poly) */
++			 /*  n*9f:		normals (3* x/y/z for each vertex of the poly) */
+ #define S3D_P_C_PEP_POLY_TEXC	17
+ 			 /*  4b:		object id */
+ 			 /*  n*6f		poly texture coordinates (3* u/v for each vertex of the poly) */
+@@ -101,8 +101,9 @@
+ #define S3D_P_C_DEL_LINE		22
+ 			 /*  4b:		object id */
+ 			 /*  4b:		number */
+-
+-
++#define S3D_P_C_PEP_LINE_NORMAL	23
++			 /*  4b:		object id */
++			 /*  n*6f:		normals (2* x/y/z for each vertex of the line) */
+ #define S3D_P_C_LOAD_POLY_NORMAL	24
+ 			 /*  4b:		object id */
+ 			 /*  4b:		position */
+@@ -123,7 +124,12 @@
+ #define S3D_P_C_LOAD_MAT_TEX	29
+ 			 /*  4b:		object id */
+ 			 /*  4b:		texture index references */
++#define S3D_P_C_LOAD_LINE_NORMAL 30
++			 /*  4b:		object id */
++			 /*  4b:		position */
++			 /*  n*6f:		normals (2* x/y/z for each vertex of the line) */
+ 
++
+ #define S3D_P_C_TOGGLE_FLAGS 	32
+ 			 /*  4b:		object id */
+ 			 /*  1b:		type  */
+
+Modified: trunk/server/user_sdl.c
+===================================================================
+--- trunk/server/user_sdl.c	2006-05-03 07:19:15 UTC (rev 268)
++++ trunk/server/user_sdl.c	2006-05-03 09:19:43 UTC (rev 269)
+@@ -49,6 +49,10 @@
+ 			 	case SDL_BUTTON_RIGHT:
+ 				case SDL_BUTTON_RMASK:
+ 			 		user_mouse(2,2,event.motion.x,event.motion.y);break;
++/*				case SDL_BUTTON_WHEELUP:
++			 		user_mouse(3,2,event.motion.x,event.motion.y);break;
++				case SDL_BUTTON_WHEELDOWN:
++			 		user_mouse(4,2,event.motion.x,event.motion.y);break;*/
+ 				case 0:
+ 					user_mouse(-1,-1,event.motion.x,event.motion.y);
+ 					break;
+@@ -67,7 +71,12 @@
+ 			 		user_mouse(1,0,event.motion.x,event.motion.y);break;
+ 			 	case SDL_BUTTON_RIGHT:
+ 			 		user_mouse(2,0,event.motion.x,event.motion.y);break;
+-
++				case SDL_BUTTON_WHEELUP:
++			 		user_mouse(3,0,event.motion.x,event.motion.y);break;
++				case SDL_BUTTON_WHEELDOWN:
++			 		user_mouse(4,0,event.motion.x,event.motion.y);break;
++				default:
++					dprintf(LOW,&quot;don't know button %d&quot;, event.button.button);
+ 			 }
+ 			 break;
+ 		case SDL_MOUSEBUTTONUP:
+@@ -79,7 +88,12 @@
+ 			 		user_mouse(1,1,event.motion.x,event.motion.y);break;
+ 			 	case SDL_BUTTON_RIGHT:
+ 			 		user_mouse(2,1,event.motion.x,event.motion.y);break;
+-
++				case SDL_BUTTON_WHEELUP:
++			 		user_mouse(3,1,event.motion.x,event.motion.y);break;
++				case SDL_BUTTON_WHEELDOWN:
++			 		user_mouse(4,1,event.motion.x,event.motion.y);break;
++				default:
++					dprintf(LOW,&quot;don't know button %d&quot;, event.button.button);
+ 			 }
+ 			 break;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000261.html">[S3d-svn] r268 - in trunk: . server
+</A></li>
+	<LI>Next message: <A HREF="000263.html">[S3d-svn] r270 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#262">[ date ]</a>
+              <a href="thread.html#262">[ thread ]</a>
+              <a href="subject.html#262">[ subject ]</a>
+              <a href="author.html#262">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

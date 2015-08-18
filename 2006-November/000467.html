@@ -1,0 +1,226 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r474 - in trunk: . apps apps/s3dosm	libs3d/libg3d/plugins/import
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r474%20-%20in%20trunk%3A%20.%20apps%20apps/s3dosm%0A%09libs3d/libg3d/plugins/import&In-Reply-To=%3C200611131536.kADFajab009272%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000466.html">
+   <LINK REL="Next"  HREF="000468.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r474 - in trunk: . apps apps/s3dosm	libs3d/libg3d/plugins/import</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r474%20-%20in%20trunk%3A%20.%20apps%20apps/s3dosm%0A%09libs3d/libg3d/plugins/import&In-Reply-To=%3C200611131536.kADFajab009272%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r474 - in trunk: . apps apps/s3dosm	libs3d/libg3d/plugins/import">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Nov 13 16:36:45 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000466.html">[S3d-svn] r473 - in trunk/apps: . kism3d
+</A></li>
+        <LI>Next message: <A HREF="000468.html">[S3d-svn] r475 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#467">[ date ]</a>
+              <a href="thread.html#467">[ thread ]</a>
+              <a href="subject.html#467">[ subject ]</a>
+              <a href="author.html#467">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-11-13 16:36:44 +0100 (Mon, 13 Nov 2006)
+New Revision: 474
+
+Removed:
+   trunk/apps/s3dosm/Makefile
+Modified:
+   trunk/
+   trunk/apps/Makefile.am
+   trunk/apps/s3dosm/draw.c
+   trunk/configure.ac
+   trunk/libs3d/libg3d/plugins/import/Makefile.am
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1137 at kero</A>:  dotslash | 2006-11-13 16:36:35 +0100
+ - autoconf fix for kisms3d, s3dosm
+ - change layer visibility only if something is actually drawn 
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1129
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1137
+
+Modified: trunk/apps/Makefile.am
+===================================================================
+--- trunk/apps/Makefile.am	2006-11-13 15:08:38 UTC (rev 473)
++++ trunk/apps/Makefile.am	2006-11-13 15:36:44 UTC (rev 474)
+@@ -6,5 +6,8 @@
+ MAYBE_X11GATE=	s3d_x11gate
+ endif
+ 
+-SUBDIRS =  ${MAYBE_S3DGPS} ${MAYBE_X11GATE} s3dvt olsrs3d dot_mcp s3dfm
++if BUILD_S3DOSM
++MAYBE_S3DOSM=	s3dosm
++endif
+ 
++SUBDIRS =  ${MAYBE_S3DGPS} ${MAYBE_X11GATE} ${MAYBE_S3DOSM} s3dvt olsrs3d dot_mcp s3dfm kism3d
+
+Deleted: trunk/apps/s3dosm/Makefile
+===================================================================
+--- trunk/apps/s3dosm/Makefile	2006-11-13 15:08:38 UTC (rev 473)
++++ trunk/apps/s3dosm/Makefile	2006-11-13 15:36:44 UTC (rev 474)
+@@ -1,24 +0,0 @@
+-BIN=s3dosm
+-VERS=0.0.1
+-SOURCES=main.c http_fetcher.c http_error_codes.c osm.c avl.c object.c draw.c kismet.c nav.c tag.c io.c
+-HEADERS=s3dosm.h http_fetcher.h
+-OBJS=$(SOURCES:.c=.o)
+-CFLAGS=-Wall -ggdb -pedantic `xml2-config --cflags`
+-LDFLAGS=-lm -ls3d  `xml2-config --libs`
+-CC=gcc
+-LD=gcc
+-
+-
+-
+-.SUFFIXES: .c .o
+-	
+-default: 	all
+-all:		$(BIN)
+-clean:
+-	rm -rf $(OBJS) $(BIN)
+-$(BIN):    $(OBJS)
+-	$(LD) $(LDFLAGS) $(OBJS) $(LIBS) -o $(BIN)
+-.c.o:  $(HEADERS)
+-	$(CC) $(CFLAGS) -c $&lt; -o $@
+-
+-
+
+Modified: trunk/apps/s3dosm/draw.c
+===================================================================
+--- trunk/apps/s3dosm/draw.c	2006-11-13 15:08:38 UTC (rev 473)
++++ trunk/apps/s3dosm/draw.c	2006-11-13 15:36:44 UTC (rev 474)
+@@ -76,6 +76,7 @@
+ 							s3d_link(node-&gt;base.oid,v-&gt;oid);
+ 							s3d_flags_on(node-&gt;base.oid,S3D_OF_VISIBLE);
+ 							s3d_rotate(node-&gt;base.oid,(90-node-&gt;lat),node-&gt;lon,0);
++							v-&gt;layer-&gt;visible=1;
+ 						} else { /* not an ap */
+ 						}
+ 					}
+@@ -112,7 +113,10 @@
+ 			else if (0==(strcmp(tag-&gt;v,&quot;residential&quot;))) color=5;
+ 		}
+ 		if (from!=NULL &amp;&amp; to!=NULL)
++		{
+ 			s3d_push_line(v-&gt;oid,from-&gt;vid,to-&gt;vid,color);
++			v-&gt;layer-&gt;visible=1;
++		}
+ 	}
+ }
+ int draw_layer(layer_t *layer)
+@@ -136,7 +140,6 @@
+ 	avl_tree_trav(layer-&gt;tree,draw_add_segments,(void *)&amp;v);
+ 	layer-&gt;center_lo=(v.lonsum)/v.n;
+ 	layer-&gt;center_la=(v.latsum)/v.n;	
+-	layer-&gt;visible=1;
+ 	s3d_flags_on(oid,S3D_OF_VISIBLE);
+ 	return(0);
+ }
+
+Modified: trunk/configure.ac
+===================================================================
+--- trunk/configure.ac	2006-11-13 15:08:38 UTC (rev 473)
++++ trunk/configure.ac	2006-11-13 15:36:44 UTC (rev 474)
+@@ -106,19 +106,26 @@
+ PKG_CHECK_MODULES(FONTCONFIG, fontconfig &gt;= 2.1.0, [:], [AC_MSG_ERROR([Please install fontconfig (version 2.1.0 or higher)])])
+ PKG_CHECK_MODULES(FREETYPE, freetype2 &gt;= 9.5.0, [:], [AC_MSG_ERROR([Please install freetype2 (version 9.5.0 or higher)])])
+ 
++# libxml2
++AM_PATH_XML2(2.0.0, HAVE_XML=yes)
++if test &quot;x$HAV_XML&quot; = &quot;xyes&quot; ; then
++	LIBXML2_CFLAGS=$XML_CPPFLAGS
++	LIBXML2_LIBS=$XML_LIBS
++	AC_SUBST(LIBXML2_CFLAGS)
++	AC_SUBST(LIBXML2_LIBS)
++fi
++		
+ 
+ dnl ##################################### EXAMPLES / APPS ######################
+ 
+-AC_CHECK_LIB(gps, main, [HAVE_GPS=yes], [HAVE_GPS=no])
+-if test x$HAVE_GPS = xyes; then
+-	GPS_CFLAGS=
+-	GPS_LIBS=-lgps	
+-	AC_SUBST(GPS_CFLAGS)
+-	AC_SUBST(GPS_LIBS)
+-else
++if test x$HAVE_XML != xyes; then
+ 	WARNS=&quot;$WARNS
+- ### Sorry, you lack the gps library to compile the s3dgps application.&quot;
++ ### Sorry, you lack the libxml2 library to compile the s3dosm application.&quot;
+ fi
++
++
++AM_CONDITIONAL([BUILD_S3DOSM], [test x$HAVE_XML= xyes])
++
+ SIM_AC_HAVE_SIMAGE_IFELSE([
+ 	SIMAGE_CFLAGS=$sim_ac_simage_cppflags
+ 	SIMAGE_LIBS=&quot;$sim_ac_simage_ldflags $sim_ac_simage_libs&quot;
+@@ -208,6 +215,8 @@
+ 	apps/s3dgps/Makefile
+ 	apps/s3dvt/Makefile
+ 	apps/s3dfm/Makefile
++	apps/kism3d/Makefile
++	apps/s3dosm/Makefile
+ 	apps/dot_mcp/Makefile
+ 	example/Makefile
+ 	objs/Makefile
+
+Modified: trunk/libs3d/libg3d/plugins/import/Makefile.am
+===================================================================
+--- trunk/libs3d/libg3d/plugins/import/Makefile.am	2006-11-13 15:08:38 UTC (rev 473)
++++ trunk/libs3d/libg3d/plugins/import/Makefile.am	2006-11-13 15:36:44 UTC (rev 474)
+@@ -55,7 +55,7 @@
+ imp_heightfield_la_SOURCES = imp_heightfield.c
+ imp_iob_la_SOURCES = imp_iob.c imp_iob.h imp_iob_chunks.h \
+ 	imp_iob_callbacks.c imp_iob_callbacks.h
+-imp_leocad_la_SOURCES = imp_leocad.c imp_leocad_library.h imp_leocad_library.c
++#imp_leocad_la_SOURCES = imp_leocad.c imp_leocad_library.h imp_leocad_library.c
+ imp_lwo_la_SOURCES = imp_lwo.c imp_lwo.h imp_lwo_chunks.h \
+ 	imp_lwo_callbacks.c imp_lwo_callbacks.h
+ imp_maya_la_SOURCES = imp_maya.c imp_maya_chunks.h \
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000466.html">[S3d-svn] r473 - in trunk/apps: . kism3d
+</A></li>
+	<LI>Next message: <A HREF="000468.html">[S3d-svn] r475 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#467">[ date ]</a>
+              <a href="thread.html#467">[ thread ]</a>
+              <a href="subject.html#467">[ subject ]</a>
+              <a href="author.html#467">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

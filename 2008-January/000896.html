@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r903 - in trunk: apps/s3dfm libs3d server	svnonly/comptest svnonly/testvis
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-January/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r903%20-%20in%20trunk%3A%20apps/s3dfm%20libs3d%20server%0A%09svnonly/comptest%20svnonly/testvis&In-Reply-To=%3C200801081952.m08JqUQo015732%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000895.html">
+   <LINK REL="Next"  HREF="000897.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r903 - in trunk: apps/s3dfm libs3d server	svnonly/comptest svnonly/testvis</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r903%20-%20in%20trunk%3A%20apps/s3dfm%20libs3d%20server%0A%09svnonly/comptest%20svnonly/testvis&In-Reply-To=%3C200801081952.m08JqUQo015732%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r903 - in trunk: apps/s3dfm libs3d server	svnonly/comptest svnonly/testvis">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan  8 20:52:30 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000895.html">[S3d-svn] r902 - trunk/libs3d
+</A></li>
+        <LI>Next message: <A HREF="000897.html">[S3d-svn] r904 - in trunk/extras/distro/gentoo: media-gfx/s3d	media-gfx/s3d/files media-gfx/s3d-svn media-libs/libg3d	media-libs/libg3d/files
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#896">[ date ]</a>
+              <a href="thread.html#896">[ thread ]</a>
+              <a href="subject.html#896">[ subject ]</a>
+              <a href="author.html#896">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-01-08 20:52:29 +0100 (Tue, 08 Jan 2008)
+New Revision: 903
+
+Modified:
+   trunk/apps/s3dfm/fs.c
+   trunk/apps/s3dfm/node.c
+   trunk/libs3d/network.c
+   trunk/server/user.c
+   trunk/svnonly/comptest/window.c
+   trunk/svnonly/testvis/testvis.c
+Log:
+Remove unreachable return statements
+
+
+Modified: trunk/apps/s3dfm/fs.c
+===================================================================
+--- trunk/apps/s3dfm/fs.c	2008-01-07 23:26:30 UTC (rev 902)
++++ trunk/apps/s3dfm/fs.c	2008-01-08 19:52:29 UTC (rev 903)
+@@ -313,8 +313,6 @@
+ 	}
+ 
+ 	return(r);
+-
+-	return(0);
+ }
+ 
+ /* write an error and wait for a reaction */
+
+Modified: trunk/apps/s3dfm/node.c
+===================================================================
+--- trunk/apps/s3dfm/node.c	2008-01-07 23:26:30 UTC (rev 902)
++++ trunk/apps/s3dfm/node.c	2008-01-08 19:52:29 UTC (rev 903)
+@@ -134,7 +134,6 @@
+ 	default:
+ 		return(-1);
+ 	}
+-	dir-&gt;disp = 0;
+ }
+ 
+ /* delete a node and all its kids internally, remove the graphics, reorder the parents etc ... */
+
+Modified: trunk/libs3d/network.c
+===================================================================
+--- trunk/libs3d/network.c	2008-01-07 23:26:30 UTC (rev 902)
++++ trunk/libs3d/network.c	2008-01-08 19:52:29 UTC (rev 903)
+@@ -63,7 +63,6 @@
+ static int _s3d_net_receive(void)
+ {
+ 	return(_s3d_tcp_net_receive());
+-	return(0);
+ }
+ #endif
+ int s3d_net_check(void)
+
+Modified: trunk/server/user.c
+===================================================================
+--- trunk/server/user.c	2008-01-07 23:26:30 UTC (rev 902)
++++ trunk/server/user.c	2008-01-08 19:52:29 UTC (rev 903)
+@@ -50,7 +50,6 @@
+ 	default:
+ 		return(0);
+ 	}
+-	return(0);
+ }
+ void user_key(uint16_t key, uint16_t unicode, uint16_t mod, int state)
+ {
+
+Modified: trunk/svnonly/comptest/window.c
+===================================================================
+--- trunk/svnonly/comptest/window.c	2008-01-07 23:26:30 UTC (rev 902)
++++ trunk/svnonly/comptest/window.c	2008-01-08 19:52:29 UTC (rev 903)
+@@ -265,8 +265,6 @@
+ 				}
+ 			}
+ 			break;
+-
+-		return(0);
+ 	}
+ 	return(-1);
+ }
+
+Modified: trunk/svnonly/testvis/testvis.c
+===================================================================
+--- trunk/svnonly/testvis/testvis.c	2008-01-07 23:26:30 UTC (rev 902)
++++ trunk/svnonly/testvis/testvis.c	2008-01-08 19:52:29 UTC (rev 903)
+@@ -150,8 +150,6 @@
+ 
+ 		}
+ 	}
+-
+-	return NULL;
+ }
+ 
+ int main(void)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000895.html">[S3d-svn] r902 - trunk/libs3d
+</A></li>
+	<LI>Next message: <A HREF="000897.html">[S3d-svn] r904 - in trunk/extras/distro/gentoo: media-gfx/s3d	media-gfx/s3d/files media-gfx/s3d-svn media-libs/libg3d	media-libs/libg3d/files
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#896">[ date ]</a>
+              <a href="thread.html#896">[ thread ]</a>
+              <a href="subject.html#896">[ subject ]</a>
+              <a href="author.html#896">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

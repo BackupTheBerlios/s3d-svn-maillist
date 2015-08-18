@@ -1,0 +1,696 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r255 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-April/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r255%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200604191809.k3JI9p9p016777%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000247.html">
+   <LINK REL="Next"  HREF="000249.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r255 - trunk/apps/olsrs3d</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r255%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200604191809.k3JI9p9p016777%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r255 - trunk/apps/olsrs3d">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Wed Apr 19 20:09:51 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000247.html">[S3d-svn] r254 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000249.html">[S3d-svn] r256 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#248">[ date ]</a>
+              <a href="thread.html#248">[ thread ]</a>
+              <a href="subject.html#248">[ subject ]</a>
+              <a href="author.html#248">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-04-19 20:09:49 +0200 (Wed, 19 Apr 2006)
+New Revision: 255
+
+Added:
+   trunk/apps/olsrs3d/terminal.c
+   trunk/apps/olsrs3d/terminal.h
+Modified:
+   trunk/apps/olsrs3d/Makefile.am
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/olsrs3d.h
+Log:
+add small terminal for user input, to search a node by ip,
+use &quot;t&quot; for move to the terminal, press ESC to remove the focus from terminal
+
+Modified: trunk/apps/olsrs3d/Makefile.am
+===================================================================
+--- trunk/apps/olsrs3d/Makefile.am	2006-04-15 16:17:14 UTC (rev 254)
++++ trunk/apps/olsrs3d/Makefile.am	2006-04-19 18:09:49 UTC (rev 255)
+@@ -2,12 +2,14 @@
+ 
+ olsrs3dincludedir = $(pkgincludedir)/olsrs3d
+ olsrs3dinclude_HEADERS =  \
+-	olsrs3d.h
++	olsrs3d.h \
++	terminal.h
+ 
+ olsrs3d_SOURCES =  \
+ 	process.c \
+ 	main.c \
+-	net.c
++	net.c \
++	terminal.c
+ 
+ olsrs3d_CPPFLAGS=	-I$(top_srcdir)/client
+ olsrs3d_LDADD=		$(top_builddir)/client/libs3d.la
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-04-15 16:17:14 UTC (rev 254)
++++ trunk/apps/olsrs3d/main.c	2006-04-19 18:09:49 UTC (rev 255)
+@@ -34,6 +34,8 @@
+ #include &lt;getopt.h&gt;	/* getopt() */
+ #include &lt;stdlib.h&gt;	/* exit() */
+ #include &quot;olsrs3d.h&quot;
++#include &quot;terminal.h&quot;
++
+ #define SPEED		10.0
+ 
+ static struct timespec sleep_time = { 0, 100 * 1000 * 1000 };   /* 100 mili seconds */
+@@ -52,6 +54,7 @@
+ int Output_border[4];
+ int *Olsr_neighbour_label_obj = NULL;
+ int Size;
++int Move_prepared = 0;
+ 
+ int Net_read_count;
+ int Output_block_counter = 0;
+@@ -75,8 +78,19 @@
+ struct olsr_node *Olsr_node_pEtx;
+ int Btn_close_id = -1;
+ int Btn_close_obj;
++
++float Title_len;
+ int cam_go=0;
+ 
++/* object vars */
++int obj_term;
++int obj_cursor;
++extern int obj_cursor_mp;
++struct s3d_object **obj;
++
++int move_cam_to = -1;
++int oid_focus = -1;
++
+ /***
+  *
+  * print usage info
+@@ -631,7 +645,8 @@
+ 	int net_result;   /* result of function net_main */
+ 	char nc_str[20];
+ 	float strLen;
+-
++	float target,current;
++	int i;
+ 	/* calculate new movement vector */
+ 	calc_olsr_node_mov();
+ 
+@@ -651,7 +666,6 @@
+ 		s3d_flags_on( Olsr_node_count_obj, S3D_OF_VISIBLE );
+ 		s3d_scale( Olsr_node_count_obj, 0.2 );
+ 		s3d_translate( Olsr_node_count_obj, -Left*3.0-(strLen * 0.2), -Bottom*3.0-0.5, -3.0 );
+-
+ 		Last_olsr_node_count = Olsr_node_count;
+ 
+ 	}
+@@ -672,6 +686,36 @@
+ 		}
+ 	}
+ 
++	/* move to terminal */
++	if(move_cam_to != -1 &amp;&amp; move_cam_to == obj[obj_term]-&gt;oid)
++	{
++		oid_focus = obj[obj_term]-&gt;oid;
++		for( i=0; i&lt;3; i++)
++		{
++			CamPosition[0][i]=(CamPosition[0][i]*4+obj[obj_term]-&gt;poi[i])/5;
++
++			target = obj[obj_term]-&gt;rot[i];
++			current = CamPosition[1][i];
++
++			if( obj[obj_term]-&gt;rot[i] - CamPosition[1][i] &gt; 180 )
++				target = obj[obj_term]-&gt;rot[i] - 360;
++			if( obj[obj_term]-&gt;rot[i] - CamPosition[1][i] &lt; -180 )
++				current = CamPosition[1][i] - 360;
++			CamPosition[1][i]=(CamPosition[1][i]*4+target)/5;
++		}
++		s3d_translate(0,CamPosition[0][0],CamPosition[0][1],CamPosition[0][2]);
++		s3d_rotate(0,CamPosition[1][0],CamPosition[1][1],CamPosition[1][2]);
++
++		if (dist(CamPosition[0],obj[obj_term]-&gt;poi)&lt;0.2)
++		{
++			s3d_translate(0,obj[obj_term]-&gt;poi[0],obj[obj_term]-&gt;poi[1],obj[obj_term]-&gt;poi[2]);
++			s3d_rotate(0,obj[obj_term]-&gt;rot[0],(obj[obj_term]-&gt;rot[1]),obj[obj_term]-&gt;rot[2]);
++			move_cam_to = -1;
++		}
++	}
++
++	rotate_cursor();
++
+ 	if( Olsr_ip_label_obj != -1 )
+ 	{
+ 		print_etx();
+@@ -685,7 +729,7 @@
+ 	CamPosition2[0][1]=  CamPosition[0][1];
+ 	CamPosition2[0][2]=  CamPosition[0][0]*sin(Zp_rotate*M_PI/180.0) + CamPosition[0][2] * cos (Zp_rotate*M_PI/180.0);
+ 
+-	if (cam_go)
++	if (cam_go &amp;&amp; move_cam_to == -1)
+ 	{ /* move a little bit closer ... */
+ 		CamPosition[0][0]=(CamPosition[0][0]*9+Olsr_node_pEtx-&gt;pos_vec[0])/10;
+ 		CamPosition[0][1]=(CamPosition[0][1]*9+Olsr_node_pEtx-&gt;pos_vec[1])/10;
+@@ -694,14 +738,13 @@
+ 		if (dist(CamPosition[0],Olsr_node_pEtx-&gt;pos_vec)&lt;5) /* close enough? stop! */
+ 				cam_go=0;
+ 	}
++
+ 	nanosleep( &amp;sleep_time, NULL );
+ 
+ 	return;
+ 
+ }
+ 
+-
+-
+ void stop() {
+ 
+ 	s3d_quit();
+@@ -709,8 +752,6 @@
+ 
+ }
+ 
+-
+-
+ /***
+  *
+  * eventhandler when key pressed
+@@ -718,60 +759,66 @@
+  ***/
+ 
+ void keypress(struct s3d_evt *event) {
+-
+ 	int key;
+ 	key=*((unsigned short *)event-&gt;buf);
+-	switch(key) {
+-		case S3DK_ESCAPE: /* esc -&gt; close olsr */
+-			stop();
+-			break;
+-		case 'c': /* c -&gt; color on/off */
+-			if(ColorSwitch) ColorSwitch = 0;
+-			else ColorSwitch = 1;
+-			break;
+-		case 'r': /* r -&gt; rotate start/stop*/
+-			if(RotateSwitch) RotateSwitch = 0;
+-			else RotateSwitch = 1;
+-			break;
+-		case '+': /* + -&gt; rotate speed increase*/
+-			if(RotateSwitch &amp;&amp; RotateSpeed &lt; 10)
+-				RotateSpeed++;
+-			break;
+-		case '-': /* - -&gt; rotate speed decrease*/
+-			if(RotateSwitch &amp;&amp; RotateSpeed &gt; 1)
+-				RotateSpeed--;
+-			break;
+-		case 16: /* strg + p -&gt; reset nodes ( zeroPoint to 0,0,0 ) */
+-			s3d_translate(ZeroPoint,0.0,0.0,0.0);
+-			ZeroPosition[0] = ZeroPosition[1] = ZeroPosition[2] = 0.0;
+-			break;
+-		case S3DK_UP: /* arrow up -&gt; move nodes up */
+-			ZeroPosition[1]++;
+-			s3d_translate(ZeroPoint,ZeroPosition[0],ZeroPosition[1],ZeroPosition[2]);
+-			break;
+-		case S3DK_DOWN: /* arrow down -&gt; move nodes down */
+-			ZeroPosition[1]--;
+-			s3d_translate(ZeroPoint,ZeroPosition[0],ZeroPosition[1],ZeroPosition[2]);
+-			break;
+-		case S3DK_PAGEUP: /* page up -&gt; change factor in calc_olsr_node_mov */
+-			if(Factor &lt; 0.9)
+-				Factor += 0.1;
+-			break;
+-		case S3DK_PAGEDOWN: /* page down -&gt; change factor in calc_olsr_node_mov */
+-			if(Factor &gt; 0.3)
+-				Factor -= 0.1;
+-			break;
++
++	if(oid_focus != obj[obj_term]-&gt;oid)
++	{
++		switch(key) {
++			case S3DK_ESCAPE: /* esc -&gt; close olsr */
++				stop();
++				break;
++			case 'c': /* c -&gt; color on/off */
++				if(ColorSwitch) ColorSwitch = 0;
++				else ColorSwitch = 1;
++				break;
++			case 'r': /* r -&gt; rotate start/stop*/
++				if(RotateSwitch) RotateSwitch = 0;
++				else RotateSwitch = 1;
++				break;
++			case 't': /* t -&gt; move to terminal*/
++				move_cam_to = obj[obj_term]-&gt;oid;
++				break;
++			case '+': /* + -&gt; rotate speed increase*/
++				if(RotateSwitch &amp;&amp; RotateSpeed &lt; 10)
++					RotateSpeed++;
++				break;
++			case '-': /* - -&gt; rotate speed decrease*/
++				if(RotateSwitch &amp;&amp; RotateSpeed &gt; 1)
++					RotateSpeed--;
++				break;
++			case 16: /* strg + p -&gt; reset nodes ( zeroPoint to 0,0,0 ) */
++				s3d_translate(ZeroPoint,0.0,0.0,0.0);
++				ZeroPosition[0] = ZeroPosition[1] = ZeroPosition[2] = 0.0;
++				break;
++			case S3DK_UP: /* arrow up -&gt; move nodes up */
++				ZeroPosition[1]++;
++				s3d_translate(ZeroPoint,ZeroPosition[0],ZeroPosition[1],ZeroPosition[2]);
++				break;
++			case S3DK_DOWN: /* arrow down -&gt; move nodes down */
++				ZeroPosition[1]--;
++				s3d_translate(ZeroPoint,ZeroPosition[0],ZeroPosition[1],ZeroPosition[2]);
++				break;
++			case S3DK_PAGEUP: /* page up -&gt; change factor in calc_olsr_node_mov */
++				if(Factor &lt; 0.9)
++					Factor += 0.1;
++				break;
++			case S3DK_PAGEDOWN: /* page down -&gt; change factor in calc_olsr_node_mov */
++				if(Factor &gt; 0.3)
++					Factor -= 0.1;
++				break;
++		}
++	} else {
++		if( (key &gt;= 48 &amp;&amp; key &lt;= 57) || key == 46 || key == 13 || key == 8 )
++			write_terminal(key);
++		if ( key == S3DK_ESCAPE )
++		{
++			oid_focus = -1;
++			move_cam_to = -1;
++		}
+ 	}
+ }
+ 
+-/*
+-void mbutton_click(struct s3d_but_info *event)
+-{
+-	printf(&quot;%s&quot;,event-&gt;state);
+-}
+-*/
+-
+-
+ /***
+  *
+  * eventhandler when object clicked
+@@ -783,7 +830,6 @@
+ 	int oid;
+ 	/* float distance,tmp_vector[3]; */
+ 	char ip_str[50];
+-	float ln;
+ 
+ 	oid=(int)*((unsigned long *)evt-&gt;buf);
+ 
+@@ -808,32 +854,31 @@
+ 
+ 	Olsr_node_pEtx = *lst_search(oid);
+ 
+-	if( Btn_close_id == -1)
++	if( Btn_close_id == -1 &amp;&amp; Olsr_node_pEtx != NULL )
+ 	{
+ 		Btn_close_id = s3d_clone( Btn_close_obj );
+ 		s3d_link(Btn_close_id,0);
+ 		s3d_flags_on(Btn_close_id,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 		s3d_scale( Btn_close_id, 0.05 );
+ 		s3d_translate( Btn_close_id,-Left*3.0-0.125, -Bottom*3.0-0.7, -3.0 );
+-
++		if ( Olsr_ip_label_obj != -1 ) s3d_del_object( Olsr_ip_label_obj );
++		snprintf( ip_str, 35, &quot;ip: %s&quot;, Olsr_node_pEtx-&gt;ip );
++		Olsr_ip_label_obj = s3d_draw_string( ip_str, &amp;Title_len );
++		s3d_link( Olsr_ip_label_obj, 0 );
++		s3d_flags_on( Olsr_ip_label_obj, S3D_OF_VISIBLE );
++		s3d_scale( Olsr_ip_label_obj, 0.2 );
++		s3d_translate( Olsr_ip_label_obj,-Left*3.0-(Title_len * 0.2)-0.15, -Bottom*3.0-1.0, -3.0 );
++		cam_go=1;
++		if ( Olsr_ip_label_obj != -1 ) s3d_del_object( Olsr_ip_label_obj );
++		snprintf( ip_str, 35, &quot;ip: %s&quot;, Olsr_node_pEtx-&gt;ip );
++		Olsr_ip_label_obj = s3d_draw_string( ip_str, &amp;Title_len );
++		s3d_link( Olsr_ip_label_obj, 0 );
++		s3d_flags_on( Olsr_ip_label_obj, S3D_OF_VISIBLE );
++		s3d_scale( Olsr_ip_label_obj, 0.2 );
++		s3d_translate( Olsr_ip_label_obj,-Left*3.0-(Title_len * 0.2)-0.15, -Bottom*3.0-1.0, -3.0 );
++	} else {
++		/* object_handler(oid); */
+ 	}
+-
+-	/*
+-	distance = dirt(CamPosition[0],olsr_node-&gt;pos_vec,tmp_vector);
+-	mov_add(ZeroPosition,tmp_vector,1.0);
+-	s3d_translate(ZeroPoint,ZeroPosition[0] * -1,ZeroPosition[1] * -1,ZeroPosition[2] * -1);
+-	*/
+-	cam_go=1;
+-
+-	/* print clicked object ip and connections */
+-	if ( Olsr_ip_label_obj != -1 ) s3d_del_object( Olsr_ip_label_obj );
+-	snprintf( ip_str, 35, &quot;ip: %s&quot;, Olsr_node_pEtx-&gt;ip );
+-	Olsr_ip_label_obj = s3d_draw_string( ip_str, &amp;ln );
+-	s3d_link( Olsr_ip_label_obj, 0 );
+-	s3d_flags_on( Olsr_ip_label_obj, S3D_OF_VISIBLE );
+-	s3d_scale( Olsr_ip_label_obj, 0.2 );
+-	s3d_translate( Olsr_ip_label_obj,-Left*3.0-(ln * 0.2)-0.15, -Bottom*3.0-1.0, -3.0 );
+-
+ }
+ 
+ void print_etx()
+@@ -870,7 +915,7 @@
+ 		float mEtx = ( tmpNeighbour-&gt;olsr_con-&gt;left_etx + tmpNeighbour-&gt;olsr_con-&gt;right_etx ) / 2;
+ 
+ 		if( mEtx != -1000 )
+-			snprintf(nIpStr, 60, &quot;%15s --&gt; %4.2f&quot;,(strcmp(Olsr_node_pEtx-&gt;ip,tmpNeighbour-&gt;olsr_con-&gt;right_olsr_node-&gt;ip)?tmpNeighbour-&gt;olsr_con-&gt;right_olsr_node-&gt;ip:tmpNeighbour-&gt;olsr_con-&gt;left_olsr_node-&gt;ip),mEtx);
++			snprintf(nIpStr, 60, &quot;%15s --&gt; %.2f&quot;,(strcmp(Olsr_node_pEtx-&gt;ip,tmpNeighbour-&gt;olsr_con-&gt;right_olsr_node-&gt;ip)?tmpNeighbour-&gt;olsr_con-&gt;right_olsr_node-&gt;ip:tmpNeighbour-&gt;olsr_con-&gt;left_olsr_node-&gt;ip),mEtx);
+ 		else
+ 			snprintf(nIpStr, 60, &quot;%15s --&gt; HNA&quot;,(strcmp(Olsr_node_pEtx-&gt;ip,tmpNeighbour-&gt;olsr_con-&gt;right_olsr_node-&gt;ip)?tmpNeighbour-&gt;olsr_con-&gt;right_olsr_node-&gt;ip:tmpNeighbour-&gt;olsr_con-&gt;left_olsr_node-&gt;ip));
+ 
+@@ -881,7 +926,9 @@
+ 		s3d_translate(Olsr_neighbour_label_obj[i], -Left*3.0-(len * 0.2)-0.15, -Bottom*3.0-p, -3.0 );
+ 		tmpNeighbour = tmpNeighbour-&gt;next_olsr_neigh_list;
+ 		p += 0.2;
+-		max_len = (len &gt; max_len)?len+0.15:max_len;
++		max_len = (len &gt; max_len - 0.2)?len+0.2:max_len;
++		max_len = (Title_len &gt; max_len - 0.2)?len+0.2:max_len;
++		/* printf(&quot;title: %f len: %f maxlen: %f %s\n&quot;,Title_len,len,max_len-0.2,nIpStr);*/
+ 	}
+ 
+ 	if( Btn_close_id != -1)
+@@ -978,6 +1025,20 @@
+ 	/* printf(&quot;%f %f %f\n&quot;,inf-&gt;trans_x,inf-&gt;trans_y,inf-&gt;trans_z); */
+ }
+ 
++void mbutton_press(struct s3d_evt *hrmz)
++{
++	struct s3d_but_info *inf;
++	inf=(struct s3d_but_info *)hrmz-&gt;buf;
++	printf(&quot;button %d, state %d\n&quot;, inf-&gt;button,inf-&gt;state);
++	return;
++}
++
++void initialize_objects()
++{
++	create_terminal();
++	create_cursor();
++}
++
+ int main( int argc, char *argv[] ) {
+ 
+ 	int optchar;
+@@ -1026,7 +1087,9 @@
+ 		if (!s3d_init(&amp;argc,&amp;argv,&quot;olsrs3d&quot;))
+ 		{
+ 			s3d_set_callback(S3D_EVENT_OBJ_INFO,object_info);
++			/* s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click); */
+ 			s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
++			s3d_set_callback(S3D_EVENT_MBUTTON,mbutton_press);
+ 			s3d_set_callback(S3D_EVENT_KEY,keypress);
+ 			s3d_set_callback(S3D_EVENT_QUIT,stop);
+ 			/* s3d_set_callback(S3D_EVENT_MBUTTON,mbutton_click); */
+@@ -1038,6 +1101,10 @@
+ 			Btn_close_obj = s3d_import_3ds_file(&quot;objs/btn_close.3ds&quot;);
+ 			ZeroPoint = s3d_new_object();
+ 			Output_border[0] = Output_border[1] = Output_border[2] = Output_border[3] = -1;
++
++			/* create system objects */
++			initialize_objects();
++
+ 			s3d_mainloop(mainloop);
+ 			s3d_quit();
+ 			net_quit();
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-04-15 16:17:14 UTC (rev 254)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-04-19 18:09:49 UTC (rev 255)
+@@ -29,6 +29,8 @@
+ #define MAXLINESIZE 1000 /* lines in a digraph just shouldn't get that longer ... */
+ #define MAXDATASIZE 100 /* max number of bytes we can get at once  */
+ 
++#define max(x,y)((x)&gt;(y)?(x):(y))
++#define min(x,y)((x)&lt;(y)?(x):(y))
+ 
+ 
+ /* linked list for the all connections */
+@@ -98,20 +100,18 @@
+ extern int	Olsr_node_hna_net;
+ extern int	Btn_close_obj;
+ extern int	Btn_close_id;
+-
+ extern int Olsr_node_count_obj;
+ extern int Olsr_node_count;
+ extern int Last_olsr_node_count;
+-
+ extern int Net_read_count;
+ extern int Output_block_counter;
+ extern int Output_block_completed;
+-
+ extern int ZeroPoint;
+-
++extern float CamPosition[2][3];
+ extern float Bottom, Left;
++extern char lbuf[MAXLINESIZE];
++extern int Move_cam_target;
+ 
+-extern char lbuf[MAXLINESIZE];
+ /* process */
+ void lst_initialize();
+ void lst_add(int id,struct olsr_node **olsr_node);
+@@ -128,3 +128,4 @@
+ void out_of_mem( void );
+ struct olsr_node **lst_search(int id);
+ void print_etx( void );
++float dist(float p1[], float p2[]);
+
+Added: trunk/apps/olsrs3d/terminal.c
+===================================================================
+--- trunk/apps/olsrs3d/terminal.c	2006-04-15 16:17:14 UTC (rev 254)
++++ trunk/apps/olsrs3d/terminal.c	2006-04-19 18:09:49 UTC (rev 255)
+@@ -0,0 +1,146 @@
++#include &lt;stdlib.h&gt;
++#include &lt;stdio.h&gt;
++#include &lt;string.h&gt;
++#include &lt;s3d.h&gt;
++#include &quot;terminal.h&quot;
++#include &quot;olsrs3d.h&quot;
++
++#define BLOCK_SIZE 10
++
++/* index of s3d_object array for objects */
++int obj_term = 0;
++int obj_cursor = 0;
++
++/* object_id of middlepoint cursor */
++int obj_cursor_mp = 0;
++
++int obj_cnt=0;
++int obj_max = 0;
++
++struct s3d_object **obj = NULL;
++
++int create_rectangle(struct rectangle *rect,float mat[]);
++
++int create_rectangle(struct rectangle *rect,float mat[])
++{
++	int oid=s3d_new_object();
++	float vertices[24];
++	unsigned long pbuf[] = { 1,2,0,0,
++											1,3,2,0,
++											5,3,1,0,
++											5,4,3,0,
++											6,5,4,0,
++											6,4,7,0,
++											0,6,7,0,
++											0,7,2,0,
++											3,2,7,0,
++											3,7,4,0,
++											5,6,0,0,
++											5,0,1,0};
++
++	vertices[0]  = (*rect).front.x; vertices[1] = (*rect).front.y; vertices[2] = (*rect).front.z;
++	vertices[3]  = (*rect).rear.x;vertices[4] = (*rect).front.y; vertices[5] = (*rect).front.z;
++	vertices[6]  = (*rect).front.x; vertices[7] = (*rect).rear.y; vertices[8] = (*rect).front.z;
++	vertices[9]  = (*rect).rear.x; vertices[10] = (*rect).rear.y; vertices[11] = (*rect).front.z;
++	vertices[12] = (*rect).rear.x; vertices[13] = (*rect).rear.y; vertices[14] = (*rect).rear.z;
++	vertices[15] = (*rect).rear.x; vertices[16] = (*rect).front.y; vertices[17] = (*rect).rear.z;
++	vertices[18] = (*rect).front.x; vertices[19] = (*rect).front.y; vertices[20] = (*rect).rear.z;
++	vertices[21] = (*rect).front.x; vertices[22] = (*rect).rear.y; vertices[23] = (*rect).rear.z;
++
++	s3d_push_vertices(oid,vertices,8);
++	s3d_push_material(oid,mat[0],mat[1],mat[2],mat[3],mat[4],mat[5],mat[6],mat[7],mat[8]);
++	s3d_push_polygons(oid,pbuf,12);
++	return(oid);
++}
++
++int create_object(char name[],float sp[], float ep[],float pos[],float poi[],float mat[])
++{
++	int oid;
++
++	struct rectangle rect;
++	rect.front.x = sp[0]; rect.front.y = sp[1]; rect.front.z = sp[2];
++	rect.rear.x = ep[0]; rect.rear.y = ep[1]; rect.rear.z = ep[2];
++	oid = create_rectangle(&amp;rect,mat);
++
++	if( obj_cnt &gt;= obj_max )
++	{
++		obj_max += BLOCK_SIZE;
++		obj = (struct s3d_object **) realloc(obj, obj_max*sizeof(struct s3d_object *));
++		if(obj == NULL)
++			out_of_mem();
++	}
++	if( (obj[obj_cnt] = (struct s3d_object *) malloc( sizeof(struct s3d_object ) )) == NULL)
++		out_of_mem();
++
++	obj[obj_cnt]-&gt;oid = oid;
++	obj[obj_cnt]-&gt;pos[0] = pos[0]; obj[obj_cnt]-&gt;pos[1] = pos[1]; obj[obj_cnt]-&gt;pos[2] = pos[2];
++	obj[obj_cnt]-&gt;rot[0] = 0; obj[obj_cnt]-&gt;rot[1] = 180; obj[obj_cnt]-&gt;rot[2] = 0;
++
++	s3d_translate(oid,pos[0],pos[1],pos[2]);
++
++	strncpy(obj[obj_cnt]-&gt;name,name,20);
++	obj[obj_cnt]-&gt;poi[0] = poi[0]; obj[obj_cnt]-&gt;poi[1] = poi[1]; obj[obj_cnt]-&gt;poi[2] = poi[2];
++	obj_cnt++;
++	return(	obj_cnt-1);
++}
++
++void create_cursor()
++{
++	float sp[] = {-0.15,-0.15,-0.05};
++	float ep[] = {0.15,0.15,0.05};
++	float pos[] = {9.15, 4.25, 299.95};
++	float poi[] = {9.0,-17.5,295.0};
++	float mat[] = {1.0,1.0,0.7,1.0,1.0,0.7,1.0,1.0,0.7};
++	obj_cursor = create_object(&quot;cursor&quot;,sp,ep,pos,poi,mat);
++	s3d_flags_on(obj[obj_cursor]-&gt;oid, S3D_OF_VISIBLE);
++	return;
++}
++
++void create_terminal()
++{
++	float sp[] = {0.0,0.0,0.0};
++	float ep[] = {10.0,5.0,2.0};
++	float pos[] = {0.0, 0.0, 300.0};
++	float poi[] = {5,2.5,295.0};
++	float mat[] = {0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6,0.6};
++	obj_term = create_object(&quot;terminal&quot;,sp,ep,pos,poi,mat);
++	s3d_flags_on(obj[obj_term]-&gt;oid, S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++	return;
++}
++
++void rotate_cursor()
++{
++	static int y = 0;
++	y = (y+20)%360;
++	s3d_rotate(obj[obj_cursor]-&gt;oid,0,y,0);
++	return;
++}
++
++void write_terminal(int key)
++{
++	static char s[20];
++	int ln = strlen(s);
++	float draw_length;
++	float tmp;
++	static int str_id = -1;
++
++	if(key == 8)
++	{
++		if(ln &gt; 0)
++			s[ln-1] = '\0';
++	} else {
++		if(ln &lt; 20)
++			s[ln] = key;
++	}
++	if(str_id != -1)
++		s3d_del_object(str_id);
++	str_id = s3d_draw_string( s, &amp;draw_length );
++	s3d_flags_on( str_id, S3D_OF_VISIBLE );
++	s3d_pep_material(str_id,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0);
++	s3d_scale( str_id, 0.4 );
++	s3d_translate( str_id,9,4,-0.45);
++	s3d_rotate(str_id,0,180,0);
++	s3d_link( str_id, obj[obj_term]-&gt;oid );
++	tmp = obj[obj_cursor]-&gt;pos[0] - (draw_length*0.43);
++	s3d_translate( obj[obj_cursor]-&gt;oid , tmp, obj[obj_cursor]-&gt;pos[1], obj[obj_cursor]-&gt;pos[2]);
++}
+
+Added: trunk/apps/olsrs3d/terminal.h
+===================================================================
+--- trunk/apps/olsrs3d/terminal.h	2006-04-15 16:17:14 UTC (rev 254)
++++ trunk/apps/olsrs3d/terminal.h	2006-04-19 18:09:49 UTC (rev 255)
+@@ -0,0 +1,29 @@
++struct coordinates {
++	float x;
++	float y;
++	float z;
++};
++
++struct rectangle {
++	struct coordinates front;
++	struct coordinates rear;
++};
++
++struct s3d_object {
++	int oid;
++	char name[20];
++	float pos[3];
++	float rot[3];
++	float poi[3];
++	int focus;
++};
++
++extern int obj_term;
++extern int obj_cursor;
++extern int obj_cursor_mp;
++extern struct s3d_object **obj;
++
++void create_cursor();
++void create_terminal();
++void rotate_cursor();
++void write_terminal(int key);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000247.html">[S3d-svn] r254 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000249.html">[S3d-svn] r256 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#248">[ date ]</a>
+              <a href="thread.html#248">[ thread ]</a>
+              <a href="subject.html#248">[ subject ]</a>
+              <a href="author.html#248">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

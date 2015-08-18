@@ -1,0 +1,256 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r21 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r21%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602031326.k13DQNle001391%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000016.html">
+   <LINK REL="Next"  HREF="000018.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r21 - trunk/apps/olsrs3d</H1>
+    <B>marec at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r21%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602031326.k13DQNle001391%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r21 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Fri Feb  3 14:26:23 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000016.html">[S3d-svn] r20 - trunk/apps/s3dgps
+</A></li>
+        <LI>Next message: <A HREF="000018.html">[S3d-svn] r22 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#17">[ date ]</a>
+              <a href="thread.html#17">[ thread ]</a>
+              <a href="subject.html#17">[ subject ]</a>
+              <a href="author.html#17">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-02-03 14:26:01 +0100 (Fri, 03 Feb 2006)
+New Revision: 21
+
+Modified:
+   trunk/apps/olsrs3d/process.c
+Log:
+comments added to olsr3d source
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-02-01 20:51:05 UTC (rev 20)
++++ trunk/apps/olsrs3d/process.c	2006-02-03 13:26:01 UTC (rev 21)
+@@ -8,12 +8,24 @@
+ float 	*adj,*new_adj;
+ int		*adj_obj,*new_adj_obj;
+ 
++
++/***
++ *
++ * create new or alter connection between 2 nodes
++ *
++ *   n1   =&gt;   node id 1
++ *   n2   =&gt;   node id 2
++ *   l    =&gt;   length ? ETX ?
++ *
++ ***/
++
+ int add_adj(int n1, int n2, float l)
+ {
+ 	int o,i,j;
+ 	i=n1&lt;n2?n1:n2;
+ 	j=n1&gt;n2?n1:n2;
+ 	if ((n1&lt;max) &amp;&amp; (n2&lt;max))
++		/* connection already exists */
+ 		o=adj_obj[i*max+j];
+ 	else o=-1;
+ 	if (o==-1)
+@@ -27,23 +39,34 @@
+ 		s3d_push_polygon(o,3,1,2,0);
+ 
+ /*		printf(&quot;new adjacent object %d between %d and %d\n&quot;,o,i,j);*/
+-	} 
++	}
+ 	new_adj_obj[i*new_max+j]=o;
+ 	new_adj[i*new_max+j]=l;
+ 	new_adj[j*new_max+i]=l;
+-		
++
+ 	return(0);
+ }
++
++
++
++/***
++ *
++ * redo all connections between nodes ?
++ *
++ ***/
++
+ int resize_adj()
+ {
+ 	int i,ind;
+-	new_adj=	realloc(new_adj,	sizeof(float)*new_max*new_max);
++	new_adj=realloc(new_adj,sizeof(float)*new_max*new_max);
+ 	new_adj_obj=realloc(new_adj_obj,sizeof(int)*new_max*new_max);
++
+ 	if (new_max&gt;1)
+-	{		
++	{
++		/* leave out one ? */
+ 		for (i=(new_max-2);i&gt;=0;i--)
+ 		{
+-			memmove(new_adj+	new_max*i,new_adj	+(new_max-1)*i,sizeof(float)*(new_max-1));
++			memmove(new_adj+new_max*i,new_adj+(new_max-1)*i,sizeof(float)*(new_max-1));
+ 			memmove(new_adj_obj+new_max*i,new_adj_obj+(new_max-1)*i,sizeof(float)*(new_max-1));
+ 			ind=i*new_max+(new_max-1);				/* the right edge */
+ 			new_adj[ind]=0.0f;
+@@ -57,39 +80,57 @@
+ 	new_adj_obj[new_max*new_max-1]=-1;			/* the right bottom corner */
+ 	return(0);
+ }
++
++
++
++/***
++ *
++ * get node id or create new node if node string could not be found
++ *
++ *   *str   =&gt;   node description
++ *
++ *   return node id
++ *
++ ***/
++
+ int get_node_num(char *str)
+ {
+-	int i,j;
+-	float f;
++	int i,j;   /* inc vars */
++	float f;   /* where does it get its value from ? */
++
+ 	for (i=0;i&lt;new_max;i++)
+ 	{
+ 		if (strncmp(node[i].name,str,NAMEMAX)==0)
+ 		{
+ 			return(i); /* return the index */
+ 		}
+-	} 
+-	
++	}
++
+ 	/* i==new_max now */
+ 	new_max++;
+ 
+ 	node=realloc(node,sizeof(struct t_node)*new_max);
+-	
++
++	/* create new node */
+ 	strncpy(node[i].name,str,NAMEMAX);
+ 	node[i].obj=s3d_clone(obj);
+ 	s3d_flags_on(node[i].obj,S3D_OF_VISIBLE);
+-	
++
++	/* create node text and attach (link) it to the node */
+ 	node[i].s_obj=s3d_draw_string(str,&amp;f);
+ 	s3d_link(node[i].s_obj, node[i].obj);
+ 	s3d_translate(node[i].s_obj,-f/2,-2,0);
+ 	/*s3d_rotate(node[i].s_obj,0,180,0);*/
+ 	s3d_flags_on(node[i].s_obj,S3D_OF_VISIBLE);
+-	
++
+ 	printf(&quot;new %s [%d], obj nr. %d - %d\n&quot;,str,i,node[i].obj,node[i].s_obj);
++
+ 	for (j=0;j&lt;3;j++)
+ 	{
+ 		node[i].pos[j]=((float)2.0*rand())/RAND_MAX-1.0;
+ 		node[i].mov[j]=0.0;
+ 	}
++
+ 	resize_adj();
+ 
+ 	return(i);
+@@ -102,6 +143,7 @@
+ 	int  	*swap_adj_obj;
+ 	char	nc_str[20];
+ 	printf(&quot;committing input ... \n&quot;);
++
+ 	/* remove old adjacent objects ... */
+ 	for (i=0;i&lt;max;i++)
+ 		for (j=i+1;j&lt;max;j++)
+@@ -115,10 +157,13 @@
+ 	/* swap the matrices */
+ 	swap_adj=adj;
+ 	swap_adj_obj=adj_obj;
+-	
++
+ 	adj=new_adj;
+ 	adj_obj=new_adj_obj;
+-	
++
++
++	/* if we have more nodes redraw node count */
++	/* what if we have less nodes ?? */
+ 	if (new_max&gt;max)
+ 	{
+ 		swap_adj=realloc(swap_adj,sizeof(float)*new_max*new_max);
+@@ -132,6 +177,8 @@
+ 		s3d_translate(node_count,left*3.0,-bottom*3.0-0.2,-3.0);
+ 
+ 	}
++
++
+ 	new_adj=swap_adj;
+ 	new_adj_obj=swap_adj_obj;
+ 	/* setting new maxsize */
+@@ -167,7 +214,7 @@
+ 				}
+ 				dn++;
+ 				break;
+-			case '}':	
++			case '}':
+ 				if (!(dn%2))	/* we don't end the input inside of strings ... this won't happen anyway, I guess */
+ 					commit_input();
+ 				break;
+@@ -179,7 +226,7 @@
+ /*		printf(&quot;######link from [%s] to [%s], label [%s]\n&quot;,data[0],data[1],data[2]);*/
+ 		n1=get_node_num(data[0]);
+ 		n2=get_node_num(data[1]);
+-		f=5.0+strtod(data[2],NULL)/10.0;
++		f=10.0+strtod(data[2],NULL)/10.0;
+ /*		printf(&quot;######link from %d to %d, %f, %d\n&quot;,n1,n2,f, f&gt;=10);*/
+ 		if (f&gt;=5) /* just to prevent ascii to float converting inconsistency ... */
+ 			add_adj(n1,n2,f);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000016.html">[S3d-svn] r20 - trunk/apps/s3dgps
+</A></li>
+	<LI>Next message: <A HREF="000018.html">[S3d-svn] r22 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#17">[ date ]</a>
+              <a href="thread.html#17">[ thread ]</a>
+              <a href="subject.html#17">[ subject ]</a>
+              <a href="author.html#17">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,414 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r778 - trunk/apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r778%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200710190000.l9J00WSU031390%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000769.html">
+   <LINK REL="Next"  HREF="000771.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r778 - trunk/apps/s3dosm</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r778%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200710190000.l9J00WSU031390%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r778 - trunk/apps/s3dosm">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 02:00:32 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000769.html">[S3d-svn] r777 - trunk/apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000771.html">[S3d-svn] r779 - trunk/apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#770">[ date ]</a>
+              <a href="thread.html#770">[ thread ]</a>
+              <a href="subject.html#770">[ subject ]</a>
+              <a href="author.html#770">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-19 02:00:31 +0200 (Fri, 19 Oct 2007)
+New Revision: 778
+
+Modified:
+   trunk/apps/s3dosm/db.c
+   trunk/apps/s3dosm/draw.c
+   trunk/apps/s3dosm/gps.c
+   trunk/apps/s3dosm/http_fetcher.c
+   trunk/apps/s3dosm/kismet.c
+   trunk/apps/s3dosm/main.c
+   trunk/apps/s3dosm/nav.c
+   trunk/apps/s3dosm/osm.c
+   trunk/apps/s3dosm/s3dosm.h
+   trunk/apps/s3dosm/ui.c
+Log:
+s3dosm: Mark local functions and variables as static
+
+
+Modified: trunk/apps/s3dosm/db.c
+===================================================================
+--- trunk/apps/s3dosm/db.c	2007-10-19 00:00:20 UTC (rev 777)
++++ trunk/apps/s3dosm/db.c	2007-10-19 00:00:31 UTC (rev 778)
+@@ -36,7 +36,7 @@
+ int db_exec(const char *query, sqlite3_callback callback, void *arg);
+ 
+ /* TODO: remove '' for security reasons */
+-void clean_string(char *clean, char *dirty, int n)
++static void clean_string(char *clean, char *dirty, int n)
+ {
+ 	strncpy(clean, dirty, n);
+ 	clean[n-1] = 0;
+
+Modified: trunk/apps/s3dosm/draw.c
+===================================================================
+--- trunk/apps/s3dosm/draw.c	2007-10-19 00:00:20 UTC (rev 777)
++++ trunk/apps/s3dosm/draw.c	2007-10-19 00:00:31 UTC (rev 778)
+@@ -64,13 +64,13 @@
+ 	int seg_id;    /* segment which is involved to the node (both internal counting) */
+ };
+ 
+-struct waylist  *waylist_p = NULL;
+-struct nodelist *nodelist_p = NULL;
+-struct adjlist *adjlist_p = NULL;
+-int    nodelist_n = 0;
+-int    adjlist_n = 0;
+-int    waylist_n = 0;
+-int    waylist_bufn = 0;
++static struct waylist  *waylist_p = NULL;
++static struct nodelist *nodelist_p = NULL;
++static struct adjlist *adjlist_p = NULL;
++static int    nodelist_n = 0;
++static int    adjlist_n = 0;
++static int    waylist_n = 0;
++static int    waylist_bufn = 0;
+ 
+ 
+ void calc_earth_to_eukl(float lat, float lon, float alt, float *x)
+@@ -82,7 +82,7 @@
+ 	x[1] = (ESIZE + alt) *   sin(la);
+ 	x[2] = (ESIZE + alt) * cos(lo) * cos(la);
+ }
+-int draw_icon(void *S3DOSMUNUSED(data), int argc, char **argv, char **S3DOSMUNUSED(azColName))
++static int draw_icon(void *S3DOSMUNUSED(data), int argc, char **argv, char **S3DOSMUNUSED(azColName))
+ {
+ 	int i, tagid = -1, oid;
+ 	int nodeid = -1, layerid = -1;
+@@ -129,7 +129,7 @@
+ 	return(0);
+ }
+ /* just fetches node information and puts in the nodelist */
+-int insert_node(void *data, int argc, char **argv, char **azColName)
++static int insert_node(void *data, int argc, char **argv, char **azColName)
+ {
+ 	struct nodelist *np = data; /* get the nodepointer */
+ 	int i;
+@@ -142,7 +142,7 @@
+ 	}
+ 	return(0);
+ }
+-int select_waytype(void *data, int argc, char **argv, char **S3DOSMUNUSED(azColName))
++static int select_waytype(void *data, int argc, char **argv, char **S3DOSMUNUSED(azColName))
+ {
+ 	int i;
+ 	for (i = 0; i &lt; argc; i++) {
+@@ -157,7 +157,7 @@
+ 	return(0);
+ }
+ /* draw waylist, clear the queue */
+-void waylist_draw(char *filter)
++static void waylist_draw(char *filter)
+ {
+ 	float len;
+ 	char query[MAXQ];
+@@ -366,7 +366,7 @@
+ 
+ 	load_update_status((100.0*num_done) / (float)num_max);
+ }
+-void waylist_add(struct waylist *p)
++static void waylist_add(struct waylist *p)
+ {
+ 	if (waylist_n &gt;= waylist_bufn) {
+ 		waylist_bufn += 64;
+@@ -379,7 +379,7 @@
+ 	waylist_n++;
+ }
+ 
+-int way_group(void *data, int argc, char **argv, char **azColName)
++static int way_group(void *data, int argc, char **argv, char **azColName)
+ {
+ 	int i;
+ 	int id = -1;
+@@ -418,7 +418,7 @@
+ 	s3d_rotate(user_icon, (90 - la), lo, 0);
+ }
+ 
+-void draw_ways(char *filter)
++static void draw_ways(char *filter)
+ {
+ 	char query[MAXQ];
+ 	num_done = 0;
+@@ -428,12 +428,12 @@
+ 	db_exec(query, way_group, filter);
+ 	waylist_draw(filter); /* last way */
+ }
+-void draw_osm(void)
++static void draw_osm(void)
+ {
+ 	load_window(&quot;Drawing Card ...&quot;);
+ 	draw_ways(&quot;layer_id=(SELECT layer_id FROM layer WHERE name='osm')&quot;);
+ }
+-void draw_kismet(void)
++static void draw_kismet(void)
+ {
+ 	char query[MAXQ];
+ 	char filter[] = &quot;layer_id=(SELECT layer_id FROM layer WHERE name='kismet')&quot;;
+
+Modified: trunk/apps/s3dosm/gps.c
+===================================================================
+--- trunk/apps/s3dosm/gps.c	2007-10-19 00:00:20 UTC (rev 777)
++++ trunk/apps/s3dosm/gps.c	2007-10-19 00:00:31 UTC (rev 778)
+@@ -25,7 +25,7 @@
+ #include &lt;s3d.h&gt;
+ #include &quot;s3dosm.h&quot;
+ #include &lt;stdio.h&gt;  /* printf() */
+-int user_icon = -1, user_icon_rotator = -1;
++static int user_icon = -1, user_icon_rotator = -1;
+ #ifdef HAVE_GPS
+ #include &lt;gps.h&gt;  /* gps_*() */
+ #ifdef NMEA_CHANNELS
+
+Modified: trunk/apps/s3dosm/http_fetcher.c
+===================================================================
+--- trunk/apps/s3dosm/http_fetcher.c	2007-10-19 00:00:20 UTC (rev 777)
++++ trunk/apps/s3dosm/http_fetcher.c	2007-10-19 00:00:31 UTC (rev 778)
+@@ -37,12 +37,12 @@
+ #include &quot;http_fetcher.h&quot;
+ 
+ /* Globals */
+-int timeout = DEFAULT_READ_TIMEOUT;
+-char *userAgent = NULL;
+-char *referer = NULL;
+-char *auth = NULL;
+-int hideUserAgent = 0;
+-int hideReferer = 1;
++static int timeout = DEFAULT_READ_TIMEOUT;
++static char *userAgent = NULL;
++static char *referer = NULL;
++static char *auth = NULL;
++static int hideUserAgent = 0;
++static int hideReferer = 1;
+ extern const char *http_errlist[]; /* Array of HTTP Fetcher error messages */
+ extern char convertedError[128]; /* Buffer to used when errors contain %d */
+ static int errorSource = 0;
+
+Modified: trunk/apps/s3dosm/kismet.c
+===================================================================
+--- trunk/apps/s3dosm/kismet.c	2007-10-19 00:00:20 UTC (rev 777)
++++ trunk/apps/s3dosm/kismet.c	2007-10-19 00:00:31 UTC (rev 778)
+@@ -28,7 +28,7 @@
+ #include &lt;libxml/parser.h&gt;
+ #include &lt;libxml/tree.h&gt;
+ static int layerid;
+-void parse_kismet_node(xmlNodePtr cur)
++static void parse_kismet_node(xmlNodePtr cur)
+ {
+ 	node_t node;
+ 	xmlAttrPtr attr;
+
+Modified: trunk/apps/s3dosm/main.c
+===================================================================
+--- trunk/apps/s3dosm/main.c	2007-10-19 00:00:20 UTC (rev 777)
++++ trunk/apps/s3dosm/main.c	2007-10-19 00:00:31 UTC (rev 778)
+@@ -41,7 +41,7 @@
+ 		s3dw_ani_mate();
+ 	}
+ }
+-int init(int argc, char **argv)
++static int init(int argc, char **argv)
+ {
+ 	s3d_select_font(&quot;vera&quot;);
+ 	ui_init();
+@@ -55,7 +55,7 @@
+ 	ready = 1;
+ 	return(0);
+ }
+-int quit(void)
++static int quit(void)
+ {
+ 	ready = 0;
+ 	gps_quit();
+
+Modified: trunk/apps/s3dosm/nav.c
+===================================================================
+--- trunk/apps/s3dosm/nav.c	2007-10-19 00:00:20 UTC (rev 777)
++++ trunk/apps/s3dosm/nav.c	2007-10-19 00:00:31 UTC (rev 778)
+@@ -5,7 +5,8 @@
+ #include &lt;stdio.h&gt; /* printf() */
+ #include &lt;math.h&gt; /* fabs() */
+ 
+-int oidx, oidy;
++static int oidx;
++int oidy;
+ static float lat, lon, tlat, tlon;
+ /* load rotation centers */
+ void nav_init(void)
+@@ -70,7 +71,7 @@
+ 	calc_earth_to_eukl(lon, lat, 0, x);
+ }
+ 
+-int get_center(void *data, int argc, char **argv, char **azColName)
++static int get_center(void *data, int argc, char **argv, char **azColName)
+ {
+ 	float *med = (float *)data;
+ 	int i;
+
+Modified: trunk/apps/s3dosm/osm.c
+===================================================================
+--- trunk/apps/s3dosm/osm.c	2007-10-19 00:00:20 UTC (rev 777)
++++ trunk/apps/s3dosm/osm.c	2007-10-19 00:00:31 UTC (rev 778)
+@@ -28,7 +28,7 @@
+ #include &lt;libxml/tree.h&gt;
+ #include &quot;http_fetcher.h&quot;
+ static int layerid;
+-int parse_osm_tags(object_t *obj, xmlNodePtr cur)
++static int parse_osm_tags(object_t *obj, xmlNodePtr cur)
+ {
+ 	xmlNodePtr c;
+ 	xmlAttrPtr attr;
+@@ -47,7 +47,7 @@
+ 	return(0);
+ 
+ }
+-void parse_osm_way(xmlNodePtr cur)
++static void parse_osm_way(xmlNodePtr cur)
+ {
+ 	way_t way;
+ 	xmlNodePtr kids;
+@@ -70,7 +70,7 @@
+ 		}
+ 	}
+ }
+-void parse_osm_segment(xmlNodePtr cur)
++static void parse_osm_segment(xmlNodePtr cur)
+ {
+ 	segment_t segment;
+ 	xmlAttrPtr attr;
+@@ -89,7 +89,7 @@
+ 		parse_osm_tags(OBJECT_T(&amp;segment), cur);
+ 	}
+ }
+-void parse_osm_node(xmlNodePtr cur)
++static void parse_osm_node(xmlNodePtr cur)
+ {
+ 	node_t node;
+ 	xmlAttrPtr attr;
+
+Modified: trunk/apps/s3dosm/s3dosm.h
+===================================================================
+--- trunk/apps/s3dosm/s3dosm.h	2007-10-19 00:00:20 UTC (rev 777)
++++ trunk/apps/s3dosm/s3dosm.h	2007-10-19 00:00:31 UTC (rev 778)
+@@ -124,6 +124,7 @@
+ 
+ /* object.c */
+ void    object_init(object_t *nobj);
++void    object_free(object_t *obj);
+ void    node_init(node_t *nnode);
+ void    segment_init(segment_t *nsegment);
+ void    way_init(way_t *nway);
+
+Modified: trunk/apps/s3dosm/ui.c
+===================================================================
+--- trunk/apps/s3dosm/ui.c	2007-10-19 00:00:20 UTC (rev 777)
++++ trunk/apps/s3dosm/ui.c	2007-10-19 00:00:31 UTC (rev 778)
+@@ -35,7 +35,7 @@
+ };
+ 
+ /* load icons, we want to clone each of them later */
+-void ui_loadicons(void)
++static void ui_loadicons(void)
+ {
+ 	int i;
+ 	for (i = 0;i &lt; ICON_NUM;i++)
+@@ -46,12 +46,12 @@
+ static s3dw_label   *loadlabel = NULL;
+ static s3dw_label   *loadstatus = NULL;
+ 
+-void key_button(s3dw_widget *button)
++static void key_button(s3dw_widget *button)
+ {
+ 	s3dw_delete(button-&gt;parent); /* parent =surface. this means close containing window */
+ }
+ 
+-int ui_getinfo_node(void *S3DOSMUNUSED(data), int argc, char **argv, char **azColName)
++static int ui_getinfo_node(void *S3DOSMUNUSED(data), int argc, char **argv, char **azColName)
+ {
+ 	int i, tagid = -1;
+ 	char type[MAXQ];
+@@ -79,7 +79,7 @@
+ 
+ 	return(0);
+ }
+-int ui_getinfo_way(void *S3DOSMUNUSED(data), int argc, char **argv, char **azColName)
++static int ui_getinfo_way(void *S3DOSMUNUSED(data), int argc, char **argv, char **azColName)
+ {
+ 	int i, tagid = -1;
+ 	char name[MAXQ];
+@@ -105,7 +105,7 @@
+ 	return(0);
+ }
+ 
+-int ui_click(struct s3d_evt *evt)
++static int ui_click(struct s3d_evt *evt)
+ {
+ 	int oid = (int) * ((uint32_t *)evt-&gt;buf);
+ 	char query[MAXQ];
+@@ -117,13 +117,13 @@
+ 
+ 	return(0);
+ }
+-int ui_key(struct s3d_evt *evt)
++static int ui_key(struct s3d_evt *evt)
+ {
+ 	/* struct s3d_key_event *key=(struct s3d_key_event *)evt-&gt;buf;*/
+ 	if (s3dw_handle_key(evt)) return(0);
+ 	return(0);
+ }
+-int ui_oinfo(struct s3d_evt *evt)
++static int ui_oinfo(struct s3d_evt *evt)
+ {
+ 	s3dw_object_info(evt);
+ 	return(0);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000769.html">[S3d-svn] r777 - trunk/apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000771.html">[S3d-svn] r779 - trunk/apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#770">[ date ]</a>
+              <a href="thread.html#770">[ thread ]</a>
+              <a href="subject.html#770">[ subject ]</a>
+              <a href="author.html#770">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

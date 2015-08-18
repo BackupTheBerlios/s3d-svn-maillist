@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r567 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r567%20-%20trunk/server&In-Reply-To=%3C200612272014.kBRKEJlp019449%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000558.html">
+   <LINK REL="Next"  HREF="000560.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r567 - trunk/server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r567%20-%20trunk/server&In-Reply-To=%3C200612272014.kBRKEJlp019449%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r567 - trunk/server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Wed Dec 27 21:14:19 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000558.html">[S3d-svn] r566 - trunk/apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000560.html">[S3d-svn] r568 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#559">[ date ]</a>
+              <a href="thread.html#559">[ thread ]</a>
+              <a href="subject.html#559">[ subject ]</a>
+              <a href="author.html#559">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-12-27 21:14:18 +0100 (Wed, 27 Dec 2006)
+New Revision: 567
+
+Modified:
+   trunk/server/main.c
+Log:
+-__APPLE__ is also defined by $other architectures? remove it again ...
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2006-12-27 18:40:26 UTC (rev 566)
++++ trunk/server/main.c	2006-12-27 20:14:18 UTC (rev 567)
+@@ -147,9 +147,11 @@
+ /*  this initalizes all components.  */
+ int init() 
+ {
++	/*
+ #define	__APPLE__
+ 	NSApplicationLoad();
+ #endif
++	*/
+ #ifdef SIGS
+ 	if (!norc)
+ 		rc_init();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000558.html">[S3d-svn] r566 - trunk/apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000560.html">[S3d-svn] r568 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#559">[ date ]</a>
+              <a href="thread.html#559">[ thread ]</a>
+              <a href="subject.html#559">[ subject ]</a>
+              <a href="author.html#559">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

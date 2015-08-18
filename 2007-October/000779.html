@@ -1,0 +1,310 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r787 - in trunk: . apps/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r787%20-%20in%20trunk%3A%20.%20apps/comptest&In-Reply-To=%3C200710191437.l9JEbigQ020198%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000778.html">
+   <LINK REL="Next"  HREF="000780.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r787 - in trunk: . apps/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r787%20-%20in%20trunk%3A%20.%20apps/comptest&In-Reply-To=%3C200710191437.l9JEbigQ020198%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r787 - in trunk: . apps/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 19 16:37:44 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000778.html">[S3d-svn] r786 - in trunk: . apps/comptest
+</A></li>
+        <LI>Next message: <A HREF="000780.html">[S3d-svn] r788 - in trunk: . apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#779">[ date ]</a>
+              <a href="thread.html#779">[ thread ]</a>
+              <a href="subject.html#779">[ subject ]</a>
+              <a href="author.html#779">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-10-19 16:37:43 +0200 (Fri, 19 Oct 2007)
+New Revision: 787
+
+Modified:
+   trunk/
+   trunk/apps/comptest/comptest.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r2729 at kero</A>:  dotslash | 2007-10-19 16:23:43 +0200
+ - only update parts affected by the damage (part 1)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2643
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2729
+
+Modified: trunk/apps/comptest/comptest.c
+===================================================================
+--- trunk/apps/comptest/comptest.c	2007-10-19 14:12:13 UTC (rev 786)
++++ trunk/apps/comptest/comptest.c	2007-10-19 14:37:43 UTC (rev 787)
+@@ -44,8 +44,12 @@
+ #endif
+ 
+ #define MAXEVENTS	50		/* maximum events per loop. */
++
++/* must be 2^x */
+ #define TEXW 256
+ #define TEXH 256
++#define TEXNUM(win, x, y)	\
++		((((win-&gt;attr.height + TEXH - 1)&amp; ~(TEXH-1))/TEXH) * ((int)(x/TEXH)) + ((int)(y/TEXW)))
+ 
+ struct extension {
+ 	int event, error;
+@@ -76,12 +80,12 @@
+ 	0, 50*1000*1000
+ }; /* 50 mili seconds */
+ 
+-int xinit();
++int xinit(void);
+ void window_update_content(struct window *win, int x, int y, int width, int height);
+ static int print_event(Display *dpy, XEvent *event);
+ void event();
+ 
+-static void mainloop(void)
++static void mainloop()
+ {
+ 	event();
+ 	nanosleep(&amp;t, NULL);
+@@ -308,7 +312,7 @@
+ 	/*  push data on texture 0 position (0,0) */
+ 	s3d_flags_on(win-&gt;oid, S3D_OF_VISIBLE);
+ }
+-static struct window* window_find(Window id)
++static struct window *window_find(Window id)
+ {
+ 	struct window *window;
+ 	for (window = window_head; window!=NULL; window = window-&gt;next) {
+@@ -337,7 +341,7 @@
+ 	/* XSelectInput(dpy, win-&gt;id, ExposureMask);*/
+ 	win-&gt;format = XRenderFindVisualFormat(dpy, win-&gt;attr.visual);
+ 
+-	if (win-&gt;format != NULL) {
++	if (win-&gt;format != 0) {
+ 		/* printf(&quot;add window: %d:%d size: %dx%d\n&quot;, win-&gt;attr.x, win-&gt;attr.y, win-&gt;attr.width, win-&gt;attr.height);*/
+ 		win-&gt;damage = XDamageCreate(dpy, win-&gt;id, XDamageReportNonEmpty);
+ 
+@@ -394,20 +398,66 @@
+ 
+ 	}
+ }
++/* convert X-format to s3ds RGBA 32bit format */
++int image_convert(XImage *image, char *bitmap)
++{
++	int x, y;
++	int rs, gs, bs;
++	int bpp;
++	char *img_ptr, *bmp_ptr;
++	unsigned long *s;
++	uint32_t *t;
+ 
++
++	if (image-&gt;format == ZPixmap) {
++/*		printf(&quot;XImage: %dx%d, format %d (%d), bpp: %d, depth %d, pad %d\n&quot;,
++		       image-&gt;width, image-&gt;height, image-&gt;format,
++		       ZPixmap, image-&gt;bits_per_pixel, image-&gt;depth, image-&gt;bitmap_pad);*/
++		rs = get_shift(image-&gt;red_mask) - 8;
++		gs = get_shift(image-&gt;green_mask) - 8;
++		bs = get_shift(image-&gt;blue_mask) - 8;
++
++		bpp = (image-&gt;bits_per_pixel / 8);
++		/* rgb is not bgr */
++		rs = rs;
++		gs = gs - 8;
++		bs = bs - 16;
++/*		printf(&quot;Ximage: rgb: %d|%d|%d\n&quot;, rs, gs, bs);;*/
++		/*  printf(&quot;red: size %d, offset %d\n&quot;,rs,roff);
++		  printf(&quot;green: size %d, offset %d\n&quot;,gs,goff);
++		  printf(&quot;blue: size %d, offset %d\n&quot;,bs,boff);
++		  printf(&quot;bits per pixel:%d\n&quot;,bpp);*/
++		for (y = 0; y &lt; image-&gt;height ; y++) {
++			img_ptr = image-&gt;data + (y * image-&gt;width) * bpp;
++			bmp_ptr = bitmap + (y * image-&gt;width) * sizeof(uint32_t);
++			for (x = 0; x &lt; image-&gt;width; x++) {
++				s = (unsigned long *)	img_ptr;
++				t = (uint32_t *)		bmp_ptr;
++				/*    bmp_ptr[0] = (rs &gt; 0 ? ((*d &amp; image-&gt;red_mask) &gt;&gt; rs)  : ((*d  &amp; image-&gt;red_mask) &lt;&lt; -rs)) ;
++				 bmp_ptr[1] = (gs &gt; 0 ? ((*d &amp; image-&gt;green_mask) &gt;&gt; gs) : ((*d  &amp; image-&gt;green_mask) &lt;&lt; -gs)) ;
++				 bmp_ptr[2] = (bs &gt; 0 ? ((*d &amp; image-&gt;blue_mask) &gt;&gt; bs)  : ((*d  &amp; image-&gt;blue_mask) &lt;&lt; -bs));
++				 bmp_ptr[3] = 255 ;*/
++				*t = (rs &gt; 0 ? ((*s &amp; image-&gt;red_mask) &gt;&gt; rs)  : ((*s  &amp; image-&gt;red_mask) &lt;&lt; -rs)) |
++				     (gs &gt; 0 ? ((*s &amp; image-&gt;green_mask) &gt;&gt; gs) : ((*s  &amp; image-&gt;green_mask) &lt;&lt; -gs)) |
++				     (bs &gt; 0 ? ((*s &amp; image-&gt;blue_mask) &gt;&gt; bs)  : ((*s  &amp; image-&gt;blue_mask) &lt;&lt; -bs)) |
++				     255 &lt;&lt; 24;
++
++				bmp_ptr += sizeof(uint32_t);
++				img_ptr += bpp;
++			}
++		}
++		return(0);
++	}
++	return(-1);
++}
++
++/* takes a bounding box and updates its window contents */
+ void window_update_content(struct window *win, int x, int y, int width, int height)
+ {
+ 	int chunk_width, chunk_height;
+ 	int xleft, xright;
+ 	int ytop, ybottom;
+-	int texnum;
+-	int xi, yi;
+-	int rs, gs, bs;
+-	int bpp;
+-	char *img_ptr, *bmp_ptr;
+ 	char *bitmap;
+-	unsigned long *s;
+-	uint32_t *t;
+ 	XImage *image;
+ 
+ 	/* update the whole window for now. */
+@@ -415,9 +465,11 @@
+ 	y = 0;
+ 	width = win-&gt;attr.width;
+ 	height = win-&gt;attr.height;
++	if (x &lt; 0) x = 0;
++	if (y &lt; 0) y = 0;
++	if (width &gt; win-&gt;attr.width - x)			width = win-&gt;attr.width - x;
++	if (height &gt; win-&gt;attr.height - y)			height = win-&gt;attr.height - y;
+ 
+-	texnum = 0;
+-
+ 	if (x == 0 &amp;&amp; y == 0 &amp;&amp; width == win-&gt;attr.width &amp;&amp; height == win-&gt;attr.height) {
+ 		if (win-&gt;already_updated) 
+ 			return;
+@@ -428,61 +480,32 @@
+ 	/* if (!win-&gt;oid)
+ 	  deco_box(win);
+ 	*/
+-	for (xleft = 0; xleft &lt; width ; xleft += TEXW) {
+-		xright = (xleft + TEXW &gt; width) ? width : xleft + TEXW;
++	for (xleft = x; xleft &lt; x + width ; xleft = xright) {
++		xright = (xleft + TEXW) &amp; ~(TEXW-1);
++		if (xright &gt; (x + width))
++			xright = x + width;
+ 		chunk_width = xright - xleft;
+-		image = XGetImage(dpy, win-&gt;id, xleft, y, chunk_width, win-&gt;attr.height, AllPlanes, ZPixmap);
++		printf(&quot;request image: xleft = %d, xright = %d, width = %d, x:y = %d:%d, width:height = %d:%d, ~TEXW = %08x\n&quot;,
++						xleft, xright, width, x, y, width, height, ~TEXW);
++		image = XGetImage(dpy, win-&gt;id, xleft, y, chunk_width, height, AllPlanes, ZPixmap);
+ 		if (!image)
+ 			return;
+-		bitmap = malloc(chunk_width * height * sizeof(uint32_t));
++		bitmap = malloc(TEXW * height * sizeof(uint32_t));
+ 		if (win-&gt;oid == -1) 
+ 			deco_box(win);
+-		if (image-&gt;format == ZPixmap) {
+-/*			printf(&quot;XImage: %dx%d, format %d (%d), bpp: %d, depth %d, pad %d\n&quot;,
+-			       image-&gt;width, image-&gt;height, image-&gt;format,
+-			       ZPixmap, image-&gt;bits_per_pixel, image-&gt;depth, image-&gt;bitmap_pad);*/
+-			rs = get_shift(image-&gt;red_mask) - 8;
+-			gs = get_shift(image-&gt;green_mask) - 8;
+-			bs = get_shift(image-&gt;blue_mask) - 8;
+-
+-			bpp = (image-&gt;bits_per_pixel / 8);
+-			/* rgb is not bgr */
+-			rs = rs;
+-			gs = gs - 8;
+-			bs = bs - 16;
+-/*			printf(&quot;Ximage: rgb: %d|%d|%d\n&quot;, rs, gs, bs);;*/
+-			/*  printf(&quot;red: size %d, offset %d\n&quot;,rs,roff);
+-			  printf(&quot;green: size %d, offset %d\n&quot;,gs,goff);
+-			  printf(&quot;blue: size %d, offset %d\n&quot;,bs,boff);
+-			  printf(&quot;bits per pixel:%d\n&quot;,bpp);*/
+-			for (yi = 0; yi &lt; height ; yi++) {
+-				img_ptr = image-&gt;data + (yi * image-&gt;width) * bpp;
+-				bmp_ptr = bitmap + ((y + yi) * chunk_width + x) * sizeof(uint32_t);
+-				for (xi = 0; xi &lt; xright - xleft; xi++) {
+-					s = (unsigned long *)img_ptr;
+-					t = (uint32_t *)bmp_ptr;
+-					/*    bmp_ptr[0] = (rs &gt; 0 ? ((*d &amp; image-&gt;red_mask) &gt;&gt; rs)  : ((*d  &amp; image-&gt;red_mask) &lt;&lt; -rs)) ;
+-					 bmp_ptr[1] = (gs &gt; 0 ? ((*d &amp; image-&gt;green_mask) &gt;&gt; gs) : ((*d  &amp; image-&gt;green_mask) &lt;&lt; -gs)) ;
+-					 bmp_ptr[2] = (bs &gt; 0 ? ((*d &amp; image-&gt;blue_mask) &gt;&gt; bs)  : ((*d  &amp; image-&gt;blue_mask) &lt;&lt; -bs));
+-					 bmp_ptr[3] = 255 ;*/
+-					*t = (rs &gt; 0 ? ((*s &amp; image-&gt;red_mask) &gt;&gt; rs)  : ((*s  &amp; image-&gt;red_mask) &lt;&lt; -rs)) |
+-					     (gs &gt; 0 ? ((*s &amp; image-&gt;green_mask) &gt;&gt; gs) : ((*s  &amp; image-&gt;green_mask) &lt;&lt; -gs)) |
+-					     (bs &gt; 0 ? ((*s &amp; image-&gt;blue_mask) &gt;&gt; bs)  : ((*s  &amp; image-&gt;blue_mask) &lt;&lt; -bs)) |
+-					     255 &lt;&lt; 24;
+-
+-					bmp_ptr += sizeof(uint32_t);
+-					img_ptr += bpp;
+-				}
+-			}
+-			/*  s3d_load_texture(win-&gt;oid,0,x,y,width,height, ???); */
+-			for (ytop = 0; ytop &lt; height; ytop += TEXH) {
+-				ybottom = (ytop + TEXH &gt; height) ? height : ytop + TEXH;
+-				chunk_height = ybottom - ytop;
+-				s3d_load_texture(win-&gt;oid, texnum, 0, 0, chunk_width, chunk_height, (unsigned char *)bitmap + chunk_width * ytop * 4);
+-				texnum++;
+-			}
+-			/*  swap images */
++//		printf(&quot;image_convert\n&quot;);
++		image_convert(image, bitmap);
++//		printf(&quot;load textures ...\n&quot;);
++		for (ytop = y; ytop &lt; y + height; ytop = ybottom) {
++			ybottom = (ytop + TEXH) &amp; ~(TEXH-1);
++			chunk_height = ybottom - ytop;
++			s3d_load_texture(win-&gt;oid, TEXNUM(win, xleft, ytop), xleft % TEXW, ytop % TEXH, 
++								chunk_width, chunk_height, (unsigned char *)bitmap + chunk_width * (ytop - y) * 4);
++/*			printf(&quot;s3d_load_texture(%d, %d, %d, %d, %d, %d, %010p);\n&quot;,
++							win-&gt;oid, TEXNUM(win, xleft, ytop), xleft % TEXW, ytop % TEXH, 
++								chunk_width, chunk_height, (unsigned char *)bitmap + chunk_width * (ytop - y) * 4);*/
+ 		}
++//		printf(&quot;done loading textures\n&quot;);
+ 		XDestroyImage(image);
+ 		free(bitmap);
+ 	}
+@@ -512,7 +535,7 @@
+ 		} else if (event.type == ConfigureNotify) {
+ 			XConfigureEvent *e = &amp;event.xconfigure; 
+ 			window = window_find(e-&gt;window);
+-			if (window != NULL) {
++			if (window != 0) {
+ /*				printf(&quot;Configure: window = %d, geometry = %d:%d (at %d:%d)\n&quot;,
+ 				       (int)e-&gt;window, e-&gt;width, e-&gt;height, e-&gt;x, e-&gt;y);*/
+ 				window_update_geometry(window, e-&gt;x, e-&gt;y, e-&gt;width, e-&gt;height);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000778.html">[S3d-svn] r786 - in trunk: . apps/comptest
+</A></li>
+	<LI>Next message: <A HREF="000780.html">[S3d-svn] r788 - in trunk: . apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#779">[ date ]</a>
+              <a href="thread.html#779">[ thread ]</a>
+              <a href="subject.html#779">[ subject ]</a>
+              <a href="author.html#779">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

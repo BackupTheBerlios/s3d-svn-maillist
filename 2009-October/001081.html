@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-74-g9496d99
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2009-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20branch%2C%20master%2C%0A%09updated.%20v0.2.1.1-74-g9496d99&In-Reply-To=%3C200910312151.n9VLpi7Y009371%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001080.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-74-g9496d99</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20Project%20s3d%20at%20BerliOS%20branch%2C%20master%2C%0A%09updated.%20v0.2.1.1-74-g9496d99&In-Reply-To=%3C200910312151.n9VLpi7Y009371%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] Project s3d at BerliOS branch, master,	updated. v0.2.1.1-74-g9496d99">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sat Oct 31 22:51:44 CET 2009</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001080.html">[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-11-g9b3c276
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1081">[ date ]</a>
+              <a href="thread.html#1081">[ thread ]</a>
+              <a href="subject.html#1081">[ subject ]</a>
+              <a href="author.html#1081">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project &quot;Project s3d at BerliOS&quot;.
+
+The branch, master has been updated
+       via  9496d99deba405598d014163440ea9194693e66d (commit)
+       via  9b3c27659380e3bf3e5632c4951ac1174d6a81f6 (commit)
+       via  f37ea447585711ebba376d6c70439b2b6e781efb (commit)
+       via  1d9b7a844a7f160cedddd41ec812346446941ee8 (commit)
+       via  ef0abb5f3aba46b24dfd0b7a1ba9f1b05dcec2ec (commit)
+       via  1cac16856bb01611a4cc0a980ab09d1bbcc7bf43 (commit)
+       via  73eb11665960151c29b4eb67df4596d4b9c0f341 (commit)
+       via  476b471b5c252ef591929308585bff52aef3b475 (commit)
+      from  d0b565b2f0fc6720659754473f374583d7b7a9cd (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 9496d99deba405598d014163440ea9194693e66d
+Merge: d0b565b2f0fc6720659754473f374583d7b7a9cd 9b3c27659380e3bf3e5632c4951ac1174d6a81f6
+Author: Sven Eckelmann &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">sven.eckelmann at gmx.de</A>&gt;
+Date:   Sat Oct 31 22:49:02 2009 +0100
+
+    Merge branch 'maint'
+    
+    Conflicts:
+    	apps/s3d_x11gate/CMakeLists.txt
+    	apps/s3dvt/CMakeLists.txt
+    	cmake/modules/FindBluetooth.cmake
+    	cmake/modules/FindCWiid.cmake
+    	cmake/modules/FindFREETYPE.cmake
+    	cmake/modules/FindFontconfig.cmake
+    	cmake/modules/FindG3D.cmake
+    	cmake/modules/FindGLIB.cmake
+    	cmake/modules/FindGPS.cmake
+    	cmake/modules/FindSQLite3.cmake
+    	cmake/modules/FindXcomposite.cmake
+    	cmake/modules/FindXdamage.cmake
+    	cmake/modules/FindXfixes.cmake
+    	cmake/modules/FindXrender.cmake
+    	cmake/modules/FindXtst.cmake
+    	experimental/comptest/comptest.h
+    	libs3dw/s3dw.h
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ ConfigureChecks.cmake               |   27 +++++----
+ Documentation/Maintain.txt          |  108 +++++++++++++++++++++--------------
+ apps/s3d_x11gate/CMakeLists.txt     |    3 +-
+ apps/s3dvt/CMakeLists.txt           |    2 +-
+ cmake/modules/FindBluetooth.cmake   |   63 --------------------
+ cmake/modules/FindCWiid.cmake       |   70 ----------------------
+ cmake/modules/FindFREETYPE.cmake    |   42 --------------
+ cmake/modules/FindFontconfig.cmake  |   42 --------------
+ cmake/modules/FindG3D.cmake         |   42 --------------
+ cmake/modules/FindGLIB.cmake        |   42 --------------
+ cmake/modules/FindGPS.cmake         |   45 +++------------
+ cmake/modules/FindSQLite3.cmake     |   42 --------------
+ cmake/modules/FindXcomposite.cmake  |   41 -------------
+ cmake/modules/FindXdamage.cmake     |   63 --------------------
+ cmake/modules/FindXfixes.cmake      |   41 -------------
+ cmake/modules/FindXrender.cmake     |   41 -------------
+ cmake/modules/FindXtst.cmake        |   63 --------------------
+ experimental/comptest/comptest.h    |    2 +-
+ experimental/comptest/x11.c         |    2 +-
+ experimental/wiitest/CMakeLists.txt |    8 +--
+ libs3d/s3dlib.h                     |    2 +-
+ libs3d/tcp.c                        |    2 +-
+ libs3dw/s3dw.h                      |    4 +-
+ 23 files changed, 99 insertions(+), 698 deletions(-)
+ delete mode 100644 cmake/modules/FindBluetooth.cmake
+ delete mode 100644 cmake/modules/FindCWiid.cmake
+ delete mode 100644 cmake/modules/FindFREETYPE.cmake
+ delete mode 100644 cmake/modules/FindFontconfig.cmake
+ delete mode 100644 cmake/modules/FindG3D.cmake
+ delete mode 100644 cmake/modules/FindGLIB.cmake
+ delete mode 100644 cmake/modules/FindSQLite3.cmake
+ delete mode 100644 cmake/modules/FindXcomposite.cmake
+ delete mode 100644 cmake/modules/FindXdamage.cmake
+ delete mode 100644 cmake/modules/FindXfixes.cmake
+ delete mode 100644 cmake/modules/FindXrender.cmake
+ delete mode 100644 cmake/modules/FindXtst.cmake
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001080.html">[S3d-svn] Project s3d at BerliOS branch, maint,	updated. v0.2.1.1-11-g9b3c276
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1081">[ date ]</a>
+              <a href="thread.html#1081">[ thread ]</a>
+              <a href="subject.html#1081">[ subject ]</a>
+              <a href="author.html#1081">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

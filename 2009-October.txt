@@ -1,0 +1,380 @@
+From lazhur at mail.berlios.de  Thu Oct 15 19:05:35 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 15 Oct 2009 19:05:35 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-1-8-g26167c9
+Message-ID: <200910151705.n9FH5Zna008705@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  26167c9c2491d8561980c804f101cf23a4b2304a (commit)
+      from  36d36169192ee8a9b003f4eca2b3192b7fedc4c3 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 26167c9c2491d8561980c804f101cf23a4b2304a
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Oct 15 18:41:30 2009 +0200
+
+    Release s3d 0.2.1.1-2
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Thu Oct 15 19:05:38 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 15 Oct 2009 19:05:38 +0200
+Subject: [S3d-svn] Project s3d at BerliOS annotated tag, debian/0.2.1.1-2,
+	created. debian/0.2.1.1-2
+Message-ID: <200910151705.n9FH5ce2008792@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The annotated tag, debian/0.2.1.1-2 has been created
+        at  86f785f14c515ba0b6f3b7c0724ddb8ebbd90c44 (tag)
+   tagging  26167c9c2491d8561980c804f101cf23a4b2304a (commit)
+  replaces  debian/0.2.1.1-1
+ tagged by  Sven Eckelmann
+        on  Thu Oct 15 18:47:55 2009 +0200
+
+- Log -----------------------------------------------------------------
+Debian release 0.2.1.1-2
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQIcBAABCgAGBQJK11I7AAoJEF2HCgfBJntGQ/kQANj/tA6fFlkAy1XL4Y2I5fKw
+ThtaX7PrjTJBhXJl+sR0vsslL2wz5hs7wqNKrKzY9b7ETd+HD4+kANGv/rdZyRz1
+IGZzwOo3yIDhVTVFG3Yd+9X5bbDp9SOTHepdJ7vDHcREvbvP59KEKHuYjQCgsngM
+25xjBE4yIOWAQnTfdzwMbnSSw68L4O0QKltqaWUSWY3dMS1DcpIkttGPhWGFeuoB
+TqyJnhrl06pNY7phE5FSHwm2oJeZ0fWTsceZn2D1CsDJM289XbCsegLYTKIMn35W
+urQ48B/qCGB/6I2p2Ra2S/8icav81ELb5xcpW6gmFIAQ9HFgARSZav7nskj25hNC
+Cj4Si+9TXMpSp1gaqPikhND1toUYwjIUVaif9ctf2vAWxbYsAGqxMmA7OgZssKeA
+ED7SkW5ssIgMlfFTKgVkikmIPnTjcLkmVYLi0EQDANu6nwO2xDnLjrSf8D/rffzg
+iUoiQf+jrtobCmx02QUrTLsNskIZvnJc/gJvOpNAeG7KfdLydWGzNqSOmT6lixW2
+r34ENwi4pyqDTuMAYy72u7Ia6Pf5/HgNaRAkIWVJB3wg3BxzEvbqjx1l3DQUAGwQ
+Y3/dfyq5yHNvGofhYzfoSyTKH6lPX16B02luA4N5zOXXGjg6e9zUOx5wP7ePo6Tg
+m3Jjw7pfrvNfjQx5fiF3
+=hmyu
+-----END PGP SIGNATURE-----
+
+Sven Eckelmann (8):
+      Upgraded to policy 3.8.3, no changes required
+      Add README.source with informations about patch management
+      Change to dep3 patch tagging guidelines
+      Remove number before patches as order is given by debian/patches/series
+      Rebuild patches with git-dep3-format
+      Remove Martin Stern from debian/copyright as his files were removed
+      Correct version number for soname and pkg-config
+      Release s3d 0.2.1.1-2
+
+-----------------------------------------------------------------------
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Thu Oct 15 22:10:00 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Thu, 15 Oct 2009 22:10:00 +0200
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	updated. v0.2.1.1-7-g1cac168
+Message-ID: <200910152010.n9FKA0TA006787@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been updated
+       via  1cac16856bb01611a4cc0a980ab09d1bbcc7bf43 (commit)
+       via  73eb11665960151c29b4eb67df4596d4b9c0f341 (commit)
+      from  476b471b5c252ef591929308585bff52aef3b475 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 1cac16856bb01611a4cc0a980ab09d1bbcc7bf43
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Oct 15 21:03:01 2009 +0200
+
+    Convert most library tests to pkg-config
+
+commit 73eb11665960151c29b4eb67df4596d4b9c0f341
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Thu Oct 15 21:04:42 2009 +0200
+
+    comptest: Synchronize definition and declaration of x11_get_prop
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ ConfigureChecks.cmake               |   27 ++++++++++++--------
+ cmake/modules/FindBluetooth.cmake   |   36 ---------------------------
+ cmake/modules/FindCWiid.cmake       |   43 --------------------------------
+ cmake/modules/FindFREETYPE.cmake    |   15 -----------
+ cmake/modules/FindFontconfig.cmake  |   15 -----------
+ cmake/modules/FindG3D.cmake         |   15 -----------
+ cmake/modules/FindGLIB.cmake        |   15 -----------
+ cmake/modules/FindGPS.cmake         |   46 ++++++----------------------------
+ cmake/modules/FindSQLite3.cmake     |   15 -----------
+ cmake/modules/FindXcomposite.cmake  |   14 ----------
+ cmake/modules/FindXdamage.cmake     |   36 ---------------------------
+ cmake/modules/FindXfixes.cmake      |   14 ----------
+ cmake/modules/FindXrender.cmake     |   14 ----------
+ cmake/modules/FindXtst.cmake        |   36 ---------------------------
+ experimental/comptest/comptest.h    |    2 +-
+ experimental/wiitest/CMakeLists.txt |    8 +----
+ 16 files changed, 27 insertions(+), 324 deletions(-)
+ delete mode 100644 cmake/modules/FindBluetooth.cmake
+ delete mode 100644 cmake/modules/FindCWiid.cmake
+ delete mode 100644 cmake/modules/FindFREETYPE.cmake
+ delete mode 100644 cmake/modules/FindFontconfig.cmake
+ delete mode 100644 cmake/modules/FindG3D.cmake
+ delete mode 100644 cmake/modules/FindGLIB.cmake
+ delete mode 100644 cmake/modules/FindSQLite3.cmake
+ delete mode 100644 cmake/modules/FindXcomposite.cmake
+ delete mode 100644 cmake/modules/FindXdamage.cmake
+ delete mode 100644 cmake/modules/FindXfixes.cmake
+ delete mode 100644 cmake/modules/FindXrender.cmake
+ delete mode 100644 cmake/modules/FindXtst.cmake
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Fri Oct 30 18:57:26 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Fri, 30 Oct 2009 18:57:26 +0100
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-2-1-g8110c72
+Message-ID: <200910301757.n9UHvQk9000081@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  8110c72ed770010d6f15223d0cde53165c654af1 (commit)
+      from  26167c9c2491d8561980c804f101cf23a4b2304a (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 8110c72ed770010d6f15223d0cde53165c654af1
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Fri Oct 30 18:56:47 2009 +0100
+
+    Remove shlibs:Depends for binary packages without shared libs dependencies
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    6 ++++++
+ debian/control   |    6 +++---
+ 2 files changed, 9 insertions(+), 3 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Oct 31 22:51:38 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 31 Oct 2009 22:51:38 +0100
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-2-2-g8189a03
+Message-ID: <200910312151.n9VLpc8d009205@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  8189a031f10a5d08612935277fbdc783149e8a79 (commit)
+      from  8110c72ed770010d6f15223d0cde53165c654af1 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 8189a031f10a5d08612935277fbdc783149e8a79
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Oct 31 21:56:12 2009 +0100
+
+    Remove unused libraries added by pkg-config from libs3d and libs3dw
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    1 +
+ debian/rules     |    1 +
+ 2 files changed, 2 insertions(+), 0 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Oct 31 22:51:44 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 31 Oct 2009 22:51:44 +0100
+Subject: [S3d-svn] Project s3d at BerliOS branch, maint,
+	updated. v0.2.1.1-11-g9b3c276
+Message-ID: <200910312151.n9VLpiim009339@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, maint has been updated
+       via  9b3c27659380e3bf3e5632c4951ac1174d6a81f6 (commit)
+       via  f37ea447585711ebba376d6c70439b2b6e781efb (commit)
+       via  1d9b7a844a7f160cedddd41ec812346446941ee8 (commit)
+       via  ef0abb5f3aba46b24dfd0b7a1ba9f1b05dcec2ec (commit)
+      from  1cac16856bb01611a4cc0a980ab09d1bbcc7bf43 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/Maintain.txt      |  108 +++++++++++++++++++++++---------------
+ apps/s3d_x11gate/CMakeLists.txt |    3 +-
+ apps/s3dvt/CMakeLists.txt       |    2 +-
+ 3 files changed, 67 insertions(+), 46 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Oct 31 22:51:44 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 31 Oct 2009 22:51:44 +0100
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-74-g9496d99
+Message-ID: <200910312151.n9VLpi7Y009371@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  9496d99deba405598d014163440ea9194693e66d (commit)
+       via  9b3c27659380e3bf3e5632c4951ac1174d6a81f6 (commit)
+       via  f37ea447585711ebba376d6c70439b2b6e781efb (commit)
+       via  1d9b7a844a7f160cedddd41ec812346446941ee8 (commit)
+       via  ef0abb5f3aba46b24dfd0b7a1ba9f1b05dcec2ec (commit)
+       via  1cac16856bb01611a4cc0a980ab09d1bbcc7bf43 (commit)
+       via  73eb11665960151c29b4eb67df4596d4b9c0f341 (commit)
+       via  476b471b5c252ef591929308585bff52aef3b475 (commit)
+      from  d0b565b2f0fc6720659754473f374583d7b7a9cd (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 9496d99deba405598d014163440ea9194693e66d
+Merge: d0b565b2f0fc6720659754473f374583d7b7a9cd 9b3c27659380e3bf3e5632c4951ac1174d6a81f6
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Oct 31 22:49:02 2009 +0100
+
+    Merge branch 'maint'
+    
+    Conflicts:
+    	apps/s3d_x11gate/CMakeLists.txt
+    	apps/s3dvt/CMakeLists.txt
+    	cmake/modules/FindBluetooth.cmake
+    	cmake/modules/FindCWiid.cmake
+    	cmake/modules/FindFREETYPE.cmake
+    	cmake/modules/FindFontconfig.cmake
+    	cmake/modules/FindG3D.cmake
+    	cmake/modules/FindGLIB.cmake
+    	cmake/modules/FindGPS.cmake
+    	cmake/modules/FindSQLite3.cmake
+    	cmake/modules/FindXcomposite.cmake
+    	cmake/modules/FindXdamage.cmake
+    	cmake/modules/FindXfixes.cmake
+    	cmake/modules/FindXrender.cmake
+    	cmake/modules/FindXtst.cmake
+    	experimental/comptest/comptest.h
+    	libs3dw/s3dw.h
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ ConfigureChecks.cmake               |   27 +++++----
+ Documentation/Maintain.txt          |  108 +++++++++++++++++++++--------------
+ apps/s3d_x11gate/CMakeLists.txt     |    3 +-
+ apps/s3dvt/CMakeLists.txt           |    2 +-
+ cmake/modules/FindBluetooth.cmake   |   63 --------------------
+ cmake/modules/FindCWiid.cmake       |   70 ----------------------
+ cmake/modules/FindFREETYPE.cmake    |   42 --------------
+ cmake/modules/FindFontconfig.cmake  |   42 --------------
+ cmake/modules/FindG3D.cmake         |   42 --------------
+ cmake/modules/FindGLIB.cmake        |   42 --------------
+ cmake/modules/FindGPS.cmake         |   45 +++------------
+ cmake/modules/FindSQLite3.cmake     |   42 --------------
+ cmake/modules/FindXcomposite.cmake  |   41 -------------
+ cmake/modules/FindXdamage.cmake     |   63 --------------------
+ cmake/modules/FindXfixes.cmake      |   41 -------------
+ cmake/modules/FindXrender.cmake     |   41 -------------
+ cmake/modules/FindXtst.cmake        |   63 --------------------
+ experimental/comptest/comptest.h    |    2 +-
+ experimental/comptest/x11.c         |    2 +-
+ experimental/wiitest/CMakeLists.txt |    8 +--
+ libs3d/s3dlib.h                     |    2 +-
+ libs3d/tcp.c                        |    2 +-
+ libs3dw/s3dw.h                      |    4 +-
+ 23 files changed, 99 insertions(+), 698 deletions(-)
+ delete mode 100644 cmake/modules/FindBluetooth.cmake
+ delete mode 100644 cmake/modules/FindCWiid.cmake
+ delete mode 100644 cmake/modules/FindFREETYPE.cmake
+ delete mode 100644 cmake/modules/FindFontconfig.cmake
+ delete mode 100644 cmake/modules/FindG3D.cmake
+ delete mode 100644 cmake/modules/FindGLIB.cmake
+ delete mode 100644 cmake/modules/FindSQLite3.cmake
+ delete mode 100644 cmake/modules/FindXcomposite.cmake
+ delete mode 100644 cmake/modules/FindXdamage.cmake
+ delete mode 100644 cmake/modules/FindXfixes.cmake
+ delete mode 100644 cmake/modules/FindXrender.cmake
+ delete mode 100644 cmake/modules/FindXtst.cmake
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

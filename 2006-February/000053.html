@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r57 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r57%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602111519.k1BFJ0kF005113%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000052.html">
+   <LINK REL="Next"  HREF="000054.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r57 - trunk/apps/olsrs3d</H1>
+    <B>nichtsnutz at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r57%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602111519.k1BFJ0kF005113%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r57 - trunk/apps/olsrs3d">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Sat Feb 11 16:19:00 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000052.html">[S3d-svn] r56 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000054.html">[S3d-svn] r58 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#53">[ date ]</a>
+              <a href="thread.html#53">[ thread ]</a>
+              <a href="subject.html#53">[ subject ]</a>
+              <a href="author.html#53">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-02-11 16:18:58 +0100 (Sat, 11 Feb 2006)
+New Revision: 57
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+Log:
+camera moving, not comlete,
+current intermediate result
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-02-11 13:09:40 UTC (rev 56)
++++ trunk/apps/olsrs3d/main.c	2006-02-11 15:18:58 UTC (rev 57)
+@@ -26,6 +26,7 @@
+ float CamPosition[2][3];   /* CamPosition[trans|rot][x-z] */
+ float ZeroPosition[3] = {0,0,0};   /* current position zero position */
+ int ZeroPoint;   /* object zeropoint */
++int Follow_id = 0;
+ 
+ 
+ 
+@@ -161,6 +162,7 @@
+ 
+ 		/* delete old shape */
+ 		if ( olsr_node-&gt;obj_id != -1 ) {
++			/* remove element from ob2ip list */
+ 			lst_del( olsr_node-&gt;obj_id );
+ 			s3d_del_object( olsr_node-&gt;obj_id );
+ 		}
+@@ -387,6 +389,12 @@
+ 	return;
+ }
+ 
++int follow_node() {
++	if(Follow_id == 0)
++		return(0);
++	
++}
++
+ void stop()
+ {
+ 	s3d_quit();
+@@ -416,15 +424,21 @@
+ 
+ void object_click(struct s3d_evt *evt)
+ {
++	struct olsr_node *F_node;
+ 	int oid;
+ 	oid=(int)*((unsigned long *)evt-&gt;buf);
++	if (Follow_id != 0 &amp;&amp; oid == Follow_id) {
++		Follow_id == 0;
++		/* set world to start point */
++	} else {
++		F_node = *lst_search(oid);
++		printf(&quot;%s&quot;,F_node-&gt;ip);
++	}
+ 	/*s3d_translate(ZeroPoint,0,50,40);
+ 	ZeroPosition[0] = 0;
+ 	ZeroPosition[1] = 50;
+ 	ZeroPosition[2] = 40;*/
+-	struct olsr_node *olsr_node;
+-	olsr_node = *lst_search(oid);
+-	printf(&quot;obj2ip: search return %s\n&quot;,olsr_node-&gt;ip);
++
+ }
+ 
+ /***
+@@ -459,6 +473,7 @@
+ 		s3d_translate(mesh,(-left)*3.0-1.8,bottom*3.0+0.8,-3.0);
+ 		s3d_flags_on(mesh,S3D_OF_VISIBLE);
+ 	}
++	printf(&quot;%f %f %f\n&quot;,inf-&gt;trans_x,inf-&gt;trans_y,inf-&gt;trans_z);
+ }
+ 
+ /***
+@@ -470,10 +485,8 @@
+ void lst_initialize() {
+ 	Obj_to_ip_head = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
+ 	Obj_to_ip_end = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
+-	if(Obj_to_ip_head == NULL || Obj_to_ip_end == NULL) {
+-		printf(&quot;not enough memory to initialize struct list\n&quot;);
+-		exit(8);
+-	}
++	if(Obj_to_ip_head == NULL || Obj_to_ip_end == NULL)
++		out_of_mem();
+ 	Obj_to_ip_head-&gt;id = 0;
+ 	Obj_to_ip_end-&gt;id = -1;
+ 	Obj_to_ip_head-&gt;prev = Obj_to_ip_end-&gt;prev = Obj_to_ip_head;
+@@ -492,10 +505,8 @@
+ void lst_add(int id,struct olsr_node **olsr_node) {
+ 	struct Obj_to_ip *new;
+ 	new = (struct Obj_to_ip*) malloc(sizeof(struct Obj_to_ip));
+-	if(new == NULL) {
+-		printf(&quot;not enough memory to add element to linked list\n&quot;);
+-		exit(8);
+-	}
++	if(new == NULL)
++		out_of_mem();
+ 	new-&gt;id = id;
+ 	new-&gt;olsr_node = *olsr_node;
+ 	move_lst_ptr(&amp;id);
+@@ -570,6 +581,12 @@
+  * search a object_id in linked list and return pointer on struct olsr_node
+  *	id =&gt; object_id , returned from s3d_clone or s3d_new_object
+  *
++ * &lt;example&gt;
++ *     struct olsr_node *olsr_node;
++ *     olsr_node = *lst_search(oid);
++ *     printf(&quot;obj2ip: search return %s\n&quot;,olsr_node-&gt;ip);
++ * &lt;/example&gt;
++ *
+  ***/
+ 
+ struct olsr_node **lst_search(int id) {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000052.html">[S3d-svn] r56 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000054.html">[S3d-svn] r58 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#53">[ date ]</a>
+              <a href="thread.html#53">[ thread ]</a>
+              <a href="subject.html#53">[ subject ]</a>
+              <a href="author.html#53">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

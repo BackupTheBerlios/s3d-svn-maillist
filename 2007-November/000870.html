@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r877 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r877%20-%20trunk/server&In-Reply-To=%3C200711251939.lAPJdjQE022888%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000869.html">
+   <LINK REL="Next"  HREF="000871.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r877 - trunk/server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r877%20-%20trunk/server&In-Reply-To=%3C200711251939.lAPJdjQE022888%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r877 - trunk/server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 25 20:39:45 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000869.html">[S3d-svn] r876 - trunk/server
+</A></li>
+        <LI>Next message: <A HREF="000871.html">[S3d-svn] r878 - in trunk: example libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#870">[ date ]</a>
+              <a href="thread.html#870">[ thread ]</a>
+              <a href="subject.html#870">[ subject ]</a>
+              <a href="author.html#870">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-25 20:39:45 +0100 (Sun, 25 Nov 2007)
+New Revision: 877
+
+Modified:
+   trunk/server/event.c
+   trunk/server/global.h
+   trunk/server/object.c
+   trunk/server/proto.h
+Log:
+- send event when texture shm comes available
+- move object-info structure into event.c
+
+
+Modified: trunk/server/event.c
+===================================================================
+--- trunk/server/event.c	2007-11-25 19:30:35 UTC (rev 876)
++++ trunk/server/event.c	2007-11-25 19:39:45 UTC (rev 877)
+@@ -112,10 +112,40 @@
+ 	return(0);
+ }
+ 
++/* inform client about an available shm-segment for the texture */
++int event_texshm(struct t_process *p, int32_t oid, int32_t tex)
++{
++	struct t_obj *o;
++	struct {
++		int32_t oid, tex;
++		int16_t tw, th, w, h;
++	} __attribute__((__packed__)) shmtex_packet;
++	s3dprintf(HIGH, &quot;informing process about new texture on oid %d, texture %d\n&quot;, oid, tex);
++	if (OBJ_VALID(p, oid, o)) {
++		shmtex_packet.oid = htonl(oid);
++		shmtex_packet.tex = htonl(tex);
++		shmtex_packet.tw = htons(o-&gt;p_tex[tex].tw);
++		shmtex_packet.th = htons(o-&gt;p_tex[tex].th);
++		shmtex_packet.w = htons(o-&gt;p_tex[tex].w);
++		shmtex_packet.h = htons(o-&gt;p_tex[tex].h);
++		prot_com_out(p, S3D_P_S_SHMTEX, (void *)&amp;shmtex_packet, sizeof(shmtex_packet));
++	}
++	return(0);
++}
++
+ /* this should replace the mcp_rep_object() function later ... */
+ int event_obj_info(struct t_process *p, int32_t oid)
+ {
+-	struct t_obj_info mo;
++	struct {
++		int32_t object;
++		uint32_t flags;
++		float trans_x, trans_y, trans_z;
++		float rot_x, rot_y, rot_z;
++		float scale;
++		float r;
++		char name[S3D_NAME_MAX];
++	} __attribute__((__packed__)) mo;
++
+ 	struct t_process *ap;
+ 	struct t_obj *o;
+ 	if (OBJ_VALID(p, oid, o)) {
+@@ -147,7 +177,7 @@
+ 			break;
+ 
+ 		}
+-		prot_com_out(p, S3D_P_S_OINFO, (uint8_t *)&amp;mo, sizeof(struct t_obj_info));
++		prot_com_out(p, S3D_P_S_OINFO, (uint8_t *)&amp;mo, sizeof(mo));
+ 	}
+ 	return(0);
+ }
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2007-11-25 19:30:35 UTC (rev 876)
++++ trunk/server/global.h	2007-11-25 19:39:45 UTC (rev 877)
+@@ -191,15 +191,6 @@
+ #endif
+ };
+ 
+-struct t_obj_info {
+-	int32_t object;
+-	uint32_t flags;
+-	float trans_x, trans_y, trans_z;
+-	float rot_x, rot_y, rot_z;
+-	float scale;
+-	float r;
+-	char name[S3D_NAME_MAX];
+-};
+ enum {
+ 	zero,
+ 	FRAME_SDL
+@@ -255,6 +246,7 @@
+ int event_obj_click(struct t_process *p, int32_t oid);
+ int event_key_pressed(uint16_t key, uint16_t uni, uint16_t mod, int state);
+ int event_mbutton_clicked(uint8_t button, uint8_t state);
++int event_texshm(struct t_process *p, int32_t oid, int32_t tex);
+ int event_cam_changed(void);
+ int event_ptr_changed(void);
+ int event_init(struct t_process *p);
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2007-11-25 19:30:35 UTC (rev 876)
++++ trunk/server/object.c	2007-11-25 19:39:45 UTC (rev 877)
+@@ -366,9 +366,11 @@
+ 
+ 					bufsize = obj-&gt;p_tex[m+i].h * obj-&gt;p_tex[m+i].w * 4;
+ 
+-					if (texture_shm_register(&amp;(obj-&gt;p_tex[m+i]), bufsize) == -1) {
++					if (texture_shm_register(&amp;(obj-&gt;p_tex[m+i]), bufsize) == 0) 
++						event_texshm(p, oid, m+i);
++					else
+ 						obj-&gt;p_tex[m+i].buf = malloc(bufsize);
+-					}
++					
+ 					memset(obj-&gt;p_tex[m+i].buf, 0, bufsize);
+ 
+ 
+
+Modified: trunk/server/proto.h
+===================================================================
+--- trunk/server/proto.h	2007-11-25 19:30:35 UTC (rev 876)
++++ trunk/server/proto.h	2007-11-25 19:39:45 UTC (rev 877)
+@@ -171,7 +171,12 @@
+ /*  2b: state */
+ #define S3D_P_S_MBUTTON 5
+ /*  1b: button number */
+-/*  2b: butotn state */
++/*  2b: button state */
++#define S3D_P_S_SHMTEX	6
++/*  4b: object id */
++/*  4b: texture number */
++/*  4b: shmid */
++/*  4*2b: width, height, bufwidth, bufheight */
+ #define S3D_P_S_NEWOBJ 16
+ /*  4b: oid */
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000869.html">[S3d-svn] r876 - trunk/server
+</A></li>
+	<LI>Next message: <A HREF="000871.html">[S3d-svn] r878 - in trunk: example libs3d server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#870">[ date ]</a>
+              <a href="thread.html#870">[ thread ]</a>
+              <a href="subject.html#870">[ subject ]</a>
+              <a href="author.html#870">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

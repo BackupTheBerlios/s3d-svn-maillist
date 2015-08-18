@@ -1,0 +1,226 @@
+From lazhur at mail.berlios.de  Fri Nov  6 13:24:36 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Fri, 6 Nov 2009 13:24:36 +0100
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-2-3-g611d7eb
+Message-ID: <200911061224.nA6COab5022051@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  611d7eb5523181df3a29e2318fe741dadf11b18b (commit)
+      from  8189a031f10a5d08612935277fbdc783149e8a79 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 611d7eb5523181df3a29e2318fe741dadf11b18b
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Fri Nov 6 13:11:04 2009 +0100
+
+    Convert to 3.0 (quilt) source format
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog     |    5 ++++-
+ debian/control       |    8 ++++----
+ debian/rules         |    1 -
+ debian/source/format |    1 +
+ 4 files changed, 9 insertions(+), 6 deletions(-)
+ create mode 100644 debian/source/format
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sun Nov 15 20:16:20 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun, 15 Nov 2009 20:16:20 +0100
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-2-5-g6d5bea1
+Message-ID: <200911151916.nAFJGK4f014739@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  6d5bea1b56bc3340c17cf8d1c954a3abf1b699b7 (commit)
+       via  9acdaa7c7238e1d85dabcbd50af7eda9b2c9851b (commit)
+      from  611d7eb5523181df3a29e2318fe741dadf11b18b (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 6d5bea1b56bc3340c17cf8d1c954a3abf1b699b7
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sun Nov 15 20:14:23 2009 +0100
+
+    Change gbp.conf to be a normal file in the debian source package
+
+commit 9acdaa7c7238e1d85dabcbd50af7eda9b2c9851b
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sun Nov 15 17:38:28 2009 +0100
+
+    Rewrote debian/rules with dh
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog             |    2 ++
+ debian/compat                |    2 +-
+ debian/control               |    2 +-
+ debian/docs                  |    1 -
+ .gbp.conf => debian/gbp.conf |    2 +-
+ debian/rules                 |   29 +++++++++++++++++++++--------
+ 6 files changed, 26 insertions(+), 12 deletions(-)
+ delete mode 100644 debian/docs
+ rename .gbp.conf => debian/gbp.conf (75%)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Mon Nov 16 01:44:25 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Mon, 16 Nov 2009 01:44:25 +0100
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-2-6-gd4f1f78
+Message-ID: <200911160044.nAG0iP3e017249@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  d4f1f78fe22d860fcd80322ff73f91e203132e5d (commit)
+      from  6d5bea1b56bc3340c17cf8d1c954a3abf1b699b7 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit d4f1f78fe22d860fcd80322ff73f91e203132e5d
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Mon Nov 16 01:32:55 2009 +0100
+
+    Release s3d 0.2.1.1-3
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Mon Nov 16 01:44:27 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Mon, 16 Nov 2009 01:44:27 +0100
+Subject: [S3d-svn] Project s3d at BerliOS annotated tag, debian/0.2.1.1-3,
+	created. debian/0.2.1.1-3
+Message-ID: <200911160044.nAG0iRwW017311@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The annotated tag, debian/0.2.1.1-3 has been created
+        at  51deb33f6f818c9d2aa371d3e888b1ba52ae8eca (tag)
+   tagging  d4f1f78fe22d860fcd80322ff73f91e203132e5d (commit)
+  replaces  debian/0.2.1.1-2
+ tagged by  Sven Eckelmann
+        on  Mon Nov 16 01:42:23 2009 +0100
+
+- Log -----------------------------------------------------------------
+Debian release 0.2.1.1-3
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQIcBAABCgAGBQJLAJ/vAAoJEF2HCgfBJntGkzsP/291l238OxXT/69VucpeyhTY
+gZRJiov1V+S4wjnJftutpXremRisneZXgN8c9LTwY8LqtW9mrqLMVPRTHDRBrGrN
+ywQefdHIcrUbITLmWQcQQJfo0rtKoDRzpvCHpvR9Jw9UOMfJg6mFUJvGlXIa3BIF
+QD9o4RbcY8P4bqTktMB4uf6Uq/VPCshh22YdqsB97wm/Ao6F/fyoFpqQLmUtCiob
+QRY2xVASYO8uhXEcQ5+bWBSs0oQghoU14vW3dgHRKjzQHZpeTy2nqK7KU2P40Icr
+uB//pD7wwL7wulx9+RnD4B2jcHCVJLQbqOe2BIYjPuTXWiQBSId3IHj/uL1CgNwT
+gJbShFXOhNz2qV+FClqmUZUUpVFXsnYR3mMCaIC2e0vxJrgnGLuXALGbw9jzeHvT
+NGdhL+MOIhH6tSV56ugQdTQoGmgY48pqTGQREv3UZrotWFkZri+/6oUi/CzPCYoS
+eVNTDc6utzkFxwn9T1SMNcxQ4r9mSA5R+GHtiVHtF5zTUz2b/dx8K+cSO3ZeMPrv
+OlRPFQECb+N3Q6bnbAcwAGetd8XXgvCzmJqpSDYIGQ4NPlQ0gongZQNq3Jb86hW3
+hj7hwmPti/wDPCwdIxYsedEpHlM0p1wYiWu5tnT6D9mqCxeCHpHM84fJk3geR91T
+A+2RC2I37ABhKqLlZjos
+=h2c7
+-----END PGP SIGNATURE-----
+
+Sven Eckelmann (6):
+      Remove shlibs:Depends for binary packages without shared libs dependencies
+      Remove unused libraries added by pkg-config from libs3d and libs3dw
+      Convert to 3.0 (quilt) source format
+      Rewrote debian/rules with dh
+      Change gbp.conf to be a normal file in the debian source package
+      Release s3d 0.2.1.1-3
+
+-----------------------------------------------------------------------
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sat Nov 21 16:19:36 2009
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sat, 21 Nov 2009 16:19:36 +0100
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-3-1-g0648fc4
+Message-ID: <200911211519.nALFJaRF029410@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  0648fc4d5f2c6aee3db461f889afab629fbea40d (commit)
+      from  d4f1f78fe22d860fcd80322ff73f91e203132e5d (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 0648fc4d5f2c6aee3db461f889afab629fbea40d
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Sat Nov 21 16:05:12 2009 +0100
+
+    Register HTML documentation in doc-base
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog        |    6 ++++++
+ debian/s3d-doc.doc-base |   10 ++++++++++
+ 2 files changed, 16 insertions(+), 0 deletions(-)
+ create mode 100644 debian/s3d-doc.doc-base
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

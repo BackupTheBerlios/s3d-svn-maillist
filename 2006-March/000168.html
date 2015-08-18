@@ -1,0 +1,531 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r172 - in trunk: . apps/s3d_x11gate apps/s3dfm apps/s3dgps apps/s3dvt client example server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r172%20-%20in%20trunk%3A%20.%20apps/s3d_x11gate%20apps/s3dfm%20apps/s3dgps%20apps/s3dvt%20client%20example%20server&In-Reply-To=%3C200603142003.k2EK3Qko021931%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000167.html">
+   <LINK REL="Next"  HREF="000169.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r172 - in trunk: . apps/s3d_x11gate apps/s3dfm apps/s3dgps apps/s3dvt client example server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r172%20-%20in%20trunk%3A%20.%20apps/s3d_x11gate%20apps/s3dfm%20apps/s3dgps%20apps/s3dvt%20client%20example%20server&In-Reply-To=%3C200603142003.k2EK3Qko021931%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r172 - in trunk: . apps/s3d_x11gate apps/s3dfm apps/s3dgps apps/s3dvt client example server">dotslash at berlios.de
+       </A><BR>
+    <I>Tue Mar 14 21:03:26 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000167.html">[S3d-svn] r171 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000169.html">[S3d-svn] r173 - in trunk: . apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#168">[ date ]</a>
+              <a href="thread.html#168">[ thread ]</a>
+              <a href="subject.html#168">[ subject ]</a>
+              <a href="author.html#168">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-03-14 21:03:24 +0100 (Tue, 14 Mar 2006)
+New Revision: 172
+
+Modified:
+   trunk/
+   trunk/apps/s3d_x11gate/s3d_x11gate.c
+   trunk/apps/s3dfm/main.c
+   trunk/apps/s3dgps/s3dgps.c
+   trunk/apps/s3dvt/main.c
+   trunk/client/object_queue.c
+   trunk/client/proto_out.c
+   trunk/client/shm.c
+   trunk/example/3dsloader.c
+   trunk/example/filebrowser.c
+   trunk/example/katze.c
+   trunk/example/radius_test.c
+   trunk/example/s3dclock.c
+   trunk/example/snowman.c
+   trunk/example/texturetest.c
+   trunk/server/global.h
+   trunk/server/main.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r249 at balthasar</A>:  dotslash | 2006-03-14 21:01:34 +0100
+ - usleep() -&gt; nanosleep()
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:246
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:249
+
+Modified: trunk/apps/s3d_x11gate/s3d_x11gate.c
+===================================================================
+--- trunk/apps/s3d_x11gate/s3d_x11gate.c	2006-03-14 19:40:38 UTC (rev 171)
++++ trunk/apps/s3d_x11gate/s3d_x11gate.c	2006-03-14 20:03:24 UTC (rev 172)
+@@ -25,12 +25,14 @@
+ #include &lt;s3d.h&gt;		 /*  s3d_*() */
+ #include &lt;stdlib.h&gt; 	 /*  getenv() */
+ #include &lt;stdio.h&gt;		 /*  printf() */
+-#include &lt;unistd.h&gt;		 /*  usleep() */
+ #include &lt;X11/Xlib.h&gt;	 /*  Ximage, Display, X*() */
+ #include &lt;X11/Xutil.h&gt;	 /*  XDestroyImage() */
+ #define XK_MISCELLANY
+ #include &lt;X11/keysymdef.h&gt;	 /* keysyms */
+ #include &lt;X11/extensions/XTest.h&gt;	/* keyboard/mouse input via s3d */
++#include &lt;time.h&gt;	/* nanosleep() */
++static struct timespec t={0,100*1000*1000}; /* 100 mili seconds */
++
+ int oid;
+ XImage *image;
+ Display *dpy=0;
+@@ -120,7 +122,8 @@
+ 		otex_image=swap_timg;
+ 	}
+ 	XDestroyImage(image);
+-	usleep(100000);
++
++	nanosleep(&amp;t,NULL); 
+ }
+ void keypress(struct s3d_evt *event)
+ {
+
+Modified: trunk/apps/s3dfm/main.c
+===================================================================
+--- trunk/apps/s3dfm/main.c	2006-03-14 19:40:38 UTC (rev 171)
++++ trunk/apps/s3dfm/main.c	2006-03-14 20:03:24 UTC (rev 172)
+@@ -24,12 +24,14 @@
+ 
+ #include &lt;s3d.h&gt;
+ #include &lt;stdio.h&gt; 	 /*  printf() */
+-#include &lt;unistd.h&gt;  /*  usleep() */
+ #include &lt;dirent.h&gt;  /*  dirent */
+ #include &lt;stdlib.h&gt;	 /*  malloc() */
+ #include &lt;string.h&gt;  /*  strlen(), strncmp(), strrchr() */
+ #include &lt;math.h&gt;	 /*  sin(),cos() */
++#include &lt;time.h&gt;	/* nanosleep() */
++static struct timespec t={0,100*1000*1000}; /* 100 mili seconds */
+ 
++
+ #define SH			0.4 /* height of the step */
+ 
+ #define T_DUNO		0
+@@ -262,7 +264,7 @@
+ }
+ void mainloop()
+ {
+-	usleep(10000);
++	nanosleep(&amp;t,NULL); 
+ }
+ int main (int argc, char **argv)
+ {
+
+Modified: trunk/apps/s3dgps/s3dgps.c
+===================================================================
+--- trunk/apps/s3dgps/s3dgps.c	2006-03-14 19:40:38 UTC (rev 171)
++++ trunk/apps/s3dgps/s3dgps.c	2006-03-14 20:03:24 UTC (rev 172)
+@@ -25,13 +25,16 @@
+ #include &lt;s3d.h&gt;
+ #include &lt;gps.h&gt; 	/* gps_*() */
+ #include &lt;stdio.h&gt; 	/* printf() */
+-#include &lt;unistd.h&gt;	/* sleep() */
+ #include &lt;errno.h&gt;  /* errno */
+ #include &lt;stdlib.h&gt;	/* malloc(), free() */
+ #include &lt;string.h&gt; /* strlen() */
+ #include &lt;math.h&gt;	/* sin(),cos(), M_PI */
+ #include &lt;simage.h&gt; /* simage things */
+ 
++#include &lt;time.h&gt;	/* nanosleep() */
++static struct timespec t={0,33*1000*1000}; /* 30 fps */
++
++
+ #define PIXELFACT	2817.947378
+ #define PIXELFACTN	281794.7378
+ #define BFS			1024
+@@ -84,7 +87,7 @@
+ 	show_position(dgps);
+ 	frame++;
+ 
+-	usleep(1000000/30);
++	nanosleep(&amp;t,NULL); 
+ }
+ 
+ /* a bad 2d-calculation right now ... */
+
+Modified: trunk/apps/s3dvt/main.c
+===================================================================
+--- trunk/apps/s3dvt/main.c	2006-03-14 19:40:38 UTC (rev 171)
++++ trunk/apps/s3dvt/main.c	2006-03-14 20:03:24 UTC (rev 172)
+@@ -33,7 +33,10 @@
+ #include &lt;sys/ioctl.h&gt; 	 /*  ioctl() */
+ #include &lt;pthread.h&gt;	 /*  pthread_create() */
+ #include &lt;s3d.h&gt;		 /*  s3d_* */
++#include &lt;time.h&gt;	/* nanosleep() */
++static struct timespec t={0,100*1000*1000}; /* 100 mili seconds */
+ 
++
+ static int pid;
+ static int term_mode=0;
+ 
+@@ -405,6 +408,8 @@
+ void mainloop()
+ {
+ 	usleep(10000);
++	nanosleep(&amp;t,NULL); 
++
+ 	if ((i+=2)&gt;100)
+ 	{
+ 		if (i%2)
+
+Modified: trunk/client/object_queue.c
+===================================================================
+--- trunk/client/object_queue.c	2006-03-14 19:40:38 UTC (rev 171)
++++ trunk/client/object_queue.c	2006-03-14 20:03:24 UTC (rev 172)
+@@ -26,7 +26,8 @@
+ #include &quot;s3dlib.h&quot;
+ #include &quot;proto.h&quot;	 
+ #include &lt;stdlib.h&gt;	 /*  malloc(),free(), realloc() */
+-#include &lt;unistd.h&gt;	 /*  usleep() */
++#include &lt;time.h&gt;		 /* nanosleep() */
++
+ /*  objects are requested before beeing used for having fast  */
+ /*  access when needed. this also makes things more asynchronous, */
+ /*  therefore faster (I hope). */
+@@ -80,6 +81,7 @@
+ 	queue[queue_size-1]=oid;
+ 	return(0);
+ }
++static struct timespec t={0,10*1000}; /* 10 micro seconds */
+ /*  an object is requested!! give one out: */
+ unsigned int _queue_want_object()
+ {
+@@ -104,7 +106,7 @@
+ 		requested++;
+ 	}
+ 	s3d_net_check();
+-	usleep(10);
++	nanosleep(&amp;t,NULL); 
+ 	} while(i++&lt;TIMEOUT);
+ 
+ 	errds(LOW,&quot;_queue_want_object()&quot;,&quot;timeout is reached. server is extremly slow/laggy or dead&quot;);	
+
+Modified: trunk/client/proto_out.c
+===================================================================
+--- trunk/client/proto_out.c	2006-03-14 19:40:38 UTC (rev 171)
++++ trunk/client/proto_out.c	2006-03-14 20:03:24 UTC (rev 172)
+@@ -32,7 +32,6 @@
+ #include &lt;stdlib.h&gt;		 /*  getenv(),atoi(), malloc() */
+ #ifdef WIN32
+ 	#define uint32_t unsigned long  /*  sohn */
+-	#define usleep(x) sleep(x/1000)  /*  sohn wars */
+ #else
+ 	#include &lt;netdb.h&gt;		 /*  gethostbyname()  */
+ #endif
+
+Modified: trunk/client/shm.c
+===================================================================
+--- trunk/client/shm.c	2006-03-14 19:40:38 UTC (rev 171)
++++ trunk/client/shm.c	2006-03-14 20:03:24 UTC (rev 172)
+@@ -24,13 +24,13 @@
+ 
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
+-#include &lt;stdlib.h&gt; /* malloc() */
++#include &lt;stdlib.h&gt; 	/* malloc() */
+ #include &lt;sys/types.h&gt;
+ #include &lt;sys/ipc.h&gt;
+ #include &lt;sys/shm.h&gt;
+ #include &lt;netinet/in.h&gt;	/* ntohs() */
+-#include &lt;errno.h&gt; /* errno */
+-#include &lt;unistd.h&gt;	/* usleep() */
++#include &lt;errno.h&gt; 		/* errno */
++#include &lt;time.h&gt;		/* nanosleep() */
+ #ifdef SHM
+ 
+ #define SHM_SIZE 		sizeof(key_t)*2  		/* space for the keys */
+@@ -40,6 +40,7 @@
+ static struct buf_t *data_in,*data_out;
+ static int shmid_in, shmid_out;
+ static int shm_idle=0;
++struct timespec t={0,1*1000}; /* 1 micro second */
+ /* char ftoken[]=&quot;/tmp/.s3d_shm&quot;;*/
+ 
+ int _shm_init(char *ftoken)
+@@ -133,7 +134,7 @@
+ 			return(-1);
+ 		}
+ 		if (wait&gt;10)
+-			usleep(1);
++			nanosleep(&amp;t,NULL); 
+ 	}
+ 	return(s - no_left);
+ }
+@@ -156,7 +157,7 @@
+ 			return(-1);
+ 		}
+ 		if (wait&gt;10)
+-			usleep(1);
++			nanosleep(&amp;t,NULL); 
+ 	}
+ 	return(s - no_left);
+ }
+
+Modified: trunk/example/3dsloader.c
+===================================================================
+--- trunk/example/3dsloader.c	2006-03-14 19:40:38 UTC (rev 171)
++++ trunk/example/3dsloader.c	2006-03-14 20:03:24 UTC (rev 172)
+@@ -25,14 +25,15 @@
+ 
+ 
+ #include &lt;s3d.h&gt;
+-#include &lt;stdio.h&gt;  /*  NULL */
+-#include &lt;unistd.h&gt;  /* usleep() */
++#include &lt;stdio.h&gt;  /* NULL */
++#include &lt;time.h&gt;	/* nanosleep() */
++static struct timespec t={0,100*1000*1000}; /* 100 mili seconds */
+ int i,oid;
+ void mainloop()
+ {
+ 	s3d_rotate(oid,0,i,0);
+ 	i++;
+-	usleep(100000);
++	nanosleep(&amp;t,NULL); 
+ }
+ void object_click(struct s3d_evt *evt)
+ {
+
+Modified: trunk/example/filebrowser.c
+===================================================================
+--- trunk/example/filebrowser.c	2006-03-14 19:40:38 UTC (rev 171)
++++ trunk/example/filebrowser.c	2006-03-14 20:03:24 UTC (rev 172)
+@@ -26,11 +26,13 @@
+ 
+ #include &lt;s3d.h&gt;
+ #include &lt;stdio.h&gt; 	 /*  printf() */
+-#include &lt;unistd.h&gt;  /*  usleep() */
+ #include &lt;dirent.h&gt;  /*  dirent */
+ #include &lt;stdlib.h&gt;	 /*  malloc() */
+ #include &lt;string.h&gt;  /*  strlen(), strncmp(), strrchr() */
+ #include &lt;math.h&gt;	 /*  sin(),cos() */
++#include &lt;time.h&gt;	/* nanosleep() */
++static struct timespec t={0,100*1000*1000}; /* 100 mili seconds */
++
+ #define T_DUNO		0
+ #define T_LOCALDIR	1
+ #define T_BACKDIR	2
+@@ -196,7 +198,7 @@
+ }
+ void mainloop()
+ {
+-	usleep(10000);
++	nanosleep(&amp;t,NULL); 
+ }
+ int main (int argc, char **argv)
+ {
+
+Modified: trunk/example/katze.c
+===================================================================
+--- trunk/example/katze.c	2006-03-14 19:40:38 UTC (rev 171)
++++ trunk/example/katze.c	2006-03-14 20:03:24 UTC (rev 172)
+@@ -25,8 +25,10 @@
+ 
+ 
+ #include &lt;s3d.h&gt;
+-#include &lt;unistd.h&gt; /* usleep()*/
+ #include &lt;math.h&gt;	/* sin() */
++#include &lt;time.h&gt;	/* nanosleep() */
++static struct timespec t={0,10*1000*1000}; /* 10 mili seconds */
++
+ int a;
+ int rot_point,body,legfr,legbr,legfl,legbl,tail;
+ 
+@@ -42,7 +44,7 @@
+ 
+ 	s3d_rotate(tail,0,30,110+pos);
+ 	s3d_rotate(rot_point,0,-a,0);
+-	usleep(10000);
++	nanosleep(&amp;t,NULL); 
+ }
+ int main(int argc, char **argv)
+ {
+
+Modified: trunk/example/radius_test.c
+===================================================================
+--- trunk/example/radius_test.c	2006-03-14 19:40:38 UTC (rev 171)
++++ trunk/example/radius_test.c	2006-03-14 20:03:24 UTC (rev 172)
+@@ -23,7 +23,9 @@
+ 
+ #include &lt;s3d.h&gt;
+ #include &lt;stdio.h&gt;  /*  NULL */
+-#include &lt;unistd.h&gt;  /* usleep() */
++#include &lt;time.h&gt;	/* nanosleep() */
++static struct timespec t={0,10*1000*1000}; /* 10 mili seconds */
++
+ #include &lt;math.h&gt;	/* sin(), cos() */
+ int item1, item2, item3;
+ int i=0;
+@@ -50,7 +52,7 @@
+ 	
+ 
+ 	i++;
+-	usleep(100000);
++	nanosleep(&amp;t,NULL); 
+ }
+ int main (int argc, char **argv)
+ {
+
+Modified: trunk/example/s3dclock.c
+===================================================================
+--- trunk/example/s3dclock.c	2006-03-14 19:40:38 UTC (rev 171)
++++ trunk/example/s3dclock.c	2006-03-14 20:03:24 UTC (rev 172)
+@@ -24,9 +24,9 @@
+ 
+ #include &lt;s3d.h&gt;
+ #include &lt;stdio.h&gt;  /*  NULL, sprintf() */
+-#include &lt;unistd.h&gt;  /* usleep() */
+-#include &lt;time.h&gt;	 /*  struct tm, time_t...  */
++#include &lt;time.h&gt;	 /*  nanosleep(), struct tm, time_t...  */
+ #include &lt;string.h&gt;  /*  strlen() */
++static struct timespec t={0,100*1000*1000}; /* 100 mili seconds */
+ int big_p,lil_p,bg,sec_p;
+ int str_oid=-1, o_str_oid;
+ struct tm *mytime;
+@@ -58,7 +58,7 @@
+ 			s3d_del_object(o_str_oid);
+ 	}
+ /* 	printf(&quot;now it's %s\n&quot;,time_str); */
+-	usleep(100000);
++	nanosleep(&amp;t,NULL); 
+ 
+ }
+ int main (int argc, char **argv)
+
+Modified: trunk/example/snowman.c
+===================================================================
+--- trunk/example/snowman.c	2006-03-14 19:40:38 UTC (rev 171)
++++ trunk/example/snowman.c	2006-03-14 20:03:24 UTC (rev 172)
+@@ -22,8 +22,10 @@
+  */
+ 
+ #include &lt;s3d.h&gt;
+-#include &lt;unistd.h&gt; /* usleep()*/
+ #include &lt;math.h&gt;	/* sin() */
++#include &lt;time.h&gt;	/* nanosleep() */
++static struct timespec t={0,10*1000*1000}; /* 10 mili seconds */
++
+ int a;
+ int oid_head;
+ int oid_middle;
+@@ -41,7 +43,7 @@
+ 	s3d_translate(oid_head,		0,1.5 +2.00*pos,0);
+ 	s3d_translate(oid_middle,	0,0   +1.25*pos,0);
+ 	s3d_translate(oid_foot,		0,-2  +1.00*pos,0);
+-	usleep(10000);
++	nanosleep(&amp;t,NULL); 
+ }
+ int main(int argc, char **argv)
+ {
+
+Modified: trunk/example/texturetest.c
+===================================================================
+--- trunk/example/texturetest.c	2006-03-14 19:40:38 UTC (rev 171)
++++ trunk/example/texturetest.c	2006-03-14 20:03:24 UTC (rev 172)
+@@ -24,14 +24,16 @@
+ 
+ #include &lt;s3d.h&gt;
+ #include &lt;stdio.h&gt;  /*  NULL */
+-#include &lt;unistd.h&gt;  /* usleep() */
+ #include &lt;stdlib.h&gt;  /* malloc(),free() */
++#include &lt;time.h&gt;	/* nanosleep() */
++static struct timespec t={0,10*1000*1000}; /* 10 mili seconds */
++
+ int i,oid;
+ void mainloop()
+ {
+ 	i=(i+1)%360;
+ 	s3d_rotate(oid,0,i,0);
+-	usleep(10000);
++	nanosleep(&amp;t,NULL); 
+ }
+ #define MAXX	300
+ #define MAXY	300
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2006-03-14 19:40:38 UTC (rev 171)
++++ trunk/server/global.h	2006-03-14 20:03:24 UTC (rev 172)
+@@ -27,9 +27,6 @@
+ #ifdef SHM
+ 	#include &lt;sys/shm.h&gt; /* key_t */
+ #endif
+-#ifdef WIN32  /*  sohn wars */
+-#define usleep(x)	sleep(x/1000)  /*  sohn wars */
+-#endif   /*  sohn wars */
+ /*  variables and defines */
+ extern int frame_mode; 	 /*  GLUT, SDL, ... ? */
+ extern int running;		 /*  server running flag */
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2006-03-14 19:40:38 UTC (rev 171)
++++ trunk/server/main.c	2006-03-14 20:03:24 UTC (rev 172)
+@@ -23,8 +23,9 @@
+ 
+ 
+ #include &quot;global.h&quot; 		 /*  contains the prototypes of all modules */
+-#include &lt;unistd.h&gt; 	 /*  usleep() */
+-#include &lt;stdlib.h&gt;		 /*  exit() */
++#include &lt;time.h&gt;		 /* nanosleep() */
++#include &lt;stdlib.h&gt;		 /* exit() */
++#include &lt;unistd.h&gt;		 /* sleep(), fork() */
+ #ifdef G_GLUT
+ #include &lt;GL/glut.h&gt; 	 /*  glutMainLoop() */
+ #endif
+@@ -114,9 +115,11 @@
+ 
+ /*  things which should be done each time in main loop go here! this is */
+ /*  just for the case we use a function for the mainloop like we do for glut... */
++
++struct timespec t={0,10*1000*1000}; /* 10 mili seconds */
+ void one_time() 
+ {
+-	usleep(10000);
++	nanosleep(&amp;t,NULL); 
+ 	user_main();
+ 	network_main(); 
+ 	graphics_main();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000167.html">[S3d-svn] r171 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000169.html">[S3d-svn] r173 - in trunk: . apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#168">[ date ]</a>
+              <a href="thread.html#168">[ thread ]</a>
+              <a href="subject.html#168">[ subject ]</a>
+              <a href="author.html#168">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

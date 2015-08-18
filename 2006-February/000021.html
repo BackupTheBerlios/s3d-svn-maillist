@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r25 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r25%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602050050.k150ocZn007828%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000020.html">
+   <LINK REL="Next"  HREF="000022.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r25 - trunk/apps/olsrs3d</H1>
+    <B>marec at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r25%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602050050.k150ocZn007828%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r25 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Sun Feb  5 01:50:38 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000020.html">[S3d-svn] r24 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000022.html">[S3d-svn] r26 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#21">[ date ]</a>
+              <a href="thread.html#21">[ thread ]</a>
+              <a href="subject.html#21">[ subject ]</a>
+              <a href="author.html#21">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-02-05 01:50:18 +0100 (Sun, 05 Feb 2006)
+New Revision: 25
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+Log:
+s3d options
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-02-03 18:20:24 UTC (rev 24)
++++ trunk/apps/olsrs3d/main.c	2006-02-05 00:50:18 UTC (rev 25)
+@@ -7,8 +7,8 @@
+ #include &quot;olsrs3d.h&quot;
+ #define SPEED		10.0
+ 
+-int DEBUG = 0;
+-char OLSR_HOST[256];
++int Debug = 0;
++char Olsr_host[256];
+ 
+ int node_count=-1;
+ int alpha=0;
+@@ -27,11 +27,11 @@
+ 
+ void print_usage( void ) {
+ 
+-	printf( &quot;Usage is olsrs3d [options]\n&quot; );
+-	printf( &quot;Options:\n&quot; );
+-	printf( &quot;   -?\tprint this short help\n&quot; );
++	printf( &quot;Usage is olsrs3d [options] [-- [s3d options]]\n&quot; );
++	printf( &quot;olsrs3d options:\n&quot; );
++	printf( &quot;   -h\tprint this short help\n&quot; );
+ 	printf( &quot;   -d\tenable debug mode\n&quot; );
+-	printf( &quot;   -h\tconnect to olsr node [default: localhost]\n&quot; );
++	printf( &quot;   -H\tconnect to olsr node [default: localhost]\n&quot; );
+ 
+ }
+ 
+@@ -214,30 +214,23 @@
+ 
+ int main( int argc, char *argv[] ) {
+ 
+-	char s3d_options[256];
+ 	int optchar;
++	strncpy( Olsr_host, &quot;127.0.0.1&quot;, 256 );
+ 
+-	strncpy( OLSR_HOST, &quot;127.0.0.1&quot;, 256 );
++	while ( ( optchar = getopt ( argc, argv, &quot;dhH:&quot; ) ) != -1 ) {
+ 
+-	while ( ( optchar = getopt ( argc, argv, &quot;d?h:&quot; ) ) != -1 ) {
+-
+ 		switch ( optchar ) {
+ 
+ 			case 'd':
+-				DEBUG = 1;
+-				printf( &quot;debug mode enabled ...\n&quot; );
++				Debug = 1;
+ 				break;
+ 
+-			case '?':
+-				print_usage();
+-				return (0);
+-
+-			case 'h':
+-				strncpy( OLSR_HOST, optarg, 256 );
++			case 'H':
++				strncpy( Olsr_host, optarg, 256 );
+ 				break;
+ 
++			case 'h':
+ 			default:
+-				printf( &quot;Bad option %s\n&quot;, optarg );
+ 				print_usage();
+ 				return (0);
+ 
+@@ -245,12 +238,18 @@
+ 
+ 	}
+ 
+-	printf( &quot;OLSR_HOST: %s\n&quot;, OLSR_HOST );
++	if ( Debug ) printf( &quot;debug mode enabled ...\n&quot; );
+ 
+-	return (0);
++	/* delete olsrs3d options */
++	while ( ( optind &lt; argc ) &amp;&amp; ( argv[optind][0] != '-' ) ) optind++;   /* optind may point to ip addr of '-H' */
++	optind--;
++	argv[optind] = argv[0];   /* save program path */
++	argc -= optind;   /* jump over olsrs3d options */
++	argv += optind;
+ 
+-	process_init(OLSR_HOST);
+-	if (!net_init(OLSR_HOST))
++
++	process_init(Olsr_host);
++	if (!net_init(Olsr_host))
+ 	{
+ 
+ 		if (!s3d_init(&amp;argc,&amp;argv,&quot;olsrs3d&quot;))
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000020.html">[S3d-svn] r24 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000022.html">[S3d-svn] r26 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#21">[ date ]</a>
+              <a href="thread.html#21">[ thread ]</a>
+              <a href="subject.html#21">[ subject ]</a>
+              <a href="author.html#21">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

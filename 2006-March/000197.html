@@ -1,0 +1,455 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r201 - in trunk: . apps/olsrs3d client server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r201%20-%20in%20trunk%3A%20.%20apps/olsrs3d%20client%20server&In-Reply-To=%3C200603181402.k2IE28MF025525%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000196.html">
+   <LINK REL="Next"  HREF="000198.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r201 - in trunk: . apps/olsrs3d client server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r201%20-%20in%20trunk%3A%20.%20apps/olsrs3d%20client%20server&In-Reply-To=%3C200603181402.k2IE28MF025525%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r201 - in trunk: . apps/olsrs3d client server">dotslash at berlios.de
+       </A><BR>
+    <I>Sat Mar 18 15:02:08 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000196.html">[S3d-svn] r200 - in trunk: . client example server
+</A></li>
+        <LI>Next message: <A HREF="000198.html">[S3d-svn] r202 - in trunk: . apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#197">[ date ]</a>
+              <a href="thread.html#197">[ thread ]</a>
+              <a href="subject.html#197">[ subject ]</a>
+              <a href="author.html#197">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-03-18 15:02:05 +0100 (Sat, 18 Mar 2006)
+New Revision: 201
+
+Added:
+   trunk/client/vector.c
+Modified:
+   trunk/
+   trunk/apps/olsrs3d/Makefile.am
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/process.c
+   trunk/apps/olsrs3d/vector.c
+   trunk/client/Makefile.am
+   trunk/client/s3d.h
+   trunk/server/event.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r301 at balthasar</A>:  dotslash | 2006-03-18 14:59:42 +0100
+ - moving vector.c into client-lib
+ - some -pedantic beautifying in olsrs3d ;)
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:299
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:301
+
+Modified: trunk/apps/olsrs3d/Makefile.am
+===================================================================
+--- trunk/apps/olsrs3d/Makefile.am	2006-03-18 13:09:15 UTC (rev 200)
++++ trunk/apps/olsrs3d/Makefile.am	2006-03-18 14:02:05 UTC (rev 201)
+@@ -5,7 +5,6 @@
+ 	olsrs3d.h
+ 
+ olsrs3d_SOURCES =  \
+-	vector.c \
+ 	process.c \
+ 	main.c \
+ 	net.c
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-03-18 13:09:15 UTC (rev 200)
++++ trunk/apps/olsrs3d/main.c	2006-03-18 14:02:05 UTC (rev 201)
+@@ -323,17 +323,16 @@
+ 
+ 		}
+ 
+-
+-		/* rotate node description so that they are always readable */
+-		tmp_mov_vec[0] = CamPosition[0][0] - olsr_node-&gt;pos_vec[0];
+-		tmp_mov_vec[1] = 0;   /* we are not interested in the y value */
+-		tmp_mov_vec[2] = CamPosition[0][2] - olsr_node-&gt;pos_vec[2];
+-
+-		/* take care of inverse cosinus */
+-		angle = ( tmp_mov_vec[0] &gt; 0 ? 180 - ( 180.0/M_PI * vector_angle( desc_norm_vec, tmp_mov_vec ) ) : 180 + ( 180.0/M_PI * vector_angle( desc_norm_vec, tmp_mov_vec ) ) );
+-
++		s3d_vector_substract( olsr_node-&gt;pos_vec, CamPosition[0], tmp_mov_vec );
++		tmp_mov_vec[1]=0; /* we are not interested in the y value */
++		angle = 180.0/M_PI * s3d_vector_angle( desc_norm_vec, tmp_mov_vec );
++		if (tmp_mov_vec[0]&gt;0)
++			angle=180-angle;
++		else
++			angle=180+angle;
+ 		s3d_rotate( olsr_node-&gt;desc_id, 0, angle , 0 );
+ 		s3d_translate( olsr_node-&gt;desc_id, -cos(angle*M_PI/180)*olsr_node-&gt;desc_length/2 ,-1.5, sin(angle*M_PI/180)*olsr_node-&gt;desc_length/2 );
++/* 		printf( &quot;olsr node (%s) angle: %f\n&quot;, olsr_node-&gt;ip, angle * 180 / M_PI );*/
+ 
+ 
+ 		/* drift away from unrelated nodes */
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-03-18 13:09:15 UTC (rev 200)
++++ trunk/apps/olsrs3d/process.c	2006-03-18 14:02:05 UTC (rev 201)
+@@ -49,6 +49,7 @@
+ 
+ 	struct olsr_con **olsr_con = &amp;Con_begin;
+ 	struct olsr_con *prev_olsr_con = NULL;   /* previous olsr connection */
++	struct olsr_neigh_list **olsr_neigh_list;
+ 
+ 	while ( (*olsr_con) != NULL ) {
+ 
+@@ -88,8 +89,8 @@
+ 
+ 		s3d_flags_on( (*olsr_con)-&gt;obj_id, S3D_OF_VISIBLE );
+ 
+-// 		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 0,4,5,0 );
+-// 		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 3,1,2,0 );
++/* 		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 0,4,5,0 );
++ 		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 3,1,2,0 );*/
+ 		s3d_link( (*olsr_con)-&gt;obj_id,  ZeroPoint );
+ 
+ 		/* add olsr node to new olsr connection in order to access the nodes from the connection list */
+@@ -113,7 +114,7 @@
+ 		(*olsr_con)-&gt;prev_olsr_con = prev_olsr_con;
+ 
+ 		/* add new olsr connection to olsr nodes in order to access the connection from the olsr node */
+-		struct olsr_neigh_list **olsr_neigh_list = &amp;(*olsr_con)-&gt;left_olsr_node-&gt;olsr_neigh_list;
++		olsr_neigh_list = &amp;(*olsr_con)-&gt;left_olsr_node-&gt;olsr_neigh_list;
+ 		while ( (*olsr_neigh_list) != NULL ) olsr_neigh_list = &amp;(*olsr_neigh_list)-&gt;next_olsr_neigh_list;
+ 		(*olsr_neigh_list) = malloc( sizeof( struct olsr_neigh_list ) );
+ 		if ( (*olsr_neigh_list) == NULL ) out_of_mem();
+
+Modified: trunk/apps/olsrs3d/vector.c
+===================================================================
+
+Modified: trunk/client/Makefile.am
+===================================================================
+--- trunk/client/Makefile.am	2006-03-18 13:09:15 UTC (rev 200)
++++ trunk/client/Makefile.am	2006-03-18 14:02:05 UTC (rev 201)
+@@ -3,7 +3,7 @@
+ libs3d_la_SOURCES=	3dsread.c callback.c error.c event.c fontselect.c \
+ 			freetype.c io.c network.c object_queue.c proto_in.c \
+ 			proto_out.c shm.c shm_ringbuf.c tcp.c \
+-			sei_construct.c sei_misc.c sei_monotone.c sei_tri.c
++			sei_construct.c sei_misc.c sei_monotone.c sei_tri.c vector.c
+ 			
+ pkginclude_HEADERS=	config.h s3d.h s3dlib.h sei_triangulate.h sei_interface.h
+ 
+
+Modified: trunk/client/s3d.h
+===================================================================
+--- trunk/client/s3d.h	2006-03-18 13:09:15 UTC (rev 200)
++++ trunk/client/s3d.h	2006-03-18 14:02:05 UTC (rev 201)
+@@ -21,7 +21,7 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
+-
++/* definitions */
+ struct s3d_evt {
+ 	unsigned char event;
+ 	int length;
+@@ -30,11 +30,53 @@
+ };
+ 
+ typedef void (*s3d_cb)(struct s3d_evt *);
++
++#define S3D_EVENT_OBJ_CLICK		1
++#define S3D_EVENT_KEY			2
++#define S3D_EVENT_MBUTTON		3
++#define S3D_EVENT_NEW_OBJECT	16
++#define S3D_EVENT_OBJ_INFO		17
++
++#define S3D_EVENT_QUIT			255
++
++/* TODO: don't keep _MCP_ events .. they're ugly */
++#define S3D_MCP_OBJECT			32
++#define S3D_MCP_DEL_OBJECT		33
++
++#define S3D_PORT				6066
++
++#define	S3D_OF_VISIBLE			0x00000001
++#define	S3D_OF_SELECTABLE		0x00000002
++#define S3D_OF_POINTABLE		0x00000004
++struct mcp_object 
++{
++	unsigned long object;
++	float trans_x,trans_y,trans_z;
++	float r;
++#define MCP_NEW_OBJECT	1
++	char name[256]; 
++};
++struct s3d_obj_info 
++{
++	unsigned long object;
++	unsigned long flags;
++	float trans_x,trans_y,trans_z;
++	float rot_x,rot_y,rot_z;
++	float scale;
++	float r;
++	char name[256]; 
++};
++struct s3d_but_info
++{
++	unsigned char button, state;
++};
++/* framework functions */
+ void s3d_usage();
+ int s3d_init(int *argc, char ***argv, char *name);
+ int s3d_quit();
+ int s3d_mainloop(void (*f)());
+ 
++/* object manipulations */
+ int s3d_push_vertex(int object, float x, float y, float z);
+ int s3d_push_vertices(int object, float *vbuf, unsigned short n);
+ int s3d_push_material( int object, 
+@@ -79,72 +121,48 @@
+ int s3d_load_polygon_normals(int object, float *nbuf,unsigned long start, unsigned short n);
+ int s3d_load_polygon_tex_coords(int object, float *tbuf, unsigned long start, unsigned short n);
+ int s3d_load_texture(int object, unsigned long tex, unsigned short xpos, unsigned short ypos, unsigned short w, unsigned short h, char *data);
++
+ int s3d_new_object();
+ int s3d_del_object(unsigned long oid);
++
+ int s3d_clone(unsigned long oid);
+ int s3d_clone_target(unsigned long oid, unsigned long toid);
++
+ int s3d_link(unsigned long oid_from, unsigned long oid_to);
+ int s3d_unlink(unsigned long oid);
+-int s3d_import_3ds_file(char *fname);
+-int s3d_import_3ds(char *buf);
+-int s3d_open_file(char *fname, char **pointer);
+-int s3d_select_font(char *mask);
+-int s3d_draw_string( char *str, float *xlen);
++
+ int s3d_flags_on(int object, unsigned long flags);
+ int s3d_flags_off(int object, unsigned long flags);
+ int s3d_translate(int object, float x, float y, float z);
+ int s3d_rotate(int object, float x, float y, float z);
+ int s3d_scale(int object, float s);
+ 
++/* high-level object creating */
++int s3d_import_3ds_file(char *fname);
++int s3d_import_3ds(char *buf);
++int s3d_open_file(char *fname, char **pointer);
++int s3d_select_font(char *mask);
++int s3d_draw_string( char *str, float *xlen);
++
++/* some vector calculation helpers */
++
++float s3d_vector_length( float vector[] );
++float s3d_vector_dot_product( float vector1[], float vector2[] );
++void s3d_vector_substract( float vector1[], float vector2[], float result_vector[] );
++float s3d_vector_angle( float vector1[], float vector2[] );
++
++/* event handlers */
+ void s3d_push_event(struct s3d_evt *newevt);
+ struct s3d_evt *s3d_pop_event();
+ struct s3d_evt *s3d_find_event(unsigned char event);
+ int s3d_delete_event(struct s3d_evt *devt);
+ 
+-
+ void s3d_set_callback(unsigned char event, s3d_cb func);
+ void s3d_clear_callback(unsigned char event);
+ void s3d_ignore_callback(unsigned char event);
+ s3d_cb s3d_get_callback(unsigned char event);
+ void s3d_process_stack();
+ 
++/* mcp special */
+ int s3d_mcp_focus(int object);
+-#define S3D_EVENT_OBJ_CLICK		1
+-#define S3D_EVENT_KEY			2
+-#define S3D_EVENT_MBUTTON		3
+-#define S3D_EVENT_NEW_OBJECT	16
+-#define S3D_EVENT_OBJ_INFO		17
+ 
+-#define S3D_EVENT_QUIT			255
+-
+-/* TODO: don't keep _MCP_ events .. they're ugly */
+-#define S3D_MCP_OBJECT			32
+-#define S3D_MCP_DEL_OBJECT		33
+-
+-#define S3D_PORT				6066
+-
+-#define	S3D_OF_VISIBLE			0x00000001
+-#define	S3D_OF_SELECTABLE		0x00000002
+-#define S3D_OF_POINTABLE		0x00000004
+-struct mcp_object 
+-{
+-	unsigned long object;
+-	float trans_x,trans_y,trans_z;
+-	float r;
+-#define MCP_NEW_OBJECT	1
+-	char name[256]; 
+-};
+-struct s3d_obj_info 
+-{
+-	unsigned long object;
+-	unsigned long flags;
+-	float trans_x,trans_y,trans_z;
+-	float rot_x,rot_y,rot_z;
+-	float scale;
+-	float r;
+-	char name[256]; 
+-};
+-struct s3d_but_info
+-{
+-	unsigned char button, state;
+-};
+
+Added: trunk/client/vector.c
+===================================================================
+--- trunk/client/vector.c	2006-03-18 13:09:15 UTC (rev 200)
++++ trunk/client/vector.c	2006-03-18 14:02:05 UTC (rev 201)
+@@ -0,0 +1,92 @@
++/*
++ * net.c
++ *
++ * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *                         Marek Lindner &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">lindner_marek at yahoo.de</A>&gt;
++ *                         Andreas Langer &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">andreas_lbg at gmx.de</A>&gt;
++ *
++ * This file is part of olsrs3d, an olsr topology visualizer for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ *
++ * olsrs3d is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * olsrs3d is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with s3d; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#include &lt;math.h&gt;		/* sqrt() */
++
++/***
++ *
++ * calculate length of a vector =&gt; <A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Length_of_a_vector">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Length_of_a_vector</A>
++ *
++ *   vector   =&gt;   given vector
++ *
++ *   return length
++ *
++ ***/
++
++float s3d_vector_length( float vector[] ) {
++	return ( sqrt( vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2] ) );
++
++}
++
++
++/***
++ *
++ * substract vector1 from vector2 =&gt; <A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Vector_addition_and_subtraction">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Vector_addition_and_subtraction</A>
++ *
++ *   vector1         =&gt;   given vector1
++ *   vector2         =&gt;   given vector2
++ *   result_vector   =&gt;   save resulting vector here
++ *
++ ***/
++
++void s3d_vector_substract( float vector1[], float vector2[], float result_vector[] ) {
++
++	result_vector[0] = vector2[0] - vector1[0];
++	result_vector[1] = vector2[1] - vector1[1];
++	result_vector[2] = vector2[2] - vector1[2];
++}
++
++/***
++ *
++ * calculate dot product of 2 vectors =&gt; <A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Dot_product">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Dot_product</A>
++ *
++ *   vector1   =&gt;   given vector1
++ *   vector2   =&gt;   given vector2
++ *
++ *   return dot product
++ *
++ ***/
++
++float s3d_vector_dot_product( float vector1[], float vector2[] ) {
++	return ( vector1[0] * vector2[0] + vector1[1] * vector2[1] + vector1[2] * vector2[2] );
++}
++
++/***
++ *
++ * calculate angle between 2 vectors =&gt; <A HREF="http://en.wikipedia.org/wiki/Vector_%28spatial%29#Dot_product">http://en.wikipedia.org/wiki/Vector_%28spatial%29#Dot_product</A>
++ *
++ *   vector1   =&gt;   given vector1
++ *   vector2   =&gt;   given vector2
++ *
++ *   return angle
++ *
++ *   NOTE: angle is between 0 and PI, therefore not covering the whole period!
++ *
++ ***/
++
++float s3d_vector_angle( float vector1[], float vector2[] ) {
++	return ( acos( s3d_vector_dot_product( vector1, vector2 ) / ( s3d_vector_length( vector1 ) * s3d_vector_length( vector2 ) ) ) );
++
++}
+
+Modified: trunk/server/event.c
+===================================================================
+--- trunk/server/event.c	2006-03-18 13:09:15 UTC (rev 200)
++++ trunk/server/event.c	2006-03-18 14:02:05 UTC (rev 201)
+@@ -61,7 +61,6 @@
+ 	uint8_t b[2];
+ 	b[0]=button;
+ 	b[1]=state;
+-	dprintf(MED,&quot;mouse button click event: %d %d&quot;,button,state);
+ 	if (obj_valid(get_proc_by_pid(MCP),focus_oid,o))
+ 		prot_com_out(get_proc_by_pid(o-&gt;n_mat), S3D_P_S_MBUTTON, (uint8_t *)&amp;b, 2);
+ 	prot_com_out(get_proc_by_pid(MCP),S3D_P_S_MBUTTON,(uint8_t *)&amp;b, 2); /* mcp always gets a copy */
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000196.html">[S3d-svn] r200 - in trunk: . client example server
+</A></li>
+	<LI>Next message: <A HREF="000198.html">[S3d-svn] r202 - in trunk: . apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#197">[ date ]</a>
+              <a href="thread.html#197">[ thread ]</a>
+              <a href="subject.html#197">[ subject ]</a>
+              <a href="author.html#197">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,190 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r900 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-January/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r900%20-%20trunk/server&In-Reply-To=%3C200801072326.m07NQ4Aw029728%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000892.html">
+   <LINK REL="Next"  HREF="000894.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r900 - trunk/server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r900%20-%20trunk/server&In-Reply-To=%3C200801072326.m07NQ4Aw029728%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r900 - trunk/server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan  8 00:26:04 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000892.html">[S3d-svn] r899 - trunk/example
+</A></li>
+        <LI>Next message: <A HREF="000894.html">[S3d-svn] r901 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#893">[ date ]</a>
+              <a href="thread.html#893">[ thread ]</a>
+              <a href="subject.html#893">[ subject ]</a>
+              <a href="author.html#893">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-01-08 00:26:04 +0100 (Tue, 08 Jan 2008)
+New Revision: 900
+
+Modified:
+   trunk/server/graphics_sdl.c
+   trunk/server/object.c
+   trunk/server/user.c
+   trunk/server/user_sdl.c
+Log:
+server: Remove nearly unused variables
+
+
+Modified: trunk/server/graphics_sdl.c
+===================================================================
+--- trunk/server/graphics_sdl.c	2008-01-07 23:25:51 UTC (rev 899)
++++ trunk/server/graphics_sdl.c	2008-01-07 23:26:04 UTC (rev 900)
+@@ -32,7 +32,6 @@
+ {
+ 	SDL_Surface *GLwin = NULL;
+ 	SDL_VideoInfo *VideoInfo;
+-	int rgb_size[3];      /*  for SDL_GL attributes */
+ 	int buffers, samples;
+ 	s3dprintf(MED, &quot;Using SDL driver ...&quot;);
+ 
+@@ -54,13 +53,6 @@
+ 
+ 
+ 	/*  set some opengl-attributes */
+-	/* SDL_GL_SetAttribute( SDL_GL_RED_SIZE, rgb_size[0] );
+-	 SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, rgb_size[1] );
+-	 SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, rgb_size[2] );*/
+-	/*  SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 5); */
+-	/*  SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 5); */
+-	/*  SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 5); */
+-	/*  SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 ); */
+ 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+ 	do {
+ 		if (aa_level &gt; 0) {
+@@ -79,24 +71,6 @@
+ 				errsf(&quot;SDL_SetVideoMode()&quot;, SDL_GetError());
+ 		}
+ 	} while (GLwin == NULL);
+-	switch (SDL_GetVideoInfo()-&gt;vfmt-&gt;BitsPerPixel) {
+-	case 8:
+-		rgb_size[0] = 3;
+-		rgb_size[1] = 3;
+-		rgb_size[2] = 2;
+-		break;
+-	case 15:
+-	case 16:
+-		rgb_size[0] = 5;
+-		rgb_size[1] = 5;
+-		rgb_size[2] = 5;
+-		break;
+-	default:
+-		rgb_size[0] = 8;
+-		rgb_size[1] = 8;
+-		rgb_size[2] = 8;
+-		break;
+-	}
+ 	if (aa_level &gt; 0) {
+ 		SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &amp;buffers);
+ 		SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &amp;samples);
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2008-01-07 23:25:51 UTC (rev 899)
++++ trunk/server/object.c	2008-01-07 23:26:04 UTC (rev 900)
+@@ -1499,13 +1499,11 @@
+ /* checks if a normal is set for a line object, or set some default if not */
+ static int check_line_normal(struct t_obj *obj, uint32_t pn)
+ {
+-	struct t_vertex *v[2];
+ 	int i, vp;
+ 	for (i = 0;i &lt; 2;i++) { /*  set and check */
+ 		vp = obj-&gt;p_line[pn].v[i]; /*  ... get the vertices ... */
+-		if (vp &lt; (int)obj-&gt;n_vertex)
+-			v[i] = &amp;(obj-&gt;p_vertex[vp]);
+-		else return(-1);
++		if (vp &gt;= (int)obj-&gt;n_vertex)
++			return(-1);
+ 	}
+ 	if ((obj-&gt;p_line[pn].n[0].x*obj-&gt;p_line[pn].n[0].x +
+ 	                obj-&gt;p_line[pn].n[0].y*obj-&gt;p_line[pn].n[0].y +
+
+Modified: trunk/server/user.c
+===================================================================
+--- trunk/server/user.c	2008-01-07 23:25:51 UTC (rev 899)
++++ trunk/server/user.c	2008-01-07 23:26:04 UTC (rev 900)
+@@ -25,7 +25,6 @@
+ #include &quot;global.h&quot;
+ /*  this file reads user input */
+ static int ox, oy;
+-static int pressed;
+ int but = -1;
+ int user_init(void)
+ {
+@@ -38,7 +37,6 @@
+ 	default:
+ 		return(-1);
+ 	}
+-	pressed = 0;
+ 	ox = oy = 0xFFFFFF;
+ 	return(0);
+ }
+
+Modified: trunk/server/user_sdl.c
+===================================================================
+--- trunk/server/user_sdl.c	2008-01-07 23:25:51 UTC (rev 899)
++++ trunk/server/user_sdl.c	2008-01-07 23:26:04 UTC (rev 900)
+@@ -35,7 +35,6 @@
+ int user_main_sdl(void)
+ {
+ 	SDL_Event  event;
+-	SDL_Surface *GLwin = NULL;
+ 	while (SDL_PollEvent(&amp;event)) {
+ 		switch (event.type) {
+ 		case SDL_MOUSEMOTION:
+@@ -125,7 +124,7 @@
+ 			s3dprintf(VLOW, &quot;SDL_SYSWMEVENT&quot;);
+ 			break;
+ 		case SDL_VIDEORESIZE:
+-			if ((GLwin = SDL_SetVideoMode(event.resize.w, event.resize.h, 16, SDLFlags)) == NULL)
++			if (SDL_SetVideoMode(event.resize.w, event.resize.h, 16, SDLFlags) == NULL)
+ 				errsf(&quot;SDL_SetVideoMode()&quot;, SDL_GetError());
+ 			graphics_reshape(event.resize.w, event.resize.h);
+ 			break;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000892.html">[S3d-svn] r899 - trunk/example
+</A></li>
+	<LI>Next message: <A HREF="000894.html">[S3d-svn] r901 - trunk/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#893">[ date ]</a>
+              <a href="thread.html#893">[ thread ]</a>
+              <a href="subject.html#893">[ subject ]</a>
+              <a href="author.html#893">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

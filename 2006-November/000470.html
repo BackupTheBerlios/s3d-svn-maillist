@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r477 - trunk/apps/kism3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r477%20-%20trunk/apps/kism3d&In-Reply-To=%3C200611131656.kADGuLP3017507%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000469.html">
+   <LINK REL="Next"  HREF="000471.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r477 - trunk/apps/kism3d</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r477%20-%20trunk/apps/kism3d&In-Reply-To=%3C200611131656.kADGuLP3017507%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r477 - trunk/apps/kism3d">marec at mail.berlios.de
+       </A><BR>
+    <I>Mon Nov 13 17:56:21 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000469.html">[S3d-svn] r476 - in trunk: . apps/kism3d apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000471.html">[S3d-svn] r478 - trunk/objs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#470">[ date ]</a>
+              <a href="thread.html#470">[ thread ]</a>
+              <a href="subject.html#470">[ subject ]</a>
+              <a href="author.html#470">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-11-13 17:56:21 +0100 (Mon, 13 Nov 2006)
+New Revision: 477
+
+Modified:
+   trunk/apps/kism3d/kism3d.c
+   trunk/apps/kism3d/kism3d.h
+Log:
+fix kism3d compile warnings
+
+Modified: trunk/apps/kism3d/kism3d.c
+===================================================================
+--- trunk/apps/kism3d/kism3d.c	2006-11-13 16:05:52 UTC (rev 476)
++++ trunk/apps/kism3d/kism3d.c	2006-11-13 16:56:21 UTC (rev 477)
+@@ -28,8 +28,11 @@
+ #include &lt;stdio.h&gt;    /* printf() */
+ #include &lt;string.h&gt;   /* memset() */
+ #include &lt;errno.h&gt;    /* errno */
+-#include &lt;sys/socket.h&gt;
++#include &lt;unistd.h&gt;   /* write() */
++
++#include &lt;sys/socket.h&gt; /* inet_pton(), inet_aton() */
+ #include &lt;sys/types.h&gt;
++#include &lt;arpa/inet.h&gt;
+ 
+ 
+ 
+@@ -74,6 +77,8 @@
+ 			last_cr_ptr = read_ptr;
+ 			*last_cr_ptr = '\0';
+ 
++			bssid = channel = type = ssid = mac = ip = NULL;
++
+ 			/* printf( &quot;line: %s\n&quot;, line_ptr ); */
+ 
+ 			if ( strncmp( line_ptr, &quot;*TIME: &quot;, strlen( &quot;*TIME: &quot; ) ) == 0 ) {
+@@ -231,9 +236,7 @@
+ 	struct list_head *kismet_pos, *kismet_pos_tmp;
+ 	struct timeval tv;
+ 	int found_args = 1, max_sock = -1, res, status;
+-	char *colon_ptr;
+-	char enable_network[] = &quot;!0 ENABLE NETWORK bssid,type,channel,ssid\n&quot;, enable_client[] = &quot;!0 ENABLE CLIENT bssid,mac,ip\n&quot;;
+-	unsigned char buff[1000];
++	char *colon_ptr, buff[1000];
+ 	fd_set wait_sockets, tmp_wait_sockets;
+ 
+ 
+@@ -272,7 +275,7 @@
+ 
+ 			kismet_src-&gt;port = strtol(colon_ptr, NULL , 10);
+ 
+-			if ( kismet_src-&gt;port &lt; 0 || kismet_src-&gt;port &gt; 65535 ) {
++			if ( kismet_src-&gt;port &lt; 1 || kismet_src-&gt;port &gt; 65535 ) {
+ 				printf( &quot;Invalid kismet PORT specified: %s\n&quot;, colon_ptr );
+ 				free( kismet_src );
+ 				found_args++;
+@@ -375,7 +378,7 @@
+ 
+ 						} else {
+ 
+-							/* hope that carriage return is now in buf */
++							/* hope that carriage return is now in buffer */
+ 							if ( strlen( kismet_src-&gt;recv_buff ) &lt; 1500 ) {
+ 
+ 								printf( &quot;WARNING: receive buffer almost filled without *any* carriage return within that data !\nAppending truncated buffer to receive buffer to prevent buffer overflow.\n&quot; );
+
+Modified: trunk/apps/kism3d/kism3d.h
+===================================================================
+--- trunk/apps/kism3d/kism3d.h	2006-11-13 16:05:52 UTC (rev 476)
++++ trunk/apps/kism3d/kism3d.h	2006-11-13 16:56:21 UTC (rev 477)
+@@ -39,7 +39,7 @@
+ 	int port;
+ 	int sock;
+ 	char *kismet_ip;
+-	unsigned char *recv_buff;
++	char *recv_buff;
+ 	struct sockaddr_in kismet_addr;
+ 	int enable_level;
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000469.html">[S3d-svn] r476 - in trunk: . apps/kism3d apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000471.html">[S3d-svn] r478 - trunk/objs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#470">[ date ]</a>
+              <a href="thread.html#470">[ thread ]</a>
+              <a href="subject.html#470">[ subject ]</a>
+              <a href="author.html#470">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,895 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r77 - in trunk: . apps apps/dot_mcp example
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r77%20-%20in%20trunk%3A%20.%20apps%20apps/dot_mcp%20example&In-Reply-To=%3C200602171537.k1HFbH6o010871%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000072.html">
+   <LINK REL="Next"  HREF="000074.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r77 - in trunk: . apps apps/dot_mcp example</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r77%20-%20in%20trunk%3A%20.%20apps%20apps/dot_mcp%20example&In-Reply-To=%3C200602171537.k1HFbH6o010871%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r77 - in trunk: . apps apps/dot_mcp example">dotslash at berlios.de
+       </A><BR>
+    <I>Fri Feb 17 16:37:17 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000072.html">[S3d-svn] r76 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000074.html">[S3d-svn] r78 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#73">[ date ]</a>
+              <a href="thread.html#73">[ thread ]</a>
+              <a href="subject.html#73">[ subject ]</a>
+              <a href="author.html#73">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-02-17 16:37:13 +0100 (Fri, 17 Feb 2006)
+New Revision: 77
+
+Added:
+   trunk/apps/dot_mcp/
+   trunk/apps/dot_mcp/Makefile.am
+   trunk/apps/dot_mcp/dot_mcp.c
+Removed:
+   trunk/example/dot_mcp.c
+Modified:
+   trunk/
+   trunk/ChangeLog
+   trunk/apps/Makefile.am
+   trunk/configure.in
+   trunk/example/Makefile.am
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r95 at balthasar</A>:  dotslash | 2006-02-17 16:36:42 +0100
+ Moving dot_mcp to apps
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:93
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:95
+
+Modified: trunk/ChangeLog
+===================================================================
+--- trunk/ChangeLog	2006-02-17 15:14:31 UTC (rev 76)
++++ trunk/ChangeLog	2006-02-17 15:37:13 UTC (rev 77)
+@@ -1,4 +1,5 @@
+-2006-02-17	Simon Wunderlich - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++2006-02-17	Simon Wunderlich - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;	
++	- moved dot_mcp to apps
+ 	- abadoning my own tries and the glu-tesselator 
+ 	  for triangulating the fonts and using public
+ 	  domain code for seidels algorithm by Narkhede A. and
+
+Modified: trunk/apps/Makefile.am
+===================================================================
+--- trunk/apps/Makefile.am	2006-02-17 15:14:31 UTC (rev 76)
++++ trunk/apps/Makefile.am	2006-02-17 15:37:13 UTC (rev 77)
+@@ -6,5 +6,5 @@
+ MAYBE_X11GATE=	s3d_x11gate
+ endif
+ 
+-SUBDIRS =  ${MAYBE_S3DGPS} ${MAYBE_X11GATE} s3dvt olsrs3d
++SUBDIRS =  ${MAYBE_S3DGPS} ${MAYBE_X11GATE} s3dvt olsrs3d dot_mcp
+ 
+
+Added: trunk/apps/dot_mcp/Makefile.am
+===================================================================
+--- trunk/apps/dot_mcp/Makefile.am	2006-02-17 15:14:31 UTC (rev 76)
++++ trunk/apps/dot_mcp/Makefile.am	2006-02-17 15:37:13 UTC (rev 77)
+@@ -0,0 +1,11 @@
++bin_PROGRAMS=	dot_mcp
++
++s3dvtincludedir = ${includedir}/dot_mcp
++s3dvtinclude_HEADERS =  
++
++s3dvt_SOURCES =  \
++	dot_mcp.c
++
++s3dvt_CPPFLAGS=	-I${top_srcdir}/client @PTHREAD_CFLAGS@
++s3dvt_LDADD=	${top_builddir}/client/libs3d.la @PTHREAD_LIBS@
++
+
+Added: trunk/apps/dot_mcp/dot_mcp.c
+===================================================================
+--- trunk/apps/dot_mcp/dot_mcp.c	2006-02-17 15:14:31 UTC (rev 76)
++++ trunk/apps/dot_mcp/dot_mcp.c	2006-02-17 15:37:13 UTC (rev 77)
+@@ -0,0 +1,362 @@
++#include &quot;s3d.h&quot;
++#include &lt;unistd.h&gt;  /*  sleep() */
++#include &lt;stdlib.h&gt;  /*  free(), malloc() */
++#include &lt;string.h&gt;  /*  strncpy() */
++#include &lt;stdio.h&gt;  /*  printf() */
++#include &lt;math.h&gt;	/* sin(), cos() */
++#define bsize 	0.2
++struct app {
++	unsigned int oid,oid_c;
++	float r;
++	int init;
++	float trans_x,trans_y,trans_z;
++	float textw;
++	char name[256]; 
++	int min_but,close_but,title;
++	int sphere;
++	struct app *next;
++};
++
++float asp=1.0;
++struct app *apps=NULL;
++float bottom=-1.0;
++float left=-1.0;
++float zoom=5.0;
++int n_app=0;
++int sphere;
++int rot_flag=0;
++struct app *focus=NULL;
++float focus_r=0;
++float alpha=0;
++unsigned int min_but,rotate,close_but;
++
++void place_apps();
++
++void set_focus(struct app *a)
++{
++	if (focus!=a)
++		/* resetting old focus */
++		if (focus!=NULL)
++		{
++			printf(&quot;unfocusing app name %s\n&quot;,focus-&gt;name);
++			s3d_scale(focus-&gt;oid,1/focus-&gt;r);
++			s3d_scale(focus-&gt;sphere,focus-&gt;r);
++
++  			s3d_flags_on(focus-&gt;sphere,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++			s3d_flags_off(focus-&gt;min_but,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++			s3d_flags_off(rotate,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++			s3d_translate(	focus-&gt;title,-focus-&gt;textw-1.2,0.0,0);
++			s3d_translate(	focus-&gt;close_but,bsize*focus-&gt;textw/2,1.2,0);
++			s3d_link(		focus-&gt;close_but,focus-&gt;sphere);
++			s3d_link(		focus-&gt;oid,0);
++		}
++	focus=a;
++	if (a==NULL)
++	{
++		focus_r=n_app;
++		s3d_mcp_focus(-1);
++	} else {
++		/* set the new focus app up */
++		s3d_translate(	a-&gt;title,-a-&gt;textw-7.2,0.0,0);
++		s3d_translate(	rotate,-4.8,0.0,0);
++		s3d_translate(	a-&gt;min_but,-2.4,0.0,0);
++		s3d_link(		a-&gt;close_but,0);
++		s3d_link(		rotate,a-&gt;close_but);
++		s3d_flags_on(	a-&gt;min_but,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++		s3d_flags_on(	rotate,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++		s3d_flags_off(	a-&gt;sphere,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++		s3d_unlink(a-&gt;oid);
++		s3d_rotate(a-&gt;oid,		0,0,0);
++		s3d_translate(a-&gt;oid,	0,0,0);
++		focus_r=a-&gt;r;
++		s3d_scale(a-&gt;oid,1);
++		s3d_mcp_focus(	a-&gt;oid);
++	}
++	place_apps();
++}
++
++int add_app(struct app *a)
++{
++	struct app *prev=NULL,*a2=apps;
++	while ((a2)!=NULL)
++	{
++		prev=a2;
++		if (a2-&gt;oid==a-&gt;oid)
++		{  /*  already added, so free() and return */
++			free(a);
++			return(1);
++		}
++		a2=a2-&gt;next;  /*  go to the end */
++	}
++	a-&gt;next=NULL;
++	if (prev==NULL)
++		apps=a;
++	else 
++		prev-&gt;next=a;
++	n_app+=1;
++	return(0);
++}
++void *find_app(int oid)
++{
++	struct app *a=apps;
++	while (a!=NULL)
++	{
++		if (oid==a-&gt;oid)
++			break;
++		a=a-&gt;next;
++	}
++	return(a);
++}
++void *del_app(int oid)
++{
++	struct app *prev=NULL,*a=apps;
++	while ((a!=NULL)  &amp;&amp; (a-&gt;oid!=oid))
++	{
++		prev=a;
++		a=a-&gt;next;
++	}
++	if (a!=NULL)
++	{  /*  found ... */
++		if (a-&gt;init)
++		{
++			s3d_del_object(a-&gt;close_but);
++			s3d_del_object(a-&gt;min_but);
++			s3d_del_object(a-&gt;title);
++			s3d_del_object(a-&gt;sphere);
++			s3d_del_object(a-&gt;oid);
++		}
++		if (prev==NULL) 
++			apps=a-&gt;next;  /*  new head */
++		else
++			prev-&gt;next=a-&gt;next;
++		n_app--;
++		if (focus==a)
++		{
++			s3d_mcp_focus(-1);
++			focus=NULL;
++		}
++		free(a);
++		place_apps();
++	} 
++	return(a);
++}
++void stop()
++{
++	s3d_quit();
++}
++void place_apps()
++{
++	struct app *a=apps;
++	int j=0;
++	while (a!=NULL)
++	{
++		if (a-&gt;init)	
++		{
++			printf(&quot;placing app [%d,'%s'], oid %d, r=%f\n&quot;,j,a-&gt;name,a-&gt;oid,a-&gt;r); 
++			if (focus==a)
++			{
++				s3d_translate(a-&gt;close_but,(-left)*zoom-0.4,(-bottom)*zoom-0.4,-zoom);
++			}
++			else 
++			{
++				s3d_translate(	a-&gt;oid,	zoom*(left)+j*2+1.0,zoom*bottom+1.0,-zoom);
++				s3d_rotate(		a-&gt;oid,	0,10,0);
++				j++;
++			}
++		}
++		a=a-&gt;next;
++	}
++}
++void mcp_object(struct s3d_evt *hrmz)
++{
++	struct mcp_object *mo;
++	struct app *a;
++	mo=(struct mcp_object *)hrmz-&gt;buf;
++	if (NULL==(a=find_app(mo-&gt;object)))
++	{
++		printf(&quot;adding new object ......&quot;);
++		a=malloc(sizeof(struct app));
++		a-&gt;oid=mo-&gt;object;
++		a-&gt;r=mo-&gt;r;
++		strncpy(a-&gt;name,mo-&gt;name,256);
++		a-&gt;init=0;
++		add_app(a);
++		place_apps();
++		printf(&quot;..%s\n&quot;,a-&gt;name);
++	} else {
++		printf(&quot;updating app %d\n&quot;,a-&gt;oid);
++		a-&gt;trans_x=mo-&gt;trans_x;
++		a-&gt;trans_y=mo-&gt;trans_y;
++		a-&gt;trans_z=mo-&gt;trans_z;
++		a-&gt;r=mo-&gt;r;
++		if (a-&gt;init)
++		{
++			if (a==focus)
++			{
++				focus_r=a-&gt;r;
++/*				s3d_translate(a-&gt;min_but,0,a-&gt;r + 1.0,0);*/
++			} else {
++				s3d_scale(a-&gt;sphere,a-&gt;r);
++				s3d_scale(a-&gt;oid,1/a-&gt;r);
++			}
++		}
++		place_apps();
++	}
++}
++void app_init(struct app *a)
++{
++	printf(&quot;building some window decorations on %d ['%s']\n&quot;,a-&gt;oid,a-&gt;name);
++/* 	a-&gt;r=s3d_get_radius(a-&gt;oid); */
++	printf(&quot;radius of object %d is %f\n&quot;,a-&gt;oid,a-&gt;r);
++	s3d_scale(a-&gt;oid,		1/a-&gt;r);
++
++	a-&gt;sphere=s3d_clone(sphere);
++	s3d_scale(		a-&gt;sphere,a-&gt;r);
++	s3d_link(		a-&gt;sphere,a-&gt;oid);
++  	s3d_flags_on(	a-&gt;sphere,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++
++/*	s3d_translate(	a-&gt;min_but,0,2.0,0);
++	s3d_link(		a-&gt;min_but,a-&gt;sphere);
++   	s3d_flags_on(	a-&gt;min_but,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);*/
++
++
++	a-&gt;title=s3d_draw_string(a-&gt;name,&amp;a-&gt;textw);
++
++	a-&gt;close_but=s3d_clone(close_but);
++	s3d_translate(	a-&gt;close_but,bsize*a-&gt;textw/2,1.2,0);
++	s3d_link(		a-&gt;close_but,a-&gt;sphere);
++  	s3d_flags_on(	a-&gt;close_but,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++
++
++	s3d_translate(	a-&gt;title,-a-&gt;textw-1.2,0.0,0);
++	s3d_link(		a-&gt;title,a-&gt;close_but);
++   	s3d_flags_on(	a-&gt;title,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++	
++	a-&gt;min_but=s3d_clone(min_but);
++	s3d_link(		a-&gt;min_but,a-&gt;close_but);
++	
++	
++	s3d_scale(		a-&gt;close_but,bsize);
++	
++	s3d_link(		a-&gt;oid,0);
++	a-&gt;init=1;
++/*	if (focus==NULL)
++		set_focus(a);
++	else*/
++		place_apps();
++}
++void mcp_del_object(struct s3d_evt *hrmz)
++{
++	struct mcp_object *mo;
++	printf(&quot;omg, something got deleted!!\n&quot;);
++	mo=(struct mcp_object *)hrmz-&gt;buf;
++	del_app(mo-&gt;object);
++}
++void object_click(struct s3d_evt *hrmz)
++{
++	struct app *a;
++	unsigned int i, oid;
++	oid=*((unsigned int *)hrmz-&gt;buf);
++	printf(&quot;%d got clicked\n&quot;,oid);
++	a=apps;i=0;
++	if (oid==rotate)
++	{
++		rot_flag=!rot_flag;
++		return;
++	}
++	while (a!=NULL)
++	{
++		printf(&quot;O_o\n&quot;);
++		if (oid==a-&gt;close_but)
++		{
++			del_app(a-&gt;oid);
++			return;
++		} else 	if (oid==a-&gt;min_but)
++		{
++			if (a==focus)
++			{
++				set_focus(NULL); /* nothing is focused now */
++			}
++			return;
++		} else 	if (((oid==a-&gt;title) || (oid==a-&gt;sphere)) || (oid==a-&gt;oid))
++		{
++			printf(&quot;giving focus to [%s], %d\n&quot;,a-&gt;name,oid);
++			set_focus(a);
++			return;
++		}
++		i++;
++		a=a-&gt;next;
++	}
++}
++void object_info(struct s3d_evt *hrmz)
++{
++	struct s3d_obj_info *inf;
++	inf=(struct s3d_obj_info *)hrmz-&gt;buf;
++	if (inf-&gt;object==0)
++	{
++		asp=inf-&gt;scale;
++		printf(&quot;screen aspect: %f\n&quot;,asp);
++		if (asp&gt;1.0) /* wide screen */
++		{
++			bottom=-1.0;
++			left=-asp;
++		} else {  /* high screen */
++			bottom=(-1.0/asp);
++			left=-1.0;
++		}
++	}
++}
++void mainloop()
++{
++	struct app *a;
++	float al,r;
++	int i;
++	a=apps;i=0;
++	while (a!=NULL)
++	{
++		if (!a-&gt;init)
++			app_init(a);
++		i++;
++		a=a-&gt;next;
++	}
++	if (rot_flag)
++	{
++		al=(alpha*M_PI/180);
++		r=(focus_r&gt;20.0)?20.0:focus_r;
++		s3d_translate(0,sin(al)*(r+5),0,cos(al)*(r+5));
++		s3d_rotate(0,0,alpha,0);
++		alpha=alpha+0.1;
++		if (alpha&gt;360.0) alpha=0.0;
++	}
++	usleep(10000);
++	
++}
++
++int main (int argc, char **argv)
++{
++	if (!s3d_init(&amp;argc,&amp;argv,&quot;mcp&quot;))	
++	{
++		s3d_set_callback(S3D_EVENT_OBJ_INFO,object_info);
++		s3d_set_callback(S3D_MCP_OBJECT,mcp_object);
++		s3d_set_callback(S3D_EVENT_QUIT,stop);
++		s3d_set_callback(S3D_MCP_DEL_OBJECT,mcp_del_object);
++		s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
++
++		if (s3d_select_font(&quot;vera&quot;))
++		{
++			printf(&quot;font not found\n&quot;);
++		}
++/*		sphere=s3d_import_3ds_file(&quot;objs/sphere.3ds&quot;);*/
++/*		s3d_pep_material_a(sphere,
++					1,1,1,0.2,
++					1,1,1,0.2,
++					1,1,1,0.2);*/
++		min_but=s3d_import_3ds_file(&quot;objs/cubeyholes.3ds&quot;);
++		rotate=s3d_import_3ds_file(&quot;objs/rotate.3ds&quot;);
++		close_but=s3d_import_3ds_file(&quot;objs/spikeybla.3ds&quot;);
++		sphere=s3d_import_3ds_file(&quot;objs/ringsystem.3ds&quot;);
++		s3d_mainloop(mainloop);
++		s3d_quit();
++	}
++	return(0);
++}
+
+Modified: trunk/configure.in
+===================================================================
+--- trunk/configure.in	2006-02-17 15:14:31 UTC (rev 76)
++++ trunk/configure.in	2006-02-17 15:37:13 UTC (rev 77)
+@@ -138,6 +138,7 @@
+ 	apps/s3d_x11gate/Makefile
+ 	apps/s3dgps/Makefile
+ 	apps/s3dvt/Makefile
++	apps/dot_mcp/Makefile
+ 	example/Makefile])
+ AC_OUTPUT
+ 
+
+Modified: trunk/example/Makefile.am
+===================================================================
+--- trunk/example/Makefile.am	2006-02-17 15:14:31 UTC (rev 76)
++++ trunk/example/Makefile.am	2006-02-17 15:37:13 UTC (rev 77)
+@@ -1,9 +1,8 @@
+-noinst_PROGRAMS=	3dsloader dot_mcp filebrowser hudtest katze \
++noinst_PROGRAMS=	3dsloader filebrowser hudtest katze \
+ 			radius_test s3d_startapp s3dclock snowman \
+ 			strtest texturetest
+ 			
+ 3dsloader_SOURCES=	3dsloader.c
+-dot_mcp_SOURCES=	dot_mcp.c
+ filebrowser_SOURCES=	filebrowser.c
+ hudtest_SOURCES=	hudtest.c
+ katze_SOURCES=		katze.c
+
+Deleted: trunk/example/dot_mcp.c
+===================================================================
+--- trunk/example/dot_mcp.c	2006-02-17 15:14:31 UTC (rev 76)
++++ trunk/example/dot_mcp.c	2006-02-17 15:37:13 UTC (rev 77)
+@@ -1,362 +0,0 @@
+-#include &quot;s3d.h&quot;
+-#include &lt;unistd.h&gt;  /*  sleep() */
+-#include &lt;stdlib.h&gt;  /*  free(), malloc() */
+-#include &lt;string.h&gt;  /*  strncpy() */
+-#include &lt;stdio.h&gt;  /*  printf() */
+-#include &lt;math.h&gt;	/* sin(), cos() */
+-#define bsize 	0.2
+-struct app {
+-	unsigned int oid,oid_c;
+-	float r;
+-	int init;
+-	float trans_x,trans_y,trans_z;
+-	float textw;
+-	char name[256]; 
+-	int min_but,close_but,title;
+-	int sphere;
+-	struct app *next;
+-};
+-
+-float asp=1.0;
+-struct app *apps=NULL;
+-float bottom=-1.0;
+-float left=-1.0;
+-float zoom=5.0;
+-int n_app=0;
+-int sphere;
+-int rot_flag=0;
+-struct app *focus=NULL;
+-float focus_r=0;
+-float alpha=0;
+-unsigned int min_but,rotate,close_but;
+-
+-void place_apps();
+-
+-void set_focus(struct app *a)
+-{
+-	if (focus!=a)
+-		/* resetting old focus */
+-		if (focus!=NULL)
+-		{
+-			printf(&quot;unfocusing app name %s\n&quot;,focus-&gt;name);
+-			s3d_scale(focus-&gt;oid,1/focus-&gt;r);
+-			s3d_scale(focus-&gt;sphere,focus-&gt;r);
+-
+-  			s3d_flags_on(focus-&gt;sphere,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-			s3d_flags_off(focus-&gt;min_but,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-			s3d_flags_off(rotate,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-			s3d_translate(	focus-&gt;title,-focus-&gt;textw-1.2,0.0,0);
+-			s3d_translate(	focus-&gt;close_but,bsize*focus-&gt;textw/2,1.2,0);
+-			s3d_link(		focus-&gt;close_but,focus-&gt;sphere);
+-			s3d_link(		focus-&gt;oid,0);
+-		}
+-	focus=a;
+-	if (a==NULL)
+-	{
+-		focus_r=n_app;
+-		s3d_mcp_focus(-1);
+-	} else {
+-		/* set the new focus app up */
+-		s3d_translate(	a-&gt;title,-a-&gt;textw-7.2,0.0,0);
+-		s3d_translate(	rotate,-4.8,0.0,0);
+-		s3d_translate(	a-&gt;min_but,-2.4,0.0,0);
+-		s3d_link(		a-&gt;close_but,0);
+-		s3d_link(		rotate,a-&gt;close_but);
+-		s3d_flags_on(	a-&gt;min_but,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-		s3d_flags_on(	rotate,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-		s3d_flags_off(	a-&gt;sphere,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-		s3d_unlink(a-&gt;oid);
+-		s3d_rotate(a-&gt;oid,		0,0,0);
+-		s3d_translate(a-&gt;oid,	0,0,0);
+-		focus_r=a-&gt;r;
+-		s3d_scale(a-&gt;oid,1);
+-		s3d_mcp_focus(	a-&gt;oid);
+-	}
+-	place_apps();
+-}
+-
+-int add_app(struct app *a)
+-{
+-	struct app *prev=NULL,*a2=apps;
+-	while ((a2)!=NULL)
+-	{
+-		prev=a2;
+-		if (a2-&gt;oid==a-&gt;oid)
+-		{  /*  already added, so free() and return */
+-			free(a);
+-			return(1);
+-		}
+-		a2=a2-&gt;next;  /*  go to the end */
+-	}
+-	a-&gt;next=NULL;
+-	if (prev==NULL)
+-		apps=a;
+-	else 
+-		prev-&gt;next=a;
+-	n_app+=1;
+-	return(0);
+-}
+-void *find_app(int oid)
+-{
+-	struct app *a=apps;
+-	while (a!=NULL)
+-	{
+-		if (oid==a-&gt;oid)
+-			break;
+-		a=a-&gt;next;
+-	}
+-	return(a);
+-}
+-void *del_app(int oid)
+-{
+-	struct app *prev=NULL,*a=apps;
+-	while ((a!=NULL)  &amp;&amp; (a-&gt;oid!=oid))
+-	{
+-		prev=a;
+-		a=a-&gt;next;
+-	}
+-	if (a!=NULL)
+-	{  /*  found ... */
+-		if (a-&gt;init)
+-		{
+-			s3d_del_object(a-&gt;close_but);
+-			s3d_del_object(a-&gt;min_but);
+-			s3d_del_object(a-&gt;title);
+-			s3d_del_object(a-&gt;sphere);
+-			s3d_del_object(a-&gt;oid);
+-		}
+-		if (prev==NULL) 
+-			apps=a-&gt;next;  /*  new head */
+-		else
+-			prev-&gt;next=a-&gt;next;
+-		n_app--;
+-		if (focus==a)
+-		{
+-			s3d_mcp_focus(-1);
+-			focus=NULL;
+-		}
+-		free(a);
+-		place_apps();
+-	} 
+-	return(a);
+-}
+-void stop()
+-{
+-	s3d_quit();
+-}
+-void place_apps()
+-{
+-	struct app *a=apps;
+-	int j=0;
+-	while (a!=NULL)
+-	{
+-		if (a-&gt;init)	
+-		{
+-			printf(&quot;placing app [%d,'%s'], oid %d, r=%f\n&quot;,j,a-&gt;name,a-&gt;oid,a-&gt;r); 
+-			if (focus==a)
+-			{
+-				s3d_translate(a-&gt;close_but,(-left)*zoom-0.4,(-bottom)*zoom-0.4,-zoom);
+-			}
+-			else 
+-			{
+-				s3d_translate(	a-&gt;oid,	zoom*(left)+j*2+1.0,zoom*bottom+1.0,-zoom);
+-				s3d_rotate(		a-&gt;oid,	0,10,0);
+-				j++;
+-			}
+-		}
+-		a=a-&gt;next;
+-	}
+-}
+-void mcp_object(struct s3d_evt *hrmz)
+-{
+-	struct mcp_object *mo;
+-	struct app *a;
+-	mo=(struct mcp_object *)hrmz-&gt;buf;
+-	if (NULL==(a=find_app(mo-&gt;object)))
+-	{
+-		printf(&quot;adding new object ......&quot;);
+-		a=malloc(sizeof(struct app));
+-		a-&gt;oid=mo-&gt;object;
+-		a-&gt;r=mo-&gt;r;
+-		strncpy(a-&gt;name,mo-&gt;name,256);
+-		a-&gt;init=0;
+-		add_app(a);
+-		place_apps();
+-		printf(&quot;..%s\n&quot;,a-&gt;name);
+-	} else {
+-		printf(&quot;updating app %d\n&quot;,a-&gt;oid);
+-		a-&gt;trans_x=mo-&gt;trans_x;
+-		a-&gt;trans_y=mo-&gt;trans_y;
+-		a-&gt;trans_z=mo-&gt;trans_z;
+-		a-&gt;r=mo-&gt;r;
+-		if (a-&gt;init)
+-		{
+-			if (a==focus)
+-			{
+-				focus_r=a-&gt;r;
+-/*				s3d_translate(a-&gt;min_but,0,a-&gt;r + 1.0,0);*/
+-			} else {
+-				s3d_scale(a-&gt;sphere,a-&gt;r);
+-				s3d_scale(a-&gt;oid,1/a-&gt;r);
+-			}
+-		}
+-		place_apps();
+-	}
+-}
+-void app_init(struct app *a)
+-{
+-	printf(&quot;building some window decorations on %d ['%s']\n&quot;,a-&gt;oid,a-&gt;name);
+-/* 	a-&gt;r=s3d_get_radius(a-&gt;oid); */
+-	printf(&quot;radius of object %d is %f\n&quot;,a-&gt;oid,a-&gt;r);
+-	s3d_scale(a-&gt;oid,		1/a-&gt;r);
+-
+-	a-&gt;sphere=s3d_clone(sphere);
+-	s3d_scale(		a-&gt;sphere,a-&gt;r);
+-	s3d_link(		a-&gt;sphere,a-&gt;oid);
+-  	s3d_flags_on(	a-&gt;sphere,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-
+-/*	s3d_translate(	a-&gt;min_but,0,2.0,0);
+-	s3d_link(		a-&gt;min_but,a-&gt;sphere);
+-   	s3d_flags_on(	a-&gt;min_but,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);*/
+-
+-
+-	a-&gt;title=s3d_draw_string(a-&gt;name,&amp;a-&gt;textw);
+-
+-	a-&gt;close_but=s3d_clone(close_but);
+-	s3d_translate(	a-&gt;close_but,bsize*a-&gt;textw/2,1.2,0);
+-	s3d_link(		a-&gt;close_but,a-&gt;sphere);
+-  	s3d_flags_on(	a-&gt;close_but,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-
+-
+-	s3d_translate(	a-&gt;title,-a-&gt;textw-1.2,0.0,0);
+-	s3d_link(		a-&gt;title,a-&gt;close_but);
+-   	s3d_flags_on(	a-&gt;title,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-	
+-	a-&gt;min_but=s3d_clone(min_but);
+-	s3d_link(		a-&gt;min_but,a-&gt;close_but);
+-	
+-	
+-	s3d_scale(		a-&gt;close_but,bsize);
+-	
+-	s3d_link(		a-&gt;oid,0);
+-	a-&gt;init=1;
+-/*	if (focus==NULL)
+-		set_focus(a);
+-	else*/
+-		place_apps();
+-}
+-void mcp_del_object(struct s3d_evt *hrmz)
+-{
+-	struct mcp_object *mo;
+-	printf(&quot;omg, something got deleted!!\n&quot;);
+-	mo=(struct mcp_object *)hrmz-&gt;buf;
+-	del_app(mo-&gt;object);
+-}
+-void object_click(struct s3d_evt *hrmz)
+-{
+-	struct app *a;
+-	unsigned int i, oid;
+-	oid=*((unsigned int *)hrmz-&gt;buf);
+-	printf(&quot;%d got clicked\n&quot;,oid);
+-	a=apps;i=0;
+-	if (oid==rotate)
+-	{
+-		rot_flag=!rot_flag;
+-		return;
+-	}
+-	while (a!=NULL)
+-	{
+-		printf(&quot;O_o\n&quot;);
+-		if (oid==a-&gt;close_but)
+-		{
+-			del_app(a-&gt;oid);
+-			return;
+-		} else 	if (oid==a-&gt;min_but)
+-		{
+-			if (a==focus)
+-			{
+-				set_focus(NULL); /* nothing is focused now */
+-			}
+-			return;
+-		} else 	if (((oid==a-&gt;title) || (oid==a-&gt;sphere)) || (oid==a-&gt;oid))
+-		{
+-			printf(&quot;giving focus to [%s], %d\n&quot;,a-&gt;name,oid);
+-			set_focus(a);
+-			return;
+-		}
+-		i++;
+-		a=a-&gt;next;
+-	}
+-}
+-void object_info(struct s3d_evt *hrmz)
+-{
+-	struct s3d_obj_info *inf;
+-	inf=(struct s3d_obj_info *)hrmz-&gt;buf;
+-	if (inf-&gt;object==0)
+-	{
+-		asp=inf-&gt;scale;
+-		printf(&quot;screen aspect: %f\n&quot;,asp);
+-		if (asp&gt;1.0) /* wide screen */
+-		{
+-			bottom=-1.0;
+-			left=-asp;
+-		} else {  /* high screen */
+-			bottom=(-1.0/asp);
+-			left=-1.0;
+-		}
+-	}
+-}
+-void mainloop()
+-{
+-	struct app *a;
+-	float al,r;
+-	int i;
+-	a=apps;i=0;
+-	while (a!=NULL)
+-	{
+-		if (!a-&gt;init)
+-			app_init(a);
+-		i++;
+-		a=a-&gt;next;
+-	}
+-	if (rot_flag)
+-	{
+-		al=(alpha*M_PI/180);
+-		r=(focus_r&gt;20.0)?20.0:focus_r;
+-		s3d_translate(0,sin(al)*(r+5),0,cos(al)*(r+5));
+-		s3d_rotate(0,0,alpha,0);
+-		alpha=alpha+0.1;
+-		if (alpha&gt;360.0) alpha=0.0;
+-	}
+-	usleep(10000);
+-	
+-}
+-
+-int main (int argc, char **argv)
+-{
+-	if (!s3d_init(&amp;argc,&amp;argv,&quot;mcp&quot;))	
+-	{
+-		s3d_set_callback(S3D_EVENT_OBJ_INFO,object_info);
+-		s3d_set_callback(S3D_MCP_OBJECT,mcp_object);
+-		s3d_set_callback(S3D_EVENT_QUIT,stop);
+-		s3d_set_callback(S3D_MCP_DEL_OBJECT,mcp_del_object);
+-		s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
+-
+-		if (s3d_select_font(&quot;vera&quot;))
+-		{
+-			printf(&quot;font not found\n&quot;);
+-		}
+-/*		sphere=s3d_import_3ds_file(&quot;objs/sphere.3ds&quot;);*/
+-/*		s3d_pep_material_a(sphere,
+-					1,1,1,0.2,
+-					1,1,1,0.2,
+-					1,1,1,0.2);*/
+-		min_but=s3d_import_3ds_file(&quot;objs/cubeyholes.3ds&quot;);
+-		rotate=s3d_import_3ds_file(&quot;objs/rotate.3ds&quot;);
+-		close_but=s3d_import_3ds_file(&quot;objs/spikeybla.3ds&quot;);
+-		sphere=s3d_import_3ds_file(&quot;objs/ringsystem.3ds&quot;);
+-		s3d_mainloop(mainloop);
+-		s3d_quit();
+-	}
+-	return(0);
+-}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000072.html">[S3d-svn] r76 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000074.html">[S3d-svn] r78 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#73">[ date ]</a>
+              <a href="thread.html#73">[ thread ]</a>
+              <a href="subject.html#73">[ subject ]</a>
+              <a href="author.html#73">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

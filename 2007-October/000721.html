@@ -1,0 +1,242 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r729 - in trunk: . apps/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r729%20-%20in%20trunk%3A%20.%20apps/comptest&In-Reply-To=%3C200710142015.l9EKFrpo025925%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000720.html">
+   <LINK REL="Next"  HREF="000722.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r729 - in trunk: . apps/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r729%20-%20in%20trunk%3A%20.%20apps/comptest&In-Reply-To=%3C200710142015.l9EKFrpo025925%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r729 - in trunk: . apps/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Oct 14 22:15:53 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000720.html">[S3d-svn] r728 - in trunk: . apps/comptest
+</A></li>
+        <LI>Next message: <A HREF="000722.html">[S3d-svn] r730 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#721">[ date ]</a>
+              <a href="thread.html#721">[ thread ]</a>
+              <a href="subject.html#721">[ subject ]</a>
+              <a href="author.html#721">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-10-14 22:15:53 +0200 (Sun, 14 Oct 2007)
+New Revision: 729
+
+Modified:
+   trunk/
+   trunk/apps/comptest/comptest.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r2641 at kero</A>:  dotslash | 2007-10-14 22:15:43 +0200
+ - update window geometry when a configure notify arrives 
+   (this gives us support for resizing and moving windows)
+ - remember full cover updates, and do them only once in a frame
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2636
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2641
+
+Modified: trunk/apps/comptest/comptest.c
+===================================================================
+--- trunk/apps/comptest/comptest.c	2007-10-13 22:20:21 UTC (rev 728)
++++ trunk/apps/comptest/comptest.c	2007-10-14 20:15:53 UTC (rev 729)
+@@ -59,6 +59,7 @@
+ 	XRenderPictureAttributes  pa;
+ 	XRenderPictFormat    *format;
+ 	Picture       picture;
++	int		   already_updated;
+ 	int        oid;
+ 	int        no;
+ 
+@@ -74,8 +75,8 @@
+ 
+ static int     win_no = 0;    /* XXX: REMOVE */
+ static struct timespec t = {
+-	0, 10*1000*1000
+-}; /* 10 mili seconds */
++	0, 50*1000*1000
++}; /* 50 mili seconds */
+ 
+ int xinit();
+ void window_update(struct window *win, int x, int y, int width, int height);
+@@ -251,7 +252,6 @@
+ 	int vindex, voffset, pindex;
+ 	int xpos, ypos;
+ 
+-	win-&gt;no = win_no++;  /* TODO: REMOVE */
+ 	win-&gt;oid = s3d_new_object();
+ /*
+ 	for (i = 0;i &lt; 8;i++) {
+@@ -306,7 +306,7 @@
+ 		}
+ 		vindex++;
+ 	}
+-	s3d_translate(win-&gt;oid, win-&gt;attr.x / 20, -win-&gt;attr.y / 20, 5 * win-&gt;no);
++	s3d_translate(win-&gt;oid, win-&gt;attr.x / 20, -win-&gt;attr.y / 20, 1 * win-&gt;no);
+ 	/*  push data on texture 0 position (0,0) */
+ 	s3d_flags_on(win-&gt;oid, S3D_OF_VISIBLE);
+ }
+@@ -317,7 +317,7 @@
+ 		if (window-&gt;id == id)
+ 			return(window);
+ 	}
+-	printf(&quot;not found. ;(\n&quot;);
++	printf(&quot;not found (window %d). ;(\n&quot;, (int)id);
+ 	return(NULL);
+ 	
+ }
+@@ -331,6 +331,8 @@
+ 		return;
+ 	win-&gt;id = id;
+ 	XGetWindowAttributes(dpy, win-&gt;id, &amp;win-&gt;attr);
++
++	win-&gt;no = win_no++;  
+ 	/* XSelectInput(dpy, win-&gt;id, ExposureMask|ButtonPressMask|KeyPressMask*/
+ 	XSelectInput(dpy, win-&gt;id, ExposureMask
+ 	             | SubstructureNotifyMask | ExposureMask | StructureNotifyMask | PropertyChangeMask);
+@@ -344,7 +346,8 @@
+ 		win-&gt;pa.subwindow_mode = IncludeInferiors;
+ 		win-&gt;picture = XRenderCreatePicture(dpy, win-&gt;id, win-&gt;format, CPSubwindowMode, &amp;win-&gt;pa);
+ 
+-		win-&gt;oid = 0;
++		win-&gt;oid = -1;
++		win-&gt;already_updated = 0;
+ 
+ 		window_update(win, 0, 0, win-&gt;attr.width, win-&gt;attr.height);
+ 
+@@ -359,6 +362,41 @@
+ 	free(win);
+ }
+ 
++void window_update_geometry(struct window *win, int x, int y, int width, int height) 
++{
++	
++	printf(&quot;window_update_geometry()\n&quot;);
++	if (win-&gt;oid == -1) {
++		win-&gt;attr.x = x;
++		win-&gt;attr.y = y;
++		win-&gt;attr.width = width;
++		win-&gt;attr.height = height;
++
++		window_update(win, 0,0, width, height);
++		return;
++	}
++	if ((win-&gt;attr.width == width) &amp;&amp; (win-&gt;attr.height == height)) {
++		if ((win-&gt;attr.x == x) &amp;&amp; (win-&gt;attr.y == y)) {
++			printf(&quot;position did not change\n&quot;);
++			return;
++		} else {
++			win-&gt;attr.x = x;
++			win-&gt;attr.y = y;
++			s3d_translate(win-&gt;oid, win-&gt;attr.x / 20, -win-&gt;attr.y / 20, 1 * win-&gt;no);
++		}
++	} else {
++		win-&gt;attr.x = x;
++		win-&gt;attr.y = y;
++		win-&gt;attr.width = width;
++		win-&gt;attr.height = height;
++
++		s3d_del_object(win-&gt;oid);	/* delete the window and redraw */
++		win-&gt;oid = -1;
++		window_update(win, 0,0, width, height);
++
++	}
++}
++
+ void window_update(struct window *win, int x, int y, int width, int height)
+ {
+ 	int chunk_width, chunk_height;
+@@ -382,6 +420,12 @@
+ 
+ 	texnum = 0;
+ 
++	if (x == 0 &amp;&amp; y == 0 &amp;&amp; width == win-&gt;attr.width &amp;&amp; height == win-&gt;attr.height) {
++		if (win-&gt;already_updated) 
++			return;
++		else
++			win-&gt;already_updated = 1;
++	}
+ 
+ 	/* if (!win-&gt;oid)
+ 	  deco_box(win);
+@@ -393,7 +437,7 @@
+ 		if (!image)
+ 			return;
+ 		bitmap = malloc(chunk_width * height * sizeof(uint32_t));
+-		if (!win-&gt;oid)
++		if (win-&gt;oid == -1) 
+ 			deco_box(win);
+ 		if (image-&gt;format == ZPixmap) {
+ /*			printf(&quot;XImage: %dx%d, format %d (%d), bpp: %d, depth %d, pad %d\n&quot;,
+@@ -452,6 +496,9 @@
+ 	XEvent event;
+ 	struct window *window;
+ 	int i;
++	for (window = window_head; window!=NULL; window = window-&gt;next) 
++		window-&gt;already_updated = 0;
++
+ 	for (i=0; i&lt; MAXEVENTS &amp;&amp; XPending(dpy); i++) {
+ 		XNextEvent(dpy, &amp;event);
+ 		print_event(dpy, &amp;event);
+@@ -464,6 +511,16 @@
+ 			window = window_find(e-&gt;drawable);
+ 			if (window!=NULL)
+ 				window_update(window, e-&gt;area.x, e-&gt;area.y, e-&gt;area.width, e-&gt;area.height);
++		} else if (event.type == ConfigureNotify) {
++			XConfigureEvent *e = &amp;event.xconfigure; 
++			window = window_find(e-&gt;window);
++			if (window != NULL) {
++/*				printf(&quot;Configure: window = %d, geometry = %d:%d (at %d:%d)\n&quot;,
++				       (int)e-&gt;window, e-&gt;width, e-&gt;height, e-&gt;x, e-&gt;y);*/
++				window_update_geometry(window, e-&gt;x, e-&gt;y, e-&gt;width, e-&gt;height);
++			} else {
++				printf(&quot;Configure: Could not find window to configure.\n&quot;);
++			}
+ 		}
+ 	}
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000720.html">[S3d-svn] r728 - in trunk: . apps/comptest
+</A></li>
+	<LI>Next message: <A HREF="000722.html">[S3d-svn] r730 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#721">[ date ]</a>
+              <a href="thread.html#721">[ thread ]</a>
+              <a href="subject.html#721">[ subject ]</a>
+              <a href="author.html#721">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

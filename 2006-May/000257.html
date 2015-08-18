@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r264 - in trunk: . client
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r264%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200605021935.k42JZP6L023723%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000256.html">
+   <LINK REL="Next"  HREF="000258.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r264 - in trunk: . client</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r264%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200605021935.k42JZP6L023723%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r264 - in trunk: . client">dotslash at berlios.de
+       </A><BR>
+    <I>Tue May  2 21:35:25 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000256.html">[S3d-svn] r263 - in trunk: . client
+</A></li>
+        <LI>Next message: <A HREF="000258.html">[S3d-svn] r265 - in trunk: . apps/dot_mcp server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#257">[ date ]</a>
+              <a href="thread.html#257">[ thread ]</a>
+              <a href="subject.html#257">[ subject ]</a>
+              <a href="author.html#257">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-02 21:34:54 +0200 (Tue, 02 May 2006)
+New Revision: 264
+
+Modified:
+   trunk/
+   trunk/client/callback.c
+   trunk/client/io.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r491 at balthasar</A>:  dotslash | 2006-05-02 21:34:19 +0200
+ - i know, it's ugly, but we can now declare callbacks before calling s3d_init. this simply
+   solves some race condition problems ...
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:489
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:491
+
+Modified: trunk/client/callback.c
+===================================================================
+--- trunk/client/callback.c	2006-05-02 18:55:53 UTC (rev 263)
++++ trunk/client/callback.c	2006-05-02 19:34:54 UTC (rev 264)
+@@ -24,8 +24,29 @@
+ 
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
++static void _s3d_ignore(struct s3d_evt *evt);
+ /*  the s3d callback list */
+-s3d_cb s3d_cb_list[MAX_CB];
++s3d_cb s3d_cb_list[MAX_CB]={
++			NULL,_s3d_ignore,_s3d_ignore,_s3d_ignore, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
++			_s3d_ignore,_s3d_ignore,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
++			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
++			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
++
++			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
++			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
++			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
++			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
++
++			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
++			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
++			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
++			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
++
++			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
++			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
++			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL,
++			NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL, NULL,NULL,NULL,NULL
++			};
+ /* the ignore-handler ;) */
+ static void _s3d_ignore(struct s3d_evt *evt)
+ {
+
+Modified: trunk/client/io.c
+===================================================================
+--- trunk/client/io.c	2006-05-02 18:55:53 UTC (rev 263)
++++ trunk/client/io.c	2006-05-02 19:34:54 UTC (rev 264)
+@@ -115,18 +115,19 @@
+ 	char 				*s;
+ 	char 				 urlc[256];		 /*  this should be enough for an url */
+ 	char 				 buf[258]; 		 /*  server buffer */
+-	int 				 i;
++/*	int 				 i;*/
+ 	 /*  null the callback table */
+-	for (i=0;i&lt;MAX_CB;i++)
++/*	for (i=0;i&lt;MAX_CB;i++)
+ 	{
+ 		s3d_cb_list[i]=NULL;
+-	}
++	}*/
+ 	/* ignore some things ... */
++	/*
+ 	s3d_ignore_callback(S3D_EVENT_KEY);
+ 	s3d_ignore_callback(S3D_EVENT_OBJ_CLICK);
+ 	s3d_ignore_callback(S3D_EVENT_OBJ_INFO);
+ 	s3d_ignore_callback(S3D_EVENT_NEW_OBJECT);
+-
++*/
+ 	if (NULL!=(s=getenv(&quot;S3D&quot;)))
+ 	{
+ 		dprintf(VLOW,&quot;at least we have the enviroment variable ... %s&quot;,s);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000256.html">[S3d-svn] r263 - in trunk: . client
+</A></li>
+	<LI>Next message: <A HREF="000258.html">[S3d-svn] r265 - in trunk: . apps/dot_mcp server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#257">[ date ]</a>
+              <a href="thread.html#257">[ thread ]</a>
+              <a href="subject.html#257">[ subject ]</a>
+              <a href="author.html#257">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

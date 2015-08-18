@@ -1,0 +1,471 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r251 - in trunk: . apps/s3dfm server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-April/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r251%20-%20in%20trunk%3A%20.%20apps/s3dfm%20server&In-Reply-To=%3C200604131904.k3DJ4nna000818%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000243.html">
+   <LINK REL="Next"  HREF="000245.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r251 - in trunk: . apps/s3dfm server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r251%20-%20in%20trunk%3A%20.%20apps/s3dfm%20server&In-Reply-To=%3C200604131904.k3DJ4nna000818%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r251 - in trunk: . apps/s3dfm server">dotslash at berlios.de
+       </A><BR>
+    <I>Thu Apr 13 21:04:49 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000243.html">[S3d-svn] r250 - in trunk: . apps/dot_mcp
+</A></li>
+        <LI>Next message: <A HREF="000245.html">[S3d-svn] r252 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#244">[ date ]</a>
+              <a href="thread.html#244">[ thread ]</a>
+              <a href="subject.html#244">[ subject ]</a>
+              <a href="author.html#244">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-04-13 21:04:20 +0200 (Thu, 13 Apr 2006)
+New Revision: 251
+
+Modified:
+   trunk/
+   trunk/apps/s3dfm/main.c
+   trunk/server/cull.c
+   trunk/server/object.c
+   trunk/server/proto.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r384 at balthasar</A>:  dotslash | 2006-04-13 21:04:06 +0200
+ - culling disabled for now, it's buggy
+ - some s3dfm advances (filenames, colors etc)
+ - system objects may not be deleted
+ 
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:382
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:384
+
+Modified: trunk/apps/s3dfm/main.c
+===================================================================
+--- trunk/apps/s3dfm/main.c	2006-04-13 16:22:39 UTC (rev 250)
++++ trunk/apps/s3dfm/main.c	2006-04-13 19:04:20 UTC (rev 251)
+@@ -51,6 +51,7 @@
+ 	int block;								/* oid of the block */
+ 	int dirs_opened;						/* how many directories are on the block */
+ 	char name[M_NAME];						/* name (e.g. file name) */
++	float len;
+ 	struct t_item *parent;					/* parent item */
+ 	struct t_item *list;					/* list of items  (if it's a subdir)*/
+ 	float px,pz;
+@@ -62,27 +63,42 @@
+ /* draw a block */
+ int new_block(struct t_item *dir)
+ {
++#define S 1.001
+ 	float vertices[]=
+-			{-1,0,-1,
+-			 -1,0, 1,
+-			  1,0, 1,
+-			  1,0,-1,
+-			 -1,1,-1,
+-			 -1,1, 1,
+-			  1,1, 1,
+-			  1,1,-1};
+-
+-			 
++			{-S,0,-S,
++			 -S,0, S,
++			  S,0, S,
++			  S,0,-S,
++			 -S,S,-S,
++			 -S,S, S,
++			  S,S, S,
++			  S,S,-S,
++			 -1,0, 0.8,
++			 -1,1, 0.8,
++			  1,1, 0.8,
++			  1,0, 0.8,
++			 };
++#undef S
++	struct t_item *d;
++	float f;	 
+ 	dir-&gt;block=s3d_new_object();
+-	s3d_push_vertices(dir-&gt;block,vertices,8);
++	s3d_push_vertices(dir-&gt;block,vertices,12);
+ 	s3d_push_material(dir-&gt;block,
+-						1,1,1,
+-						1,1,1,
+-						1,1,1);
++						0.5,0.5,0.5,
++						0.5,0.5,0.5,
++						0.5,0.5,0.5
++					);
++	d=dir;
++	f=0;
++	while (d-&gt;parent!=NULL)
++	{
++		f=(f+1)/4;
++		d=d-&gt;parent;
++	}
+ 	s3d_push_material(dir-&gt;block,
+-						0.5,1,0.5,
+-						0.5,1,0.5,
+-						0.5,1,0.5);
++						0.5+f/2,0.5+f,0.6,
++						0.5+f/2,0.5+f,0.6,
++						0.5+f/2,0.5+f,0.6);
+ 
+ 	s3d_push_polygon(dir-&gt;block,4,5,6,1);
+ 	s3d_push_polygon(dir-&gt;block,4,6,7,1);
+@@ -95,6 +111,10 @@
+ 
+ 	s3d_push_polygon(dir-&gt;block,2,6,7,0);
+ 	s3d_push_polygon(dir-&gt;block,2,7,3,0);
++	
++	s3d_push_polygon(dir-&gt;block,8,9,10,0);
++	s3d_push_polygon(dir-&gt;block,8,10,11,0);
++
+ 	return(0);
+ 
+ }
+@@ -137,21 +157,45 @@
+ 			}
+ 	}
+ }
++/* places the string at the left side of the cube */
++int place_str(struct t_item *dir)
++{
++
++	s3d_rotate(dir-&gt;str,0,90,0);
++	s3d_translate(dir-&gt;str,1.1,0.3,1);
++	s3d_scale(dir-&gt;str,(float)1.8/(dir-&gt;len));
++	s3d_scale(dir-&gt;str,(float)1.8/(dir-&gt;len));
++	s3d_link(dir-&gt;str,dir-&gt;block);
++	s3d_flags_on(dir-&gt;str,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++}
+ int display_dir(struct t_item *dir)
+ {
+ 	int i;
+ 	float  px,pz;
+ 	int dirn, dps;
++	float len;
+ 	float vertices[]={	-1,-0.5,0,
+ 						-1, 0.5,0,
+ 						 1, 0.5,0,
+-						 1,-0.5,0};
++						 1,-0.5,0,
++						-1,-0.5,-1,
++						-1, 0.5,-1,
++						 1, 0.5,-1,
++						 1,-0.5,-1};
++	unsigned long polys[]={
++				1,3,0,0,				2,3,1,0,
++				5,6,2,0,				1,5,2,0,
++				2,6,7,0,				2,7,3,0,
++				0,3,7,0,				0,7,4,0,
++				5,1,0,0,				5,0,4,0	
++				};
+ 	float d;
+ 	px=pz=0.0;
+ 	if (dir-&gt;disp)
+ 		return(-1); /* already displayed ... */ 
+ 	s3d_del_object(dir-&gt;block);
+ 	new_block(dir);
++	place_str(dir);
+ 	if (dir-&gt;parent!=NULL)
+ 		dir-&gt;parent-&gt;dirs_opened++;
+ 	dir-&gt;dirs_opened=0;
+@@ -169,36 +213,49 @@
+ 		dir-&gt;list[i].px=((float)((int)i%dps)+0.5)/((float)dps)-0.5;
+ 		dir-&gt;list[i].pz=((float)((int)i/dps)+0.5)/((float)dps)-0.5;
+ 		dir-&gt;list[i].block=s3d_new_object();
+-		s3d_link(dir-&gt;list[i].block,dir-&gt;block);
+-		s3d_push_vertices(dir-&gt;list[i].block,vertices,4);
+-		d=((int)i%2)*0.2;
++		printf(&quot;[L]inking %d against %d\n&quot;,dir-&gt;list[i].block,dir-&gt;block);
++		s3d_push_vertices(dir-&gt;list[i].block,vertices,8);
++		d=((int)(((i+(dps+1)%2*(i/dps)))%2))*0.2;
+ 		switch (dir-&gt;list[i].type)
+ 		{
+ 			case T_FOLDER:
+ 				s3d_push_material(dir-&gt;list[i].block,
+-										1-d,1-d,0,
+-										1-d,1-d,0,
+-										1-d,1-d,0);
++										0.4-d,0.4-d,0,
++										0.4-d,0.4-d,0,
++										0.4-d,0.4-d,0);
+ 				break;
+ 			default:
+ 				s3d_push_material(dir-&gt;list[i].block,
+-										0,0,1-d,
+-										0,0,1-d,
+-										0,0,1-d);
++										0,0,0.5-d,
++										0,0,0.5-d,
++										0,0,0.5-d);
+ 		};
+-		s3d_push_polygon(dir-&gt;list[i].block,0,1,2,0);
+-		s3d_push_polygon(dir-&gt;list[i].block,0,2,3,0);
++		s3d_push_polygons(dir-&gt;list[i].block,polys,10);
++/*		s3d_push_polygon(dir-&gt;list[i].block,0,1,2,0);
++		s3d_push_polygon(dir-&gt;list[i].block,0,2,3,0);*/
+ 		s3d_scale(dir-&gt;list[i].block,(float)1.0/((float)dps));
++		dir-&gt;list[i].str=s3d_draw_string(dir-&gt;list[i].name,&amp;len);
++		if (len&lt;2) len=2;
++		dir-&gt;list[i].len=len;
++		s3d_scale(dir-&gt;list[i].str,(float)1.8/(((float)dps)*len));
++
+ 		s3d_translate(dir-&gt;list[i].block,dir-&gt;list[i].px*2,dir-&gt;list[i].pz+0.5,1.0);
++		s3d_translate(dir-&gt;list[i].str,dir-&gt;list[i].px*2-0.9/(float)dps,dir-&gt;list[i].pz-0.4/(float)dps+0.5,1.01);
++		s3d_link(dir-&gt;list[i].block,dir-&gt;block);
++		s3d_link(dir-&gt;list[i].str,dir-&gt;block);
+ 	}
+ 	dir-&gt;disp=1;
+ 	if (dir-&gt;parent!=NULL)
+ 	{
+ 		s3d_link(dir-&gt;block,dir-&gt;parent-&gt;block);
++		printf(&quot;[L] parent: linking against %d\n&quot;,dir-&gt;parent-&gt;block);
+ 		placeontop(dir-&gt;parent);
+ 	}
+ 	for (i=0;i&lt;dir-&gt;n_item;i++)
++	{
+ 		s3d_flags_on(dir-&gt;list[i].block,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++		s3d_flags_on(dir-&gt;list[i].str,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++	}
+     s3d_flags_on(dir-&gt;block,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 	return(0);
+ }
+@@ -277,8 +334,8 @@
+ {
+ 	int i;
+ 	struct t_item *f;
+-	if (t-&gt;block==oid)
+-		return(t);
++	if (t-&gt;block==oid)		return(t);
++	if (t-&gt;str==oid)		return(t);
+ 	if (t-&gt;type==T_FOLDER)
+ 		for (i=0;i&lt;t-&gt;n_item;i++)
+ 			if ((f=finditem(&amp;(t-&gt;list[i]),oid))!=NULL)
+@@ -337,14 +394,14 @@
+ 		printf(&quot;[C]ould not find :/\n&quot;);
+ 	}
+ }
+-#define ZOOMS 	5
++#define ZOOMS 	10
+ void mainloop()
+ {
+ 	dpx=(px+dpx*ZOOMS)/(ZOOMS+1);
+ 	dpy=(py+dpy*ZOOMS)/(ZOOMS+1);
+ 	dpz=(pz+dpz*ZOOMS)/(ZOOMS+1);
+ 	dscale=(scale+dscale*ZOOMS)/(ZOOMS+1);
+-	s3d_translate(root.block,dpx*SCALE,-3.0+SCALE*dpy,dpz*SCALE);
++	s3d_translate(root.block,dpx*SCALE,-1.2+SCALE*dpy,dpz*SCALE);
+ 	s3d_scale(root.block,dscale*SCALE);
+ 
+ 	nanosleep(&amp;t,NULL); 
+@@ -371,9 +428,12 @@
+ 		/* set up file system representation */
+ 		strncpy(root.name,&quot;/&quot;,M_NAME);
+ 		root.parent=NULL;
++		root.block=-1;
+ 		root.type=T_FOLDER;
+ 		root.px=root.pz=0.0;
+ 		root.dirs_opened=0;
++		root.str=s3d_draw_string(root.name,&amp;root.len);
++		if (root.len&lt;2) root.len=2;
+ 		parse_dir(&amp;root);
+ 		rescale(&amp;root);
+ 		display_dir(&amp;root);
+
+Modified: trunk/server/cull.c
+===================================================================
+--- trunk/server/cull.c	2006-04-13 16:22:39 UTC (rev 250)
++++ trunk/server/cull.c	2006-04-13 19:04:20 UTC (rev 251)
+@@ -109,7 +109,7 @@
+ {
+ 	int i;
+ 	struct t_plane *p;
+-	
++	return(1);
+ 	for(i=0;i&lt;6;i++)
+ 	{
+ 		p=&amp;frustumPlane[i];
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2006-04-13 16:22:39 UTC (rev 250)
++++ trunk/server/object.c	2006-04-13 19:04:20 UTC (rev 251)
+@@ -1853,66 +1853,70 @@
+ 	uint32_t i;
+ 	uint32_t mcp_oid=-1;
+ 	mcp_p=get_proc_by_pid(MCP);
+-	if ((p-&gt;id==MCP) &amp;&amp; (obj_valid(p,oid,o)))
++	if (obj_valid(p,oid,o))
+ 	{
+-		if (o-&gt;oflags&amp;OF_VIRTUAL)  /*  only delete if virtual */
++		if (p-&gt;id==MCP) 
+ 		{
+-			dprintf(HIGH,&quot;the mcp wants %d to be closed&quot;,o-&gt;n_mat);
+-			event_quit(get_proc_by_pid(o-&gt;n_mat));
+-			return(0);
+-		}
++			if (o-&gt;oflags&amp;OF_VIRTUAL)  /*  only delete if virtual */
++			{
++				dprintf(HIGH,&quot;the mcp wants %d to be closed&quot;,o-&gt;n_mat);
++				event_quit(get_proc_by_pid(o-&gt;n_mat));
++				return(0);
++			}
++		} else 
++			mcp_oid=p-&gt;mcp_oid;
+ 		if (o-&gt;oflags&amp;OF_SYSTEM)
+ 		{
+ 			dprintf(HIGH,&quot;can't delete system object!&quot;);
+ 			return(0);
+ 		}
+-	} else 
+-		mcp_oid=p-&gt;mcp_oid;
+-	if (obj_valid(p,oid,o))
+-	{
+-		obj_free(p,oid);
+-		if ((p-&gt;id!=MCP) &amp;&amp; (p-&gt;biggest_obj==oid))
+-		{  /*  if object was the biggest object, find a new one. */
+-			mr=-1;
+-			p-&gt;biggest_obj=-1;
+-			for (i=0;i&lt;p-&gt;n_obj;i++)
+-				if (p-&gt;object[i]!=NULL)
+-				{
+-					r=p-&gt;object[i]-&gt;r+p-&gt;object[i]-&gt;or;
+-					if (r&gt;mr)
++
++		if (obj_valid(p,oid,o))
++		{
++			obj_free(p,oid);
++			if ((p-&gt;id!=MCP) &amp;&amp; (p-&gt;biggest_obj==oid))
++			{  /*  if object was the biggest object, find a new one. */
++				mr=-1;
++				p-&gt;biggest_obj=-1;
++				for (i=0;i&lt;p-&gt;n_obj;i++)
++					if (p-&gt;object[i]!=NULL)
+ 					{
+-						if (!(p-&gt;object[i]-&gt;oflags&amp;OF_SYSTEM)) 
++						r=p-&gt;object[i]-&gt;r+p-&gt;object[i]-&gt;or;
++						if (r&gt;mr)
+ 						{
+-							p-&gt;biggest_obj=i;
+-							mr=r;
++							if (!(p-&gt;object[i]-&gt;oflags&amp;OF_SYSTEM)) 
++							{
++								p-&gt;biggest_obj=i;
++								mr=r;
++							}
+ 						}
+ 					}
+-				}
+-			mcp_p-&gt;object[mcp_oid]-&gt;r=mr;
+-			dprintf(MED,&quot;new biggest object is :%d (size: %f)&quot;,p-&gt;biggest_obj,mr);
++				mcp_p-&gt;object[mcp_oid]-&gt;r=mr;
++				dprintf(MED,&quot;new biggest object is :%d (size: %f)&quot;,p-&gt;biggest_obj,mr);
++			}
++			/*  check if someone depended on this object as clone.... */
++			if (o-&gt;oflags&amp;OF_CLONE_SRC)
++				for (i=0;i&lt;p-&gt;n_obj;i++)
++					if (p-&gt;object[i]!=NULL)
++						if ((p-&gt;object[i]-&gt;oflags&amp;OF_CLONE) &amp;&amp; (p-&gt;object[i]-&gt;n_vertex==oid))  /*  it's linking to our object! */
++						{
++							p-&gt;object[i]-&gt;oflags&amp;=~OF_CLONE;  	 /*  disable clone flag */
++							p-&gt;object[i]-&gt;n_vertex=0; 			 /*  and &quot;clone reference&quot; to 0 */
++							p-&gt;object[i]-&gt;r=0.0F;				 /*  empty object, so radius is zero! */
++							if (p-&gt;id!=MCP) obj_check_biggest_object(p,i);
++						}
++			/* check if we were a link source for anyone ... */
++			if (o-&gt;oflags&amp;OF_LINK_SRC)
++				for (i=0;i&lt;p-&gt;n_obj;i++)
++					if (p-&gt;object[i]!=NULL)
++						if ((p-&gt;object[i]-&gt;oflags&amp;OF_LINK) &amp;&amp; (p-&gt;object[i]-&gt;linkid==oid))
++						{
++								p-&gt;object[i]-&gt;linkid=-1;			 /*  lost our link target! */
++							if (mcp_oid&gt;-1)
++								obj_pos_update(p,i);
++						}
++			return(0);
+ 		}
+-		/*  check if someone depended on this object as clone.... */
+-		if (o-&gt;oflags&amp;OF_CLONE_SRC)
+-			for (i=0;i&lt;p-&gt;n_obj;i++)
+-				if (p-&gt;object[i]!=NULL)
+-					if ((p-&gt;object[i]-&gt;oflags&amp;OF_CLONE) &amp;&amp; (p-&gt;object[i]-&gt;n_vertex==oid))  /*  it's linking to our object! */
+-					{
+-						p-&gt;object[i]-&gt;oflags&amp;=~OF_CLONE;  	 /*  disable clone flag */
+-						p-&gt;object[i]-&gt;n_vertex=0; 			 /*  and &quot;clone reference&quot; to 0 */
+-						p-&gt;object[i]-&gt;r=0.0F;				 /*  empty object, so radius is zero! */
+-						if (p-&gt;id!=MCP) obj_check_biggest_object(p,i);
+-					}
+-		/* check if we were a link source for anyone ... */
+-		if (o-&gt;oflags&amp;OF_LINK_SRC)
+-			for (i=0;i&lt;p-&gt;n_obj;i++)
+-				if (p-&gt;object[i]!=NULL)
+-					if ((p-&gt;object[i]-&gt;oflags&amp;OF_LINK) &amp;&amp; (p-&gt;object[i]-&gt;linkid==oid))
+-					{
+-						p-&gt;object[i]-&gt;linkid=-1;			 /*  lost our link target! */
+-						if (mcp_oid&gt;-1)
+-							obj_pos_update(p,i);
+-					}
+-		return(0);
+ 	}
+ 	return(-1);
+ }
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2006-04-13 16:22:39 UTC (rev 250)
++++ trunk/server/proto.c	2006-04-13 19:04:20 UTC (rev 251)
+@@ -78,7 +78,7 @@
+ 				break;
+ 			case S3D_P_C_NEW_OBJ:
+ 				oid=htonl(obj_new(p));
+-/* 				dprintf(LOW,&quot;pid %d registering new object %d&quot;,pid,oid); */
++/* 				dprintf(LOW,&quot;pid %d registering new object %d&quot;,p-&gt;id,ntohl(oid)); */
+ 				prot_com_out(p,S3D_P_S_NEWOBJ,(uint8_t *)&amp;oid, 4);
+ 				break;
+ 			case S3D_P_C_DEL_OBJ:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000243.html">[S3d-svn] r250 - in trunk: . apps/dot_mcp
+</A></li>
+	<LI>Next message: <A HREF="000245.html">[S3d-svn] r252 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#244">[ date ]</a>
+              <a href="thread.html#244">[ thread ]</a>
+              <a href="subject.html#244">[ subject ]</a>
+              <a href="author.html#244">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

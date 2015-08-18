@@ -1,0 +1,270 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r700 - trunk/cmake/modules
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r700%20-%20trunk/cmake/modules&In-Reply-To=%3C200709240219.l8O2JX8U012722%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000691.html">
+   <LINK REL="Next"  HREF="000693.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r700 - trunk/cmake/modules</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r700%20-%20trunk/cmake/modules&In-Reply-To=%3C200709240219.l8O2JX8U012722%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r700 - trunk/cmake/modules">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Sep 24 04:19:33 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000691.html">[S3d-svn] r699 - trunk/apps/comptest
+</A></li>
+        <LI>Next message: <A HREF="000693.html">[S3d-svn] r701 - in trunk: . apps apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#692">[ date ]</a>
+              <a href="thread.html#692">[ thread ]</a>
+              <a href="subject.html#692">[ subject ]</a>
+              <a href="author.html#692">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-09-24 04:19:33 +0200 (Mon, 24 Sep 2007)
+New Revision: 700
+
+Added:
+   trunk/cmake/modules/FindXcomposite.cmake
+   trunk/cmake/modules/FindXdamage.cmake
+   trunk/cmake/modules/FindXfixes.cmake
+   trunk/cmake/modules/FindXrender.cmake
+Modified:
+   trunk/cmake/modules/FindXtst.cmake
+Log:
+Added cmake check for Xcomposite, Xdamage, Xfixes, Xrender
+
+
+Added: trunk/cmake/modules/FindXcomposite.cmake
+===================================================================
+--- trunk/cmake/modules/FindXcomposite.cmake	2007-09-24 02:19:27 UTC (rev 699)
++++ trunk/cmake/modules/FindXcomposite.cmake	2007-09-24 02:19:33 UTC (rev 700)
+@@ -0,0 +1,39 @@
++# Try to find Xcomposite
++#  XCOMPOSITE_FOUND - If false, do not try to use Xcomposite
++#  XCOMPOSITE_LIBRARIES - the libraries to link against
++#  XCOMPOSITE_DEFINITIONS - switches required for Xcomposite
++
++
++if (XCOMPOSITE_LIBRARIES)
++	# path set by user or was found in the past
++	set(XCOMPOSITE_FOUND TRUE)
++else (XCOMPOSITE_LIBRARIES)
++	include(UsePkgConfig)
++
++	pkgconfig(xcomposite _IncDir _LinkDir _LinkFlags _CFlags)
++	set(XCOMPOSITE_DEFINITIONS ${_CFlags})
++
++	find_library(XCOMPOSITE_LIBRARIES
++		NAMES Xcomposite
++		PATHS ${_LinkDir}
++	)
++
++	if (XCOMPOSITE_LIBRARIES)
++		set(XCOMPOSITE_FOUND TRUE)
++	endif (XCOMPOSITE_LIBRARIES)
++
++	if (XCOMPOSITE_FOUND)
++		if (NOT XCOMPOSITE_FIND_QUIETLY)
++			message(STATUS &quot;Found Xcomposite: ${XCOMPOSITE_LIBRARIES}&quot;)
++		endif (NOT XCOMPOSITE_FIND_QUIETLY)
++	else (XCOMPOSITE_FOUND)
++		if (XCOMPOSITE_FIND_REQUIRED)
++			message(FATAL_ERROR &quot;Could not find Xcomposite&quot;)
++		endif (XCOMPOSITE_FIND_REQUIRED)
++	endif (XCOMPOSITE_FOUND)
++
++	# set visibility in cache
++	set(XCOMPOSITE_DEFINITIONS ${XCOMPOSITE_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
++ 	mark_as_advanced(XCOMPOSITE_LIBRARIES XCOMPOSITE_DEFINITIONS)
++
++endif (XCOMPOSITE_LIBRARIES)
+
+Added: trunk/cmake/modules/FindXdamage.cmake
+===================================================================
+--- trunk/cmake/modules/FindXdamage.cmake	2007-09-24 02:19:27 UTC (rev 699)
++++ trunk/cmake/modules/FindXdamage.cmake	2007-09-24 02:19:33 UTC (rev 700)
+@@ -0,0 +1,39 @@
++# Try to find Xdamage
++#  XDAMAGE_FOUND - If false, do not try to use Xdamage
++#  XDAMAGE_LIBRARIES - the libraries to link against
++#  XDAMAGE_DEFINITIONS - switches required for Xdamage
++
++
++if (XDAMAGE_LIBRARIES)
++	# path set by user or was found in the past
++	set(XDAMAGE_FOUND TRUE)
++else (XDAMAGE_LIBRARIES)
++	include(UsePkgConfig)
++
++	pkgconfig(xdamage _IncDir _LinkDir _LinkFlags _CFlags)
++	set(XDAMAGE_DEFINITIONS ${_CFlags})
++
++	find_library(XDAMAGE_LIBRARIES
++		NAMES Xdamage
++		PATHS ${_LinkDir}
++	)
++
++	if (XDAMAGE_LIBRARIES)
++		set(XDAMAGE_FOUND TRUE)
++	endif (XDAMAGE_LIBRARIES)
++
++	if (XDAMAGE_FOUND)
++		if (NOT XDAMAGE_FIND_QUIETLY)
++			message(STATUS &quot;Found Xdamage: ${XDAMAGE_LIBRARIES}&quot;)
++		endif (NOT XDAMAGE_FIND_QUIETLY)
++	else (XDAMAGE_FOUND)
++		if (XDAMAGE_FIND_REQUIRED)
++			message(FATAL_ERROR &quot;Could not find Xdamage&quot;)
++		endif (XDAMAGE_FIND_REQUIRED)
++	endif (XDAMAGE_FOUND)
++
++	# set visibility in cache
++	set(XDAMAGE_DEFINITIONS ${XDAMAGE_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
++ 	mark_as_advanced(XDAMAGE_LIBRARIES XDAMAGE_DEFINITIONS)
++
++endif (XDAMAGE_LIBRARIES)
+
+Added: trunk/cmake/modules/FindXfixes.cmake
+===================================================================
+--- trunk/cmake/modules/FindXfixes.cmake	2007-09-24 02:19:27 UTC (rev 699)
++++ trunk/cmake/modules/FindXfixes.cmake	2007-09-24 02:19:33 UTC (rev 700)
+@@ -0,0 +1,39 @@
++# Try to find Xfixes
++#  XFIXES_FOUND - If false, do not try to use Xfixes
++#  XFIXES_LIBRARIES - the libraries to link against
++#  XFIXES_DEFINITIONS - switches required for Xfixes
++
++
++if (XFIXES_LIBRARIES)
++	# path set by user or was found in the past
++	set(XFIXES_FOUND TRUE)
++else (XFIXES_LIBRARIES)
++	include(UsePkgConfig)
++
++	pkgconfig(xfixes _IncDir _LinkDir _LinkFlags _CFlags)
++	set(XFIXES_DEFINITIONS ${_CFlags})
++
++	find_library(XFIXES_LIBRARIES
++		NAMES Xfixes
++		PATHS ${_LinkDir}
++	)
++
++	if (XFIXES_LIBRARIES)
++		set(XFIXES_FOUND TRUE)
++	endif (XFIXES_LIBRARIES)
++
++	if (XFIXES_FOUND)
++		if (NOT XFIXES_FIND_QUIETLY)
++			message(STATUS &quot;Found Xfixes: ${XFIXES_LIBRARIES}&quot;)
++		endif (NOT XFIXES_FIND_QUIETLY)
++	else (XFIXES_FOUND)
++		if (XFIXES_FIND_REQUIRED)
++			message(FATAL_ERROR &quot;Could not find Xfixes&quot;)
++		endif (XFIXES_FIND_REQUIRED)
++	endif (XFIXES_FOUND)
++
++	# set visibility in cache
++	set(XFIXES_DEFINITIONS ${XFIXES_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
++ 	mark_as_advanced(XFIXES_LIBRARIES XFIXES_DEFINITIONS)
++
++endif (XFIXES_LIBRARIES)
+
+Added: trunk/cmake/modules/FindXrender.cmake
+===================================================================
+--- trunk/cmake/modules/FindXrender.cmake	2007-09-24 02:19:27 UTC (rev 699)
++++ trunk/cmake/modules/FindXrender.cmake	2007-09-24 02:19:33 UTC (rev 700)
+@@ -0,0 +1,39 @@
++# Try to find Xrender
++#  XRENDER_FOUND - If false, do not try to use Xrender
++#  XRENDER_LIBRARIES - the libraries to link against
++#  XRENDER_DEFINITIONS - switches required for Xrender
++
++
++if (XRENDER_LIBRARIES)
++	# path set by user or was found in the past
++	set(XRENDER_FOUND TRUE)
++else (XRENDER_LIBRARIES)
++	include(UsePkgConfig)
++
++	pkgconfig(xrender _IncDir _LinkDir _LinkFlags _CFlags)
++	set(XRENDER_DEFINITIONS ${_CFlags})
++
++	find_library(XRENDER_LIBRARIES
++		NAMES Xrender
++		PATHS ${_LinkDir}
++	)
++
++	if (XRENDER_LIBRARIES)
++		set(XRENDER_FOUND TRUE)
++	endif (XRENDER_LIBRARIES)
++
++	if (XRENDER_FOUND)
++		if (NOT XRENDER_FIND_QUIETLY)
++			message(STATUS &quot;Found Xrender: ${XRENDER_LIBRARIES}&quot;)
++		endif (NOT XRENDER_FIND_QUIETLY)
++	else (XRENDER_FOUND)
++		if (XRENDER_FIND_REQUIRED)
++			message(FATAL_ERROR &quot;Could not find Xrender&quot;)
++		endif (XRENDER_FIND_REQUIRED)
++	endif (XRENDER_FOUND)
++
++	# set visibility in cache
++	set(XRENDER_DEFINITIONS ${XRENDER_DEFINITIONS} CACHE STRING &quot;Defines for compilation.&quot; FORCE)
++ 	mark_as_advanced(XRENDER_LIBRARIES XRENDER_DEFINITIONS)
++
++endif (XRENDER_LIBRARIES)
+
+Modified: trunk/cmake/modules/FindXtst.cmake
+===================================================================
+--- trunk/cmake/modules/FindXtst.cmake	2007-09-24 02:19:27 UTC (rev 699)
++++ trunk/cmake/modules/FindXtst.cmake	2007-09-24 02:19:33 UTC (rev 700)
+@@ -10,7 +10,7 @@
+ else (XTST_LIBRARIES)
+ 	include(UsePkgConfig)
+ 
+-	pkgconfig(XTST _IncDir _LinkDir _LinkFlags _CFlags)
++	pkgconfig(xtst _IncDir _LinkDir _LinkFlags _CFlags)
+ 	set(XTST_DEFINITIONS ${_CFlags})
+ 
+ 	find_library(XTST_LIBRARIES
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000691.html">[S3d-svn] r699 - trunk/apps/comptest
+</A></li>
+	<LI>Next message: <A HREF="000693.html">[S3d-svn] r701 - in trunk: . apps apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#692">[ date ]</a>
+              <a href="thread.html#692">[ thread ]</a>
+              <a href="subject.html#692">[ subject ]</a>
+              <a href="author.html#692">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

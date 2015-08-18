@@ -1,0 +1,561 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r503 - in trunk: . apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r503%20-%20in%20trunk%3A%20.%20apps/s3dosm&In-Reply-To=%3C200612022109.kB2L9a25032705%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000495.html">
+   <LINK REL="Next"  HREF="000497.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r503 - in trunk: . apps/s3dosm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r503%20-%20in%20trunk%3A%20.%20apps/s3dosm&In-Reply-To=%3C200612022109.kB2L9a25032705%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r503 - in trunk: . apps/s3dosm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sat Dec  2 22:09:36 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000495.html">[S3d-svn] r502 - in trunk: . apps/s3dgps
+</A></li>
+        <LI>Next message: <A HREF="000497.html">[S3d-svn] r504 - in trunk: . apps/s3dgps objs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#496">[ date ]</a>
+              <a href="thread.html#496">[ thread ]</a>
+              <a href="subject.html#496">[ subject ]</a>
+              <a href="author.html#496">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-12-02 22:09:34 +0100 (Sat, 02 Dec 2006)
+New Revision: 503
+
+Added:
+   trunk/apps/s3dosm/gps.c
+Modified:
+   trunk/
+   trunk/apps/s3dosm/Makefile.am
+   trunk/apps/s3dosm/draw.c
+   trunk/apps/s3dosm/http_fetcher.c
+   trunk/apps/s3dosm/http_fetcher.h
+   trunk/apps/s3dosm/main.c
+   trunk/apps/s3dosm/nav.c
+   trunk/apps/s3dosm/s3dosm.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1198 at kero</A>:  dotslash | 2006-12-02 22:08:53 +0100
+ - gps support, showing your position
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1196
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1198
+
+Modified: trunk/apps/s3dosm/Makefile.am
+===================================================================
+--- trunk/apps/s3dosm/Makefile.am	2006-12-02 15:59:31 UTC (rev 502)
++++ trunk/apps/s3dosm/Makefile.am	2006-12-02 21:09:34 UTC (rev 503)
+@@ -5,9 +5,10 @@
+ 				  
+ s3dosm_SOURCES =  \
+ 	main.c http_fetcher.c http_error_codes.c osm.c \
+-	object.c draw.c kismet.c nav.c tag.c io.c db.c
++	object.c draw.c kismet.c nav.c tag.c io.c db.c \
++	gps.c
+ 
+-s3dosm_CPPFLAGS=	-pg -I$(top_srcdir)/libs3d @LIBXML2_CFLAGS@ @LIBSQLITE3_CFLAGS@
+-s3dosm_LDADD=		$(top_builddir)/libs3d/libs3d.la @LIBXML2_LIBS@ @LIBSQLITE3_LIBS@
++s3dosm_CPPFLAGS=	-pg -I$(top_srcdir)/libs3d @LIBXML2_CFLAGS@ @LIBSQLITE3_CFLAGS@ @GPS_CFLAGS@
++s3dosm_LDADD=		$(top_builddir)/libs3d/libs3d.la @LIBXML2_LIBS@ @LIBSQLITE3_LIBS@ @GPS_LIBS@
+ s3dosm_LDFLAGS=		-pg
+ 
+
+Modified: trunk/apps/s3dosm/draw.c
+===================================================================
+--- trunk/apps/s3dosm/draw.c	2006-12-02 15:59:31 UTC (rev 502)
++++ trunk/apps/s3dosm/draw.c	2006-12-02 21:09:34 UTC (rev 503)
+@@ -34,7 +34,7 @@
+ 	int vnum;
+ };
+ 
+-void calc_earth_to_eukl(float lon, float lat, float *x)
++void calc_earth_to_eukl(float lat, float lon, float *x)
+ {
+ 	float la,lo;
+ 	la=lat*M_PI/180.0;
+@@ -53,7 +53,7 @@
+ 		float x[3];
+ 		node_t *node=NODE_T(t);
+ 		node-&gt;vid=v-&gt;vnum;
+-		calc_earth_to_eukl(node-&gt;lon,node-&gt;lat,x);
++		calc_earth_to_eukl(node-&gt;lat,node-&gt;lon,x);
+ 		s3d_push_vertex(v-&gt;oid,x[0],x[1],x[2]);
+ 		if (node-&gt;visible==2) /* something special */
+ 		{
+@@ -168,8 +168,8 @@
+ 		nodelist_n=0;
+ 		snprintf(query,MAXQ,&quot;SELECT longitude, latitude, altitude FROM node WHERE node_id IN (%d,%d);&quot;,waylist_p[i].node_from,waylist_p[i].node_to);
+ 		db_exec(query, insert_node,(void *)nodelist_p);
+-		calc_earth_to_eukl(nodelist_p[0].lo,nodelist_p[0].la,x);
+-		calc_earth_to_eukl(nodelist_p[1].lo,nodelist_p[1].la,x+3);
++		calc_earth_to_eukl(nodelist_p[0].la,nodelist_p[0].lo,x);
++		calc_earth_to_eukl(nodelist_p[1].la,nodelist_p[1].lo,x+3);
+ 		s3d_push_vertices(way_obj,x,2);
+ 		s3d_push_line(way_obj, vert,vert+1, 0);
+ 		vert+=2;
+@@ -242,6 +242,13 @@
+ 	waylist_draw(); /* last way */
+ 	printf(&quot;[done]\n&quot;);
+ }
++void draw_translate_icon(int user_icon, float la, float lo)
++{
++	float x[3];
++	calc_earth_to_eukl(la,lo,x);
++	s3d_translate(user_icon,x[0],x[1],x[2]);
++	s3d_rotate(user_icon,(90-la),lo,0);
++}
+ void draw_osm()
+ {
+ 	draw_ways(&quot;segment.layer_id=(SELECT layer_id FROM layer WHERE name='osm')&quot;);
+
+Added: trunk/apps/s3dosm/gps.c
+===================================================================
+--- trunk/apps/s3dosm/gps.c	2006-12-02 15:59:31 UTC (rev 502)
++++ trunk/apps/s3dosm/gps.c	2006-12-02 21:09:34 UTC (rev 503)
+@@ -0,0 +1,202 @@
++/*
++ * gps.c
++ * 
++ * Copyright (C) 2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++ *
++ * This file is part of s3dosm, a gps card application for s3d.
++ * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
++ * 
++ * s3dosm is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ * 
++ * s3dosm is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ * 
++ * You should have received a copy of the GNU General Public License
++ * along with s3dosm; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++
++#include &lt;s3d.h&gt;
++#include &quot;s3dosm.h&quot;
++#include &lt;stdio.h&gt; 	/* printf() */
++int user_icon=-1,user_icon_rotator=-1;
++#ifdef HAVE_GPS
++#include &lt;gps.h&gt; 	/* gps_*() */
++#ifdef NMEA_CHANNELS
++#define GPS_NEW
++#endif
++#ifdef SIRF_CHANNELS
++#define GPS_NEW
++#endif
++
++#include &lt;errno.h&gt;  /* errno */
++#include &lt;stdlib.h&gt;	/* malloc(), free() */
++#include &lt;string.h&gt; /* strlen() */
++#include &lt;stdio.h&gt;		 /*  snprintf(), printf(), NULL */
++#include &lt;time.h&gt;	 /*  nanosleep(), struct tm, time_t...  */
++#include &lt;math.h&gt;	/* fabs(), finite () */
++static struct gps_data_t 	*dgps;
++static int 					 frame=0;
++static int 					 lastfix=0;
++static int 					 gps_active=0;
++static float 				 lat,lon,tlat,tlon;	/* we have the same in nav.c, this one is for the user icon ... */
++static float				 lat_old,lon_old;
++void 				 show_gpsdata(struct gps_data_t *dgps);
++void				 show_position(struct gps_data_t *dgps);
++
++void show_gpsdata(struct gps_data_t *dgps)
++{
++	if (!dgps-&gt;online) 
++		printf(&quot;WARNING: no connection to gps device\n&quot;);
++#ifdef GPS_NEW
++	printf(&quot;[%d] lat/long: [%f|%f], altitude %f\n&quot;,frame,dgps-&gt;fix.latitude,dgps-&gt;fix.longitude,dgps-&gt;fix.altitude);
++	printf(&quot;speed [kph]: %f\n&quot;,dgps-&gt;fix.speed/KNOTS_TO_KPH);
++	printf(&quot;used %d/%d satellits\n&quot;,dgps-&gt;satellites_used,dgps-&gt;satellites);
++	printf(&quot;################## = %f %f %f\n&quot;,dgps-&gt;fix.pitch, dgps-&gt;fix.roll, dgps-&gt;fix.dip);
++#else
++	printf(&quot;[%d] lat/long: [%f|%f], altitude %f\n&quot;,frame,dgps-&gt;latitude,dgps-&gt;longitude,dgps-&gt;altitude);
++	printf(&quot;speed [kph]: %f\n&quot;,dgps-&gt;speed/KNOTS_TO_KPH);
++	printf(&quot;used %d/%d satellits\n&quot;,dgps-&gt;satellites_used,dgps-&gt;satellites);
++
++#endif
++	switch (dgps-&gt;status)
++	{
++		case STATUS_NO_FIX:		printf(&quot;status: no fix\n&quot;);break;
++		case STATUS_FIX:		printf(&quot;status: fix\n&quot;);break;
++		case STATUS_DGPS_FIX:	printf(&quot;status: dgps fix\n&quot;);break;
++	}
++#ifdef GPS_NEW
++	switch (dgps-&gt;fix.mode)
++#else 
++	switch (dgps-&gt;mode)
++#endif
++	{
++		case MODE_NOT_SEEN:	printf(&quot;mode: not seen yet\n&quot;);break;
++		case MODE_NO_FIX:	printf(&quot;mode: no fix\n&quot;);break;
++		case MODE_2D:		printf(&quot;mode: 2d fix\n&quot;);break;
++		case MODE_3D:		printf(&quot;mode: 3d fix\n&quot;);break;
++	}
++}
++void show_position(struct gps_data_t *dgps)
++{
++	int fix=1;
++	float la,lo,heading;
++#ifdef GPS_NEW
++	if (!dgps-&gt;online) 
++		fix=0;
++	switch (dgps-&gt;fix.mode)
++	{
++		case MODE_NOT_SEEN:	fix=0;break;
++		case MODE_NO_FIX:	fix=0;break;
++	}
++	
++	la=dgps-&gt;fix.latitude;
++	lo=dgps-&gt;fix.longitude;
++
++#else
++	if (!dgps-&gt;online) 
++		fix=0;
++	switch (dgps-&gt;mode)
++	{
++		case MODE_NOT_SEEN:	fix=0;break;
++		case MODE_NO_FIX:	fix=0;break;
++	}
++	la=dgps-&gt;latitude;
++	lo=dgps-&gt;longitude;
++#endif
++	tlat=la;tlon=lo;
++	nav_center(la,lo);
++	heading=get_heading(lat_old,lon_old,la,lo);
++	if (!lastfix &amp;&amp; fix) 		{s3d_flags_on(user_icon,S3D_OF_VISIBLE);s3d_scale(user_icon,1.0);}
++	if (lastfix &amp;&amp; !fix)		{s3d_scale(user_icon,0.3);lat=tlat;lon=tlon;}
++	if (finitef(heading))		s3d_rotate(user_icon,0,heading,0);
++	lat_old=la;
++	lon_old=lo;
++	lastfix=fix;
++}
++int gps_init(char *gpshost)
++{
++	char *err_str;
++	dgps=gps_open(gpshost,&quot;2947&quot;);
++    if (dgps==NULL) {
++		switch ( errno ) {
++			case NL_NOSERVICE: 	err_str = &quot;can't get service entry&quot;; break;
++			case NL_NOHOST: 	err_str = &quot;can't get host entry&quot;; break;
++			case NL_NOPROTO: 	err_str = &quot;can't get protocol entry&quot;; break;
++			case NL_NOSOCK: 	err_str = &quot;can't create socket&quot;; break;
++			case NL_NOSOCKOPT: 	err_str = &quot;error SETSOCKOPT SO_REUSEADDR&quot;; break;
++			case NL_NOCONNECT: 	err_str = &quot;can't connect to host&quot;; break;
++			default:           	err_str = &quot;Unknown&quot;; break;
++		}
++		printf(&quot;no connection to gpsd\n&quot;);
++		fprintf(stderr, &quot;s3dosm: no gpsd running or network error: %d, %s\n&quot;	,  errno, err_str);
++		return(-1);
++	}
++	user_icon=s3d_clone(icons[ICON_ARROW].oid);
++	user_icon_rotator=s3d_new_object();
++	s3d_link(user_icon,user_icon_rotator);
++	s3d_link(user_icon_rotator,oidy); 
++	tlat=lat=lat_old=0.0;
++	tlon=lon=lon_old=0.0;
++	gps_active=1;
++	gps_query(dgps, &quot;w+x\n&quot;);
++	return(0);
++}
++int gps_main()
++{
++	if (gps_active &amp;&amp; ((frame%6)==0))
++	{
++		if (gps_poll(dgps) &lt; 0) 
++		{
++			printf(&quot;read error on server socket\n&quot;);
++			gps_quit();
++		}
++
++		/*show_gpsdata(dgps);*/
++		show_position(dgps);
++	}
++	if ((fabs(tlat-lat)&gt;0.00001) &amp;&amp; (fabs(tlon-lon)&gt;0.00001)) {
++		if (lat==0.0 &amp;&amp; lon==0.0) {
++			lat=tlat;
++			lon=tlon;
++		} else {
++			lat=(tlat+lat*3)/4;
++			lon=(tlon+lon*3)/4;
++		}
++	} else { tlat=lat;tlon=lon;}
++	draw_translate_icon(user_icon_rotator,lat,lon);
++	frame++;
++	return(0);
++}
++int gps_quit()
++{
++	if (gps_active)
++	{
++		printf(&quot;deactivating gps-connection ...\n&quot;);
++		gps_active=0;
++		gps_close(dgps);
++	}
++	return(0);
++}
++#else
++
++int gps_init(char *gpshost)
++{
++	printf(&quot;GPS support not compiled in!\n&quot;);
++	return(0);
++}
++int gps_main()
++{
++	return(0);
++}
++int gps_quit()
++{
++	return(0);
++}
++#endif
+
+Modified: trunk/apps/s3dosm/http_fetcher.c
+===================================================================
+--- trunk/apps/s3dosm/http_fetcher.c	2006-12-02 15:59:31 UTC (rev 502)
++++ trunk/apps/s3dosm/http_fetcher.c	2006-12-02 21:09:34 UTC (rev 503)
+@@ -124,7 +124,7 @@
+ 		strcat(requestBuf, &quot;User-Agent: &quot;);
+ 		strcat(requestBuf, DEFAULT_USER_AGENT);
+ 		strcat(requestBuf, &quot;/&quot;);
+-		strcat(requestBuf, VERSION);
++		strcat(requestBuf, HTTP_FETCHER_VERSION);
+ 		strcat(requestBuf, &quot;\r\n&quot;);
+ 		}
+ 	else if(!hideUserAgent)
+@@ -379,7 +379,7 @@
+ 	char ec64[]=&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&quot;;
+ 	char *b64;
+ 	int i,j,c,len,n;
+-	char o;
++	char o=0;
+ 	 /* base64 encode user and pass */
+ 	if ((user==NULL) || (pass==NULL)) /* bad input or request to clean up */
+ 	{
+
+Modified: trunk/apps/s3dosm/http_fetcher.h
+===================================================================
+--- trunk/apps/s3dosm/http_fetcher.h	2006-12-02 15:59:31 UTC (rev 502)
++++ trunk/apps/s3dosm/http_fetcher.h	2006-12-02 21:09:34 UTC (rev 503)
+@@ -29,7 +29,7 @@
+ #define PORT_NUMBER 			80
+ #define HTTP_VERSION 			&quot;HTTP/1.1&quot;
+ #define DEFAULT_USER_AGENT		&quot;HTTP Fetcher&quot;
+-#define	VERSION					&quot;1.0&quot;
++#define	HTTP_FETCHER_VERSION	&quot;1.0&quot;
+ #define DEFAULT_READ_TIMEOUT	30		/* Seconds to wait before giving up
+ 										 *	when no data is arriving */
+ 	 
+
+Modified: trunk/apps/s3dosm/main.c
+===================================================================
+--- trunk/apps/s3dosm/main.c	2006-12-02 15:59:31 UTC (rev 502)
++++ trunk/apps/s3dosm/main.c	2006-12-02 21:09:34 UTC (rev 503)
+@@ -31,6 +31,8 @@
+ {
+ 	struct timespec t={0,100*1000*1000}; /* 100 mili seconds */
+ 	nanosleep(&amp;t,NULL); 
++	gps_main();
++	nav_main();
+ }
+ int init(int argc, char **argv)
+ {
+@@ -40,12 +42,14 @@
+ 	nav_init();
+ 	nav_autocenter();
+ 	draw_all_layers();
++	gps_init(&quot;localhost&quot;);
+ 	return(0);
+ }
+ int quit()
+ {
+ 	s3d_quit();
+ 	db_quit();
++	gps_quit();
+ 	return(0);
+ }
+ int main(int argc, char **argv)
+
+Modified: trunk/apps/s3dosm/nav.c
+===================================================================
+--- trunk/apps/s3dosm/nav.c	2006-12-02 15:59:31 UTC (rev 502)
++++ trunk/apps/s3dosm/nav.c	2006-12-02 21:09:34 UTC (rev 503)
+@@ -3,12 +3,15 @@
+ #include &lt;string.h&gt;	/* strcmp() */
+ #include &lt;stdlib.h&gt;	/* strtod() */
+ #include &lt;stdio.h&gt;	/* printf() */
++#include &lt;math.h&gt;	/* fabs() */
+ 
+ icon_t icons[ICON_NUM]={
+ 		{&quot;objs/accesspoint.3ds&quot;,0},
+ 		{&quot;objs/star.3ds&quot;,0},
++		{&quot;objs/arrow2.3ds&quot;,0}
+ 	};
+ int oidx, oidy;
++static float lat,lon,tlat,tlon;
+ /* load icons, we want to clone each of them later */
+ void nav_loadicons()
+ {
+@@ -21,6 +24,7 @@
+ /* load rotation centers */
+ void nav_init()
+ {
++	lat=lon=tlat=tlon=0.0;
+ 	nav_loadicons();
+ 	oidx=s3d_new_object();
+ 	oidy=s3d_new_object();
+@@ -29,11 +33,27 @@
+ /* center to given latitude longitude */
+ void nav_center(float la, float lo)
+ {
++	tlat=la;
++	tlon=lo;
++}
++void nav_main()
++{
+ 	float x[3];
+-	s3d_rotate(oidy,0,-lo,0);
+-	s3d_rotate(oidx,-(90-la),0,0);
+-	calc_earth_to_eukl(lo,la,x);
+-	s3d_translate(oidx,0,-ESIZE*RESCALE,0);
++	if ((fabs(tlat-lat)&gt;0.00001) &amp;&amp; (fabs(tlon-lon)&gt;0.00001))
++	{
++		if (lat==0.0 &amp;&amp; lon==0.0)
++		{
++			lat=tlat;
++			lon=tlon;
++		} else {
++			lat=(tlat+lat*15)/16;
++			lon=(tlon+lon*15)/16;
++		}
++	} else { lat=tlat;lon=tlon;}
++	s3d_rotate(oidy,0,-lon,0);
++	s3d_rotate(oidx,-(90-lat),0,0);
++	calc_earth_to_eukl(lon,lat,x);
++	s3d_translate(oidx,0,-ESIZE*RESCALE- VIEWHEIGHT,0);
+ 	s3d_scale(oidx,RESCALE);
+ }
+ 
+@@ -51,6 +71,22 @@
+ 	}
+ 	return(0);
+ }
++/* returns the heading in degress of position P1 -&gt; P2 */
++float get_heading(float la1, float lo1, float la2, float lo2) {
++	float p1_north[3], p1[3], p2[3];
++	float dir[3],north[3];
++	float angle;
++	int i;
++	calc_earth_to_eukl(la1,lo1,p1);
++	calc_earth_to_eukl(la2,lo2,p2);
++	calc_earth_to_eukl(la1+1,lo1,p1_north);
++	for (i=0;i&lt;3;i++)		north[i]=p1_north[i]-p1[i];
++	for (i=0;i&lt;3;i++)		dir[i]=p2[i]-p1[i];
++	angle=s3d_vector_angle(dir,north);
++	angle=angle*180.0/M_PI;
++	if ((lo2&gt;lo1) || (lo1-lo2&gt;180.0))		angle=360-angle;
++	return(angle);
++}
+ /* find some good center on our own */
+ void nav_autocenter()
+ {
+
+Modified: trunk/apps/s3dosm/s3dosm.h
+===================================================================
+--- trunk/apps/s3dosm/s3dosm.h	2006-12-02 15:59:31 UTC (rev 502)
++++ trunk/apps/s3dosm/s3dosm.h	2006-12-02 21:09:34 UTC (rev 503)
+@@ -1,6 +1,8 @@
+ #include &lt;sqlite3.h&gt;
++#include &quot;../../config.h&quot;
+ #define	ESIZE	637800		/* earth size */
+-#define	RESCALE	1
++#define	RESCALE	0.5
++#define VIEWHEIGHT 3
+ #define MAXQ	4096	
+ #define QBUF	1024*128
+ 
+@@ -46,6 +48,7 @@
+ enum {
+ 	ICON_AP,
+ 	ICON_AP_OPEN,
++	ICON_ARROW,
+ 	ICON_NUM
+ };
+ enum {
+@@ -130,12 +133,15 @@
+ layer_t *load_kismet_file(char *filename);
+ /* draw.c */
+ void draw_all_layers();
+-void calc_earth_to_eukl(float lon, float lat, float *x);
+ int draw_layer(layer_t *layer);
++void calc_earth_to_eukl(float lat, float lon, float *x);
++void draw_translate_icon(int user_icon, float la, float lo);
+ /* nav.c */
++void nav_main();
+ void nav_init();
+ void nav_center(float la, float lo);
+ void nav_autocenter();
++float get_heading(float la1, float lo1, float la2, float lo2);
+ extern int oidy;
+ /* tag.c */
+ void tag_add(object_t *obj,char *k, char *v);
+@@ -156,3 +162,7 @@
+ int db_insert_layer(char *layer_name);
+ void db_flush();
+ int callback(void *NotUsed, int argc, char **argv, char **azColName);
++/* gps.c */
++int gps_init(char *gpshost);
++int gps_main();
++int gps_quit();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000495.html">[S3d-svn] r502 - in trunk: . apps/s3dgps
+</A></li>
+	<LI>Next message: <A HREF="000497.html">[S3d-svn] r504 - in trunk: . apps/s3dgps objs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#496">[ date ]</a>
+              <a href="thread.html#496">[ thread ]</a>
+              <a href="subject.html#496">[ subject ]</a>
+              <a href="author.html#496">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

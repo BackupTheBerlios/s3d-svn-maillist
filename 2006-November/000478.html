@@ -1,0 +1,230 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r485 - trunk/apps/kism3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r485%20-%20trunk/apps/kism3d&In-Reply-To=%3C200611261349.kAQDnZOA021068%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000477.html">
+   <LINK REL="Next"  HREF="000479.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r485 - trunk/apps/kism3d</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r485%20-%20trunk/apps/kism3d&In-Reply-To=%3C200611261349.kAQDnZOA021068%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r485 - trunk/apps/kism3d">marec at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 26 14:49:35 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000477.html">[S3d-svn] r484 - in trunk: . server
+</A></li>
+        <LI>Next message: <A HREF="000479.html">[S3d-svn] r486 - in trunk: . apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#478">[ date ]</a>
+              <a href="thread.html#478">[ thread ]</a>
+              <a href="subject.html#478">[ subject ]</a>
+              <a href="author.html#478">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-11-26 14:49:35 +0100 (Sun, 26 Nov 2006)
+New Revision: 485
+
+Modified:
+   trunk/apps/kism3d/gui.c
+   trunk/apps/kism3d/kism3d.c
+   trunk/apps/kism3d/kism3d.h
+   trunk/apps/kism3d/network.c
+Log:
+let the networks dance  ;-)
+
+Modified: trunk/apps/kism3d/gui.c
+===================================================================
+--- trunk/apps/kism3d/gui.c	2006-11-26 11:45:17 UTC (rev 484)
++++ trunk/apps/kism3d/gui.c	2006-11-26 13:49:35 UTC (rev 485)
+@@ -27,6 +27,7 @@
+ #include &lt;s3d.h&gt;
+ #include &lt;math.h&gt;	/* M_PI, cos(), sin() */
+ #include &lt;stdlib.h&gt;	/* malloc(), free() */
++#include &lt;stdio.h&gt;      /* printf() */
+ #include &lt;time.h&gt;	/* nanosleep()  */
+ #include &lt;pthread.h&gt;
+ 
+@@ -109,6 +110,9 @@
+ 
+ 	struct list_head *network_pos;
+ 	struct wlan_network *wlan_network;
++	float real_node_pos_x, real_node_pos_z, label_str_len;
++	int network_index = 0;
++	char *label_str;
+ 
+ 
+ 	pthread_mutex_lock( &amp;Network_list_mutex );
+@@ -119,15 +123,52 @@
+ 
+ 		if ( wlan_network-&gt;visible ) {
+ 
++			network_index++;
++
+ 			if ( wlan_network-&gt;obj_id == -1 ) {
+ 
+ 				wlan_network-&gt;obj_id = wire_sphere(30,30);
+-				s3d_scale( wlan_network-&gt;obj_id, 5 );
+-				s3d_translate( wlan_network-&gt;obj_id, wlan_network-&gt;pos_vec[0], wlan_network-&gt;pos_vec[1], wlan_network-&gt;pos_vec[2] );
+ 				s3d_flags_on( wlan_network-&gt;obj_id, S3D_OF_VISIBLE );
+ 
+ 			}
+ 
++			wlan_network-&gt;scale_factor = wlan_network-&gt;num_wlan_clients;
++			s3d_scale( wlan_network-&gt;obj_id, wlan_network-&gt;scale_factor );
++
++			real_node_pos_x = sin( ( 360 / Num_networks ) * network_index ) * ( M_PI / 180 ) * ( ( ( 100 * Num_networks ) / 2 * M_PI ) );
++			real_node_pos_z = cos( ( 360 / Num_networks ) * network_index ) * ( M_PI / 180 ) * ( ( ( 100 * Num_networks ) / 2 * M_PI ) );
++
++			if ( ( wlan_network-&gt;pos_vec[0] != real_node_pos_x ) || ( wlan_network-&gt;pos_vec[2] != real_node_pos_z ) ) {
++
++				if ( wlan_network-&gt;pos_vec[0] != real_node_pos_x )
++					wlan_network-&gt;pos_vec[0] += ( ( real_node_pos_x - wlan_network-&gt;pos_vec[0] ) * ( wlan_network-&gt;pos_vec[0] / real_node_pos_x ) );
++
++				if ( wlan_network-&gt;pos_vec[2] != real_node_pos_z )
++					wlan_network-&gt;pos_vec[2] += ( ( real_node_pos_z - wlan_network-&gt;pos_vec[2] ) * ( wlan_network-&gt;pos_vec[2] / real_node_pos_z ) );
++
++				s3d_translate( wlan_network-&gt;obj_id, wlan_network-&gt;pos_vec[0], wlan_network-&gt;pos_vec[1], wlan_network-&gt;pos_vec[2] );
++
++			}
++
++			if ( wlan_network-&gt;properties_changed ) {
++
++				wlan_network-&gt;properties_changed = 0;
++
++				if ( wlan_network-&gt;label_id != -1 )
++					s3d_del_object( wlan_network-&gt;label_id );
++
++
++				label_str = alloc_memory( 100 );
++				snprintf( label_str, 100, &quot;%s\n%s&quot;, wlan_network-&gt;bssid, wlan_network-&gt;ssid );
++				label_str_len = 100;
++
++				wlan_network-&gt;label_id = s3d_draw_string( label_str, &amp;label_str_len );
++				s3d_link( wlan_network-&gt;label_id, wlan_network-&gt;obj_id );
++				s3d_translate( wlan_network-&gt;label_id, - label_str_len / 2, -2, 0 );
++				s3d_flags_on( wlan_network-&gt;label_id, S3D_OF_VISIBLE );
++
++			}
++
+ 			wlan_network-&gt;rotation = ( wlan_network-&gt;rotation + 1 ) % 360;
+ 			s3d_rotate( wlan_network-&gt;obj_id, 0, wlan_network-&gt;rotation, 0 );
+ 
+@@ -164,8 +205,16 @@
+ 
+ 	if ( !s3d_init( NULL, NULL, &quot;kism3d&quot; ) ) {
+ 
+-		s3d_mainloop( mainloop );
++		if ( s3d_select_font( &quot;vera&quot; ) ) {
+ 
++			printf( &quot;font 'vera' not found\n&quot; );
++
++		} else {
++
++			s3d_mainloop( mainloop );
++
++		}
++
+ 		s3d_quit();
+ 
+ 	}
+
+Modified: trunk/apps/kism3d/kism3d.c
+===================================================================
+--- trunk/apps/kism3d/kism3d.c	2006-11-26 11:45:17 UTC (rev 484)
++++ trunk/apps/kism3d/kism3d.c	2006-11-26 13:49:35 UTC (rev 485)
+@@ -45,6 +45,7 @@
+ pthread_mutex_t Client_list_mutex = PTHREAD_MUTEX_INITIALIZER;
+ 
+ int Kism3d_aborted = 0;
++int Num_networks = 0;
+ 
+ 
+ 
+
+Modified: trunk/apps/kism3d/kism3d.h
+===================================================================
+--- trunk/apps/kism3d/kism3d.h	2006-11-26 11:45:17 UTC (rev 484)
++++ trunk/apps/kism3d/kism3d.h	2006-11-26 13:49:35 UTC (rev 485)
+@@ -50,11 +50,14 @@
+ 	int type;
+ 	int channel;
+ 	int num_wlan_clients;
++	int properties_changed;
+ 	int visible;
+ 	float pos_vec[3];
+ 	float mov_vec[3];
+ 	int obj_id;
++	int label_id;
+ 	int rotation;
++	int scale_factor;
+ 
+ };
+ 
+@@ -89,3 +92,4 @@
+ extern pthread_mutex_t Network_list_mutex;
+ extern pthread_mutex_t Client_list_mutex;
+ extern int Kism3d_aborted;
++extern int Num_networks;
+
+Modified: trunk/apps/kism3d/network.c
+===================================================================
+--- trunk/apps/kism3d/network.c	2006-11-26 11:45:17 UTC (rev 484)
++++ trunk/apps/kism3d/network.c	2006-11-26 13:49:35 UTC (rev 485)
+@@ -62,10 +62,17 @@
+ 	wlan_network-&gt;mov_vec[0] = wlan_network-&gt;mov_vec[1] = wlan_network-&gt;mov_vec[2] = 0.0;
+ 
+ 	wlan_network-&gt;obj_id = -1;
++	wlan_network-&gt;label_id = -1;
++
+ 	wlan_network-&gt;rotation = 0;
++	wlan_network-&gt;scale_factor = 0;
+ 
++	wlan_network-&gt;properties_changed = 1;
++
+ 	list_add_tail(&amp;wlan_network-&gt;list, &amp;Network_list);
+ 
++	Num_networks++;
++
+ 	return wlan_network;
+ 
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000477.html">[S3d-svn] r484 - in trunk: . server
+</A></li>
+	<LI>Next message: <A HREF="000479.html">[S3d-svn] r486 - in trunk: . apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#478">[ date ]</a>
+              <a href="thread.html#478">[ thread ]</a>
+              <a href="subject.html#478">[ subject ]</a>
+              <a href="author.html#478">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r869 - trunk/svnonly/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r869%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711210056.lAL0uSeF016342%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000861.html">
+   <LINK REL="Next"  HREF="000863.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r869 - trunk/svnonly/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r869%20-%20trunk/svnonly/comptest&In-Reply-To=%3C200711210056.lAL0uSeF016342%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r869 - trunk/svnonly/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Wed Nov 21 01:56:28 CET 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000861.html">[S3d-svn] r868 - trunk/svnonly/comptest
+</A></li>
+        <LI>Next message: <A HREF="000863.html">[S3d-svn] r870 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#862">[ date ]</a>
+              <a href="thread.html#862">[ thread ]</a>
+              <a href="subject.html#862">[ subject ]</a>
+              <a href="author.html#862">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-11-21 01:56:28 +0100 (Wed, 21 Nov 2007)
+New Revision: 869
+
+Modified:
+   trunk/svnonly/comptest/window.c
+   trunk/svnonly/comptest/x11.c
+Log:
+- use XCompositeRedirectWindow() to in window_add to have it redirected once it
+  comes available
+- only update contents after all requests were answered
+
+
+Modified: trunk/svnonly/comptest/window.c
+===================================================================
+--- trunk/svnonly/comptest/window.c	2007-11-21 00:03:16 UTC (rev 868)
++++ trunk/svnonly/comptest/window.c	2007-11-21 00:56:28 UTC (rev 869)
+@@ -115,6 +115,7 @@
+ 	
+ 
+ 
++	XCompositeRedirectWindow(dpy, id, CompositeRedirectAutomatic);
+ 	window_update_content(win, 0, 0, win-&gt;attr.width, win-&gt;attr.height);
+ /*	printf(&quot;window (%d) added\n&quot;, (int)id);*/
+ }
+@@ -149,7 +150,6 @@
+ void window_update_geometry(struct window *win, int x, int y, int width, int height)
+ {
+ 
+-	printf(&quot;window_update_geometry()\n&quot;);
+ 	if (win-&gt;oid == -1) {
+ 		win-&gt;attr.x = x;
+ 		win-&gt;attr.y = y;
+
+Modified: trunk/svnonly/comptest/x11.c
+===================================================================
+--- trunk/svnonly/comptest/x11.c	2007-11-21 00:03:16 UTC (rev 868)
++++ trunk/svnonly/comptest/x11.c	2007-11-21 00:56:28 UTC (rev 869)
+@@ -170,10 +170,12 @@
+ 	XEvent event;
+ 	struct window *window;
+ 	int i;
+-	for (window = window_head; window != NULL; window = window-&gt;next)
+-		window-&gt;already_updated = 0;
++	int ret;
++/*	for (window = window_head; window != NULL; window = window-&gt;next)
++		window-&gt;already_updated = 0;*/
+ 
+-	for (i = 0; i &lt; MAXEVENTS &amp;&amp; XPending(dpy); i++) {
++	while (XPending(dpy)) {
++/*	for (i = 0; i &lt; MAXEVENTS &amp;&amp; XPending(dpy); i++) {*/
+ 		XNextEvent(dpy, &amp;event);
+ 		print_event(dpy, &amp;event);
+ 		switch (event.type - xdamage.event) {
+@@ -185,7 +187,10 @@
+ 			XDamageSubtract(dpy, e-&gt;damage, None, None);
+ 			window = window_find(e-&gt;drawable);
+ 			if (window != NULL)
+-				window_update_content(window, e-&gt;area.x, e-&gt;area.y, e-&gt;area.width, e-&gt;area.height);
++				window-&gt;already_updated = 0;
++				/* TODO: remember the rect damaged, and only update this part later. merge it if there was
++				 * already damage. */
++/*				window_update_content(window, e-&gt;area.x, e-&gt;area.y, e-&gt;area.width, e-&gt;area.height);*/
+ 			break;
+ 		   }
+ 
+@@ -216,6 +221,12 @@
+ 		   }
+ 		}
+ 	}
++	for (window = window_head; window != NULL; window = window-&gt;next)
++		if (window-&gt;already_updated == 0) {
++			window_update_content(window, 0,0, window-&gt;attr.width, window-&gt;attr.height);
++			window-&gt;already_updated = 1;
++		}
++
+ }
+ 
+ void x11_addwindows() 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000861.html">[S3d-svn] r868 - trunk/svnonly/comptest
+</A></li>
+	<LI>Next message: <A HREF="000863.html">[S3d-svn] r870 - trunk/svnonly/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#862">[ date ]</a>
+              <a href="thread.html#862">[ thread ]</a>
+              <a href="subject.html#862">[ subject ]</a>
+              <a href="author.html#862">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

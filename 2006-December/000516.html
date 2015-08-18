@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r523 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r523%20-%20trunk/server&In-Reply-To=%3C200612081808.kB8I8i4c005223%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000515.html">
+   <LINK REL="Next"  HREF="000517.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r523 - trunk/server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r523%20-%20trunk/server&In-Reply-To=%3C200612081808.kB8I8i4c005223%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r523 - trunk/server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Fri Dec  8 19:08:44 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000515.html">[S3d-svn] r522 - in trunk: . server
+</A></li>
+        <LI>Next message: <A HREF="000517.html">[S3d-svn] r524 - in trunk: . libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#516">[ date ]</a>
+              <a href="thread.html#516">[ thread ]</a>
+              <a href="subject.html#516">[ subject ]</a>
+              <a href="author.html#516">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-12-08 19:08:35 +0100 (Fri, 08 Dec 2006)
+New Revision: 523
+
+Modified:
+   trunk/server/graphics_sdl.c
+Log:
+- some workaround for systems (my notebook ;) behaving weird while trying to enable multisampling
+
+Modified: trunk/server/graphics_sdl.c
+===================================================================
+--- trunk/server/graphics_sdl.c	2006-12-08 17:39:52 UTC (rev 522)
++++ trunk/server/graphics_sdl.c	2006-12-08 18:08:35 UTC (rev 523)
+@@ -65,14 +65,24 @@
+ /* 	SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 5); */
+ /* 	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 ); */
+ 	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+-	if (aa_level&gt;0) {
+-		if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1 ))			s3dprintf(VHIGH,&quot;error initializing multisampling&quot;);
+-		if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, aa_level ))	s3dprintf(VHIGH,&quot;no multisampling available&quot;);
+-	}
++	do {
++		if (aa_level&gt;0) {
++			if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1 ))			s3dprintf(VHIGH,&quot;error initializing multisampling&quot;);
++			if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, aa_level ))	s3dprintf(VHIGH,&quot;no multisampling available&quot;);
++		}
+ 
+-	 /*  more opengl-init-stuff */
+-	if ((GLwin = SDL_SetVideoMode(X_RES,Y_RES,16,SDLFlags))==NULL) 
+-			errsf(&quot;SDL_SetVideoMode()&quot;,SDL_GetError());
++		 /*  more opengl-init-stuff */
++		if ((GLwin = SDL_SetVideoMode(X_RES,Y_RES,16,SDLFlags))==NULL) 
++		{
++			if (aa_level&gt;0) {
++				s3dprintf(MED,&quot;retry without multisampling&quot;);
++				aa_level=0;
++				SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0 );
++				SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0 );
++			} else
++				errsf(&quot;SDL_SetVideoMode()&quot;,SDL_GetError());
++		}
++	} while (GLwin==0);
+ 	switch (SDL_GetVideoInfo()-&gt;vfmt-&gt;BitsPerPixel) {
+ 	    case 8:
+ 				rgb_size[0] = 3;	rgb_size[1] = 3;	rgb_size[2] = 2;	break;
+@@ -82,11 +92,12 @@
+             default:
+ 				rgb_size[0] = 8;	rgb_size[1] = 8;	rgb_size[2] = 8;	break;
+ 	}
++	if (aa_level &gt;0) {
++	    SDL_GL_GetAttribute( SDL_GL_MULTISAMPLEBUFFERS, &amp;buffers );
++	    SDL_GL_GetAttribute( SDL_GL_MULTISAMPLESAMPLES, &amp;samples );
++	    s3dprintf(LOW,&quot;Buffers: %d Samples: %d&quot;, buffers, samples);
++	}
+ 
+-    SDL_GL_GetAttribute( SDL_GL_MULTISAMPLEBUFFERS, &amp;buffers );
+-    SDL_GL_GetAttribute( SDL_GL_MULTISAMPLESAMPLES, &amp;samples );
+-    s3dprintf(LOW,&quot;Buffers: %d Samples: %d&quot;, buffers, samples);
+-
+ 	 /*  print some information */
+ 	s3dprintf(VLOW,&quot;Screen BPP: %d&quot;, SDL_GetVideoSurface()-&gt;format-&gt;BitsPerPixel);
+ 	s3dprintf(VLOW,&quot;Vendor     : %s&quot;, glGetString( GL_VENDOR ) );
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000515.html">[S3d-svn] r522 - in trunk: . server
+</A></li>
+	<LI>Next message: <A HREF="000517.html">[S3d-svn] r524 - in trunk: . libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#516">[ date ]</a>
+              <a href="thread.html#516">[ thread ]</a>
+              <a href="subject.html#516">[ subject ]</a>
+              <a href="author.html#516">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

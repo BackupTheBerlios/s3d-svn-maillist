@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r960 - in trunk: Documentation/libs3d libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r960%20-%20in%20trunk%3A%20Documentation/libs3d%20libs3d&In-Reply-To=%3C200808191834.m7JIYCBt016732%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000943.html">
+   <LINK REL="Next"  HREF="000945.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r960 - in trunk: Documentation/libs3d libs3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r960%20-%20in%20trunk%3A%20Documentation/libs3d%20libs3d&In-Reply-To=%3C200808191834.m7JIYCBt016732%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r960 - in trunk: Documentation/libs3d libs3d">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Tue Aug 19 20:34:12 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000943.html">[S3d-svn] r959 - in trunk/Documentation: libs3d libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000945.html">[S3d-svn] r961 - trunk/Documentation/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#944">[ date ]</a>
+              <a href="thread.html#944">[ thread ]</a>
+              <a href="subject.html#944">[ subject ]</a>
+              <a href="author.html#944">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2008-08-19 20:34:09 +0200 (Tue, 19 Aug 2008)
+New Revision: 960
+
+Modified:
+   trunk/Documentation/libs3d/libs3d.docbook
+   trunk/libs3d/proto_out.c
+Log:
+add s3d_push_textures() to docbook, fix a copy+paste bug
+
+
+Modified: trunk/Documentation/libs3d/libs3d.docbook
+===================================================================
+--- trunk/Documentation/libs3d/libs3d.docbook	2008-08-19 12:13:34 UTC (rev 959)
++++ trunk/Documentation/libs3d/libs3d.docbook	2008-08-19 18:34:09 UTC (rev 960)
+@@ -307,7 +307,7 @@
+ &lt;para&gt;
+ as for vertices, you can push arrays of polygons to have greater performance.
+ the pbuf should contain n polygons which consist of 4 uint32_t values
+-of 3 vertices indeces and 1 material index.
++of 3 vertices indices and 1 material index.
+ &lt;/para&gt;
+ &lt;programlisting&gt;
+ uint32_t pbuf[] = { 0, 1, 2, 0};
+@@ -375,7 +375,25 @@
+ &lt;/para&gt;
+ &lt;/sect2&gt;
+ 
++&lt;sect2&gt;
++&lt;title&gt;s3d_push_textures&lt;/title&gt;
++&lt;funcsynopsis&gt;
++&lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
++&lt;funcprototype&gt;
++&lt;funcdef&gt;int &lt;function&gt;s3d_push_textures&lt;/function&gt;&lt;/funcdef&gt;
++&lt;paramdef&gt;int &lt;parameter&gt;object&lt;/parameter&gt;, 
++const uint16_t *&lt;parameter&gt;*tbuf&lt;/parameter&gt;,
++uint16_t &lt;parameter&gt;n&lt;/parameter&gt;&lt;/paramdef&gt;
++&lt;/funcprototype&gt;
++&lt;/funcsynopsis&gt;
++&lt;para&gt;
++As for vertices, you can push arrays of textures on the texture stack 
++to have greater performance.
++The tbuf should contain n texture sizes which consist of 2 uint16_t values
++for width and height for each texture. 
++&lt;/para&gt;
+ 
++
+ &lt;sect2&gt;
+ &lt;title&gt;s3d_pop_vertex&lt;/title&gt;
+ &lt;funcsynopsis&gt;
+
+Modified: trunk/libs3d/proto_out.c
+===================================================================
+--- trunk/libs3d/proto_out.c	2008-08-19 12:13:34 UTC (rev 959)
++++ trunk/libs3d/proto_out.c	2008-08-19 18:34:09 UTC (rev 960)
+@@ -376,7 +376,7 @@
+ 		s = tbuf + i * stepl / 2;
+ 		for (j = 0;j &lt; flen / 2;j++)
+ 			d[j] = htons(s[j]);
+-		net_send(S3D_P_C_PUSH_POLY, (char *)buf, flen + 4);
++		net_send(S3D_P_C_PUSH_TEX, (char *)buf, flen + 4);
+ 	}
+ 	return(0);
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000943.html">[S3d-svn] r959 - in trunk/Documentation: libs3d libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000945.html">[S3d-svn] r961 - trunk/Documentation/libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#944">[ date ]</a>
+              <a href="thread.html#944">[ thread ]</a>
+              <a href="subject.html#944">[ subject ]</a>
+              <a href="author.html#944">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

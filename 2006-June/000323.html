@@ -1,0 +1,2632 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r330 - in trunk: . libs3d libs3dw server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r330%20-%20in%20trunk%3A%20.%20libs3d%20libs3dw%20server&In-Reply-To=%3C200606042027.k54KRbjs018143%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000322.html">
+   <LINK REL="Next"  HREF="000324.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r330 - in trunk: . libs3d libs3dw server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r330%20-%20in%20trunk%3A%20.%20libs3d%20libs3dw%20server&In-Reply-To=%3C200606042027.k54KRbjs018143%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r330 - in trunk: . libs3d libs3dw server">dotslash at berlios.de
+       </A><BR>
+    <I>Sun Jun  4 22:27:37 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000322.html">[S3d-svn] r329 - in trunk: . libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000324.html">[S3d-svn] r331 - in trunk: . libs3d/libg3d/plugins/image
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#323">[ date ]</a>
+              <a href="thread.html#323">[ thread ]</a>
+              <a href="subject.html#323">[ subject ]</a>
+              <a href="author.html#323">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-04 22:27:36 +0200 (Sun, 04 Jun 2006)
+New Revision: 330
+
+Modified:
+   trunk/
+   trunk/libs3d/3dsread.c
+   trunk/libs3d/error.c
+   trunk/libs3d/freetype.c
+   trunk/libs3d/io.c
+   trunk/libs3d/object_queue.c
+   trunk/libs3d/proto_in.c
+   trunk/libs3d/proto_out.c
+   trunk/libs3d/s3dlib.h
+   trunk/libs3d/shm.c
+   trunk/libs3d/shm_ringbuf.c
+   trunk/libs3d/tcp.c
+   trunk/libs3dw/animate.c
+   trunk/libs3dw/input.c
+   trunk/libs3dw/s3dw_int.h
+   trunk/libs3dw/surface.c
+   trunk/server/config.h
+   trunk/server/cull.c
+   trunk/server/error.c
+   trunk/server/event.c
+   trunk/server/global.h
+   trunk/server/graphics.c
+   trunk/server/graphics_glut.c
+   trunk/server/graphics_sdl.c
+   trunk/server/main.c
+   trunk/server/matrix.c
+   trunk/server/mcp.c
+   trunk/server/object.c
+   trunk/server/process.c
+   trunk/server/proto.c
+   trunk/server/shm.c
+   trunk/server/tcp.c
+   trunk/server/user.c
+   trunk/server/user_glut.c
+   trunk/server/user_sdl.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r701 at balthasar</A>:  dotslash | 2006-06-04 22:27:31 +0200
+ - dprintf -&gt; s3dprintf, dprintf conflicts with glibc ... :(
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:699
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:701
+
+Modified: trunk/libs3d/3dsread.c
+===================================================================
+--- trunk/libs3d/3dsread.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/libs3d/3dsread.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -85,7 +85,7 @@
+ 		r[1]=n[1]/len;
+ 		r[2]=n[2]/len;
+ 	} else {
+-		dprintf(VLOW,&quot;normal(): couldn't calc normal&quot;);
++		s3dprintf(VLOW,&quot;normal(): couldn't calc normal&quot;);
+ 		r[0]=r[1]=r[2]=0.0F;
+ 	}
+ }
+@@ -223,7 +223,7 @@
+ 				return(NULL);
+ 			}
+ 		}
+-		 /* dprintf(LOW,&quot;polygon [%d/%d]: %d %d %d is in smoothlist %d&quot;,i,polynum,v[0],v[1],v[2],g); */
++		 /* s3dprintf(LOW,&quot;polygon [%d/%d]: %d %d %d is in smoothlist %d&quot;,i,polynum,v[0],v[1],v[2],g); */
+ 		
+ 		normal(	vertex_buf+v[0]*3,
+ 				vertex_buf+v[1]*3,
+@@ -235,12 +235,12 @@
+ 
+ 
+ 
+-	 /* dprintf(MED,&quot;processing the final group ... %d (%d members)&quot;,g,n); */
++	 /* s3dprintf(MED,&quot;processing the final group ... %d (%d members)&quot;,g,n); */
+ 	smooth(vertex_buf,voff,poly_buf+(i-n)*4,pnormal_list+(i-n)*3, nbuf+(i-n)*9,v_t_buf,n,g);
+ /*	for (i=0;i&lt;polynum;i++)
+ 	{
+ 		for (j=0;j&lt;3;j++)
+-			dprintf(MED,&quot;poly[%d/%d],point[%d/3]: %f %f %f&quot;,i,polynum,j,
++			s3dprintf(MED,&quot;poly[%d/%d],point[%d/3]: %f %f %f&quot;,i,polynum,j,
+ 							nbuf[i*9+j*3],
+ 							nbuf[i*9+j*3+1],
+ 							nbuf[i*9+j*3+2]);
+@@ -295,7 +295,7 @@
+ 		cid=gints(ptr);
+ 		clen=gintl(ptr+2);
+ 		
+-		dprintf (VLOW,&quot;[pos %x]: \t%04x [len:%d]&quot;,(ptr-buf),cid,(clen-6));
++		s3dprintf (VLOW,&quot;[pos %x]: \t%04x [len:%d]&quot;,(ptr-buf),cid,(clen-6));
+ 		if ((ptr==buf) &amp;&amp; (cid!=0x4d4d))
+ 		{
+ 			errs(&quot;3d_import_3ds()&quot;,&quot;file doesn't start with 0x4d4d, maybe file corrupt?&quot;);
+@@ -305,7 +305,7 @@
+ 		switch (cid)
+ 		{
+ 		  case 0x4d4d: 
+-			  dprintf(VLOW,&quot;-- the main chunk!!&quot;);
++			  s3dprintf(VLOW,&quot;-- the main chunk!!&quot;);
+ 			  filesize=clen;
+ 			  if (cur_oid==-1)
+ 			  {
+@@ -317,24 +317,24 @@
+ 
+            	  break;
+ 		  case 0x3D3D:
+-			  dprintf(VLOW,&quot;-- the 3d editor chunk!&quot;);
++			  s3dprintf(VLOW,&quot;-- the 3d editor chunk!&quot;);
+ 			  break;
+ 		  case 0x4000:
+-			  dprintf(VLOW,&quot;-- an object block. let's see ...&quot;);
++			  s3dprintf(VLOW,&quot;-- an object block. let's see ...&quot;);
+ 			  strncpy((char *)ostr,(char *)ptr,MAXSTRN);
+ 			  vertex_offset+=v;
+ 			  v=0;
+ 			  ptr=(ptr+strlen(ostr)+1);
+ 			  break;
+ 		  case 0x4100:
+-			  dprintf(VLOW,&quot;-- Triangular mesh&quot;);
++			  s3dprintf(VLOW,&quot;-- Triangular mesh&quot;);
+ 			  smooth_list=NULL;
+ 			  mesh_end=ptr+(clen-6);
+ 			  break;
+ 		  case 0x4110: 
+ 			  vertexnum=gints(ptr);
+ 			  ptr+=sizeof(unsigned short);
+-			  dprintf(VLOW,&quot;-- vertices list!! number of vertices: %d&quot;,vertexnum);
++			  s3dprintf(VLOW,&quot;-- vertices list!! number of vertices: %d&quot;,vertexnum);
+ 			  vertex_buf=malloc(sizeof(float)*3*vertexnum);
+ 			  if (vertex_buf==NULL) break;
+ /* 			  memcpy(vertex_buf,ptr,sizeof(float)*3*i); */
+@@ -350,7 +350,7 @@
+ 		  case 0x4120:
+ 			polynum=gints(ptr);
+ 			ptr+=sizeof(unsigned short);
+-			dprintf(VLOW,&quot;-- polygon list!! number of polygons: %d&quot;,polynum);
++			s3dprintf(VLOW,&quot;-- polygon list!! number of polygons: %d&quot;,polynum);
+ 			poly_buf=malloc(sizeof(unsigned long)*4*polynum);
+ 			if (poly_buf==NULL) break;
+ 		    for (j=0; j&lt;polynum; j++)
+@@ -364,10 +364,10 @@
+ 			break;
+ 		  case 0x4130:
+ 			ptr2=(char *)ptr+(clen-6);  /*  backup our endpointer ... */
+-			dprintf(VLOW,&quot;-- material information for faces .....&quot;);
++			s3dprintf(VLOW,&quot;-- material information for faces .....&quot;);
+ 			strncpy((char *)ostr,(char *)ptr,MAXSTRN);
+ 			ptr+=strlen(ptr)+1;
+-			dprintf(VLOW,&quot;.. material string name is %s&quot;,ostr);
++			s3dprintf(VLOW,&quot;.. material string name is %s&quot;,ostr);
+ 			col_obj=0;
+ 			while (col_obj&lt;256 &amp;&amp; (strncmp(ostr,materials[col_obj],MAXSTRN)!=0)) col_obj++;
+ 			if (col_obj&gt;=256)
+@@ -389,7 +389,7 @@
+ 			ptr=ptr2;
+ 			break;
+ 		  case 0x4150:
+-			dprintf(VLOW,&quot;-- smoothing group information (length %d [%d])&quot;, clen,clen/4);
++			s3dprintf(VLOW,&quot;-- smoothing group information (length %d [%d])&quot;, clen,clen/4);
+ 			smooth_list=(unsigned long *)ptr;
+ 			for (j=0;j&lt;(clen/4);j++)
+ 			{
+@@ -399,10 +399,10 @@
+ 			ptr=(char *)ptr+(clen-6);
+ 			break;
+ 		  case 0x4160:
+-			  dprintf(VLOW,&quot;-- translation matrix&quot;);
++			  s3dprintf(VLOW,&quot;-- translation matrix&quot;);
+ 			  for (j=0; j&lt;4; j++)
+ 		 	  {
+-				dprintf(VLOW,&quot;[%f:%f:%f:%f]&quot;,
++				s3dprintf(VLOW,&quot;[%f:%f:%f:%f]&quot;,
+ 								*((float *)ptr),
+ 								*((float *)ptr+1),
+ 								*((float *)ptr+2),
+@@ -412,11 +412,11 @@
+ 			  }
+ 			  break;
+ 		  case 0xafff:
+-			  dprintf(VLOW,&quot;-- material chunk O_o&quot;);
++			  s3dprintf(VLOW,&quot;-- material chunk O_o&quot;);
+ 			  break;
+ 		  case 0xa000:
+ 			  strncpy((char *)ostr,(char *)ptr,MAXSTRN);
+-			  dprintf(VLOW,&quot;-- material string name is %s&quot;,ostr);
++			  s3dprintf(VLOW,&quot;-- material string name is %s&quot;,ostr);
+ 			  ptr=(char *)ptr+(clen-6);
+ 			  color|=8;
+ 			  break;
+@@ -430,7 +430,7 @@
+ 			  r3=(unsigned char)*(ptr+6);
+ 			  g3=(unsigned char)*(ptr+7);
+ 			  b3=(unsigned char)*(ptr+8);
+-			  dprintf(VLOW,&quot;-- ambient color 3:&gt;&gt; [rgb] [%x %x %x]&quot;,r3,g3,b3);
++			  s3dprintf(VLOW,&quot;-- ambient color 3:&gt;&gt; [rgb] [%x %x %x]&quot;,r3,g3,b3);
+ 			  r_amb=r3;g_amb=g3;b_amb=b3;
+ 			  color=color|1;
+ 			  ptr=(char *)ptr+(clen-6);
+@@ -445,7 +445,7 @@
+ 			  r3=(unsigned char)*(ptr+6);
+ 			  g3=(unsigned char)*(ptr+7);
+ 			  b3=(unsigned char)*(ptr+8);
+-			  dprintf(VLOW,&quot;-- diffuse color 3:&gt;&gt; [rgb] [%x %x %x]&quot;,r3,g3,b3);
++			  s3dprintf(VLOW,&quot;-- diffuse color 3:&gt;&gt; [rgb] [%x %x %x]&quot;,r3,g3,b3);
+ 			  r_diff=r3;g_diff=g3;b_diff=b3;
+ 			  color=color|2;
+ 			  ptr=(char *)ptr+(clen-6);
+@@ -460,7 +460,7 @@
+ 			  r3=(unsigned char)*(ptr+6);
+ 			  g3=(unsigned char)*(ptr+7);
+ 			  b3=(unsigned char)*(ptr+8);
+-			  dprintf(VLOW,&quot;-- spec color 3:&gt;&gt; [rgb] [%x %x %x]&quot;,r3,g3,b3);
++			  s3dprintf(VLOW,&quot;-- spec color 3:&gt;&gt; [rgb] [%x %x %x]&quot;,r3,g3,b3);
+ 			  r_spec=r3;g_spec=g3;b_spec=b3;
+ 			  color=color|4;
+ 			  ptr=(char *)ptr+(clen-6);
+@@ -477,10 +477,10 @@
+ 							  /*  that's just because i'm lazy */
+ 			{
+ 				strncpy(materials[col_obj],ostr,MAXSTRN);
+-				dprintf(VLOW,&quot;assigned material %s on position %d&quot;,
++				s3dprintf(VLOW,&quot;assigned material %s on position %d&quot;,
+ 								materials[col_obj],col_obj);
+ 			}
+-			dprintf(VLOW,&quot;-- [%d]colors... amb: %d %d %d, spec %d %d %d, diff %d %d %d&quot;,col_obj,
++			s3dprintf(VLOW,&quot;-- [%d]colors... amb: %d %d %d, spec %d %d %d, diff %d %d %d&quot;,col_obj,
+ 							r_amb,g_amb,b_amb,
+ 							r_spec,g_spec,b_spec,
+ 							r_diff,g_diff,b_diff
+@@ -503,7 +503,7 @@
+ 					nbuf=calc_normals(vertex_buf,vertexnum,poly_buf,polynum,vertex_offset,smooth_list);
+ 
+ 				 /*  do in 1000 chunks */
+-				dprintf(LOW,&quot;committing %d polys&quot;,polynum);
++				s3dprintf(LOW,&quot;committing %d polys&quot;,polynum);
+ 				tnbuf=nbuf;
+ 				tpbuf=poly_buf;
+ #define CSIZE	1000
+@@ -541,7 +541,7 @@
+ 			}
+ 		}
+ 	}
+-	dprintf(VLOW,&quot;-- done [ptr:%010p,buf:%010p]...&quot;,ptr,buf);
++	s3dprintf(VLOW,&quot;-- done [ptr:%010p,buf:%010p]...&quot;,ptr,buf);
+ 	free(buf);
+ 	return(cur_oid);
+ }
+
+Modified: trunk/libs3d/error.c
+===================================================================
+--- trunk/libs3d/error.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/libs3d/error.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -27,9 +27,9 @@
+ #include &lt;stdarg.h&gt;		 /*  va_list */
+ #include &lt;stdio.h&gt; 		 /*  perror(),fprintf() */
+ #include &lt;string.h&gt; 	 /*  sterror */
+-/*  dprintf is only for internal use. */
++/*  s3dprintf is only for internal use. */
+ #ifdef DEBUG
+-void dprintf(int relevance, const char *fmt, ...) {
++void s3dprintf(int relevance, const char *fmt, ...) {
+ 	char dbm[DBM_MAX];
+ 	va_list args;
+ 	if (relevance &gt;= DEBUG )
+
+Modified: trunk/libs3d/freetype.c
+===================================================================
+--- trunk/libs3d/freetype.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/libs3d/freetype.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -133,7 +133,7 @@
+ 		errds(VHIGH,&quot;s3d_add_tessbuf():FT_Load_Char()&quot;,&quot;can't load character&quot;);
+ 		return(-1);
+ 	} 
+-	dprintf(VLOW,&quot;[T]riangulating character %c&quot;,a);
++	s3dprintf(VLOW,&quot;[T]riangulating character %c&quot;,a);
+ 	norm=1.0/face-&gt;glyph-&gt;metrics.vertAdvance;
+ 	ch=a;
+ 	v_off=0;
+@@ -167,7 +167,7 @@
+ 				i++;
+ 			}
+ 			ar=0.5f*norm*norm*ar;
+-			dprintf(VLOW,&quot;contour %d has area of %3.3f, cntr is %d, contour starts at %d, ncon %d&quot;,c,ar,cntr[c], csta[c], ncon);
++			s3dprintf(VLOW,&quot;contour %d has area of %3.3f, cntr is %d, contour starts at %d, ncon %d&quot;,c,ar,cntr[c], csta[c], ncon);
+ 			area[c]=ar; /* save the area */
+ 		}
+ 		/* now as we have the areas and sizes of the contours, we need to order our contours so that 
+@@ -187,7 +187,7 @@
+ 				}
+ 			if (outl==-1)
+ 			{
+-				dprintf(HIGH,&quot;hole without outline found, exiting ... %c&quot;,a);
++				s3dprintf(HIGH,&quot;hole without outline found, exiting ... %c&quot;,a);
+ 				return(-1);
+ 			}
+ 			for (i=0;i&lt;n;i++)
+@@ -211,7 +211,7 @@
+ 					if (fabsf(ar)&gt;1)						/* if ar = 0.0, it's outside, elseway it's a multiple of pi. this check should be
+ 															 * very generous to roundoff errors */
+ 					{
+-						dprintf(VLOW,&quot;hole %d (%d) in %d (%d): interior angle sum %f (n=%d)&quot;,i,perm[i],outl, perm[outl],ar,n);
++						s3dprintf(VLOW,&quot;hole %d (%d) in %d (%d): interior angle sum %f (n=%d)&quot;,i,perm[i],outl, perm[outl],ar,n);
+ 						j=perm[n-1];	/* swap our hole to the end */
+ 						perm[n-1]=perm[i];
+ 						perm[i]=j;
+@@ -253,7 +253,7 @@
+ 			n++;				 /* count out and inlines ... */
+ 			if (area[perm[c]]&gt;0) /* outline? start! */
+ 			{
+-				dprintf(VLOW,&quot;[T]riangulation from outline %d (%d contours, area = %f)&quot;,perm[c],n,area[perm[c]]);
++				s3dprintf(VLOW,&quot;[T]riangulation from outline %d (%d contours, area = %f)&quot;,perm[c],n,area[perm[c]]);
+ 				np=sei_triangulate_polygon(n, ncntr+c, nvertices+(ncsta[c]), triangles);
+ 				for (i=0;i&lt;np;i++)
+ 				{
+@@ -284,11 +284,11 @@
+ 	memcpy(vbuf,tess_buf[a].vbuf,sizeof(float)*3*tess_buf[a].vn);
+ 	memcpy(pbuf,tess_buf[a].pbuf,sizeof(unsigned long)*4*tess_buf[a].pn);
+ 	 /*  prepare the buffs ... */
+-/* 	dprintf(LOW,&quot;drawing [%c] (%d vertices, %d polys&quot;,a,tess_buf[a].vn,tess_buf[a].pn); */
++/* 	s3dprintf(LOW,&quot;drawing [%c] (%d vertices, %d polys&quot;,a,tess_buf[a].vn,tess_buf[a].pn); */
+ 	for (i=0;i&lt;tess_buf[a].vn;i++)
+ 	{
+ 		vbuf[i*3]+=*xoff;
+-/*		dprintf(LOW,&quot;vertex [%c:%d] %f %f %f&quot;,a,i,
++/*		s3dprintf(LOW,&quot;vertex [%c:%d] %f %f %f&quot;,a,i,
+ 						vbuf[i*3],
+ 						vbuf[i*3+1],
+ 						vbuf[i*3+2]);*/
+@@ -298,13 +298,13 @@
+ 		pbuf[i*4]+=*voff;
+ 		pbuf[i*4+1]+=*voff;
+ 		pbuf[i*4+2]+=*voff;
+-/*		dprintf(LOW,&quot;poly [%c:%d] %d %d %d | %d (voff %d)&quot;,a,i,
++/*		s3dprintf(LOW,&quot;poly [%c:%d] %d %d %d | %d (voff %d)&quot;,a,i,
+ 						pbuf[i*4],
+ 						pbuf[i*4+1],
+ 						pbuf[i*4+2],
+ 						pbuf[i*4+3],*voff);*/
+ 	}
+-	dprintf(VLOW,&quot;commiting %d vertices, %d polygons&quot;,tess_buf[a].vn,tess_buf[a].pn);
++	s3dprintf(VLOW,&quot;commiting %d vertices, %d polygons&quot;,tess_buf[a].vn,tess_buf[a].pn);
+ 	s3d_push_vertices(oid,vbuf,tess_buf[a].vn);
+ 	s3d_push_polygons(oid,pbuf,tess_buf[a].pn);
+ 	*xoff+=tess_buf[a].xoff;  /*  xoffset */
+
+Modified: trunk/libs3d/io.c
+===================================================================
+--- trunk/libs3d/io.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/libs3d/io.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -90,7 +90,7 @@
+ 				if (optarg)
+ 				{
+ 					url=optarg;
+-					dprintf(HIGH,&quot;connecting to %s&quot;,url);
++					s3dprintf(HIGH,&quot;connecting to %s&quot;,url);
+ 				}
+ 			}
+ 			break;
+@@ -130,7 +130,7 @@
+ */
+ 	if (NULL!=(s=getenv(&quot;S3D&quot;)))
+ 	{
+-		dprintf(VLOW,&quot;at least we have the enviroment variable ... %s&quot;,s);
++		s3dprintf(VLOW,&quot;at least we have the enviroment variable ... %s&quot;,s);
+ 		url=s;
+ 	}
+ 	parse_args(argc,argv);
+@@ -226,7 +226,7 @@
+ 	if (fstat(fileno(fp),&amp;bf))
+ 	{ errdn(VLOW,&quot;s3d_open_file():fstat()&quot;,errno); return(-1);}
+ 	filesize=bf.st_size;
+-	dprintf(VLOW, &quot;opening %s, filesize is %d&quot;,fname, filesize);
++	s3dprintf(VLOW, &quot;opening %s, filesize is %d&quot;,fname, filesize);
+ 	if ((buf=malloc(filesize))==NULL)
+ 	{
+ 		errn(&quot;s3d_open_3ds_file():malloc()&quot;,errno);
+
+Modified: trunk/libs3d/object_queue.c
+===================================================================
+--- trunk/libs3d/object_queue.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/libs3d/object_queue.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -65,17 +65,17 @@
+ int _queue_new_object(unsigned int oid)
+ {
+ 	int i;
+-/* 	dprintf(LOW,&quot;having a new object (%d) in the queue!!&quot;,oid); */
++/* 	s3dprintf(LOW,&quot;having a new object (%d) in the queue!!&quot;,oid); */
+ 	for (i=0;i&lt;queue_size;i++)
+ 		if (queue[i]==Q_UNUSED)
+ 		{
+-/* 			dprintf(LOW,&quot;placing it at position %d&quot;,i); */
++/* 			s3dprintf(LOW,&quot;placing it at position %d&quot;,i); */
+ 			queue[i]=oid;
+ 			return(0);
+ 		}
+ 	if (queue_size==0) return(-1);  /*  already quit. */
+ 	 /*  if we reach here, all slots all taken.  */
+-/* 	dprintf(LOW,&quot;no place for object, resizing stack.&quot;,i); */
++/* 	s3dprintf(LOW,&quot;no place for object, resizing stack.&quot;,i); */
+ 	queue=realloc(queue,sizeof(unsigned int)*(queue_size+1));
+ 	queue_size+=1;
+ 	queue[queue_size-1]=oid;
+
+Modified: trunk/libs3d/proto_in.c
+===================================================================
+--- trunk/libs3d/proto_in.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/libs3d/proto_in.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -39,10 +39,10 @@
+ 	switch (opcode)
+ 	{
+ 		case S3D_P_S_INIT:
+-			dprintf(MED,&quot;S3D_P_S_INIT: init!!&quot;);
++			s3dprintf(MED,&quot;S3D_P_S_INIT: init!!&quot;);
+ 			break;
+ 		case S3D_P_S_QUIT:
+-			dprintf(MED,&quot;S3D_P_S_QUIT: server wants us to go. well ...&quot;);
++			s3dprintf(MED,&quot;S3D_P_S_QUIT: server wants us to go. well ...&quot;);
+ 			s3d_quit();
+ 			break;	
+ 		case S3D_P_S_CLICK:
+@@ -56,7 +56,7 @@
+ 					s3devt-&gt;length=4;
+ 					s3devt-&gt;buf=buf;
+ 				}
+-				dprintf(MED,&quot;S3D_P_S_CLICK: %d got clicked ....&quot;,oid);
++				s3dprintf(MED,&quot;S3D_P_S_CLICK: %d got clicked ....&quot;,oid);
+ 			}
+ 			break;
+ 		case S3D_P_S_NEWOBJ:
+@@ -70,7 +70,7 @@
+ 					s3devt-&gt;length=4;
+ 					s3devt-&gt;buf=buf;
+ 				}
+-				dprintf(VLOW,&quot;S3D_P_S_NEWOBJ: new object %d&quot;,oid);
++				s3dprintf(VLOW,&quot;S3D_P_S_NEWOBJ: new object %d&quot;,oid);
+ 			}
+ 			break;
+ 		case S3D_P_S_KEY:
+@@ -88,7 +88,7 @@
+ 					s3devt-&gt;buf=buf;
+ 					s3devt-&gt;event=(keyevent-&gt;state==0)?S3D_EVENT_KEYDOWN:S3D_EVENT_KEYUP;
+ 				}
+-				dprintf(VLOW,&quot;S3D_P_S_KEY: key %d hit!!&quot;,*((uint16_t *)s3devt-&gt;buf));
++				s3dprintf(VLOW,&quot;S3D_P_S_KEY: key %d hit!!&quot;,*((uint16_t *)s3devt-&gt;buf));
+ 			}
+ 			break;
+ 		case S3D_P_S_MBUTTON:
+@@ -100,7 +100,7 @@
+ 					s3devt-&gt;length=2;
+ 					s3devt-&gt;buf=buf;
+ 				}
+-				dprintf(VLOW,&quot;S3D_P_S_MBUTTON: mbutton %d, state %d !!&quot;,*((uint8_t *)s3devt-&gt;buf), *(1+(uint8_t *)s3devt-&gt;buf));
++				s3dprintf(VLOW,&quot;S3D_P_S_MBUTTON: mbutton %d, state %d !!&quot;,*((uint8_t *)s3devt-&gt;buf), *(1+(uint8_t *)s3devt-&gt;buf));
+ 			}
+ 			break;
+ 		case S3D_P_MCP_OBJECT:
+@@ -118,10 +118,10 @@
+ 					buf[length-1]='\0';  /*  put a null byte at the end  */
+ 										 /*  for the not so careful users */
+ 					s3devt-&gt;buf=buf;
+-					dprintf(VLOW,&quot;S3D_P_MCP_OBEJCT: something is happening to object %d, name %s&quot;, 	mo-&gt;object, mo-&gt;name);
++					s3dprintf(VLOW,&quot;S3D_P_MCP_OBEJCT: something is happening to object %d, name %s&quot;, 	mo-&gt;object, mo-&gt;name);
+ 
+ 				}
+-			} else dprintf(MED,&quot;wrong length for S3D_P_MCP_OBJECT length %d != %d&quot;,length,sizeof(struct mcp_object));
++			} else s3dprintf(MED,&quot;wrong length for S3D_P_MCP_OBJECT length %d != %d&quot;,length,sizeof(struct mcp_object));
+ 			break;
+ 		case S3D_P_S_OINFO:
+ 			if (length==sizeof(struct s3d_obj_info))
+@@ -139,13 +139,13 @@
+ 					buf[length-1]='\0';  /*  put a null byte at the end  */
+ 										 /*  for the not so careful users */
+ 					s3devt-&gt;buf=buf;
+-					dprintf(VLOW,&quot;S3D_P_S_OINFO: something is happening to object %d, name %s&quot;, 
++					s3dprintf(VLOW,&quot;S3D_P_S_OINFO: something is happening to object %d, name %s&quot;, 
+ 								oi-&gt;object,
+ 								oi-&gt;name
+ 								);
+ 
+ 				}
+-			} else dprintf(MED,&quot;wrong length for S3D_P_S_OINFO length %d != %d&quot;,length,sizeof(struct s3d_obj_info));
++			} else s3dprintf(MED,&quot;wrong length for S3D_P_S_OINFO length %d != %d&quot;,length,sizeof(struct s3d_obj_info));
+ 			break;
+ 
+ 		case S3D_P_MCP_DEL_OBJECT:
+@@ -156,13 +156,13 @@
+ 					s3devt-&gt;event=S3D_MCP_DEL_OBJECT;
+ 					s3devt-&gt;length=length;
+ 					*((uint32_t *)buf)=ntohl(*((uint32_t *)buf));  /*  revert oid */
+-					dprintf(MED,&quot;S3D_P_MCP_DEL_OBEJCT: deleting object %d&quot;,*((uint32_t *)buf));
++					s3dprintf(MED,&quot;S3D_P_MCP_DEL_OBEJCT: deleting object %d&quot;,*((uint32_t *)buf));
+ 					s3devt-&gt;buf=buf;
+ 				}
+ 			}
+ 			break;
+ 		default:
+-			dprintf(MED,&quot;don't know command %d&quot;,opcode);
++			s3dprintf(MED,&quot;don't know command %d&quot;,opcode);
+ 			if (buf!=NULL) free(buf);
+ 	}
+ 	if (s3devt!=NULL)
+
+Modified: trunk/libs3d/proto_out.c
+===================================================================
+--- trunk/libs3d/proto_out.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/libs3d/proto_out.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -58,7 +58,7 @@
+ 	buf[0]=htonl(oid);
+ 	buf[1]=htonl(toid);
+ 	net_send(S3D_P_C_CLONE,(char *)&amp;buf,8);
+-/* 	dprintf(MED,&quot;... changed clone-target of object %d to %d&quot;, oid, toid); */
++/* 	s3dprintf(MED,&quot;... changed clone-target of object %d to %d&quot;, oid, toid); */
+ 	return oid;
+ }
+ /*  deletes an object */
+@@ -140,7 +140,7 @@
+ 	char				buf[4+4*12];
+ 	char				*ptr;
+ 	int					len=4+4*12;
+-/* 	dprintf(LOW, &quot;adding a new material...&quot;); */
++/* 	s3dprintf(LOW, &quot;adding a new material...&quot;); */
+ 	ptr=buf;
+ 	*((uint32_t *)ptr)=htonl(object);	ptr+=sizeof(uint32_t);		  /*  object id */
+ 	*((float *)ptr)=amb_r;				ptr+=sizeof(float);
+@@ -169,7 +169,7 @@
+ 	char				buf[4+4*12];
+ 	char				*ptr;
+ 	int					len=4+4*12;
+-/* 	dprintf(LOW, &quot;adding a new material...&quot;); */
++/* 	s3dprintf(LOW, &quot;adding a new material...&quot;); */
+ 	ptr=buf;
+ 	*((uint32_t *)ptr)=htonl(object);	ptr+=sizeof(uint32_t);		  /*  object id */
+ 	*((float *)ptr)=amb_r;				ptr+=sizeof(float);
+@@ -398,7 +398,7 @@
+ 	char				buf[4+4*12];
+ 	char				*ptr;
+ 	int					len=4+4*12;
+-/* 	dprintf(LOW, &quot;adding a new material...&quot;); */
++/* 	s3dprintf(LOW, &quot;adding a new material...&quot;); */
+ 	ptr=buf;
+ 	*((uint32_t *)ptr)=htonl(object);	ptr+=sizeof(uint32_t);		  /*  object id */
+ 	*((float *)ptr)=amb_r;				ptr+=sizeof(float);
+@@ -427,7 +427,7 @@
+ 	char				buf[4+4*12];
+ 	char				*ptr;
+ 	int					len=4+4*12;
+-/* 	dprintf(LOW, &quot;adding a new material...&quot;); */
++/* 	s3dprintf(LOW, &quot;adding a new material...&quot;); */
+ 	ptr=buf;
+ 	*((uint32_t *)ptr)=htonl(object);	ptr+=sizeof(uint32_t);		  /*  object id */
+ 	*((float *)ptr)=amb_r;				ptr+=sizeof(float);
+@@ -727,7 +727,7 @@
+ 	char				buf[4+1+4],*ptr;
+ 	int					len=4+1+4;
+ 	ptr=buf;
+-/* 	dprintf(VLOW, &quot;toggling flags on .. %010x&quot;, flags); */
++/* 	s3dprintf(VLOW, &quot;toggling flags on .. %010x&quot;, flags); */
+ 	*((uint32_t *)ptr)=htonl(object);			ptr+=4;
+ 	*ptr=OF_TURN_ON;							ptr+=1;
+ 	*((uint32_t *)ptr)=htonl(flags);			ptr+=4;		
+@@ -739,7 +739,7 @@
+ 	char				buf[4+1+4],*ptr;
+ 	int					len=4+1+4;
+ 	ptr=buf;
+-/* 	dprintf(VLOW, &quot;toggling flags off .. %010x&quot;, flags); */
++/* 	s3dprintf(VLOW, &quot;toggling flags off .. %010x&quot;, flags); */
+ 	*((uint32_t *)ptr)=htonl(object);			ptr+=4;
+ 	*ptr=OF_TURN_OFF;							ptr+=1;
+ 	*((uint32_t *)ptr)=htonl(flags);			ptr+=4;		 
+@@ -751,7 +751,7 @@
+ 	char				buf[4+4*3],*ptr;
+ 	int					len=4+4*3;
+ 	ptr=buf;
+-/* 	dprintf(VLOW, &quot;translating object to  .. %f, %f, %f&quot;, x,y,z); */
++/* 	s3dprintf(VLOW, &quot;translating object to  .. %f, %f, %f&quot;, x,y,z); */
+ 	*((uint32_t *)ptr)=htonl(object);			ptr+=4;
+ 	*((float *)ptr)=x;							ptr+=4;
+ 	*((float *)ptr)=y;							ptr+=4;
+@@ -766,7 +766,7 @@
+ 	char				buf[4+4*3],*ptr;
+ 	int					len=4+4*3;
+ 	ptr=buf;
+-/* 	dprintf(VLOW, &quot;rotating object to  .. %f, %f, %f&quot;, x,y,z); */
++/* 	s3dprintf(VLOW, &quot;rotating object to  .. %f, %f, %f&quot;, x,y,z); */
+ 	*((uint32_t *)ptr)=htonl(object);			ptr+=4;
+ 	*((float *)ptr)=x;							ptr+=4;
+ 	*((float *)ptr)=y;							ptr+=4;
+
+Modified: trunk/libs3d/s3dlib.h
+===================================================================
+--- trunk/libs3d/s3dlib.h	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/libs3d/s3dlib.h	2006-06-04 20:27:36 UTC (rev 330)
+@@ -51,7 +51,7 @@
+ /*  some local prototypes: */
+ /*  char *s3d_open_file(char *fname); */
+ int net_prot_in(uint8_t opcode, uint16_t length, char *buf);
+-void dprintf(int relevance, const char *fmt, ...);
++void s3dprintf(int relevance, const char *fmt, ...);
+ void errn(char *func,int en);
+ void errs(char *func, char *msg);
+ void errdn(int relevance, char *func,int en); 
+@@ -109,7 +109,7 @@
+ 
+ #include &quot;config.h&quot;
+ #ifndef DEBUG
+-#define dprintf(...) /* nothing */
++#define s3dprintf(...) /* nothing */
+ #define errdn(...) /* nothing */
+ #define errds(...) /* nothing */
+ #endif
+
+Modified: trunk/libs3d/shm.c
+===================================================================
+--- trunk/libs3d/shm.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/libs3d/shm.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -50,13 +50,13 @@
+ /*	struct shmid_ds *buf; */
+ 	key_t key,key_out,key_in;
+ 	
+-	dprintf(MED,&quot;connecting to shm token %s&quot;,ftoken);
++	s3dprintf(MED,&quot;connecting to shm token %s&quot;,ftoken);
+ 	/* make the key: */
+ 	if ((key = ftok(ftoken, 'R')) == -1) {
+ 		errn(&quot;shm_init():ftok()&quot;,errno);
+ 		return(1);
+ 	}
+-	dprintf(MED,&quot;init key is 0x%08x&quot;,key);
++	s3dprintf(MED,&quot;init key is 0x%08x&quot;,key);
+ 	
+ 	/* connect to the segment: */
+ 	if ((shmid = shmget(key, SHM_SIZE, 0644 )) == -1) {
+@@ -70,10 +70,10 @@
+ 		errn(&quot;shm_init():shmat()&quot;,errno);
+ 		return(1);
+ 	}
+-	dprintf(MED,&quot;right now, next_keys are: %08x, %08x&quot;,next_key[0],next_key[1]);
++	s3dprintf(MED,&quot;right now, next_keys are: %08x, %08x&quot;,next_key[0],next_key[1]);
+ 	while ((0==(key_in=next_key[1])) || (0==(key_out=next_key[0])));
+ 	next_key[0]=next_key[1]=0;
+-	dprintf(MED,&quot;right now, next_keys are: %08x, %08x&quot;,key_in,key_out);
++	s3dprintf(MED,&quot;right now, next_keys are: %08x, %08x&quot;,key_in,key_out);
+ 	/* as we have the new key, we  can detach here now. */
+ 	if (shmdt(next_key) == -1) { 
+ 		errn(&quot;shm_init():shmdt()&quot;,errno);
+@@ -130,7 +130,7 @@
+ 		str += no_written;
+ 		if (wait++&gt;SHM_MAXLOOP) 
+ 		{
+-			dprintf(HIGH,&quot;shm_writen():waited too long ...&quot;);
++			s3dprintf(HIGH,&quot;shm_writen():waited too long ...&quot;);
+ 			return(-1);
+ 		}
+ 		if (wait&gt;10)
+@@ -153,7 +153,7 @@
+ 		str += no_read;
+ 		if (wait++&gt;SHM_MAXLOOP) 
+ 		{
+-			dprintf(HIGH,&quot;shm_readn():waited too long ...&quot;);
++			s3dprintf(HIGH,&quot;shm_readn():waited too long ...&quot;);
+ 			return(-1);
+ 		}
+ 		if (wait&gt;10)
+@@ -181,7 +181,7 @@
+ 			net_prot_in(opcode,length,buf);
+ 			found=1;
+ 		} else {
+-			dprintf(HIGH,&quot;socket seems to be dead ...&quot;);
++			s3dprintf(HIGH,&quot;socket seems to be dead ...&quot;);
+ 			s3d_quit();
+ 		}
+ 	} else {
+@@ -190,7 +190,7 @@
+ 			shmctl(shmid_in,IPC_STAT,&amp;d);
+ 			if (d.shm_nattch==1) /* we're all alone ... remove it!! */
+ 			{
+-				dprintf(MED,&quot;server vanished ... &quot;);
++				s3dprintf(MED,&quot;server vanished ... &quot;);
+ 				s3d_quit();
+ 			} else 
+ 				shm_idle=0;
+
+Modified: trunk/libs3d/shm_ringbuf.c
+===================================================================
+--- trunk/libs3d/shm_ringbuf.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/libs3d/shm_ringbuf.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -45,7 +45,7 @@
+ 	{
+ 		if /*((size*2)&gt;RB_MAX_SIZE)*/ (1)
+ 		{
+-	/*		dprintf(MED,&quot;buffer reached maxsize, no resizing possible&quot;);*/
++	/*		s3dprintf(MED,&quot;buffer reached maxsize, no resizing possible&quot;);*/
+ 			return(0);
+ 		}
+ /*		printf(&quot;buffer full!! resizing ... (to size %d)&quot;,(int)size*2);
+
+Modified: trunk/libs3d/tcp.c
+===================================================================
+--- trunk/libs3d/tcp.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/libs3d/tcp.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -88,14 +88,14 @@
+ 		errn(&quot;_tcp_init():signal()&quot;,errno);
+ #endif
+ 	s3d_socket=sd;
+-	dprintf(MED,&quot;connection to %s:%d established&quot;, sv, pn);
++	s3dprintf(MED,&quot;connection to %s:%d established&quot;, sv, pn);
+ 	return(0);
+ }
+ int _tcp_quit()
+ {
+ 	if (s3d_socket)
+ 	{
+-		dprintf(MED,&quot;closing socket %d&quot;,s3d_socket);
++		s3dprintf(MED,&quot;closing socket %d&quot;,s3d_socket);
+ 		close(s3d_socket);
+ 		s3d_socket=0;
+ 	}
+@@ -139,7 +139,7 @@
+ 		tv.tv_sec=tv.tv_usec=0;
+ 		FD_SET(s3d_socket,&amp;fs_proc);
+ 	
+-		 /* dprintf(LOW,&quot;Added %d procceses into file descriptor ...&quot;, n); */
++		 /* s3dprintf(LOW,&quot;Added %d procceses into file descriptor ...&quot;, n); */
+ 		if (select(FD_SETSIZE, &amp;fs_proc, NULL,NULL,&amp;tv) ==-1) 
+ 		{
+ 			errn(&quot;select()&quot;,errno); 
+@@ -156,7 +156,7 @@
+ 					net_prot_in(opcode,length,buf);
+ 					found=1;
+ 				} else {
+-					dprintf(HIGH,&quot;socket seems to be dead ...&quot;);
++					s3dprintf(HIGH,&quot;socket seems to be dead ...&quot;);
+ 					s3d_quit();
+ 				}
+ 			}
+
+Modified: trunk/libs3dw/animate.c
+===================================================================
+--- trunk/libs3dw/animate.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/libs3dw/animate.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -64,7 +64,7 @@
+ 		ani_n--;
+ 		ani_s[i]=ani_s[ani_n]; /* that should also work if i is the last one */
+ 	} else {
+-		dprintf(MED,&quot;[F]ATAL: can't delete animation!\n&quot;);
++		s3dprintf(MED,&quot;[F]ATAL: can't delete animation!\n&quot;);
+ 	}
+ }
+ /* well ... */
+
+Modified: trunk/libs3dw/input.c
+===================================================================
+--- trunk/libs3dw/input.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/libs3dw/input.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -172,7 +172,7 @@
+ 	char *newtext;
+ 	char key=keys-&gt;unicode; /* unicode support so far ... :/ */
+ 	int len;
+-	dprintf(MED,&quot;edit field got key %d!!&quot;,key);
++	s3dprintf(MED,&quot;edit field got key %d!!&quot;,key);
+ 	switch (keys-&gt;keysym)
+ 	{
+ 		case S3DK_BACKSPACE:
+
+Modified: trunk/libs3dw/s3dw_int.h
+===================================================================
+--- trunk/libs3dw/s3dw_int.h	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/libs3dw/s3dw_int.h	2006-06-04 20:27:36 UTC (rev 330)
+@@ -21,7 +21,7 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
+-#include &lt;s3dlib.h&gt; /* dprintf() */
++#include &lt;s3dlib.h&gt; /* s3dprintf() */
+ #define MAXANI		128
+ #define ZOOMS		5
+ /* constructor and handler callbacks */
+
+Modified: trunk/libs3dw/surface.c
+===================================================================
+--- trunk/libs3dw/surface.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/libs3dw/surface.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -64,7 +64,7 @@
+ 	surface-&gt;oid_title=s3d_draw_string(surface-&gt;title,&amp;length);
+ 	while (length &gt; (widget-&gt;width+1))
+ 	{
+-		dprintf(HIGH,&quot;%f &gt; %f&quot;,length,widget-&gt;width+1);
++		s3dprintf(HIGH,&quot;%f &gt; %f&quot;,length,widget-&gt;width+1);
+ 		textlen=strlen(surface-&gt;title);
+ 		if (length&gt;((widget-&gt;width+1)*1.3))
+ 			textlen=textlen*((widget-&gt;width+1)*1.1/length);
+@@ -177,13 +177,13 @@
+ 	if (widget-&gt;oid==oid)
+ 	{
+ 		s3dw_focus(widget);
+-		dprintf(MED,&quot;body %s clicked&quot;,surface-&gt;title);
++		s3dprintf(MED,&quot;body %s clicked&quot;,surface-&gt;title);
+ 		return(1);
+ 	}
+ 	if ((surface-&gt;oid_tbar==oid) || (surface-&gt;oid_title==oid))
+ 	{
+ 		s3dw_focus(widget);
+-		dprintf(MED,&quot;title %s clicked&quot;,surface-&gt;title);
++		s3dprintf(MED,&quot;title %s clicked&quot;,surface-&gt;title);
+ 		return(1);
+ 	}
+ 	return(0);
+
+Modified: trunk/server/config.h
+===================================================================
+--- trunk/server/config.h	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/config.h	2006-06-04 20:27:36 UTC (rev 330)
+@@ -43,7 +43,7 @@
+ #define DEBUG	LOW
+ #ifndef DEBUG
+ #define errds(...) /* nothing */
+-#define dprintf(...) /* nothing */
++#define s3dprintf(...) /* nothing */
+ #endif
+ 
+ 
+
+Modified: trunk/server/cull.c
+===================================================================
+--- trunk/server/cull.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/cull.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -114,7 +114,7 @@
+ 		p=&amp;frustumPlane[i];
+ 		if (p-&gt;n.x*center-&gt;x+p-&gt;n.y*center-&gt;y+p-&gt;n.z*center-&gt;z+p-&gt;d &lt;= -radius)
+ 		{
+-/*			dprintf(MED,&quot;out of %d plane (n %f %f %f |d %f)&quot;,i,p-&gt;n.x,p-&gt;n.y,p-&gt;n.z,p-&gt;d);*/
++/*			s3dprintf(MED,&quot;out of %d plane (n %f %f %f |d %f)&quot;,i,p-&gt;n.x,p-&gt;n.y,p-&gt;n.z,p-&gt;d);*/
+ 			 return 0; /* sorry, no ... */
+ 		}
+ 	}
+
+Modified: trunk/server/error.c
+===================================================================
+--- trunk/server/error.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/error.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -67,7 +67,7 @@
+ }
+ /*  printing debug message */
+ 
+-void dprintf(int relevance, const char *fmt, ...) {
++void s3dprintf(int relevance, const char *fmt, ...) {
+ 	char dbm[DBM_MAX];
+ 	va_list args;
+ 	if (relevance &gt;= DEBUG )
+
+Modified: trunk/server/event.c
+===================================================================
+--- trunk/server/event.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/event.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -38,7 +38,7 @@
+ int event_obj_click(struct t_process *p, uint32_t oid)
+ {
+ 	uint32_t moid=htonl(oid);
+-	dprintf(MED,&quot;telling client that oid %d got clicked&quot;,oid);
++	s3dprintf(MED,&quot;telling client that oid %d got clicked&quot;,oid);
+ 	prot_com_out(p,S3D_P_S_CLICK,(uint8_t *)&amp;moid, 4);
+ 	return(0);
+ }
+@@ -84,7 +84,7 @@
+ int event_quit(struct t_process *p)
+ {
+ 	prot_com_out(p, S3D_P_S_QUIT, NULL,0);
+-	dprintf(HIGH,&quot;sending pid %d QUIT signal&quot;,p-&gt;id); 
++	s3dprintf(HIGH,&quot;sending pid %d QUIT signal&quot;,p-&gt;id); 
+ 	process_del(p-&gt;id);
+ 	return(0);
+ }
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/global.h	2006-06-04 20:27:36 UTC (rev 330)
+@@ -267,7 +267,7 @@
+ void errsf(char *func, char *msg);
+ #ifdef DEBUG
+ void errds(int relevance,char *func, const char *fmt, ...);
+-void dprintf(int relevance, const char *msg, ...);
++void s3dprintf(int relevance, const char *msg, ...);
+ #endif
+ /*  graphics.c */
+ int graphics_quit(void);
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/graphics.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -149,7 +149,7 @@
+ 					k=cull_sphere_in_frustum(&amp;x,ap-&gt;object[j]-&gt;r * sqrt(y.x*y.x + y.y*y.y + y.z*y.z));
+ 					if (k)
+ 					{
+-/*						dprintf(HIGH,&quot;object %d is in %s frustum&quot;,j,k?&quot;&quot;:&quot;not&quot;);*/
++/*						s3dprintf(HIGH,&quot;object %d is in %s frustum&quot;,j,k?&quot;&quot;:&quot;not&quot;);*/
+ 						if (select_mode==1)
+ 							glPushName(j);
+ 						obj_render(ap,j);
+@@ -193,19 +193,19 @@
+ 						y.z-=x.z;
+ 
+ 						k=cull_sphere_in_frustum(&amp;x,o-&gt;r * sqrt(y.x*y.x + y.y*y.y + y.z*y.z));
+-						dprintf(VLOW,&quot;mcp-object %d is in %s frustum&quot;,i,k?&quot;&quot;:&quot;not&quot;);
++						s3dprintf(VLOW,&quot;mcp-object %d is in %s frustum&quot;,i,k?&quot;&quot;:&quot;not&quot;);
+ 						if (k)
+ 							{
+ 							if (select_mode==1)
+ 							{
+-								dprintf(VLOW,&quot;object %d in culling frustrum!&quot;,i);
++								s3dprintf(VLOW,&quot;object %d in culling frustrum!&quot;,i);
+ 								glLoadName(i);
+ 							}
+ 							render_virtual_object(o);
+ 						} else {
+ 							if (select_mode==1)
+ 							{
+-								dprintf(VLOW,&quot;object %d not in culling frustrum!&quot;,i);
++								s3dprintf(VLOW,&quot;object %d not in culling frustrum!&quot;,i);
+ 							}
+ 						}
+ 					}
+@@ -222,7 +222,7 @@
+ 					{
+ 						if (select_mode==1)
+ 						{
+-							dprintf(VLOW,&quot;mcp object no. %d&quot;,i);
++							s3dprintf(VLOW,&quot;mcp object no. %d&quot;,i);
+ 							glLoadName(-1);
+ 							glPushName(i);
+ 						}
+@@ -288,7 +288,7 @@
+ 	if (hits&gt;0)
+ 	{
+ 		big=INFINITY;
+-		dprintf(LOW,&quot;had %d hits&quot;,hits);
++		s3dprintf(LOW,&quot;had %d hits&quot;,hits);
+ 		ptr=select_buf;
+ 		mcp_o=o=names=-1;
+ 		/* check all the hits, only select the nearest ... */
+@@ -313,18 +313,18 @@
+ 			} else 
+ 				for (j=0;j&lt;names;j++)
+ 					ptr++;
+-		    dprintf(VLOW,&quot;[HIT %d] names %d [z1:%f|z2:%f] mcp_o=%d, o=%d &quot;,i,names, z1, z2, mcp_o, o);
++		    s3dprintf(VLOW,&quot;[HIT %d] names %d [z1:%f|z2:%f] mcp_o=%d, o=%d &quot;,i,names, z1, z2, mcp_o, o);
+ 		}
+-		dprintf(VLOW,&quot;mcp_o= %d, o= %d&quot;,mcp_o,o);
++		s3dprintf(VLOW,&quot;mcp_o= %d, o= %d&quot;,mcp_o,o);
+ 		ptr=select_buf;
+ 		if (mcp_o==-1) /* it's an mcp object */
+ 		{
+-			dprintf(LOW,&quot;clicked on mcp-object no. %d&quot;,o);
++			s3dprintf(LOW,&quot;clicked on mcp-object no. %d&quot;,o);
+ 			event_obj_click(p,o);
+ 		} else 
+ 		if ((names&gt;1) &amp;&amp; ((mcp_o&gt;=0)&amp;&amp;(mcp_o&lt;p-&gt;n_obj)))
+ 		{ /* it's an usual object */
+-			dprintf(LOW,&quot;clicked on mcp-object %d, object %d&quot;,mcp_o,o);
++			s3dprintf(LOW,&quot;clicked on mcp-object %d, object %d&quot;,mcp_o,o);
+ 			if (p-&gt;object[mcp_o]!=NULL)  /*  that shouldn't happen anyways ... */
+ 			{
+ 				obj_debug(get_proc_by_pid(p-&gt;object[mcp_o]-&gt;n_mat),o); 
+
+Modified: trunk/server/graphics_glut.c
+===================================================================
+--- trunk/server/graphics_glut.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/graphics_glut.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -35,14 +35,14 @@
+ 	/* XXX: Faking argc and argv is probably not a good idea. */
+ 	int argc=1;
+ 	char *argv[]={&quot;s3d&quot;, NULL};
+-	dprintf(MED,&quot;Using GLUT for GL/windowing ...&quot;);
++	s3dprintf(MED,&quot;Using GLUT for GL/windowing ...&quot;);
+  	glutInit(&amp;argc, argv); 
+ 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGBA);
+ 	glutInitWindowSize (X_RES, Y_RES);
+ 	glutCreateWindow(&quot;grmbl&quot;);
+     glutIdleFunc(one_time);
+ 	if (0!=(atexit(quit)))
+-		dprintf(MED,&quot;Error in setting Exit function ...&quot;);
++		s3dprintf(MED,&quot;Error in setting Exit function ...&quot;);
+ 	glutDisplayFunc(graphics_main);
+ 	glutReshapeFunc(graphics_reshape);
+ 	return(0);
+
+Modified: trunk/server/graphics_sdl.c
+===================================================================
+--- trunk/server/graphics_sdl.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/graphics_sdl.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -32,7 +32,7 @@
+     SDL_Surface *GLwin = NULL;
+     SDL_VideoInfo *VideoInfo;
+     int rgb_size[3]; 				 /*  for SDL_GL attributes */
+-	dprintf(MED,&quot;Using SDL driver ...&quot;);
++	s3dprintf(MED,&quot;Using SDL driver ...&quot;);
+ 	
+     SDLFlags = SDL_OPENGL | SDL_GL_DOUBLEBUFFER | SDL_HWPALETTE | SDL_RESIZABLE;
+     if (SDL_Init(SDL_INIT_VIDEO) &lt; 0)  		
+@@ -41,12 +41,12 @@
+ 			errs(&quot;SDL_GetVIdeoInfo()&quot;,SDL_GetError());
+     if(VideoInfo -&gt; hw_available) 
+ 	{
+-		dprintf(LOW,&quot;detected HW_SURFACE&quot;);
++		s3dprintf(LOW,&quot;detected HW_SURFACE&quot;);
+ 		SDLFlags |= SDL_HWSURFACE;
+ 	}
+ 	else
+ 	{
+-		dprintf(LOW,&quot;detected SW_SURFACE&quot;);
++		s3dprintf(LOW,&quot;detected SW_SURFACE&quot;);
+ 		SDLFlags |= SDL_SWSURFACE;
+ 	}
+     if(VideoInfo -&gt; blit_hw)  	
+@@ -77,11 +77,11 @@
+ 	}
+ 
+ 	 /*  print some information */
+-	dprintf(VLOW,&quot;Screen BPP: %d&quot;, SDL_GetVideoSurface()-&gt;format-&gt;BitsPerPixel);
+-	dprintf(VLOW,&quot;Vendor     : %s&quot;, glGetString( GL_VENDOR ) );
+-	dprintf(VLOW,&quot;Renderer   : %s&quot;, glGetString( GL_RENDERER ) );
+-	dprintf(VLOW,&quot;Version    : %s&quot;, glGetString( GL_VERSION ) );
+-	dprintf(VLOW,&quot;Extensions : %s&quot;, glGetString( GL_EXTENSIONS ) );
++	s3dprintf(VLOW,&quot;Screen BPP: %d&quot;, SDL_GetVideoSurface()-&gt;format-&gt;BitsPerPixel);
++	s3dprintf(VLOW,&quot;Vendor     : %s&quot;, glGetString( GL_VENDOR ) );
++	s3dprintf(VLOW,&quot;Renderer   : %s&quot;, glGetString( GL_RENDERER ) );
++	s3dprintf(VLOW,&quot;Version    : %s&quot;, glGetString( GL_VERSION ) );
++	s3dprintf(VLOW,&quot;Extensions : %s&quot;, glGetString( GL_EXTENSIONS ) );
+ 	
+ 	graphics_reshape(X_RES,Y_RES);
+ 	return(0);
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/main.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -51,7 +51,7 @@
+ /*  handles the SIGINT command. maybe put signals in a special file? */
+ void sigint_handler(int sig)
+ {
+-	dprintf(HIGH,&quot;oh my gosh there is a sigint/term signal! running away ...&quot;);
++	s3dprintf(HIGH,&quot;oh my gosh there is a sigint/term signal! running away ...&quot;);
+ 	quit();
+ }
+ void sigchld_handler(int sig)
+@@ -59,7 +59,7 @@
+ 	if (kidpid!=0)
+ 	{
+ 		kidpid=0;
+-	    dprintf(HIGH,&quot;how cruel, my kid died!!&quot;);
++	    s3dprintf(HIGH,&quot;how cruel, my kid died!!&quot;);
+ 		quit();
+ 	}
+ }
+@@ -81,17 +81,17 @@
+ 	{
+ 		nanosleep(&amp;t,NULL); 	/* giving the father lots of time to set his signal handler
+ 					 			 * and all his sockets up */
+-		dprintf(VHIGH,&quot;hello, i'm the kid and will start the rc file now!&quot;);
++		s3dprintf(VHIGH,&quot;hello, i'm the kid and will start the rc file now!&quot;);
+ 		for (i=0;i&lt;(sizeof(s3drc)/sizeof(char **));i++)
+ 		{
+ 			if ((*s3drc[i])!=NULL)
+ 			{
+-				dprintf(LOW,&quot;[RC] launching %s&quot;,*s3drc[i]);
++				s3dprintf(LOW,&quot;[RC] launching %s&quot;,*s3drc[i]);
+ 				ret=system(*s3drc[i]);
+-				dprintf(LOW,&quot;[RC] system() said %d&quot;,ret);
++				s3dprintf(LOW,&quot;[RC] system() said %d&quot;,ret);
+ 				if (ret&lt;128) 
+ 				{
+-					dprintf(LOW,&quot;[RC] system() did well, I guess. let's die clean now.&quot;);
++					s3dprintf(LOW,&quot;[RC] system() did well, I guess. let's die clean now.&quot;);
+ 					exit(0);
+ 				}
+ 			} 
+@@ -140,7 +140,7 @@
+ 	if (!norc)
+ 		rc_init();
+ #else
+-	dprintf(VHIGH,&quot;rc-files won't work without signals :(&quot;);
++	s3dprintf(VHIGH,&quot;rc-files won't work without signals :(&quot;);
+ #endif
+ 	if (!frame_mode)  /*  turn default frame_mode on */
+ 	{
+@@ -182,13 +182,13 @@
+ 		process_quit();
+ 		if (kidpid!=0)
+ 		{ /* our kid is most probably still alive. kill it!! */
+-			dprintf(HIGH,&quot;kill all the kids!!&quot;);
++			s3dprintf(HIGH,&quot;kill all the kids!!&quot;);
+ 			kill(kidpid,SIGTERM);
+ 			kidpid=0;
+ 		}
+ 	}
+ 	running=0;
+-	dprintf(VHIGH,&quot;byebye, s3d quitting ...&quot;);
++	s3dprintf(VHIGH,&quot;byebye, s3d quitting ...&quot;);
+ 	exit(0);
+ }
+ /*  processing arguments from the commandline */
+@@ -225,25 +225,25 @@
+ #endif					
+ 					break;
+ 				case 'r':
+-					dprintf(VHIGH,&quot;using rc file: %s&quot;,optarg);
++					s3dprintf(VHIGH,&quot;using rc file: %s&quot;,optarg);
+ 					rc=optarg;
+ 					break;
+ 				case 'n':
+-					dprintf(VHIGH,&quot;Using no rc file!&quot;);
++					s3dprintf(VHIGH,&quot;Using no rc file!&quot;);
+ 					norc=1;
+ 					break;
+ 
+ 				case '?':
+ 				case 'h':
+-					dprintf(VHIGH,&quot;usage: %s [options]&quot;,argv[0]);
+-					dprintf(VHIGH,&quot;s3d, the 3d server:&quot;);
++					s3dprintf(VHIGH,&quot;usage: %s [options]&quot;,argv[0]);
++					s3dprintf(VHIGH,&quot;s3d, the 3d server:&quot;);
+ #ifdef G_GLUT
+-					dprintf(VHIGH,&quot; --use-glut, -g:\tuse GLUT as framework-system&quot;);
++					s3dprintf(VHIGH,&quot; --use-glut, -g:\tuse GLUT as framework-system&quot;);
+ #endif
+ #ifdef G_SDL
+-					dprintf(VHIGH,&quot; --use-sdl, -s:\tuse SDL as framework-system&quot;);
++					s3dprintf(VHIGH,&quot; --use-sdl, -s:\tuse SDL as framework-system&quot;);
+ #endif
+-					dprintf(VHIGH,&quot; --help, -?, -h: this helpful text&quot;);
++					s3dprintf(VHIGH,&quot; --help, -?, -h: this helpful text&quot;);
+ 					errsf(&quot;process_args()&quot;,&quot;exiting for users sake&quot;);
+ 					return(-1);
+ 		}
+
+Modified: trunk/server/matrix.c
+===================================================================
+--- trunk/server/matrix.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/matrix.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -42,10 +42,10 @@
+ #define M(x, y)		MAT[I(x, y)]
+ void mat_debug(t_mtrx S)
+ {
+-	dprintf(MED,&quot;MAT_0: %.2f %.2f %.2f %.2f&quot;,S[I(0,0)],S[I(1,0)],S[I(2,0)],S[I(3,0)]);
+-	dprintf(MED,&quot;MAT_1: %.2f %.2f %.2f %.2f&quot;,S[I(0,1)],S[I(1,1)],S[I(2,1)],S[I(3,1)]);
+-	dprintf(MED,&quot;MAT_2: %.2f %.2f %.2f %.2f&quot;,S[I(0,2)],S[I(1,2)],S[I(2,2)],S[I(3,2)]);
+-	dprintf(MED,&quot;MAT_3: %.2f %.2f %.2f %.2f&quot;,S[I(0,3)],S[I(1,3)],S[I(2,3)],S[I(3,3)]);
++	s3dprintf(MED,&quot;MAT_0: %.2f %.2f %.2f %.2f&quot;,S[I(0,0)],S[I(1,0)],S[I(2,0)],S[I(3,0)]);
++	s3dprintf(MED,&quot;MAT_1: %.2f %.2f %.2f %.2f&quot;,S[I(0,1)],S[I(1,1)],S[I(2,1)],S[I(3,1)]);
++	s3dprintf(MED,&quot;MAT_2: %.2f %.2f %.2f %.2f&quot;,S[I(0,2)],S[I(1,2)],S[I(2,2)],S[I(3,2)]);
++	s3dprintf(MED,&quot;MAT_3: %.2f %.2f %.2f %.2f&quot;,S[I(0,3)],S[I(1,3)],S[I(2,3)],S[I(3,3)]);
+ }
+ void myMultMatrix(t_mtrx mat2)
+ {
+@@ -107,10 +107,10 @@
+ 	memcpy(Mm,MAT,sizeof(t_mtrx));			/* backup matrix */
+ 	memcpy(Pm,Identity,sizeof(t_mtrx));		/* target */
+ 
+-/*	dprintf(MED,&quot;start:&quot;);
++/*	s3dprintf(MED,&quot;start:&quot;);
+ 	mat_debug(MAT);*/
+ 
+-/*	dprintf(LOW,&quot;inverting matrix, we shall begin now ...&quot;);*/
++/*	s3dprintf(LOW,&quot;inverting matrix, we shall begin now ...&quot;);*/
+ 
+ 	/* step 1 */
+ 	for (l=0;l&lt;4;l++)
+@@ -118,7 +118,7 @@
+ check:	if (M(l,l)*M(l,l)&gt;0.00000001F) /* it won't work with real zero */
+ 		{
+ 			
+-/*			dprintf(MED,&quot;normalizing line %d&quot;,l);*/
++/*			s3dprintf(MED,&quot;normalizing line %d&quot;,l);*/
+ 			/* normalize */
+ 			f=1/M(l,l);
+ 			M(l,l)=1.0;
+@@ -127,12 +127,12 @@
+ 			for (i=0;i&lt;4;i++)
+ 				P(i,l)*=f; /* ... and the right */
+ /*			mat_debug(Mm);
+-			dprintf(MED,&quot;-&quot;);
++			s3dprintf(MED,&quot;-&quot;);
+ 			mat_debug(Pm);*/
+ 			/* mult/fac */
+ 			for (lh=l+1;lh&lt;4;lh++)
+ 			{
+-			/*	dprintf(MED,&quot;adding line %d for %d&quot;,lh,l);*/
++			/*	s3dprintf(MED,&quot;adding line %d for %d&quot;,lh,l);*/
+ 				if (M(l,lh)!=0) /* &quot;first&quot; element of the line */
+ 				{
+ 					f=-M(l,lh);
+@@ -141,15 +141,15 @@
+ 						M(i,lh)+=f*M(i,l);
+ 					for (i=0;i&lt;4;i++)	/* ... and the right one! */
+ 						P(i,lh)+=f*P(i,l);
+-				} /*else dprintf(MED,&quot;element already zero!&quot;);*/
++				} /*else s3dprintf(MED,&quot;element already zero!&quot;);*/
+ 			}
+ 		} else {
+ 			M(l,l)=0.0F;
+-/*			dprintf(MED,&quot;already zero now check and try to swap lines ...&quot;);*/
++/*			s3dprintf(MED,&quot;already zero now check and try to swap lines ...&quot;);*/
+ 			for (lh=l+1;lh&lt;4;lh++)
+ 				if (M(l,lh)!=0.0)
+ 				{
+-/*					dprintf(MED,&quot;swapping lines %d and %d&quot;,l,lh);*/
++/*					s3dprintf(MED,&quot;swapping lines %d and %d&quot;,l,lh);*/
+ 					for (i=0;i&lt;4;i++)
+ 					{
+ 						f=M(i,l);
+@@ -162,7 +162,7 @@
+ 					}
+ 					goto check;
+ 				}
+-			dprintf(MED,&quot;nothing to swap, can't reverse this matrix! returning ... &quot;);
++			s3dprintf(MED,&quot;nothing to swap, can't reverse this matrix! returning ... &quot;);
+ 			mat_debug(Mm);
+ 			return(-1); /* the dead end!! */
+ 		}
+@@ -177,13 +177,13 @@
+ 	 * */
+ 
+ 	/* step 2 */
+-/*	dprintf(MED,&quot;S.T.E.P. 2!!&quot;);*/
++/*	s3dprintf(MED,&quot;S.T.E.P. 2!!&quot;);*/
+ 	for (l=3;l&gt;0;l--)
+ 	{
+ 		/* mult/fac */
+ 		for (lh=l-1;lh&gt;=0;lh--)
+ 		{
+-/*			dprintf(MED,&quot;adding line %d for %d&quot;,lh,l);*/
++/*			s3dprintf(MED,&quot;adding line %d for %d&quot;,lh,l);*/
+ 			if (M(l,lh)!=0) /* &quot;first&quot; element of the line */
+ 			{
+ 				f=-M(l,lh);
+@@ -199,7 +199,7 @@
+ 		}
+ 	}
+ 	/* now, Mm,is Identity and Pm is result!*/
+-/*	dprintf(MED,&quot;result:&quot;);
++/*	s3dprintf(MED,&quot;result:&quot;);
+ 	mat_debug(Pm);*/
+ 	memcpy(MAT,Pm,sizeof(t_mtrx)); /* copy result */
+ 	return(0);
+
+Modified: trunk/server/mcp.c
+===================================================================
+--- trunk/server/mcp.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/mcp.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -90,7 +90,7 @@
+ 	unsigned long oid=htonl(mcp_oid);
+ 	if (mcp_oid==focus_oid)
+ 	{
+-		dprintf(MED,&quot;lost the focus of mcp-oid %d&quot;,mcp_oid);
++		s3dprintf(MED,&quot;lost the focus of mcp-oid %d&quot;,mcp_oid);
+ 		mcp_focus(-1);
+ 	}
+ 	prot_com_out(get_proc_by_pid(MCP),S3D_P_MCP_DEL_OBJECT,(uint8_t *)&amp;oid,4);
+@@ -103,7 +103,7 @@
+ 	struct t_obj *o;
+ 	focus_oid=-1;
+ 	p=get_proc_by_pid(MCP);
+-	dprintf(MED,&quot;request to focus %d&quot;,oid);
++	s3dprintf(MED,&quot;request to focus %d&quot;,oid);
+ 	if (obj_valid(p,oid,o))
+ 		if (o-&gt;oflags&amp;OF_VIRTUAL)
+ 		{
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/object.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -43,25 +43,25 @@
+ int obj_debug			(struct t_process *p, uint32_t oid)
+ {
+ 	struct t_obj *o;
+-	dprintf(HIGH,&quot;about pid %d/obj %d:&quot;,p-&gt;id,oid);
++	s3dprintf(HIGH,&quot;about pid %d/obj %d:&quot;,p-&gt;id,oid);
+ 	if (obj_valid(p,oid,o))
+ 	{
+-		dprintf(HIGH,&quot;vertices: %d, polygons: %d, materials: %d, textures: %d, flags: %010x&quot;,o-&gt;n_vertex,o-&gt;n_poly, o-&gt;n_mat, o-&gt;n_tex,o-&gt;oflags);
+-		dprintf(HIGH,&quot;linkid %d, displaylist %d&quot;,o-&gt;linkid,o-&gt;dplist);
+-		dprintf(HIGH,&quot;translation: %f %f %f&quot;,o-&gt;translate.x,o-&gt;translate.y,o-&gt;translate.z);
+-		dprintf(HIGH,&quot;rotation: %f %f %f&quot;,o-&gt;rotate.x,o-&gt;rotate.y,o-&gt;rotate.z);
+-		dprintf(HIGH,&quot;scale: %f&quot;,o-&gt;scale);
++		s3dprintf(HIGH,&quot;vertices: %d, polygons: %d, materials: %d, textures: %d, flags: %010x&quot;,o-&gt;n_vertex,o-&gt;n_poly, o-&gt;n_mat, o-&gt;n_tex,o-&gt;oflags);
++		s3dprintf(HIGH,&quot;linkid %d, displaylist %d&quot;,o-&gt;linkid,o-&gt;dplist);
++		s3dprintf(HIGH,&quot;translation: %f %f %f&quot;,o-&gt;translate.x,o-&gt;translate.y,o-&gt;translate.z);
++		s3dprintf(HIGH,&quot;rotation: %f %f %f&quot;,o-&gt;rotate.x,o-&gt;rotate.y,o-&gt;rotate.z);
++		s3dprintf(HIGH,&quot;scale: %f&quot;,o-&gt;scale);
+ 		if (o-&gt;oflags&amp;OF_SYSTEM)
+ 		{
+-			dprintf(HIGH,&quot;it's a system object!!&quot;);
++			s3dprintf(HIGH,&quot;it's a system object!!&quot;);
+ 		}
+ 		else if (o-&gt;oflags&amp;OF_CLONE)
+ 		{
+-			dprintf(HIGH,&quot;it's a clone linking to %d&quot;,o-&gt;n_vertex);
++			s3dprintf(HIGH,&quot;it's a clone linking to %d&quot;,o-&gt;n_vertex);
+ 			obj_debug(p,o-&gt;n_vertex);
+ 		}
+ 	} else {
+-		dprintf(HIGH,&quot;can't get oid %d pid %d&quot;,oid,p-&gt;id);
++		s3dprintf(HIGH,&quot;can't get oid %d pid %d&quot;,oid,p-&gt;id);
+ 	}
+ 	return(0);
+ }
+@@ -89,7 +89,7 @@
+ 		{
+ 			if (obj-&gt;dplist)
+ 			{
+-				dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++				s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 				glDeleteLists(obj-&gt;dplist,1);
+ 				obj-&gt;dplist=0;
+ 			}
+@@ -106,7 +106,7 @@
+ 						(a-&gt;y * a-&gt;y ) +
+ 						(a-&gt;z * a-&gt;z ));
+ 				if (r&gt; obj-&gt;r) obj-&gt;r=r;
+-/*				dprintf(VLOW,&quot;added following vertex[%d]: %f, %f, %f&quot;,i,
++/*				s3dprintf(VLOW,&quot;added following vertex[%d]: %f, %f, %f&quot;,i,
+ 								obj-&gt;p_vertex[m+i].x,
+ 								obj-&gt;p_vertex[m+i].y,
+ 								obj-&gt;p_vertex[m+i].z);*/
+@@ -166,7 +166,7 @@
+ 		{
+ 			if (obj-&gt;dplist)
+ 			{
+-				dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++				s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 				glDeleteLists(obj-&gt;dplist,1);
+ 				obj-&gt;dplist=0;
+ 			}
+@@ -217,7 +217,7 @@
+ 		{
+ 			if (obj-&gt;dplist)
+ 			{
+-				dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++				s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 				glDeleteLists(obj-&gt;dplist,1);
+ 				obj-&gt;dplist=0;
+ 			}
+@@ -264,7 +264,7 @@
+ 		{
+ 			if (obj-&gt;dplist)
+ 			{
+-				dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++				s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 				glDeleteLists(obj-&gt;dplist,1);
+ 				obj-&gt;dplist=0;
+ 			}
+@@ -307,7 +307,7 @@
+ 		{
+ /*			if (obj-&gt;dplist)
+ 			{
+-				dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++				s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 				glDeleteLists(obj-&gt;dplist,1);
+ 				obj-&gt;dplist=0;
+ 			}*/
+@@ -321,7 +321,7 @@
+ 				{
+ 					d=log((double)obj-&gt;p_tex[m+i].tw)/log(2.0);
+ 					hm=pow(2,floor(d));
+-					dprintf(MED,&quot;hm %d, tw %d&quot;,hm,obj-&gt;p_tex[m+i].tw);
++					s3dprintf(MED,&quot;hm %d, tw %d&quot;,hm,obj-&gt;p_tex[m+i].tw);
+ 					if (hm!=obj-&gt;p_tex[m+i].tw) 	{
+ 						obj-&gt;p_tex[m+i].w=hm*2;
+ 						obj-&gt;p_tex[m+i].xs=(float)((double)obj-&gt;p_tex[m+i].tw)/((double)obj-&gt;p_tex[m+i].w);
+@@ -331,7 +331,7 @@
+ 					}
+ 					d=log((double)obj-&gt;p_tex[m+i].th)/log(2.0);
+ 					hm=pow(2,floor(d));
+-					dprintf(MED,&quot;hm %d, th %d&quot;,hm,obj-&gt;p_tex[m+i].th);
++					s3dprintf(MED,&quot;hm %d, th %d&quot;,hm,obj-&gt;p_tex[m+i].th);
+ 					
+ 					if (hm!=obj-&gt;p_tex[m+i].th) 	{
+ 						obj-&gt;p_tex[m+i].h=hm*2;
+@@ -384,11 +384,11 @@
+ 
+ 		if (obj-&gt;dplist)
+ 		{
+-			dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++			s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 			glDeleteLists(obj-&gt;dplist,1);
+ 			obj-&gt;dplist=0;
+ 		}
+-		dprintf(VLOW,&quot;pepping poly's %d to %d&quot;,(m-n),m);
++		s3dprintf(VLOW,&quot;pepping poly's %d to %d&quot;,(m-n),m);
+ 		for (i=(m-n);i&lt;m;i++)
+ 		{
+ 			for (j=0;j&lt;3;j++)
+@@ -434,11 +434,11 @@
+ 
+ 		if (obj-&gt;dplist)
+ 		{
+-			dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++			s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 			glDeleteLists(obj-&gt;dplist,1);
+ 			obj-&gt;dplist=0;
+ 		}
+-		dprintf(VLOW,&quot;pepping line's %d to %d&quot;,(m-n),m);
++		s3dprintf(VLOW,&quot;pepping line's %d to %d&quot;,(m-n),m);
+ 		for (i=(m-n);i&lt;m;i++)
+ 		{
+ 			for (j=0;j&lt;2;j++)
+@@ -486,11 +486,11 @@
+ 
+ 		if (obj-&gt;dplist)
+ 		{
+-			dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++			s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 			glDeleteLists(obj-&gt;dplist,1);
+ 			obj-&gt;dplist=0;
+ 		}
+-		dprintf(VLOW,&quot;pepping poly's %d to %d&quot;,(m-n),m);
++		s3dprintf(VLOW,&quot;pepping poly's %d to %d&quot;,(m-n),m);
+ 		for (i=(m-n);i&lt;m;i++)
+ 		{
+ 			for (j=0;j&lt;3;j++)
+@@ -525,11 +525,11 @@
+ 		}
+ 		if (obj-&gt;dplist)
+ 		{
+-			dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++			s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 			glDeleteLists(obj-&gt;dplist,1);
+ 			obj-&gt;dplist=0;
+ 		}
+-		dprintf(VLOW,&quot;pepping mats %d to %d&quot;,(m-n),m);
++		s3dprintf(VLOW,&quot;pepping mats %d to %d&quot;,(m-n),m);
+ 		for (i=(m-n);i&lt;m;i++)
+ 		{
+ 			obj-&gt;p_mat[i].amb_r=*(px++);
+@@ -571,11 +571,11 @@
+ 		}
+ 		if (obj-&gt;dplist)
+ 		{
+-			dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++			s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 			glDeleteLists(obj-&gt;dplist,1);
+ 			obj-&gt;dplist=0;
+ 		}
+-		dprintf(VLOW,&quot;pepping lines %d to %d&quot;,(m-n),m);
++		s3dprintf(VLOW,&quot;pepping lines %d to %d&quot;,(m-n),m);
+ 		for (i=(m-n);i&lt;m;i++)
+ 		{
+ 			obj-&gt;p_line[i].v[0]=*(px++);
+@@ -615,11 +615,11 @@
+ 		}
+ 		if (obj-&gt;dplist)
+ 		{
+-			dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++			s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 			glDeleteLists(obj-&gt;dplist,1);
+ 			obj-&gt;dplist=0;
+ 		}
+-		dprintf(VLOW,&quot;pepping vertices %d to %d&quot;,(m-n),m-1);
++		s3dprintf(VLOW,&quot;pepping vertices %d to %d&quot;,(m-n),m-1);
+ 		for (i=(m-n);i&lt;m;i++)
+ 		{
+ 			obj-&gt;p_vertex[i].x=*(px++);
+@@ -682,11 +682,11 @@
+ 		}
+ 		if (obj-&gt;dplist)
+ 		{
+-			dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++			s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 			glDeleteLists(obj-&gt;dplist,1);
+ 			obj-&gt;dplist=0;
+ 		}
+-		dprintf(MED,&quot;pepping mats %d to %d&quot;,(m-n),m);
++		s3dprintf(MED,&quot;pepping mats %d to %d&quot;,(m-n),m);
+ 		for (i=(m-n);i&lt;m;i++)
+ 			obj-&gt;p_mat[i].tex=*(px++);
+ 	} else 
+@@ -716,7 +716,7 @@
+ 
+ 		if (obj-&gt;dplist)
+ 		{
+-			dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++			s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 			glDeleteLists(obj-&gt;dplist,1);
+ 			obj-&gt;dplist=0;
+ 		}
+@@ -763,7 +763,7 @@
+ 
+ 		if (obj-&gt;dplist)
+ 		{
+-			dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++			s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 			glDeleteLists(obj-&gt;dplist,1);
+ 			obj-&gt;dplist=0;
+ 		}
+@@ -809,7 +809,7 @@
+ 
+ 		if (obj-&gt;dplist)
+ 		{
+-			dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++			s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 			glDeleteLists(obj-&gt;dplist,1);
+ 			obj-&gt;dplist=0;
+ 		}
+@@ -846,11 +846,11 @@
+ 		}
+ 		if (obj-&gt;dplist)
+ 		{
+-			dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++			s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 			glDeleteLists(obj-&gt;dplist,1);
+ 			obj-&gt;dplist=0;
+ 		}
+-		dprintf(MED,&quot;pepping %d mats, starting at %d&quot;,n,start);
++		s3dprintf(MED,&quot;pepping %d mats, starting at %d&quot;,n,start);
+ 		for (i=start;i&lt;(start+n);i++)
+ 		{
+ 			obj-&gt;p_mat[i].amb_r=*(px++);
+@@ -876,7 +876,7 @@
+ 	GLuint t;
+ 	if ((t=tex-&gt;gl_texnum)!=-1)
+ 	{
+-/* dprintf(MED,&quot;updating texture %d at [%d %d] with a [%d %d] pixbuf&quot;,t,x,y,w,h); */
++/* s3dprintf(MED,&quot;updating texture %d at [%d %d] with a [%d %d] pixbuf&quot;,t,x,y,w,h); */
+ /* 		glTexSubImage2D(t,0,x,y,w,h,GL_RGBA,GL_UNSIGNED_BYTE,pixbuf); */
+ 
+ 		glDeleteTextures(1,&amp;t);
+@@ -904,7 +904,7 @@
+ 			{
+ 				if (obj-&gt;dplist)
+ 				{
+-					dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++					s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 					glDeleteLists(obj-&gt;dplist,1);
+ 					obj-&gt;dplist=0;
+ 				}
+@@ -950,7 +950,7 @@
+ 			case OF_TURN_SWAP:	obj-&gt;oflags^=f;		break;
+ 			default:return(-1);
+ 		}
+-/* 		dprintf(VLOW,&quot;toggled %d-&gt;oflags=%010x with %010x [%d]&quot;,oid,obj-&gt;oflags,flags,type); */
++/* 		s3dprintf(VLOW,&quot;toggled %d-&gt;oflags=%010x with %010x [%d]&quot;,oid,obj-&gt;oflags,flags,type); */
+ 	} 
+ 	return(0);
+ }
+@@ -968,7 +968,7 @@
+ 			return(-1);
+ 		}
+ 
+-		dprintf(VLOW,&quot;deleting %d vertices of pid %d/ oid %d&quot;,n,p-&gt;id,oid);
++		s3dprintf(VLOW,&quot;deleting %d vertices of pid %d/ oid %d&quot;,n,p-&gt;id,oid);
+ 		m=obj-&gt;n_vertex;	 /*  saving the first number of vertices */
+ 		if (n&gt;=m) 
+ 		{
+@@ -983,7 +983,7 @@
+ 			{
+ 				if (obj-&gt;dplist)
+ 				{
+-					dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++					s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 					glDeleteLists(obj-&gt;dplist,1);
+ 					obj-&gt;dplist=0;
+ 				}
+@@ -1012,7 +1012,7 @@
+ 			return(-1);
+ 		}
+ 
+-		dprintf(VLOW,&quot;deleting %d materials of pid %d/ oid %d&quot;,n,p-&gt;id,oid);
++		s3dprintf(VLOW,&quot;deleting %d materials of pid %d/ oid %d&quot;,n,p-&gt;id,oid);
+ 		m=obj-&gt;n_mat;	 /*  saving the first number of materials */
+ 		if (n&gt;=m) 
+ 		{
+@@ -1026,7 +1026,7 @@
+ 		{
+ 			if (obj-&gt;dplist)
+ 			{
+-				dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++				s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 				glDeleteLists(obj-&gt;dplist,1);
+ 				obj-&gt;dplist=0;
+ 			}
+@@ -1051,7 +1051,7 @@
+ 			return(-1);
+ 		}
+ 
+-		dprintf(VLOW,&quot;deleting %d polys of pid %d/ oid %d&quot;,n,p-&gt;id,oid);
++		s3dprintf(VLOW,&quot;deleting %d polys of pid %d/ oid %d&quot;,n,p-&gt;id,oid);
+ 		m=obj-&gt;n_poly;	 /*  saving the first number of poly  */
+ 		if (n&gt;=m) 
+ 		{
+@@ -1065,7 +1065,7 @@
+ 		{
+ 			if (obj-&gt;dplist)
+ 			{
+-				dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++				s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 				glDeleteLists(obj-&gt;dplist,1);
+ 				obj-&gt;dplist=0;
+ 			}
+@@ -1090,7 +1090,7 @@
+ 			return(-1);
+ 		}
+ 
+-		dprintf(VLOW,&quot;deleting %d lines of pid %d/ oid %d&quot;,n,p-&gt;id,oid);
++		s3dprintf(VLOW,&quot;deleting %d lines of pid %d/ oid %d&quot;,n,p-&gt;id,oid);
+ 		m=obj-&gt;n_line;	 /*  saving the first number of line  */
+ 		if (n&gt;=m) 
+ 		{
+@@ -1104,7 +1104,7 @@
+ 		{
+ 			if (obj-&gt;dplist)
+ 			{
+-				dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++				s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 				glDeleteLists(obj-&gt;dplist,1);
+ 				obj-&gt;dplist=0;
+ 			}
+@@ -1131,7 +1131,7 @@
+ 			return(-1);
+ 		}
+ 
+-		dprintf(VLOW,&quot;deleting %d textures of pid %d/ oid %d&quot;,n,p-&gt;id,oid);
++		s3dprintf(VLOW,&quot;deleting %d textures of pid %d/ oid %d&quot;,n,p-&gt;id,oid);
+ 		m=obj-&gt;n_tex;	 /*  saving the first number of textures  */
+ 		if (n&gt;=m) 
+ 		{
+@@ -1166,7 +1166,7 @@
+ 			{
+ 				if (obj-&gt;dplist)
+ 				{
+-					dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
++					s3dprintf(VLOW,&quot;freeing display list %d to get new data&quot;,obj-&gt;dplist);
+ 						glDeleteLists(obj-&gt;dplist,1);
+ 					obj-&gt;dplist=0;
+ 				}
+@@ -1202,7 +1202,7 @@
+ /*				mySetMatrix(mcp_p-&gt;object[oid]-&gt;m);
+ 				myInvert();
+ 				myTransform3f(v);
+-				dprintf(LOW,&quot;%3.3f %3.3f %3.3f&quot;,v[0],v[1],v[2]);*/
++				s3dprintf(LOW,&quot;%3.3f %3.3f %3.3f&quot;,v[0],v[1],v[2]);*/
+ 				obj_translate(mcp_p,oid,v);
+ 			} 
+ 		} else {
+@@ -1211,7 +1211,7 @@
+ 			obj-&gt;translate.z=*(transv+2);
+ 			obj_pos_update(p,oid,oid);
+ 		}
+-		dprintf(VLOW,&quot;[translate|pid %d] %d: %3.3f %3.3f %3.3f&quot;,p-&gt;id,oid,obj-&gt;translate.x,obj-&gt;translate.y,obj-&gt;translate.z);
++		s3dprintf(VLOW,&quot;[translate|pid %d] %d: %3.3f %3.3f %3.3f&quot;,p-&gt;id,oid,obj-&gt;translate.x,obj-&gt;translate.y,obj-&gt;translate.z);
+ 	}
+ 	return(0);
+ }
+@@ -1251,7 +1251,7 @@
+ 			obj-&gt;rotate.z=f;
+ 			obj_pos_update(p,oid,oid);
+ 		}
+-		dprintf(VLOW,&quot;[rotate|pid %d] %d: %3.3f %3.3f %3.3f&quot;,p-&gt;id,oid,obj-&gt;rotate.x,obj-&gt;rotate.y,obj-&gt;rotate.z);
++		s3dprintf(VLOW,&quot;[rotate|pid %d] %d: %3.3f %3.3f %3.3f&quot;,p-&gt;id,oid,obj-&gt;rotate.x,obj-&gt;rotate.y,obj-&gt;rotate.z);
+ 	}
+ 	return(0);
+ }
+@@ -1264,7 +1264,7 @@
+ 		if ((p-&gt;id==MCP) || (!(obj-&gt;oflags&amp;OF_SYSTEM)))
+ 		if (!isinf(scav) &amp;&amp; !isnan(scav) &amp;&amp; !((scav&lt;1.0e-10) &amp;&amp; (scav&gt;-1.0e-10))) /* ignore very low values */
+ 		{
+-			dprintf(VLOW,&quot;[scale|pid %d] obj %d to %f&quot;,p-&gt;id,oid,scav);
++			s3dprintf(VLOW,&quot;[scale|pid %d] obj %d to %f&quot;,p-&gt;id,oid,scav);
+ 			obj-&gt;scale=scav;
+ 	/*		obj-&gt;scale.x=*scav;
+ 			obj-&gt;scale.y=*(scav+1);
+@@ -1287,12 +1287,12 @@
+ 			into_position(p,on,depth+1);
+ 		} else {
+ 			obj-&gt;oflags&amp;=~OF_LINK;
+-			dprintf(LOW,&quot;link object is broken, removing link&quot;);
++			s3dprintf(LOW,&quot;link object is broken, removing link&quot;);
+ 		}
+ 	}
+ 	 /* if (depth&gt;=MAXLOOP) */
+ 	if (depth&gt;=p-&gt;n_obj)
+-		dprintf(MED,&quot;too much looping ...&quot;);
++		s3dprintf(MED,&quot;too much looping ...&quot;);
+ 	glTranslatef(obj-&gt;translate.x,obj-&gt;translate.y,obj-&gt;translate.z);
+ 	glRotatef(obj-&gt;rotate.y,0.0,1.0,0.0);
+ 	glRotatef(obj-&gt;rotate.x,1.0,0.0,0.0);
+@@ -1376,7 +1376,7 @@
+ 	{	 /*  this is now the biggest object. */
+ 		mcp_o-&gt;r=r;
+ 		p-&gt;biggest_obj=oid;
+-/*		dprintf(MED,&quot;there is a new biggest object in [%d:\&quot;\&quot;]&quot;,p-&gt;id,p-&gt;name);*/
++/*		s3dprintf(MED,&quot;there is a new biggest object in [%d:\&quot;\&quot;]&quot;,p-&gt;id,p-&gt;name);*/
+ 		mcp_rep_object(p-&gt;mcp_oid);	  /*  and tell the mcp */
+ 	} else {
+ 		if (p-&gt;biggest_obj==oid)
+@@ -1397,7 +1397,7 @@
+ 				}
+ 			if (found)
+ 			{
+-				dprintf(VLOW,&quot;there is a new biggest object in [%d:\&quot;\&quot;]&quot;,p-&gt;id,p-&gt;name);
++				s3dprintf(VLOW,&quot;there is a new biggest object in [%d:\&quot;\&quot;]&quot;,p-&gt;id,p-&gt;name);
+ 				mcp_o-&gt;r=r;  /*  save the new size */
+ 				mcp_rep_object(p-&gt;mcp_oid);	  /*  and tell the mcp */
+ 			}
+@@ -1484,7 +1484,7 @@
+ 	struct t_obj 		*ao,*o;
+ 	struct t_process	*ap;
+ 	o=p-&gt;object[oid];
+-	dprintf(VLOW,&quot;[obj_pos_upd|pid %d] %d&quot;,p-&gt;id, oid,first_oid);
++	s3dprintf(VLOW,&quot;[obj_pos_upd|pid %d] %d&quot;,p-&gt;id, oid,first_oid);
+ 	o-&gt;m_uptodate=0;
+ 	obj_recalc_tmat(p,oid);
+ 	if (p-&gt;id!=MCP) 
+@@ -1526,7 +1526,7 @@
+ 					event_ptr_changed();
+ 					break;
+ 				default:
+-					dprintf(LOW,&quot;[obj_pos_upd|pid %d] %d unknown system event&quot;,p-&gt;id,oid);
++					s3dprintf(LOW,&quot;[obj_pos_upd|pid %d] %d unknown system event&quot;,p-&gt;id,oid);
+ 					
+ 			}
+ 
+@@ -1640,11 +1640,11 @@
+ 				glGenTextures(1,&amp;t);
+ 				glBindTexture( GL_TEXTURE_2D, t);
+ 				tex-&gt;gl_texnum=t;
+-				dprintf(HIGH,&quot;generated texture %d [%dx%d, in memory %dx%d]&quot;,t,tex-&gt;tw,tex-&gt;th,tex-&gt;w,tex-&gt;h);
++				s3dprintf(HIGH,&quot;generated texture %d [%dx%d, in memory %dx%d]&quot;,t,tex-&gt;tw,tex-&gt;th,tex-&gt;w,tex-&gt;h);
+ /*				for (j=0;j&lt;tex-&gt;th;j++)
+ 				for (i=0;i&lt;tex-&gt;tw;i++)
+ 				{
+-					dprintf(MED,&quot;pixel[%d,%d], %d %d %d %d&quot;,i,j,
++					s3dprintf(MED,&quot;pixel[%d,%d], %d %d %d %d&quot;,i,j,
+ 									tex-&gt;buf[(j*tex-&gt;w+i)*4+0],
+ 									tex-&gt;buf[(j*tex-&gt;w+i)*4+1],
+ 									tex-&gt;buf[(j*tex-&gt;w+i)*4+2],
+@@ -1693,13 +1693,13 @@
+ 	else {
+ 		obj-&gt;dplist=glGenLists(1);
+ 		if (obj-&gt;dplist)	glNewList(obj-&gt;dplist,GL_COMPILE_AND_EXECUTE);
+-		 else 				dprintf(LOW,&quot;couldn't get a new list :/&quot;);
++		 else 				s3dprintf(LOW,&quot;couldn't get a new list :/&quot;);
+ 		omat=-1;
+ 		for (pn=0; pn&lt;obj-&gt;n_poly; pn++)  /*  cycle throu our polygons ... */
+ 		{
+ 			if (calc_normal(obj,pn))
+ 			{
+-				dprintf(HIGH,&quot;something is wrong with polygon %d!&quot;,pn);
++				s3dprintf(HIGH,&quot;something is wrong with polygon %d!&quot;,pn);
+ 				if (obj-&gt;dplist) glEndList();	glPopMatrix(); /* clean up GL-stuff */
+ 				return(-1);
+ 			}
+@@ -1712,7 +1712,7 @@
+ 					if (m-&gt;tex!=-1)		tex=get_texture(obj,m);
+ 					if (tex==NULL)		/* still NULL? then it couldn't get the texture. */
+ 					{
+-/*						dprintf(VLOW,&quot;no texture, using standard material...&quot;);*/
++/*						s3dprintf(VLOW,&quot;no texture, using standard material...&quot;);*/
+ 						glBindTexture( GL_TEXTURE_2D,0);
+ 						matgl[0]=m-&gt;amb_r/2;		
+ 						matgl[1]=m-&gt;amb_g/2;		
+@@ -1734,7 +1734,7 @@
+ 						glMaterialfv(GL_FRONT,GL_SPECULAR,matgl);
+ 					}
+ 				} else {
+-					dprintf(MED,&quot;something is wrong with polygon %d! material: [%d,%d]&quot;,pn, mat,obj-&gt;n_mat);
++					s3dprintf(MED,&quot;something is wrong with polygon %d! material: [%d,%d]&quot;,pn, mat,obj-&gt;n_mat);
+ 					if (obj-&gt;dplist) glEndList();	glEnd();	glPopMatrix();
+ 					return(-1);
+ 				}
+@@ -1747,7 +1747,7 @@
+ 					glNormal3f(-on-&gt;x,-on-&gt;y,-on-&gt;z);
+ 					if (tex!=NULL)
+ 					{
+-/*						dprintf(MED,&quot;using texture coordinate (%f,%f) for polygon %d point %d&quot;,
++/*						s3dprintf(MED,&quot;using texture coordinate (%f,%f) for polygon %d point %d&quot;,
+ 										obj-&gt;p_poly[pn].tc[i].x *tex-&gt;xs,
+ 										obj-&gt;p_poly[pn].tc[i].y *tex-&gt;ys,
+ 										pn,i);*/
+@@ -1765,7 +1765,7 @@
+ 		{
+ 			if (check_line_normal(obj,pn))
+ 			{
+-				dprintf(HIGH,&quot;something is wrong with line %d!&quot;,pn);
++				s3dprintf(HIGH,&quot;something is wrong with line %d!&quot;,pn);
+ 				if (obj-&gt;dplist) glEndList();	glPopMatrix(); /* clean up GL-stuff */
+ 				return(-1);
+ 			}
+@@ -1796,7 +1796,7 @@
+ 		 /* 			glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,matgl); */
+ 					glMaterialfv(GL_FRONT,GL_SPECULAR,matgl);
+ 				} else {
+-					dprintf(MED,&quot;something is wrong with line %d! material: [%d,%d]&quot;,pn, mat,obj-&gt;n_mat);
++					s3dprintf(MED,&quot;something is wrong with line %d! material: [%d,%d]&quot;,pn, mat,obj-&gt;n_mat);
+ 					if (obj-&gt;dplist) glEndList();
+ 					glEnd();
+ 					glPopMatrix();
+@@ -1827,7 +1827,7 @@
+ 	struct t_obj *o,*o2;
+ 	if (obj_valid(p,oid,o))
+ 	{
+-		dprintf(VLOW,&quot;link_delete(): [%d] unlinking %d from %d&quot;,p-&gt;id, oid, o-&gt;linkid);
++		s3dprintf(VLOW,&quot;link_delete(): [%d] unlinking %d from %d&quot;,p-&gt;id, oid, o-&gt;linkid);
+ 		if (o-&gt;linkid!=-1) 
+ 		{
+ 			if (o-&gt;lprev!=-1)
+@@ -1860,7 +1860,7 @@
+ 	struct t_obj *o,*ot,*o2;
+ 	if (obj_valid(p,oid,o) &amp;&amp; obj_valid(p,target,ot))
+ 	{
+-		dprintf(VLOW,&quot;link_insert(): [%d] linking %d to %d&quot;,p-&gt;id, oid, target);
++		s3dprintf(VLOW,&quot;link_insert(): [%d] linking %d to %d&quot;,p-&gt;id, oid, target);
+ 		o-&gt;oflags|=OF_LINK;
+ 		o-&gt;linkid=target;
+ 		o-&gt;lnext=ot-&gt;lsub; /* we have a new &quot;first&quot; element */
+@@ -1904,7 +1904,7 @@
+ 			errds(VHIGH,&quot;obj_link()&quot;,&quot;can't link system-objects in non-mcp-apps!&quot;);
+ 			return(-1);
+ 		}
+- 		dprintf(VLOW,&quot;[link|pid %d] %d -&gt; %d&quot;,p-&gt;id, oid_from,oid_to); 
++ 		s3dprintf(VLOW,&quot;[link|pid %d] %d -&gt; %d&quot;,p-&gt;id, oid_from,oid_to); 
+ 		if (oid_to!=o-&gt;linkid) /* only if something changed ... */
+ 		{
+ 			if (o-&gt;linkid!=-1)
+@@ -1929,7 +1929,7 @@
+ 			return(-1);
+ 		}
+ 		link_delete(p,oid);
+-		dprintf(VLOW,&quot;removing link of object %d from pid %d&quot;,oid,p-&gt;id);
++		s3dprintf(VLOW,&quot;removing link of object %d from pid %d&quot;,oid,p-&gt;id);
+ 
+ 		obj_pos_update(p,oid,oid);
+ 		return(0);
+@@ -1964,7 +1964,7 @@
+ 			{
+ 				reuse=1;
+ 				break;
+-/* 				dprintf(HIGH,&quot;reusing position %d&quot;,pos); */
++/* 				s3dprintf(HIGH,&quot;reusing position %d&quot;,pos); */
+ 			}
+ 		}
+ 		if (!reuse)
+@@ -1976,10 +1976,10 @@
+ 			p-&gt;n_obj++;					 /*  increment counter */
+ 		}
+ 		p-&gt;object[pos]=obj;						
+-		dprintf(VLOW,&quot;pid %d added new object %d at %010p [pos %d]&quot;,p-&gt;id,pos,obj,pos);
++		s3dprintf(VLOW,&quot;pid %d added new object %d at %010p [pos %d]&quot;,p-&gt;id,pos,obj,pos);
+ 		return (pos);
+ 	} else {
+-		dprintf(HIGH,&quot;obj_new(): no such process %d&quot;,p-&gt;id);	
++		s3dprintf(HIGH,&quot;obj_new(): no such process %d&quot;,p-&gt;id);	
+ 		return(-1);
+ 	}
+ }
+@@ -1995,7 +1995,7 @@
+ 	{
+ 		if ((o-&gt;oflags&amp;OF_SYSTEM) || (no-&gt;oflags&amp;OF_SYSTEM))
+ 		{
+-			dprintf(MED,&quot;can't clone from or to system objects&quot;);
++			s3dprintf(MED,&quot;can't clone from or to system objects&quot;);
+ 		}
+ 		 /*  get obj pointer and check for availability of the other object. */
+ 		if (((already_clone=(o-&gt;oflags&amp;OF_CLONE)) || (!(o-&gt;n_vertex|o-&gt;n_mat|o-&gt;n_poly|o-&gt;n_tex))) &amp;&amp; (!(o-&gt;oflags&amp;OF_VIRTUAL)))
+@@ -2020,7 +2020,7 @@
+ 							}
+ 					if (!is_clnsrc)
+ 					{
+-						dprintf(MED,&quot;obj_clone_change(): %d in process %d is no longer a clone-source&quot;,oid,p-&gt;id);
++						s3dprintf(MED,&quot;obj_clone_change(): %d in process %d is no longer a clone-source&quot;,oid,p-&gt;id);
+ 						p-&gt;object[oid]-&gt;oflags&amp;=~OF_CLONE_SRC;
+ 					}
+ 				}
+@@ -2031,7 +2031,7 @@
+ 				no-&gt;oflags|=OF_CLONE_SRC;
+ 				o-&gt;n_vertex=toid;  /*  n_vertex is not used for this as it's just cloned, so we can use it ... */
+ 				obj_size_update(p,oid);
+-				dprintf(LOW,&quot;changed clone-target of obj %d to %d of process %d&quot;,oid,toid,p-&gt;id);
++				s3dprintf(LOW,&quot;changed clone-target of obj %d to %d of process %d&quot;,oid,toid,p-&gt;id);
+ 				if (p-&gt;id!=MCP) obj_check_biggest_object(p,oid);
+ 			} else {
+ 				errds(MED,&quot;obj_clone_change()&quot;,&quot;couldn't clone %d from %d (on pid %d): cloning from itself doesn't make sense!&quot;,oid,toid,p-&gt;id,oid);
+@@ -2061,7 +2061,7 @@
+ 	{
+ 		if (o-&gt;oflags&amp;OF_SYSTEM)
+ 		{
+-			dprintf(HIGH,&quot;can't delete system object!&quot;);
++			s3dprintf(HIGH,&quot;can't delete system object!&quot;);
+ 			return(0);
+ 		}
+ 
+@@ -2070,7 +2070,7 @@
+ 		{
+ 			if (o-&gt;oflags&amp;OF_VIRTUAL)  /*  only delete if virtual */
+ 			{
+-				dprintf(HIGH,&quot;the mcp wants %d to be closed&quot;,o-&gt;n_mat);
++				s3dprintf(HIGH,&quot;the mcp wants %d to be closed&quot;,o-&gt;n_mat);
+ 				event_quit(get_proc_by_pid(o-&gt;n_mat));
+ 				return(0);
+ 			}
+@@ -2098,7 +2098,7 @@
+ 						}
+ 					}
+ 				mcp_p-&gt;object[mcp_oid]-&gt;r=mr;
+-				dprintf(MED,&quot;new biggest object is :%d (size: %f)&quot;,p-&gt;biggest_obj,mr);
++				s3dprintf(MED,&quot;new biggest object is :%d (size: %f)&quot;,p-&gt;biggest_obj,mr);
+ 			}
+ 			/*  check if someone depended on this object as clone.... */
+ 			if (o-&gt;oflags&amp;OF_CLONE_SRC)
+@@ -2123,7 +2123,7 @@
+ 	uint32_t i;
+ 	GLuint t;
+ 	struct t_obj *o=p-&gt;object[oid];
+-	dprintf(HIGH,&quot;deleting object %d of process %d&quot;,oid,p-&gt;id);
++	s3dprintf(HIGH,&quot;deleting object %d of process %d&quot;,oid,p-&gt;id);
+ 
+ 	/* clearing links */
+ 	if (o-&gt;linkid!=-1)		link_delete(p,oid);
+@@ -2133,7 +2133,7 @@
+ 		link_delete(p,o-&gt;lsub);
+ 		if (i==o-&gt;lsub) 
+ 		{
+-			dprintf(HIGH,&quot;something is wrong!!&quot;);
++			s3dprintf(HIGH,&quot;something is wrong!!&quot;);
+ 			o=NULL; /* segfault */
+ 			o-&gt;lsub=-1;
+ 		}
+@@ -2161,7 +2161,7 @@
+ 	{
+ 		if (!(o-&gt;oflags&amp;(OF_CLONE|OF_SYSTEM))) 
+ 		{
+-			dprintf(VLOW,&quot;freeing display list %d&quot;,o-&gt;dplist);
++			s3dprintf(VLOW,&quot;freeing display list %d&quot;,o-&gt;dplist);
+ 			glDeleteLists(o-&gt;dplist,1);
+ 		}
+ 	}
+
+Modified: trunk/server/process.c
+===================================================================
+--- trunk/server/process.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/process.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -48,7 +48,7 @@
+ 	{
+ 		if (procs_p[MCP].con_type==CON_NULL)
+ 		{
+-			dprintf(MED,&quot;free mcp place, pid %d becoming mcp!&quot;,p-&gt;id);
++			s3dprintf(MED,&quot;free mcp place, pid %d becoming mcp!&quot;,p-&gt;id);
+ 			con_type=p-&gt;con_type; /* move connection data */
+ #ifdef TCP			
+ 			procs_p[MCP].sockid=p-&gt;sockid; /* don't save contype yet,
+@@ -64,7 +64,7 @@
+ 			process_list_rm(p-&gt;id); /* remove old process, but don't kill connection */
+ 			return(&amp;procs_p[MCP]);
+ 		} else {
+-			dprintf(LOW,&quot;the place for the mcp is already taken ...&quot;);
++			s3dprintf(LOW,&quot;the place for the mcp is already taken ...&quot;);
+ 			return(NULL);
+ 		}
+ 	} else {
+@@ -80,14 +80,14 @@
+ 	/* 		mcp_p-&gt;object[mcp_oid]-&gt;p_mat=(struct t_material *)new_p; */
+ 						/*  dirty, but it's just a pointer after all ... */
+ 			p-&gt;mcp_oid=mcp_oid;
+-			dprintf(LOW,&quot;process %d now has mcp_oid %d&quot;,p-&gt;id,mcp_oid);
++			s3dprintf(LOW,&quot;process %d now has mcp_oid %d&quot;,p-&gt;id,mcp_oid);
+ 			mcp_rep_object(mcp_oid);
+ 			if (mcp_p-&gt;con_type==CON_NULL)
+ 			{  /*  there is no mcp connected! setting focus to the new program: */
+ 				mcp_focus(mcp_oid);
+ 			}
+ 		} else {
+-			dprintf(LOW,&quot;couldn't add object to mcp ...&quot;);
++			s3dprintf(LOW,&quot;couldn't add object to mcp ...&quot;);
+ 		}
+ 	}
+ 	return(p);
+@@ -123,8 +123,8 @@
+ 		p-&gt;object[ptr]-&gt;oflags=OF_POINTER;
+ 		link_insert(p,ptr,cam);
+ 	}
+-	dprintf(MED,&quot;process_sys_init(): added object cam0 %d&quot;,cam);
+-	dprintf(MED,&quot;process_sys_init(): added object ptr0 %d&quot;,ptr);
++	s3dprintf(MED,&quot;process_sys_init(): added object cam0 %d&quot;,cam);
++	s3dprintf(MED,&quot;process_sys_init(): added object ptr0 %d&quot;,ptr);
+ 	obj_pos_update(get_proc_by_pid(MCP),cam,cam);
+ 	obj_pos_update(get_proc_by_pid(MCP),ptr,ptr);
+ /*	obj_recalc_tmat(p,0);*/
+@@ -228,7 +228,7 @@
+ 		 /*  the mcp keeps in our memory ... */
+ 		 /*  so we just delete the objects added */
+ 		 /*  by the last mcp */
+-		dprintf(MED,&quot;clean up mcp's junk ...&quot;);
++		s3dprintf(MED,&quot;clean up mcp's junk ...&quot;);
+ 		for (i=0;i&lt;p-&gt;n_obj;i++)
+ 		{
+ 			if (p-&gt;object[i]!=NULL)
+@@ -252,10 +252,10 @@
+ int process_quit()
+ {
+ 	int i;
+-	dprintf(HIGH,&quot;telling %d processes to go away&quot;,procs_n);
++	s3dprintf(HIGH,&quot;telling %d processes to go away&quot;,procs_n);
+ 	for (i=(procs_n-1);i&gt;=0;i--)
+ 	{ 
+-		dprintf(HIGH,&quot;[QUIT] for %d&quot;,i);
++		s3dprintf(HIGH,&quot;[QUIT] for %d&quot;,i);
+ 		event_quit(&amp;procs_p[i]);
+ /*		process_del(procs_p[i].id);*/
+ 	}
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/proto.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -59,19 +59,19 @@
+ 								 /*  the mcp */
+ 		if ((mcp_oid==-1) &amp;&amp; (command!=S3D_P_C_INIT))
+ 		{
+-			dprintf(MED,&quot;prot_com_in(): commands without beeing initialized ?! no way, kicking ...&quot;);
++			s3dprintf(MED,&quot;prot_com_in(): commands without beeing initialized ?! no way, kicking ...&quot;);
+ 			event_quit(p);
+ 		}
+ 	} 
+ 	length=ntohs(*((uint16_t *)((uint8_t *)pbuf+1)));
+ 	cptr=buf=pbuf+3;
+-/* 	if (mcp_oid==-1) dprintf(HIGH,&quot;couldn't find mcp-oid for pid %d!&quot;,p-&gt;id); */
++/* 	if (mcp_oid==-1) s3dprintf(HIGH,&quot;couldn't find mcp-oid for pid %d!&quot;,p-&gt;id); */
+ 		switch (command) {
+ 			case S3D_P_C_INIT:
+ 				memset(name,0,NAME_MAX);
+ 				if (length&gt;NAME_MAX) i=NAME_MAX; else i=length;
+ 				strncpy(name,(char *)buf,i);
+-				dprintf(LOW,&quot;[%d]\&quot;%s\&quot; logged in&quot;, p-&gt;id,name);
++				s3dprintf(LOW,&quot;[%d]\&quot;%s\&quot; logged in&quot;, p-&gt;id,name);
+ 				if (NULL==(np=process_protinit(p,name)))
+ 					event_quit(p);  /*  couldn't get process */
+ 				else
+@@ -79,7 +79,7 @@
+ 				break;
+ 			case S3D_P_C_NEW_OBJ:
+ 				oid=htonl(obj_new(p));
+-/* 				dprintf(LOW,&quot;pid %d registering new object %d&quot;,p-&gt;id,ntohl(oid)); */
++/* 				s3dprintf(LOW,&quot;pid %d registering new object %d&quot;,p-&gt;id,ntohl(oid)); */
+ 				prot_com_out(p,S3D_P_S_NEWOBJ,(uint8_t *)&amp;oid, 4);
+ 				break;
+ 			case S3D_P_C_DEL_OBJ:
+@@ -111,7 +111,7 @@
+ 				}
+ 				break;
+ 			case S3D_P_C_QUIT:
+-				dprintf(LOW,&quot;QUIT issued&quot;);
++				s3dprintf(LOW,&quot;QUIT issued&quot;);
+ 				event_quit(p);
+ 				break;
+ 			case S3D_P_C_PUSH_VERTEX:
+@@ -119,7 +119,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(4*3);
+-/* 					dprintf(LOW,&quot;received %d new vertices for object oid...%d&quot;, num, oid); */
++/* 					s3dprintf(LOW,&quot;received %d new vertices for object oid...%d&quot;, num, oid); */
+ 					obj_push_vertex(p,oid, (float  *)cptr, num);
+ 				}
+ 				break;
+@@ -128,7 +128,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(4*12);
+-/* 					dprintf(LOW,&quot;received %d new materials for object oid...%d&quot;, num, oid); */
++/* 					s3dprintf(LOW,&quot;received %d new materials for object oid...%d&quot;, num, oid); */
+ 					obj_push_mat(p,oid, (float *)cptr, num);
+ 				}
+ 				break;
+@@ -137,7 +137,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(4*4);
+-/* 					dprintf(LOW,&quot;received %d new polygons for object oid...%d&quot;, num, oid); */
++/* 					s3dprintf(LOW,&quot;received %d new polygons for object oid...%d&quot;, num, oid); */
+ 					for (i=0;i&lt;(num*4);i++)
+ 						*((uint32_t *)cptr+i)=
+ 								ntohl(*((uint32_t *)cptr+i));
+@@ -150,7 +150,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(4*3);
+- 					dprintf(VLOW,&quot;received %d new lines for object oid...%d&quot;, num, oid); 
++ 					s3dprintf(VLOW,&quot;received %d new lines for object oid...%d&quot;, num, oid); 
+ 					for (i=0;i&lt;(num*3);i++)
+ 						*((uint32_t *)cptr+i)=
+ 								ntohl(*((uint32_t *)cptr+i));
+@@ -163,7 +163,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(2*2);
+-					dprintf(LOW,&quot;received %d new textures for object oid...%d&quot;, num, oid);
++					s3dprintf(LOW,&quot;received %d new textures for object oid...%d&quot;, num, oid);
+ 					for (i=0;i&lt;(num*2);i++)
+ 						*((uint16_t *)cptr+i)=
+ 								ntohs(*((uint16_t *)cptr+i));
+@@ -176,7 +176,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(9*4);
+-					dprintf(VLOW,&quot;PEP_POLY_NORMAL[%d]: oid %d, %f polys&quot;,length,oid, (length-4)/(9.0*4.0));
++					s3dprintf(VLOW,&quot;PEP_POLY_NORMAL[%d]: oid %d, %f polys&quot;,length,oid, (length-4)/(9.0*4.0));
+ 					obj_pep_poly_normal(p,oid, (float *)cptr, num);
+ 				}
+ 				break;
+@@ -185,7 +185,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(6*4);
+-					dprintf(VLOW,&quot;PEP_LINE_NORMAL[%d]: oid %d, %.1f lines&quot;,length,oid, (length-4)/(6.0*4.0));
++					s3dprintf(VLOW,&quot;PEP_LINE_NORMAL[%d]: oid %d, %.1f lines&quot;,length,oid, (length-4)/(6.0*4.0));
+ 					obj_pep_line_normal(p,oid, (float *)cptr, num);
+ 				}
+ 				break;
+@@ -194,7 +194,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(6*4);
+-					dprintf(VLOW,&quot;PEP_POLY_TEXC[%d]: oid %d, %f polys&quot;,length,oid, (length-4)/(6.0*4.0));
++					s3dprintf(VLOW,&quot;PEP_POLY_TEXC[%d]: oid %d, %f polys&quot;,length,oid, (length-4)/(6.0*4.0));
+ 					obj_pep_poly_texc(p,oid, (float *)cptr, num);
+ 				}
+ 				break;
+@@ -203,7 +203,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(4*12);
+-					dprintf(VLOW,&quot;PEP_MAT[%d]: %d materials for object oid...%d&quot;, length, num, oid);
++					s3dprintf(VLOW,&quot;PEP_MAT[%d]: %d materials for object oid...%d&quot;, length, num, oid);
+ 					obj_pep_mat(p,oid, (float *)cptr, num);
+ 				}
+ 				break;
+@@ -212,7 +212,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(4*3);
+- 					dprintf(VLOW,&quot;pepping %d new vertices for object oid...%d&quot;, num, oid); 
++ 					s3dprintf(VLOW,&quot;pepping %d new vertices for object oid...%d&quot;, num, oid); 
+ 					obj_pep_vertex(p,oid, (float  *)cptr, num);
+ 				}
+ 				break;
+@@ -222,7 +222,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(4);
+-					dprintf(VLOW,&quot;PEP_MAT_TEX[%d]: %d materials for object oid...%d&quot;, length, num, oid);
++					s3dprintf(VLOW,&quot;PEP_MAT_TEX[%d]: %d materials for object oid...%d&quot;, length, num, oid);
+ 					obj_pep_mat_tex(p,oid, (uint32_t *)cptr, num);
+ 				}
+ 				break;
+@@ -231,7 +231,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-4)/(4*3);
+- 					dprintf(VLOW,&quot;pepping %d new lines for object oid...%d&quot;, num, oid); 
++ 					s3dprintf(VLOW,&quot;pepping %d new lines for object oid...%d&quot;, num, oid); 
+ 					for (i=0;i&lt;(num*3);i++)
+ 						*((uint32_t *)cptr+i)=
+ 								ntohl(*((uint32_t *)cptr+i));
+@@ -244,7 +244,7 @@
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					toid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-8)/(6*4);
+-					dprintf(VLOW,&quot;LOAD_POLY_NORMAL[%d]: oid %d, %.2f lines&quot;,length,oid, (length-8)/(6.0*4.0));
++					s3dprintf(VLOW,&quot;LOAD_POLY_NORMAL[%d]: oid %d, %.2f lines&quot;,length,oid, (length-8)/(6.0*4.0));
+ 					obj_load_line_normal(p,oid, (float *)cptr, toid, num);
+ 				}
+ 				break;
+@@ -254,7 +254,7 @@
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					toid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-8)/(9*4);
+-					dprintf(MED,&quot;LOAD_POLY_NORMAL[%d]: oid %d, %f polys&quot;,length,oid, (length-8)/(9.0*4.0));
++					s3dprintf(MED,&quot;LOAD_POLY_NORMAL[%d]: oid %d, %f polys&quot;,length,oid, (length-8)/(9.0*4.0));
+ 					obj_load_poly_normal(p,oid, (float *)cptr, toid, num);
+ 				}
+ 				break;
+@@ -264,7 +264,7 @@
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					toid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-8)/(6*4);
+-					dprintf(MED,&quot;LOAD_POLY_TEXC[%d]: oid %d, %f polys&quot;,length,oid, (length-8)/(6.0*4.0));
++					s3dprintf(MED,&quot;LOAD_POLY_TEXC[%d]: oid %d, %f polys&quot;,length,oid, (length-8)/(6.0*4.0));
+ 					obj_load_poly_texc(p,oid, (float *)cptr, toid, num);
+ 				}
+ 				break;
+@@ -274,7 +274,7 @@
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					toid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=(length-8)/(4*12);
+-					dprintf(LOW,&quot;LOAD_MAT[%d]: %d materials for object oid...%d&quot;, length, num, oid);
++					s3dprintf(LOW,&quot;LOAD_MAT[%d]: %d materials for object oid...%d&quot;, length, num, oid);
+ 					obj_load_mat(p,oid, (float *)cptr, toid, num);
+ 				}
+ 				break;
+@@ -288,7 +288,7 @@
+ 					w=ntohs(*((uint16_t *)cptr));			cptr+=2;
+ 					h=ntohs(*((uint16_t *)cptr));			cptr+=2;
+ 					num=length-16;
+-	 /* 				dprintf(MED,&quot;LOAD_TEX[%d]: oid %d, texture %d, [%d x %d] data at [%d x %d] (%d = %d)&quot;,length, oid,toid,w,h,x,y,num,w*h*4,num); */
++	 /* 				s3dprintf(MED,&quot;LOAD_TEX[%d]: oid %d, texture %d, [%d x %d] data at [%d x %d] (%d = %d)&quot;,length, oid,toid,w,h,x,y,num,w*h*4,num); */
+ 					if ((w*h*4)==num)  /*  check correct size */
+ 						obj_load_tex(p,oid, toid, x, y, w, h, cptr);
+ 				}
+@@ -298,7 +298,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=ntohl(*((uint32_t *)cptr));		cptr+=4;
+-/* 					dprintf(LOW,&quot;deleting %d vertices for object oid...%d&quot;, num, oid); */
++/* 					s3dprintf(LOW,&quot;deleting %d vertices for object oid...%d&quot;, num, oid); */
+ 					obj_del_vertex(p,oid,num);
+ 				}
+ 				break;
+@@ -307,7 +307,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=ntohl(*((uint32_t *)cptr));		cptr+=4;
+-/* 					dprintf(LOW,&quot;deleting %d vertices for object oid...%d&quot;, num, oid); */
++/* 					s3dprintf(LOW,&quot;deleting %d vertices for object oid...%d&quot;, num, oid); */
+ 					obj_del_poly(p,oid,num);
+ 				}	
+ 				break;
+@@ -316,7 +316,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=ntohl(*((uint32_t *)cptr));		cptr+=4;
+- 					dprintf(VLOW,&quot;deleting %d lines for object oid...%d&quot;, num, oid); 
++ 					s3dprintf(VLOW,&quot;deleting %d lines for object oid...%d&quot;, num, oid); 
+ 					obj_del_line(p,oid,num);
+ 				}	
+ 				break;
+@@ -326,7 +326,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=ntohl(*((uint32_t *)cptr));		cptr+=4;
+-/* 					dprintf(LOW,&quot;deleting %d materials for object oid...%d&quot;, num, oid); */
++/* 					s3dprintf(LOW,&quot;deleting %d materials for object oid...%d&quot;, num, oid); */
+ 					obj_del_mat(p,oid,num);
+ 				}
+ 				break;
+@@ -335,7 +335,7 @@
+ 				{
+ 					oid=ntohl(*((uint32_t *)cptr));		cptr+=4;
+ 					num=ntohl(*((uint32_t *)cptr));		cptr+=4;
+-/* 					dprintf(LOW,&quot;deleting %d textures for object oid...%d&quot;, num, oid); */
++/* 					s3dprintf(LOW,&quot;deleting %d textures for object oid...%d&quot;, num, oid); */
+ 					obj_del_tex(p,oid,num);
+ 				}
+ 				break;
+@@ -377,7 +377,7 @@
+ 				}
+ 				break;
+ 			default:
+-				dprintf(LOW,&quot;don't know this command (%d)&quot;,command);
++				s3dprintf(LOW,&quot;don't know this command (%d)&quot;,command);
+ 		}
+ 	return(0);
+ }
+@@ -394,7 +394,7 @@
+ 			memcpy(obuf+3,buf,length);
+ 		if (n_writen(p,obuf,length+3)&lt;0)
+ 		{
+-			dprintf(LOW,&quot;prot_com_out():n_writen(): connection seems to be dead (pid %d)&quot;, p-&gt;id);
++			s3dprintf(LOW,&quot;prot_com_out():n_writen(): connection seems to be dead (pid %d)&quot;, p-&gt;id);
+ 			process_del(p-&gt;id);
+ 		}
+ 		return(0);
+
+Modified: trunk/server/shm.c
+===================================================================
+--- trunk/server/shm.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/shm.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -68,7 +68,7 @@
+ 		errnf(&quot;shm_init():ftok()&quot;,errno);
+ 		return(1);
+ 	}
+-	dprintf(LOW,&quot;shm_init(): init key is 0x%08x&quot;,key);
++	s3dprintf(LOW,&quot;shm_init(): init key is 0x%08x&quot;,key);
+ 	mkey=next_key(key);
+ 	/* connect to (and possibly create) the segment: */
+ 	if ((shmid = shmget(key, SHM_SIZE, 0644 | IPC_CREAT)) == -1) {
+@@ -104,7 +104,7 @@
+ 	mkey=next_key(mkey);
+ 	mycb-&gt;key_ctos=mkey;
+ 	mkey=next_key(mkey);
+-	dprintf(MED,&quot;shm_open_comblock():stoc: %08x, ctos: %08x&quot;,mycb-&gt;key_stoc,mycb-&gt;key_ctos);
++	s3dprintf(MED,&quot;shm_open_comblock():stoc: %08x, ctos: %08x&quot;,mycb-&gt;key_stoc,mycb-&gt;key_ctos);
+ 	/* connect &amp; create the client to server segment: */
+ 	if ((mycb-&gt;shmid_ctos = shmget(mycb-&gt;key_ctos, RB_STD_SIZE, 0644 | IPC_CREAT)) == -1) {
+ 		errn(&quot;shm_open_comblock:shmget()&quot;,errno);
+@@ -132,17 +132,17 @@
+ 	data[0]=mycb-&gt;key_ctos;
+ 	data[1]=mycb-&gt;key_stoc;
+ 	mycb-&gt;idle=0;
+-	dprintf(LOW,&quot;shm_open_comblock():data: %08x, %08x&quot;,data[0],data[1]);
++	s3dprintf(LOW,&quot;shm_open_comblock():data: %08x, %08x&quot;,data[0],data[1]);
+ 	return(0);	
+ }
+ 
+ int shm_quit()
+ {
+ 	/* detach from the segment: */
+-	dprintf(LOW,&quot;shm_quit()...&quot;);
++	s3dprintf(LOW,&quot;shm_quit()...&quot;);
+ 	unlink(ftoken);
+ 	data[0]=data[1]=0;
+-	dprintf(MED,&quot;shm_quit():removing init block&quot;);
++	s3dprintf(MED,&quot;shm_quit():removing init block&quot;);
+ 	if (shmdt(data) == -1) 
+ 		errn(&quot;shm_quit():shmdt()&quot;,errno);
+ 	if (shmctl(shmid, IPC_RMID, NULL) == -1) 
+@@ -151,8 +151,8 @@
+ }
+ int shm_remove(struct t_process *p)
+ {
+-	dprintf(MED,&quot;shm_remove(): removing pid %d&quot;,p-&gt;id);
+-	dprintf(MED,&quot;shm_remove():freeing keys: %08x, %08x&quot;,p-&gt;shmsock.key_ctos,p-&gt;shmsock.key_stoc);
++	s3dprintf(MED,&quot;shm_remove(): removing pid %d&quot;,p-&gt;id);
++	s3dprintf(MED,&quot;shm_remove():freeing keys: %08x, %08x&quot;,p-&gt;shmsock.key_ctos,p-&gt;shmsock.key_stoc);
+ 	if (shmdt(p-&gt;shmsock.data_ctos) == -1) 
+ 		errn(&quot;shm_rmove():shmdt()&quot;,errno);
+ 	if (shmctl(p-&gt;shmsock.shmid_ctos, IPC_RMID, NULL) == -1) 
+@@ -188,7 +188,7 @@
+ 						shmctl(procs_p[i].shmsock.shmid_ctos,IPC_STAT,&amp;d);
+ 						if (d.shm_nattch==1) /* we're all alone ... remove it!! */
+ 						{
+-							dprintf(MED,&quot;client [%s] detached, removing ... &quot;,procs_p[i].name);
++							s3dprintf(MED,&quot;client [%s] detached, removing ... &quot;,procs_p[i].name);
+ 							process_del(procs_p[i].id);
+ 						} else {
+ 							procs_p[i].shmsock.idle=0;
+@@ -203,8 +203,8 @@
+ 		new_p=process_add();
+ 		new_p-&gt;con_type=CON_SHM;
+ 		memcpy(&amp;new_p-&gt;shmsock,&amp;waiting_comblock,sizeof(struct t_shmcb));
+-		dprintf(HIGH,&quot;shm_main():registered new connection (keys %d, %d) as pid %d&quot;,new_p-&gt;shmsock.key_ctos,new_p-&gt;shmsock.key_stoc, new_p-&gt;id);
+-			dprintf(LOW,&quot;shm_main():new client attached! allocating shm block for further clients ...&quot;);
++		s3dprintf(HIGH,&quot;shm_main():registered new connection (keys %d, %d) as pid %d&quot;,new_p-&gt;shmsock.key_ctos,new_p-&gt;shmsock.key_stoc, new_p-&gt;id);
++			s3dprintf(LOW,&quot;shm_main():new client attached! allocating shm block for further clients ...&quot;);
+ 			shm_new_comblock(data);
+ 		}
+ 	return(0);
+@@ -219,7 +219,7 @@
+ 	if (3==shm_readn(dai,ibuf,3))
+ 	{
+ 		length=ntohs(*((uint16_t *)((uint8_t *)ibuf+1)));
+-		dprintf(VLOW,&quot;command %d, length %d&quot;,ibuf[0], length);
++		s3dprintf(VLOW,&quot;command %d, length %d&quot;,ibuf[0], length);
+ 		if (length&gt;0)
+ 		{
+ 			shm_readn(dai,ibuf+3,length);	  
+@@ -242,7 +242,7 @@
+ 		buf += no_written;
+ 		if (wait++&gt;SHM_MAXLOOP) 
+ 		{
+-			dprintf(HIGH,&quot;shm_writen():waited too long ...&quot;);
++			s3dprintf(HIGH,&quot;shm_writen():waited too long ...&quot;);
+ 			return(-1);
+ 		}
+ 	}
+@@ -263,7 +263,7 @@
+ 		buf += no_read;
+ 		if (wait++&gt;SHM_MAXLOOP) 
+ 		{
+-			dprintf(HIGH,&quot;shm_readn():waited too long ...&quot;);
++			s3dprintf(HIGH,&quot;shm_readn():waited too long ...&quot;);
+ 			return(-1);
+ 		}
+ 	}
+
+Modified: trunk/server/tcp.c
+===================================================================
+--- trunk/server/tcp.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/tcp.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -53,7 +53,7 @@
+ {
+ 	int yes=1;
+ 	struct sockaddr_in my_addr;   
+-	dprintf(LOW,&quot;server: creating socket&quot;);
++	s3dprintf(LOW,&quot;server: creating socket&quot;);
+ #ifdef WIN32  /*  sohn wars */
+ 	WSADATA datainfo;
+ 	if (WSAStartup(257, &amp;datainfo) != 0)
+@@ -62,7 +62,7 @@
+    if ((tcp_sockid = socket(AF_INET,SOCK_STREAM,0)) &lt; 0)
+      errnf(&quot;socket()&quot;, errno);
+ 
+-   dprintf(LOW,&quot;server: binding my local socket&quot;);
++   s3dprintf(LOW,&quot;server: binding my local socket&quot;);
+    /*  allow addresses to be reused */
+    /*  this seems to have something to do with servers using one port */
+    if ( setsockopt(tcp_sockid, SOL_SOCKET, SO_REUSEADDR, &amp;yes, sizeof(int)) == -1 )
+@@ -118,7 +118,7 @@
+ 	}
+ 	else 
+ 	if (FD_ISSET(tcp_sockid,&amp;fs_port)) {  /* redundant, I guess */
+-		dprintf(HIGH,&quot;select(): new connection!!&quot;);
++		s3dprintf(HIGH,&quot;select(): new connection!!&quot;);
+         if ((newsd = accept(tcp_sockid ,(struct sockaddr *) &amp;client_addr,&amp;clilen)) &lt; 0)
+ 			 errn(&quot;accept()&quot;,errno);
+ 		else 
+@@ -132,7 +132,7 @@
+ 			new_p=process_add();
+ 			new_p-&gt;con_type=CON_TCP;
+ 			new_p-&gt;sockid=newsd;
+-			dprintf(HIGH,&quot;registered new connection %d as pid %d&quot;,new_p-&gt;sockid, new_p-&gt;id);
++			s3dprintf(HIGH,&quot;registered new connection %d as pid %d&quot;,new_p-&gt;sockid, new_p-&gt;id);
+ 		}
+ 	}
+ 	return(0);
+@@ -207,7 +207,7 @@
+ 	if (3==tcp_readn(p-&gt;sockid, ibuf,3))
+ 	{
+ 		length=ntohs(*((uint16_t *)((uint8_t *)ibuf+1)));
+-		dprintf(VLOW,&quot;command %d, length %d&quot;,ibuf[0], length);
++		s3dprintf(VLOW,&quot;command %d, length %d&quot;,ibuf[0], length);
+ 		if (length&gt;0)
+ 		{
+ 			tcp_readn(p-&gt;sockid,ibuf+3,length);	  /*  uint16_t is limited to 65536, so  */
+@@ -215,7 +215,7 @@
+ 		}
+ 		prot_com_in(p,ibuf);
+ 	} else {
+-		dprintf(LOW,&quot;tcp_prot_com_in():n_readn():fd seems to be dead (pid %d, sock %d)&quot;, p-&gt;id, p-&gt;sockid);
++		s3dprintf(LOW,&quot;tcp_prot_com_in():n_readn():fd seems to be dead (pid %d, sock %d)&quot;, p-&gt;id, p-&gt;sockid);
+ 		process_del(p-&gt;id);
+ 	}
+ 	return(0);
+
+Modified: trunk/server/user.c
+===================================================================
+--- trunk/server/user.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/user.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -84,7 +84,7 @@
+ 					navi_back();
+ 					break;
+ 				default:
+-					dprintf(VLOW,&quot;button is ... %d&quot;, button);
++					s3dprintf(VLOW,&quot;button is ... %d&quot;, button);
+ 			}
+ 			ox=x;
+ 			oy=y;
+@@ -93,7 +93,7 @@
+ 		case 1:  /*  mouse up */
+ 			ox=oy=0xFFFFFF;
+ 			event_mbutton_clicked(button,state);
+-	/*		dprintf(LOW,&quot;state is: %d,button is %d&quot;,state,button);*/
++	/*		s3dprintf(LOW,&quot;state is: %d,button is %d&quot;,state,button);*/
+ 			break;
+ 		case 2:	 /*  mouse still down */
+ 			switch (button)
+@@ -113,7 +113,7 @@
+ 					navi_back();
+ 					break;
+ 				default:
+-					dprintf(VLOW,&quot;button is ... %d&quot;, button);
++					s3dprintf(VLOW,&quot;button is ... %d&quot;, button);
+ 			}
+ 			ox=x;
+ 			oy=y;
+
+Modified: trunk/server/user_glut.c
+===================================================================
+--- trunk/server/user_glut.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/user_glut.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -34,7 +34,7 @@
+ /*  init user input things for glut */
+ int user_init_glut()
+ {
+-	dprintf(MED,&quot;using GLUT for user input&quot;);
++	s3dprintf(MED,&quot;using GLUT for user input&quot;);
+ 	glutKeyboardFunc (keyboard);
+ 	glutSpecialFunc (special);
+ 	glutMouseFunc (user_mouse);
+@@ -76,7 +76,7 @@
+ 		case GLUT_KEY_INSERT: 	mkey=S3DK_INSERT;break;
+ 		default: 				mkey=skey; break;
+ 	}
+-	dprintf(MED,&quot;special(): %d -&gt; %d&quot;,skey,mkey);
++	s3dprintf(MED,&quot;special(): %d -&gt; %d&quot;,skey,mkey);
+ 	user_key(mkey,0,0,0);
+ 	user_key(mkey,0,0,1);
+ }
+
+Modified: trunk/server/user_sdl.c
+===================================================================
+--- trunk/server/user_sdl.c	2006-06-04 18:55:53 UTC (rev 329)
++++ trunk/server/user_sdl.c	2006-06-04 20:27:36 UTC (rev 330)
+@@ -40,7 +40,7 @@
+ 	switch (event.type)
+ 	{
+ 		case SDL_MOUSEMOTION: 
+-/* 			dprintf(VLOW,&quot;Current mouse position is: (%d, %d),button %d&quot;, event.motion.x, event.motion.y,event.button.button); */
++/* 			s3dprintf(VLOW,&quot;Current mouse position is: (%d, %d),button %d&quot;, event.motion.x, event.motion.y,event.button.button); */
+ 			 switch (event.button.button)
+ 			 {
+ 			 	case SDL_BUTTON_LEFT:
+@@ -59,7 +59,7 @@
+ 					break;
+ 					 /*  no button ... */
+ 				default:
+-					dprintf(LOW,&quot;don't know button %d&quot;, event.button.button);
++					s3dprintf(LOW,&quot;don't know button %d&quot;, event.button.button);
+ 
+ 			 }
+ 			break;
+@@ -77,7 +77,7 @@
+ 				case SDL_BUTTON_WHEELDOWN:
+ 			 		user_mouse(4,0,event.motion.x,event.motion.y);break;
+ 				default:
+-					dprintf(LOW,&quot;don't know button %d&quot;, event.button.button);
++					s3dprintf(LOW,&quot;don't know button %d&quot;, event.button.button);
+ 			 }
+ 			 break;
+ 		case SDL_MOUSEBUTTONUP:
+@@ -94,7 +94,7 @@
+ 				case SDL_BUTTON_WHEELDOWN:
+ 			 		user_mouse(4,1,event.motion.x,event.motion.y);break;
+ 				default:
+-					dprintf(LOW,&quot;don't know button %d&quot;, event.button.button);
++					s3dprintf(LOW,&quot;don't know button %d&quot;, event.button.button);
+ 			 }
+ 			 break;
+ 
+@@ -105,25 +105,25 @@
+ 			user_key(event.key.keysym.sym,event.key.keysym.unicode,event.key.keysym.mod,1);
+ 			break;
+ 		case SDL_QUIT:
+-			dprintf(HIGH,&quot;SDL_QUIT&quot;);
++			s3dprintf(HIGH,&quot;SDL_QUIT&quot;);
+ 			quit();
+ 			break;
+ 		 /*  these events are not processed right now ... */
+-		case SDL_ACTIVEEVENT:		dprintf(VLOW,&quot;SDL_ACTIVEEVENT&quot;);break;
+-		case SDL_SYSWMEVENT:		dprintf(VLOW,&quot;SDL_SYSWMEVENT&quot;);break;
++		case SDL_ACTIVEEVENT:		s3dprintf(VLOW,&quot;SDL_ACTIVEEVENT&quot;);break;
++		case SDL_SYSWMEVENT:		s3dprintf(VLOW,&quot;SDL_SYSWMEVENT&quot;);break;
+ 		case SDL_VIDEORESIZE:		if ((GLwin = SDL_SetVideoMode(event.resize.w,event.resize.h,16,SDLFlags))==NULL) 
+ 										errsf(&quot;SDL_SetVideoMode()&quot;,SDL_GetError());
+ 									graphics_reshape(event.resize.w,event.resize.h);
+ 									break;
+-		case SDL_VIDEOEXPOSE:		dprintf(LOW,&quot;SDL_VIDEOEXPOSE&quot;);break;
+-		case SDL_USEREVENT:			dprintf(VLOW,&quot;SDL_USEREVENT&quot;);break;
+-		case SDL_JOYAXISMOTION:		dprintf(VLOW,&quot;SDL_JOYAXISMOTION&quot;);break;
+-		case SDL_JOYBALLMOTION:		dprintf(VLOW,&quot;SDL_JOYBALLMOTION&quot;);break;
+-		case SDL_JOYHATMOTION:		dprintf(VLOW,&quot;SDL_JOYHATMOTION&quot;);break;
+-		case SDL_JOYBUTTONDOWN:		dprintf(VLOW,&quot;SDL_JOYBUTTONDOWN&quot;);break;
+-		case SDL_JOYBUTTONUP:		dprintf(VLOW,&quot;SDL_JOYBUTTONUP&quot;);break;
++		case SDL_VIDEOEXPOSE:		s3dprintf(LOW,&quot;SDL_VIDEOEXPOSE&quot;);break;
++		case SDL_USEREVENT:			s3dprintf(VLOW,&quot;SDL_USEREVENT&quot;);break;
++		case SDL_JOYAXISMOTION:		s3dprintf(VLOW,&quot;SDL_JOYAXISMOTION&quot;);break;
++		case SDL_JOYBALLMOTION:		s3dprintf(VLOW,&quot;SDL_JOYBALLMOTION&quot;);break;
++		case SDL_JOYHATMOTION:		s3dprintf(VLOW,&quot;SDL_JOYHATMOTION&quot;);break;
++		case SDL_JOYBUTTONDOWN:		s3dprintf(VLOW,&quot;SDL_JOYBUTTONDOWN&quot;);break;
++		case SDL_JOYBUTTONUP:		s3dprintf(VLOW,&quot;SDL_JOYBUTTONUP&quot;);break;
+ 		default:
+-			dprintf(MED,&quot;SDL_PollEvent(): unhandled event&quot;);
++			s3dprintf(MED,&quot;SDL_PollEvent(): unhandled event&quot;);
+ 		 	break;
+ 	  }
+   }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000322.html">[S3d-svn] r329 - in trunk: . libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000324.html">[S3d-svn] r331 - in trunk: . libs3d/libg3d/plugins/image
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#323">[ date ]</a>
+              <a href="thread.html#323">[ thread ]</a>
+              <a href="subject.html#323">[ subject ]</a>
+              <a href="author.html#323">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

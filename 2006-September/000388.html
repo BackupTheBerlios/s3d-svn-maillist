@@ -1,0 +1,215 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r395 - trunk/apps/s3d_x11gate
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r395%20-%20trunk/apps/s3d_x11gate&In-Reply-To=%3C200609162315.k8GNFg0P025150%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000387.html">
+   <LINK REL="Next"  HREF="000389.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r395 - trunk/apps/s3d_x11gate</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r395%20-%20trunk/apps/s3d_x11gate&In-Reply-To=%3C200609162315.k8GNFg0P025150%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r395 - trunk/apps/s3d_x11gate">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Sep 17 01:15:42 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000387.html">[S3d-svn] r394 - in trunk: example libs3d server
+</A></li>
+        <LI>Next message: <A HREF="000389.html">[S3d-svn] r396 - in trunk: apps/olsrs3d libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#388">[ date ]</a>
+              <a href="thread.html#388">[ thread ]</a>
+              <a href="subject.html#388">[ subject ]</a>
+              <a href="author.html#388">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-17 01:15:42 +0200 (Sun, 17 Sep 2006)
+New Revision: 395
+
+Modified:
+   trunk/apps/s3d_x11gate/s3d_x11gate.c
+Log:
+- some shm testing (not stable!!)
+
+Modified: trunk/apps/s3d_x11gate/s3d_x11gate.c
+===================================================================
+--- trunk/apps/s3d_x11gate/s3d_x11gate.c	2006-09-16 10:48:18 UTC (rev 394)
++++ trunk/apps/s3d_x11gate/s3d_x11gate.c	2006-09-16 23:15:42 UTC (rev 395)
+@@ -30,15 +30,30 @@
+ #define XK_MISCELLANY
+ #include &lt;X11/keysymdef.h&gt;	 /* keysyms */
+ #include &lt;X11/extensions/XTest.h&gt;	/* keyboard/mouse input via s3d */
+-#include &lt;time.h&gt;	/* nanosleep() */
++#include &lt;X11/extensions/XShm.h&gt; /* */
++#include &lt;time.h&gt;		/* nanosleep() */
++#include &lt;sys/time.h&gt; 	/* gettimeofday */
++#include &lt;sys/ipc.h&gt;
++#include &lt;sys/shm.h&gt;
+ static struct timespec t={0,100*1000*1000}; /* 100 mili seconds */
+ 
+ int oid;
+ XImage *image;
+ Display *dpy=0;
+ int window,scr;
+-int width,height;
++unsigned int width,height, height, depth;
++int format;
++char *data;
++Visual *visual;
++XShmSegmentInfo shminfo;
+ char *tex_image=NULL,*otex_image=NULL,*img1,*img2;
++
++
++
++struct timeval start, end;
++int iterations;
++float count[3];
++
+ int get_shift(unsigned long t)
+ {
+ 	int i=0;
+@@ -57,7 +72,18 @@
+ 	int bpp;
+ 	char *swap_timg;
+ 	int last_change,start_change;
+-	image = XGetImage(dpy,window,0,0,width,height,AllPlanes,ZPixmap);
++	gettimeofday(&amp;end,NULL);
++	count[0]+=(end.tv_sec-start.tv_sec)*10000000 + end.tv_usec-start.tv_usec;
++	start.tv_sec	=end.tv_sec;
++	start.tv_usec 	=end.tv_usec;
++
++/*	image = XGetImage(dpy,window,0,0,width,height,AllPlanes,ZPixmap);*/
++	printf(&quot;dpy: %010p, window: %010p, image: %010p\n&quot;,dpy,window,image);
++	XShmGetImage(dpy, window, image, 0,0,0xffffffff);
++	gettimeofday(&amp;end,NULL);
++	count[1]+=(end.tv_sec-start.tv_sec)*10000000 + end.tv_usec-start.tv_usec;
++	start.tv_sec	=end.tv_sec;
++	start.tv_usec 	=end.tv_usec;
+ 	if (image-&gt;format==ZPixmap)
+ 	{
+ 		printf(&quot;Ximage: %dx%d, format %d (%d), bpp: %d, depth %d, pad %d\n&quot;,image-&gt;width,image-&gt;height,image-&gt;format,ZPixmap,
+@@ -102,7 +128,6 @@
+ 				}
+ 				if (last_change!=y)
+ 				{	 /*  last change is already over, post it! */
+-/*					printf(&quot;[%d to %d]&quot;,start_change,last_change);*/
+ 					s3d_load_texture(oid,0,0,start_change,width,last_change-start_change+1,(unsigned char *)tex_image+start_change*width*4);
+ 					start_change=-1;
+ 					last_change=-1;
+@@ -121,9 +146,16 @@
+ 		tex_image=otex_image;
+ 		otex_image=swap_timg;
+ 	}
+-	XDestroyImage(image);
++	gettimeofday(&amp;end,NULL);
++	count[2]+=(end.tv_sec-start.tv_sec)*10000000 + end.tv_usec-start.tv_usec;
++	start.tv_sec	=end.tv_sec;
++	start.tv_usec 	=end.tv_usec;
++	iterations++;
++/*	XDestroyImage(image);*/
++	for (x=0;x&lt;3;x++)
++		printf(&quot;[%d] %f\n&quot;,x,count[x]/iterations);
+ 
+-	nanosleep(&amp;t,NULL); 
++/*	nanosleep(&amp;t,NULL); */
+ }
+ void keypress(struct s3d_evt *event)
+ {
+@@ -152,7 +184,11 @@
+ }
+ void mouseclick(struct s3d_evt *event)
+ {
+-	printf(&quot;not processing mouse clicks yet ... \n&quot;);
++	int i;
++	printf(&quot;thats it, collecting:\n&quot;);
++	for (i=0;i&lt;3;i++)
++		printf(&quot;[%d] %f\n&quot;,i,count[i]/iterations);
++	exit(0);	
+ }
+ int main(int argc, char **argv)
+ {
+@@ -167,12 +203,16 @@
+ 		printf(&quot;couldn't open display\n&quot;);
+ 		return(-1);
+ 	}
++	count[0]=count[1]=count[2]=0;
++	iterations=0;
+ 	if (!s3d_init(&amp;argc,&amp;argv,&quot;X11-gate&quot;))
+ 	{
+ 		scr = DefaultScreen(dpy);
+ 		window = RootWindow(dpy, scr);
+ 		width = DisplayWidth(dpy, scr);
+ 		height = DisplayHeight(dpy, scr);
++		visual= DefaultVisual(dpy, scr);
++		depth = DefaultDepth(dpy, scr);
+ 		XLockDisplay(dpy);
+ 		xt=XTestQueryExtension(dpy,&amp;a,&amp;b,&amp;c,&amp;d);
+ 		XUnlockDisplay(dpy);
+@@ -180,6 +220,19 @@
+ 		{
+ 			printf(&quot;having xtest extension ...\n&quot;);
+ 		}
++/* X11 shm - <A HREF="http://www.xfree86.org/current/mit-shm.html">http://www.xfree86.org/current/mit-shm.html</A> */
++		
++		image= XShmCreateImage(dpy, visual, depth, ZPixmap, NULL, &amp;shminfo, width, height);
++		shminfo.shmid = shmget(IPC_PRIVATE, image-&gt;bytes_per_line * image-&gt;height, IPC_CREAT|0777);
++		shminfo.shmaddr = image-&gt;data = shmat (shminfo.shmid, 0, 0);
++		shmctl(shminfo.shmid, IPC_RMID, 0);
++		shminfo.readOnly= False;
++		if (!XShmAttach(dpy, &amp;shminfo)) 
++			printf(&quot;cannot use the shared memory segment .. :( \n&quot;);
++		else
++			printf(&quot;can use share segment :D\n&quot;);
++		XSync(dpy, False);
++		
+ 		s3d_set_callback(S3D_EVENT_OBJ_CLICK,mouseclick);
+ 		s3d_set_callback(S3D_EVENT_KEY,keypress);
+ 		printf(&quot;screen: %dx%d\n&quot;,width,height);
+@@ -207,7 +260,8 @@
+ 		s3d_push_texture(oid,width,height);
+ 					 /*  push data on texture 0 position (0,0) */
+ 		s3d_pep_material_texture(oid,0);	 /*  assign texture 0 to material 0 */
+-		s3d_flags_on(oid,S3D_OF_VISIBLE);
++		s3d_flags_on(oid,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++		gettimeofday(&amp;start,NULL);
+ 		s3d_mainloop(mainloop);
+ 		free(img1);
+ 		free(img2);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000387.html">[S3d-svn] r394 - in trunk: example libs3d server
+</A></li>
+	<LI>Next message: <A HREF="000389.html">[S3d-svn] r396 - in trunk: apps/olsrs3d libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#388">[ date ]</a>
+              <a href="thread.html#388">[ thread ]</a>
+              <a href="subject.html#388">[ subject ]</a>
+              <a href="author.html#388">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

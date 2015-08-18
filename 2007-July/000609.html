@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r618 - in branches/s3d-cmake: libs3d server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r618%20-%20in%20branches/s3d-cmake%3A%20libs3d%20server&In-Reply-To=%3C200707011315.l61DF0R2032069%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000608.html">
+   <LINK REL="Next"  HREF="000612.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r618 - in branches/s3d-cmake: libs3d server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r618%20-%20in%20branches/s3d-cmake%3A%20libs3d%20server&In-Reply-To=%3C200707011315.l61DF0R2032069%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r618 - in branches/s3d-cmake: libs3d server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Jul  1 15:15:00 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000608.html">[S3d-svn] r617 - in branches/s3d-cmake: libs3d server
+</A></li>
+        <LI>Next message: <A HREF="000612.html">[S3d-svn] r619 - branches/s3d-cmake/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#609">[ date ]</a>
+              <a href="thread.html#609">[ thread ]</a>
+              <a href="subject.html#609">[ subject ]</a>
+              <a href="author.html#609">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-07-01 15:15:00 +0200 (Sun, 01 Jul 2007)
+New Revision: 618
+
+Modified:
+   branches/s3d-cmake/libs3d/s3dlib.h
+   branches/s3d-cmake/server/global.h
+Log:
+- Marked parameters in dummy-debug &quot;static inline&quot; functions as explicit unused to disable warnings
+
+
+Modified: branches/s3d-cmake/libs3d/s3dlib.h
+===================================================================
+--- branches/s3d-cmake/libs3d/s3dlib.h	2007-07-01 13:14:59 UTC (rev 617)
++++ branches/s3d-cmake/libs3d/s3dlib.h	2007-07-01 13:15:00 UTC (rev 618)
+@@ -60,17 +60,22 @@
+ /*  some local prototypes: */
+ /*  char *s3d_open_file(char *fname); */
+ int net_prot_in(uint8_t opcode, uint16_t length, char *buf);
++
+ #ifdef DEBUG
+ void s3dprintf(int relevance, const char *fmt, ...);
+ void errdn(int relevance, char *func,int en); 
+ void errds(int relevance,char *func, const char *fmt, ...);
+-
+ #else 
+-static __inline__ void s3dprintf(int relevance, const char *fmt, ...) {}
+-static __inline__ void errdn(int relevance, char *func,int en) {}
+-static __inline__ void errds(int relevance,char *func, const char *fmt, ...) {}
++static __inline__ void s3dprintf(int relevance  __attribute__((unused)),
++                                 const char *fmt __attribute__((unused)), ...) {}
++static __inline__ void errdn(int relevance __attribute__((unused)),
++                             char *func __attribute__((unused)),
++                             int en __attribute__((unused))) {}
++static __inline__ void errds(int relevance __attribute__((unused)),
++                             char *func __attribute__((unused)),
++                             const char *fmt __attribute__((unused)), ...) {}
++#endif
+ 
+-#endif
+ void errn(char *func,int en);
+ void errs(char *func, char *msg);
+ 
+
+Modified: branches/s3d-cmake/server/global.h
+===================================================================
+--- branches/s3d-cmake/server/global.h	2007-07-01 13:14:59 UTC (rev 617)
++++ branches/s3d-cmake/server/global.h	2007-07-01 13:15:00 UTC (rev 618)
+@@ -277,8 +277,11 @@
+ void errds(int relevance,char *func, const char *fmt, ...);
+ void s3dprintf(int relevance, const char *msg, ...);
+ #else
+-static __inline__ void errds(int relevance, char *func, const char *fmt, ...) {}
+-static __inline__ void s3dprintf(int relevance, const char *msg, ...) {}
++static __inline__ void errds(int relevance __attribute__((unused)),
++                             char *func __attribute__((unused)),
++                             const char *fmt __attribute__((unused)), ...) {}
++static __inline__ void s3dprintf(int relevance __attribute__((unused)),
++                                 const char *msg __attribute__((unused)), ...) {}
+ #endif
+ /*  graphics.c */
+ int graphics_quit(void);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000608.html">[S3d-svn] r617 - in branches/s3d-cmake: libs3d server
+</A></li>
+	<LI>Next message: <A HREF="000612.html">[S3d-svn] r619 - branches/s3d-cmake/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#609">[ date ]</a>
+              <a href="thread.html#609">[ thread ]</a>
+              <a href="subject.html#609">[ subject ]</a>
+              <a href="author.html#609">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

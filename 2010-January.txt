@@ -1,0 +1,119 @@
+From lazhur at mail.berlios.de  Wed Jan 13 23:42:49 2010
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Wed, 13 Jan 2010 23:42:49 +0100
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-4-1-g858eec8
+Message-ID: <201001132242.o0DMgnBe014082@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  858eec88132eafbd3e9f685bc8ba670a29f3d4e9 (commit)
+      from  f2402ff69d5ef9f99337430326e8c7bff1802141 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 858eec88132eafbd3e9f685bc8ba670a29f3d4e9
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Jan 13 23:42:52 2010 +0100
+
+    Correct spelling errors found by lintian
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog                       |    8 +++++++-
+ debian/manpages/s3d_load_materials_a.3 |    2 +-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Wed Jan 13 23:54:35 2010
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Wed, 13 Jan 2010 23:54:35 +0100
+Subject: [S3d-svn] Project s3d at BerliOS branch, master,
+	updated. v0.2.1.1-79-gfdd7cbe
+Message-ID: <201001132254.o0DMsZn4014664@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, master has been updated
+       via  fdd7cbe76924d8d88a7c7ec743de7e0ce342b3ba (commit)
+      from  49e45b072bc0ec989bfe1f2b3c8461b48340758f (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit fdd7cbe76924d8d88a7c7ec743de7e0ce342b3ba
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Wed Jan 13 23:53:58 2010 +0100
+
+    Correct spelling of information
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ Documentation/extractdefinitions.py                |   28 ++++++++++----------
+ Documentation/libs3d/functions.docbook             |    2 +-
+ Documentation/manpages/man3/s3d_load_materials_a.3 |    2 +-
+ libs3d/proto_out.c                                 |    2 +-
+ 4 files changed, 17 insertions(+), 17 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Tue Jan 19 23:49:27 2010
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Tue, 19 Jan 2010 23:49:27 +0100
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-4-2-g38a7b19
+Message-ID: <201001192249.o0JMnR1r020955@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  38a7b1910ec390bac03cc1fdcf81e2c7bfd16990 (commit)
+      from  858eec88132eafbd3e9f685bc8ba670a29f3d4e9 (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 38a7b1910ec390bac03cc1fdcf81e2c7bfd16990
+Author: Sven Eckelmann <sven.eckelmann at gmx.de>
+Date:   Tue Jan 19 23:49:53 2010 +0100
+
+    Update copyright years
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    1 +
+ debian/copyright |    4 ++--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

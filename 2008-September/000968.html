@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r988 - trunk/Documentation
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r988%20-%20trunk/Documentation&In-Reply-To=%3C200809031546.m83Fk2dE031417%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000967.html">
+   <LINK REL="Next"  HREF="000969.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r988 - trunk/Documentation</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r988%20-%20trunk/Documentation&In-Reply-To=%3C200809031546.m83Fk2dE031417%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r988 - trunk/Documentation">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Wed Sep  3 17:46:02 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000967.html">[S3d-svn] r987 - trunk/Documentation
+</A></li>
+        <LI>Next message: <A HREF="000969.html">[S3d-svn] r989 - trunk/Documentation
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#968">[ date ]</a>
+              <a href="thread.html#968">[ thread ]</a>
+              <a href="subject.html#968">[ subject ]</a>
+              <a href="author.html#968">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-03 17:46:02 +0200 (Wed, 03 Sep 2008)
+New Revision: 988
+
+Modified:
+   trunk/Documentation/extractdefinitions.py
+Log:
+Save struct elements in a specialized class
+
+Modified: trunk/Documentation/extractdefinitions.py
+===================================================================
+--- trunk/Documentation/extractdefinitions.py	2008-09-03 15:45:55 UTC (rev 987)
++++ trunk/Documentation/extractdefinitions.py	2008-09-03 15:46:02 UTC (rev 988)
+@@ -186,6 +186,39 @@
+ 		if self.param['array'] != '':
+ 			create_append_text(paramdef, self.param['array'])
+ 
++class struct_element:
++	def __init__(self, node):
++		self.element = {'type': '', 'name' : '', 'help': []}
++		for node2 in node.childNodes:
++			if node2.nodeName == &quot;name&quot;:
++				self.element['name'] = get_text(node2)
++
++			if node2.nodeName == &quot;type&quot;:
++				self.element['type'] = get_text(node2)
++
++			if node2.nodeName == 'detaileddescription':
++				self.element['help'] = detaileddescription(node2)
++
++	def dom_append(self, programlisting):
++		create_append_text(programlisting, '\t'+self.element['type'])
++		if self.element['type'][-1:] != &quot;*&quot;:
++			# dont add space between * and name
++			create_append_text(programlisting, &quot; &quot;)
++		create_append_text(programlisting, self.element['name']+';\n')
++
++	def dom_append_help(self, variablelist):
++		# ignore members with empty help texts
++		if self.element['help'].isempty():
++			return
++
++		varlistentry = create_append(variablelist, 'varlistentry')
++		term = create_append(varlistentry, 'term')
++		create_append_text(term, self.element['name'])
++		listitem = create_append(varlistentry, 'listitem')
++
++		# add help to struct member
++		self.element['help'].dom_append(listitem)
++
+ def remove_exportdefinitions(function_return):
+ 	exports = [&quot;S3DEXPORT&quot;, &quot;S3DWEXPORT&quot;]
+ 	for export in exports:
+@@ -267,19 +300,8 @@
+ 				struct['help'] = detaileddescription(node)
+ 
+ 		for node in dom.getElementsByTagName(&quot;memberdef&quot;):
+-			element = {'type': '', 'name' : '', 'help': []}
+-			for node2 in node.childNodes:
+-				if node2.nodeName == &quot;name&quot;:
+-					element['name'] = get_text(node2)
++			struct['elements'].append(struct_element(node))
+ 
+-				if node2.nodeName == &quot;type&quot;:
+-					element['type'] = get_text(node2)
+-
+-				if node2.nodeName == 'detaileddescription':
+-					element['help'] = detaileddescription(node2)
+-
+-			struct['elements'].append(element)
+-
+ 	return structlist
+ 
+ &quot;&quot;&quot;
+@@ -383,11 +405,7 @@
+ 		programlisting = create_append(sect2, 'programlisting')
+ 		create_append_text(programlisting, 'struct '+struct['name']+' {\n')
+ 		for element in struct['elements']:
+-			create_append_text(programlisting, '\t'+element['type'])
+-			if element['type'][-1:] != &quot;*&quot;:
+-				# dont add space between * and name
+-				create_append_text(programlisting, &quot; &quot;)
+-			create_append_text(programlisting, element['name']+';\n')
++			element.dom_append(programlisting)
+ 		create_append_text(programlisting, '}')
+ 
+ 		# add help to struct
+@@ -396,18 +414,8 @@
+ 		# add list of struct members with their help
+ 		variablelist = create_append(sect2, 'variablelist')
+ 		for element in struct['elements']:
+-			# ignore members with empty help texts
+-			if element['help'].isempty():
+-				continue
++			element.dom_append_help(variablelist)
+ 
+-			varlistentry = create_append(variablelist, 'varlistentry')
+-			term = create_append(varlistentry, 'term')
+-			create_append_text(term, element['name'])
+-			listitem = create_append(varlistentry, 'listitem')
+-
+-			# add help to struct member
+-			element['help'].dom_append(listitem)
+-
+ 		# remove empty variablelist
+ 		if len(variablelist.childNodes) == 0:
+ 			sect2.removeChild(variablelist)
+@@ -572,11 +580,7 @@
+ 		programlisting = create_append(refsect1, 'programlisting')
+ 		create_append_text(programlisting, 'struct '+struct['name']+' {\n')
+ 		for element in struct['elements']:
+-			create_append_text(programlisting, '\t'+element['type'])
+-			if element['type'][-1:] != &quot;*&quot;:
+-				# dont add space between * and name
+-				create_append_text(programlisting, &quot; &quot;)
+-			create_append_text(programlisting, element['name']+';\n')
++			element.dom_append(programlisting)
+ 		create_append_text(programlisting, '}')
+ 
+ 		# add help to struct
+@@ -588,18 +592,8 @@
+ 		# add list of struct members with their help
+ 		variablelist = create_append(refsect1, 'variablelist')
+ 		for element in struct['elements']:
+-			# ignore members with empty help texts
+-			if element['help'].isempty():
+-				continue
++			element.dom_append_help(variablelist)
+ 
+-			varlistentry = create_append(variablelist, 'varlistentry')
+-			term = create_append(varlistentry, 'term')
+-			create_append_text(term, element['name'])
+-			listitem = create_append(varlistentry, 'listitem')
+-
+-			# add help to struct member
+-			element['help'].dom_append(listitem)
+-
+ 		# remove empty variablelist
+ 		if len(variablelist.childNodes) == 0:
+ 			refsect1.removeChild(variablelist)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000967.html">[S3d-svn] r987 - trunk/Documentation
+</A></li>
+	<LI>Next message: <A HREF="000969.html">[S3d-svn] r989 - trunk/Documentation
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#968">[ date ]</a>
+              <a href="thread.html#968">[ thread ]</a>
+              <a href="subject.html#968">[ subject ]</a>
+              <a href="author.html#968">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

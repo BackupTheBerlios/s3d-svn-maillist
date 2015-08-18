@@ -1,0 +1,285 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r150 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r150%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603131633.k2DGXexb017565%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000145.html">
+   <LINK REL="Next"  HREF="000147.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r150 - trunk/apps/olsrs3d</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r150%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603131633.k2DGXexb017565%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r150 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Mon Mar 13 17:33:40 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000145.html">[S3d-svn] r149 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000147.html">[S3d-svn] r151 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#146">[ date ]</a>
+              <a href="thread.html#146">[ thread ]</a>
+              <a href="subject.html#146">[ subject ]</a>
+              <a href="author.html#146">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-03-13 17:33:39 +0100 (Mon, 13 Mar 2006)
+New Revision: 150
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/net.c
+   trunk/apps/olsrs3d/olsrs3d.h
+   trunk/apps/olsrs3d/process.c
+Log:
+new color scheme for olsrs3d
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-03-12 15:37:48 UTC (rev 149)
++++ trunk/apps/olsrs3d/main.c	2006-03-13 16:33:39 UTC (rev 150)
+@@ -46,7 +46,7 @@
+ int Olsr_node_count = 0, Last_olsr_node_count = -1;
+ int Olsr_node_count_obj = -1;
+ 
+-int Byte_count;
++int Net_read_count;
+ 
+ int Olsr_node_obj, Olsr_node_inet_obj, Olsr_node_hna_net;
+ 
+@@ -386,6 +386,7 @@
+ 			distance = dirt( olsr_con-&gt;left_olsr_node-&gt;pos_vec, olsr_con-&gt;right_olsr_node-&gt;pos_vec, tmp_mov_vec );
+ 			f = (( olsr_con-&gt;left_etx + olsr_con-&gt;right_etx ) / 4.0 ) / distance;
+ 			if ( f &lt; 0.3 ) f = 0.3;
++// 			if ( f &lt; 0.9 ) f = 0.9;
+ 
+ 			mov_add( olsr_con-&gt;left_olsr_node-&gt;mov_vec, tmp_mov_vec, 1 / f - 1 );
+ 			mov_add( olsr_con-&gt;right_olsr_node-&gt;mov_vec, tmp_mov_vec, - ( 1 / f - 1 ) );
+@@ -410,7 +411,7 @@
+ 
+ 	float null_vec[3] = {0,0,0};
+ 	float tmp_mov_vec[3];
+-	float distance, factor, etx, rgb;
++	float distance, factor, etx, rgb, rgb2;
+ 	struct olsr_con *olsr_con = Con_begin;
+ 
+ 	while ( olsr_con != NULL ) {
+@@ -494,7 +495,7 @@
+ 		s3d_pop_vertex( olsr_con-&gt;obj_id, 6 );
+ 		s3d_pop_polygon( olsr_con-&gt;obj_id, 2 );
+ 		s3d_pop_material( olsr_con-&gt;obj_id, 1 );
+-		
++
+ 		s3d_push_vertex( olsr_con-&gt;obj_id, olsr_con-&gt;left_olsr_node-&gt;pos_vec[0] , olsr_con-&gt;left_olsr_node-&gt;pos_vec[1] , olsr_con-&gt;left_olsr_node-&gt;pos_vec[2] );
+ 		s3d_push_vertex( olsr_con-&gt;obj_id, olsr_con-&gt;left_olsr_node-&gt;pos_vec[0] + 0.2 , olsr_con-&gt;left_olsr_node-&gt;pos_vec[1] , olsr_con-&gt;left_olsr_node-&gt;pos_vec[2] );
+ 		s3d_push_vertex( olsr_con-&gt;obj_id, olsr_con-&gt;left_olsr_node-&gt;pos_vec[0] - 0.2 , olsr_con-&gt;left_olsr_node-&gt;pos_vec[1] , olsr_con-&gt;left_olsr_node-&gt;pos_vec[2] );
+@@ -502,7 +503,7 @@
+ 		s3d_push_vertex( olsr_con-&gt;obj_id, olsr_con-&gt;right_olsr_node-&gt;pos_vec[0] , olsr_con-&gt;right_olsr_node-&gt;pos_vec[1] , olsr_con-&gt;right_olsr_node-&gt;pos_vec[2] );
+ 		s3d_push_vertex( olsr_con-&gt;obj_id, olsr_con-&gt;right_olsr_node-&gt;pos_vec[0] , olsr_con-&gt;right_olsr_node-&gt;pos_vec[1]+ 0.2 , olsr_con-&gt;right_olsr_node-&gt;pos_vec[2] );
+ 		s3d_push_vertex( olsr_con-&gt;obj_id, olsr_con-&gt;right_olsr_node-&gt;pos_vec[0] , olsr_con-&gt;right_olsr_node-&gt;pos_vec[1]- 0.2 , olsr_con-&gt;right_olsr_node-&gt;pos_vec[2] );
+-		
++
+ 		if ( ColorSwitch ) {
+ 
+ 			/* HNA */
+@@ -517,28 +518,59 @@
+ 
+ 				etx = ( ( ( olsr_con-&gt;left_etx + olsr_con-&gt;right_etx ) / 2.0 ) - 10.0 ) * 10.0;
+ 
+-				if ( ( etx &gt;= 1.0 ) &amp;&amp; ( etx &lt; 2.0 ) ) {
++				/* very good link - bright blue */
++				if ( ( etx &gt;= 1.0 ) &amp;&amp; ( etx &lt; 1.5 ) ) {
+ 
+-					rgb = etx - 1.0;
+ 					s3d_push_material( olsr_con-&gt;obj_id,
+-								rgb,1.0,0.0,
+-								rgb,1.0,0.0,
+-								rgb,1.0,0.0);
++							0.5,1.0,1.0,
++							0.5,1.0,1.0,
++							0.5,1.0,1.0);
+ 
++				/* good link - bright yellow */
++				} else if ( ( etx &gt;= 1.5 ) &amp;&amp; ( etx &lt; 2.0 ) ) {
++
++					rgb = 2.0 - etx;
++					s3d_push_material( olsr_con-&gt;obj_id,
++							1.0,1.0,rgb,
++							1.0,1.0,rgb,
++							1.0,1.0,rgb);
++
++				/* not so good link - orange */
+ 				} else if ( ( etx &gt;= 2.0 ) &amp;&amp; ( etx &lt; 3.0 ) ) {
+ 
+-					rgb = 3.0 - etx;
++					rgb = 1.5 - ( etx / 2.0 );
+ 					s3d_push_material( olsr_con-&gt;obj_id,
+-								1.0,rgb,0.0,
+-								1.0,rgb,0.0,
+-								1.0,rgb,0.0);
++							1.0,rgb,0.0,
++							1.0,rgb,0.0,
++							1.0,rgb,0.0);
+ 
++				/* bad link (almost dead) - brown */
++				} else if ( ( etx &gt;= 3.0 ) &amp;&amp; ( etx &lt; 5.0 ) ) {
++
++					rgb = 1.75 - ( etx / 4.0 );
++					rgb2 = 1.25 - ( etx / 4.0 );
++					s3d_push_material( olsr_con-&gt;obj_id,
++							rgb,rgb2,0.0,
++							rgb,rgb2,0.0,
++							rgb,rgb2,0.0);
++
++				/* zombie link - grey */
++				} else if ( ( etx &gt;= 5.0 ) &amp;&amp; ( etx &lt; 1000.0 ) ) {
++
++					rgb = 1000.0 / ( 1500.0 + etx );
++
++					s3d_push_material( olsr_con-&gt;obj_id,
++							rgb,rgb,rgb,
++							rgb,rgb,rgb,
++							rgb,rgb,rgb);
++
++				/* wtf - dark grey */
+ 				} else {
+ 
+ 					s3d_push_material( olsr_con-&gt;obj_id,
+-								1.0,0.0,0.0,
+-								1.0,0.0,0.0,
+-								1.0,0.0,0.0);
++							0.6,0.6,0.6,
++							0.6,0.6,0.6,
++							0.6,0.6,0.6);
+ 
+ 				}
+ 
+@@ -594,7 +626,7 @@
+ 	}
+ 
+ 	/* read data from socket */
+-	Byte_count = 0;
++	Net_read_count = 0;
+ 	while ( ( net_result = net_main() ) != 0 ) {
+ 		if ( net_result == -1 ) {
+ 			s3d_quit();
+@@ -658,7 +690,7 @@
+ 			break;
+ 		case 16: /* strg + p */
+ 			s3d_translate(ZeroPoint,0.0,0.0,0.0);
+-			ZeroPosition[0] = ZeroPosition[1] = ZeroPosition[2] = 0.0; 
++			ZeroPosition[0] = ZeroPosition[1] = ZeroPosition[2] = 0.0;
+ 			break;
+ 		case 101: /* arrow up */
+ 			ZeroPosition[1]++;
+
+Modified: trunk/apps/olsrs3d/net.c
+===================================================================
+--- trunk/apps/olsrs3d/net.c	2006-03-12 15:37:48 UTC (rev 149)
++++ trunk/apps/olsrs3d/net.c	2006-03-13 16:33:39 UTC (rev 150)
+@@ -27,7 +27,7 @@
+ 
+ #include &lt;stdio.h&gt;
+ #include &lt;stdlib.h&gt;
+-#include &lt;unistd.h&gt;
++#include &lt;unistd.h&gt;	/* usleep() */
+ #include &lt;errno.h&gt;
+ #include &lt;string.h&gt; 	/* strlen(), memmove(), strncpy(), strncat() */
+ #include &lt;netdb.h&gt;
+@@ -111,9 +111,10 @@
+ 
+ 	process_main();
+ 
+-	if ( ( Byte_count += numbytes ) &gt; 1000 ) {
++	if ( ++Net_read_count &gt; 5 ) {
+ 		return(0);   /* continue mainloop */
+ 	} else {
++		/* usleep(5000); */
+ 		return(1);   /* continue reading data from socket */
+ 	}
+ 
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-03-12 15:37:48 UTC (rev 149)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-03-13 16:33:39 UTC (rev 150)
+@@ -96,7 +96,7 @@
+ extern int Olsr_node_count;
+ extern int Last_olsr_node_count;
+ 
+-extern int Byte_count;
++extern int Net_read_count;
+ 
+ extern int ZeroPoint;
+ 
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-03-12 15:37:48 UTC (rev 149)
++++ trunk/apps/olsrs3d/process.c	2006-03-13 16:33:39 UTC (rev 150)
+@@ -442,7 +442,7 @@
+ 							if ( Debug ) printf( &quot;new hna network: %s\n&quot;, olsr_node2-&gt;ip );
+ 
+ 						}
+-						if(olsr_node1-&gt;visible &amp;&amp; olsr_node2-&gt;visible)
++						if ( olsr_node1-&gt;visible &amp;&amp; olsr_node2-&gt;visible )
+ 							add_olsr_con( olsr_node1, olsr_node2, -1000.00 );
+ 
+ 					}
+@@ -469,17 +469,8 @@
+ 
+ 	}
+ 
+-	if ( last_cr_ptr != NULL ) memmove( lbuf, last_cr_ptr + 1, strlen( last_cr_ptr));
++	if ( last_cr_ptr != NULL ) memmove( lbuf, last_cr_ptr + 1, strlen( last_cr_ptr ) );
+ 
+-	/* TODO: check this changes as they crash olsrs3d
+-	if ( last_cr_ptr != NULL )
+-	{*/
+-		/* memmove( lbuf, ++last_cr_ptr, strlen( last_cr_ptr) ); */
+-		/* TODO: please check this process.c:339: warning: operation on `last_cr_ptr' may be undefined, i've changed it like this: */
+-		/*last_cr_ptr++;
+-		memmove( lbuf, last_cr_ptr, strlen( last_cr_ptr) );
+-	}*/
+-
+ 	return(0);
+ 
+ }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000145.html">[S3d-svn] r149 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000147.html">[S3d-svn] r151 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#146">[ date ]</a>
+              <a href="thread.html#146">[ thread ]</a>
+              <a href="subject.html#146">[ subject ]</a>
+              <a href="author.html#146">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

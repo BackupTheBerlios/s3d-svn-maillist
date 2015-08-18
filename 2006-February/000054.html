@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r58 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r58%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602120505.k1C55o20002885%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000053.html">
+   <LINK REL="Next"  HREF="000055.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r58 - trunk/apps/olsrs3d</H1>
+    <B>nichtsnutz at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r58%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602120505.k1C55o20002885%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r58 - trunk/apps/olsrs3d">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Sun Feb 12 06:05:50 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000053.html">[S3d-svn] r57 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000055.html">[S3d-svn] r59 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#54">[ date ]</a>
+              <a href="thread.html#54">[ thread ]</a>
+              <a href="subject.html#54">[ subject ]</a>
+              <a href="author.html#54">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-02-12 06:05:47 +0100 (Sun, 12 Feb 2006)
+New Revision: 58
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+Log:
+remove changes for world shift
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-02-11 15:18:58 UTC (rev 57)
++++ trunk/apps/olsrs3d/main.c	2006-02-12 05:05:47 UTC (rev 58)
+@@ -26,7 +26,6 @@
+ float CamPosition[2][3];   /* CamPosition[trans|rot][x-z] */
+ float ZeroPosition[3] = {0,0,0};   /* current position zero position */
+ int ZeroPoint;   /* object zeropoint */
+-int Follow_id = 0;
+ 
+ 
+ 
+@@ -389,12 +388,6 @@
+ 	return;
+ }
+ 
+-int follow_node() {
+-	if(Follow_id == 0)
+-		return(0);
+-	
+-}
+-
+ void stop()
+ {
+ 	s3d_quit();
+@@ -424,21 +417,12 @@
+ 
+ void object_click(struct s3d_evt *evt)
+ {
+-	struct olsr_node *F_node;
+ 	int oid;
+ 	oid=(int)*((unsigned long *)evt-&gt;buf);
+-	if (Follow_id != 0 &amp;&amp; oid == Follow_id) {
+-		Follow_id == 0;
+-		/* set world to start point */
+-	} else {
+-		F_node = *lst_search(oid);
+-		printf(&quot;%s&quot;,F_node-&gt;ip);
+-	}
+ 	/*s3d_translate(ZeroPoint,0,50,40);
+ 	ZeroPosition[0] = 0;
+ 	ZeroPosition[1] = 50;
+ 	ZeroPosition[2] = 40;*/
+-
+ }
+ 
+ /***
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000053.html">[S3d-svn] r57 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000055.html">[S3d-svn] r59 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#54">[ date ]</a>
+              <a href="thread.html#54">[ thread ]</a>
+              <a href="subject.html#54">[ subject ]</a>
+              <a href="author.html#54">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,462 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r483 - trunk/apps/kism3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r483%20-%20trunk/apps/kism3d&In-Reply-To=%3C200611211642.kALGgQbc007628%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000475.html">
+   <LINK REL="Next"  HREF="000477.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r483 - trunk/apps/kism3d</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r483%20-%20trunk/apps/kism3d&In-Reply-To=%3C200611211642.kALGgQbc007628%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r483 - trunk/apps/kism3d">marec at mail.berlios.de
+       </A><BR>
+    <I>Tue Nov 21 17:42:26 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000475.html">[S3d-svn] r482 - in trunk: . example
+</A></li>
+        <LI>Next message: <A HREF="000477.html">[S3d-svn] r484 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#476">[ date ]</a>
+              <a href="thread.html#476">[ thread ]</a>
+              <a href="subject.html#476">[ subject ]</a>
+              <a href="author.html#476">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-11-21 17:42:26 +0100 (Tue, 21 Nov 2006)
+New Revision: 483
+
+Modified:
+   trunk/apps/kism3d/Makefile.am
+   trunk/apps/kism3d/gui.c
+   trunk/apps/kism3d/kism3d.c
+   trunk/apps/kism3d/kism3d.h
+   trunk/apps/kism3d/network.c
+Log:
+initial kism3d gui setup
+
+Modified: trunk/apps/kism3d/Makefile.am
+===================================================================
+--- trunk/apps/kism3d/Makefile.am	2006-11-19 16:31:02 UTC (rev 482)
++++ trunk/apps/kism3d/Makefile.am	2006-11-21 16:42:26 UTC (rev 483)
+@@ -8,6 +8,7 @@
+ 	kism3d.c network.c client.c gui.c
+ 
+ kism3d_CPPFLAGS=		-I${top_srcdir}/libs3d -I${top_srcdir}/libs3dw
+-kism3d_LDADD=		${top_builddir}/libs3d/libs3d.la ${top_builddir}/libs3dw/libs3dw.la
++kism3d_LDADD=		${top_builddir}/libs3d/libs3d.la ${top_builddir}/libs3dw/libs3dw.la 
++kism3d_LDFLAGS =	-lpthread
+ 
+ 
+
+Modified: trunk/apps/kism3d/gui.c
+===================================================================
+--- trunk/apps/kism3d/gui.c	2006-11-19 16:31:02 UTC (rev 482)
++++ trunk/apps/kism3d/gui.c	2006-11-21 16:42:26 UTC (rev 483)
+@@ -22,3 +22,155 @@
+  */
+ 
+ 
++
++#include &quot;kism3d.h&quot;
++#include &lt;s3d.h&gt;
++#include &lt;math.h&gt;	/* M_PI, cos(), sin() */
++#include &lt;stdlib.h&gt;	/* malloc(), free() */
++#include &lt;time.h&gt;	/* nanosleep()  */
++#include &lt;pthread.h&gt;
++
++
++
++int oid;
++int r;
++
++int wire_sphere(int slices, int stacks)
++{
++	int x,y,i,o;
++	int num_v,num_l;
++	float *v,*n;			/* vertices, normals */
++	float alpha, beta;
++	unsigned int *l;	/* lines */
++	num_v=(stacks+1) * slices;
++	num_l=stacks * slices+ (stacks-1) * slices; /* vertical + horizontal */
++	v=malloc(sizeof(float) * 3 * num_v);
++	n=malloc(sizeof(float) * 6 * num_l);
++	l=malloc(sizeof(unsigned int) * 3 * num_l);
++	i=0;
++	for (x=0;x&lt;slices;x++) {
++		alpha=(x*360.0/slices)*M_PI/180.0;
++		for (y=0;y&lt;(stacks+1);y++) {
++			beta=((y*180/slices)-90.0)*M_PI/180.0;
++			v[i*3+0]=cos(alpha) * cos(beta);
++			v[i*3+1]=sin(beta);
++			v[i*3+2]=sin(alpha) * cos(beta);
++			i++;
++		}
++	}
++	i=0;
++	for (x=0;x&lt;slices;x++) {
++		for (y=0;y&lt;stacks;y++) {
++			if ((y!=0) &amp;&amp; (y!=stacks)) /* no horizontal lines at the poles */
++			{
++				l[i*3+0]=(x*(stacks+1))+y;
++				l[i*3+1]=(((x+1)%slices)*(stacks+1))+y;
++				l[i*3+2]=0;
++				n[i*6+0]=v[ l[i*3+0]*3 + 0];
++				n[i*6+1]=v[ l[i*3+0]*3 + 1];
++				n[i*6+2]=v[ l[i*3+0]*3 + 2];
++				n[i*6+3]=v[ l[i*3+1]*3 + 0];
++				n[i*6+4]=v[ l[i*3+1]*3 + 1];
++				n[i*6+5]=v[ l[i*3+1]*3 + 2];
++
++				i++;
++
++			}
++			/* vertical lines */
++			l[i*3+0]=(x*(stacks+1))+y;
++			l[i*3+1]=(x*(stacks+1))+y+1;
++			l[i*3+2]=0;
++			n[i*6+0]=v[ l[i*3+0]*3 + 0];
++			n[i*6+1]=v[ l[i*3+0]*3 + 1];
++			n[i*6+2]=v[ l[i*3+0]*3 + 2];
++			n[i*6+3]=v[ l[i*3+1]*3 + 0];
++			n[i*6+4]=v[ l[i*3+1]*3 + 1];
++			n[i*6+5]=v[ l[i*3+1]*3 + 2];
++			i++;
++
++		}
++	}
++	o=s3d_new_object();
++	s3d_push_material(o,0,0,1,
++			  1,0,0,
++			  0,1,0);
++	s3d_push_vertices(o,v,num_v);
++	s3d_push_lines(o,l,num_l);
++	s3d_load_line_normals(o,n,0,num_l);
++	free(v);
++	free(n);
++	free(l);
++	return(o);
++}
++
++
++
++int handle_networks() {
++
++	struct list_head *network_pos;
++	struct wlan_network *wlan_network;
++
++
++	pthread_mutex_lock( &amp;Network_list_mutex );
++
++	list_for_each(network_pos, &amp;Network_list) {
++
++		wlan_network = list_entry(network_pos, struct wlan_network, list);
++
++		if ( wlan_network-&gt;visible ) {
++
++			if ( wlan_network-&gt;obj_id == -1 ) {
++
++				wlan_network-&gt;obj_id = wire_sphere(30,30);
++				s3d_scale( wlan_network-&gt;obj_id, 5 );
++				s3d_translate( wlan_network-&gt;obj_id, wlan_network-&gt;pos_vec[0], wlan_network-&gt;pos_vec[1], wlan_network-&gt;pos_vec[2] );
++				s3d_flags_on( wlan_network-&gt;obj_id, S3D_OF_VISIBLE );
++
++			}
++
++			wlan_network-&gt;rotation = ( wlan_network-&gt;rotation + 1 ) % 360;
++			s3d_rotate( wlan_network-&gt;obj_id, 0, wlan_network-&gt;rotation, 0 );
++
++		}
++
++	}
++
++
++	pthread_mutex_unlock( &amp;Network_list_mutex );
++
++	return(0);
++
++}
++
++
++
++void mainloop() {
++
++	struct timespec sleeptime = { 0, 100 * 1000 * 1000 };   /* 100 mili seconds */
++
++
++	handle_networks();
++
++	if ( Kism3d_aborted )
++		s3d_quit();
++
++	nanosleep( &amp;sleeptime, NULL );
++
++}
++
++
++
++int gui_main( void *unused ) {
++
++	if ( !s3d_init( NULL, NULL, &quot;kism3d&quot; ) ) {
++
++		s3d_mainloop( mainloop );
++
++		s3d_quit();
++
++	}
++
++	Kism3d_aborted = 1;
++	return(0);
++
++}
+\ No newline at end of file
+
+Modified: trunk/apps/kism3d/kism3d.c
+===================================================================
+--- trunk/apps/kism3d/kism3d.c	2006-11-19 16:31:02 UTC (rev 482)
++++ trunk/apps/kism3d/kism3d.c	2006-11-21 16:42:26 UTC (rev 483)
+@@ -29,6 +29,7 @@
+ #include &lt;string.h&gt;   /* memset(), strncmp(), strncpy() */
+ #include &lt;errno.h&gt;    /* errno */
+ #include &lt;unistd.h&gt;   /* write() */
++#include &lt;pthread.h&gt;
+ 
+ #include &lt;sys/socket.h&gt; /* inet_pton(), inet_aton() */
+ #include &lt;sys/types.h&gt;
+@@ -40,8 +41,13 @@
+ DEFINE_LIST_HEAD(Network_list);
+ DEFINE_LIST_HEAD(Client_list);
+ 
++pthread_mutex_t Network_list_mutex = PTHREAD_MUTEX_INITIALIZER;
++pthread_mutex_t Client_list_mutex = PTHREAD_MUTEX_INITIALIZER;
+ 
++int Kism3d_aborted = 0;
+ 
++
++
+ void *alloc_memory( int len ) {
+ 
+ 	void *res = malloc( len );
+@@ -183,6 +189,8 @@
+ 
+ 				}
+ 
++				pthread_mutex_lock( &amp;Network_list_mutex );
++
+ 				wlan_network = get_wlan_network( bssid );
+ 
+ 				if ( ( wlan_network-&gt;type != -1 ) &amp;&amp; ( wlan_network-&gt;channel != -1 ) &amp;&amp; ( wlan_network-&gt;ssid != NULL ) ) {
+@@ -201,6 +209,7 @@
+ 
+ 				strncpy( wlan_network-&gt;ssid, ssid, strlen( ssid ) );
+ 
++				pthread_mutex_unlock( &amp;Network_list_mutex );
+ 
+ 				/* printf( &quot;network found - bssid %s, type %s, channel %s, ssid %s\n&quot;, bssid, type, channel, ssid ); */
+ 
+@@ -253,8 +262,22 @@
+ 
+ 				strncpy( wlan_client-&gt;bssid, bssid, 18 );
+ 				strncpy( wlan_client-&gt;ip, ip, 16 );
+-				wlan_client-&gt;wlan_network = find_wlan_network( wlan_client-&gt;bssid );
+ 
++				wlan_network = find_wlan_network( wlan_client-&gt;bssid );
++
++				if ( wlan_client-&gt;wlan_network != wlan_network ) {
++
++					if ( wlan_client-&gt;wlan_network != NULL )
++						wlan_client-&gt;wlan_network-&gt;num_wlan_clients--;
++
++					if ( wlan_network != NULL )
++						wlan_network-&gt;num_wlan_clients++;
++
++					wlan_client-&gt;wlan_network = wlan_network;
++
++				}
++
++
+ 				/* printf( &quot;client found - bssid %s, mac %s, ip %s\n&quot;, bssid, mac, ip ); */
+ 
+ 			} else if ( strncmp( line_ptr, &quot;*ALERT: &quot;, strlen( &quot;*ALERT: &quot; ) ) == 0 ) {
+@@ -284,9 +307,10 @@
+ 	struct in_addr tmp_ip_holder;
+ 	struct kismet_src *kismet_src;
+ 	struct list_head *kismet_pos, *kismet_pos_tmp;
+-	struct wlan_network *wlan_network;
+-	struct wlan_client *wlan_client;
++	/* struct wlan_network *wlan_network;
++	struct wlan_client *wlan_client; */
+ 	struct timeval tv;
++	pthread_t s3d_thread_id;
+ 	int num_kismet_sources = 0, found_args = 1, max_sock = -1, res, status;
+ 	char *colon_ptr, buff[1000];
+ 	fd_set wait_sockets, tmp_wait_sockets;
+@@ -395,22 +419,25 @@
+ 	}
+ 
+ 
+-	while ( num_kismet_sources &gt; 0 ) {
++	pthread_create( &amp;s3d_thread_id, NULL, &amp;gui_main, NULL );
+ 
++
++	while ( ( num_kismet_sources &gt; 0 ) &amp;&amp; !( Kism3d_aborted ) ) {
++
+ 		tv.tv_sec = 0;
+ 		tv.tv_usec = 250;
+ 
+ 		tmp_wait_sockets = wait_sockets;
+ 
+-		res = select(max_sock + 1, &amp;tmp_wait_sockets, NULL, NULL, &amp;tv);
++		res = select( max_sock + 1, &amp;tmp_wait_sockets, NULL, NULL, &amp;tv );
+ 
+ 		if ( res &gt; 0 ) {
+ 
+ 			max_sock = -1;
+ 
+-			list_for_each_safe(kismet_pos, kismet_pos_tmp, &amp;kismet_src_list) {
++			list_for_each_safe( kismet_pos, kismet_pos_tmp, &amp;kismet_src_list ) {
+ 
+-				kismet_src = list_entry(kismet_pos, struct kismet_src, list);
++				kismet_src = list_entry( kismet_pos, struct kismet_src, list );
+ 
+ 				if ( FD_ISSET( kismet_src-&gt;sock, &amp;tmp_wait_sockets ) ) {
+ 
+@@ -488,7 +515,7 @@
+ 
+ 		}
+ 
+-		printf( &quot;\nCurrent network list:\n&quot; );
++		/* printf( &quot;\nCurrent network list:\n&quot; );
+ 
+ 		list_for_each_safe(kismet_pos, kismet_pos_tmp, &amp;Network_list) {
+ 
+@@ -506,8 +533,27 @@
+ 
+ 			printf( &quot;   =&gt; %s belonging to %s\n&quot;, wlan_client-&gt;mac, ( wlan_client-&gt;wlan_network == NULL ? &quot;unknown&quot; : wlan_client-&gt;wlan_network-&gt;bssid ) );
+ 
++		} */
++
++	}
++
++
++	if ( Kism3d_aborted ) {
++
++		printf( &quot;Closing all sockets ... \n&quot; );
++		list_for_each(kismet_pos, &amp;kismet_src_list) {
++
++			kismet_src = list_entry( kismet_pos, struct kismet_src, list );
++
++			close( kismet_src-&gt;sock );
++
+ 		}
+ 
++	} else {
++
++		Kism3d_aborted = 1;
++		pthread_join( s3d_thread_id, NULL );
++
+ 	}
+ 
+ 	return (0);
+
+Modified: trunk/apps/kism3d/kism3d.h
+===================================================================
+--- trunk/apps/kism3d/kism3d.h	2006-11-19 16:31:02 UTC (rev 482)
++++ trunk/apps/kism3d/kism3d.h	2006-11-21 16:42:26 UTC (rev 483)
+@@ -49,11 +49,12 @@
+ 	char *ssid;
+ 	int type;
+ 	int channel;
++	int num_wlan_clients;
+ 	int visible;
+ 	float pos_vec[3];
+ 	float mov_vec[3];
+ 	int obj_id;
+-	int desc_id;
++	int rotation;
+ 
+ };
+ 
+@@ -63,7 +64,7 @@
+ 	struct list_head list;
+ 	char bssid[18];
+ 	char mac[18];
+-	int ip[16];
++	char ip[16];
+ 	struct wlan_network *wlan_network;
+ 	int visible;
+ 	float pos_vec[3];
+@@ -79,8 +80,12 @@
+ struct wlan_network *get_wlan_network( char *bssid );
+ struct wlan_network *find_wlan_network( char *bssid );
+ struct wlan_client *get_wlan_client( char *mac );
++int gui_main( void *unused );
+ 
+ 
+ 
+ extern struct list_head Network_list;
+ extern struct list_head Client_list;
++extern pthread_mutex_t Network_list_mutex;
++extern pthread_mutex_t Client_list_mutex;
++extern int Kism3d_aborted;
+
+Modified: trunk/apps/kism3d/network.c
+===================================================================
+--- trunk/apps/kism3d/network.c	2006-11-19 16:31:02 UTC (rev 482)
++++ trunk/apps/kism3d/network.c	2006-11-21 16:42:26 UTC (rev 483)
+@@ -52,6 +52,8 @@
+ 
+ 	wlan_network-&gt;ssid = NULL;
+ 
++	wlan_network-&gt;num_wlan_clients = 0;
++
+ 	wlan_network-&gt;visible = 1;
+ 
+ 	wlan_network-&gt;pos_vec[0] = ( ( float ) 2.0 * rand() ) / RAND_MAX - 1.0;
+@@ -60,7 +62,7 @@
+ 	wlan_network-&gt;mov_vec[0] = wlan_network-&gt;mov_vec[1] = wlan_network-&gt;mov_vec[2] = 0.0;
+ 
+ 	wlan_network-&gt;obj_id = -1;
+-	wlan_network-&gt;desc_id = -1;
++	wlan_network-&gt;rotation = 0;
+ 
+ 	list_add_tail(&amp;wlan_network-&gt;list, &amp;Network_list);
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000475.html">[S3d-svn] r482 - in trunk: . example
+</A></li>
+	<LI>Next message: <A HREF="000477.html">[S3d-svn] r484 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#476">[ date ]</a>
+              <a href="thread.html#476">[ thread ]</a>
+              <a href="subject.html#476">[ subject ]</a>
+              <a href="author.html#476">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,314 @@
+From dotslash at mail.berlios.de  Mon Dec 31 18:46:48 2007
+From: dotslash at mail.berlios.de (dotslash at BerliOS)
+Date: Mon, 31 Dec 2007 18:46:48 +0100
+Subject: [S3d-svn] r886 - trunk/server
+Message-ID: <200712311746.lBVHkmKl031204@sheep.berlios.de>
+
+Author: dotslash
+Date: 2007-12-31 18:46:46 +0100 (Mon, 31 Dec 2007)
+New Revision: 886
+
+Modified:
+   trunk/server/graphics_sdl.c
+Log:
+- set title name
+
+
+Modified: trunk/server/graphics_sdl.c
+===================================================================
+--- trunk/server/graphics_sdl.c	2007-11-25 22:09:38 UTC (rev 885)
++++ trunk/server/graphics_sdl.c	2007-12-31 17:46:46 UTC (rev 886)
+@@ -102,6 +102,7 @@
+ 		SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &samples);
+ 		s3dprintf(LOW, "Buffers: %d Samples: %d", buffers, samples);
+ 	}
++	SDL_WM_SetCaption("S3D","S3D");
+ 
+ 	/*  print some information */
+ 	s3dprintf(VLOW, "Screen BPP: %d", SDL_GetVideoSurface()->format->BitsPerPixel);
+
+
+
+From dotslash at mail.berlios.de  Mon Dec 31 19:18:21 2007
+From: dotslash at mail.berlios.de (dotslash at BerliOS)
+Date: Mon, 31 Dec 2007 19:18:21 +0100
+Subject: [S3d-svn] r887 - trunk/svnonly/comptest
+Message-ID: <200712311818.lBVIILq1018087@sheep.berlios.de>
+
+Author: dotslash
+Date: 2007-12-31 19:18:21 +0100 (Mon, 31 Dec 2007)
+New Revision: 887
+
+Modified:
+   trunk/svnonly/comptest/comptest.h
+   trunk/svnonly/comptest/window.c
+   trunk/svnonly/comptest/x11.c
+Log:
+- determine window names, find s3d window and set it on top
+
+
+Modified: trunk/svnonly/comptest/comptest.h
+===================================================================
+--- trunk/svnonly/comptest/comptest.h	2007-12-31 17:46:46 UTC (rev 886)
++++ trunk/svnonly/comptest/comptest.h	2007-12-31 18:18:21 UTC (rev 887)
+@@ -31,15 +31,16 @@
+ struct window {
+ 	Window        id;
+ 	XWindowAttributes    attr;   /* position, size etc. */
+-	XImage      *image;
+-	Damage       damage;  /* damage notification */
+-	Pixmap			pix;
++	XImage     *image;
++	Damage      damage;  /* damage notification */
++	Pixmap		pix;
+ 	int			geometry_update_needed;
+ 	int     	content_update_needed;
+ 	XRectangle	content_update;
+-	int        oid;
+-	int		   no;
++	int			oid;
++	int			no;
+ 	int 		mapped;
++	char		*name;
+ 
+ 	struct window     *next;
+ };
+@@ -62,9 +63,13 @@
+ 
+ extern struct window   *window_head;
+ /* x11.c */
++void x11_always_on_top(Window win);
+ void event(void);
+ int xinit(void);
+ int error(Display *COMPUNUSED(dpy), XErrorEvent *event);
+ int print_event(Display *COMPUNUSED(dpy), XEvent *event);
+ void x11_addwindows();
++char *x11_get_prop(Window win, char *prop);
++char *x11_get_name(Window win); 
++void print_properties(Window win);
+ extern Display *dpy;
+
+Modified: trunk/svnonly/comptest/window.c
+===================================================================
+--- trunk/svnonly/comptest/window.c	2007-12-31 17:46:46 UTC (rev 886)
++++ trunk/svnonly/comptest/window.c	2007-12-31 18:18:21 UTC (rev 887)
+@@ -89,6 +89,9 @@
+ 		return(NULL);
+ 	}
+ 	win->id = id;
++/*	print_properties(id);*/
++	win->name = x11_get_name(id);
++	printf("###################### name = %s\n", win->name);
+ 	win->next = window_head;
+ 	window_head = win;
+ 	win->damage = None;
+@@ -133,7 +136,6 @@
+ 	printf("window_map(%d)\n", (int)win->id);
+ 	if (win->mapped)
+ 		return;
+-
+ 	win->mapped = 1;
+ 	win->content_update_needed = 1;
+ 	win->content_update.x = 0;
+
+Modified: trunk/svnonly/comptest/x11.c
+===================================================================
+--- trunk/svnonly/comptest/x11.c	2007-12-31 17:46:46 UTC (rev 886)
++++ trunk/svnonly/comptest/x11.c	2007-12-31 18:18:21 UTC (rev 887)
+@@ -24,6 +24,7 @@
+ #include "comptest.h"
+ #include <stdio.h>		/* printf() */
+ #include <string.h>		/* memcpy() */
++#include <stdlib.h>		/* free() */
+ #include <X11/Xproto.h>	/* X_* request defines */
+ 
+ #define XCOMPOSITE_VERSION_0_2 200
+@@ -123,7 +124,125 @@
+ 	return(0);
+ }
+ 
++void print_properties(Window win)
++{
++	Atom *p;
++	int num, j;
++	char *aname;
++	Atom type;
++	int format;
++	unsigned long nitems, bytes_after;
++	unsigned char *ret = NULL;
+ 
++	p = XListProperties(dpy, win, &num);
++	printf("found %d properties for window %d\n", num, (int)win);
++	for (j = 0; j < num; j++) {
++		aname = XGetAtomName(dpy, p[j]);
++		if (aname) {
++			if(Success == XGetWindowProperty(dpy, win, XInternAtom(dpy, aname, False),
++						0L, ~0L, False, XA_STRING,
++						&type, &format, &nitems,
++						&bytes_after, &ret))
++			{
++/*				printf("format = %d, nitems = %d, bytes_after = %d\n", format, nitems, bytes_after);*/
++				printf("%s = %s\n", aname, ret);
++				XFree(ret);
++			}
++			XFree(aname);
++		} else printf("NULL\n");
++	}
++	XFree(p);
++}
++char *x11_get_prop(Window win, char *prop) 
++{
++	Atom type;
++	int format;
++	unsigned long nitems, bytes_after;
++	unsigned char *reqret = NULL;
++	char *ret = NULL;
++
++
++	if(Success == XGetWindowProperty(dpy, win, XInternAtom(dpy, prop, False),
++		0L, ~0L, False, /*XA_STRING*/ AnyPropertyType,
++		&type, &format, &nitems,
++		&bytes_after, &reqret)) {
++		if (reqret != NULL) {
++			ret = strdup((char *)reqret);
++			XFree(reqret);
++		} 
++	}
++	return(ret);
++}
++char *x11_get_name(Window win) 
++{
++	unsigned int nchildren;
++	Window *children;
++	Window root, parent;
++	char *role, *name;
++	int j;
++
++	role = x11_get_prop(win, "WM_WINDOW_ROLE");
++	if (role != NULL) {
++		if (strcmp(role, "decoration widget") == 0){
++			free(role);
++			return(NULL);
++		}
++		free(role);
++	}
++	name = x11_get_prop(win, "WM_NAME");
++	if (name != NULL) {
++		if (strcmp(name, "S3D") == 0) {
++			printf("setting s3d to always on top\n");
++			x11_always_on_top(win);
++		}
++		return(name);
++	}
++
++	XQueryTree(dpy, win, &root, &parent, &children, &nchildren);
++
++	for (j = 0; j < (int)nchildren; j++) {
++		name = x11_get_name(children[j]);
++		if (name != NULL)
++			break;
++	}
++	XFree(children);
++	return(name);
++
++}
++
++/* set always on top property to s3d server */
++void x11_always_on_top(Window win)
++{
++	Atom net_wm_state_stays_on_top, net_wm_state;
++	XClientMessageEvent xev;
++	int scr_no;
++
++	net_wm_state = XInternAtom(dpy, "_NET_WM_STATE", False);
++	if (net_wm_state == None)
++		fprintf(stderr, "No _NET_WM_STATE\n");
++
++	net_wm_state_stays_on_top = XInternAtom(dpy, "_NET_WM_STATE_STAYS_ON_TOP", 0);
++	if (net_wm_state_stays_on_top == None)
++		fprintf(stderr, "No _NET_WM_STATE_STAYS_ON_TOP\n");
++
++	memset(&xev, 0, sizeof(xev));
++	xev.type = ClientMessage;
++	xev.message_type = net_wm_state;
++	xev.display = dpy;
++	xev.window = win;
++	xev.format = 32;
++	xev.data.l[0] = 1;
++	xev.data.l[1] = net_wm_state_stays_on_top;
++	xev.data.l[2] = 0;
++
++	for (scr_no = 0; scr_no < ScreenCount(dpy); scr_no++) {
++		if (!XSendEvent(dpy, RootWindow(dpy, scr_no), False, SubstructureRedirectMask, (XEvent *) & xev))
++			fprintf(stderr, "Error XSendEvent() on type of event: _NET_WM_STATE\n");
++	}
++	XFlush(dpy);
++}
++
++
+ int xinit(void)
+ {
+ 	int composite_major, composite_minor;
+
+
+
+From dotslash at mail.berlios.de  Mon Dec 31 20:13:56 2007
+From: dotslash at mail.berlios.de (dotslash at BerliOS)
+Date: Mon, 31 Dec 2007 20:13:56 +0100
+Subject: [S3d-svn] r888 - trunk/svnonly/comptest
+Message-ID: <200712311913.lBVJDutH021742@sheep.berlios.de>
+
+Author: dotslash
+Date: 2007-12-31 20:13:55 +0100 (Mon, 31 Dec 2007)
+New Revision: 888
+
+Modified:
+   trunk/svnonly/comptest/x11.c
+Log:
+- don't query tree if it fails
+
+
+Modified: trunk/svnonly/comptest/x11.c
+===================================================================
+--- trunk/svnonly/comptest/x11.c	2007-12-31 18:18:21 UTC (rev 887)
++++ trunk/svnonly/comptest/x11.c	2007-12-31 19:13:55 UTC (rev 888)
+@@ -94,6 +94,8 @@
+ 	switch (event->request_code) {
+ 	case X_GetWindowAttributes:	req = "XGetWindowAttributes()";	break;
+ 	case X_GetImage:			req = "XGetImage()";			break;
++	case X_QueryTree:			req = "XQueryTree()";			break;
++	case X_GetProperty:			req = "XGetProperty()";			break;
+ 	default:				break;
+ 	}
+ 	if (event->request_code == xcomposite.request) {
+@@ -162,7 +164,7 @@
+ 	char *ret = NULL;
+ 
+ 
+-	if(Success == XGetWindowProperty(dpy, win, XInternAtom(dpy, prop, False),
++	if (Success == XGetWindowProperty(dpy, win, XInternAtom(dpy, prop, False),
+ 		0L, ~0L, False, /*XA_STRING*/ AnyPropertyType,
+ 		&type, &format, &nitems,
+ 		&bytes_after, &reqret)) {
+@@ -198,14 +200,16 @@
+ 		return(name);
+ 	}
+ 
+-	XQueryTree(dpy, win, &root, &parent, &children, &nchildren);
++	if (XQueryTree(dpy, win, &root, &parent, &children, &nchildren) == 0)
++		return(NULL);
+ 
+ 	for (j = 0; j < (int)nchildren; j++) {
+ 		name = x11_get_name(children[j]);
+ 		if (name != NULL)
+ 			break;
+ 	}
+-	XFree(children);
++	if (children != NULL)
++		XFree(children);
+ 	return(name);
+ 
+ }
+
+
+

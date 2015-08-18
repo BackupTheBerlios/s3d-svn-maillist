@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1037 - trunk/example
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1037%20-%20trunk/example&In-Reply-To=%3C200811231602.mANG2IcM009715%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001016.html">
+   <LINK REL="Next"  HREF="001018.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1037 - trunk/example</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1037%20-%20trunk/example&In-Reply-To=%3C200811231602.mANG2IcM009715%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1037 - trunk/example">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Nov 23 17:02:18 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001016.html">[S3d-svn] r1036 - trunk/apps/meshs3d
+</A></li>
+        <LI>Next message: <A HREF="001018.html">[S3d-svn] r1038 - trunk/apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1017">[ date ]</a>
+              <a href="thread.html#1017">[ thread ]</a>
+              <a href="subject.html#1017">[ subject ]</a>
+              <a href="author.html#1017">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-11-23 17:02:18 +0100 (Sun, 23 Nov 2008)
+New Revision: 1037
+
+Modified:
+   trunk/example/filebrowser.c
+Log:
+Build examples/filebrowser.c even if data structure is different in cygwin
+
+It is possible that the cygwin build is complete useless because not all needed
+informations for directory traversel are available. Maybe a better workaround
+should be added or the compilation of this example must be removed under
+windows.
+
+Modified: trunk/example/filebrowser.c
+===================================================================
+--- trunk/example/filebrowser.c	2008-11-23 16:02:13 UTC (rev 1036)
++++ trunk/example/filebrowser.c	2008-11-23 16:02:18 UTC (rev 1037)
+@@ -100,10 +100,13 @@
+ 				strncat(ndir, &quot;/&quot;, M_DIR - strlen(ndir));
+ 				strncat(ndir, namelist[n]-&gt;d_name, M_DIR - strlen(ndir));
+ 				/*     printf(&quot;displaying %s\n&quot;,ndir); */
++#if defined(DT_UNKNOWN) &amp;&amp; defined(DT_DIR)
+ 				if ((namelist[n]-&gt;d_type == DT_DIR) ||
+ 				                ((namelist[n]-&gt;d_type == DT_UNKNOWN) &amp;&amp; (opendir(ndir) != NULL)))
+ 					item[n].type = T_FOLDER;
+-				else {
++				else
++#endif /* defined(DT_UNKNOWN) &amp;&amp; defined(DT_DIR) */
++				{
+ 					if (ext != NULL) {
+ 						if (0 == strncmp(ext, &quot;.3ds&quot;, strlen(ext) &lt; 4 ? strlen(ext) : 4))
+ 							item[n].type = T_GEOMETRY;
+@@ -186,7 +189,9 @@
+ 			/*    r=s3d_get_radius(p); */
+ 			/*    s3d_scale(p,1.0/r,1.0/r,1.0/r); */
+ 			s3d_flags_on(item[n].descr_oid, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
++#if defined(DT_UNKNOWN) &amp;&amp; defined(DT_DIR)
+ 			printf(&quot;%s [%d]\n&quot;, nstr, namelist[n]-&gt;d_type);
++#endif /* defined(DT_UNKNOWN) &amp;&amp; defined(DT_DIR) */
+ 			printf(&quot;string %d linked to %d\n&quot;, item[n].descr_oid, item[n].icon_oid);
+ 			free(namelist[n]);
+ 		}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001016.html">[S3d-svn] r1036 - trunk/apps/meshs3d
+</A></li>
+	<LI>Next message: <A HREF="001018.html">[S3d-svn] r1038 - trunk/apps/s3dvt
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1017">[ date ]</a>
+              <a href="thread.html#1017">[ thread ]</a>
+              <a href="subject.html#1017">[ subject ]</a>
+              <a href="author.html#1017">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

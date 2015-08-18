@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1043 - trunk/server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1043%20-%20trunk/server&In-Reply-To=%3C200811262124.mAQLOigm002016%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001022.html">
+   <LINK REL="Next"  HREF="001024.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1043 - trunk/server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1043%20-%20trunk/server&In-Reply-To=%3C200811262124.mAQLOigm002016%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1043 - trunk/server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Wed Nov 26 22:24:44 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001022.html">[S3d-svn] r1042 - trunk/server
+</A></li>
+        <LI>Next message: <A HREF="001024.html">[S3d-svn] r1044 - in trunk: apps/s3dfm example
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1023">[ date ]</a>
+              <a href="thread.html#1023">[ thread ]</a>
+              <a href="subject.html#1023">[ subject ]</a>
+              <a href="author.html#1023">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-11-26 22:24:42 +0100 (Wed, 26 Nov 2008)
+New Revision: 1043
+
+Modified:
+   trunk/server/network.c
+   trunk/server/shm.c
+Log:
+server: Process tcp data even if shm is deactivated
+
+If server is compiled with `cmake . -DHAVE_SHM=0` no data of a process
+will be consumed. If it is compiled with SHM support turn will be reset
+to 1 in each shm_main. To get the same behaviour without shm_main we set
+turn to 1 in each call to network_main.
+
+Modified: trunk/server/network.c
+===================================================================
+--- trunk/server/network.c	2008-11-26 20:44:31 UTC (rev 1042)
++++ trunk/server/network.c	2008-11-26 21:24:42 UTC (rev 1043)
+@@ -92,6 +92,8 @@
+ /*  this basicly polls for new connection */
+ int network_main(void)
+ {
++	turn = 1;
++
+ #ifdef TCP
+ #ifdef SIGS
+ 	if (sigio == 1) { /*  as long as there is no locking/threadsafety, do like this ... */
+
+Modified: trunk/server/shm.c
+===================================================================
+--- trunk/server/shm.c	2008-11-26 20:44:31 UTC (rev 1042)
++++ trunk/server/shm.c	2008-11-26 21:24:42 UTC (rev 1043)
+@@ -180,7 +180,6 @@
+ 	/* do*/
+ 	{
+ 		/*  found=0;*/
+-		turn = 1;
+ 		iterations = 0;
+ 		for (i = 0;i &lt; procs_n;i++) {
+ 			iterations++;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001022.html">[S3d-svn] r1042 - trunk/server
+</A></li>
+	<LI>Next message: <A HREF="001024.html">[S3d-svn] r1044 - in trunk: apps/s3dfm example
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1023">[ date ]</a>
+              <a href="thread.html#1023">[ thread ]</a>
+              <a href="subject.html#1023">[ subject ]</a>
+              <a href="author.html#1023">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

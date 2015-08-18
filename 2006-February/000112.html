@@ -1,0 +1,315 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r116 - in trunk: . client server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r116%20-%20in%20trunk%3A%20.%20client%20server&In-Reply-To=%3C200602271801.k1RI1ncB005548%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000111.html">
+   <LINK REL="Next"  HREF="000113.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r116 - in trunk: . client server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r116%20-%20in%20trunk%3A%20.%20client%20server&In-Reply-To=%3C200602271801.k1RI1ncB005548%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r116 - in trunk: . client server">dotslash at berlios.de
+       </A><BR>
+    <I>Mon Feb 27 19:01:49 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000111.html">[S3d-svn] r115 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000113.html">[S3d-svn] r117 - in trunk: . client example
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#112">[ date ]</a>
+              <a href="thread.html#112">[ thread ]</a>
+              <a href="subject.html#112">[ subject ]</a>
+              <a href="author.html#112">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-02-27 19:01:26 +0100 (Mon, 27 Feb 2006)
+New Revision: 116
+
+Added:
+   trunk/INSTALL
+Modified:
+   trunk/
+   trunk/ChangeLog
+   trunk/README
+   trunk/client/fontselect.c
+   trunk/server/graphics.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r155 at balthasar</A>:  dotslash | 2006-02-27 19:01:17 +0100
+ - INFINITY define into #ifndef
+ - splitting README and INSTALL
+ 
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:150
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:155
+
+Modified: trunk/ChangeLog
+===================================================================
+--- trunk/ChangeLog	2006-02-27 17:14:24 UTC (rev 115)
++++ trunk/ChangeLog	2006-02-27 18:01:26 UTC (rev 116)
+@@ -1,3 +1,7 @@
++2006-02-27  Simon Wunderlich - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++	- INFINITY define into #ifndef
++	- splitting README and INSTALL
++	- security check for strncat and strncpy functions
+ 2006-02-22  Simon Wunderlich - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+ 	- only select the nearest hit when clicking, not all on the line
+ 	- fopen errors are not that important when looking through the
+
+Added: trunk/INSTALL
+===================================================================
+--- trunk/INSTALL	2006-02-27 17:14:24 UTC (rev 115)
++++ trunk/INSTALL	2006-02-27 18:01:26 UTC (rev 116)
+@@ -0,0 +1,80 @@
++### 1 Preparing 
++
++Before being able to install s3d and the sample programs, you need to prepare
++the build, and compile s3d. 
++
++### 1.1 Subversion Checkout
++
++If you are using a version directly checked out from subversion, you will need
++to setup the GNU autotools first. The following assumes that automake 1.9,
++autoconf 2.59 are available and installed into a directory listed in the $PATH
++environment variable.
++
++$ ./autogen.sh [--prefix=/some/where] [--disable-debug] [--enable-profiling]
++
++This will create configure, and run it. Use the --prefix command line argument
++to select a different prefix to install s3d into. The default is /usr/local, so
++binaries will get installed into /usr/local/bin, libraries into
++/usr/local/lib, and documentation into /usr/local/share/doc/s3d-version.
++If you are not intending to work on s3d, you can use the --disable-debug
++argument to disable building a debug version. Likewise, --enable-profiling
++will enable a version compiled for profiling.
++
++After configure has been created, you can also use
++
++$ ./configure --help
++
++to learn about more configuration parameters.
++
++### 1.2 Preparing a Released Version
++
++A released version of s3d contains a pregenerated configure script, which you
++can run directly:
++
++$ ./configure [--prefix=/somewhere] [--enable-debug] [--enable-profiling]
++
++Releases do not have debugging or profiling enabled by default, if you want these
++features you have to enable them with --enable-debug and --enable-profiling,
++respectively.
++
++### 2 Building
++
++After configure has finished, you can start the build of s3d:
++
++$ make
++
++in the root directory will compile server, client-lib and the examples
++for you.
++
++after that, go
++
++$ cd server
++$ ./s3d
++
++fire up the server. if you're lucky, a window appears.now the s3d is listening 
++on port 6066. 
++now it's time to test some things. on another terminal:
++
++$ cd examples
++$ ./3dsloader miu3ds/miu.3ds
++
++now there should appear a rotating cat. you can move with with the middle 
++mouse-button pushed.
++now you can try the MCP, which is something like a windowmanager in X:
++
++$ cd examples
++$ ./dot_mcp
++
++now you should get some fancy window decorations :D
++there are a few other examples, just play around
++
++### 3 Installing
++
++You can use the install target to install s3d into the selected prefix. 
++Currently, you have to install s3d, otherwise the examples will not get built.
++
++$ make install
++
++Depending on the selected prefix, you may need to become superuser first.
++
++
+
+Modified: trunk/README
+===================================================================
+--- trunk/README	2006-02-27 17:14:24 UTC (rev 115)
++++ trunk/README	2006-02-27 18:01:26 UTC (rev 116)
+@@ -1,6 +1,3 @@
+-Well ... Hello :)
+-this should give you a little starting point in my s3d project.
+-
+ 1.REASONS
+ ---------
+ 
+@@ -20,85 +17,8 @@
+ 2.INSTALL
+ ---------
+ 
+-2.1 Preparing 
++see the INSTALL file
+ 
+-Before being able to install s3d and the sample programs, you need to prepare
+-the build, and compile s3d. 
+-
+-2.1.1 Subversion Checkout
+-
+-If you are using a version directly checked out from subversion, you will need
+-to setup the GNU autotools first. The following assumes that automake 1.9,
+-autoconf 2.59 are available and installed into a directory listed in the $PATH
+-environment variable.
+-
+-$ ./autogen.sh [--prefix=/some/where] [--disable-debug] [--enable-profiling]
+-
+-This will create configure, and run it. Use the --prefix command line argument
+-to select a different prefix to install s3d into. The default is /usr/local, so
+-binaries will get installed into /usr/local/bin, libraries into
+-/usr/local/lib, and documentation into /usr/local/share/doc/s3d-version.
+-If you are not intending to work on s3d, you can use the --disable-debug
+-argument to disable building a debug version. Likewise, --enable-profiling
+-will enable a version compiled for profiling.
+-
+-After configure has been created, you can also use
+-
+-$ ./configure --help
+-
+-to learn about more configuration parameters.
+-
+-2.1.2 Preparing a Released Version
+-
+-A released version of s3d contains a pregenerated configure script, which you
+-can run directly:
+-
+-$ ./configure [--prefix=/somewhere] [--enable-debug] [--enable-profiling]
+-
+-Releases do not have debugging or profiling enabled by default, if you want these
+-features you have to enable them with --enable-debug and --enable-profiling,
+-respectively.
+-
+-2.2 Building
+-
+-After configure has finished, you can start the build of s3d:
+-
+-$ make
+-
+-in the root directory will compile server, client-lib and the examples
+-for you.
+-
+-after that, go
+-
+-$ cd server
+-$ ./s3d
+-
+-fire up the server. if you're lucky, a window appears.now the s3d is listening 
+-on port 6066. 
+-now it's time to test some things. on another terminal:
+-
+-$ cd examples
+-$ ./3dsloader miu3ds/miu.3ds
+-
+-now there should appear a rotating cat. you can move with with the middle 
+-mouse-button pushed.
+-now you can try the MCP, which is something like a windowmanager in X:
+-
+-$ cd examples
+-$ ./dot_mcp
+-
+-now you should get some fancy window decorations :D
+-there are a few other examples, just play around
+-
+-2.3 Installing
+-
+-You can use the install target to install s3d into the selected prefix. 
+-Currently, you have to install s3d, otherwise the examples will not get built.
+-
+-$ make install
+-
+-Depending on the selected prefix, you may need to become superuser first.
+-
+ 3. WARRANTY
+ -----------
+ 
+
+Modified: trunk/client/fontselect.c
+===================================================================
+--- trunk/client/fontselect.c	2006-02-27 17:14:24 UTC (rev 115)
++++ trunk/client/fontselect.c	2006-02-27 18:01:26 UTC (rev 116)
+@@ -71,7 +71,8 @@
+ 							if (good==NULL)
+ 								good=malloc(256);
+ 							strncpy(good,flist[fnum],255);
+-							strncat(good,fname,255);
++							good[256]=0; 									/* just in case */
++							strncat(good,fname,255-strlen(good));
+ 							if ((strlen(mask)+4)==strlen(fname))
+ 							{
+ 								return(good);
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2006-02-27 17:14:24 UTC (rev 115)
++++ trunk/server/graphics.c	2006-02-27 18:01:26 UTC (rev 116)
+@@ -7,7 +7,9 @@
+ #include &lt;SDL.h&gt;	 /*  SDL_GL_SwapBuffers */
+ #endif
+ #include &lt;math.h&gt;		 /*  sin(),cos() */
++#ifndef INFINITY
+ #define INFINITY 1&lt;&lt;30
++#endif
+ /*  this file handles graphics routines */
+ /*  local prototypes ... */
+ void render_virtual_object(struct t_obj *o);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000111.html">[S3d-svn] r115 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000113.html">[S3d-svn] r117 - in trunk: . client example
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#112">[ date ]</a>
+              <a href="thread.html#112">[ thread ]</a>
+              <a href="subject.html#112">[ subject ]</a>
+              <a href="author.html#112">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

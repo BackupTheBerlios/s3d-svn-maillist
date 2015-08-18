@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r944 - in trunk: apps/s3dvt libs3d libs3dw server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-August/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r944%20-%20in%20trunk%3A%20apps/s3dvt%20libs3d%20libs3dw%20server&In-Reply-To=%3C200808162203.m7GM3Hj5001068%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000927.html">
+   <LINK REL="Next"  HREF="000925.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r944 - in trunk: apps/s3dvt libs3d libs3dw server</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r944%20-%20in%20trunk%3A%20apps/s3dvt%20libs3d%20libs3dw%20server&In-Reply-To=%3C200808162203.m7GM3Hj5001068%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r944 - in trunk: apps/s3dvt libs3d libs3dw server">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Aug 17 00:03:17 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000927.html">[S3d-svn] r943 - in trunk: libs3d libs3dw
+</A></li>
+        <LI>Next message: <A HREF="000925.html">[S3d-svn] r945 - in trunk: apps/s3dfm apps/s3dosm example	experimental/comptest experimental/olsrs3d libs3d libs3dw server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#929">[ date ]</a>
+              <a href="thread.html#929">[ thread ]</a>
+              <a href="subject.html#929">[ subject ]</a>
+              <a href="author.html#929">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-08-17 00:03:16 +0200 (Sun, 17 Aug 2008)
+New Revision: 944
+
+Modified:
+   trunk/apps/s3dvt/terminal.c
+   trunk/libs3d/shm_ringbuf.c
+   trunk/libs3dw/arrange.c
+   trunk/server/shm_ringbuf.c
+Log:
+Remove some dead initialisations
+
+Modified: trunk/apps/s3dvt/terminal.c
+===================================================================
+--- trunk/apps/s3dvt/terminal.c	2008-08-15 23:28:29 UTC (rev 943)
++++ trunk/apps/s3dvt/terminal.c	2008-08-16 22:03:16 UTC (rev 944)
+@@ -78,7 +78,7 @@
+ 
+ static t_line* line_is_full(void)
+ {
+-	t_line *pcurline = (t_line*) &amp; line + cy;
++	t_line *pcurline;
+ 	cy++;
+ 	if (cy &gt;= MAX_LINES) {     /*  damn it ... our display is filled ... let's move everything upwards */
+ 		cy = MAX_LINES - 1;
+
+Modified: trunk/libs3d/shm_ringbuf.c
+===================================================================
+--- trunk/libs3d/shm_ringbuf.c	2008-08-15 23:28:29 UTC (rev 943)
++++ trunk/libs3d/shm_ringbuf.c	2008-08-16 22:03:16 UTC (rev 944)
+@@ -75,7 +75,7 @@
+ unsigned int shm_read(struct buf_t *rb, char *buf, unsigned int n)
+ {
+ 	int wrap = 0;
+-	unsigned int mn = n;
++	unsigned int mn;
+ 	unsigned int rs;
+ 	uint32_t e, s, size;
+ 	char *data;
+
+Modified: trunk/libs3dw/arrange.c
+===================================================================
+--- trunk/libs3dw/arrange.c	2008-08-15 23:28:29 UTC (rev 943)
++++ trunk/libs3dw/arrange.c	2008-08-16 22:03:16 UTC (rev 944)
+@@ -53,7 +53,7 @@
+ 
+ void s3dw_arr_normdir(float *dir)
+ {
+-	float dirlen = s3d_vector_length(dir);
++	float dirlen;
+ 	while ((dirlen = s3d_vector_length(dir)) == 0) {
+ 		/* make up some random direction if they're exactly the same position */
+ 		dir[0] = ((float)rand() - RAND_MAX / 2.0) / RAND_MAX;
+
+Modified: trunk/server/shm_ringbuf.c
+===================================================================
+--- trunk/server/shm_ringbuf.c	2008-08-15 23:28:29 UTC (rev 943)
++++ trunk/server/shm_ringbuf.c	2008-08-16 22:03:16 UTC (rev 944)
+@@ -74,7 +74,7 @@
+ int shm_read(struct buf_t *rb, char *buf, int n)
+ {
+ 	int wrap = 0;
+-	int mn = n;
++	int mn;
+ 	int rs;
+ 	int32_t e, s, size;
+ 	char *data;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000927.html">[S3d-svn] r943 - in trunk: libs3d libs3dw
+</A></li>
+	<LI>Next message: <A HREF="000925.html">[S3d-svn] r945 - in trunk: apps/s3dfm apps/s3dosm example	experimental/comptest experimental/olsrs3d libs3d libs3dw server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#929">[ date ]</a>
+              <a href="thread.html#929">[ thread ]</a>
+              <a href="subject.html#929">[ subject ]</a>
+              <a href="author.html#929">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

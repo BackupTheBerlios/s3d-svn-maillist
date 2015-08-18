@@ -1,0 +1,225 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r243 - in trunk: . example server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r243%20-%20in%20trunk%3A%20.%20example%20server&In-Reply-To=%3C200603292048.k2TKm6so011637%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000235.html">
+   <LINK REL="Next"  HREF="000237.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r243 - in trunk: . example server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r243%20-%20in%20trunk%3A%20.%20example%20server&In-Reply-To=%3C200603292048.k2TKm6so011637%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r243 - in trunk: . example server">dotslash at berlios.de
+       </A><BR>
+    <I>Wed Mar 29 22:48:06 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000235.html">[S3d-svn] r242 - in trunk: . apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000237.html">[S3d-svn] r244 - in trunk: . objs server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#236">[ date ]</a>
+              <a href="thread.html#236">[ thread ]</a>
+              <a href="subject.html#236">[ subject ]</a>
+              <a href="author.html#236">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-03-29 22:48:05 +0200 (Wed, 29 Mar 2006)
+New Revision: 243
+
+Modified:
+   trunk/
+   trunk/example/ptrtest.c
+   trunk/server/object.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r365 at balthasar</A>:  dotslash | 2006-03-29 22:47:32 +0200
+ - user programs can now modify system object positions (camera etc). hope it works good :) see ptrtest for demo.
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:341
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:365
+
+Modified: trunk/example/ptrtest.c
+===================================================================
+--- trunk/example/ptrtest.c	2006-03-29 19:51:57 UTC (rev 242)
++++ trunk/example/ptrtest.c	2006-03-29 20:48:05 UTC (rev 243)
+@@ -25,6 +25,7 @@
+ #include &lt;s3d.h&gt;
+ #include &lt;stdio.h&gt;  /*  NULL*/
+ #include &lt;time.h&gt;	/* nanosleep() */
++#include &lt;math.h&gt;	/* sin(), cos() */
+ int i;
+ int o;
+ float bottom=-1.0;
+@@ -32,7 +33,7 @@
+ float asp=1.0;
+ float len=1.0;
+ int alpha=0;
+-static struct timespec t={0,100*1000*1000}; /* 100 mili seconds */
++static struct timespec t={0,10*1000*1000}; /* 100 mili seconds */
+ void stop(struct s3d_evt *evt)
+ {
+ 	s3d_quit();
+@@ -40,8 +41,12 @@
+ 
+ void mainloop()
+ {
+-	alpha=(alpha+5)%360;
++	float a;
++	alpha=(alpha+1)%360;
+ 	s3d_rotate(o,alpha,0,0);
++	a=(((float)alpha)*M_PI/180);
++	s3d_translate(0,sin(a)*30,0,30+cos(a)*30);
++	s3d_rotate(0,sin(a)*30,alpha,0);
+ 	nanosleep(&amp;t,NULL); 
+ }
+ void object_info(struct s3d_evt *hrmz)
+@@ -74,7 +79,7 @@
+ 	struct s3d_but_info *inf;
+ 	char s[256];
+ 	inf=(struct s3d_but_info *)hrmz-&gt;buf;
+-	snprintf(s,256,&quot;button %d, state %d&quot;, inf-&gt;button,inf-&gt;state);
++	snprintf(s,256,&quot;please, watch your stomach! button %d, state %d&quot;, inf-&gt;button,inf-&gt;state);
+ 	printf(&quot;button %d, state %d\n&quot;, inf-&gt;button,inf-&gt;state);
+ 	s3d_del_object(o);
+ 	o=s3d_draw_string(s,&amp;len);
+@@ -87,7 +92,7 @@
+ int main (int argc, char **argv)
+ {
+ 	i=0;
+-	if (!s3d_init(&amp;argc,&amp;argv,&quot;ptrtest&quot;))	
++	if (!s3d_init(&amp;argc,&amp;argv,&quot;ptr and cam test&quot;))	
+ 	{
+ 		s3d_set_callback(S3D_EVENT_OBJ_INFO,object_info);
+ 		s3d_set_callback(S3D_EVENT_MBUTTON,mbutton_press);
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2006-03-29 19:51:57 UTC (rev 242)
++++ trunk/server/object.c	2006-03-29 20:48:05 UTC (rev 243)
+@@ -1059,16 +1059,33 @@
+ int obj_translate(struct t_process *p, uint32_t oid, float *transv)
+ {
+ 	struct t_obj *obj;
++	struct t_process *mcp_p=get_proc_by_pid(MCP);
++	float v[3];
+ 	if (obj_valid(p,oid,obj))
+ 	{
+-		if ((p-&gt;id==MCP) || (!(obj-&gt;oflags&amp;OF_SYSTEM)))
++		dprintf(VLOW,&quot;[translate|pid %d] %d: %3.3f %3.3f %3.3f&quot;,p-&gt;id,oid,obj-&gt;translate.x,obj-&gt;translate.y,obj-&gt;translate.z);
++		if ((p-&gt;id!=MCP) &amp;&amp; (obj-&gt;oflags&amp;OF_SYSTEM))
+ 		{
++			if (focus_oid==p-&gt;mcp_oid)
++			{
++				v[0]=transv[0];
++				v[1]=transv[1];
++				v[2]=transv[2];
++				mySetMatrix(mcp_p-&gt;object[p-&gt;mcp_oid]-&gt;m);
++				myTransform3f(v);
++/*				mySetMatrix(mcp_p-&gt;object[oid]-&gt;m);
++				myInvert();
++				myTransform3f(v);
++				dprintf(LOW,&quot;%3.3f %3.3f %3.3f&quot;,v[0],v[1],v[2]);*/
++				obj_translate(mcp_p,oid,v);
++			} 
++		} else {
+ 			obj-&gt;translate.x=*transv;
+ 			obj-&gt;translate.y=*(transv+1);
+ 			obj-&gt;translate.z=*(transv+2);
+-			dprintf(VLOW,&quot;[translate|pid %d] %d: %3.3f %3.3f %3.3f&quot;,p-&gt;id,oid,obj-&gt;translate.x,obj-&gt;translate.y,obj-&gt;translate.z);
+ 			obj_pos_update(p,oid);
+ 		}
++
+ 	}
+ 	return(0);
+ }
+@@ -1076,11 +1093,22 @@
+ int obj_rotate(struct t_process *p, uint32_t oid, float *rotv)
+ {
+ 	struct t_obj *obj;
++	struct t_process *mcp_p=get_proc_by_pid(MCP);
++	float v[3];
+ 	float f;
+ 	if (obj_valid(p,oid,obj))
+ 	{
+-		if ((p-&gt;id==MCP) || (!(obj-&gt;oflags&amp;OF_SYSTEM)))
++		dprintf(VLOW,&quot;[rotate|pid %d] %d: %3.3f %3.3f %3.3f&quot;,p-&gt;id,oid,obj-&gt;rotate.x,obj-&gt;rotate.y,obj-&gt;rotate.z);
++		if ((p-&gt;id!=MCP) &amp;&amp; (obj-&gt;oflags&amp;OF_SYSTEM))
+ 		{
++			if (focus_oid==p-&gt;mcp_oid)
++			{
++				v[0]=obj-&gt;rotate.x + (rotv[0] - obj-&gt;rotate.x);
++				v[1]=obj-&gt;rotate.y + (rotv[1] - obj-&gt;rotate.y);
++				v[2]=obj-&gt;rotate.z + (rotv[2] - obj-&gt;rotate.z);
++				obj_rotate(mcp_p,oid,v);
++			}
++		} else {
+ 			f=*rotv;
+ 			if (f&lt;0.0)		f+=(float)((int)-f/360)*360;
+ 			if (f&gt;360.0)	f+=(float)((int)f/360)*-360;
+@@ -1093,7 +1121,6 @@
+ 			if (f&lt;0.0)		f+=(float)((int)-f/360)*360;
+ 			if (f&gt;360.0)	f+=(float)((int)f/360)*-360;
+ 			obj-&gt;rotate.z=f;
+-			dprintf(VLOW,&quot;[rotate|pid %d] %d: %3.3f %3.3f %3.3f&quot;,p-&gt;id,oid,obj-&gt;rotate.x,obj-&gt;rotate.y,obj-&gt;rotate.z);
+ 			obj_pos_update(p,oid);
+ 		}
+ 	}
+@@ -1287,6 +1314,7 @@
+ 			o=mcp_p-&gt;object[o-&gt;linkid];
+ 		else o=NULL;
+ 	}
++	/* mov in the mcp space */
+ 	mySetMatrix(mcp_p-&gt;object[oid]-&gt;m);
+ 	v[0]=v[1]=v[2]=0.0;
+ 	myTransform3f(v);
+@@ -1302,7 +1330,7 @@
+ 			o=mcp_p-&gt;object[o-&gt;linkid];
+ 		else o=NULL;
+ 	}
+-
++	/* reverse in the application space */
+ 	mySetMatrix(mcp_p-&gt;object[p-&gt;mcp_oid]-&gt;m);
+ 	myInvert();
+ 	myTransform3f(v);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000235.html">[S3d-svn] r242 - in trunk: . apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000237.html">[S3d-svn] r244 - in trunk: . objs server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#236">[ date ]</a>
+              <a href="thread.html#236">[ thread ]</a>
+              <a href="subject.html#236">[ subject ]</a>
+              <a href="author.html#236">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

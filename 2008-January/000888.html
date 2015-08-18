@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r895 - trunk/apps/s3dfm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-January/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r895%20-%20trunk/apps/s3dfm&In-Reply-To=%3C200801072325.m07NP7Ml029383%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000887.html">
+   <LINK REL="Next"  HREF="000889.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r895 - trunk/apps/s3dfm</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r895%20-%20trunk/apps/s3dfm&In-Reply-To=%3C200801072325.m07NP7Ml029383%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r895 - trunk/apps/s3dfm">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Tue Jan  8 00:25:07 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000887.html">[S3d-svn] r894 - trunk/apps/kism3d
+</A></li>
+        <LI>Next message: <A HREF="000889.html">[S3d-svn] r896 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#888">[ date ]</a>
+              <a href="thread.html#888">[ thread ]</a>
+              <a href="subject.html#888">[ subject ]</a>
+              <a href="author.html#888">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-01-08 00:25:07 +0100 (Tue, 08 Jan 2008)
+New Revision: 895
+
+Modified:
+   trunk/apps/s3dfm/focus.c
+   trunk/apps/s3dfm/parse.c
+Log:
+s3dfm: Remove nearly unused variables
+
+
+Modified: trunk/apps/s3dfm/focus.c
+===================================================================
+--- trunk/apps/s3dfm/focus.c	2008-01-07 23:24:59 UTC (rev 894)
++++ trunk/apps/s3dfm/focus.c	2008-01-07 23:25:07 UTC (rev 895)
+@@ -25,7 +25,6 @@
+ #include &lt;s3d_keysym.h&gt;
+ #include &lt;stdio.h&gt; /* printf() */
+ #include &lt;math.h&gt;  /* ceil(), sqrt() */
+-static int moveon = 1;
+ 
+ /* get the scale for the rootbox zoom */
+ float focus_get_scale(t_node *f)
+@@ -57,7 +56,6 @@
+ 	root.px = 0.0;
+ 	root.py = 0.0;
+ 	root.pz = 0.0;
+-	moveon = 1;
+ 	/* printf(&quot;[Z]ooming to %s\n&quot;,f-&gt;name);*/
+ 	/* box_collapse_grandkids(f);*/
+ 	root.scale = focus_get_scale(f);
+
+Modified: trunk/apps/s3dfm/parse.c
+===================================================================
+--- trunk/apps/s3dfm/parse.c	2008-01-07 23:24:59 UTC (rev 894)
++++ trunk/apps/s3dfm/parse.c	2008-01-07 23:25:07 UTC (rev 895)
+@@ -35,7 +35,7 @@
+ 	int n, i;
+ 	int oldn;
+ 	DIR  *dirhd = NULL;
+-	char *ext, *nstr = NULL;
++	char *nstr = NULL;
+ 	char path[M_DIR];
+ 	char ndir[M_DIR];
+ 
+@@ -72,18 +72,13 @@
+ 				/* find out the filetype ... very simple */
+ 				dir-&gt;sub[i]-&gt;type = T_DUNO;
+ 				dir-&gt;sub[i]-&gt;pindex = i;
+-				ext = strrchr(nstr, '.');
+ 				strncpy(ndir, path, M_DIR);
+ 				strncat(ndir, namelist[n]-&gt;d_name, M_DIR);
+ 				if ((namelist[n]-&gt;d_type == DT_DIR) || ((namelist[n]-&gt;d_type == DT_UNKNOWN)))
+ 					if ((dirhd = opendir(ndir)) != NULL) {
+ 						dir-&gt;sub[i]-&gt;type = T_FOLDER;
+ 						closedir(dirhd);
+-					} /*else if (ext!=NULL)
+-        {
+-         if (0==strncmp(ext,&quot;.3ds&quot;,strlen(ext)&lt;4?strlen(ext):4))     dir-&gt;sub[i]-&gt;type=T_GEOMETRY;
+-         else if (0==strncmp(ext,&quot;.mp3&quot;,strlen(ext)&lt;4?strlen(ext):4))    dir-&gt;sub[i]-&gt;type=T_MUSIC;
+-         } */
++					}
+ 				dir-&gt;sub[i]-&gt;check = 0; /* check=0 means we've already processed this item */
+ 			}
+ 			free(namelist[n]);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000887.html">[S3d-svn] r894 - trunk/apps/kism3d
+</A></li>
+	<LI>Next message: <A HREF="000889.html">[S3d-svn] r896 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#888">[ date ]</a>
+              <a href="thread.html#888">[ thread ]</a>
+              <a href="subject.html#888">[ subject ]</a>
+              <a href="author.html#888">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r589 - trunk/apps/meshs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-April/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r589%20-%20trunk/apps/meshs3d&In-Reply-To=%3C200704181505.l3IF5rBX025402%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000580.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r589 - trunk/apps/meshs3d</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r589%20-%20trunk/apps/meshs3d&In-Reply-To=%3C200704181505.l3IF5rBX025402%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r589 - trunk/apps/meshs3d">nichtsnutz at mail.berlios.de
+       </A><BR>
+    <I>Wed Apr 18 17:05:53 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000580.html">[S3d-svn] r588 - trunk/apps/meshs3d
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#581">[ date ]</a>
+              <a href="thread.html#581">[ thread ]</a>
+              <a href="subject.html#581">[ subject ]</a>
+              <a href="author.html#581">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2007-04-18 17:05:52 +0200 (Wed, 18 Apr 2007)
+New Revision: 589
+
+Modified:
+   trunk/apps/meshs3d/main.c
+   trunk/apps/meshs3d/meshs3d.h
+   trunk/apps/meshs3d/process.c
+Log:
+search hash_resize bug
+
+Modified: trunk/apps/meshs3d/main.c
+===================================================================
+--- trunk/apps/meshs3d/main.c	2007-04-18 09:57:50 UTC (rev 588)
++++ trunk/apps/meshs3d/main.c	2007-04-18 15:05:52 UTC (rev 589)
+@@ -154,8 +154,8 @@
+ 	while ( NULL != ( hashit = hash_iterate( con_hash, hashit ) ) )
+ 	{
+ 		con = (struct node_con *) hashit-&gt;bucket-&gt;data;
+-		first_node = hash_find( node_hash, &amp;con-&gt;ip1 );
+-		sec_node = hash_find( node_hash, &amp;con-&gt;ip2 );
++		first_node = hash_find( node_hash, &amp;con-&gt;ip[0] );
++		sec_node = hash_find( node_hash, &amp;con-&gt;ip[1] );
+ 		distance = dirt( first_node-&gt;pos_vec, sec_node-&gt;pos_vec, tmp_mov_vec );
+ 		f = ( ( con-&gt;etx1_sqrt + con-&gt;etx2_sqrt ) / 4.0 ) / distance;
+ // 
+@@ -186,8 +186,8 @@
+ 	while ( NULL != ( hashit = hash_iterate( con_hash, hashit ) ) )
+ 	{
+ 		con = (struct node_con *) hashit-&gt;bucket-&gt;data;
+-		first_node = hash_find( node_hash, &amp;con-&gt;ip1 );
+-		sec_node = hash_find( node_hash, &amp;con-&gt;ip2 );
++		first_node = hash_find( node_hash, &amp;con-&gt;ip[0] );
++		sec_node = hash_find( node_hash, &amp;con-&gt;ip[1] );
+ 		/* move left olsr node if it has not been moved yet */
+ 		if ( !( ( first_node-&gt;mov_vec[0] == 0 ) &amp;&amp; ( first_node-&gt;mov_vec[1] == 0 ) &amp;&amp; ( first_node-&gt;mov_vec[2] == 0 ) ) &amp;&amp; first_node-&gt;visible ) {
+ 			distance = dirt( first_node-&gt;pos_vec, null_vec, tmp_mov_vec );
+
+Modified: trunk/apps/meshs3d/meshs3d.h
+===================================================================
+--- trunk/apps/meshs3d/meshs3d.h	2007-04-18 09:57:50 UTC (rev 588)
++++ trunk/apps/meshs3d/meshs3d.h	2007-04-18 15:05:52 UTC (rev 589)
+@@ -32,8 +32,7 @@
+ /* linked list for the all connections */
+ struct node_con
+ {
+-	unsigned int ip1;
+-	unsigned int ip2;
++	unsigned int ip[2];
+ 	float etx1;							/* etx of left olsr node */
+ 	float etx2;						/* etx of right olsr node */
+ 	float etx1_sqrt;					/* sqrt of etx of left olsr node */
+@@ -43,7 +42,6 @@
+ 	float rgb;
+ };
+ 
+-
+ /* linked list for the neighbours of each olsr node */
+ struct olsr_neigh_list
+ {
+
+Modified: trunk/apps/meshs3d/process.c
+===================================================================
+--- trunk/apps/meshs3d/process.c	2007-04-18 09:57:50 UTC (rev 588)
++++ trunk/apps/meshs3d/process.c	2007-04-18 15:05:52 UTC (rev 589)
+@@ -126,9 +126,9 @@
+ 	con = ( struct node_con* ) hash_find( con_hash, ip);
+ 	if( con == NULL )
+ 	{
+-		con = (struct node_con *) debugMalloc( sizeof(struct node_con), 102 );
+-		con-&gt;ip1 = ip[0];
+-		con-&gt;ip2 = ip[1];
++		con = ( struct node_con * ) debugMalloc( sizeof( struct node_con ), 102 );
++		con-&gt;ip[0] = ip[0];
++		con-&gt;ip[1] = ip[1];
+ 		con-&gt;color = 0;
+ 		con-&gt;obj_id = 0;
+ 		con-&gt;rgb = 0.00;
+@@ -139,7 +139,7 @@
+ 		hash_add( con_hash, con );
+ 	}
+ 
+-	if( con-&gt;ip1 == ip1 )
++	if( con-&gt;ip[0] == ip1 )
+ 	{
+ 		con-&gt;etx1 = etx;
+ 		con-&gt;etx1_sqrt = sqrt( etx );
+@@ -153,7 +153,7 @@
+ 	{
+ 		swaphash = hash_resize( con_hash, con_hash-&gt;size * 2 );
+ 		if ( swaphash == NULL )
+-			exit_error(&quot;Couldn't resize hash table \n&quot; );
++			exit_error(&quot;Couldn't resize hash table \n&quot;);
+ 		con_hash = swaphash;
+ 	}
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000580.html">[S3d-svn] r588 - trunk/apps/meshs3d
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#581">[ date ]</a>
+              <a href="thread.html#581">[ thread ]</a>
+              <a href="subject.html#581">[ subject ]</a>
+              <a href="author.html#581">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

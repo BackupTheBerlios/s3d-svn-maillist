@@ -1,0 +1,595 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r328 - in trunk: . apps/s3dvt example libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r328%20-%20in%20trunk%3A%20.%20apps/s3dvt%20example%20libs3d%20libs3dw&In-Reply-To=%3C200606041757.k54Hvn3X016820%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000320.html">
+   <LINK REL="Next"  HREF="000322.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r328 - in trunk: . apps/s3dvt example libs3d libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r328%20-%20in%20trunk%3A%20.%20apps/s3dvt%20example%20libs3d%20libs3dw&In-Reply-To=%3C200606041757.k54Hvn3X016820%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r328 - in trunk: . apps/s3dvt example libs3d libs3dw">dotslash at berlios.de
+       </A><BR>
+    <I>Sun Jun  4 19:57:49 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000320.html">[S3d-svn] r327 - in trunk: . libs3d server
+</A></li>
+        <LI>Next message: <A HREF="000322.html">[S3d-svn] r329 - in trunk: . libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#321">[ date ]</a>
+              <a href="thread.html#321">[ thread ]</a>
+              <a href="subject.html#321">[ subject ]</a>
+              <a href="author.html#321">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-06-04 19:57:33 +0200 (Sun, 04 Jun 2006)
+New Revision: 328
+
+Added:
+   trunk/libs3dw/TODO
+Modified:
+   trunk/
+   trunk/apps/s3dvt/main.c
+   trunk/example/widgets.c
+   trunk/libs3d/TODO
+   trunk/libs3dw/Makefile.am
+   trunk/libs3dw/animate.c
+   trunk/libs3dw/button.c
+   trunk/libs3dw/event.c
+   trunk/libs3dw/input.c
+   trunk/libs3dw/label.c
+   trunk/libs3dw/root.c
+   trunk/libs3dw/s3dw.h
+   trunk/libs3dw/s3dw_int.h
+   trunk/libs3dw/surface.c
+   trunk/libs3dw/widget.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r697 at balthasar</A>:  dotslash | 2006-06-04 19:57:17 +0200
+ - repair s3dvt for new keycode managing
+ - widgets auto arrangement :D
+ - proper keycode use in libs3dw
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:693
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:697
+
+Modified: trunk/apps/s3dvt/main.c
+===================================================================
+--- trunk/apps/s3dvt/main.c	2006-06-04 15:33:07 UTC (rev 327)
++++ trunk/apps/s3dvt/main.c	2006-06-04 17:57:33 UTC (rev 328)
+@@ -397,10 +397,10 @@
+ }*/
+ void keypress(struct s3d_evt *event)
+ {
++	struct s3d_key_event *keys=(struct s3d_key_event *)event-&gt;buf;
+ 	int key;
+-	key=*((unsigned short *)event-&gt;buf);
+ /*	printf(&quot;received key: %d\n&quot;,key);*/
+-	switch (key)
++	switch (key=keys-&gt;keysym)
+ 	{
+ 		case S3DK_F1:
+ 		case S3DK_F2:
+@@ -482,8 +482,8 @@
+ 			term_addchar(10);
+ 			break;
+ 		default:
+-			if ((char)key)  /*  \0 is no good idea .. */
+-				term_addchar((char)key);
++			if ((char)keys-&gt;unicode)  /*  \0 is no good idea .. */
++				term_addchar((char)keys-&gt;unicode);
+ 	}
+ 
+ }
+
+Modified: trunk/example/widgets.c
+===================================================================
+--- trunk/example/widgets.c	2006-06-04 15:33:07 UTC (rev 327)
++++ trunk/example/widgets.c	2006-06-04 17:57:33 UTC (rev 328)
+@@ -33,7 +33,7 @@
+ 
+ s3dw_surface *surface;
+ s3dw_input *input;
+-static struct timespec t={0,100*1000*1000}; /* 100 mili seconds */
++static struct timespec t={0,33*1000*1000}; /* 33 mili seconds */
+ void mainloop()
+ {
+ 	/* keep this in your mainloop. this will do smooth animations for you ... */
+@@ -47,9 +47,30 @@
+ {
+ 	s3dw_handle_click(evt);
+ }
++void key_button(s3dw_widget *button)
++{
++	s3dw_delete(button-&gt;parent); /* parent =surface. this means close containing window */
++}
+ void key(struct s3d_evt *evt)
+ {
++	struct s3d_key_event *key=(struct s3d_key_event *)evt-&gt;buf;
++	char string[8];
++	s3dw_surface *miniwin;
++	s3dw_button  *button;
++	
+ 	s3dw_handle_key(evt);
++	/* okay, that's a little bit insane ... ;) 
++	 * we create some little windows with the actual key pressed. */
++
++	miniwin=s3dw_surface_new(&quot;Key&quot;,6,6);
++	sprintf(string,&quot;%c&quot;,key-&gt;unicode);
++	s3dw_label_new(miniwin,string,1,2);
++	button=s3dw_button_new(miniwin,&quot;OK&quot;,2,4);
++	/* clicking on the button will exit ... */
++	button-&gt;onclick=key_button;
++	/* of couse, show it */
++	s3dw_show(S3DWIDGET(miniwin));
++
+ }
+ 
+ void done_button(s3dw_widget *dummy)
+
+Modified: trunk/libs3d/TODO
+===================================================================
+--- trunk/libs3d/TODO	2006-06-04 15:33:07 UTC (rev 327)
++++ trunk/libs3d/TODO	2006-06-04 17:57:33 UTC (rev 328)
+@@ -1,4 +1,5 @@
+ TODO:
++- key repeation
+ - texture support for 3ds
+ - shmat() return (char *) -1 or NULL?! data_ctos/data_stoc should
+   really not be 0x0
+
+Modified: trunk/libs3dw/Makefile.am
+===================================================================
+--- trunk/libs3dw/Makefile.am	2006-06-04 15:33:07 UTC (rev 327)
++++ trunk/libs3dw/Makefile.am	2006-06-04 17:57:33 UTC (rev 328)
+@@ -1,6 +1,6 @@
+ lib_LTLIBRARIES=	libs3dw.la
+ 
+-libs3dw_la_SOURCES=	button.c surface.c widget.c style.c event.c animate.c label.c input.c root.c
++libs3dw_la_SOURCES=	button.c surface.c widget.c style.c event.c animate.c label.c input.c root.c arrange.c
+ 			
+ include_HEADERS= 	s3dw.h
+ noinst_HEADERS=		s3dw_int.h
+
+Added: trunk/libs3dw/TODO
+===================================================================
+--- trunk/libs3dw/TODO	2006-06-04 15:33:07 UTC (rev 327)
++++ trunk/libs3dw/TODO	2006-06-04 17:57:33 UTC (rev 328)
+@@ -0,0 +1 @@
++- focus colors, focus cycling
+
+Modified: trunk/libs3dw/animate.c
+===================================================================
+--- trunk/libs3dw/animate.c	2006-06-04 15:33:07 UTC (rev 327)
++++ trunk/libs3dw/animate.c	2006-06-04 17:57:33 UTC (rev 328)
+@@ -29,10 +29,10 @@
+ /* the animation stack */
+ static s3dw_widget *ani_s[MAXANI];
+ static int ani_n=0;
+-int moveon=1;
++static int animation_on=0;
+ 
+ /* is item f already on stack? */
+-int _s3dw_ani_onstack(s3dw_widget *f)
++int s3dw_ani_onstack(s3dw_widget *f)
+ {
+ 	int i;
+ 	for (i=0;i&lt;ani_n;i++)
+@@ -42,21 +42,21 @@
+ 
+ }
+ /* add an item on the animation stack */
+-void _s3dw_ani_add(s3dw_widget *f)
++void s3dw_ani_add(s3dw_widget *f)
+ {
+-	if (ani_n&lt;MAXANI)
++	if ((ani_n&lt;MAXANI) &amp;&amp; (animation_on))
+ 	{
+-		if (_s3dw_ani_onstack(f))
++		if (s3dw_ani_onstack(f))
+ 			return;		/* already in list */
+ 		ani_s[ani_n]=f;
+-		_s3dw_ani_iterate(f);
++		s3dw_ani_iterate(f);
+ 		ani_n++;
+ 	}
+ 	else /* no place, finish now */
+-		_s3dw_ani_finish(f,-1);
++		s3dw_ani_finish(f,-1);
+ }
+ /* delete an item from the animation stack */
+-void _s3dw_ani_del(int i)
++void s3dw_ani_del(int i)
+ {
+ 	if ((i&gt;=0) &amp;&amp; (i&lt;ani_n))
+ 	{
+@@ -68,7 +68,7 @@
+ 	}
+ }
+ /* well ... */
+-void _s3dw_ani_doit(s3dw_widget *f)
++void s3dw_ani_doit(s3dw_widget *f)
+ {
+ 	s3d_translate(	f-&gt;oid, f-&gt;ax,f-&gt;ay,f-&gt;az);
+ 	s3d_rotate(		f-&gt;oid, f-&gt;arx,f-&gt;ary,f-&gt;arz);
+@@ -76,17 +76,17 @@
+ }
+ 
+ /* finish an animation on the stack, stack index i */
+-void _s3dw_ani_finish(s3dw_widget *f, int i)
++void s3dw_ani_finish(s3dw_widget *f, int i)
+ {
+ 	f-&gt;ax= f-&gt;x;
+ 	f-&gt;ay= f-&gt;y;
+ 	f-&gt;az= f-&gt;z;
+ 	f-&gt;as= f-&gt;s;
+-	_s3dw_ani_doit(f);
++	s3dw_ani_doit(f);
+ 	if (i!=-1)
+-		_s3dw_ani_del(i);
++		s3dw_ani_del(i);
+ }
+-void _s3dw_ani_iterate(s3dw_widget *f)
++void s3dw_ani_iterate(s3dw_widget *f)
+ {
+ 	f-&gt;ax=(f-&gt;x + f-&gt;ax*ZOOMS)/(ZOOMS+1);
+ 	f-&gt;ay=(f-&gt;y + f-&gt;ay*ZOOMS)/(ZOOMS+1);
+@@ -96,7 +96,7 @@
+ }
+ 
+ /* checks if f is good enough */
+-int _s3dw_ani_check(s3dw_widget *f)
++int s3dw_ani_check(s3dw_widget *f)
+ {
+ 	float x,y,z;
+ 	x=f-&gt;ax - f-&gt;x;
+@@ -111,16 +111,17 @@
+ {
+ 	int i;
+ 	s3dw_widget *f;
++	animation_on=1;			/* animation is activated */
+ 	for (i=0;i&lt;ani_n;i++)
+ 	{
+ 		f=ani_s[i];
+-		_s3dw_ani_iterate(f);
+-		if (_s3dw_ani_check(f))
++		s3dw_ani_iterate(f);
++		if (s3dw_ani_check(f))
+ 		{
+-			_s3dw_ani_finish(f,i);
++			s3dw_ani_finish(f,i);
+ 			i--; /* a new widget is here now, take care in the next iteration */
+ 		} else {
+-			_s3dw_ani_doit(f);
++			s3dw_ani_doit(f);
+ 		}
+ 	}
+ }
+
+Modified: trunk/libs3dw/button.c
+===================================================================
+--- trunk/libs3dw/button.c	2006-06-04 15:33:07 UTC (rev 327)
++++ trunk/libs3dw/button.c	2006-06-04 17:57:33 UTC (rev 328)
+@@ -119,7 +119,7 @@
+ 	free(button);
+ }
+ /* handle key events */
+-int s3dw_button_event_key(s3dw_widget *widget, unsigned short oid)
++int s3dw_button_event_key(s3dw_widget *widget, struct s3d_key_event *keys)
+ {
+ 	return(0);
+ }
+
+Modified: trunk/libs3dw/event.c
+===================================================================
+--- trunk/libs3dw/event.c	2006-06-04 15:33:07 UTC (rev 327)
++++ trunk/libs3dw/event.c	2006-06-04 17:57:33 UTC (rev 328)
+@@ -33,6 +33,6 @@
+ }
+ void s3dw_handle_key(struct s3d_evt *evt)
+ {
+-	unsigned short key=*((unsigned short *)evt-&gt;buf);
+-	s3dw_widget_event_key(s3dw_getroot(),key);
++	struct s3d_key_event *keys=(struct s3d_key_event *)evt-&gt;buf;
++	s3dw_widget_event_key(s3dw_getroot(),keys);
+ }
+
+Modified: trunk/libs3dw/input.c
+===================================================================
+--- trunk/libs3dw/input.c	2006-06-04 15:33:07 UTC (rev 327)
++++ trunk/libs3dw/input.c	2006-06-04 17:57:33 UTC (rev 328)
+@@ -166,34 +166,39 @@
+ 	input-&gt;oid_text=oid_text;
+ }
+ /* handle key events */
+-int s3dw_input_event_key(s3dw_widget *widget, unsigned short key)
++int s3dw_input_event_key(s3dw_widget *widget, struct s3d_key_event *keys)
+ {
+ 	s3dw_input *input=(s3dw_input *)widget;
+ 	char *newtext;
++	char key=keys-&gt;unicode; /* unicode support so far ... :/ */
+ 	int len;
+ 	dprintf(MED,&quot;edit field got key %d!!&quot;,key);
+-	if (isprint(key))
++	switch (keys-&gt;keysym)
+ 	{
+-		len=strlen(input-&gt;text);
+-		newtext=malloc(len + 2); /* +1 for the terminating byte, +1 for the new character */
+-		strcpy(newtext,input-&gt;text);
+-		newtext[len]=key;
+-		newtext[len+1]=0;
+-		s3dw_input_change_text(input,newtext);
+-		free(newtext);
+-		return(1);
+-	} 
+-	if (key==S3DK_BACKSPACE)
+-	{
+-		len=strlen(input-&gt;text);
+-		if ((len=strlen(input-&gt;text))&gt;0)
+-		{
+-			newtext=malloc(len + 0); /* +1 for the terminating byte, -1 for the deleted character */
+-			strncpy(newtext,input-&gt;text,len);
+-			newtext[len-1]=0;
+-			s3dw_input_change_text(input,newtext);
+-			free(newtext);
+-		}
++		case S3DK_BACKSPACE:
++			len=strlen(input-&gt;text);
++			if ((len=strlen(input-&gt;text))&gt;0)
++			{
++				newtext=malloc(len + 0); /* +1 for the terminating byte, -1 for the deleted character */
++				strncpy(newtext,input-&gt;text,len);
++				newtext[len-1]=0;
++				s3dw_input_change_text(input,newtext);
++				free(newtext);
++				return(1);
++			}
++			break;
++		default:
++			if (isprint(key))
++			{
++				len=strlen(input-&gt;text);
++				newtext=malloc(len + 2); /* +1 for the terminating byte, +1 for the new character */
++				strcpy(newtext,input-&gt;text);
++				newtext[len]=key;
++				newtext[len+1]=0;
++				s3dw_input_change_text(input,newtext);
++				free(newtext);
++				return(1);
++			} 
+ 	}
+ 	
+ 	return(0);
+
+Modified: trunk/libs3dw/label.c
+===================================================================
+--- trunk/libs3dw/label.c	2006-06-04 15:33:07 UTC (rev 327)
++++ trunk/libs3dw/label.c	2006-06-04 17:57:33 UTC (rev 328)
+@@ -80,7 +80,7 @@
+ 	free(label);
+ }
+ /* handle key events */
+-int s3dw_label_event_key(s3dw_widget *widget, unsigned short oid)
++int s3dw_label_event_key(s3dw_widget *widget, struct s3d_key_event *keys)
+ {
+ 	return(0);
+ }
+
+Modified: trunk/libs3dw/root.c
+===================================================================
+--- trunk/libs3dw/root.c	2006-06-04 15:33:07 UTC (rev 327)
++++ trunk/libs3dw/root.c	2006-06-04 17:57:33 UTC (rev 328)
+@@ -42,7 +42,7 @@
+ 	return(0);
+ }
+ /* dummy handler */
+-int s3dw_root_event_key(s3dw_widget *widget,unsigned short key)
++int s3dw_root_event_key(s3dw_widget *widget,struct s3d_key_event *keys)
+ {
+ 	return(0);
+ }
+
+Modified: trunk/libs3dw/s3dw.h
+===================================================================
+--- trunk/libs3dw/s3dw.h	2006-06-04 15:33:07 UTC (rev 327)
++++ trunk/libs3dw/s3dw.h	2006-06-04 17:57:33 UTC (rev 328)
+@@ -30,6 +30,8 @@
+ #define 	S3DW_ACTIVE		2
+ /* tells us if the widget is currently displayed */
+ #define		S3DW_ONSCREEN	256
++/* if the surface (or widget) is already properly arranged */
++#define 	S3DW_ARRANGED	512
+ /* just a typecaster to beatify code. use it if you like */
+ #define 	S3DWIDGET(x)	(s3dw_widget *)x
+ 
+
+Modified: trunk/libs3dw/s3dw_int.h
+===================================================================
+--- trunk/libs3dw/s3dw_int.h	2006-06-04 15:33:07 UTC (rev 327)
++++ trunk/libs3dw/s3dw_int.h	2006-06-04 17:57:33 UTC (rev 328)
+@@ -22,11 +22,11 @@
+  */
+ 
+ #include &lt;s3dlib.h&gt; /* dprintf() */
+-#define MAXANI		16
++#define MAXANI		128
+ #define ZOOMS		5
+ /* constructor and handler callbacks */
+ typedef int (*s3dw_click_callback)(s3dw_widget *, unsigned long);
+-typedef int (*s3dw_key_callback)(  s3dw_widget *, unsigned short);
++typedef int (*s3dw_key_callback)(  s3dw_widget *, struct s3d_key_event *);
+ s3dw_callback 		s3dwcb_show[S3DW_NTYPES];
+ s3dw_callback 		s3dwcb_hide[S3DW_NTYPES];
+ s3dw_callback 		s3dwcb_destroy[S3DW_NTYPES];
+@@ -38,13 +38,13 @@
+ void s3dw_nothing(s3dw_widget *widget);
+ void s3dw_root_destroy(s3dw_widget *widget);
+ int s3dw_root_event_click(s3dw_widget *widget, unsigned long oid);
+-int s3dw_root_event_key(s3dw_widget *widget, unsigned short key);
++int s3dw_root_event_key(s3dw_widget *widget, struct s3d_key_event *keys);
+ /* widget.c */
+ s3dw_widget *s3dw_widget_new();
+ void s3dw_widget_append(s3dw_widget *parent, s3dw_widget *widget);
+ void s3dw_widget_visible(s3dw_widget *widget);
+ int s3dw_widget_event_click(s3dw_widget *widget, unsigned long oid);
+-int s3dw_widget_event_key(s3dw_widget *widget, unsigned short key);
++int s3dw_widget_event_key(s3dw_widget *widget, struct s3d_key_event *keys);
+ /* surface.c */
+ void s3dw_surface_destroy(s3dw_widget *widget);
+ void s3dw_surface_draw(s3dw_widget *widget);
+@@ -52,15 +52,15 @@
+ void s3dw_surface_show(s3dw_widget *widget);
+ void s3dw_surface_hide(s3dw_widget *widget);
+ int s3dw_surface_event_click(s3dw_widget *widget, unsigned long oid);
+-int s3dw_surface_event_key(s3dw_widget *widget, unsigned short key);
++int s3dw_surface_event_key(s3dw_widget *widget, struct s3d_key_event *keys);
+ /* button.c */
+ void s3dw_button_destroy(s3dw_widget *widget);
+ void s3dw_button_draw(s3dw_widget *widget);
+ void s3dw_button_erase(s3dw_widget *widget);
+ void s3dw_button_show(s3dw_widget *widget);
+ void s3dw_button_hide(s3dw_widget *widget);
+-int s3dw_button_event_key(s3dw_widget *widget, unsigned short key);
+ int s3dw_button_event_click(s3dw_widget *widget, unsigned long oid);
++int s3dw_button_event_key(s3dw_widget *widget, struct s3d_key_event *keys);
+ 
+ /* label.c */
+ void s3dw_label_destroy(s3dw_widget *widget);
+@@ -69,7 +69,7 @@
+ void s3dw_label_show(s3dw_widget *widget);
+ void s3dw_label_hide(s3dw_widget *widget);
+ int s3dw_label_event_click(s3dw_widget *widget, unsigned long oid);
+-int s3dw_label_event_key(s3dw_widget *widget, unsigned short key);
++int s3dw_label_event_key(s3dw_widget *widget, struct s3d_key_event *keys);
+ 
+ /* input.c */
+ void s3dw_input_destroy(s3dw_widget *widget);
+@@ -79,15 +79,19 @@
+ void s3dw_input_hide(s3dw_widget *widget);
+ unsigned long s3dw_input_draw_string(s3dw_widget *widget);
+ int s3dw_input_event_click(s3dw_widget *widget, unsigned long oid);
+-int s3dw_input_event_key(s3dw_widget *widget, unsigned short key);
++int s3dw_input_event_key(s3dw_widget *widget, struct s3d_key_event *keys);
+ 
+ /* style.c */
+ extern s3dw_style def_style;
+ /* animate.c */
+-int  _s3dw_ani_onstack(s3dw_widget *f);
+-void _s3dw_ani_add(s3dw_widget *f);
+-void _s3dw_ani_del(int i);
+-void _s3dw_ani_doit(s3dw_widget *f);
+-void _s3dw_ani_finish(s3dw_widget *f, int i);
+-void _s3dw_ani_iterate(s3dw_widget *f);
+-int  _s3dw_ani_check(s3dw_widget *f);
++int  s3dw_ani_onstack(s3dw_widget *f);
++void s3dw_ani_add(s3dw_widget *f);
++void s3dw_ani_del(int i);
++void s3dw_ani_doit(s3dw_widget *f);
++void s3dw_ani_finish(s3dw_widget *f, int i);
++void s3dw_ani_iterate(s3dw_widget *f);
++int  s3dw_ani_check(s3dw_widget *f);
++/* arrange.c */
++void s3dw_arrange();
++void s3dw_arr_widgetcenter(s3dw_widget *widget, float *center);
++void s3dw_arr_normdir(float *dir);
+
+Modified: trunk/libs3dw/surface.c
+===================================================================
+--- trunk/libs3dw/surface.c	2006-06-04 15:33:07 UTC (rev 327)
++++ trunk/libs3dw/surface.c	2006-06-04 17:57:33 UTC (rev 328)
+@@ -130,6 +130,7 @@
+ {
+ 	s3dw_surface *surface;
+ 	s3dw_widget  *widget;
++	float f1[3];
+ 			
+ 	surface=(s3dw_surface *)malloc(sizeof(s3dw_surface));
+ 	surface-&gt;title=strdup(title);
+@@ -137,8 +138,15 @@
+ 	widget-&gt;type=S3DW_TSURFACE;
+ 	widget-&gt;width=width;
+ 	widget-&gt;height=height;
++	widget-&gt;as=0.01;
++	s3dw_arr_widgetcenter(widget,f1);
++	widget-&gt;x=-f1[0];
++	widget-&gt;y=-f1[1];
++	widget-&gt;z=-f1[2];
+ 	s3dw_widget_append(s3dw_getroot(),widget);
+ 	s3dw_surface_draw(widget);
++	s3dw_arrange();
++	s3dw_ani_add(widget);
+ 	return(surface);
+ }
+ /* delete objects in the s3d context */
+@@ -158,7 +166,7 @@
+ 	free(surface);
+ }
+ /* handle key events */
+-int s3dw_surface_event_key(s3dw_widget *widget, unsigned short oid)
++int s3dw_surface_event_key(s3dw_widget *widget, struct s3d_key_event *keys)
+ {
+ 	return(0);
+ }
+
+Modified: trunk/libs3dw/widget.c
+===================================================================
+--- trunk/libs3dw/widget.c	2006-06-04 15:33:07 UTC (rev 327)
++++ trunk/libs3dw/widget.c	2006-06-04 17:57:33 UTC (rev 328)
+@@ -56,11 +56,11 @@
+ 	return(0);
+ }
+ /* widget received key,,call specific function and check (focused) kids */
+-int s3dw_widget_event_key(s3dw_widget *widget, unsigned short key)
++int s3dw_widget_event_key(s3dw_widget *widget, struct s3d_key_event *keys)
+ {
+-	if (s3dwcb_key[widget-&gt;type](widget,key)) return(1);
++	if (s3dwcb_key[widget-&gt;type](widget,keys)) return(1);
+ 	if (widget-&gt;focus!=-1)
+-		if (s3dw_widget_event_key(widget-&gt;pobj[widget-&gt;focus],key)) return(1);
++		if (s3dw_widget_event_key(widget-&gt;pobj[widget-&gt;focus],keys)) return(1);
+ 	return(0);
+ }
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000320.html">[S3d-svn] r327 - in trunk: . libs3d server
+</A></li>
+	<LI>Next message: <A HREF="000322.html">[S3d-svn] r329 - in trunk: . libs3dw
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#321">[ date ]</a>
+              <a href="thread.html#321">[ thread ]</a>
+              <a href="subject.html#321">[ subject ]</a>
+              <a href="author.html#321">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

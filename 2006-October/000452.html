@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r459 - in trunk: . libs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r459%20-%20in%20trunk%3A%20.%20libs3d&In-Reply-To=%3C200610311608.k9VG8r1u020866%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000451.html">
+   <LINK REL="Next"  HREF="000453.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r459 - in trunk: . libs3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r459%20-%20in%20trunk%3A%20.%20libs3d&In-Reply-To=%3C200610311608.k9VG8r1u020866%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r459 - in trunk: . libs3d">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Tue Oct 31 17:08:53 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000451.html">[S3d-svn] r458 - in trunk: . apps/s3dfm
+</A></li>
+        <LI>Next message: <A HREF="000453.html">[S3d-svn] r460 - in trunk: . extras/swig
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#452">[ date ]</a>
+              <a href="thread.html#452">[ thread ]</a>
+              <a href="subject.html#452">[ subject ]</a>
+              <a href="author.html#452">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-10-31 17:08:52 +0100 (Tue, 31 Oct 2006)
+New Revision: 459
+
+Modified:
+   trunk/
+   trunk/libs3d/freetype.c
+   trunk/libs3d/s3d.h
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r1110 at kero</A>:  dotslash | 2006-10-31 17:08:49 +0100
+ - add s3d_strlen() to determine string length without drawing
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1108
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:1110
+
+Modified: trunk/libs3d/freetype.c
+===================================================================
+--- trunk/libs3d/freetype.c	2006-10-31 16:08:26 UTC (rev 458)
++++ trunk/libs3d/freetype.c	2006-10-31 16:08:52 UTC (rev 459)
+@@ -28,6 +28,7 @@
+ #include &quot;sei_interface.h&quot;	/* sei_triangulate_polygon() */
+ #include &lt;stdlib.h&gt;    		/*  malloc(), free() */
+ #include &lt;math.h&gt;			/*  atan2() */
++#include &lt;string.h&gt;			/*  strncmp(), strncpy() */
+ #include &quot;ft2build.h&quot;
+ #include FT_FREETYPE_H
+ #undef __FTERRORS_H__                
+@@ -50,12 +51,12 @@
+ static FT_Library 	library;
+ static FT_Face		face;
+ static char *memory_font=NULL;		 /*  the font file in memory */
++static char oldfontpath[256];
+ static int memory_font_size=0;	 /*  and it's size, to reduce load times. */
+ static int ft_init=0;
+ static int face_init=0;
+ 
+ static int v_off; 	 /*  the vertex number offset, to have the right vertex numbers for each character */
+-static int f_oid;	 /*  the oid of our font string */
+ static int ch;
+ struct t_buf tess_buf[256];
+ 
+@@ -66,6 +67,7 @@
+ {
+ 	int error= FT_Init_FreeType( &amp;library);
+ 	int i;
++	oldfontpath[0]=0;
+ 	if (error)
+ 		return (-1);
+     ft_init=1;
+@@ -334,7 +336,11 @@
+ 			errds(VHIGH,&quot;s3d_select_font()&quot;,&quot;error in initializtation (ft_init())&quot;);
+ 			return(-1);
+ 		}
+-
++	if (strncmp(oldfontpath,path,256)==0)
++	{
++		s3dprintf(VLOW,&quot;font already %s loaded.&quot;, path);
++		return(-1);
++	}
+ 	 /*  yse (system-specific?!) font grabber */
+ 	if (((c=s3d_findfont(path))!=NULL))
+ 	{
+@@ -344,8 +350,9 @@
+ 		if ((memory_font_size=s3d_open_file(c,p))&gt;0)
+ 		{
+ 			if (!s3d_ft_load_font())
+-			{
++			{	/* success */
+ 				if (oldfont!=NULL)				free(oldfont);
++				strncpy(oldfontpath,path,256);
+ 				return(0);
+ 			} else {
+ 				memory_font=oldfont;
+@@ -365,6 +372,7 @@
+ 	float xoff;
+ 	int voff;
+ 	int len;
++	uint32_t f_oid;
+ 	if (!ft_init)
+ 		if (s3d_ft_init())
+ 		{
+@@ -388,6 +396,38 @@
+ 	if (xlen!=NULL) *xlen=xoff;
+ 	return(f_oid);
+ }
++/* get the string length before actually drawing it. */
++float s3d_strlen( char *str) {
++	int i;
++	float xoff;
++	int voff;
++	int len;
++	uint16_t a;
++	if (!ft_init)
++		if (s3d_ft_init())
++		{
++			errds(VHIGH,&quot;s3d_draw_string()&quot;,&quot;error in initializtation (ft_init())&quot;);
++			return(0.0);
++		}
++	if (!face_init)
++	{
++		errds(VHIGH,&quot;s3d_draw_string()&quot;,&quot;no font to draw with&quot;);
++		return(0.0);
++	}
++	 /*  standard material */
++	xoff=0;
++	voff=0; 
++	len=strlen(str);
++	for (i=0;i&lt;len; i++)
++	{
++		a=(uint8_t )str[i];
++		if (!(tess_buf[a].vbuf &amp;&amp; tess_buf[a].pbuf))
++			_s3d_add_tessbuf(a);
++		xoff+=tess_buf[a].xoff;  /*  xoffset */
++	}
++	return(xoff);
++	
++}
+ int s3d_ft_quit()
+ {
+ 	_s3d_clear_tessbuf();
+
+Modified: trunk/libs3d/s3d.h
+===================================================================
+--- trunk/libs3d/s3d.h	2006-10-31 16:08:26 UTC (rev 458)
++++ trunk/libs3d/s3d.h	2006-10-31 16:08:52 UTC (rev 459)
+@@ -156,6 +156,7 @@
+ int s3d_open_file(char *fname, char **pointer);
+ int s3d_select_font(char *mask);
+ int s3d_draw_string( char *str, float *xlen);
++float s3d_strlen( char *str);
+ 
+ /* some vector calculation helpers */
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000451.html">[S3d-svn] r458 - in trunk: . apps/s3dfm
+</A></li>
+	<LI>Next message: <A HREF="000453.html">[S3d-svn] r460 - in trunk: . extras/swig
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#452">[ date ]</a>
+              <a href="thread.html#452">[ thread ]</a>
+              <a href="subject.html#452">[ subject ]</a>
+              <a href="author.html#452">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

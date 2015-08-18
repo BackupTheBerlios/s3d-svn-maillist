@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r720 - in trunk: . apps/meshs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r720%20-%20in%20trunk%3A%20.%20apps/meshs3d&In-Reply-To=%3C200710082108.l98L81Ne020405%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000711.html">
+   <LINK REL="Next"  HREF="000713.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r720 - in trunk: . apps/meshs3d</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r720%20-%20in%20trunk%3A%20.%20apps/meshs3d&In-Reply-To=%3C200710082108.l98L81Ne020405%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r720 - in trunk: . apps/meshs3d">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Mon Oct  8 23:08:01 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000711.html">[S3d-svn] r719 - trunk/apps/meshs3d
+</A></li>
+        <LI>Next message: <A HREF="000713.html">[S3d-svn] r721 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#712">[ date ]</a>
+              <a href="thread.html#712">[ thread ]</a>
+              <a href="subject.html#712">[ subject ]</a>
+              <a href="author.html#712">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-10-08 23:08:00 +0200 (Mon, 08 Oct 2007)
+New Revision: 720
+
+Modified:
+   trunk/
+   trunk/apps/meshs3d/main.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r2604 at kero</A>:  dotslash | 2007-10-08 23:07:48 +0200
+ - remove node jitter by calculating 4th root of the value. 
+   [you might want to play with that value. 0.25 = 1/4, 
+    big value (like squareroot, 0.5) still jitters but converges faster,
+    small values might stay in local optima (or at least stay longer)]
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2591
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2604
+
+Modified: trunk/apps/meshs3d/main.c
+===================================================================
+--- trunk/apps/meshs3d/main.c	2007-10-08 20:41:53 UTC (rev 719)
++++ trunk/apps/meshs3d/main.c	2007-10-08 21:08:00 UTC (rev 720)
+@@ -203,7 +203,7 @@
+ 
+ 					/* we have a connection */
+ 					wish_distance = ((con-&gt;etx1_sqrt + con-&gt;etx2_sqrt)) + 4;
+-					f = wish_distance / distance;
++					f = powf(wish_distance / distance, 0.25);
+ 					mov_add(first_node-&gt;mov_vec, tmp_mov_vec, (1 / f - 1));
+ 					mov_add(sec_node-&gt;mov_vec, tmp_mov_vec, -(1 / f - 1));
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000711.html">[S3d-svn] r719 - trunk/apps/meshs3d
+</A></li>
+	<LI>Next message: <A HREF="000713.html">[S3d-svn] r721 - trunk/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#712">[ date ]</a>
+              <a href="thread.html#712">[ thread ]</a>
+              <a href="subject.html#712">[ subject ]</a>
+              <a href="author.html#712">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r61 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r61%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602121752.k1CHqbJT032067%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000056.html">
+   <LINK REL="Next"  HREF="000058.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r61 - trunk/apps/olsrs3d</H1>
+    <B>nichtsnutz at berlios.de</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r61%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602121752.k1CHqbJT032067%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r61 - trunk/apps/olsrs3d">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Sun Feb 12 18:52:38 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000056.html">[S3d-svn] r60 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000058.html">[S3d-svn] r62 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#57">[ date ]</a>
+              <a href="thread.html#57">[ thread ]</a>
+              <a href="subject.html#57">[ subject ]</a>
+              <a href="author.html#57">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-02-12 18:52:33 +0100 (Sun, 12 Feb 2006)
+New Revision: 61
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+Log:
+fix linked list
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-02-12 17:37:33 UTC (rev 60)
++++ trunk/apps/olsrs3d/main.c	2006-02-12 17:52:33 UTC (rev 61)
+@@ -9,7 +9,6 @@
+ 
+ int Debug = 0;
+ 
+-
+ char Olsr_host[256];   /* ip or hostname of olsr node with running dot_draw plugin */
+ 
+ struct olsr_con *Con_begin = NULL;   /* begin of connection list */
+@@ -476,7 +475,7 @@
+ 	if(Obj_to_ip_head == NULL || Obj_to_ip_end == NULL)
+ 		out_of_mem();
+ 	Obj_to_ip_head-&gt;id = 0;
+-	Obj_to_ip_end-&gt;id = -1;
++	Obj_to_ip_end-&gt;id = (int) NULL;
+ 	Obj_to_ip_head-&gt;prev = Obj_to_ip_end-&gt;prev = Obj_to_ip_head;
+ 	Obj_to_ip_head-&gt;next = Obj_to_ip_end-&gt;next = Obj_to_ip_end;
+ 	List_ptr = Obj_to_ip_head;
+@@ -536,31 +535,33 @@
+ void move_lst_ptr(int *id) {
+ 	/* printf(&quot;obj2ip: move for %d\n&quot;,*id); */
+ 	/* head to point at end or id lass then first element in linked list*/
+- 	if(Obj_to_ip_head-&gt;next-&gt;id == -1 || *id &lt; Obj_to_ip_head-&gt;next-&gt;id)
++ 	if(Obj_to_ip_head-&gt;next-&gt;id == NULL || *id &lt; Obj_to_ip_head-&gt;next-&gt;id)
+ 		List_ptr = Obj_to_ip_head;
+  	/* id is greather then last element in linked list */
+ 	else if(*id &gt; Obj_to_ip_end-&gt;prev-&gt;id)
+ 		List_ptr = Obj_to_ip_end-&gt;prev;
+ 	else {
+ 		printf(&quot;obj2ip: ok i search deeper ;-) for id=%d\n&quot;,*id);
+-		if(*id &lt; (int)(Obj_to_ip_end-&gt;prev-&gt;id - Obj_to_ip_head-&gt;next-&gt;id) / 2) {
++		if((*id - (int) Obj_to_ip_head-&gt;next-&gt;id) &lt;= ((int)(Obj_to_ip_end-&gt;prev-&gt;id)-*id)) {
+ 			List_ptr = Obj_to_ip_head-&gt;next;
+-			printf(&quot;obj2ip: start at head id %d &lt; %d (last-first)/2\n&quot;,*id,(Obj_to_ip_end-&gt;prev-&gt;id - Obj_to_ip_head-&gt;next-&gt;id) / 2);
++			printf(&quot;obj2ip: start at head id %d - %d &lt;= %d - %d \n&quot;,*id,Obj_to_ip_head-&gt;next-&gt;id,*id,Obj_to_ip_end-&gt;prev-&gt;id);
+ 			while(*id &gt; List_ptr-&gt;next-&gt;id) {
++				printf(&quot;obj2ip: %d &gt; %d move to &quot;,*id,List_ptr-&gt;next-&gt;id);
+ 				List_ptr = List_ptr-&gt;next;
+-				/* printf(&quot;obj2ip: move --&gt; %d\n&quot;,List_ptr-&gt;next-&gt;id); */
++				printf(&quot;%d\n&quot;,List_ptr-&gt;id);
+ 			}
+ 		} else {
+ 			List_ptr = Obj_to_ip_end-&gt;prev;
+-			printf(&quot;obj2ip: start at end id %d &gt; %d (last-first)/2\n&quot;,*id,(Obj_to_ip_end-&gt;prev-&gt;id - Obj_to_ip_head-&gt;next-&gt;id) / 2);
++			printf(&quot;obj2ip: start at end id %d - %d &gt; %d - %d \n&quot;,*id,Obj_to_ip_head-&gt;next-&gt;id,Obj_to_ip_end-&gt;prev-&gt;id,*id);
+ 			//do List_ptr = List_ptr-&gt;prev; while(*id &gt; List_ptr-&gt;prev-&gt;id);
+ 			while(*id &lt; List_ptr-&gt;prev-&gt;id) {
++				printf(&quot;obj2ip: %d &lt; %d move to &quot;,*id,List_ptr-&gt;prev-&gt;id);
+ 				List_ptr = List_ptr-&gt;prev;
+-				/* printf(&quot;obj2ip: move &lt;-- %d\n&quot;,List_ptr-&gt;id); */
++				printf(&quot;%d\n&quot;,List_ptr-&gt;id);
+ 			}
+ 			List_ptr = List_ptr-&gt;prev-&gt;prev;
+ 		}
+-		printf(&quot;obj2ip: found id %d--&gt; %d &lt;--%d\n&quot;,List_ptr-&gt;id,List_ptr-&gt;next-&gt;id,List_ptr-&gt;next-&gt;next-&gt;id);
++		printf(&quot;obj2ip: found id to insert/delete between %d--&gt; .. &lt;--%d\n&quot;,List_ptr-&gt;id,List_ptr-&gt;next-&gt;next-&gt;id);
+ 	}
+ }
+ 
+@@ -624,7 +625,6 @@
+ 
+ 	/* set extern int optind = 0 for parse_args in io.c */
+ 	optind = 0;
+-
+ 	process_init(Olsr_host);
+ 	if (!net_init(Olsr_host))
+ 	{
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000056.html">[S3d-svn] r60 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000058.html">[S3d-svn] r62 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#57">[ date ]</a>
+              <a href="thread.html#57">[ thread ]</a>
+              <a href="subject.html#57">[ subject ]</a>
+              <a href="author.html#57">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,96 @@
+From lazhur at mail.berlios.de  Sun Feb  6 12:38:41 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun,  6 Feb 2011 12:38:41 +0100 (CET)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.1.1-6-9-g31adcbc
+Message-ID: <20110206113841.7DFB9480311@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  31adcbc082190a7f46442a9a91ec4ec47c860b2b (commit)
+      from  f73ecccd3fa16d93570c6a832cedb7caa121ad3f (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 31adcbc082190a7f46442a9a91ec4ec47c860b2b
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sun Feb 6 12:31:51 2011 +0100
+
+    Release s3d 0.2.1.1-7
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog                |    5 +++--
+ debian/patches/filter_pie.patch |    2 +-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+
+From lazhur at mail.berlios.de  Sun Feb  6 12:38:42 2011
+From: lazhur at mail.berlios.de (lazhur at BerliOS)
+Date: Sun,  6 Feb 2011 12:38:42 +0100 (CET)
+Subject: [S3d-svn] Project s3d at BerliOS annotated tag, debian/0.2.1.1-7,
+	created. debian/0.2.1.1-7
+Message-ID: <20110206113842.9934D481364@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The annotated tag, debian/0.2.1.1-7 has been created
+        at  f5359a41d5afa4475594c6c4a5f7ce6700f42102 (tag)
+   tagging  31adcbc082190a7f46442a9a91ec4ec47c860b2b (commit)
+  replaces  debian/0.2.1.1-6
+ tagged by  Sven Eckelmann
+        on  Sun Feb 6 12:33:49 2011 +0100
+
+- Log -----------------------------------------------------------------
+Debian release 0.2.1.1-7
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQIcBAABCgAGBQJNTocdAAoJEF2HCgfBJntG70QP/0zYeDBLZGueWiYYPhieufnH
+AiDhHbPfaibYmZxguKhgkPtHW0LzWzK+2kBTuD+Qfb2VfMAD705PyzNDyh3ToiAe
+eoLvkxMNvfY6XXtkKbjFy/FHm/s43r3KA2+/Oi7s6xZ5t9lm82JXss5Udq72pRSE
+hPfYmuuIsCjrRc9wOXVNW1HdGWtKazCahkQDmcgC59C2y8e9+i1MEljzTsiL6udy
+7qPvcFKqHAcGaUOITceevi4gFFj6Vn9KMQ8ZJrpukFTZZe+dqrxUATsvMe/5HrkQ
+bA3+9DSpE+wVRpEAdY1VBPbFoaeZgI+3P/G2PYmNl80B6Q3gssYZv85ptdsA+yC6
+icY2cYqOaNrpVfBqmNAOI+yQNp0hQUu7APv7RoBPM90TJ1oQIdXT52Cxk9ylw9y9
+6aKsdZ9D43UIkyqBxQcbfTMkoLsyOk32w6hbUgulI2nkdkSbBPhlOm/JrA+ftO+p
+XvzWNHYZX91eD2Avags7vpX103bfnVOB1R5cIy1dgnu3iRpXnmMA+jxKelArkM41
+xkYD1kc/WpcgKWX2kQWC51OKXrs7qNWhiOcBYYgqHaWhmQIyiB8jP5BtDgYTC9bI
+eyIsQVfEQivOW4HBAbo5H39xk+M83QVYozVNNmeFW/KFPJg7WF6EwoSW1+RKWUH8
+IAsdCxp0sJBROyUNZdRI
+=cscV
+-----END PGP SIGNATURE-----
+
+Sven Eckelmann (9):
+      Updated my maintainer e-mail address
+      Keep dependencies on separate lines in debian/control
+      Enforce order in debian/control
+      Update debian/copyright to rev=135
+      Update debian/copyright to DEP5 revision 153
+      Update copyright years in debian/copyright
+      Use more verbose license terms
+      Update DEP-5 Format url to revision 164
+      Release s3d 0.2.1.1-7
+
+-----------------------------------------------------------------------
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

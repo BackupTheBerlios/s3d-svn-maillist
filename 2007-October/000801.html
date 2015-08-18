@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r809 - in trunk/Documentation: libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r809%20-%20in%20trunk/Documentation%3A%20libs3d%20libs3dw&In-Reply-To=%3C200710231246.l9NCkqK7008731%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000800.html">
+   <LINK REL="Next"  HREF="000802.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r809 - in trunk/Documentation: libs3d libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r809%20-%20in%20trunk/Documentation%3A%20libs3d%20libs3dw&In-Reply-To=%3C200710231246.l9NCkqK7008731%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r809 - in trunk/Documentation: libs3d libs3dw">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Tue Oct 23 14:46:52 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000800.html">[S3d-svn] r808 - trunk/extras/distro/gentoo/media-gfx/s3d-svn
+</A></li>
+        <LI>Next message: <A HREF="000802.html">[S3d-svn] r810 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#801">[ date ]</a>
+              <a href="thread.html#801">[ thread ]</a>
+              <a href="subject.html#801">[ subject ]</a>
+              <a href="author.html#801">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-10-23 14:46:51 +0200 (Tue, 23 Oct 2007)
+New Revision: 809
+
+Modified:
+   trunk/Documentation/libs3d/libs3d.docbook
+   trunk/Documentation/libs3dw/libs3dw.docbook
+Log:
+- add some TODOs in the documentation
+
+Modified: trunk/Documentation/libs3d/libs3d.docbook
+===================================================================
+--- trunk/Documentation/libs3d/libs3d.docbook	2007-10-22 22:20:01 UTC (rev 808)
++++ trunk/Documentation/libs3d/libs3d.docbook	2007-10-23 12:46:51 UTC (rev 809)
+@@ -967,9 +967,16 @@
+ &lt;/para&gt;
+ &lt;/sect2&gt;
+ 
+-
++&lt;!-- TODO: 
++		- this is obsolete. update with s3d_import_model_file() ...
++		- add:  s3d_strlen()
++				s3d_vector_cross_product
++				s3d_angle_to_cam()
++				s3d_ignore_callback()
++				s3d_net_check()
++	--&gt;
+ &lt;sect2&gt;
+-&lt;title&gt;s3d_import_3ds&lt;/title&gt;
++&lt;title&gt;s3d_import_3ds&lt;/title&gt;	
+ &lt;funcsynopsis&gt;
+ &lt;funcsynopsisinfo&gt;&lt;![CDATA[#include &lt;s3d.h&gt;]]&gt;&lt;/funcsynopsisinfo&gt;
+ &lt;funcprototype&gt;
+
+Modified: trunk/Documentation/libs3dw/libs3dw.docbook
+===================================================================
+--- trunk/Documentation/libs3dw/libs3dw.docbook	2007-10-22 22:20:01 UTC (rev 808)
++++ trunk/Documentation/libs3dw/libs3dw.docbook	2007-10-23 12:46:51 UTC (rev 809)
+@@ -1,4 +1,8 @@
+ &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
++&lt;!-- TODO: 
++	add input, textbox, scrollbar types
++	s3dw_handle_info()
++--&gt;
+ &lt;chapter id=&quot;libs3dw&quot;&gt;
+ &lt;title&gt;libs3wd - The S3D Widget Library&lt;/title&gt;
+ &lt;sect1 id=&quot;using_3dw&quot;&gt;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000800.html">[S3d-svn] r808 - trunk/extras/distro/gentoo/media-gfx/s3d-svn
+</A></li>
+	<LI>Next message: <A HREF="000802.html">[S3d-svn] r810 - trunk
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#801">[ date ]</a>
+              <a href="thread.html#801">[ thread ]</a>
+              <a href="subject.html#801">[ subject ]</a>
+              <a href="author.html#801">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

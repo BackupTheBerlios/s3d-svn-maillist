@@ -1,0 +1,191 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r693 - in trunk: . apps/kism3d apps/s3d_x11gate	apps/s3dfm apps/s3dosm apps/s3dvt cmake/modules
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r693%20-%20in%20trunk%3A%20.%20apps/kism3d%20apps/s3d_x11gate%0A%09apps/s3dfm%20apps/s3dosm%20apps/s3dvt%20cmake/modules&In-Reply-To=%3C200709232158.l8NLwc5J013820%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000684.html">
+   <LINK REL="Next"  HREF="000686.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r693 - in trunk: . apps/kism3d apps/s3d_x11gate	apps/s3dfm apps/s3dosm apps/s3dvt cmake/modules</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r693%20-%20in%20trunk%3A%20.%20apps/kism3d%20apps/s3d_x11gate%0A%09apps/s3dfm%20apps/s3dosm%20apps/s3dvt%20cmake/modules&In-Reply-To=%3C200709232158.l8NLwc5J013820%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r693 - in trunk: . apps/kism3d apps/s3d_x11gate	apps/s3dfm apps/s3dosm apps/s3dvt cmake/modules">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Sep 23 23:58:38 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000684.html">[S3d-svn] r692 - trunk/apps/s3d_x11gate
+</A></li>
+        <LI>Next message: <A HREF="000686.html">[S3d-svn] r694 - in trunk: . libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#685">[ date ]</a>
+              <a href="thread.html#685">[ thread ]</a>
+              <a href="subject.html#685">[ subject ]</a>
+              <a href="author.html#685">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-09-23 23:58:37 +0200 (Sun, 23 Sep 2007)
+New Revision: 693
+
+Added:
+   trunk/cmake/modules/LateStatus.cmake
+Modified:
+   trunk/ConfigureChecks.cmake
+   trunk/apps/kism3d/CMakeLists.txt
+   trunk/apps/s3d_x11gate/CMakeLists.txt
+   trunk/apps/s3dfm/CMakeLists.txt
+   trunk/apps/s3dosm/CMakeLists.txt
+   trunk/apps/s3dvt/CMakeLists.txt
+Log:
+Print all missing packages after configure for optional modules
+
+
+Modified: trunk/ConfigureChecks.cmake
+===================================================================
+--- trunk/ConfigureChecks.cmake	2007-09-23 21:58:25 UTC (rev 692)
++++ trunk/ConfigureChecks.cmake	2007-09-23 21:58:37 UTC (rev 693)
+@@ -1,4 +1,5 @@
+ include(LateErrors)
++include(LateStatus)
+ 
+ # find required lib and add include dir for FREETYPE
+ find_package(FREETYPE)
+
+Modified: trunk/apps/kism3d/CMakeLists.txt
+===================================================================
+--- trunk/apps/kism3d/CMakeLists.txt	2007-09-23 21:58:25 UTC (rev 692)
++++ trunk/apps/kism3d/CMakeLists.txt	2007-09-23 21:58:37 UTC (rev 693)
+@@ -8,4 +8,9 @@
+ 
+ 	# install 
+ 	install(TARGETS kism3d RUNTIME DESTINATION bin)
++else (PTHREADS_FOUND)
++	PkgStatus_Later(&quot;pthreads&quot;)
++	
++	# print late status
++	Collected_PkgStatus(&quot;kism3d&quot;)
+ endif (PTHREADS_FOUND)
+
+Modified: trunk/apps/s3d_x11gate/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3d_x11gate/CMakeLists.txt	2007-09-23 21:58:25 UTC (rev 692)
++++ trunk/apps/s3d_x11gate/CMakeLists.txt	2007-09-23 21:58:37 UTC (rev 693)
+@@ -8,4 +8,9 @@
+ 
+ 	# install
+ 	install(TARGETS s3d_x11gate RUNTIME DESTINATION bin)
++else (XTST_FOUND)
++	PkgStatus_Later(&quot;xtst (pkg name: libxtst-dev)&quot;)
++	
++	# print late status
++	Collected_PkgStatus(&quot;s3d_x11gate&quot;)
+ endif (XTST_FOUND)
+
+Modified: trunk/apps/s3dfm/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3dfm/CMakeLists.txt	2007-09-23 21:58:25 UTC (rev 692)
++++ trunk/apps/s3dfm/CMakeLists.txt	2007-09-23 21:58:37 UTC (rev 693)
+@@ -9,4 +9,9 @@
+ 
+ 	# install 
+ 	install(TARGETS s3dfm RUNTIME DESTINATION bin)
++else (PTHREADS_FOUND)
++	PkgStatus_Later(&quot;pthreads&quot;)
++	
++	# print late status
++	Collected_PkgStatus(&quot;s3dfm&quot;)
+ endif (PTHREADS_FOUND)
+
+Modified: trunk/apps/s3dosm/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3dosm/CMakeLists.txt	2007-09-23 21:58:25 UTC (rev 692)
++++ trunk/apps/s3dosm/CMakeLists.txt	2007-09-23 21:58:37 UTC (rev 693)
+@@ -16,4 +16,15 @@
+ 
+ 	# install 
+ 	install(TARGETS s3dosm RUNTIME DESTINATION bin)
++else (LIBXML2_FOUND AND SQLITE3_FOUND)
++	if (NOT LIBXML2_FOUND)
++		PkgStatus_Later(&quot;libxml2 (pkg name: libxml2-dev)&quot;)
++	endif (NOT LIBXML2_FOUND)
++	
++	if (NOT SQLITE3_FOUND)
++		PkgStatus_Later(&quot;SQLite3 (pkg name: libsqlite3-dev)&quot;)
++	endif (NOT SQLITE3_FOUND)
++	
++	# print late status
++	Collected_PkgStatus(&quot;s3dosm&quot;)
+ endif (LIBXML2_FOUND AND SQLITE3_FOUND)
+
+Modified: trunk/apps/s3dvt/CMakeLists.txt
+===================================================================
+--- trunk/apps/s3dvt/CMakeLists.txt	2007-09-23 21:58:25 UTC (rev 692)
++++ trunk/apps/s3dvt/CMakeLists.txt	2007-09-23 21:58:37 UTC (rev 693)
+@@ -8,4 +8,9 @@
+ 
+ 	# install
+ 	install(TARGETS s3dvt RUNTIME DESTINATION bin)
++else (PTHREADS_FOUND)
++	PkgStatus_Later(&quot;pthreads&quot;)
++	
++	# print late status
++	Collected_PkgStatus(&quot;s3dvt&quot;)
+ endif (PTHREADS_FOUND)
+
+Added: trunk/cmake/modules/LateStatus.cmake
+===================================================================
+--- trunk/cmake/modules/LateStatus.cmake	2007-09-23 21:58:25 UTC (rev 692)
++++ trunk/cmake/modules/LateStatus.cmake	2007-09-23 21:58:37 UTC (rev 693)
+@@ -0,0 +1,15 @@
++# Defines the following macros:
++#
++# PkgStatus_Later(errmsg)
++# Collected_PkgStatus(modulename)
++
++macro(PkgStatus_Later _errmsg)
++	set(pgk_status &quot;${pgk_status}\n\t${_errmsg}&quot;)
++endmacro(PkgStatus_Later _errmsg)
++
++macro(Collected_PkgStatus _modulename)
++	if (pgk_status)
++		message(STATUS &quot;${_modulename} will not be build because of missing packages: ${pgk_status}\n\t&quot;
++			&quot;The exact names can differ depending on the distribution.&quot;)
++	endif (pgk_status)
++endmacro(Collected_PkgStatus _modulename)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000684.html">[S3d-svn] r692 - trunk/apps/s3d_x11gate
+</A></li>
+	<LI>Next message: <A HREF="000686.html">[S3d-svn] r694 - in trunk: . libs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#685">[ date ]</a>
+              <a href="thread.html#685">[ thread ]</a>
+              <a href="subject.html#685">[ subject ]</a>
+              <a href="author.html#685">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

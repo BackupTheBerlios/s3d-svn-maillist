@@ -1,0 +1,40 @@
+From ecsv at mail.berlios.de  Sun Oct 16 01:22:18 2011
+From: ecsv at mail.berlios.de (ecsv at BerliOS)
+Date: Sun, 16 Oct 2011 01:22:18 +0200 (CEST)
+Subject: [S3d-svn] Project s3d at BerliOS branch, debian,
+	updated. debian/0.2.2-5-4-g3ac18f9
+Message-ID: <20111015232219.4D0FF480342@sheep.berlios.de>
+
+This is an automated email from the git hooks/post-receive script. It was
+generated because a ref change was pushed to the repository containing
+the project "Project s3d at BerliOS".
+
+The branch, debian has been updated
+       via  3ac18f9d0d282389ba99d0a162560ee4188873ff (commit)
+      from  7491025f568a0d3ab0e9fa1f3695af321459b65f (commit)
+
+Those revisions listed above that are new to this repository have
+not appeared on any other notification email; so we list those
+revisions in full, below.
+
+- Log -----------------------------------------------------------------
+commit 3ac18f9d0d282389ba99d0a162560ee4188873ff
+Author: Sven Eckelmann <sven at narfation.org>
+Date:   Sun Oct 16 01:19:22 2011 +0200
+
+    Remove hardening-includes which are now integrated in dpkg-buildflags
+
+-----------------------------------------------------------------------
+
+Summary of changes:
+ debian/changelog |    2 ++
+ debian/control   |    1 -
+ debian/rules     |    6 +-----
+ 3 files changed, 3 insertions(+), 6 deletions(-)
+
+
+hooks/post-receive
+-- 
+Project s3d at BerliOS
+
+

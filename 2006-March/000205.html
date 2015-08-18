@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r209 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r209%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603182325.k2INPvbq029840%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000204.html">
+   <LINK REL="Next"  HREF="000206.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r209 - trunk/apps/olsrs3d</H1>
+    <B>marec at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r209%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200603182325.k2INPvbq029840%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r209 - trunk/apps/olsrs3d">marec at berlios.de
+       </A><BR>
+    <I>Sun Mar 19 00:25:57 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000204.html">[S3d-svn] r208 - in trunk: . apps/dot_mcp apps/olsrs3d apps/s3dvt server
+</A></li>
+        <LI>Next message: <A HREF="000206.html">[S3d-svn] r210 - trunk/objs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#205">[ date ]</a>
+              <a href="thread.html#205">[ thread ]</a>
+              <a href="subject.html#205">[ subject ]</a>
+              <a href="author.html#205">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: marec
+Date: 2006-03-19 00:25:57 +0100 (Sun, 19 Mar 2006)
+New Revision: 209
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/olsrs3d.h
+   trunk/apps/olsrs3d/process.c
+Log:
+- some code cleaning
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-03-18 15:19:50 UTC (rev 208)
++++ trunk/apps/olsrs3d/main.c	2006-03-18 23:25:57 UTC (rev 209)
+@@ -64,7 +64,7 @@
+ int ColorSwitch = 0;   /* enable/disable colored olsr connections */
+ int RotateSwitch = 0;
+ int RotateSpeed = 2;
+-float factor = 0.5;	/* factor in calc_olsr_node_mov */
++float Factor = 0.5;	/* Factor in calc_olsr_node_mov */
+ 
+ /***
+  *
+@@ -185,7 +185,7 @@
+ 
+ void handle_olsr_node( struct olsr_node *olsr_node ) {
+ 
+-	float distance, angle;
++	float distance, angle, angle_rad;
+ 	float tmp_mov_vec[3], desc_norm_vec[3] = {0,0,-1};
+ 	struct olsr_node *other_node;
+ 	struct Obj_to_ip *Obj_to_ip_curr;
+@@ -323,18 +323,26 @@
+ 			olsr_node-&gt;node_type_modified = 0;
+ 
+ 		}
++
++
+ 		/* rotate node description so that they are always readable */
+ 		tmp_mov_vec[0] = CamPosition[0][0] - olsr_node-&gt;pos_vec[0];
+ 		tmp_mov_vec[1] = 0;   /* we are not interested in the y value */
+ 		tmp_mov_vec[2] = CamPosition[0][2] - olsr_node-&gt;pos_vec[2];
+-	
++
++		angle = s3d_vector_angle( desc_norm_vec, tmp_mov_vec );
++
+ 		/* take care of inverse cosinus */
+-		angle = ( tmp_mov_vec[0] &gt; 0 ? 
+-					180 - ( 180.0/M_PI * s3d_vector_angle( desc_norm_vec, tmp_mov_vec ) ) : 
+-					180 + ( 180.0/M_PI * s3d_vector_angle( desc_norm_vec, tmp_mov_vec ) ) );
+-																		
++		if ( tmp_mov_vec[0] &gt; 0 ) {
++			angle_rad = 90.0/M_PI - angle;
++			angle = 180 - ( 180.0/M_PI * angle );
++		} else {
++			angle_rad = 90.0/M_PI + angle;
++			angle = 180 + ( 180.0/M_PI * angle );
++		}
++
+ 		s3d_rotate( olsr_node-&gt;desc_id, 0, angle , 0 );
+-		s3d_translate( olsr_node-&gt;desc_id, -cos(angle*M_PI/180)*olsr_node-&gt;desc_length/2 ,-1.5, sin(angle*M_PI/180)*olsr_node-&gt;desc_length/2 );
++		s3d_translate( olsr_node-&gt;desc_id, -cos(angle_rad)*olsr_node-&gt;desc_length/2 ,-1.5, sin(angle_rad)*olsr_node-&gt;desc_length/2 );
+ 
+ 
+ 		/* drift away from unrelated nodes */
+@@ -407,7 +415,7 @@
+ 			 * drift factor - 0.0 &lt; factor &lt; 1.0 ( best results: 0.3 &lt; factor &lt; 0.9
+ 			 * small factor: fast and strong drift to neighbours
+ 			 ***/
+-			if ( f &lt; factor ) f = factor;
++			if ( f &lt; Factor ) f = Factor;
+ 
+ 			mov_add( olsr_con-&gt;left_olsr_node-&gt;mov_vec, tmp_mov_vec, 1 / f - 1 );
+ 			mov_add( olsr_con-&gt;right_olsr_node-&gt;mov_vec, tmp_mov_vec, - ( 1 / f - 1 ) );
+@@ -606,6 +614,8 @@
+ 
+ 		s3d_push_line( olsr_con-&gt;obj_id, 2,3,0 );
+ 		s3d_push_line( olsr_con-&gt;obj_id, 0,1,0 );
++		/*s3d_pep_line( olsr_con-&gt;obj_id, 2,3,0 );
++		s3d_pep_line( olsr_con-&gt;obj_id, 0,1,0 );*/
+ 
+ 		olsr_con = olsr_con-&gt;next_olsr_con;
+ 
+@@ -721,12 +731,12 @@
+ 			s3d_translate(ZeroPoint,ZeroPosition[0],ZeroPosition[1],ZeroPosition[2]);
+ 			break;
+ 		case S3DK_PAGEUP: /* page up -&gt; change factor in calc_olsr_node_mov */
+-			if(factor &lt; 0.9)
+-				factor += 0.1;
++			if(Factor &lt; 0.9)
++				Factor += 0.1;
+ 			break;
+ 		case S3DK_PAGEDOWN: /* page down -&gt; change factor in calc_olsr_node_mov */
+-			if(factor &gt; 0.3)
+-				factor -= 0.1;
++			if(Factor &gt; 0.3)
++				Factor -= 0.1;
+ 			break;
+ 	}
+ }
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-03-18 15:19:50 UTC (rev 208)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-03-18 23:25:57 UTC (rev 209)
+@@ -122,9 +122,3 @@
+ void out_of_mem( void );
+ struct olsr_node **lst_search(int id);
+ 
+-/* vector */
+-float vector_length( float vector[] );
+-void vector_substract( float vector1[], float vector2[], float result_vector[] );
+-float vector_dot_product( float vector1[], float vector2[] );
+-float vector_angle( float vector1[], float vector2[] );
+-
+
+Modified: trunk/apps/olsrs3d/process.c
+===================================================================
+--- trunk/apps/olsrs3d/process.c	2006-03-18 15:19:50 UTC (rev 208)
++++ trunk/apps/olsrs3d/process.c	2006-03-18 23:25:57 UTC (rev 209)
+@@ -87,10 +87,13 @@
+ 				  1.0,1.0,1.0,
+ 				  1.0,1.0,1.0);
+ 
++		/*s3d_push_line( (*olsr_con)-&gt;obj_id, 2,3,0 );
++		s3d_push_line( (*olsr_con)-&gt;obj_id, 0,1,0 );*/
++
+ 		s3d_flags_on( (*olsr_con)-&gt;obj_id, S3D_OF_VISIBLE );
+ 
+-/* 		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 0,4,5,0 );
+- 		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 3,1,2,0 );*/
++		/*s3d_push_polygon( (*olsr_con)-&gt;obj_id, 0,4,5,0 );
++		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 3,1,2,0 );*/
+ 		s3d_link( (*olsr_con)-&gt;obj_id,  ZeroPoint );
+ 
+ 		/* add olsr node to new olsr connection in order to access the nodes from the connection list */
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000204.html">[S3d-svn] r208 - in trunk: . apps/dot_mcp apps/olsrs3d apps/s3dvt server
+</A></li>
+	<LI>Next message: <A HREF="000206.html">[S3d-svn] r210 - trunk/objs
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#205">[ date ]</a>
+              <a href="thread.html#205">[ thread ]</a>
+              <a href="subject.html#205">[ subject ]</a>
+              <a href="author.html#205">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

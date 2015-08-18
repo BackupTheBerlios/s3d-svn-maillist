@@ -1,0 +1,252 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r259 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-April/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r259%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200604230213.k3N2D0Yg029735%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000251.html">
+   <LINK REL="Next"  HREF="000253.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r259 - trunk/apps/olsrs3d</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r259%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200604230213.k3N2D0Yg029735%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r259 - trunk/apps/olsrs3d">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Sun Apr 23 04:13:00 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000251.html">[S3d-svn] r258 - in trunk: . server
+</A></li>
+        <LI>Next message: <A HREF="000253.html">[S3d-svn] r260 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#252">[ date ]</a>
+              <a href="thread.html#252">[ thread ]</a>
+              <a href="subject.html#252">[ subject ]</a>
+              <a href="author.html#252">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-04-23 04:12:50 +0200 (Sun, 23 Apr 2006)
+New Revision: 259
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/olsrs3d.h
+   trunk/apps/olsrs3d/terminal.c
+   trunk/apps/olsrs3d/terminal.h
+Log:
+- add search node
+- 't' move to terminal
+- 'esc' move back from terminal to start point
+- 'enter' search and move to node
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-04-22 23:33:57 UTC (rev 258)
++++ trunk/apps/olsrs3d/main.c	2006-04-23 02:12:50 UTC (rev 259)
+@@ -82,12 +82,12 @@
+ float Title_len;
+ int cam_go=0;
+ 
+-/* object vars */
++/* object vars
+ int obj_term;
+ int obj_cursor;
+-extern int obj_cursor_mp;
++int obj_cursor_mp;
+ struct s3d_object **obj;
+-
++*/
+ int move_cam_to = -1;
+ int oid_focus = -1;
+ float returnPoint[2][3];
+@@ -713,6 +713,34 @@
+ 			s3d_rotate(0,obj[obj_term]-&gt;rot[0],(obj[obj_term]-&gt;rot[1]),obj[obj_term]-&gt;rot[2]);
+ 			move_cam_to = -1;
+ 		}
++	} else if ( move_cam_to != -2 &amp;&amp; move_cam_to != -1 ) {
++		oid_focus = -1;
++		for( i=0; i&lt;3; i++)
++		{
++			if( i==2 )
++				CamPosition[0][i]=(CamPosition[0][i]*4+(search_node-&gt;pos_vec[i]+10))/5;
++			else if ( i == 1 )
++				CamPosition[0][i]=(CamPosition[0][i]*4+(search_node-&gt;pos_vec[i])+2)/5;
++			else
++				CamPosition[0][i]=(CamPosition[0][i]*4+search_node-&gt;pos_vec[i])/5;
++			target = 0.0;
++			current = CamPosition[1][i];
++
++			if( 0 - CamPosition[1][i] &gt; 180 )
++				target = 0 - 360;
++			if( 0 - CamPosition[1][i] &lt; -180 )
++				current = CamPosition[1][i] - 360;
++			CamPosition[1][i]=(CamPosition[1][i]*4+target)/5;
++		}
++		s3d_translate(0,CamPosition[0][0],CamPosition[0][1],CamPosition[0][2]);
++		s3d_rotate(0,CamPosition[1][0],CamPosition[1][1],CamPosition[1][2]);
++
++/*		if (dist(CamPosition[0],search_node-&gt;pos_vec) &lt; 6)
++		{
++			s3d_translate(0,search_node-&gt;pos_vec[0],search_node-&gt;pos_vec[1],(search_node-&gt;pos_vec[2]+5));
++			s3d_rotate(0,0,0,0);
++			move_cam_to = -1;
++		}*/
+ 	}
+ 	
+ 	/* move back to returnPoint */
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-04-22 23:33:57 UTC (rev 258)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-04-23 02:12:50 UTC (rev 259)
+@@ -111,6 +111,7 @@
+ extern float Bottom, Left;
+ extern char lbuf[MAXLINESIZE];
+ extern int Move_cam_target;
++extern int move_cam_to;
+ 
+ /* process */
+ void lst_initialize();
+
+Modified: trunk/apps/olsrs3d/terminal.c
+===================================================================
+--- trunk/apps/olsrs3d/terminal.c	2006-04-22 23:33:57 UTC (rev 258)
++++ trunk/apps/olsrs3d/terminal.c	2006-04-23 02:12:50 UTC (rev 259)
+@@ -18,8 +18,10 @@
+ int obj_max = 0;
+ 
+ struct s3d_object **obj = NULL;
++struct olsr_node *search_node;
+ 
+ int create_rectangle(struct rectangle *rect,float mat[]);
++int find_olsr_node( char *ip );
+ 
+ int create_rectangle(struct rectangle *rect,float mat[])
+ {
+@@ -124,23 +126,61 @@
+ 	float tmp;
+ 	static int str_id = -1;
+ 
+-	if(key == 8)
++	if(key != 13)
+ 	{
+-		if(ln &gt; 0)
+-			s[ln-1] = '\0';
++		if(key == 8)
++		{
++			if(ln &gt; 0)
++				s[ln-1] = '\0';
++		} else {
++			if(ln &lt; 20)
++				s[ln] = key;
++		}
++		if(str_id != -1)
++			s3d_del_object(str_id);
++		str_id = s3d_draw_string( s, &amp;draw_length );
++		s3d_flags_on( str_id, S3D_OF_VISIBLE );
++		s3d_pep_material(str_id,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0);
++		s3d_scale( str_id, 0.4 );
++		s3d_translate( str_id,9,4,-0.45);
++		s3d_rotate(str_id,0,180,0);
++		s3d_link( str_id, obj[obj_term]-&gt;oid );
++		tmp = obj[obj_cursor]-&gt;pos[0] - (draw_length*0.43);
++		s3d_translate( obj[obj_cursor]-&gt;oid , tmp, obj[obj_cursor]-&gt;pos[1], obj[obj_cursor]-&gt;pos[2]);
+ 	} else {
+-		if(ln &lt; 20)
+-			s[ln] = key;
++		if(!find_olsr_node(s))
++		{
++			printf(&quot;no node found\n&quot;);
++		} else {
++			move_cam_to = search_node-&gt;obj_id;	
++		}
+ 	}
+-	if(str_id != -1)
+-		s3d_del_object(str_id);
+-	str_id = s3d_draw_string( s, &amp;draw_length );
+-	s3d_flags_on( str_id, S3D_OF_VISIBLE );
+-	s3d_pep_material(str_id,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0);
+-	s3d_scale( str_id, 0.4 );
+-	s3d_translate( str_id,9,4,-0.45);
+-	s3d_rotate(str_id,0,180,0);
+-	s3d_link( str_id, obj[obj_term]-&gt;oid );
+-	tmp = obj[obj_cursor]-&gt;pos[0] - (draw_length*0.43);
+-	s3d_translate( obj[obj_cursor]-&gt;oid , tmp, obj[obj_cursor]-&gt;pos[1], obj[obj_cursor]-&gt;pos[2]);
+ }
++
++int find_olsr_node( char *ip )
++{
++	int result;
++	search_node = Olsr_root;
++	
++	while ( search_node != NULL )
++	{
++
++		result = strncmp( search_node-&gt;ip, ip, NAMEMAX );
++
++		/* we found the node */
++		if ( result == 0 ) 
++			break;
++
++		/* the searched node must be in the subtree */
++		if ( result &lt; 0 )
++			search_node = search_node-&gt;right;
++		else
++			search_node = search_node-&gt;left;
++	}
++	
++	if( search_node != NULL )
++	{
++		return(1);
++	}
++	return(0);
++}
+
+Modified: trunk/apps/olsrs3d/terminal.h
+===================================================================
+--- trunk/apps/olsrs3d/terminal.h	2006-04-22 23:33:57 UTC (rev 258)
++++ trunk/apps/olsrs3d/terminal.h	2006-04-23 02:12:50 UTC (rev 259)
+@@ -22,6 +22,7 @@
+ extern int obj_cursor;
+ extern int obj_cursor_mp;
+ extern struct s3d_object **obj;
++extern struct olsr_node *search_node;
+ 
+ void create_cursor();
+ void create_terminal();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000251.html">[S3d-svn] r258 - in trunk: . server
+</A></li>
+	<LI>Next message: <A HREF="000253.html">[S3d-svn] r260 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#252">[ date ]</a>
+              <a href="thread.html#252">[ thread ]</a>
+              <a href="subject.html#252">[ subject ]</a>
+              <a href="author.html#252">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

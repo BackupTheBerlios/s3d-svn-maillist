@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r181 - in trunk: . apps/dot_mcp
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r181%20-%20in%20trunk%3A%20.%20apps/dot_mcp&In-Reply-To=%3C200603142215.k2EMFDZK014530%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000176.html">
+   <LINK REL="Next"  HREF="000178.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r181 - in trunk: . apps/dot_mcp</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r181%20-%20in%20trunk%3A%20.%20apps/dot_mcp&In-Reply-To=%3C200603142215.k2EMFDZK014530%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r181 - in trunk: . apps/dot_mcp">dotslash at berlios.de
+       </A><BR>
+    <I>Tue Mar 14 23:15:13 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000176.html">[S3d-svn] r180 - in trunk: . client
+</A></li>
+        <LI>Next message: <A HREF="000178.html">[S3d-svn] r182 - in trunk: . Documentation
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#177">[ date ]</a>
+              <a href="thread.html#177">[ thread ]</a>
+              <a href="subject.html#177">[ subject ]</a>
+              <a href="author.html#177">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-03-14 23:15:12 +0100 (Tue, 14 Mar 2006)
+New Revision: 181
+
+Modified:
+   trunk/
+   trunk/ChangeLog
+   trunk/apps/dot_mcp/main.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r266 at balthasar</A>:  dotslash | 2006-03-14 23:14:49 +0100
+ - changelog, less output in dot_mcp
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:264
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:266
+
+Modified: trunk/ChangeLog
+===================================================================
+--- trunk/ChangeLog	2006-03-14 22:08:59 UTC (rev 180)
++++ trunk/ChangeLog	2006-03-14 22:15:12 UTC (rev 181)
+@@ -1,4 +1,6 @@
+ 2006-03-14  Simon Wunderlich - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++	- added push/pep/pop-line and pep-vertex
++	- dot_mcp now has egoshooter-mode (w,a,s,d)
+ 	- added some Documentation entries
+ 2006-03-10  Simon Wunderlich - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+ 	- added rc functionality: use /etc/s3drc or ~/.s3drc to
+
+Modified: trunk/apps/dot_mcp/main.c
+===================================================================
+--- trunk/apps/dot_mcp/main.c	2006-03-14 22:08:59 UTC (rev 180)
++++ trunk/apps/dot_mcp/main.c	2006-03-14 22:15:12 UTC (rev 181)
+@@ -331,11 +331,9 @@
+ 		campos.x=inf-&gt;trans_x;
+ 		campos.y=inf-&gt;trans_y;
+ 		campos.z=inf-&gt;trans_z;
+-		printf(&quot;campos update: %f, %f, %f\n&quot;,campos.x,campos.y,campos.z);
+ 		camrot.x=inf-&gt;rot_x;
+ 		camrot.y=inf-&gt;rot_y;
+ 		camrot.z=inf-&gt;rot_z;
+-		printf(&quot;camrot update: %f, %f, %f\n&quot;,camrot.x,camrot.y,camrot.z);
+ 
+ 		if (asp!=inf-&gt;scale)
+ 		{
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000176.html">[S3d-svn] r180 - in trunk: . client
+</A></li>
+	<LI>Next message: <A HREF="000178.html">[S3d-svn] r182 - in trunk: . Documentation
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#177">[ date ]</a>
+              <a href="thread.html#177">[ thread ]</a>
+              <a href="subject.html#177">[ subject ]</a>
+              <a href="author.html#177">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r405 - in trunk: . apps/olsrs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r405%20-%20in%20trunk%3A%20.%20apps/olsrs3d%20libs3dw&In-Reply-To=%3C200609172004.k8HK4OnT006529%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000397.html">
+   <LINK REL="Next"  HREF="000399.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r405 - in trunk: . apps/olsrs3d libs3dw</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r405%20-%20in%20trunk%3A%20.%20apps/olsrs3d%20libs3dw&In-Reply-To=%3C200609172004.k8HK4OnT006529%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r405 - in trunk: . apps/olsrs3d libs3dw">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Sep 17 22:04:24 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000397.html">[S3d-svn] r404 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000399.html">[S3d-svn] r406 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#398">[ date ]</a>
+              <a href="thread.html#398">[ thread ]</a>
+              <a href="subject.html#398">[ subject ]</a>
+              <a href="author.html#398">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-09-17 22:04:23 +0200 (Sun, 17 Sep 2006)
+New Revision: 405
+
+Modified:
+   trunk/
+   trunk/apps/olsrs3d/main.c
+   trunk/libs3dw/arrange.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r986 at balthasar</A>:  dotslash | 2006-09-17 22:04:14 +0200
+ - window move more to camera
+ - 1 label become 2 O.o
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:900
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:986
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-09-17 16:20:15 UTC (rev 404)
++++ trunk/apps/olsrs3d/main.c	2006-09-17 20:04:23 UTC (rev 405)
+@@ -116,7 +116,9 @@
+ 	s3dw_button  *button;
+ 
+ 	infwin = s3dw_surface_new( &quot;Help Window&quot;, 20, 19 );
+-	s3dw_label_new(infwin,&quot;C        - Colour On/Off&quot;,1,2);
++
++	/*s3dw_label_new(infwin,&quot;C        - Colour On/Off&quot;,1,2);*/
++	s3dw_label_new(infwin,&quot;C&quot;,1,2); 						s3dw_label_new(infwin,&quot;- Colour On/Off&quot;,3,2);
+ 	s3dw_label_new(infwin,&quot;R        - Rotation On/Off&quot;,1,4);
+ 	s3dw_label_new(infwin,&quot;+        - Increase Rotation Speed&quot;,1,5);
+ 	s3dw_label_new(infwin,&quot; -        - Decrease Rotation Speed&quot;,1,6);
+
+Modified: trunk/libs3dw/arrange.c
+===================================================================
+--- trunk/libs3dw/arrange.c	2006-09-17 16:20:15 UTC (rev 404)
++++ trunk/libs3dw/arrange.c	2006-09-17 20:04:23 UTC (rev 405)
+@@ -109,7 +109,7 @@
+ 		}
+ 	}
+ }
+-#define DIST	60.0
++#define DIST	30.0
+ void s3dw_follow()
+ {
+ 	s3dw_widget *w,*root=s3dw_getroot();
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000397.html">[S3d-svn] r404 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000399.html">[S3d-svn] r406 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#398">[ date ]</a>
+              <a href="thread.html#398">[ thread ]</a>
+              <a href="subject.html#398">[ subject ]</a>
+              <a href="author.html#398">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

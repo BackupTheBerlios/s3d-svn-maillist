@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r728 - in trunk: . apps/comptest
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r728%20-%20in%20trunk%3A%20.%20apps/comptest&In-Reply-To=%3C200710132220.l9DMKLaU016681%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000719.html">
+   <LINK REL="Next"  HREF="000721.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r728 - in trunk: . apps/comptest</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r728%20-%20in%20trunk%3A%20.%20apps/comptest&In-Reply-To=%3C200710132220.l9DMKLaU016681%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r728 - in trunk: . apps/comptest">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Oct 14 00:20:21 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000719.html">[S3d-svn] r727 - in trunk: . apps/comptest
+</A></li>
+        <LI>Next message: <A HREF="000721.html">[S3d-svn] r729 - in trunk: . apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#720">[ date ]</a>
+              <a href="thread.html#720">[ thread ]</a>
+              <a href="subject.html#720">[ subject ]</a>
+              <a href="author.html#720">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-10-14 00:20:21 +0200 (Sun, 14 Oct 2007)
+New Revision: 728
+
+Modified:
+   trunk/
+   trunk/apps/comptest/comptest.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r2636 at kero</A>:  dotslash | 2007-10-14 00:20:15 +0200
+ - limit max events per loop so the comptest-client does not seem deaf to the server
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2634
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2636
+
+Modified: trunk/apps/comptest/comptest.c
+===================================================================
+--- trunk/apps/comptest/comptest.c	2007-10-13 22:03:56 UTC (rev 727)
++++ trunk/apps/comptest/comptest.c	2007-10-13 22:20:21 UTC (rev 728)
+@@ -43,6 +43,7 @@
+ #endif
+ #endif
+ 
++#define MAXEVENTS	50		/* maximum events per loop. */
+ #define TEXW 256
+ #define TEXH 256
+ 
+@@ -131,7 +132,7 @@
+ 		name = &quot;Configure!!&quot;;
+ 	}
+ 
+-	printf(&quot;Event: %s\n&quot;, name);
++/*	printf(&quot;Event: %s\n&quot;, name);*/
+ 	return(0);
+ }
+ 
+@@ -395,9 +396,9 @@
+ 		if (!win-&gt;oid)
+ 			deco_box(win);
+ 		if (image-&gt;format == ZPixmap) {
+-			printf(&quot;XImage: %dx%d, format %d (%d), bpp: %d, depth %d, pad %d\n&quot;,
++/*			printf(&quot;XImage: %dx%d, format %d (%d), bpp: %d, depth %d, pad %d\n&quot;,
+ 			       image-&gt;width, image-&gt;height, image-&gt;format,
+-			       ZPixmap, image-&gt;bits_per_pixel, image-&gt;depth, image-&gt;bitmap_pad);
++			       ZPixmap, image-&gt;bits_per_pixel, image-&gt;depth, image-&gt;bitmap_pad);*/
+ 			rs = get_shift(image-&gt;red_mask) - 8;
+ 			gs = get_shift(image-&gt;green_mask) - 8;
+ 			bs = get_shift(image-&gt;blue_mask) - 8;
+@@ -407,7 +408,7 @@
+ 			rs = rs;
+ 			gs = gs - 8;
+ 			bs = bs - 16;
+-			printf(&quot;Ximage: rgb: %d|%d|%d\n&quot;, rs, gs, bs);;
++/*			printf(&quot;Ximage: rgb: %d|%d|%d\n&quot;, rs, gs, bs);;*/
+ 			/*  printf(&quot;red: size %d, offset %d\n&quot;,rs,roff);
+ 			  printf(&quot;green: size %d, offset %d\n&quot;,gs,goff);
+ 			  printf(&quot;blue: size %d, offset %d\n&quot;,bs,boff);
+@@ -450,14 +451,15 @@
+ {
+ 	XEvent event;
+ 	struct window *window;
+-	while (XPending(dpy)) {
++	int i;
++	for (i=0; i&lt; MAXEVENTS &amp;&amp; XPending(dpy); i++) {
+ 		XNextEvent(dpy, &amp;event);
+ 		print_event(dpy, &amp;event);
+ 		if (event.type == xdamage.event + XDamageNotify) {
+ 			XDamageNotifyEvent *e = (XDamageNotifyEvent*) &amp; event;
+-			printf(&quot;window = %d, geometry = %d:%d (at %d:%d), area = %d:%d (at %d:%d)\n&quot;,
++/*			printf(&quot;window = %d, geometry = %d:%d (at %d:%d), area = %d:%d (at %d:%d)\n&quot;,
+ 			       (int)e-&gt;drawable, e-&gt;geometry.width, e-&gt;geometry.height, e-&gt;geometry.x, e-&gt;geometry.y,
+-			       e-&gt;area.width, e-&gt;area.height, e-&gt;area.x, e-&gt;area.y);
++			       e-&gt;area.width, e-&gt;area.height, e-&gt;area.x, e-&gt;area.y);*/
+ 			XDamageSubtract(dpy, e-&gt;damage, None, None);
+ 			window = window_find(e-&gt;drawable);
+ 			if (window!=NULL)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000719.html">[S3d-svn] r727 - in trunk: . apps/comptest
+</A></li>
+	<LI>Next message: <A HREF="000721.html">[S3d-svn] r729 - in trunk: . apps/comptest
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#720">[ date ]</a>
+              <a href="thread.html#720">[ thread ]</a>
+              <a href="subject.html#720">[ subject ]</a>
+              <a href="author.html#720">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

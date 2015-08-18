@@ -1,0 +1,1340 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r661 - in trunk: . server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r661%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200709020939.l829dfaA023995%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000652.html">
+   <LINK REL="Next"  HREF="000654.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r661 - in trunk: . server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r661%20-%20in%20trunk%3A%20.%20server&In-Reply-To=%3C200709020939.l829dfaA023995%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r661 - in trunk: . server">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Sun Sep  2 11:39:41 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000652.html">[S3d-svn] r660 - in trunk: . apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000654.html">[S3d-svn] r662 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#653">[ date ]</a>
+              <a href="thread.html#653">[ thread ]</a>
+              <a href="subject.html#653">[ subject ]</a>
+              <a href="author.html#653">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2007-09-02 11:39:40 +0200 (Sun, 02 Sep 2007)
+New Revision: 661
+
+Modified:
+   trunk/
+   trunk/server/event.c
+   trunk/server/global.h
+   trunk/server/graphics.c
+   trunk/server/main.c
+   trunk/server/mcp.c
+   trunk/server/object.c
+   trunk/server/process.c
+   trunk/server/proto.c
+   trunk/server/shm_ringbuf.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r2297 at kero</A>:  dotslash | 2007-09-02 11:39:35 +0200
+ - change most of the ids from uint32_t to int32_t. I wonder what hit me when I changed them all to unsigned ...
+ - remove the compiler warnings in the server
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2294
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:2297
+
+Modified: trunk/server/event.c
+===================================================================
+--- trunk/server/event.c	2007-09-01 12:49:32 UTC (rev 660)
++++ trunk/server/event.c	2007-09-02 09:39:40 UTC (rev 661)
+@@ -35,7 +35,7 @@
+ extern int winw,winh; /* to give aspect ratio to the program */
+ /*  I don't plan to keep this until the end, but it can show us how */
+ /*  to interact ... */
+-int event_obj_click(struct t_process *p, uint32_t oid)
++int event_obj_click(struct t_process *p, int32_t oid)
+ {
+ 	uint32_t moid=htonl(oid);
+ 	s3dprintf(MED,&quot;telling client that oid %d got clicked&quot;,oid);
+@@ -53,7 +53,7 @@
+ 	k[1]=htons(uni);
+ 	k[2]=htons(mod);
+ 	k[3]=htons(state);
+-	if (obj_valid(get_proc_by_pid(MCP),focus_oid,o))
++	if (OBJ_VALID(get_proc_by_pid(MCP),focus_oid,o))
+ 		prot_com_out(get_proc_by_pid(o-&gt;n_mat), S3D_P_S_KEY, (uint8_t *)k, 8);
+ 	prot_com_out(get_proc_by_pid(MCP),S3D_P_S_KEY,(uint8_t *)k, 8); /* mcp always gets a copy */
+ 	return(0);
+@@ -67,7 +67,7 @@
+ 	uint8_t b[2];
+ 	b[0]=button;
+ 	b[1]=state;
+-	if (obj_valid(get_proc_by_pid(MCP),focus_oid,o))
++	if (OBJ_VALID(get_proc_by_pid(MCP),focus_oid,o))
+ 		prot_com_out(get_proc_by_pid(o-&gt;n_mat), S3D_P_S_MBUTTON, (uint8_t *)&amp;b, 2);
+ 	prot_com_out(get_proc_by_pid(MCP),S3D_P_S_MBUTTON,(uint8_t *)&amp;b, 2); /* mcp always gets a copy */
+ 	return(0);
+@@ -95,7 +95,7 @@
+ 	struct t_obj	 *o;
+ 	p=get_proc_by_pid(MCP);
+ 	event_obj_info(p,0);
+-	if (obj_valid(p,focus_oid,o))
++	if (OBJ_VALID(p,focus_oid,o))
+ 		event_obj_info(get_proc_by_pid(o-&gt;n_mat),0);
+ 	return(0);
+ }
+@@ -106,7 +106,7 @@
+ 	struct t_obj	 *o;
+ 	p=get_proc_by_pid(MCP);
+ 	event_obj_info(p,get_pointer(p));
+-	if (obj_valid(p,focus_oid,o))
++	if (OBJ_VALID(p,focus_oid,o))
+ 	{
+ 		p=get_proc_by_pid(o-&gt;n_mat); /* focused program pointer*/
+ 		event_obj_info(p,get_pointer(p));
+@@ -115,12 +115,12 @@
+ }
+ 
+ /* this should replace the mcp_rep_object() function later ... */
+-int event_obj_info(struct t_process *p, uint32_t oid)
++int event_obj_info(struct t_process *p, int32_t oid)
+ {
+ 	struct t_obj_info mo;
+ 	struct t_process *ap;
+ 	struct t_obj *o;
+-	if (obj_valid(p,oid,o))
++	if (OBJ_VALID(p,oid,o))
+ 	{
+ 		mo.object=htonl(oid);
+ 		mo.trans_x=p-&gt;object[oid]-&gt;translate.x;
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2007-09-01 12:49:32 UTC (rev 660)
++++ trunk/server/global.h	2007-09-02 09:39:40 UTC (rev 661)
+@@ -63,7 +63,7 @@
+ 
+ #define RB_OVERHEAD		sizeof(struct buf_t)
+ 
+-#define obj_valid(p,oid,o)	((oid&lt;p-&gt;n_obj) &amp;&amp; ((o=p-&gt;object[oid])!=NULL))
++#define OBJ_VALID(p,oid,o)	(oid &gt;= 0) &amp;&amp; ((oid &lt; p-&gt;n_obj) &amp;&amp; ((o=p-&gt;object[oid])!=NULL))
+ typedef float t_mtrx[16];
+ 
+ struct buf_t
+@@ -104,7 +104,7 @@
+ 	float amb_r,amb_g,amb_b,amb_a, 			 /*  ambience */
+ 		  spec_r,spec_g,spec_b,spec_a,	 	 /*  specualar */
+ 		  diff_r,diff_g,diff_b,diff_a;		 /*  diffusion */
+-	uint32_t tex;							 /*  texture index, -1 if there is no */
++	int32_t tex;							 /*  texture index, -1 if there is no */
+ };
+ /*  this defines a texture */
+ struct t_tex
+@@ -114,7 +114,7 @@
+ 	uint8_t *buf;		 /*  the data */
+ 	float xs,ys;		 /*  scale data for gl-implementations which require 2^x */
+ 						 /*  texture sizes. */
+-	uint32_t gl_texnum;	 /*  the gl texture number. */
++	int32_t gl_texnum;	 /*  the gl texture number. */
+ };
+ /*  the object type */
+ struct t_obj
+@@ -145,13 +145,13 @@
+ #define OF_3DPOINTER	0xB0000000
+ 
+ #define OF_MASK			0x00FFFFFF
+-		uint32_t n_vertex, n_mat, n_poly, n_tex, n_line;
++		int32_t n_vertex, n_mat, n_poly, n_tex, n_line;
+ 					 /*  if OF_VIRTUAL is set, n_mat contains the pid */
+ 					 /*  if OF_CLONE is set, n_vertex contains the original oid */
+ 					 /*  I know this is dirty, but it would a waste of data if I don't do so ... */
+-		uint32_t dplist;	 /*  opengl display list number */
+-		uint32_t linkid;	 /*  linking target, -1 if there is none */
+-		uint32_t lsub,lnext,lprev;
++		int32_t dplist;		 /*  opengl display list number */
++		int32_t linkid;		 /*  linking target, -1 if there is none */
++		int32_t lsub,lnext,lprev;
+ 		 /*  pointer to our objects; */
+ 		struct t_vertex *p_vertex;
+ 		struct t_mat	*p_mat;
+@@ -179,9 +179,9 @@
+ {
+ 	char 				  name[NAME_MAX];		 /*  process name */
+ 	struct t_obj		**object;				 /*  initial pointer to object list */
+-	uint32_t			  n_obj;				 /*  number of objects */
+-	uint32_t			  biggest_obj;			 /*  the biggest object */
+-	uint32_t			  mcp_oid;				 /*  oid in mcp */
++	int32_t				  n_obj;				 /*  number of objects */
++	int32_t				  biggest_obj;			 /*  the biggest object */
++	int32_t				  mcp_oid;				 /*  oid in mcp */
+ 	int 				  id;					 /*  pid */
+ 	int					  con_type;				 /*  type of connection, one of following: */
+ #define CON_NULL	0
+@@ -197,7 +197,7 @@
+ 
+ struct t_obj_info 
+ {
+-	uint32_t object;
++	int32_t object;
+ 	uint32_t flags;
+ 	float trans_x,trans_y,trans_z;
+ 	float rot_x,rot_y,rot_z;
+@@ -252,8 +252,8 @@
+ int prot_com_in(struct t_process *p, uint8_t *pbuf);
+ int prot_com_out(struct t_process *p, uint8_t opcode, uint8_t *buf, uint16_t length);
+ /* event.c */
+-int event_obj_info(struct t_process *p, uint32_t oid);
+-int event_obj_click(struct t_process *p, uint32_t oid);
++int event_obj_info(struct t_process *p, int32_t oid);
++int event_obj_click(struct t_process *p, int32_t oid);
+ int event_key_pressed(uint16_t key, uint16_t uni, uint16_t mod, int state);
+ int event_mbutton_clicked(uint8_t button, uint8_t state);
+ int event_cam_changed(void);
+@@ -328,53 +328,53 @@
+ struct t_process *process_protinit(struct t_process *p, char *name);
+ struct t_process *get_proc_by_pid(int pid);
+ /*  object.c */
+-int obj_debug			(struct t_process *p, uint32_t oid);
++int obj_debug			(struct t_process *p, int32_t oid);
+ int obj_new				(struct t_process *p);
+-int obj_clone			(struct t_process *p, uint32_t oid);
+-int obj_clone_change	(struct t_process *p, uint32_t oid, uint32_t toid);
+-int obj_link			(struct t_process *p, uint32_t oid_from, uint32_t oid_to);
+-int obj_unlink			(struct t_process *p, uint32_t oid);
+-int obj_del				(struct t_process *p, uint32_t oid);
+-int obj_push_vertex		(struct t_process *p, uint32_t oid, float *x, uint32_t n);
+-int obj_push_mat		(struct t_process *p, uint32_t oid, float *x, uint32_t n);
+-int obj_push_poly		(struct t_process *p, uint32_t oid, uint32_t *x, uint32_t n);
+-int obj_push_line		(struct t_process *p, uint32_t oid, uint32_t *x, uint32_t n);
+-int obj_push_tex		(struct t_process *p, uint32_t oid, uint16_t *x, uint32_t n);
+-int obj_pep_poly_normal	(struct t_process *p, uint32_t oid, float *x, uint32_t n);
+-int obj_pep_line_normal (struct t_process *p, uint32_t oid, float *x, uint32_t n);
+-int obj_pep_poly_texc	(struct t_process *p, uint32_t oid, float *x, uint32_t  n);
+-int obj_pep_mat			(struct t_process *p, uint32_t oid, float *x, uint32_t n);
+-int obj_pep_mat_tex		(struct t_process *p, uint32_t oid, uint32_t *x, uint32_t n);
+-int obj_pep_vertex		(struct t_process *p, uint32_t oid, float *x, uint32_t n);
+-int obj_pep_line		(struct t_process *p, uint32_t oid, uint32_t *x, uint32_t n);
+-int obj_load_poly_normal(struct t_process *p, uint32_t oid, float *x, uint32_t start, uint32_t n);
+-int obj_load_line_normal(struct t_process *p, uint32_t oid, float *x, uint32_t start, uint32_t n);
+-int obj_load_poly_texc	(struct t_process *p, uint32_t oid, float *x, uint32_t start, uint32_t n);
+-int obj_load_mat		(struct t_process *p, uint32_t oid, float *x, uint32_t start, uint32_t n);
+-int obj_load_tex		(struct t_process *p, uint32_t oid, uint32_t tex, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *pixbuf);
+-int obj_del_vertex		(struct t_process *p, uint32_t oid, uint32_t n);
+-int obj_del_mat			(struct t_process *p, uint32_t oid, uint32_t n);
+-int obj_del_poly		(struct t_process *p, uint32_t oid, uint32_t n);
+-int obj_del_line		(struct t_process *p, uint32_t oid, uint32_t n);
+-int obj_del_tex			(struct t_process *p, uint32_t oid, uint32_t n);
+-int obj_toggle_flags	(struct t_process *p, uint32_t oid, uint8_t type, uint32_t flags);
+-int obj_translate		(struct t_process *p, uint32_t oid, float *transv);
+-int obj_rotate			(struct t_process *p, uint32_t oid, float *rotv);
+-int obj_scale			(struct t_process *p, uint32_t oid, float scav);
+-int obj_render			(struct t_process *p, uint32_t oid);
+-int obj_free			(struct t_process *p, uint32_t oid);
++int obj_clone			(struct t_process *p, int32_t oid);
++int obj_clone_change	(struct t_process *p, int32_t oid, int32_t toid);
++int obj_link			(struct t_process *p, int32_t oid_from, int32_t oid_to);
++int obj_unlink			(struct t_process *p, int32_t oid);
++int obj_del				(struct t_process *p, int32_t oid);
++int obj_push_vertex		(struct t_process *p, int32_t oid, float *x, int32_t n);
++int obj_push_mat		(struct t_process *p, int32_t oid, float *x, int32_t n);
++int obj_push_poly		(struct t_process *p, int32_t oid, uint32_t *x, int32_t n);
++int obj_push_line		(struct t_process *p, int32_t oid, uint32_t *x, int32_t n);
++int obj_push_tex		(struct t_process *p, int32_t oid, uint16_t *x, int32_t n);
++int obj_pep_poly_normal	(struct t_process *p, int32_t oid, float *x, int32_t n);
++int obj_pep_line_normal (struct t_process *p, int32_t oid, float *x, int32_t n);
++int obj_pep_poly_texc	(struct t_process *p, int32_t oid, float *x, int32_t  n);
++int obj_pep_mat			(struct t_process *p, int32_t oid, float *x, int32_t n);
++int obj_pep_mat_tex		(struct t_process *p, int32_t oid, uint32_t *x, int32_t n);
++int obj_pep_vertex		(struct t_process *p, int32_t oid, float *x, int32_t n);
++int obj_pep_line		(struct t_process *p, int32_t oid, uint32_t *x, int32_t n);
++int obj_load_poly_normal(struct t_process *p, int32_t oid, float *x, int32_t start, int32_t n);
++int obj_load_line_normal(struct t_process *p, int32_t oid, float *x, int32_t start, int32_t n);
++int obj_load_poly_texc	(struct t_process *p, int32_t oid, float *x, int32_t start, int32_t n);
++int obj_load_mat		(struct t_process *p, int32_t oid, float *x, int32_t start, int32_t n);
++int obj_load_tex		(struct t_process *p, int32_t oid, int32_t tex, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *pixbuf);
++int obj_del_vertex		(struct t_process *p, int32_t oid, int32_t n);
++int obj_del_mat			(struct t_process *p, int32_t oid, int32_t n);
++int obj_del_poly		(struct t_process *p, int32_t oid, int32_t n);
++int obj_del_line		(struct t_process *p, int32_t oid, int32_t n);
++int obj_del_tex			(struct t_process *p, int32_t oid, int32_t n);
++int obj_toggle_flags	(struct t_process *p, int32_t oid, uint8_t type, uint32_t flags);
++int obj_translate		(struct t_process *p, int32_t oid, float *transv);
++int obj_rotate			(struct t_process *p, int32_t oid, float *rotv);
++int obj_scale			(struct t_process *p, int32_t oid, float scav);
++int obj_render			(struct t_process *p, int32_t oid);
++int obj_free			(struct t_process *p, int32_t oid);
+ void obj_get_maximum	(struct t_process *p, struct t_obj *obj);
+ void into_position		(struct t_process *p, struct t_obj *obj, int depth);
+-void obj_recalc_tmat	(struct t_process *p, uint32_t oid);
+-void obj_size_update	(struct t_process *p, uint32_t oid);
+-void obj_pos_update(struct t_process *p, uint32_t oid, uint32_t first_oid);
+-void obj_check_biggest_object(struct t_process *p, uint32_t oid);
+-uint32_t get_pointer(struct t_process *p);
+-void link_delete(struct t_process *p, uint32_t oid);
+-void link_insert(struct t_process *p, uint32_t oid, uint32_t target);
++void obj_recalc_tmat	(struct t_process *p, int32_t oid);
++void obj_size_update	(struct t_process *p, int32_t oid);
++void obj_pos_update(struct t_process *p, int32_t oid, int32_t first_oid);
++void obj_check_biggest_object(struct t_process *p, int32_t oid);
++int32_t get_pointer(struct t_process *p);
++void link_delete(struct t_process *p, int32_t oid);
++void link_insert(struct t_process *p, int32_t oid, int32_t target);
+ /*  mcp.c */
+-int mcp_rep_object(uint32_t mcp_oid);
+-int mcp_del_object(uint32_t mcp_oid);
++int mcp_rep_object(int32_t mcp_oid);
++int mcp_del_object(int32_t mcp_oid);
+ int mcp_init(void);
+ int mcp_focus(int oid);
+ /*  matrix.c */
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2007-09-01 12:49:32 UTC (rev 660)
++++ trunk/server/graphics.c	2007-09-02 09:39:40 UTC (rev 661)
+@@ -123,7 +123,7 @@
+ {
+ 	struct t_process *ap;
+ 	struct t_vertex x,y;
+-	uint32_t j,k;
++	int32_t j,k;
+ 	t_mtrx m;
+ 
+ 	glPushMatrix();
+@@ -171,11 +171,11 @@
+ int render_by_mcp()
+ {
+ 	struct t_process *p=get_proc_by_pid(MCP);
+-	uint32_t i;
++	int32_t i;
+ 	struct t_obj *o;
+ 	struct t_vertex x,y;
+ 	int k;
+-	for (i=0;i&lt;p-&gt;n_obj;i++)
++	for (i=0 ; i &lt; p-&gt;n_obj ; i++)
+ 	{   /* check all mcp objects ... */
+ 		o=p-&gt;object[i];
+ 		if (o!=NULL)
+@@ -247,9 +247,10 @@
+ 	GLint viewport[4];
+ 	GLfloat xpos,ypos;
+ 	float big,z1,z2;
+-	uint32_t mcp_o,o;
++	int32_t mcp_o,o;
+ 	struct t_process *p=get_proc_by_pid(MCP);
+-	GLuint select_buf[SBSIZE],*ptr,names,hits;
++	GLuint select_buf[SBSIZE],*ptr;
++	int hits, names;
+ 	t_mtrx m;
+ 
+ 	select_mode=1;
+@@ -286,14 +287,14 @@
+ 	render_by_mcp();
+ 	glFlush();
+ 	hits=glRenderMode(GL_RENDER);
+-	if (hits&gt;0)
++	if ( hits &gt; 0 )
+ 	{
+ 		big=INFINITY;
+ 		s3dprintf(LOW,&quot;had %d hits&quot;,hits);
+ 		ptr=select_buf;
+-		mcp_o=o=names=-1;
++		mcp_o= o= names= -1;
+ 		/* check all the hits, only select the nearest ... */
+-		for (i=0;i&lt;hits;i++)
++		for (i=0 ; i &lt; hits ; i++)
+ 		{
+ 			names=*ptr;						ptr++;
+ 			z1=(float)*ptr/0x7fffffff;		ptr++;
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2007-09-01 12:49:32 UTC (rev 660)
++++ trunk/server/main.c	2007-09-02 09:39:40 UTC (rev 661)
+@@ -92,7 +92,7 @@
+ 		 * and all his sockets up */
+ 		while (!running)  
+ 			nanosleep(&amp;t,NULL); 	
+-		for (i=0;i&lt;(sizeof(s3drc)/sizeof(char **));i++)
++		for (i=0 ; i &lt; ((int)(sizeof(s3drc)/sizeof(char **))) ; i++)
+ 		{
+ 			if ((*s3drc[i])!=NULL)
+ 			{
+
+Modified: trunk/server/mcp.c
+===================================================================
+--- trunk/server/mcp.c	2007-09-01 12:49:32 UTC (rev 660)
++++ trunk/server/mcp.c	2007-09-02 09:39:40 UTC (rev 661)
+@@ -68,7 +68,7 @@
+ 	return(0);
+ }
+ /*  report the mcp about our object */
+-int mcp_rep_object(uint32_t mcp_oid)
++int mcp_rep_object(int32_t mcp_oid)
+ {
+ 	struct mcp_object mo;
+ 	struct t_process *p,*ap;
+@@ -85,9 +85,9 @@
+ 	return(0);
+ }
+ /* tells the mcp that some program vanished ... */
+-int mcp_del_object(uint32_t mcp_oid)
++int mcp_del_object(int32_t mcp_oid)
+ {
+-	uint32_t oid=htonl(mcp_oid);
++	int32_t oid=htonl(mcp_oid);
+ 	if (mcp_oid==focus_oid)
+ 	{
+ 		s3dprintf(MED,&quot;lost the focus of mcp-oid %d&quot;,mcp_oid);
+@@ -104,7 +104,7 @@
+ 	focus_oid=-1;
+ 	p=get_proc_by_pid(MCP);
+ 	s3dprintf(MED,&quot;request to focus %d&quot;,oid);
+-	if (obj_valid(p,oid,o))
++	if (OBJ_VALID(p,oid,o))
+ 		if (o-&gt;oflags&amp;OF_VIRTUAL)
+ 		{
+ 			focus_oid=oid;
+
+Modified: trunk/server/object.c
+===================================================================
+--- trunk/server/object.c	2007-09-01 12:49:32 UTC (rev 660)
++++ trunk/server/object.c	2007-09-02 09:39:40 UTC (rev 661)
+@@ -39,14 +39,14 @@
+ 
+ 
+ static void obj_update_tex(struct t_tex *tex,u_int16_t x,u_int16_t y,u_int16_t w,u_int16_t h,u_int8_t *pixbuf);
+-void obj_sys_update(struct t_process *p, uint32_t oid);
++void obj_sys_update(struct t_process *p, int32_t oid);
+ 
+ /*  debugging function for objects, prints out some stuff known about it... */
+-int obj_debug			(struct t_process *p, uint32_t oid)
++int obj_debug			(struct t_process *p, int32_t oid)
+ {
+ 	struct t_obj *o;
+ 	s3dprintf(HIGH,&quot;about pid %d/obj %d:&quot;,p-&gt;id,oid);
+-	if (obj_valid(p,oid,o))
++	if (OBJ_VALID(p,oid,o))
+ 	{
+ 		s3dprintf(HIGH,&quot;vertices: %d, polygons: %d, materials: %d, textures: %d, flags: %010x&quot;,o-&gt;n_vertex,o-&gt;n_poly, o-&gt;n_mat, o-&gt;n_tex,o-&gt;oflags);
+ 		s3dprintf(HIGH,&quot;linkid %d, displaylist %d&quot;,o-&gt;linkid,o-&gt;dplist);
+@@ -68,16 +68,16 @@
+ 	return(0);
+ }
+ /*  push a few new vertices onto the stack. */
+-int obj_push_vertex		(struct t_process *p, uint32_t oid, float *x, uint32_t n)
++int obj_push_vertex		(struct t_process *p, int32_t oid, float *x, int32_t n)
+ {
+-	uint32_t i,m;
++	int32_t i,m;
+ 	struct t_vertex *p_vertex;
+ 	struct t_vertex *a;
+ 	struct t_obj *obj;
+ 	float *px;
+ 	float r;
+ 	int is_clnsrc;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		if (obj-&gt;oflags&amp;OF_NODATA)
+ 		{
+@@ -149,13 +149,13 @@
+ }
+ 
+ 
+-int obj_push_mat		(struct t_process *p, uint32_t oid, float *x, uint32_t n)
++int obj_push_mat		(struct t_process *p, int32_t oid, float *x, int32_t n)
+ {
+-	uint32_t i,m;
++	int32_t i,m;
+ 	struct t_mat *p_mat;
+ 	struct t_obj *obj;
+ 	float *px;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		if (obj-&gt;oflags&amp;OF_NODATA)
+ 		{
+@@ -199,13 +199,13 @@
+ }
+ 
+ /*  its always the same ... this time we push some polys on the stack */
+-int obj_push_poly(struct t_process *p, uint32_t oid, uint32_t *x, uint32_t n)
++int obj_push_poly(struct t_process *p, int32_t oid, uint32_t *x, int32_t n)
+ {
+-	uint32_t i,m;
++	int32_t i,m;
+ 	struct t_poly *p_poly;
+ 	struct t_obj *obj;
+ 	uint32_t *px;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		if (obj-&gt;oflags&amp;OF_NODATA)
+ 		{
+@@ -246,13 +246,13 @@
+ 	return(0);
+ }
+ /*  its always the same ... this time we push some lines on the stack */
+-int obj_push_line(struct t_process *p, uint32_t oid, uint32_t *x, uint32_t n)
++int obj_push_line(struct t_process *p, int32_t oid, uint32_t *x, int32_t n)
+ {
+-	uint32_t i,m;
++	int32_t i,m;
+ 	struct t_line *p_line;
+ 	struct t_obj *obj;
+ 	uint32_t *px;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		if (obj-&gt;oflags&amp;OF_NODATA)
+ 		{
+@@ -289,14 +289,14 @@
+ }
+ /* creates n new textures on the texture stack, of object oid, with (w,h)
+  * given through *x */
+-int obj_push_tex(struct t_process *p, uint32_t oid, uint16_t *x, uint32_t n)
++int obj_push_tex(struct t_process *p, int32_t oid, uint16_t *x, int32_t n)
+ {
+-	uint32_t i,m;
++	int32_t i,m;
+ 	double d;
+ 	struct t_tex *p_tex;
+ 	struct t_obj *obj;
+ 	uint16_t *px,hm;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		if (obj-&gt;oflags&amp;OF_NODATA)
+ 		{
+@@ -365,13 +365,13 @@
+ 	return(0);
+ }
+ /*  add some normal information to the polygon buffer */
+-int obj_pep_poly_normal(struct t_process *p, uint32_t oid, float *x, uint32_t n)
++int obj_pep_poly_normal(struct t_process *p, int32_t oid, float *x, int32_t n)
+ {
+-	uint32_t i,j,m;
++	int32_t i,j,m;
+ 	struct t_obj *obj;
+ 	float *px;
+  	float len; 
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		m=obj-&gt;n_poly;
+ 		if (m&lt;n)	 /*  saving the first number of polys */
+@@ -415,13 +415,13 @@
+ 	return(0);
+ }
+ /*  add some normal information to the line buffer */
+-int obj_pep_line_normal(struct t_process *p, uint32_t oid, float *x, uint32_t n)
++int obj_pep_line_normal(struct t_process *p, int32_t oid, float *x, int32_t n)
+ {
+-	uint32_t i,j,m;
++	int32_t i,j,m;
+ 	struct t_obj *obj;
+ 	float *px;
+ 	float len;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		m=obj-&gt;n_line;
+ 		if (m&lt;n)	 /*  saving the first number of lines */
+@@ -467,12 +467,12 @@
+ }
+ 
+ /*  add textures coordinates to each vertex of the polygon(s) */
+-int obj_pep_poly_texc(struct t_process *p, uint32_t oid, float *x, uint32_t n)
++int obj_pep_poly_texc(struct t_process *p, int32_t oid, float *x, int32_t n)
+ {
+-	uint32_t i,j,m;
++	int32_t i,j,m;
+ 	struct t_obj *obj;
+ 	float *px;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		if (obj-&gt;oflags&amp;OF_NODATA)
+ 		{
+@@ -508,12 +508,12 @@
+ 	return(0);
+ }
+ /*  overwrite n latest materials with some other materials */
+-int obj_pep_mat(struct t_process *p, uint32_t oid, float *x, uint32_t n)
++int obj_pep_mat(struct t_process *p, int32_t oid, float *x, int32_t n)
+ {
+-	uint32_t i,m;
++	int32_t i,m;
+ 	struct t_obj *obj;
+ 	float *px;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		m=obj-&gt;n_mat;	 /*  saving the first number of materials */
+ 		if (m&lt;n)	
+@@ -554,12 +554,12 @@
+ 	return(0);
+ }
+ /*  overwrite n latest lines with some other lines */
+-int obj_pep_line(struct t_process *p, uint32_t oid, uint32_t *x, uint32_t n)
++int obj_pep_line(struct t_process *p, int32_t oid, uint32_t *x, int32_t n)
+ {
+-	uint32_t i,m;
++	int32_t i,m;
+ 	struct t_obj *obj;
+ 	uint32_t *px;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		m=obj-&gt;n_line;	 /*  saving the first number of lines */
+ 		if (m&lt;n)	
+@@ -595,15 +595,15 @@
+ 
+ 
+ /*  overwrite n latest vertices with some other vertices */
+-int obj_pep_vertex(struct t_process *p, uint32_t oid, float *x, uint32_t n)
++int obj_pep_vertex(struct t_process *p, int32_t oid, float *x, int32_t n)
+ {
+-	uint32_t i,m;
++	int32_t i,m;
+ 	float r;
+ 	struct t_vertex *a;
+ 	struct t_obj *obj;
+ 	float *px;
+ 	int is_clnsrc;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		m=obj-&gt;n_vertex;	 /*  saving the first number of vertices */
+ 		if (m&lt;n)	 
+@@ -665,12 +665,12 @@
+ 	return(0);
+ }
+ /*  assign textures to the last n materials */
+-int obj_pep_mat_tex(struct t_process *p, uint32_t oid, uint32_t *x, uint32_t n)
++int obj_pep_mat_tex(struct t_process *p, int32_t oid, uint32_t *x, int32_t n)
+ {
+-	uint32_t i,m;
++	int32_t i,m;
+ 	struct t_obj *obj;
+ 	uint32_t *px;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		m=obj-&gt;n_mat;	 /*  saving the first number of vertices */
+ 		if (m&lt;n)	 /*  saving the first number of polys */
+@@ -698,14 +698,15 @@
+ 	return(0);
+ }
+ /*  add some normal information to the polygon buffer */
+-int obj_load_poly_normal(struct t_process *p, uint32_t oid, float *x, uint32_t start, uint32_t n)
++int obj_load_poly_normal(struct t_process *p, int32_t oid, float *x, int32_t start, int32_t n)
+ {
+-	uint32_t i,j,m;
++	int32_t i,j,m;
+ 	struct t_obj *obj;
+ 	float *px;
+ 	float len;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
++		if (start &lt; 0) return(-1);
+ 		m=obj-&gt;n_poly;
+ 		if (m&lt;(start+n))	
+ 			n=m-start; 
+@@ -745,14 +746,15 @@
+ 	return(0);
+ }
+ /*  add some normal information to the line  buffer */
+-int obj_load_line_normal(struct t_process *p, uint32_t oid, float *x, uint32_t start, uint32_t n)
++int obj_load_line_normal(struct t_process *p, int32_t oid, float *x, int32_t start, int32_t n)
+ {
+-	uint32_t i,j,m;
++	int32_t i,j,m;
+ 	struct t_obj *obj;
+ 	float *px;
+ 	float len;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
++		if (start &lt; 0) return(-1);
+ 		m=obj-&gt;n_line;
+ 		if (m&lt;(start+n))	
+ 			n=m-start; 
+@@ -792,13 +794,14 @@
+ 	return(0);
+ }
+ /*  add textures coordinates to each vertex of the polygon(s) */
+-int obj_load_poly_texc(struct t_process *p, uint32_t oid, float *x, uint32_t start, uint32_t n)
++int obj_load_poly_texc(struct t_process *p, int32_t oid, float *x, int32_t start, int32_t n)
+ {
+-	uint32_t i,j,m;
++	int32_t i,j,m;
+ 	struct t_obj *obj;
+ 	float *px;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
++		if (start &lt; 0) return(-1);
+ 		m=obj-&gt;n_poly;
+ 		if (m&lt;(start+n))	
+ 			n=m-start; 
+@@ -830,13 +833,14 @@
+ 
+ 
+ /*  load at position start n materials, overwriting old ones */
+-int obj_load_mat(struct t_process *p, uint32_t oid, float *x, uint32_t start, uint32_t n)
++int obj_load_mat(struct t_process *p, int32_t oid, float *x, int32_t start, int32_t n)
+ {
+-	uint32_t i,m;
++	int32_t i,m;
+ 	struct t_obj *obj;
+ 	float *px;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
++		if (start &lt; 0) return(-1);
+ 		m=obj-&gt;n_mat;	
+ 		if (m&lt;(start+n))	
+ 			n=m-start; 
+@@ -876,8 +880,9 @@
+ static void obj_update_tex(struct t_tex *tex,u_int16_t S3DUNUSED(x),u_int16_t S3DUNUSED(y),u_int16_t S3DUNUSED(w),u_int16_t S3DUNUSED(h),u_int8_t *S3DUNUSED(pixbuf))
+ {
+ 	GLuint t;
+-	if ((t=tex-&gt;gl_texnum)!=-1)
++	if ((tex-&gt;gl_texnum)!=-1)
+ 	{
++		t= tex-&gt;gl_texnum;
+ /* s3dprintf(MED,&quot;updating texture %d at [%d %d] with a [%d %d] pixbuf&quot;,t,x,y,w,h); */
+ /* 		glTexSubImage2D(t,0,x,y,w,h,GL_RGBA,GL_UNSIGNED_BYTE,pixbuf); */
+ 
+@@ -886,20 +891,21 @@
+ 	}
+ }
+ /*  loads some data into the pixbuf */
+-int obj_load_tex		(struct t_process *p, uint32_t oid, uint32_t tex, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *pixbuf)
++int obj_load_tex		(struct t_process *p, int32_t oid, int32_t tex, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *pixbuf)
+ {
+ 	struct t_obj *obj;
+ 	struct t_tex *t;
+-	uint32_t i,p1,p2,m;
++	int32_t i,p1,p2,m;
+ 	int16_t mw;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		if (obj-&gt;oflags&amp;OF_NODATA)
+ 		{
+ 			errds(MED,&quot;obj_load_tex()&quot;,&quot;error: no data on object allowed!&quot;);
+ 			return(-1);
+ 		}
+-		if (tex&lt;obj-&gt;n_tex)
++		if ( tex &lt; 0 ) return(-1);
++		if ( tex &lt; obj-&gt;n_tex)
+ 		{
+ 			t=&amp;obj-&gt;p_tex[tex];
+ 			if (t-&gt;buf!=NULL)
+@@ -937,13 +943,13 @@
+ 	} 
+ 	return(-1);
+ }
+-int obj_toggle_flags(struct t_process *p, uint32_t oid, uint8_t type, uint32_t flags)
++int obj_toggle_flags(struct t_process *p, int32_t oid, uint8_t type, uint32_t flags)
+ {
+ 	struct t_obj *obj;
+ 	uint32_t f;
+ 
+ 	f=flags&amp;OF_MASK;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		switch (type)
+ 		{
+@@ -957,12 +963,12 @@
+ 	return(0);
+ }
+ /*  deletes the last n vertices of the stack. if n&gt;=n_vertex, delete all vertices */
+-int obj_del_vertex(struct t_process *p, uint32_t oid, uint32_t n)
++int obj_del_vertex(struct t_process *p, int32_t oid, int32_t n)
+ {
+-	uint32_t m;
++	int32_t m;
+ 	struct t_vertex *p_vertex;
+ 	struct t_obj *obj;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		if (obj-&gt;oflags&amp;OF_NODATA)
+ 		{
+@@ -1001,12 +1007,12 @@
+ 	return(0);
+ }
+ /*  deletes the last n materials of the stack. if n&gt;=n_mat, delete all materials */
+-int obj_del_mat(struct t_process *p, uint32_t oid, uint32_t n)
++int obj_del_mat(struct t_process *p, int32_t oid, int32_t n)
+ {
+-	uint32_t m;
++	int32_t m;
+ 	struct t_mat *p_mat;
+ 	struct t_obj *obj;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		if (obj-&gt;oflags&amp;OF_NODATA)
+ 		{
+@@ -1040,12 +1046,12 @@
+ 	return(0);
+ }
+ /*  deletes the last n polys of the stack. if n&gt;=n_poly, delete all polys */
+-int obj_del_poly(struct t_process *p, uint32_t oid, uint32_t n)
++int obj_del_poly(struct t_process *p, int32_t oid, int32_t n)
+ {
+-	uint32_t m;
++	int32_t m;
+ 	struct t_poly *p_poly;
+ 	struct t_obj *obj;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		if (obj-&gt;oflags&amp;OF_NODATA)
+ 		{
+@@ -1079,12 +1085,12 @@
+ 	return(0);
+ }
+ /*  deletes the last n lines of the stack. if n&gt;=n_line, delete all lines */
+-int obj_del_line(struct t_process *p, uint32_t oid, uint32_t n)
++int obj_del_line(struct t_process *p, int32_t oid, int32_t n)
+ {
+-	uint32_t m;
++	int32_t m;
+ 	struct t_line *p_line;
+ 	struct t_obj *obj;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		if (obj-&gt;oflags&amp;OF_NODATA)
+ 		{
+@@ -1118,14 +1124,14 @@
+ 	return(0);
+ }
+ /*  delete texture object */
+-int obj_del_tex(struct t_process *p, uint32_t oid, uint32_t n)
++int obj_del_tex(struct t_process *p, int32_t oid, int32_t n)
+ {
+-	uint32_t m;
+-	uint32_t i;
++	int32_t m;
++	int32_t i;
+ 	struct t_tex *p_tex;
+ 	struct t_obj *obj;
+ 	GLuint t;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		if (obj-&gt;oflags&amp;OF_NODATA)
+ 		{
+@@ -1182,12 +1188,12 @@
+ }
+ 
+ /*  from proto.c, translates the object. */
+-int obj_translate(struct t_process *p, uint32_t oid, float *transv)
++int obj_translate(struct t_process *p, int32_t oid, float *transv)
+ {
+ 	struct t_obj *obj;
+ 	struct t_process *mcp_p=get_proc_by_pid(MCP);
+ 	float v[3];
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		if (isnan(transv[0])||isinf(transv[0])) return(-1);
+ 		if (isnan(transv[1])||isinf(transv[1])) return(-1);
+@@ -1218,13 +1224,13 @@
+ 	return(0);
+ }
+ /*  set rotate vector .... */
+-int obj_rotate(struct t_process *p, uint32_t oid, float *rotv)
++int obj_rotate(struct t_process *p, int32_t oid, float *rotv)
+ {
+ 	struct t_obj *obj;
+ 	struct t_process *mcp_p=get_proc_by_pid(MCP);
+ 	float v[3];
+ 	float f;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		if (isnan(rotv[0])||isinf(rotv[0])) return(-1);
+ 		if (isnan(rotv[1])||isinf(rotv[1])) return(-1);
+@@ -1258,10 +1264,10 @@
+ 	return(0);
+ }
+ /*  and scaling ! */
+-int obj_scale(struct t_process *p, uint32_t oid, float scav)
++int obj_scale(struct t_process *p, int32_t oid, float scav)
+ {
+ 	struct t_obj *obj;
+-	if (obj_valid(p,oid,obj))
++	if (OBJ_VALID(p,oid,obj))
+ 	{
+ 		if ((p-&gt;id==MCP) || (!(obj-&gt;oflags&amp;OF_SYSTEM)))
+ 		if (!isinf(scav) &amp;&amp; !isnan(scav) &amp;&amp; !((scav&lt;1.0e-10) &amp;&amp; (scav&gt;-1.0e-10))) /* ignore very low values */
+@@ -1284,7 +1290,7 @@
+ 	if ((obj-&gt;oflags&amp;OF_LINK) &amp;&amp; (depth&lt;p-&gt;n_obj))
+ 	{
+ 		/* TODO: only MultMatrix if m_uptodate ?! */
+-		if (obj_valid(p,obj-&gt;linkid,on))
++		if (OBJ_VALID(p,obj-&gt;linkid,on))
+ 		{
+ 			into_position(p,on,depth+1);
+ 		} else {
+@@ -1303,15 +1309,15 @@
+ 	glScalef(obj-&gt;scale,obj-&gt;scale,obj-&gt;scale);
+ }
+ 
+-void obj_size_update(struct t_process *p, uint32_t oid)
++void obj_size_update(struct t_process *p, int32_t oid)
+ {
+ 	struct t_obj *o,*o2;
+ 	struct t_vertex *a,*vp;
+ 	float r;
+ 	int vn,is_clnsrc;
+-	uint32_t i;
++	int32_t i;
+ 	if (p-&gt;id==MCP) return; /*  mcp does not need that. */
+-	if (obj_valid(p,oid,o))
++	if (OBJ_VALID(p,oid,o))
+ 	{
+ 		if (o-&gt;oflags&amp;OF_SYSTEM)
+ 		{
+@@ -1345,7 +1351,7 @@
+ 				{
+ 					if (p-&gt;object[i]!=NULL)
+ 					{
+-						if ((p-&gt;object[i]-&gt;oflags&amp;OF_CLONE) &amp;&amp; (p-&gt;object[i]-&gt;n_vertex==oid))
++						if ((p-&gt;object[i]-&gt;oflags&amp;OF_CLONE) &amp;&amp; (p-&gt;object[i]-&gt;n_vertex== oid))
+ 						{ /* if it's pointing to our object ... */
+ 							is_clnsrc=1;
+ 							p-&gt;object[i]-&gt;r=o-&gt;r*(p-&gt;object[i]-&gt;r/o-&gt;scale); /* give it the new radius too! */
+@@ -1361,12 +1367,12 @@
+ }
+ /*  checks if the object is (still) the biggest object. assumes that oid */
+ /*  is valid */
+-void obj_check_biggest_object(struct t_process *p, uint32_t oid)
++void obj_check_biggest_object(struct t_process *p, int32_t oid)
+ {
+ 	struct t_obj *o,*mcp_o;
+ 	struct t_process *mcp_p;
+ 	float r,r2;
+-	uint32_t i;
++	int32_t i;
+ 	int found;
+ 	mcp_p=get_proc_by_pid(MCP);
+ 	mcp_o=mcp_p-&gt;object[p-&gt;mcp_oid];
+@@ -1408,7 +1414,7 @@
+ 	}
+ }
+ /* calculates and saves the transformation matrix, if needed */
+-void obj_recalc_tmat(struct t_process *p, uint32_t oid)
++void obj_recalc_tmat(struct t_process *p, int32_t oid)
+ {
+ 	GLint matrixmode;
+ 	if (!p-&gt;object[oid]-&gt;m_uptodate)
+@@ -1424,7 +1430,7 @@
+ 		p-&gt;object[oid]-&gt;m_uptodate=1;
+ 	}
+ }
+-void obj_sys_update(struct t_process *p, uint32_t oid)
++void obj_sys_update(struct t_process *p, int32_t oid)
+ {
+ 	struct t_process *mcp_p=get_proc_by_pid(MCP);
+ 	struct t_obj	 *o;
+@@ -1480,7 +1486,7 @@
+ 	obj_pos_update(p,oid,oid); /* now also update the matrix and the objects linking to our sys-object ... */
+ }
+ /*  recalculate the position of an object. this assumes that oid is valid. */
+-void obj_pos_update(struct t_process *p, uint32_t oid, uint32_t first_oid)
++void obj_pos_update(struct t_process *p, int32_t oid, int32_t first_oid)
+ {
+ 	float v[3];
+ 	struct t_obj 		*ao,*o;
+@@ -1500,12 +1506,12 @@
+ 	} else 
+ 		if (o-&gt;oflags&amp;OF_SYSTEM) /* TODO: what will we do if $sys_object is linked to another? */
+ 		{ /* a system object changed position? let's update the focus'ed sys-objects */
+-			if (obj_valid(p,focus_oid,ao))
++			if (OBJ_VALID(p,focus_oid,ao))
+ 				if (NULL!=(ap=get_proc_by_pid(ao-&gt;n_mat)))
+ 				{
+ 					if (OF_POINTER==(o-&gt;oflags&amp;0xF0000000))
+ 					{ /* we dont have to do that much in this case ... */
+-						if (obj_valid(ap,get_pointer(ap),ao)) /* we can redefine ao here -&gt; ao = focused app's pointer*/
++						if (OBJ_VALID(ap,get_pointer(ap),ao)) /* we can redefine ao here -&gt; ao = focused app's pointer*/
+ 						{
+ 							ao-&gt;rotate.x=o-&gt;rotate.x;
+ 							ao-&gt;rotate.y=o-&gt;rotate.y;
+@@ -1545,13 +1551,13 @@
+ {
+ 	struct t_vertex a,b,n;
+ 	struct t_vertex *v[3];
+-	uint32_t vp,i;
++	int32_t vp,i;
+ 	
+ 	float len;
+ 	for (i=0;i&lt;3;i++)  /*  set and check */
+ 	{
+ 		vp= obj-&gt;p_poly[pn].v[i];  /*  ... get the vertices ... */
+-		if (vp&lt;obj-&gt;n_vertex)
++		if ( vp &lt; obj-&gt;n_vertex)
+ 			v[i]=&amp;(obj-&gt;p_vertex[vp]);
+ 		else return(-1);
+ 	}
+@@ -1589,7 +1595,7 @@
+ 	return(0);
+ }
+ 
+-/* checks if a normal is set for a line object, or set some default oif not */
++/* checks if a normal is set for a line object, or set some default if not */
+ int check_line_normal(struct t_obj *obj, uint32_t pn)
+ {
+ 	struct t_vertex *v[2];
+@@ -1597,7 +1603,7 @@
+ 	for (i=0;i&lt;2;i++)  /*  set and check */
+ 	{
+ 		vp= obj-&gt;p_line[pn].v[i];  /*  ... get the vertices ... */
+-		if (vp&lt;obj-&gt;n_vertex)
++		if (vp &lt; (int)obj-&gt;n_vertex)
+ 			v[i]=&amp;(obj-&gt;p_vertex[vp]);
+ 		else return(-1);
+ 	}
+@@ -1623,7 +1629,7 @@
+ 	struct t_tex *tex=NULL;
+ 	GLfloat matgl[4];
+ /* 	int i,j; */
+-	if (m-&gt;tex&lt;obj-&gt;n_tex)
++	if (m-&gt;tex &lt; obj-&gt;n_tex)
+ 	{
+ 		tex=&amp;obj-&gt;p_tex[m-&gt;tex];
+ 		if (tex-&gt;buf!=NULL)
+@@ -1672,18 +1678,18 @@
+ 	return(tex);
+ }
+ /*  finally, the rendering portion. */
+-int obj_render(struct t_process *p,uint32_t oid)
++int obj_render(struct t_process *p,int32_t oid)
+ {
+-	uint32_t pn;
+-	uint32_t mat,omat=-1;
+-	uint32_t v;
++	int32_t pn;
++	int32_t mat,omat=-1;
++	int32_t v;
+ /* 	int link_obj; */
+ 	struct t_vertex *on;
+ 	struct t_obj *obj;
+ 	struct t_mat *m;
+ 	struct t_tex *tex=NULL;
+ 	GLfloat matgl[4];
+-	uint32_t i;
++	int32_t i;
+ 
+ 	obj=p-&gt;object[oid];
+ 	glPushMatrix();
+@@ -1825,20 +1831,20 @@
+ }
+ 
+ /* remove the oid out of the link chain */
+-void link_delete(struct t_process *p, uint32_t oid)
++void link_delete(struct t_process *p, int32_t oid)
+ {
+ 	struct t_obj *o,*o2;
+-	if (obj_valid(p,oid,o))
++	if (OBJ_VALID(p,oid,o))
+ 	{
+ 		s3dprintf(VLOW,&quot;link_delete(): [%d] unlinking %d from %d&quot;,p-&gt;id, oid, o-&gt;linkid);
+ 		if (o-&gt;linkid!=-1) 
+ 		{
+ 			if (o-&gt;lprev!=-1)
+-				if (obj_valid(p,o-&gt;lprev,o2))
++				if (OBJ_VALID(p,o-&gt;lprev,o2))
+ 				{ /* we have a previous pointer linking to us */
+ 					o2-&gt;lnext=o-&gt;lnext; /* might also be -1 */
+ 				}
+-			if (obj_valid(p,o-&gt;linkid,o2))
++			if (OBJ_VALID(p,o-&gt;linkid,o2))
+ 			{
+ 				if (o2-&gt;lsub==oid)
+ 				{/* parent is having oid as it's first link in chain */
+@@ -1846,7 +1852,7 @@
+ 				}
+ 			}
+ 			if (o-&gt;lnext!=-1)
+-				if (obj_valid(p,o-&gt;lnext,o2))
++				if (OBJ_VALID(p,o-&gt;lnext,o2))
+ 				{ /* fixing next's previous pointer */
+ 					o2-&gt;lprev=o-&gt;lprev;
+ 				}
+@@ -1858,16 +1864,16 @@
+ 	}
+ }
+ /* add an element into the link chain */
+-void link_insert(struct t_process *p, uint32_t oid, uint32_t target)
++void link_insert(struct t_process *p, int32_t oid, int32_t target)
+ {
+ 	struct t_obj *o,*ot,*o2;
+-	if (obj_valid(p,oid,o) &amp;&amp; obj_valid(p,target,ot))
++	if (OBJ_VALID(p,oid,o) &amp;&amp; OBJ_VALID(p,target,ot))
+ 	{
+ 		s3dprintf(VLOW,&quot;link_insert(): [%d] linking %d to %d&quot;,p-&gt;id, oid, target);
+ 		o-&gt;oflags|=OF_LINK;
+ 		o-&gt;linkid=target;
+ 		o-&gt;lnext=ot-&gt;lsub; /* we have a new &quot;first&quot; element */
+-		if (o-&gt;lnext!=-1) if (obj_valid(p,o-&gt;lnext,o2))  /* if we already had an element
++		if (o-&gt;lnext!=-1) if (OBJ_VALID(p,o-&gt;lnext,o2))  /* if we already had an element
+ 														  in the chain, create the backlink */
+ 		{
+ 			o2-&gt;lprev=oid;
+@@ -1877,10 +1883,10 @@
+ }
+ /*  creates a link from object from an object to another  */
+ /*  to have a translation or anything move with other things */
+-int obj_link(struct t_process *p, uint32_t oid_from, uint32_t oid_to)
++int obj_link(struct t_process *p, int32_t oid_from, int32_t oid_to)
+ {
+ 	struct t_obj *o,*o2;
+-	if (obj_valid(p,oid_from,o) &amp;&amp; obj_valid(p,oid_to,o2))
++	if (OBJ_VALID(p,oid_from,o) &amp;&amp; OBJ_VALID(p,oid_to,o2))
+ 	{
+ 		if (oid_to==oid_from)
+ 		{
+@@ -1921,10 +1927,10 @@
+ 	return(-1);
+ }
+ /*  this unlinks an object ... */
+-int obj_unlink(struct t_process *p, uint32_t oid)
++int obj_unlink(struct t_process *p, int32_t oid)
+ {
+ 	struct t_obj *o;
+-	if (obj_valid(p,oid,o))
++	if (OBJ_VALID(p,oid,o))
+ 	{
+ 		if (OF_POINTER==(o-&gt;oflags&amp;0xF0000000))
+ 		{
+@@ -1943,7 +1949,7 @@
+ int obj_new(struct t_process *p)
+ {
+ 	struct t_obj *obj;
+-	uint32_t pos,reuse=0;
++	int32_t pos,reuse=0;
+ 	obj=malloc(sizeof(struct t_obj));  /*  get an object and define it with our data */
+ 	memset(obj,0,sizeof(struct t_obj));
+ 	obj-&gt;linkid=-1;
+@@ -1961,7 +1967,7 @@
+ 	if (p!=NULL)
+ 	{
+ 		 /*  look for an old object for reuse ... */
+-		for (pos=0;pos&lt;p-&gt;n_obj;pos++)
++		for (pos=0; pos &lt; p-&gt;n_obj ; pos++)
+ 		{
+ 			if (p-&gt;object[pos]==NULL)
+ 			{
+@@ -1989,12 +1995,12 @@
+ 
+ /*  this changes the clone-target or sets up a new clone link. */
+ /*  this will check and supress looplinks and clonechains */
+-int obj_clone_change(struct t_process *p, uint32_t oid, uint32_t toid)
++int obj_clone_change(struct t_process *p, int32_t oid, int32_t toid)
+ {
+ 	struct t_obj *o,*no;
+ 	int already_clone,is_clnsrc;
+-	uint32_t i;
+-	if (obj_valid(p,oid,o) &amp;&amp; obj_valid(p,toid,no))
++	int32_t i;
++	if (OBJ_VALID(p,oid,o) &amp;&amp; OBJ_VALID(p,toid,no))
+ 	{
+ 		if ((o-&gt;oflags&amp;OF_SYSTEM) || (no-&gt;oflags&amp;OF_SYSTEM))
+ 		{
+@@ -2052,15 +2058,15 @@
+ 
+ 
+ /*  object-deletion request from proto.c */
+-int obj_del(struct t_process *p, uint32_t oid)
++int obj_del(struct t_process *p, int32_t oid)
+ {
+ 	struct t_process *mcp_p;
+ 	struct t_obj *o;
+ 	float r,mr;
+-	uint32_t i;
+-	uint32_t mcp_oid=-1;
++	int32_t i;
++	int32_t mcp_oid=-1;
+ 	mcp_p=get_proc_by_pid(MCP);
+-	if (obj_valid(p,oid,o))
++	if (OBJ_VALID(p,oid,o))
+ 	{
+ 		if (o-&gt;oflags&amp;OF_SYSTEM)
+ 		{
+@@ -2080,7 +2086,7 @@
+ 		} else 
+ 			mcp_oid=p-&gt;mcp_oid;
+ 
+-		if (obj_valid(p,oid,o))
++		if (OBJ_VALID(p,oid,o))
+ 		{
+ 			obj_free(p,oid);
+ 			if ((p-&gt;id!=MCP) &amp;&amp; (p-&gt;biggest_obj==oid))
+@@ -2121,9 +2127,9 @@
+ }
+ 
+ /*  this is the &quot;direct&quot; freeing function, without checking for perfomance */
+-int obj_free(struct t_process *p,uint32_t oid)
++int obj_free(struct t_process *p,int32_t oid)
+ {
+-	uint32_t i;
++	int32_t i;
+ 	GLuint t;
+ 	struct t_obj *o=p-&gt;object[oid];
+ 	s3dprintf(HIGH,&quot;deleting object %d of process %d&quot;,oid,p-&gt;id);
+@@ -2180,9 +2186,9 @@
+ 	return(0);
+ }
+ /* get the object of the pointer (that's 1, usually */
+-uint32_t get_pointer(struct t_process *p)
++int32_t get_pointer(struct t_process *p)
+ {
+-	uint32_t i;
++	int32_t i;
+ 	for (i=0;i&lt;p-&gt;n_obj;i++)
+ 	{
+ 
+
+Modified: trunk/server/process.c
+===================================================================
+--- trunk/server/process.c	2007-09-01 12:49:32 UTC (rev 660)
++++ trunk/server/process.c	2007-09-02 09:39:40 UTC (rev 661)
+@@ -38,7 +38,7 @@
+ struct t_process *process_protinit(struct t_process *p, char *name)
+ {
+ 	int con_type;
+-	uint32_t mcp_oid;
++	int32_t mcp_oid;
+ 	if ((strncmp(name,&quot;sys_&quot;,4)==0))
+ 	{ /* we don't like &quot;sys_&quot;-apps, kicking this */
+ 		errds(VHIGH,&quot;process_protinit()&quot;,&quot;appnames starting with 'sys_' not allowed.&quot;);
+@@ -72,7 +72,7 @@
+ 		process_sys_init(p);
+ 
+ 	/* register the new process in the mcp */
+-		if (-1!=(mcp_oid=obj_new(&amp;procs_p[MCP])))
++		if (-1!=(mcp_oid= obj_new(&amp;procs_p[MCP])))
+ 		{
+ 			mcp_p-&gt;object[mcp_oid]-&gt;oflags|=OF_VIRTUAL|OF_VISIBLE|OF_SELECTABLE;
+ 			mcp_p-&gt;object[mcp_oid]-&gt;n_mat=p-&gt;id;
+@@ -111,7 +111,7 @@
+ 		/* TODO: ... get the cam and ptr position of the mcp, somehow */
+ 		p-&gt;object[cam]-&gt;oflags=OF_CAM;
+ 		
+-		if (obj_valid(mcp_p,get_pointer(mcp_p),o)) /* get parent pointer, copy parent */
++		if (OBJ_VALID(mcp_p,get_pointer(mcp_p),o)) /* get parent pointer, copy parent */
+ 		{
+ 			p-&gt;object[ptr]-&gt;rotate.x=o-&gt;rotate.x;
+ 			p-&gt;object[ptr]-&gt;rotate.y=o-&gt;rotate.y;
+@@ -206,7 +206,7 @@
+ 			for (j=0;j&lt;mcp_p-&gt;n_obj;j++)	 /*  remove clones and links pointing on this app-object ... */
+ 				if (mcp_p-&gt;object[j]!=NULL)
+ 				{
+-					if ((mcp_p-&gt;object[j]-&gt;oflags&amp;OF_CLONE) &amp;&amp; (mcp_p-&gt;object[j]-&gt;n_vertex==p-&gt;mcp_oid))  /*  it's linking to our object! */
++					if ((mcp_p-&gt;object[j]-&gt;oflags&amp;OF_CLONE) &amp;&amp; (mcp_p-&gt;object[j]-&gt;n_vertex == p-&gt;mcp_oid))  /*  it's linking to our object! */
+ 					{
+ 						mcp_p-&gt;object[j]-&gt;oflags&amp;=~OF_CLONE;  	 /*  disable clone flag */
+ 						mcp_p-&gt;object[j]-&gt;n_vertex=0; 			 /*  and &quot;clone reference&quot; to 0 */
+
+Modified: trunk/server/proto.c
+===================================================================
+--- trunk/server/proto.c	2007-09-01 12:49:32 UTC (rev 660)
++++ trunk/server/proto.c	2007-09-02 09:39:40 UTC (rev 661)
+@@ -51,7 +51,7 @@
+ 	uint16_t w,h,x,y;
+ 	uint32_t oid,toid;
+ 	uint8_t	type;
+-	uint32_t flags,mcp_oid=-1;
++	int32_t flags,mcp_oid=-1;
+ 	command=pbuf[0];
+ 	if (p-&gt;id!=0)
+ 	{
+
+Modified: trunk/server/shm_ringbuf.c
+===================================================================
+--- trunk/server/shm_ringbuf.c	2007-09-01 12:49:32 UTC (rev 660)
++++ trunk/server/shm_ringbuf.c	2007-09-02 09:39:40 UTC (rev 661)
+@@ -30,7 +30,7 @@
+ {
+ 	int wrap=0;
+ 	int rs;
+-	uint32_t e,s,size;
++	int32_t e,s,size;
+ 	char *data;
+ 
+ 	e=rb-&gt;end;
+@@ -40,7 +40,7 @@
+ 	if (e&lt;s) {
+ 		wrap=1;
+ 	} 
+-	while ((((s+size*(1-wrap))-e)&lt;(n+1))) /* checking free space */
++	while ((((s+size*(1-wrap))-e) &lt; (n+1))) /* checking free space */
+ 	{
+ 		if /*((size*2)&gt;RB_MAX_SIZE)*/ (1)
+ 		{
+@@ -79,7 +79,7 @@
+ 	int wrap=0;
+ 	int mn=n;
+ 	int rs;
+-	uint32_t e,s,size;
++	int32_t e,s,size;
+ 	char *data;
+ 
+ 	e=rb-&gt;end;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000652.html">[S3d-svn] r660 - in trunk: . apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000654.html">[S3d-svn] r662 - trunk/server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#653">[ date ]</a>
+              <a href="thread.html#653">[ thread ]</a>
+              <a href="subject.html#653">[ subject ]</a>
+              <a href="author.html#653">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

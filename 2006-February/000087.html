@@ -1,0 +1,392 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r91 - in trunk: . apps/dot_mcp client example server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r91%20-%20in%20trunk%3A%20.%20apps/dot_mcp%20client%20example%20server&In-Reply-To=%3C200602182303.k1IN3tPY013852%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000086.html">
+   <LINK REL="Next"  HREF="000088.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r91 - in trunk: . apps/dot_mcp client example server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r91%20-%20in%20trunk%3A%20.%20apps/dot_mcp%20client%20example%20server&In-Reply-To=%3C200602182303.k1IN3tPY013852%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r91 - in trunk: . apps/dot_mcp client example server">dotslash at berlios.de
+       </A><BR>
+    <I>Sun Feb 19 00:03:55 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000086.html">[S3d-svn] r90 - in trunk: . apps/dot_mcp apps/olsrs3d apps/s3dgps example objs
+</A></li>
+        <LI>Next message: <A HREF="000088.html">[S3d-svn] r92 - in trunk: . extras
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#87">[ date ]</a>
+              <a href="thread.html#87">[ thread ]</a>
+              <a href="subject.html#87">[ subject ]</a>
+              <a href="author.html#87">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-02-19 00:03:55 +0100 (Sun, 19 Feb 2006)
+New Revision: 91
+
+Modified:
+   trunk/
+   trunk/ChangeLog
+   trunk/TODO
+   trunk/apps/dot_mcp/main.c
+   trunk/client/TODO
+   trunk/client/error.c
+   trunk/client/s3dlib.h
+   trunk/example/TODO
+   trunk/server/config.h
+   trunk/server/error.c
+   trunk/server/global.h
+   trunk/server/graphics.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r121 at balthasar</A>:  dotslash | 2006-02-19 00:03:45 +0100
+ - by commenting out DEBUG define, all debug messages
+   will not even be [call]ed
+ - dot_mcp gets a reset view button
+ 		  
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:119
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:121
+
+Modified: trunk/ChangeLog
+===================================================================
+--- trunk/ChangeLog	2006-02-18 22:23:43 UTC (rev 90)
++++ trunk/ChangeLog	2006-02-18 23:03:55 UTC (rev 91)
+@@ -1,4 +1,7 @@
+ 2006-02-18	Simon Wunderlich - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;	
++	- by commenting out DEBUG define, all debug messages
++	  will not even be [call]ed
++	- dot_mcp added view reset button, fixed rotate button 
+ 	- dot_mcp has now some &quot;GO!!&quot; menu
+ 	- 3dsread.c x-axis inversion fixed
+ 	- fixed 0.0 size application problem
+
+Modified: trunk/TODO
+===================================================================
+--- trunk/TODO	2006-02-18 22:23:43 UTC (rev 90)
++++ trunk/TODO	2006-02-18 23:03:55 UTC (rev 91)
+@@ -1,8 +1,6 @@
+ client(portability?!):
+ 	shmat() return (char *) -1 or NULL?! data_ctos/data_stoc should
+ 	really not be 0x0
+-	check 3dsreader binary stuff, gints/gintl, maybe there is some clean
+-	function ....
+ 
+ general:
+ 	start mcp with s3d
+
+Modified: trunk/apps/dot_mcp/main.c
+===================================================================
+--- trunk/apps/dot_mcp/main.c	2006-02-18 22:23:43 UTC (rev 90)
++++ trunk/apps/dot_mcp/main.c	2006-02-18 23:03:55 UTC (rev 91)
+@@ -28,7 +28,7 @@
+ struct app *focus=NULL;
+ float focus_r=0;
+ float alpha=0;
+-unsigned int min_but,rotate,close_but,sphere,menu=-1;
++unsigned int min_but,rotate,close_but,sphere,reset,menu=-1;
+ 
+ void place_apps();
+ 
+@@ -44,7 +44,6 @@
+ 
+   			s3d_flags_on(focus-&gt;sphere,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 			s3d_flags_off(focus-&gt;min_but,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+-			s3d_flags_off(rotate,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 			s3d_translate(	focus-&gt;title,-focus-&gt;textw-1.2,0.0,0);
+ 			s3d_translate(	focus-&gt;close_but,bsize*focus-&gt;textw/2,1.2,0);
+ 			s3d_link(		focus-&gt;close_but,focus-&gt;sphere);
+@@ -55,15 +54,21 @@
+ 	{
+ 		focus_r=n_app;
+ 		s3d_mcp_focus(-1);
++		s3d_flags_off(rotate,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++		s3d_flags_off(reset,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++		rot_flag=0;
+ 	} else {
+ 		/* set the new focus app up */
+-		s3d_translate(	a-&gt;title,-a-&gt;textw-7.2,0.0,0);
++		s3d_translate(	a-&gt;title,-a-&gt;textw-9.6,0.0,0);
++		s3d_translate(	reset,-7.2,0.0,0);
+ 		s3d_translate(	rotate,-4.8,0.0,0);
+ 		s3d_translate(	a-&gt;min_but,-2.4,0.0,0);
+ 		s3d_link(		a-&gt;close_but,0);
+ 		s3d_link(		rotate,a-&gt;close_but);
++		s3d_link(		reset,a-&gt;close_but);
+ 		s3d_flags_on(	a-&gt;min_but,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 		s3d_flags_on(	rotate,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
++		s3d_flags_on(	reset,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 		s3d_flags_off(	a-&gt;sphere,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 		s3d_unlink(a-&gt;oid);
+ 		s3d_rotate(a-&gt;oid,		0,0,0);
+@@ -132,7 +137,7 @@
+ 		n_app--;
+ 		if (focus==a)
+ 		{
+-			s3d_mcp_focus(-1);
++			set_focus(NULL);
+ 			focus=NULL;
+ 		}
+ 		free(a);
+@@ -195,7 +200,6 @@
+ 			if (a==focus)
+ 			{
+ 				focus_r=a-&gt;r;
+-/*				s3d_translate(a-&gt;min_but,0,a-&gt;r + 1.0,0);*/
+ 			} else {
+ 				s3d_scale(a-&gt;sphere,a-&gt;r);
+ 				s3d_scale(a-&gt;oid,1/a-&gt;r);
+@@ -207,7 +211,6 @@
+ void app_init(struct app *a)
+ {
+ 	printf(&quot;building some window decorations on %d ['%s']\n&quot;,a-&gt;oid,a-&gt;name);
+-/* 	a-&gt;r=s3d_get_radius(a-&gt;oid); */
+ 	printf(&quot;radius of object %d is %f\n&quot;,a-&gt;oid,a-&gt;r);
+ 	s3d_scale(a-&gt;oid,		1/a-&gt;r);
+ 
+@@ -216,11 +219,6 @@
+ 	s3d_link(		a-&gt;sphere,a-&gt;oid);
+   	s3d_flags_on(	a-&gt;sphere,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);
+ 
+-/*	s3d_translate(	a-&gt;min_but,0,2.0,0);
+-	s3d_link(		a-&gt;min_but,a-&gt;sphere);
+-   	s3d_flags_on(	a-&gt;min_but,S3D_OF_VISIBLE|S3D_OF_SELECTABLE);*/
+-
+-
+ 	a-&gt;title=s3d_draw_string(a-&gt;name,&amp;a-&gt;textw);
+ 
+ 	a-&gt;close_but=s3d_clone(close_but);
+@@ -265,6 +263,11 @@
+ 		rot_flag=!rot_flag;
+ 		return;
+ 	}
++	if (oid==reset)
++	{
++		s3d_translate(0,0.0,0.0,5.0);
++		s3d_rotate(0,0,0,0);
++	}
+ 	while (a!=NULL)
+ 	{
+ 		if (oid==a-&gt;close_but)
+@@ -357,12 +360,12 @@
+ 					1,1,1,0.2);*/
+ 		min_but=s3d_import_3ds_file(&quot;objs/cubeyholes.3ds&quot;);
+ 		rotate=s3d_import_3ds_file(&quot;objs/rotate.3ds&quot;);
++		reset=s3d_import_3ds_file(&quot;objs/reset.3ds&quot;);
+ 		close_but=s3d_import_3ds_file(&quot;objs/spikeybla.3ds&quot;);
+ 		sphere=s3d_import_3ds_file(&quot;objs/ringsystem.3ds&quot;);
+ 		menu=menu_init();
+ 		s3d_link(menu,0);
+ 		s3d_scale(menu,bsize);
+-		printf(&quot;min_but: %d, rotate: %d, close_but: %d, sphere: %d, menu: %d&quot;,min_but,rotate,close,sphere, menu);
+ 		place_apps();
+ 		s3d_mainloop(mainloop);
+ 		s3d_quit();
+
+Modified: trunk/client/TODO
+===================================================================
+--- trunk/client/TODO	2006-02-18 22:23:43 UTC (rev 90)
++++ trunk/client/TODO	2006-02-18 23:03:55 UTC (rev 91)
+@@ -1,3 +1,2 @@
+ TODO:
+  - .max, .x, .obj files
+- - turn debug messages OUT
+
+Modified: trunk/client/error.c
+===================================================================
+--- trunk/client/error.c	2006-02-18 22:23:43 UTC (rev 90)
++++ trunk/client/error.c	2006-02-18 23:03:55 UTC (rev 91)
+@@ -4,6 +4,7 @@
+ #include &lt;stdio.h&gt; 		 /*  perror(),fprintf() */
+ #include &lt;string.h&gt; 	 /*  sterror */
+ /*  dprintf is only for internal use. */
++#ifdef DEBUG
+ void dprintf(int relevance, const char *fmt, ...) {
+ 	char dbm[DBM_MAX];
+ 	va_list args;
+@@ -16,16 +17,10 @@
+ 		fprintf(stderr,&quot;s3dlib: %s\n&quot;,(char *)&amp;dbm);
+ 	}
+ }
+-void errn(char *func,int en) {
+-	fprintf(stderr,&quot;s3dlib error: %s: (%d) %s\n&quot;,func,en, strerror(en));
+-}
+ void errdn(int relevance, char *func,int en) {
+ 	if (relevance &gt;= DEBUG )
+ 		 fprintf(stderr,&quot;s3dlib error: %s: (%d) %s\n&quot;,func,en, strerror(en));
+ }
+-void errs(char *func, char *msg) {
+-	fprintf(stderr,&quot;s3dlib error: %s: %s\n&quot;,func,msg);
+-}
+ 
+ void errds(int relevance,char *func, const char *fmt, ...)
+ {
+@@ -40,3 +35,12 @@
+ 		fprintf(stderr,&quot;s3dlib error: %s:%s\n&quot;,func,(char *)&amp;dbm);
+ 	}
+ }
++#endif
++void errn(char *func,int en) {
++	fprintf(stderr,&quot;s3dlib error: %s: (%d) %s\n&quot;,func,en, strerror(en));
++}
++void errs(char *func, char *msg) {
++	fprintf(stderr,&quot;s3dlib error: %s: %s\n&quot;,func,msg);
++}
++
++
+
+Modified: trunk/client/s3dlib.h
+===================================================================
+--- trunk/client/s3dlib.h	2006-02-18 22:23:43 UTC (rev 90)
++++ trunk/client/s3dlib.h	2006-02-18 23:03:55 UTC (rev 91)
+@@ -79,3 +79,9 @@
+ int _s3d_tesselate(struct tessp_t *t,struct t_buf *b);
+ 
+ #include &quot;config.h&quot;
++#ifndef DEBUG
++#define dprintf(...) /* nothing */
++#define errdn(...) /* nothing */
++#define errds(...) /* nothing */
++#endif
++
+
+Modified: trunk/example/TODO
+===================================================================
+--- trunk/example/TODO	2006-02-18 22:23:43 UTC (rev 90)
++++ trunk/example/TODO	2006-02-18 23:03:55 UTC (rev 91)
+@@ -1,4 +0,0 @@
+-check S3D_QUIT_event
+-dot_mcp: 
+-	dnjl:	error opening pty
+-	check updating names
+
+Modified: trunk/server/config.h
+===================================================================
+--- trunk/server/config.h	2006-02-18 22:23:43 UTC (rev 90)
++++ trunk/server/config.h	2006-02-18 23:03:55 UTC (rev 91)
+@@ -15,7 +15,11 @@
+ #define	VHIGH	5
+ /*  which is the minimum level of debugmessage we want to see? */
+ #define DEBUG	LOW
+-#define NO_DEBUG	1 /* we want no debugging !! */
++#ifndef DEBUG
++#define errds(...) /* nothing */
++#define dprintf(...) /* nothing */
++#endif
++
+ /*  which subsystem do we use for rendering and ? */
+ 
+ /* GLUT is the GL utility library which you obtain at 
+
+Modified: trunk/server/error.c
+===================================================================
+--- trunk/server/error.c	2006-02-18 22:23:43 UTC (rev 90)
++++ trunk/server/error.c	2006-02-18 23:03:55 UTC (rev 91)
+@@ -26,7 +26,7 @@
+ 	fprintf(stderr,&quot;FATAL: %s: %s\n&quot;,func,msg);
+ 	exit(-1);
+ }
+-
++#ifdef DEBUG
+ /*  printing error message */
+ void errds(int relevance,char *func, const char *fmt, ...)
+ {
+@@ -41,7 +41,6 @@
+ 		fprintf(stderr,&quot;error: %s:%s\n&quot;,func,(char *)&amp;dbm);
+ 	}
+ }
+-#ifdef DEBUG
+ /*  printing debug message */
+ 
+ void dprintf(int relevance, const char *fmt, ...) {
+@@ -57,8 +56,5 @@
+ 		fprintf(stdout,&quot;debug: %s\n&quot;,(char *)&amp;dbm);
+ 	}
+ }
+-#else 
+-void dprintf(int relevance, const char *fmt, ...) {
+-		/* placeholder ... */
+-}
++
+ #endif
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2006-02-18 22:23:43 UTC (rev 90)
++++ trunk/server/global.h	2006-02-18 23:03:55 UTC (rev 91)
+@@ -228,8 +228,10 @@
+ void errnf(char *func, int en);
+ void errs(char *func, char *msg);
+ void errsf(char *func, char *msg);
++#ifdef DEBUG
+ void errds(int relevance,char *func, const char *fmt, ...);
+ void dprintf(int relevance, const char *msg, ...);
++#endif
+ /*  graphics.c */
+ int graphics_quit(void);
+ void graphics_main(void);
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2006-02-18 22:23:43 UTC (rev 90)
++++ trunk/server/graphics.c	2006-02-18 23:03:55 UTC (rev 91)
+@@ -316,6 +316,7 @@
+  	glPushMatrix();  /*  save the cam */ 
+ 		glLightfv(GL_LIGHT0,GL_POSITION,pos);
+ 		render_by_mcp();
++#ifdef DEBUG
+ 		glPushMatrix();
+ 			glRotatef(90,1.0,0.0,0.0);	
+ 			glMaterialfv(GL_FRONT,GL_AMBIENT,wire_amb);
+@@ -323,6 +324,7 @@
+ 			glMaterialfv(GL_FRONT,GL_DIFFUSE,wire_diff);
+ 			glutWireTorus(100,100,40,40);
+ 		glPopMatrix();
++#endif
+  	glPopMatrix();  /*  restore the cam */ 
+ 	glLoadIdentity();
+ 	glMultMatrixf(m);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000086.html">[S3d-svn] r90 - in trunk: . apps/dot_mcp apps/olsrs3d apps/s3dgps example objs
+</A></li>
+	<LI>Next message: <A HREF="000088.html">[S3d-svn] r92 - in trunk: . extras
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#87">[ date ]</a>
+              <a href="thread.html#87">[ thread ]</a>
+              <a href="subject.html#87">[ subject ]</a>
+              <a href="author.html#87">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

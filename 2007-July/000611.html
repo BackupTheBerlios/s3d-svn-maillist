@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r620 - in branches/s3d-cmake: apps/meshs3d libs3d libs3dw
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-July/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r620%20-%20in%20branches/s3d-cmake%3A%20apps/meshs3d%20libs3d%20libs3dw&In-Reply-To=%3C200707011315.l61DF45V032123%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000612.html">
+   <LINK REL="Next"  HREF="000613.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r620 - in branches/s3d-cmake: apps/meshs3d libs3d libs3dw</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r620%20-%20in%20branches/s3d-cmake%3A%20apps/meshs3d%20libs3d%20libs3dw&In-Reply-To=%3C200707011315.l61DF45V032123%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r620 - in branches/s3d-cmake: apps/meshs3d libs3d libs3dw">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Sun Jul  1 15:15:04 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000612.html">[S3d-svn] r619 - branches/s3d-cmake/apps/meshs3d
+</A></li>
+        <LI>Next message: <A HREF="000613.html">[S3d-svn] r621 - branches/s3d-cmake/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#611">[ date ]</a>
+              <a href="thread.html#611">[ thread ]</a>
+              <a href="subject.html#611">[ subject ]</a>
+              <a href="author.html#611">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-07-01 15:15:03 +0200 (Sun, 01 Jul 2007)
+New Revision: 620
+
+Modified:
+   branches/s3d-cmake/apps/meshs3d/process.c
+   branches/s3d-cmake/libs3d/proto_out.c
+   branches/s3d-cmake/libs3dw/label.c
+Log:
+- Remove unused variables
+
+
+Modified: branches/s3d-cmake/apps/meshs3d/process.c
+===================================================================
+--- branches/s3d-cmake/apps/meshs3d/process.c	2007-07-01 13:15:01 UTC (rev 619)
++++ branches/s3d-cmake/apps/meshs3d/process.c	2007-07-01 13:15:03 UTC (rev 620)
+@@ -201,12 +201,10 @@
+ 
+ 	int dn;
+ 	float f;
+-	char *lbuf_ptr, *last_cr_ptr, *con_from, *con_from_end, *con_to, *con_to_end, *etx, *etx_end, *tmpChar;
+-	struct node *node_from, *node_to;
++	char *lbuf_ptr, *last_cr_ptr, *con_from, *con_from_end, *con_to, *con_to_end, *etx, *etx_end;
++	/* struct node *node_from, *node_to; */
+ 
+ 	unsigned int int_con_from=0, int_con_to=0;
+-	char hna_name[NAMEMAX];
+-	char hna_node[NAMEMAX];
+ 
+ 	lbuf_ptr = lbuf;
+ 	last_cr_ptr = NULL;
+
+Modified: branches/s3d-cmake/libs3d/proto_out.c
+===================================================================
+--- branches/s3d-cmake/libs3d/proto_out.c	2007-07-01 13:15:01 UTC (rev 619)
++++ branches/s3d-cmake/libs3d/proto_out.c	2007-07-01 13:15:03 UTC (rev 620)
+@@ -41,7 +41,6 @@
+ int s3d_new_object()
+ {
+ 	int oid;
+-	int old_cb_lock;
+ 	
+ 	cb_lock++; /* please, no callbacks now. */
+ 	oid=_queue_want_object();
+
+Modified: branches/s3d-cmake/libs3dw/label.c
+===================================================================
+--- branches/s3d-cmake/libs3dw/label.c	2007-07-01 13:15:01 UTC (rev 619)
++++ branches/s3d-cmake/libs3dw/label.c	2007-07-01 13:15:03 UTC (rev 620)
+@@ -53,7 +53,7 @@
+ void s3dw_label_change_text(s3dw_label *label, char *text)
+ {
+ 	s3dw_widget *widget=(s3dw_widget *)label;
+-	uint32_t oid_text;
++
+ 	/* redraw the text ... */
+ 	free(label-&gt;text);
+ 	label-&gt;text=strdup(text);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000612.html">[S3d-svn] r619 - branches/s3d-cmake/apps/meshs3d
+</A></li>
+	<LI>Next message: <A HREF="000613.html">[S3d-svn] r621 - branches/s3d-cmake/apps/meshs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#611">[ date ]</a>
+              <a href="thread.html#611">[ thread ]</a>
+              <a href="subject.html#611">[ subject ]</a>
+              <a href="author.html#611">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

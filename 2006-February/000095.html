@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r99 - in trunk: . client
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r99%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200602221615.k1MGFosS012821%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000094.html">
+   <LINK REL="Next"  HREF="000096.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r99 - in trunk: . client</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r99%20-%20in%20trunk%3A%20.%20client&In-Reply-To=%3C200602221615.k1MGFosS012821%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r99 - in trunk: . client">dotslash at berlios.de
+       </A><BR>
+    <I>Wed Feb 22 17:15:50 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000094.html">[S3d-svn] r98 - trunk
+</A></li>
+        <LI>Next message: <A HREF="000096.html">[S3d-svn] r100 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#95">[ date ]</a>
+              <a href="thread.html#95">[ thread ]</a>
+              <a href="subject.html#95">[ subject ]</a>
+              <a href="author.html#95">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-02-22 17:15:38 +0100 (Wed, 22 Feb 2006)
+New Revision: 99
+
+Modified:
+   trunk/
+   trunk/client/io.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r132 at balthasar</A>:  dotslash | 2006-02-22 17:15:32 +0100
+  - fopen errors are not that important when looking through the
+    search path ...
+  - SIGNAL -&gt; WITH_SIGNALS
+ 
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:130
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:132
+
+Modified: trunk/client/io.c
+===================================================================
+--- trunk/client/io.c	2006-02-21 21:52:57 UTC (rev 98)
++++ trunk/client/io.c	2006-02-22 16:15:38 UTC (rev 99)
+@@ -134,7 +134,7 @@
+ 
+ 	 /*  TODO: we should wait for the INIT-event here before proceeding. */
+ 	_queue_init();
+-#ifdef SIGNAL
++#ifdef WITH_SIGNALS
+     if (signal(SIGINT, (sig_t)sigint_handler) == SIG_ERR)
+ 		errdn(LOW,&quot;s3d_init():signal()&quot;,errno);
+     if (signal(SIGTERM, (sig_t)sigint_handler) == SIG_ERR)
+@@ -192,11 +192,11 @@
+ 	{ errn(&quot;s3d_open_file():fseek()&quot;,errno); return(0);}*/
+ 
+ 	if ((fp = fopen(fname, &quot;rt&quot;)) == NULL)
+-	{ errn(&quot;s3d_open_file():fopen()&quot;,errno); return(-1);}
++	{ errdn(VLOW,&quot;s3d_open_file():fopen()&quot;,errno); return(-1);}
+ 	if (fstat(fileno(fp),&amp;bf))
+-	{ errn(&quot;s3d_open_file():fopen()&quot;,errno); return(-1);}
++	{ errdn(VLOW,&quot;s3d_open_file():fopen()&quot;,errno); return(-1);}
+ 	filesize=bf.st_size;
+-	dprintf(LOW, &quot;opening %s, filesize is %d&quot;,fname, filesize);
++	dprintf(VLOW, &quot;opening %s, filesize is %d&quot;,fname, filesize);
+ 	if ((buf=malloc(filesize))==NULL)
+ 	{
+ 		errn(&quot;s3d_open_3ds_file():malloc()&quot;,errno);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000094.html">[S3d-svn] r98 - trunk
+</A></li>
+	<LI>Next message: <A HREF="000096.html">[S3d-svn] r100 - in trunk: . server
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#95">[ date ]</a>
+              <a href="thread.html#95">[ thread ]</a>
+              <a href="subject.html#95">[ subject ]</a>
+              <a href="author.html#95">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

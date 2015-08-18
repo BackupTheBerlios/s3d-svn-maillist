@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r804 - trunk/Documentation
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-October/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r804%20-%20trunk/Documentation&In-Reply-To=%3C200710222041.l9MKf7C4003159%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000795.html">
+   <LINK REL="Next"  HREF="000797.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r804 - trunk/Documentation</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r804%20-%20trunk/Documentation&In-Reply-To=%3C200710222041.l9MKf7C4003159%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r804 - trunk/Documentation">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Oct 22 22:41:07 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000795.html">[S3d-svn] r803 - trunk/Documentation
+</A></li>
+        <LI>Next message: <A HREF="000797.html">[S3d-svn] r805 - trunk/Documentation
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#796">[ date ]</a>
+              <a href="thread.html#796">[ thread ]</a>
+              <a href="subject.html#796">[ subject ]</a>
+              <a href="author.html#796">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-10-22 22:41:07 +0200 (Mon, 22 Oct 2007)
+New Revision: 804
+
+Modified:
+   trunk/Documentation/CMakeLists.txt
+Log:
+Generate and install documentation when docbook2html is available
+
+
+Modified: trunk/Documentation/CMakeLists.txt
+===================================================================
+--- trunk/Documentation/CMakeLists.txt	2007-10-22 20:40:55 UTC (rev 803)
++++ trunk/Documentation/CMakeLists.txt	2007-10-22 20:41:07 UTC (rev 804)
+@@ -2,3 +2,32 @@
+ add_subdirectory(libs3dw)
+ add_subdirectory(manpages)
+ add_subdirectory(server)
++
++project(Documentation C)
++
++if (DOCBOOK2HTML_COMPILER)
++	add_custom_command(
++		OUTPUT  ${Documentation_BINARY_DIR}/index.html
++		COMMAND ${DOCBOOK2HTML_COMPILER}
++		ARGS    ${Documentation_SOURCE_DIR}/s3d.docbook
++		DEPENDS ${Documentation_SOURCE_DIR}/s3d.docbook
++			${Documentation_SOURCE_DIR}/bookinfo.docbook
++			${Documentation_SOURCE_DIR}/server/server.docbook
++			${Documentation_SOURCE_DIR}/libs3dw/libs3dw.docbook
++			${Documentation_SOURCE_DIR}/libs3d/libs3d.docbook
++		COMMENT &quot;Build s3d documentation&quot;
++	)
++	
++	add_custom_target(documentation ALL echo
++		DEPENDS   ${Documentation_BINARY_DIR}/index.html
++	)
++
++	# install
++	file(GLOB DOCS ${Documentation_BINARY_DIR}/*.html)
++	install(FILES ${DOCS} DESTINATION share/doc/s3d)
++else (DOCBOOK2HTML_COMPILER)
++	PkgStatus_Later(&quot;docbook2html (pkg name: docbook-utils)&quot;)
++	
++	# print late status
++	Collected_PkgStatus(&quot;documentation&quot;)
++endif (DOCBOOK2HTML_COMPILER)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000795.html">[S3d-svn] r803 - trunk/Documentation
+</A></li>
+	<LI>Next message: <A HREF="000797.html">[S3d-svn] r805 - trunk/Documentation
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#796">[ date ]</a>
+              <a href="thread.html#796">[ thread ]</a>
+              <a href="subject.html#796">[ subject ]</a>
+              <a href="author.html#796">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

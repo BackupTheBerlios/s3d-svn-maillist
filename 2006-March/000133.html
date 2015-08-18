@@ -1,0 +1,517 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r137 - in trunk: . client server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r137%20-%20in%20trunk%3A%20.%20client%20server&In-Reply-To=%3C200603032112.k23LCIAF021338%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000132.html">
+   <LINK REL="Next"  HREF="000134.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r137 - in trunk: . client server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r137%20-%20in%20trunk%3A%20.%20client%20server&In-Reply-To=%3C200603032112.k23LCIAF021338%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r137 - in trunk: . client server">dotslash at berlios.de
+       </A><BR>
+    <I>Fri Mar  3 22:12:18 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000132.html">[S3d-svn] r136 - in trunk: . apps/olsrs3d apps/s3dfm apps/s3dgps client server
+</A></li>
+        <LI>Next message: <A HREF="000134.html">[S3d-svn] r138 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#133">[ date ]</a>
+              <a href="thread.html#133">[ thread ]</a>
+              <a href="subject.html#133">[ subject ]</a>
+              <a href="author.html#133">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-03-03 22:12:17 +0100 (Fri, 03 Mar 2006)
+New Revision: 137
+
+Modified:
+   trunk/
+   trunk/ChangeLog
+   trunk/client/config.h
+   trunk/client/io.c
+   trunk/client/network.c
+   trunk/client/s3dlib.h
+   trunk/client/shm.c
+   trunk/client/shm_ringbuf.c
+   trunk/server/config.h
+   trunk/server/global.h
+   trunk/server/graphics.c
+   trunk/server/main.c
+   trunk/server/user.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r193 at balthasar</A>:  dotslash | 2006-03-03 22:12:12 +0100
+ - using values from config.h, user does not have to edit server/config.h
+   or clients/config.h anymore to fit his/her needs
+ 				  
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:191
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:193
+
+Modified: trunk/ChangeLog
+===================================================================
+--- trunk/ChangeLog	2006-03-03 20:30:10 UTC (rev 136)
++++ trunk/ChangeLog	2006-03-03 21:12:17 UTC (rev 137)
+@@ -1,4 +1,6 @@
+ 2006-03-03  Simon Wunderlich - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
++	- using values from config.h, user does not have to edit server/config.h
++	  or clients/config.h anymore to fit his/her needs
+ 	- Finally, Font triangulating is stable (at least it seems so ;)
+ 2006-02-27  Simon Wunderlich - &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+ 	- added GPL/LGPL copyright notes (phew -.-)
+
+Modified: trunk/client/config.h
+===================================================================
+--- trunk/client/config.h	2006-03-03 20:30:10 UTC (rev 136)
++++ trunk/client/config.h	2006-03-03 21:12:17 UTC (rev 137)
+@@ -23,8 +23,8 @@
+ 
+ 
+ /*  this is definitly the better way to pick fonts. */
++
+ #define WITH_FONTCONFIG
+-/* #define WITH_SIGNALS */
+ /*  our level of debug messages */
+ #define DEBUG			LOW /*  standard debug level */
+ #define SHM_MAX_IDLE	200	/* maximum wait for server timeout */
+
+Modified: trunk/client/io.c
+===================================================================
+--- trunk/client/io.c	2006-03-03 20:30:10 UTC (rev 136)
++++ trunk/client/io.c	2006-03-03 21:12:17 UTC (rev 137)
+@@ -34,7 +34,7 @@
+ #include &lt;sys/socket.h&gt;  /*  socket() */
+ #include &lt;getopt.h&gt;		 /*  getopt() */
+ #include &lt;fcntl.h&gt;		 /*  fcntl() */
+-#ifdef WITH_SIGNALS
++#ifdef SIGS
+ #include &lt;signal.h&gt;		 /*  signal.h, SIG_PIPE */
+ #endif
+ #include &lt;netinet/in.h&gt;  /*  htons(),htonl() */
+@@ -45,7 +45,7 @@
+ static char				*url=NULL;
+ extern int 				con_type;
+ /*  this file is the client-lib-implementation which holds the function to connect and control the server. */
+-#ifdef WITH_SIGNALS
++#ifdef SIGS
+ int _s3d_sigio=0;
+ void sigpipe_handler(int sig, int code)  /*  ... ? */
+ {
+@@ -158,7 +158,7 @@
+ 
+ 	 /*  TODO: we should wait for the INIT-event here before proceeding. */
+ 	_queue_init();
+-#ifdef WITH_SIGNALS
++#ifdef SIGS
+     if (signal(SIGINT, (sig_t)sigint_handler) == SIG_ERR)
+ 		errdn(LOW,&quot;s3d_init():signal()&quot;,errno);
+     if (signal(SIGTERM, (sig_t)sigint_handler) == SIG_ERR)
+@@ -174,8 +174,12 @@
+ 	net_send(S3D_P_C_QUIT,NULL,0);
+ 	switch (con_type)
+ 	{
++#ifdef TCP
+ 		case CON_TCP:_tcp_quit();break;
++#endif
++#ifdef SHM
+ 		case CON_SHM:_shm_quit();break;
++#endif
+ 	}
+ 	con_type=CON_NULL;
+ 	_queue_quit();
+
+Modified: trunk/client/network.c
+===================================================================
+--- trunk/client/network.c	2006-03-03 20:30:10 UTC (rev 136)
++++ trunk/client/network.c	2006-03-03 21:12:17 UTC (rev 137)
+@@ -29,11 +29,13 @@
+ #include &lt;unistd.h&gt;		 /*  read(), write() */
+ #include &lt;errno.h&gt;		 /*  errno */
+ #include &lt;netinet/in.h&gt;  /*  htons(),htonl() */
+-#ifdef WITH_SIGNALS
++#ifdef SIGS
+ extern int _s3d_sigio;
+ #endif
+ int con_type=CON_NULL;
++#ifdef TCP
+ static int _s3d_net_receive();
++#endif
+ 
+ int net_send(unsigned char opcode, char *buf, unsigned short length)
+ {
+@@ -46,34 +48,45 @@
+ 	memcpy(buff+3,buf,length);
+ 	switch (con_type)
+ 	{
++#ifdef SHM
+ 		case CON_SHM:shm_writen(buff,length+3);break;
++#endif
++#ifdef TCP		
+ 		case CON_TCP:tcp_writen(buff,length+3);break;
++#endif
+ 	}
+ 	return(0);
+ }
+ /* handler for socket based connection types */
++#ifdef TCP
+ int _s3d_net_receive()
+ {
+ 	return(_s3d_tcp_net_receive());
++	return(0);
+ }
++#endif
+ int s3d_net_check()
+ {
+ 	switch (con_type)
+ 	{
++#ifdef TCP
+ 		case CON_TCP:
+-#ifdef WITH_SIGNALS
++#ifdef SIGS
+ 		if (_s3d_sigio)
+ 		{
+ #endif
+ 			while (_s3d_net_receive());
+-#ifdef WITH_SIGNALS
++#ifdef SIGS
+ 			_s3d_sigio=0;
+ 		}	
+ #endif
+ 			break;
++#endif
++#ifdef SHM
+ 		case CON_SHM:
+ 			while(_shm_net_receive());
+ 			break;
++#endif
+ 	}
+ 	return(0);
+ }
+@@ -81,7 +94,9 @@
+ {
+ 	char				*s,*sv,*port=NULL;
+ 	char				*first_slash=NULL;
++#ifdef TCP
+ 	int					 pn=0;
++#endif
+ 	int					 tcp,shm;
+ 	tcp=shm=1; /* everything is possible, yet */
+ 	
+@@ -124,11 +139,14 @@
+ 			shm=0;
+ 		}
+ 	}
++#ifdef SHM
+ 	if (shm)
+ 	{
+ 		if (!strncmp(port, &quot;shm&quot;,3))
+ 			if (!_shm_init(sv)) return(con_type=CON_SHM);
+ 	}
++#endif
++#ifdef TCP
+ 	if (tcp)
+ 	{
+ 		pn=6066;
+@@ -142,5 +160,6 @@
+ 		}
+ 		if (!_tcp_init(sv,pn)) return(con_type=CON_TCP);
+ 	}
++#endif
+ 	return(CON_NULL);
+ }
+
+Modified: trunk/client/s3dlib.h
+===================================================================
+--- trunk/client/s3dlib.h	2006-03-03 20:30:10 UTC (rev 136)
++++ trunk/client/s3dlib.h	2006-03-03 21:12:17 UTC (rev 137)
+@@ -23,6 +23,7 @@
+ 
+ 
+ #include &lt;stdint.h&gt;
++#include &quot;../config.h&quot;
+ #define VLOW	1
+ #define	LOW		2
+ #define MED		3
+@@ -67,13 +68,16 @@
+ int s3d_net_check();
+ int net_send(unsigned char opcode, char *buf, unsigned short length);
+ int s3d_net_init(char *urlc);
++#ifdef TCP
+ /* tcp.c */
+ int _tcp_init();
+ int _tcp_quit();
+ int _s3d_tcp_net_receive();
+ int tcp_writen(char *str,int s);
+ int tcp_readn(char *str,int s);
++#endif
+ /* shm_ringbuf.c */
++#ifdef SHM
+ struct buf_t
+ {
+ 	uint32_t start,end,bufsize;	/* start/end of the data */
+@@ -86,6 +90,7 @@
+ int _shm_net_receive();
+ int shm_writen(char *str,int s);
+ int shm_readn(char *str,int s);
++#endif
+ /* freetype.c */
+ struct t_buf
+ {
+
+Modified: trunk/client/shm.c
+===================================================================
+--- trunk/client/shm.c	2006-03-03 20:30:10 UTC (rev 136)
++++ trunk/client/shm.c	2006-03-03 21:12:17 UTC (rev 137)
+@@ -21,6 +21,7 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
+ #include &lt;stdlib.h&gt; /* malloc() */
+@@ -30,6 +31,7 @@
+ #include &lt;netinet/in.h&gt;	/* ntohs() */
+ #include &lt;errno.h&gt; /* errno */
+ #include &lt;unistd.h&gt;	/* usleep() */
++#ifdef SHM
+ 
+ #define SHM_SIZE 		sizeof(key_t)*2  		/* space for the keys */
+ #define SHM_MAXLOOP		10000
+@@ -195,3 +197,4 @@
+ 	}
+ 	return(found);
+ }
++#endif
+
+Modified: trunk/client/shm_ringbuf.c
+===================================================================
+--- trunk/client/shm_ringbuf.c	2006-03-03 20:30:10 UTC (rev 136)
++++ trunk/client/shm_ringbuf.c	2006-03-03 21:12:17 UTC (rev 137)
+@@ -21,10 +21,12 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++
+ #include &quot;s3d.h&quot;
+ #include &quot;s3dlib.h&quot;
+ #include &lt;stdint.h&gt; /* uint32_t */
+ #include &lt;string.h&gt;	/* memcpy() */
++#ifdef SHM
+ int shm_write(struct buf_t *rb,char *buf, int n)
+ {
+ 	int wrap=0;
+@@ -100,4 +102,4 @@
+ 	if (rb-&gt;start&gt;=rb-&gt;bufsize) rb-&gt;start-=rb-&gt;bufsize;
+ 	return(mn);
+ }
+-
++#endif
+
+Modified: trunk/server/config.h
+===================================================================
+--- trunk/server/config.h	2006-03-03 20:30:10 UTC (rev 136)
++++ trunk/server/config.h	2006-03-03 21:12:17 UTC (rev 137)
+@@ -21,6 +21,8 @@
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
++/* use the global config.h */
++#include &quot;../config.h&quot; 
+ 
+ /*  to be filled with configure options ...  */
+ /*   */
+@@ -44,22 +46,4 @@
+ #define dprintf(...) /* nothing */
+ #endif
+ 
+-/*  which subsystem do we use for rendering and ? */
+ 
+-/* GLUT is the GL utility library which you obtain at 
+- * <A HREF="http://freeglut.sourceforge.net/">http://freeglut.sourceforge.net/</A>  
+- */
+-#define G_GLUT	1
+-/* SDL is a framework for simple media access which contains
+- * opengl support besides music, cdrom etc.
+- */
+-/*  #define G_SDL	2 */
+-/*  do we want signals? usually, yes. it makes network things  */
+-/*  with polling a lot faster and  */
+-/*  we can go down properly on a terminate signal... */
+-/*  windows does not support that, so ... */
+-#ifndef WIN32
+-#define SIGS	1
+-#define SHM		1
+-#endif
+-#define TCP		1
+
+Modified: trunk/server/global.h
+===================================================================
+--- trunk/server/global.h	2006-03-03 20:30:10 UTC (rev 136)
++++ trunk/server/global.h	2006-03-03 21:12:17 UTC (rev 137)
+@@ -186,6 +186,11 @@
+ 	float r;
+ 	char name[NAME_MAX]; 
+ };
++enum {
++	zero,
++	FRAME_GLUT,
++	FRAME_SDL
++};
+ /*  main.c */
+ int init(void);
+ int quit(void);
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2006-03-03 20:30:10 UTC (rev 136)
++++ trunk/server/graphics.c	2006-03-03 21:12:17 UTC (rev 137)
+@@ -49,10 +49,10 @@
+ 	switch (frame_mode)
+ 	{
+ #ifdef G_SDL
+-		case G_SDL:graphics_init_sdl();break;
++		case FRAME_SDL:graphics_init_sdl();break;
+ #endif
+ #ifdef G_GLUT
+-		case G_GLUT:graphics_init_glut();break;
++		case FRAME_GLUT:graphics_init_glut();break;
+ #endif
+ 		default: return(-1);
+ 	}
+@@ -371,13 +371,13 @@
+ 	switch (frame_mode)
+ 	{
+ #ifdef G_GLUT
+-		case G_GLUT:glutSwapBuffers();break;
++		case FRAME_GLUT:glutSwapBuffers();break;
+ #endif
+ #ifdef G_SDL
+-    	case G_SDL:SDL_GL_SwapBuffers();break;
++    	case FRAME_SDL:SDL_GL_SwapBuffers();break;
+ #endif
+ #ifdef G_GLX
+-		case G_GLX:...
++		case FRAME_GLX:...
+ #endif
+ 	}
+ }
+
+Modified: trunk/server/main.c
+===================================================================
+--- trunk/server/main.c	2006-03-03 20:30:10 UTC (rev 136)
++++ trunk/server/main.c	2006-03-03 21:12:17 UTC (rev 137)
+@@ -72,10 +72,10 @@
+ 	if (!frame_mode)  /*  turn default frame_mode on */
+ 	{
+ #ifdef G_GLUT
+-		frame_mode=G_GLUT;
++		frame_mode=FRAME_GLUT;
+ #else
+ #ifdef G_SDL
+-		frame_mode=G_SDL;
++		frame_mode=FRAME_SDL;
+ #endif
+ #endif
+ 	}
+@@ -129,14 +129,14 @@
+ 				case 0:break;
+ 				case 'g':
+ #ifdef G_GLUT
+-					frame_mode=G_GLUT;
++					frame_mode=FRAME_GLUT;
+ #else
+ 					errs(&quot;process_args()&quot;,&quot;sorry, GLUT is not available&quot;);
+ #endif
+ 					break;
+ 				case 's':
+ #ifdef G_SDL
+-					frame_mode=G_SDL;
++					frame_mode=FRAME_SDL;
+ #else
+ 					errs(&quot;process_args()&quot;,&quot;sorry, SDL is not available&quot;);
+ #endif					
+@@ -165,7 +165,7 @@
+ 	switch (frame_mode)
+ 	{
+ #ifdef G_GLUT
+-		case G_GLUT:glutMainLoop();break;
++		case FRAME_GLUT:glutMainLoop();break;
+ #endif
+ 		default:mainloop();
+ 	}
+
+Modified: trunk/server/user.c
+===================================================================
+--- trunk/server/user.c	2006-03-03 20:30:10 UTC (rev 136)
++++ trunk/server/user.c	2006-03-03 21:12:17 UTC (rev 137)
+@@ -31,10 +31,10 @@
+ 	switch (frame_mode)
+ 	{
+ #ifdef G_GLUT
+-		case G_GLUT:user_init_glut();break;
++		case FRAME_GLUT:user_init_glut();break;
+ #endif
+ #ifdef G_SDL
+-    	case G_SDL:user_init_sdl();break;
++    	case FRAME_SDL:user_init_sdl();break;
+ #endif
+ 		default:return(-1);
+ 	}
+@@ -45,10 +45,10 @@
+ 	switch (frame_mode)
+ 	{
+ #ifdef G_GLUT
+-		case G_GLUT:return(0);  /*  glut uses callback functions */
++		case FRAME_GLUT:return(0);  /*  glut uses callback functions */
+ #endif
+ #ifdef G_SDL
+-    	case G_SDL:user_main_sdl();
++    	case FRAME_SDL:user_main_sdl();
+ #endif
+ 		default:return(0);
+ 	}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000132.html">[S3d-svn] r136 - in trunk: . apps/olsrs3d apps/s3dfm apps/s3dgps client server
+</A></li>
+	<LI>Next message: <A HREF="000134.html">[S3d-svn] r138 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#133">[ date ]</a>
+              <a href="thread.html#133">[ thread ]</a>
+              <a href="subject.html#133">[ subject ]</a>
+              <a href="author.html#133">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

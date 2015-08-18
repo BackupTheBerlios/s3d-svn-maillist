@@ -1,0 +1,192 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r1044 - in trunk: apps/s3dfm example
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-November/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1044%20-%20in%20trunk%3A%20apps/s3dfm%20example&In-Reply-To=%3C200811262348.mAQNmeV6000350%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="001023.html">
+   <LINK REL="Next"  HREF="001025.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r1044 - in trunk: apps/s3dfm example</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r1044%20-%20in%20trunk%3A%20apps/s3dfm%20example&In-Reply-To=%3C200811262348.mAQNmeV6000350%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r1044 - in trunk: apps/s3dfm example">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Thu Nov 27 00:48:40 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="001023.html">[S3d-svn] r1043 - trunk/server
+</A></li>
+        <LI>Next message: <A HREF="001025.html">[S3d-svn] r1045 - trunk/apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1024">[ date ]</a>
+              <a href="thread.html#1024">[ thread ]</a>
+              <a href="subject.html#1024">[ subject ]</a>
+              <a href="author.html#1024">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-11-27 00:48:34 +0100 (Thu, 27 Nov 2008)
+New Revision: 1044
+
+Modified:
+   trunk/apps/s3dfm/fs.c
+   trunk/apps/s3dfm/parse.c
+   trunk/apps/s3dfm/s3dfm.h
+   trunk/example/filebrowser.c
+Log:
+Rewrote directory detection with posix stat
+
+Not all posix plattforms provide struct stat::d_type for a directory.
+It is safer use stat for each entry in a directory and then test for
+directory modes.
+
+Modified: trunk/apps/s3dfm/fs.c
+===================================================================
+--- trunk/apps/s3dfm/fs.c	2008-11-26 21:24:42 UTC (rev 1043)
++++ trunk/apps/s3dfm/fs.c	2008-11-26 23:48:34 UTC (rev 1044)
+@@ -131,6 +131,20 @@
+ 	*bytes += s.st_size;
+ 	/* printf(&quot;end: %d files, %d dirs, %d bytes in %s\n&quot;,*files,*dirs,*bytes,source);*/
+ }
++
++/* returns 1 if source is a directory */
++int fs_isdir(const char *source)
++{
++	struct stat s;
++
++	if (-1 == stat(source, &amp;s))
++		return 0;
++	if (S_ISDIR(s.st_mode)) {
++		return 1;
++	}
++	return 0;
++}
++
+ /* approximate the heaviness of our source ...*/
+ void fs_fl_approx(filelist *fl, int *files, int *dirs, int *bytes)
+ {
+
+Modified: trunk/apps/s3dfm/parse.c
+===================================================================
+--- trunk/apps/s3dfm/parse.c	2008-11-26 21:24:42 UTC (rev 1043)
++++ trunk/apps/s3dfm/parse.c	2008-11-26 23:48:34 UTC (rev 1044)
+@@ -34,7 +34,6 @@
+ 	struct dirent **namelist;
+ 	int n, i;
+ 	int oldn;
+-	DIR  *dirhd = NULL;
+ 	char *nstr = NULL;
+ 	char path[M_DIR];
+ 	char ndir[M_DIR];
+@@ -74,13 +73,8 @@
+ 				dir-&gt;sub[i]-&gt;pindex = i;
+ 				strncpy(ndir, path, M_DIR);
+ 				strncat(ndir, namelist[n]-&gt;d_name, M_DIR);
+-#ifdef DT_DIR
+-				if ((namelist[n]-&gt;d_type == DT_DIR) || ((namelist[n]-&gt;d_type == DT_UNKNOWN)))
+-					if ((dirhd = opendir(ndir)) != NULL) {
+-						dir-&gt;sub[i]-&gt;type = T_FOLDER;
+-						closedir(dirhd);
+-					}
+-#endif /* DT_DIR */
++				if (fs_isdir(ndir))
++					dir-&gt;sub[i]-&gt;type = T_FOLDER;
+ 				dir-&gt;sub[i]-&gt;check = 0; /* check=0 means we've already processed this item */
+ 			}
+ 			free(namelist[n]);
+
+Modified: trunk/apps/s3dfm/s3dfm.h
+===================================================================
+--- trunk/apps/s3dfm/s3dfm.h	2008-11-26 21:24:42 UTC (rev 1043)
++++ trunk/apps/s3dfm/s3dfm.h	2008-11-26 23:48:34 UTC (rev 1044)
+@@ -186,6 +186,7 @@
+ int    fs_move(char *source, char *dest);
+ int    fs_unlink(char *dest);
+ int    fs_error(const char *message, char *file);
++int    fs_isdir(const char *source);
+ /* icon.c */
+ int    icon_draw(t_node *dir);
+ int    icon_undisplay(t_node *dir);
+
+Modified: trunk/example/filebrowser.c
+===================================================================
+--- trunk/example/filebrowser.c	2008-11-26 21:24:42 UTC (rev 1043)
++++ trunk/example/filebrowser.c	2008-11-26 23:48:34 UTC (rev 1044)
+@@ -32,6 +32,7 @@
+ #include &lt;unistd.h&gt;  /*  chdir() */
+ #include &lt;math.h&gt;  /*  sin(),cos() */
+ #include &lt;time.h&gt; /* nanosleep() */
++#include &lt;sys/stat.h&gt;
+ #include &quot;example.h&quot; /* S3DUNUSED */
+ static struct timespec t = {
+ 	0, 100*1000*1000
+@@ -67,6 +68,7 @@
+ 	char *nstr;
+ 	float alpha, al, radius, f;
+ 	char ndir[M_DIR+1];
++	struct stat s;
+ 	if (n_item) {
+ 		printf(&quot;freeing %d old items\n&quot;, n_item);
+ 		for (i = 0;i &lt; n_item;i++) {
+@@ -100,12 +102,11 @@
+ 				strncat(ndir, &quot;/&quot;, M_DIR - strlen(ndir));
+ 				strncat(ndir, namelist[n]-&gt;d_name, M_DIR - strlen(ndir));
+ 				/*     printf(&quot;displaying %s\n&quot;,ndir); */
+-#if defined(DT_UNKNOWN) &amp;&amp; defined(DT_DIR)
+-				if ((namelist[n]-&gt;d_type == DT_DIR) ||
+-				                ((namelist[n]-&gt;d_type == DT_UNKNOWN) &amp;&amp; (opendir(ndir) != NULL)))
++				stat(ndir, &amp;s);
++				if (S_ISDIR(s.st_mode)) {
+ 					item[n].type = T_FOLDER;
++				}
+ 				else
+-#endif /* defined(DT_UNKNOWN) &amp;&amp; defined(DT_DIR) */
+ 				{
+ 					if (ext != NULL) {
+ 						if (0 == strncmp(ext, &quot;.3ds&quot;, strlen(ext) &lt; 4 ? strlen(ext) : 4))
+@@ -189,9 +190,6 @@
+ 			/*    r=s3d_get_radius(p); */
+ 			/*    s3d_scale(p,1.0/r,1.0/r,1.0/r); */
+ 			s3d_flags_on(item[n].descr_oid, S3D_OF_VISIBLE | S3D_OF_SELECTABLE);
+-#if defined(DT_UNKNOWN) &amp;&amp; defined(DT_DIR)
+-			printf(&quot;%s [%d]\n&quot;, nstr, namelist[n]-&gt;d_type);
+-#endif /* defined(DT_UNKNOWN) &amp;&amp; defined(DT_DIR) */
+ 			printf(&quot;string %d linked to %d\n&quot;, item[n].descr_oid, item[n].icon_oid);
+ 			free(namelist[n]);
+ 		}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="001023.html">[S3d-svn] r1043 - trunk/server
+</A></li>
+	<LI>Next message: <A HREF="001025.html">[S3d-svn] r1045 - trunk/apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#1024">[ date ]</a>
+              <a href="thread.html#1024">[ thread ]</a>
+              <a href="subject.html#1024">[ subject ]</a>
+              <a href="author.html#1024">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

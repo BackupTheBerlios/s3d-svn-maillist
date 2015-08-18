@@ -1,0 +1,229 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r265 - in trunk: . apps/dot_mcp server
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r265%20-%20in%20trunk%3A%20.%20apps/dot_mcp%20server&In-Reply-To=%3C200605021936.k42JaeTx024243%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000257.html">
+   <LINK REL="Next"  HREF="000259.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r265 - in trunk: . apps/dot_mcp server</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r265%20-%20in%20trunk%3A%20.%20apps/dot_mcp%20server&In-Reply-To=%3C200605021936.k42JaeTx024243%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r265 - in trunk: . apps/dot_mcp server">dotslash at berlios.de
+       </A><BR>
+    <I>Tue May  2 21:36:40 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000257.html">[S3d-svn] r264 - in trunk: . client
+</A></li>
+        <LI>Next message: <A HREF="000259.html">[S3d-svn] r266 - in trunk: . apps/dot_mcp
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#258">[ date ]</a>
+              <a href="thread.html#258">[ thread ]</a>
+              <a href="subject.html#258">[ subject ]</a>
+              <a href="author.html#258">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-02 21:36:29 +0200 (Tue, 02 May 2006)
+New Revision: 265
+
+Modified:
+   trunk/
+   trunk/TODO
+   trunk/apps/dot_mcp/main.c
+   trunk/server/TODO
+   trunk/server/graphics.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r493 at balthasar</A>:  dotslash | 2006-05-02 21:35:54 +0200
+ - green torus into mcp ...
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:491
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:493
+
+Modified: trunk/TODO
+===================================================================
+--- trunk/TODO	2006-05-02 19:34:54 UTC (rev 264)
++++ trunk/TODO	2006-05-02 19:36:29 UTC (rev 265)
+@@ -3,6 +3,7 @@
+ dot_mcp:
+ 	* sane paths for applications
+ autotools:
++	* install ${PREFIX}/include/s3d.h as symlink to ${PREFIX}/include/s3d/s3d.h
+ 	* OBJECTPATH for finding the object?
+ 	* ./configure: line 23422: HAVE_PTHREAD: command not found &lt; huh?
+ 	* ./configure: line 22373: MDL_HAVE_OPENGL: command not found
+
+Modified: trunk/apps/dot_mcp/main.c
+===================================================================
+--- trunk/apps/dot_mcp/main.c	2006-05-02 19:34:54 UTC (rev 264)
++++ trunk/apps/dot_mcp/main.c	2006-05-02 19:36:29 UTC (rev 265)
+@@ -63,6 +63,40 @@
+ 
+ void place_apps();
+ 
++#define SIDES	60
++#define RINGS	60
++int greentorus()
++{
++	int o,i,j;
++	float R,r,a;
++	float v[SIDES*RINGS*3];
++	unsigned long l[SIDES*RINGS*6];
++	o=s3d_new_object();
++	R=100; /* outer radius */
++	r=100; /* inner radius */
++	a=M_PI/180;
++	for (i=0;i&lt;RINGS;i++)
++	for (j=0;j&lt;SIDES;j++)
++	{
++		v[i*SIDES*3+ j*3 +0]=(R+r*cos(a*((float)j*360.0/SIDES)))* cos(a*((float)i*360.0/RINGS));
++		v[i*SIDES*3+ j*3 +1]= r*sin(a* ((float)j*360.0/SIDES));
++		v[i*SIDES*3+ j*3 +2]=(R+r*cos(a*((float)j*360.0/SIDES)))* sin(a*((float)i*360.0/RINGS));
++		
++		l[i*SIDES*6+ j*6 +0]=i*SIDES+ j;
++		l[i*SIDES*6+ j*6 +1]=i*SIDES+ (j+1)%SIDES;
++		l[i*SIDES*6+ j*6 +2]=0;
++		l[i*SIDES*6+ j*6 +3]=i*SIDES+ j;
++		l[i*SIDES*6+ j*6 +4]=((i+1)%RINGS)*SIDES+ j;
++		l[i*SIDES*6+ j*6 +5]=0;
++	}
++	s3d_push_material_a(o, 0.2,0.6,0.2,0.5,
++						   1  ,1  ,1  ,0.5,
++						   0.2,0.6,0.2,0.5);
++	s3d_push_vertices(o,v,RINGS*SIDES);
++	s3d_push_lines(o,l,RINGS*SIDES*2);
++	s3d_flags_on(o,S3D_OF_VISIBLE);
++	return(o);
++}
+ void set_focus(struct app *a)
+ {
+ 	if (focus!=a)
+@@ -406,8 +440,6 @@
+ 
+ int main (int argc, char **argv)
+ {
+-	if (!s3d_init(&amp;argc,&amp;argv,&quot;mcp&quot;))	
+-	{
+ 		s3d_set_callback(S3D_EVENT_OBJ_INFO,object_info);
+ 		s3d_set_callback(S3D_MCP_OBJECT,mcp_object);
+ 		s3d_set_callback(S3D_EVENT_QUIT,stop);
+@@ -415,6 +447,10 @@
+ 		s3d_set_callback(S3D_EVENT_OBJ_CLICK,object_click);
+ 		s3d_set_callback(S3D_EVENT_KEY,keypress);
+ 
++	if (!s3d_init(&amp;argc,&amp;argv,&quot;mcp&quot;))	
++	{
++		greentorus(); /* just call ... */
++
+ 		if (s3d_select_font(&quot;vera&quot;))
+ 		{
+ 			printf(&quot;font not found\n&quot;);
+
+Modified: trunk/server/TODO
+===================================================================
+--- trunk/server/TODO	2006-05-02 19:34:54 UTC (rev 264)
++++ trunk/server/TODO	2006-05-02 19:36:29 UTC (rev 265)
+@@ -1,6 +1,7 @@
+ HIGH:
+  - properly buffer incoming network traffic!!
+ MED:
++ - pep_line_normals
+  - culling for selection-mode - do it with line-culling, not plane-culling!
+  - stop networking grepping after some deadline to prevent DoS ...?
+  - delete polygon normals when vertex got changed?!
+
+Modified: trunk/server/graphics.c
+===================================================================
+--- trunk/server/graphics.c	2006-05-02 19:34:54 UTC (rev 264)
++++ trunk/server/graphics.c	2006-05-02 19:36:29 UTC (rev 265)
+@@ -24,9 +24,11 @@
+ #include &quot;global.h&quot;
+ #include &lt;stdlib.h&gt;		 /*  malloc() */
+ #include &lt;string.h&gt;		 /*  memcpy() */
++/*
+ #ifdef G_GLUT
+-#include &lt;GL/glut.h&gt; 	 /*  glutWireTorus() -  to be removed later */ 
++#include &lt;GL/glut.h&gt; 	 *  glutWireTorus() -  to be removed later *
+ #endif
++*/
+ #include &lt;GL/gl.h&gt;		 /*  GLint */
+ #ifdef G_SDL
+ #include &lt;SDL.h&gt;	 /*  SDL_GL_SwapBuffers */
+@@ -339,10 +341,11 @@
+ 	GLfloat light0_diff[]={0.5,0.5,0.5,1.0};
+ 	GLfloat light0_amb[]={1.0,1.0,1.0,1.0};
+ 	
++/*
+ 	GLfloat wire_amb[]={0.1,0.3,0.1,0.5};
+ 	GLfloat wire_diff[]={0.1,0.3,0.1,0.5};
+ 	GLfloat wire_spec[]={1.0,1.0,1.0,0.5};
+-
++*/
+ 	select_mode=0;
+ 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  /*  clear screen */
+ 	 /*  set up the cam ... */
+@@ -368,11 +371,12 @@
+  	glPushMatrix();  /*  save the cam */ 
+ 		glLightfv(GL_LIGHT0,GL_POSITION,pos);
+ 		render_by_mcp();
++/*
+ #ifdef DEBUG
+ #ifdef G_GLUT
+ 		glPushMatrix();
+ 			glRotatef(90,1.0,0.0,0.0);	
+-			/* set some evilish green color */
++			/ * set some evilish green color * /
+ 			glMaterialfv(GL_FRONT,GL_AMBIENT,wire_amb);
+ 			glMaterialfv(GL_FRONT,GL_SPECULAR,wire_spec);
+ 			glMaterialfv(GL_FRONT,GL_DIFFUSE,wire_diff);
+@@ -380,7 +384,7 @@
+ 			glutWireTorus(100,100,40,40);
+ 		glPopMatrix();
+ #endif
+-#endif
++#endif*/
+  	glPopMatrix();  /*  restore the cam */ 
+ 	glLoadIdentity();
+ 	glMultMatrixf(m);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000257.html">[S3d-svn] r264 - in trunk: . client
+</A></li>
+	<LI>Next message: <A HREF="000259.html">[S3d-svn] r266 - in trunk: . apps/dot_mcp
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#258">[ date ]</a>
+              <a href="thread.html#258">[ thread ]</a>
+              <a href="subject.html#258">[ subject ]</a>
+              <a href="author.html#258">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

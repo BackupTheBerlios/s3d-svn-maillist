@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r604 - branches/s3d-cmake/cmake/modules
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r604%20-%20branches/s3d-cmake/cmake/modules&In-Reply-To=%3C200706252155.l5PLtxGO022981%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000593.html">
+   <LINK REL="Next"  HREF="000596.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r604 - branches/s3d-cmake/cmake/modules</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r604%20-%20branches/s3d-cmake/cmake/modules&In-Reply-To=%3C200706252155.l5PLtxGO022981%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r604 - branches/s3d-cmake/cmake/modules">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Mon Jun 25 23:55:59 CEST 2007</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000593.html">[S3d-svn] r603 - in branches/s3d-cmake: . cmake/modules
+</A></li>
+        <LI>Next message: <A HREF="000596.html">[S3d-svn] r605 - branches/s3d-cmake/cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#595">[ date ]</a>
+              <a href="thread.html#595">[ thread ]</a>
+              <a href="subject.html#595">[ subject ]</a>
+              <a href="author.html#595">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2007-06-25 23:55:59 +0200 (Mon, 25 Jun 2007)
+New Revision: 604
+
+Modified:
+   branches/s3d-cmake/cmake/modules/FindFREETYPE.cmake
+   branches/s3d-cmake/cmake/modules/FindGLIB.cmake
+Log:
+- Reduced number of cached variables in FindFreeType.cmake and FindGLIB.cmake
+- Marked some cached variables as internal
+- Fix recheck of FindFreeType and FindGLIB in every run of make
+
+
+Modified: branches/s3d-cmake/cmake/modules/FindFREETYPE.cmake
+===================================================================
+--- branches/s3d-cmake/cmake/modules/FindFREETYPE.cmake	2007-06-25 21:55:57 UTC (rev 603)
++++ branches/s3d-cmake/cmake/modules/FindFREETYPE.cmake	2007-06-25 21:55:59 UTC (rev 604)
+@@ -14,7 +14,7 @@
+ 	pkgconfig(freetype2 _IncDir _LinkDir _LinkFlags _CFlags)
+ 	set(FREETYPE_DEFINITIONS ${_CFlags})
+ 	
+-	find_path(FREETYPENORMAL_INCLUDE_DIR
++	find_path(FREETYPE_INCLUDE_DIR
+ 		NAMES freetype/config/ftheader.h
+ 		PATHS
+ 			${_IncDir}
+@@ -32,9 +32,11 @@
+ 		PATHS ${_LinkDir}
+ 	)
+ 	
+-	if (FREETYPENORMAL_INCLUDE_DIR AND FREETYPECONFIG_INCLUDE_DIR)
+-		set(FREETYPE_INCLUDE_DIR ${FREETYPENORMAL_INCLUDE_DIR} ${FREETYPECONFIG_INCLUDE_DIR})
+-	endif (FREETYPENORMAL_INCLUDE_DIR AND FREETYPECONFIG_INCLUDE_DIR)
++	if (FREETYPE_INCLUDE_DIR AND FREETYPECONFIG_INCLUDE_DIR)
++		set(FREETYPE_INCLUDE_DIR ${FREETYPE_INCLUDE_DIR} ${FREETYPECONFIG_INCLUDE_DIR})
++	else (FREETYPE_INCLUDE_DIR AND FREETYPECONFIG_INCLUDE_DIR)
++		set(FREETYPE_INCLUDE_DIR)
++	endif (FREETYPE_INCLUDE_DIR AND FREETYPECONFIG_INCLUDE_DIR)
+ 
+ 	if (FREETYPE_INCLUDE_DIR AND FREETYPE_LIBRARIES)
+ 		set(FREETYPE_FOUND TRUE)
+@@ -50,6 +52,12 @@
+ 		endif (FREETYPE_FIND_REQUIRED)
+ 	endif (FREETYPE_FOUND)
+ 
+- 	mark_as_advanced(FREETYPE_INCLUDE_DIR FREETYPE_LIBRARIES FREETYPENORMAL_INCLUDE_DIR FREETYPECONFIG_INCLUDE_DIR)
++	# set visibility in cache
++	set(FREETYPE_INCLUDE_DIR ${FREETYPE_INCLUDE_DIR} CACHE STRING &quot;Path to a file.&quot;)
++	set(FREETYPE_LIBRARIES ${FREETYPE_INCLUDE_DIR} CACHE STRING &quot;Path to a library.&quot;)
++ 	mark_as_advanced(FREETYPE_INCLUDE_DIR FREETYPE_LIBRARIES)
+ 
+-endif (FREETYPE_LIBRARIES AND FREETYPE_INCLUDE_DIR)
+\ No newline at end of file
++	# mark as internal
++	set(FREETYPECONFIG_INCLUDE_DIR ${FREETYPECONFIG_INCLUDE_DIR} CACHE INTERNAL &quot;Path to a config file.&quot; FORCE)
++
++endif (FREETYPE_LIBRARIES AND FREETYPE_INCLUDE_DIR)
+
+Modified: branches/s3d-cmake/cmake/modules/FindGLIB.cmake
+===================================================================
+--- branches/s3d-cmake/cmake/modules/FindGLIB.cmake	2007-06-25 21:55:57 UTC (rev 603)
++++ branches/s3d-cmake/cmake/modules/FindGLIB.cmake	2007-06-25 21:55:59 UTC (rev 604)
+@@ -14,7 +14,7 @@
+ 	pkgconfig(glib-2.0 _IncDir _LinkDir _LinkFlags _CFlags)
+ 	set(GLIB2_DEFINITIONS ${_CFlags})
+ 	
+-	find_path(GLIBNORMAL_INCLUDE_DIR
++	find_path(GLIB2_INCLUDE_DIR
+ 		NAMES glib.h
+ 		PATHS
+ 			${_IncDir}
+@@ -37,9 +37,11 @@
+ 		PATHS ${_LinkDir}
+ 	)
+ 	
+-	if (GLIBNORMAL_INCLUDE_DIR AND GLIBCONFIG_INCLUDE_DIR)
+-		set(GLIB2_INCLUDE_DIR ${GLIBNORMAL_INCLUDE_DIR} ${GLIBCONFIG_INCLUDE_DIR})
+-	endif (GLIBNORMAL_INCLUDE_DIR AND GLIBCONFIG_INCLUDE_DIR)
++	if (GLIB2_INCLUDE_DIR AND GLIBCONFIG_INCLUDE_DIR)
++		set(GLIB2_INCLUDE_DIR ${GLIB2_INCLUDE_DIR} ${GLIBCONFIG_INCLUDE_DIR})
++	else (GLIB2_INCLUDE_DIR AND GLIBCONFIG_INCLUDE_DIR)
++		set(GLIB2_INCLUDE_DIR)
++	endif (GLIB2_INCLUDE_DIR AND GLIBCONFIG_INCLUDE_DIR)
+ 
+ 	if (GLIB2_INCLUDE_DIR AND GLIB2_LIBRARIES)
+ 		set(GLIB2_FOUND TRUE)
+@@ -55,6 +57,12 @@
+ 		endif (GLIB2_FIND_REQUIRED)
+ 	endif (GLIB2_FOUND)
+ 
+- 	mark_as_advanced(GLIB2_INCLUDE_DIR GLIB2_LIBRARIES GLIBNORMAL_INCLUDE_DIR GLIBCONFIG_INCLUDE_DIR)
++	# set visibility in cache
++	set(GLIB2_INCLUDE_DIR ${GLIB2_INCLUDE_DIR} CACHE STRING &quot;Path to a file.&quot;)
++	set(GLIB2_LIBRARIES ${GLIB2_INCLUDE_DIR} CACHE STRING &quot;Path to a library.&quot;)
++ 	mark_as_advanced(GLIB2_INCLUDE_DIR GLIB2_LIBRARIES)
+ 
+-endif (GLIB2_LIBRARIES AND GLIB2_INCLUDE_DIR)
+\ No newline at end of file
++	# mark as internal
++	set(GLIBCONFIG_INCLUDE_DIR ${GLIBCONFIG_INCLUDE_DIR} CACHE INTERNAL &quot;Path to a config file.&quot; FORCE)
++
++endif (GLIB2_LIBRARIES AND GLIB2_INCLUDE_DIR)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000593.html">[S3d-svn] r603 - in branches/s3d-cmake: . cmake/modules
+</A></li>
+	<LI>Next message: <A HREF="000596.html">[S3d-svn] r605 - branches/s3d-cmake/cmake/modules
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#595">[ date ]</a>
+              <a href="thread.html#595">[ thread ]</a>
+              <a href="subject.html#595">[ subject ]</a>
+              <a href="author.html#595">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

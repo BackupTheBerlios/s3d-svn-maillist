@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r286 - in trunk: . Documentation/s3dapi
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r286%20-%20in%20trunk%3A%20.%20Documentation/s3dapi&In-Reply-To=%3C200605162103.k4GL3CQE006308%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000278.html">
+   <LINK REL="Next"  HREF="000280.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r286 - in trunk: . Documentation/s3dapi</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r286%20-%20in%20trunk%3A%20.%20Documentation/s3dapi&In-Reply-To=%3C200605162103.k4GL3CQE006308%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r286 - in trunk: . Documentation/s3dapi">dotslash at berlios.de
+       </A><BR>
+    <I>Tue May 16 23:03:12 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000278.html">[S3d-svn] r285 - trunk/apps/dot_mcp
+</A></li>
+        <LI>Next message: <A HREF="000280.html">[S3d-svn] r287 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#279">[ date ]</a>
+              <a href="thread.html#279">[ thread ]</a>
+              <a href="subject.html#279">[ subject ]</a>
+              <a href="author.html#279">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-05-16 23:03:11 +0200 (Tue, 16 May 2006)
+New Revision: 286
+
+Modified:
+   trunk/
+   trunk/Documentation/s3dapi/s3dapi.docbook
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r573 at balthasar</A>:  dotslash | 2006-05-16 23:01:10 +0200
+ - docbook corrections again
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:563
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:573
+
+Modified: trunk/Documentation/s3dapi/s3dapi.docbook
+===================================================================
+--- trunk/Documentation/s3dapi/s3dapi.docbook	2006-05-15 20:58:18 UTC (rev 285)
++++ trunk/Documentation/s3dapi/s3dapi.docbook	2006-05-16 21:03:11 UTC (rev 286)
+@@ -503,14 +503,18 @@
+ &lt;paramdef&gt;
+ int &lt;parameter&gt;object&lt;/parameter&gt;, 
+ float *&lt;parameter&gt;nbuf&lt;/parameter&gt;,
+-unsigned short &lt;parameter&gt;n&lt;/parameter&gt;,
++unsigned short &lt;parameter&gt;n&lt;/parameter&gt;
+ &lt;/paramdef&gt;
+ &lt;/funcprototype&gt;
+ &lt;/funcsynopsis&gt;
+ &lt;para&gt;
+ Adds normal information to polygons, giving each vertex of a polygon a normal information. With this, you can
+-archive smoothed edge effects. nbuf holds n*9 float values, 3 (x,y,z) vector values for each vertex of the Polygon.
+-Don't worry if you don't use this, it's kind of hard to calculate and the server will use some always use some
++achieve smoothed edge effects. 
++&lt;/para&gt;
++&lt;para&gt;
++nbuf should contain n * 9 float values, for each vertex a normal vector (x,y,z), and you have 
++3 Vertices for each Polygon so that makes 9 float values per Polygon in Total.	
++Don't worry if you don't use this, it's kind of hard to calculate and the server will always use some
+ proper normal values (same for every vertex, calculated by the plane which is defined by the 3 points of the polygon.
+ &lt;/para&gt;
+ &lt;/sect1&gt;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000278.html">[S3d-svn] r285 - trunk/apps/dot_mcp
+</A></li>
+	<LI>Next message: <A HREF="000280.html">[S3d-svn] r287 - in trunk: . apps/s3dfm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#279">[ date ]</a>
+              <a href="thread.html#279">[ thread ]</a>
+              <a href="subject.html#279">[ subject ]</a>
+              <a href="author.html#279">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

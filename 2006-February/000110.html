@@ -1,0 +1,300 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r114 - trunk/apps/olsrs3d
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r114%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602271703.k1RH3oVe010407%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000109.html">
+   <LINK REL="Next"  HREF="000111.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r114 - trunk/apps/olsrs3d</H1>
+    <B>nichtsnutz at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r114%20-%20trunk/apps/olsrs3d&In-Reply-To=%3C200602271703.k1RH3oVe010407%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r114 - trunk/apps/olsrs3d">nichtsnutz at berlios.de
+       </A><BR>
+    <I>Mon Feb 27 18:03:50 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000109.html">[S3d-svn] r113 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000111.html">[S3d-svn] r115 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#110">[ date ]</a>
+              <a href="thread.html#110">[ thread ]</a>
+              <a href="subject.html#110">[ subject ]</a>
+              <a href="author.html#110">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: nichtsnutz
+Date: 2006-02-27 18:03:50 +0100 (Mon, 27 Feb 2006)
+New Revision: 114
+
+Modified:
+   trunk/apps/olsrs3d/main.c
+   trunk/apps/olsrs3d/olsrs3d.h
+Log:
+delete node fix the fix
+
+
+
+Modified: trunk/apps/olsrs3d/main.c
+===================================================================
+--- trunk/apps/olsrs3d/main.c	2006-02-27 16:54:40 UTC (rev 113)
++++ trunk/apps/olsrs3d/main.c	2006-02-27 17:03:50 UTC (rev 114)
+@@ -166,8 +166,9 @@
+ 	if ( olsr_node == NULL ) return;
+ 
+ 	/* olsr node vanished */
+-	olsr_node-&gt;last_seen--;
+-	if ( olsr_node-&gt;last_seen == 0 ) {
++	if(olsr_node-&gt;last_seen &gt; 0)
++		olsr_node-&gt;last_seen--;
++	if ( olsr_node-&gt;last_seen == 0 &amp;&amp; olsr_node-&gt;visible) {
+ 
+ 		if ( Debug ) printf( &quot;olsr node vanished: %s\n&quot;, olsr_node-&gt;ip );
+ 
+@@ -180,16 +181,33 @@
+ 			s3d_del_object( olsr_node-&gt;obj_id );
+ 	
+ 			olsr_con_list = olsr_node-&gt;olsr_con_list;
+-				while( olsr_con_list != NULL) {
+-					olsr_con_list-&gt;olsr_con-&gt;visible = 0;
+-					s3d_del_object(olsr_con_list-&gt;olsr_con-&gt;obj_id);
+-					olsr_con_list = olsr_con_list-&gt;next_olsr_con_list;
++
++			while( olsr_con_list != NULL) {
++				printf(&quot;start remove\n&quot;);
++				printf(&quot;remove %d\n&quot;,olsr_con_list-&gt;olsr_con-&gt;obj_id);
++				s3d_del_object(olsr_con_list-&gt;olsr_con-&gt;obj_id);
++
++				if( olsr_con_list-&gt;olsr_con-&gt;left_olsr_node == olsr_node)
++					free(olsr_con_list-&gt;olsr_con-&gt;right_olsr_node-&gt;olsr_con_list);
++				else
++					free(olsr_con_list-&gt;olsr_con-&gt;left_olsr_node-&gt;olsr_con_list);
++
++				/* delete connection list entry */
++				// prev_olsr_con_list-&gt;next_olsr_con_list = olsr_con_list-&gt;next_olsr_con_list;
++				
++				/* delete connection */
++				if ( olsr_con_list-&gt;olsr_con-&gt;prev_olsr_con != NULL ) olsr_con_list-&gt;olsr_con-&gt;prev_olsr_con-&gt;next_olsr_con = olsr_con_list-&gt;olsr_con-&gt;next_olsr_con;
++				if ( olsr_con_list-&gt;olsr_con-&gt;next_olsr_con != NULL ) olsr_con_list-&gt;olsr_con-&gt;next_olsr_con-&gt;prev_olsr_con = olsr_con_list-&gt;olsr_con-&gt;prev_olsr_con;
++				free( olsr_con_list-&gt;olsr_con );
++				free( olsr_con_list );
++				olsr_con_list = olsr_con_list-&gt;next_olsr_con_list;
+ 			}
++			
+ 		}
+ 
+ 		if ( olsr_node-&gt;desc_id != -1 ) s3d_del_object( olsr_node-&gt;desc_id );
+ 
+-	} else {
++	} else if (olsr_node-&gt;visible) {
+ 
+ 		/* olsr node shape has been modified */
+ 		if ( olsr_node-&gt;node_type_modified ) {
+@@ -250,24 +268,7 @@
+ 						prev_olsr_con_list = olsr_con_list;
+ 
+ 					/* invisble (deleted) node */
+-					} else {
+-
+-// 						s3d_pop_vertex( olsr_con_list-&gt;olsr_con-&gt;obj_id, 6 );
+-// 						s3d_pop_polygon( olsr_con_list-&gt;olsr_con-&gt;obj_id, 2 );
+-// 						s3d_pop_material( olsr_con_list-&gt;olsr_con-&gt;obj_id, 1 );
+-//
+-// 						/* delete connection list entry */
+-// 						prev_olsr_con_list-&gt;next_olsr_con_list = olsr_con_list-&gt;next_olsr_con_list;
+-//
+-// 						/* delete connection */
+-// 						if ( olsr_con_list-&gt;olsr_con-&gt;prev_olsr_con != NULL ) olsr_con_list-&gt;olsr_con-&gt;prev_olsr_con-&gt;next_olsr_con = olsr_con_list-&gt;olsr_con-&gt;next_olsr_con;
+-// 						if ( olsr_con_list-&gt;olsr_con-&gt;next_olsr_con != NULL ) olsr_con_list-&gt;olsr_con-&gt;next_olsr_con-&gt;prev_olsr_con = olsr_con_list-&gt;olsr_con-&gt;prev_olsr_con;
+-//
+-// 						free( olsr_con_list-&gt;olsr_con );
+-// 						free( olsr_con_list );
+-
+ 					}
+-
+ 					olsr_con_list = olsr_con_list-&gt;next_olsr_con_list;
+ 
+ 				}
+@@ -385,73 +386,73 @@
+ 
+ 		}
+ 
+-		if( (*olsr_con)-&gt;visible) {
+-			/* move connection between left and right olsr node */
+-			s3d_pop_vertex( (*olsr_con)-&gt;obj_id, 6 );
+-			s3d_pop_polygon( (*olsr_con)-&gt;obj_id, 2 );
+-			s3d_pop_material( (*olsr_con)-&gt;obj_id, 1 );
++
++		/* move connection between left and right olsr node */
++		s3d_pop_vertex( (*olsr_con)-&gt;obj_id, 6 );
++		s3d_pop_polygon( (*olsr_con)-&gt;obj_id, 2 );
++		s3d_pop_material( (*olsr_con)-&gt;obj_id, 1 );
++
++		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[0] + ZeroPosition[0], (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[1] + ZeroPosition[1], (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[2] + ZeroPosition[2] );
++		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[0] + 0.2 + ZeroPosition[0], (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[1] + ZeroPosition[1], (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[2] + ZeroPosition[2] );
++		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[0] - 0.2 + ZeroPosition[0], (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[1] + ZeroPosition[1], (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[2] + ZeroPosition[2] );
++
++		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[0] + ZeroPosition[0], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[1]+ ZeroPosition[1], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[2] + ZeroPosition[2] );
++		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[0] + ZeroPosition[0], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[1]+ 0.2 + ZeroPosition[1], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[2] + ZeroPosition[2] );
++		s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[0] + ZeroPosition[0], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[1]- 0.2 + ZeroPosition[1], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[2] + ZeroPosition[2] );
++
++		if ( ColorSwitch ) {
+ 	
+-			s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[0] + ZeroPosition[0], (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[1] + ZeroPosition[1], (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[2] + ZeroPosition[2] );
+-			s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[0] + 0.2 + ZeroPosition[0], (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[1] + ZeroPosition[1], (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[2] + ZeroPosition[2] );
+-			s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[0] - 0.2 + ZeroPosition[0], (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[1] + ZeroPosition[1], (*olsr_con)-&gt;left_olsr_node-&gt;pos_vec[2] + ZeroPosition[2] );
++			/* HNA */
++			if ( (*olsr_con)-&gt;left_etx == -1000.00 ) {
++
++				s3d_push_material( (*olsr_con)-&gt;obj_id,
++							   0.0,0.0,1.0,
++							   0.0,0.0,1.0,
++							   0.0,0.0,1.0);
+ 	
+-			s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[0] + ZeroPosition[0], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[1]+ ZeroPosition[1], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[2] + ZeroPosition[2] );
+-			s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[0] + ZeroPosition[0], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[1]+ 0.2 + ZeroPosition[1], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[2] + ZeroPosition[2] );
+-			s3d_push_vertex( (*olsr_con)-&gt;obj_id, (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[0] + ZeroPosition[0], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[1]- 0.2 + ZeroPosition[1], (*olsr_con)-&gt;right_olsr_node-&gt;pos_vec[2] + ZeroPosition[2] );
+-	
+-			if ( ColorSwitch ) {
+-	
+-				/* HNA */
+-				if ( (*olsr_con)-&gt;left_etx == -1000.00 ) {
+-	
++			} else {
++
++				etx = ( ( ( (*olsr_con)-&gt;left_etx + (*olsr_con)-&gt;right_etx ) / 2.0 ) - 10.0 ) * 10.0;
++
++				if ( ( etx &gt;= 1.0 ) &amp;&amp; ( etx &lt; 2.0 ) ) {
++
++					rgb = etx - 1.0;
+ 					s3d_push_material( (*olsr_con)-&gt;obj_id,
+-								   0.0,0.0,1.0,
+-								   0.0,0.0,1.0,
+-								   0.0,0.0,1.0);
+-	
++								rgb,1.0,0.0,
++								rgb,1.0,0.0,
++								rgb,1.0,0.0);
++
++				} else if ( ( etx &gt;= 2.0 ) &amp;&amp; ( etx &lt; 3.0 ) ) {
++
++					rgb = 3.0 - etx;
++					s3d_push_material( (*olsr_con)-&gt;obj_id,
++								1.0,rgb,0.0,
++								1.0,rgb,0.0,
++								1.0,rgb,0.0);
++
+ 				} else {
+-	
+-					etx = ( ( ( (*olsr_con)-&gt;left_etx + (*olsr_con)-&gt;right_etx ) / 2.0 ) - 10.0 ) * 10.0;
+-	
+-					if ( ( etx &gt;= 1.0 ) &amp;&amp; ( etx &lt; 2.0 ) ) {
+-	
+-						rgb = etx - 1.0;
+-						s3d_push_material( (*olsr_con)-&gt;obj_id,
+-									rgb,1.0,0.0,
+-									rgb,1.0,0.0,
+-									rgb,1.0,0.0);
+-	
+-					} else if ( ( etx &gt;= 2.0 ) &amp;&amp; ( etx &lt; 3.0 ) ) {
+-	
+-						rgb = 3.0 - etx;
+-						s3d_push_material( (*olsr_con)-&gt;obj_id,
+-									1.0,rgb,0.0,
+-									1.0,rgb,0.0,
+-									1.0,rgb,0.0);
+-	
+-					} else {
+-	
+-						s3d_push_material( (*olsr_con)-&gt;obj_id,
+-									1.0,0.0,0.0,
+-									1.0,0.0,0.0,
+-									1.0,0.0,0.0);
+-	
+-					}
+-	
++
++					s3d_push_material( (*olsr_con)-&gt;obj_id,
++								1.0,0.0,0.0,
++								1.0,0.0,0.0,
++								1.0,0.0,0.0);
++
+ 				}
+-	
+-			} else {
+-	
+-				s3d_push_material( (*olsr_con)-&gt;obj_id,
+-							1.0,1.0,1.0,
+-							1.0,1.0,1.0,
+-							1.0,1.0,1.0);
+-	
++
+ 			}
++
++		} else {
++
++			s3d_push_material( (*olsr_con)-&gt;obj_id,
++						1.0,1.0,1.0,
++						1.0,1.0,1.0,
++						1.0,1.0,1.0);
+ 	
+-			s3d_push_polygon( (*olsr_con)-&gt;obj_id, 0,4,5,0 );
+-			s3d_push_polygon( (*olsr_con)-&gt;obj_id, 3,1,2,0 );
+ 		}
++	
++		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 0,4,5,0 );
++		s3d_push_polygon( (*olsr_con)-&gt;obj_id, 3,1,2,0 );
++
+ 		olsr_con = &amp;(*olsr_con)-&gt;next_olsr_con;
+ 
+ 	}
+
+Modified: trunk/apps/olsrs3d/olsrs3d.h
+===================================================================
+--- trunk/apps/olsrs3d/olsrs3d.h	2006-02-27 16:54:40 UTC (rev 113)
++++ trunk/apps/olsrs3d/olsrs3d.h	2006-02-27 17:03:50 UTC (rev 114)
+@@ -15,7 +15,6 @@
+ 	struct olsr_node *right_olsr_node;   /* pointer to right end point of the connection */
+ 	float left_etx;   /* etx of left olsr node */
+ 	float right_etx;   /* etx of right olsr node */
+-	int visible;   /* is this connection visible or vanished */
+ 	int obj_id;   /* id of connection object in s3d */
+ 
+ };
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000109.html">[S3d-svn] r113 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000111.html">[S3d-svn] r115 - trunk/apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#110">[ date ]</a>
+              <a href="thread.html#110">[ thread ]</a>
+              <a href="subject.html#110">[ subject ]</a>
+              <a href="author.html#110">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

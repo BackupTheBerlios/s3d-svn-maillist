@@ -1,0 +1,309 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r992 - in trunk/Documentation: . manpages/man3
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r992%20-%20in%20trunk/Documentation%3A%20.%20manpages/man3&In-Reply-To=%3C200809042336.m84Na905006379%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000971.html">
+   <LINK REL="Next"  HREF="000973.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r992 - in trunk/Documentation: . manpages/man3</H1>
+    <B>lazhur at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r992%20-%20in%20trunk/Documentation%3A%20.%20manpages/man3&In-Reply-To=%3C200809042336.m84Na905006379%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r992 - in trunk/Documentation: . manpages/man3">lazhur at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep  5 01:36:09 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000971.html">[S3d-svn] r991 - in trunk: Documentation/libs3d	Documentation/manpages/man3 libs3d
+</A></li>
+        <LI>Next message: <A HREF="000973.html">[S3d-svn] r993 - trunk/Documentation
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#972">[ date ]</a>
+              <a href="thread.html#972">[ thread ]</a>
+              <a href="subject.html#972">[ subject ]</a>
+              <a href="author.html#972">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: lazhur
+Date: 2008-09-05 01:36:09 +0200 (Fri, 05 Sep 2008)
+New Revision: 992
+
+Modified:
+   trunk/Documentation/extractdefinitions.py
+   trunk/Documentation/manpages/man3/s3d_net_check.3
+   trunk/Documentation/manpages/man3/s3d_new_object.3
+   trunk/Documentation/manpages/man3/s3d_pop_event.3
+   trunk/Documentation/manpages/man3/s3d_process_stack.3
+   trunk/Documentation/manpages/man3/s3d_quit.3
+   trunk/Documentation/manpages/man3/s3d_usage.3
+   trunk/Documentation/manpages/man3/s3dw_ani_mate.3
+   trunk/Documentation/manpages/man3/s3dw_getroot.3
+Log:
+Mark functions without parameters as &lt;void&gt; for manpages
+
+Modified: trunk/Documentation/extractdefinitions.py
+===================================================================
+--- trunk/Documentation/extractdefinitions.py	2008-09-04 23:36:02 UTC (rev 991)
++++ trunk/Documentation/extractdefinitions.py	2008-09-04 23:36:09 UTC (rev 992)
+@@ -4,6 +4,7 @@
+ import xml.dom.minidom
+ from xml.dom.minidom import Node
+ import os
++import re
+ 
+ class Callable:
+     def __init__(self, func):
+@@ -62,6 +63,10 @@
+ 	while new_str[0] in ['_']:
+ 		new_str = new_str[1:]
+ 	return new_str
++
++def filter_xmldirectclosed(xml):
++	p = re.compile('&lt;([^&lt;&gt;]+)\s*/&gt;')
++	return p.sub(r'&lt;\1&gt;', xml)
+ 	
+ 
+ &quot;&quot;&quot;
+@@ -76,7 +81,6 @@
+ 			t += get_text(node)
+ 	return t
+ 
+-
+ class detaileddescription:
+ 	t = []
+ 
+@@ -186,6 +190,12 @@
+ 		if self.param['array'] != '':
+ 			create_append_text(paramdef, self.param['array'])
+ 
++	def is_void(self):
++		if self.param['type'] == 'void' and self.param['declname'] == '':
++			return 1
++		else:
++			return 0
++
+ class struct_element:
+ 	def __init__(self, node):
+ 		self.element = {'type': '', 'name' : '', 'help': []}
+@@ -343,7 +353,8 @@
+ 		func_file = open(name+'/functions.docbook', &quot;w&quot;)
+ 		for func in functionlist:
+ 			sgml = docbook_functions.generate_sgml(func, synopsis)
+-			sgml.writexml(func_file)
++			cleanml = filter_xmldirectclosed(sgml.toxml())
++			func_file.write(cleanml)
+ 		func_file.close()
+ 
+ 	&quot;&quot;&quot;
+@@ -393,7 +404,8 @@
+ 		struct_file = open(name+'/structs.docbook', &quot;w&quot;)
+ 		for struct in structlist:
+ 			sgml = docbook_structs.generate_sgml(struct)
+-			sgml.writexml(struct_file)
++			cleanml = filter_xmldirectclosed(sgml.toxml())
++			struct_file.write(cleanml)
+ 		struct_file.close()
+ 
+ 	&quot;&quot;&quot;
+@@ -440,7 +452,8 @@
+ 		typedef_file = open(name+'/typedefs.docbook', &quot;w&quot;)
+ 		for typedef in typedeflist:
+ 			sgml = docbook_typedefs.generate_sgml(typedef)
+-			sgml.writexml(typedef_file)
++			cleanml = filter_xmldirectclosed(sgml.toxml())
++			typedef_file.write(cleanml)
+ 		typedef_file.close()
+ 
+ 	&quot;&quot;&quot;
+@@ -504,7 +517,8 @@
+ 			func_file = open('./manpages/man3/'+cleanup_stringbegin(func['name'])+'.sgml', &quot;w&quot;)
+ 			func_file.write('&lt;!DOCTYPE refentry PUBLIC &quot;-//OASIS//DTD DocBook V4.1//EN&quot;&gt;\n')
+ 			sgml = manpage_functions.generate_sgml(func, synopsis)
+-			sgml.writexml(func_file)
++			cleanml = filter_xmldirectclosed(sgml.toxml())
++			func_file.write(cleanml)
+ 			func_file.close()
+ 
+ 	&quot;&quot;&quot;
+@@ -525,10 +539,12 @@
+ 		create_append_text(func, function['name'])
+ 
+ 		# add parameter to function definition
+-		
+ 		param_num = len(function['param'])
+-		for i in range(0, param_num):
+-			function['param'][i].dom_append(funcprototype, &quot;\t&quot;)
++		if param_num == 1 and function['param'][0].is_void():
++			void = create_append(funcprototype, 'void')
++		else:
++			for i in range(0, param_num):
++				function['param'][i].dom_append(funcprototype, &quot;\t&quot;)
+ 
+ 		# add help to function
+ 		refsect1 = create_append(refentry, 'refsect1')
+@@ -551,7 +567,8 @@
+ 			func_file = open('./manpages/man9/'+cleanup_stringbegin(func['name'])+'.sgml', &quot;w&quot;)
+ 			func_file.write('&lt;!DOCTYPE refentry PUBLIC &quot;-//OASIS//DTD DocBook V4.1//EN&quot;&gt;\n')
+ 			sgml = manpage_structs.generate_sgml(func, synopsis)
+-			sgml.writexml(func_file)
++			cleanml = filter_xmldirectclosed(sgml.toxml())
++			func_file.write(cleanml)
+ 			func_file.close()
+ 
+ 	&quot;&quot;&quot;
+
+Modified: trunk/Documentation/manpages/man3/s3d_net_check.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_net_check.3	2008-09-04 23:36:02 UTC (rev 991)
++++ trunk/Documentation/manpages/man3/s3d_net_check.3	2008-09-04 23:36:09 UTC (rev 992)
+@@ -6,8 +6,7 @@
+ .nf 
+ #include &lt;s3d.h&gt; 
+ .sp 1 
+-\fBint \fBs3d_net_check\fP\fR( 
+-\fB	void\fR); 
++\fBint \fBs3d_net_check\fP\fR(\fBvoid\fR) 
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+
+Modified: trunk/Documentation/manpages/man3/s3d_new_object.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_new_object.3	2008-09-04 23:36:02 UTC (rev 991)
++++ trunk/Documentation/manpages/man3/s3d_new_object.3	2008-09-04 23:36:09 UTC (rev 992)
+@@ -6,8 +6,7 @@
+ .nf 
+ #include &lt;s3d.h&gt; 
+ .sp 1 
+-\fBint \fBs3d_new_object\fP\fR( 
+-\fB	void\fR); 
++\fBint \fBs3d_new_object\fP\fR(\fBvoid\fR) 
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+
+Modified: trunk/Documentation/manpages/man3/s3d_pop_event.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_pop_event.3	2008-09-04 23:36:02 UTC (rev 991)
++++ trunk/Documentation/manpages/man3/s3d_pop_event.3	2008-09-04 23:36:09 UTC (rev 992)
+@@ -6,8 +6,7 @@
+ .nf 
+ #include &lt;s3d.h&gt; 
+ .sp 1 
+-\fBstruct s3d_evt * \fBs3d_pop_event\fP\fR( 
+-\fB	void\fR); 
++\fBstruct s3d_evt * \fBs3d_pop_event\fP\fR(\fBvoid\fR) 
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+
+Modified: trunk/Documentation/manpages/man3/s3d_process_stack.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_process_stack.3	2008-09-04 23:36:02 UTC (rev 991)
++++ trunk/Documentation/manpages/man3/s3d_process_stack.3	2008-09-04 23:36:09 UTC (rev 992)
+@@ -6,8 +6,7 @@
+ .nf 
+ #include &lt;s3d.h&gt; 
+ .sp 1 
+-\fBvoid \fBs3d_process_stack\fP\fR( 
+-\fB	void\fR); 
++\fBvoid \fBs3d_process_stack\fP\fR(\fBvoid\fR) 
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+
+Modified: trunk/Documentation/manpages/man3/s3d_quit.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_quit.3	2008-09-04 23:36:02 UTC (rev 991)
++++ trunk/Documentation/manpages/man3/s3d_quit.3	2008-09-04 23:36:09 UTC (rev 992)
+@@ -6,8 +6,7 @@
+ .nf 
+ #include &lt;s3d.h&gt; 
+ .sp 1 
+-\fBint \fBs3d_quit\fP\fR( 
+-\fB	void\fR); 
++\fBint \fBs3d_quit\fP\fR(\fBvoid\fR) 
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+
+Modified: trunk/Documentation/manpages/man3/s3d_usage.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3d_usage.3	2008-09-04 23:36:02 UTC (rev 991)
++++ trunk/Documentation/manpages/man3/s3d_usage.3	2008-09-04 23:36:09 UTC (rev 992)
+@@ -6,8 +6,7 @@
+ .nf 
+ #include &lt;s3d.h&gt; 
+ .sp 1 
+-\fBvoid \fBs3d_usage\fP\fR( 
+-\fB	void\fR); 
++\fBvoid \fBs3d_usage\fP\fR(\fBvoid\fR) 
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_ani_mate.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_ani_mate.3	2008-09-04 23:36:02 UTC (rev 991)
++++ trunk/Documentation/manpages/man3/s3dw_ani_mate.3	2008-09-04 23:36:09 UTC (rev 992)
+@@ -6,8 +6,7 @@
+ .nf 
+ #include &lt;s3dw.h&gt; 
+ .sp 1 
+-\fBvoid \fBs3dw_ani_mate\fP\fR( 
+-\fB	void\fR); 
++\fBvoid \fBs3dw_ani_mate\fP\fR(\fBvoid\fR) 
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+
+Modified: trunk/Documentation/manpages/man3/s3dw_getroot.3
+===================================================================
+--- trunk/Documentation/manpages/man3/s3dw_getroot.3	2008-09-04 23:36:02 UTC (rev 991)
++++ trunk/Documentation/manpages/man3/s3dw_getroot.3	2008-09-04 23:36:09 UTC (rev 992)
+@@ -6,8 +6,7 @@
+ .nf 
+ #include &lt;s3dw.h&gt; 
+ .sp 1 
+-\fBs3dw_widget * \fBs3dw_getroot\fP\fR( 
+-\fB	void\fR); 
++\fBs3dw_widget * \fBs3dw_getroot\fP\fR(\fBvoid\fR) 
+ .fi 
+ .SH &quot;Description&quot; 
+ .PP 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000971.html">[S3d-svn] r991 - in trunk: Documentation/libs3d	Documentation/manpages/man3 libs3d
+</A></li>
+	<LI>Next message: <A HREF="000973.html">[S3d-svn] r993 - trunk/Documentation
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#972">[ date ]</a>
+              <a href="thread.html#972">[ thread ]</a>
+              <a href="subject.html#972">[ subject ]</a>
+              <a href="author.html#972">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

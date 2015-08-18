@@ -1,0 +1,347 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r127 - in trunk: . apps/dot_mcp apps/s3d_x11gate apps/s3dgps apps/s3dvt
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r127%20-%20in%20trunk%3A%20.%20apps/dot_mcp%20apps/s3d_x11gate%20apps/s3dgps%20apps/s3dvt&In-Reply-To=%3C200602272300.k1RN06Au007501%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000122.html">
+   <LINK REL="Next"  HREF="000124.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r127 - in trunk: . apps/dot_mcp apps/s3d_x11gate apps/s3dgps apps/s3dvt</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r127%20-%20in%20trunk%3A%20.%20apps/dot_mcp%20apps/s3d_x11gate%20apps/s3dgps%20apps/s3dvt&In-Reply-To=%3C200602272300.k1RN06Au007501%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r127 - in trunk: . apps/dot_mcp apps/s3d_x11gate apps/s3dgps apps/s3dvt">dotslash at berlios.de
+       </A><BR>
+    <I>Tue Feb 28 00:00:06 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000122.html">[S3d-svn] r126 - trunk/apps/olsrs3d
+</A></li>
+        <LI>Next message: <A HREF="000124.html">[S3d-svn] r128 - in trunk: . apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#123">[ date ]</a>
+              <a href="thread.html#123">[ thread ]</a>
+              <a href="subject.html#123">[ subject ]</a>
+              <a href="author.html#123">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-02-28 00:00:03 +0100 (Tue, 28 Feb 2006)
+New Revision: 127
+
+Modified:
+   trunk/
+   trunk/apps/dot_mcp/dot_mcp.h
+   trunk/apps/dot_mcp/main.c
+   trunk/apps/dot_mcp/menu.c
+   trunk/apps/s3d_x11gate/s3d_x11gate.c
+   trunk/apps/s3dgps/s3dgps.c
+   trunk/apps/s3dvt/main.c
+   trunk/apps/s3dvt/s3dvt.h
+   trunk/apps/s3dvt/terminal.c
+Log:
+ <A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">r175 at balthasar</A>:  dotslash | 2006-02-27 23:59:55 +0100
+ - Changing apps to standalone application
+
+
+
+Property changes on: trunk
+___________________________________________________________________
+Name: svk:merge
+   - bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:171
+   + bf2c72c7-850b-0410-b9e4-c1fddb578f10:/s3d-trunk:175
+
+Modified: trunk/apps/dot_mcp/dot_mcp.h
+===================================================================
+--- trunk/apps/dot_mcp/dot_mcp.h	2006-02-27 22:52:39 UTC (rev 126)
++++ trunk/apps/dot_mcp/dot_mcp.h	2006-02-27 23:00:03 UTC (rev 127)
+@@ -3,24 +3,23 @@
+  * 
+  * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+- * This file is part of s3d, a 3d network display server.
++ * This file is part of dot_mcp, a mcp for s3d.
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * s3d is free software; you can redistribute it and/or modify
++ * dot_mcp is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation; either version 2 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d is distributed in the hope that it will be useful,
++ * dot_mcp is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  * 
+  * You should have received a copy of the GNU General Public License
+- * along with s3d; if not, write to the Free Software
++ * along with dot_mcp; if not, write to the Free Software
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
+-
+ int menu_init();
+ void menu_click(int oid);
+
+Modified: trunk/apps/dot_mcp/main.c
+===================================================================
+--- trunk/apps/dot_mcp/main.c	2006-02-27 22:52:39 UTC (rev 126)
++++ trunk/apps/dot_mcp/main.c	2006-02-27 23:00:03 UTC (rev 127)
+@@ -3,21 +3,21 @@
+  * 
+  * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+- * This file is part of s3d, a 3d network display server.
++ * This file is part of dot_mcp, a mcp for s3d.
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * s3d is free software; you can redistribute it and/or modify
++ * dot_mcp is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation; either version 2 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d is distributed in the hope that it will be useful,
++ * dot_mcp is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  * 
+  * You should have received a copy of the GNU General Public License
+- * along with s3d; if not, write to the Free Software
++ * along with dot_mcp; if not, write to the Free Software
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
+
+Modified: trunk/apps/dot_mcp/menu.c
+===================================================================
+--- trunk/apps/dot_mcp/menu.c	2006-02-27 22:52:39 UTC (rev 126)
++++ trunk/apps/dot_mcp/menu.c	2006-02-27 23:00:03 UTC (rev 127)
+@@ -3,25 +3,26 @@
+  * 
+  * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+- * This file is part of s3d, a 3d network display server.
++ * This file is part of dot_mcp, a mcp for s3d.
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * s3d is free software; you can redistribute it and/or modify
++ * dot_mcp is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation; either version 2 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d is distributed in the hope that it will be useful,
++ * dot_mcp is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  * 
+  * You should have received a copy of the GNU General Public License
+- * along with s3d; if not, write to the Free Software
++ * along with dot_mcp; if not, write to the Free Software
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
+ 
++
+ #include &quot;s3d.h&quot;
+ #include &quot;dot_mcp.h&quot;
+ #include &lt;unistd.h&gt; /* fork(), execl() */
+
+Modified: trunk/apps/s3d_x11gate/s3d_x11gate.c
+===================================================================
+--- trunk/apps/s3d_x11gate/s3d_x11gate.c	2006-02-27 22:52:39 UTC (rev 126)
++++ trunk/apps/s3d_x11gate/s3d_x11gate.c	2006-02-27 23:00:03 UTC (rev 127)
+@@ -3,21 +3,21 @@
+  * 
+  * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+- * This file is part of s3d, a 3d network display server.
++ * This file is part of s3d_x11gate, a 3d gateway for x11 desktops.
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * s3d is free software; you can redistribute it and/or modify
++ * s3d_x11gate is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation; either version 2 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d is distributed in the hope that it will be useful,
++ * s3d_x11gate is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  * 
+  * You should have received a copy of the GNU General Public License
+- * along with s3d; if not, write to the Free Software
++ * along with s3d_x11gate; if not, write to the Free Software
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
+
+Modified: trunk/apps/s3dgps/s3dgps.c
+===================================================================
+--- trunk/apps/s3dgps/s3dgps.c	2006-02-27 22:52:39 UTC (rev 126)
++++ trunk/apps/s3dgps/s3dgps.c	2006-02-27 23:00:03 UTC (rev 127)
+@@ -3,21 +3,21 @@
+  * 
+  * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  *
+- * This file is part of s3d, a 3d network display server.
++ * This file is part of s3dgps, a gps navigator for s3d.
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * s3d is free software; you can redistribute it and/or modify
++ * s3dgps is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation; either version 2 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d is distributed in the hope that it will be useful,
++ * s3dgps is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  * 
+  * You should have received a copy of the GNU General Public License
+- * along with s3d; if not, write to the Free Software
++ * along with s3dgps; if not, write to the Free Software
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
+
+Modified: trunk/apps/s3dvt/main.c
+===================================================================
+--- trunk/apps/s3dvt/main.c	2006-02-27 22:52:39 UTC (rev 126)
++++ trunk/apps/s3dvt/main.c	2006-02-27 23:00:03 UTC (rev 127)
+@@ -4,21 +4,21 @@
+  * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  * Copyright (C) 2002 Alexander Graf &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">helly at gmx.net</A>&gt;
+  *
+- * This file is part of s3d, a 3d network display server.
++ * This file is part of s3dvt, a 3d terminal emulator for s3d.
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * s3d is free software; you can redistribute it and/or modify
++ * s3dvt is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation; either version 2 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d is distributed in the hope that it will be useful,
++ * s3dvt is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  * 
+  * You should have received a copy of the GNU General Public License
+- * along with s3d; if not, write to the Free Software
++ * along with s3dvt; if not, write to the Free Software
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
+
+Modified: trunk/apps/s3dvt/s3dvt.h
+===================================================================
+--- trunk/apps/s3dvt/s3dvt.h	2006-02-27 22:52:39 UTC (rev 126)
++++ trunk/apps/s3dvt/s3dvt.h	2006-02-27 23:00:03 UTC (rev 127)
+@@ -4,25 +4,24 @@
+  * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  * Copyright (C) 2002 Alexander Graf &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">helly at gmx.net</A>&gt;
+  *
+- * This file is part of s3d, a 3d network display server.
++ * This file is part of s3dvt, a 3d terminal emulator for s3d.
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * s3d is free software; you can redistribute it and/or modify
++ * s3dvt is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation; either version 2 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d is distributed in the hope that it will be useful,
++ * s3dvt is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  * 
+  * You should have received a copy of the GNU General Public License
+- * along with s3d; if not, write to the Free Software
++ * along with s3dvt; if not, write to the Free Software
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
+-
+ #define MAX_LINES	50
+ #define MAX_CHARS	80
+ #define DEFAULT_FGCOLOR 2
+
+Modified: trunk/apps/s3dvt/terminal.c
+===================================================================
+--- trunk/apps/s3dvt/terminal.c	2006-02-27 22:52:39 UTC (rev 126)
++++ trunk/apps/s3dvt/terminal.c	2006-02-27 23:00:03 UTC (rev 127)
+@@ -4,21 +4,21 @@
+  * Copyright (C) 2004-2006 Simon Wunderlich &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">dotslash at packetmixer.de</A>&gt;
+  * Copyright (C) 2002 Alexander Graf &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/s3d-svn">helly at gmx.net</A>&gt;
+  *
+- * This file is part of s3d, a 3d network display server.
++ * This file is part of s3dvt, a 3d terminal emulator for s3d.
+  * See <A HREF="http://s3d.berlios.de/">http://s3d.berlios.de/</A> for more updates.
+  * 
+- * s3d is free software; you can redistribute it and/or modify
++ * s3dvt is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation; either version 2 of the License, or
+  * (at your option) any later version.
+  * 
+- * s3d is distributed in the hope that it will be useful,
++ * s3dvt is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  * 
+  * You should have received a copy of the GNU General Public License
+- * along with s3d; if not, write to the Free Software
++ * along with s3dvt; if not, write to the Free Software
+  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  */
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000122.html">[S3d-svn] r126 - trunk/apps/olsrs3d
+</A></li>
+	<LI>Next message: <A HREF="000124.html">[S3d-svn] r128 - in trunk: . apps/olsrs3d
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#123">[ date ]</a>
+              <a href="thread.html#123">[ thread ]</a>
+              <a href="subject.html#123">[ subject ]</a>
+              <a href="author.html#123">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>

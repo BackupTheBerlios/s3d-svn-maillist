@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [S3d-svn] r569 - trunk/apps/s3dosm
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/s3d-svn/2006-December/index.html" >
+   <LINK REL="made" HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r569%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200612272026.kBRKQqP5022399%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000560.html">
+   <LINK REL="Next"  HREF="000562.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[S3d-svn] r569 - trunk/apps/s3dosm</H1>
+    <B>dotslash at BerliOS</B> 
+    <A HREF="mailto:s3d-svn%40lists.berlios.de?Subject=Re%3A%20%5BS3d-svn%5D%20r569%20-%20trunk/apps/s3dosm&In-Reply-To=%3C200612272026.kBRKQqP5022399%40sheep.berlios.de%3E"
+       TITLE="[S3d-svn] r569 - trunk/apps/s3dosm">dotslash at mail.berlios.de
+       </A><BR>
+    <I>Wed Dec 27 21:26:52 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000560.html">[S3d-svn] r568 - trunk/apps/s3dosm
+</A></li>
+        <LI>Next message: <A HREF="000562.html">[S3d-svn] r570 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#561">[ date ]</a>
+              <a href="thread.html#561">[ thread ]</a>
+              <a href="subject.html#561">[ subject ]</a>
+              <a href="author.html#561">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: dotslash
+Date: 2006-12-27 21:26:52 +0100 (Wed, 27 Dec 2006)
+New Revision: 569
+
+Modified:
+   trunk/apps/s3dosm/net.c
+Log:
+- more verbosity for olsr-part when failing
+
+Modified: trunk/apps/s3dosm/net.c
+===================================================================
+--- trunk/apps/s3dosm/net.c	2006-12-27 20:15:35 UTC (rev 568)
++++ trunk/apps/s3dosm/net.c	2006-12-27 20:26:52 UTC (rev 569)
+@@ -48,11 +48,13 @@
+     struct sockaddr_in their_addr; /* connector's address information  */
+ 
+     if ((he=gethostbyname(host)) == NULL) {  /* get the host info  */
++		fprintf(stderr,&quot;Can't connect to host %s\n&quot;,host);
+         herror(&quot;olsr_net:gethostbyname&quot;);
+         return(1);
+     }
+ 
+     if ((sockfd = socket(PF_INET, SOCK_STREAM, 0)) == -1) {
++		fprintf(stderr,&quot;Can't connect to host %s\n&quot;,host);
+         perror(&quot;olsr_net:socket&quot;);
+         return(1);
+     }
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000560.html">[S3d-svn] r568 - trunk/apps/s3dosm
+</A></li>
+	<LI>Next message: <A HREF="000562.html">[S3d-svn] r570 - trunk/apps/s3dosm
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#561">[ date ]</a>
+              <a href="thread.html#561">[ thread ]</a>
+              <a href="subject.html#561">[ subject ]</a>
+              <a href="author.html#561">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/s3d-svn">More information about the S3d-svn
+mailing list</a><br>
+</body></html>
